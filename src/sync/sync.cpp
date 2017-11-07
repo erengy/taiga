@@ -242,6 +242,7 @@ bool AddServiceDataToRequest(Request& request, int id) {
 
   add_data(kMyAnimeList);
   add_data(kKitsu);
+  add_data(kAniList);
 
   return true;
 }

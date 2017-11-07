@@ -383,6 +383,7 @@ void PageMyInfo::Refresh(int anime_id) {
       edit.SetText(anime_item->GetMyTags());
       break;
     case sync::kKitsu:
+    case sync::kAniList:
       SetDlgItemText(IDC_STATIC_TAGSNOTES, L"Notes:");
       edit.SetCueBannerText(L"Enter your notes about this anime");
       edit.SetText(anime_item->GetMyNotes());
@@ -501,6 +502,7 @@ bool PageMyInfo::Save() {
       history_item.tags = GetDlgItemText(IDC_EDIT_ANIME_TAGS);
       break;
     case sync::kKitsu:
+    case sync::kAniList:
       history_item.notes = GetDlgItemText(IDC_EDIT_ANIME_TAGS);
       break;
   }

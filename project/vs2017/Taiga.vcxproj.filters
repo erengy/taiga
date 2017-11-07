@@ -73,6 +73,9 @@
     <Filter Include="library\anime">
       <UniqueIdentifier>{d6043b6b-33fb-470e-bab4-28380104489e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="sync\anilist">
+      <UniqueIdentifier>{b390951c-cbaf-4d02-871d-563957f7080e}</UniqueIdentifier>
+    </Filter>
     <Filter Include="sync\kitsu">
       <UniqueIdentifier>{4eb462d7-7759-463c-99cf-e34daf381970}</UniqueIdentifier>
     </Filter>
@@ -420,6 +423,12 @@
     </ClCompile>
     <ClCompile Include="..\..\src\sync\sync.cpp">
       <Filter>sync</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\sync\anilist.cpp">
+      <Filter>sync\anilist</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\sync\anilist_util.cpp">
+      <Filter>sync\anilist</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\sync\kitsu.cpp">
       <Filter>sync\kitsu</Filter>
@@ -908,6 +917,12 @@
     </ClInclude>
     <ClInclude Include="..\..\src\sync\sync.h">
       <Filter>sync</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\sync\anilist.h">
+      <Filter>sync\anilist</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\sync\anilist_util.h">
+      <Filter>sync\anilist</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\sync\kitsu.h">
       <Filter>sync\kitsu</Filter>

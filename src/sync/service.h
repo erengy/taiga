@@ -33,7 +33,8 @@ enum ServiceId {
   kFirstService = 1,
   kMyAnimeList = 1,
   kKitsu = 2,
-  kLastService = 2
+  kAniList = 3,
+  kLastService = 3
 };
 
 enum RequestType {

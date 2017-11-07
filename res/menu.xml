@@ -24,8 +24,14 @@
 	<menu name="Services">
 		<item name="Synchronize list&#9;Ctrl+S" action="Synchronize()"/>
 		<item type="separator"/>
+		<item name="AniList" sub="AniList"/>
 		<item name="Kitsu" sub="Kitsu"/>
 		<item name="MyAnimeList" sub="MyAnimeList"/>
+	</menu>
+	<!-- AniList -->
+	<menu name="AniList">
+		<item name="Go to my profile" action="AniListViewProfile()"/>
+		<item name="Go to my stats"   action="AniListViewStats()"/>
 	</menu>
 	<!-- Kitsu -->
 	<menu name="Kitsu">

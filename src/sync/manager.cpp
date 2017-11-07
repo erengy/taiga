@@ -22,6 +22,7 @@
 #include "library/discover.h"
 #include "library/history.h"
 #include "library/resource.h"
+#include "sync/anilist.h"
 #include "sync/kitsu.h"
 #include "sync/manager.h"
 #include "sync/myanimelist.h"
@@ -39,6 +40,7 @@ Manager::Manager() {
   // Create services
   services_[kMyAnimeList].reset(new myanimelist::Service());
   services_[kKitsu].reset(new kitsu::Service());
+  services_[kAniList].reset(new anilist::Service());
 }
 
 Manager::~Manager() {
