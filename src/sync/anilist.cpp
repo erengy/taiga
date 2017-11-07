@@ -168,7 +168,28 @@ void Service::GetSeason(Request& request, HttpRequest& http_request) {
 }
 
 void Service::SearchTitle(Request& request, HttpRequest& http_request) {
-  // TODO
+  static const auto query{LR"(
+query ($query: String) {
+  Page {
+    media(search: $query, type: ANIME) {
+      {mediaFields}
+    }
+  }
+})"
+  };
+
+  const Json json{
+    {
+      "query", ExpandQuery(query)
+    },
+    {
+      "variables", {
+        {"query", WstrToStr(request.data[L"title"])},
+      }
+    }
+  };
+
+  http_request.body = StrToWstr(json.dump());
 }
 
 void Service::AddLibraryEntry(Request& request, HttpRequest& http_request) {
@@ -218,7 +239,15 @@ void Service::GetSeason(Response& response, HttpResponse& http_response) {
 }
 
 void Service::SearchTitle(Response& response, HttpResponse& http_response) {
-  // TODO
+  Json root;
+
+  if (!ParseResponseBody(http_response.body, response, root))
+    return;
+
+  for (const auto& media : root["data"]["Page"]["media"]) {
+    const auto anime_id = ParseMediaObject(media);
+    AppendString(response.data[L"ids"], ToWstr(anime_id), L",");
+  }
 }
 
 void Service::AddLibraryEntry(Response& response, HttpResponse& http_response) {
