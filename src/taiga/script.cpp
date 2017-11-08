@@ -23,6 +23,7 @@
 #include "library/anime_db.h"
 #include "library/anime_episode.h"
 #include "library/anime_util.h"
+#include "sync/anilist_util.h"
 #include "sync/kitsu_util.h"
 #include "sync/myanimelist_util.h"
 #include "sync/sync.h"
@@ -401,6 +402,9 @@ std::wstring ReplaceVariables(std::wstring str, const anime::Episode& episode,
               break;
             case sync::kKitsu:
               REPLACE(L"animeurl", ENCODE(sync::kitsu::GetAnimePage(*anime_item)));
+              break;
+            case sync::kAniList:
+              REPLACE(L"animeurl", ENCODE(sync::anilist::GetAnimePage(*anime_item)));
               break;
           }
         } else {
