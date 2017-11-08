@@ -402,7 +402,7 @@ int Service::ParseMediaListObject(const Json& json) const {
   anime_item.SetMyNotes(StrToWstr(JsonReadStr(json, "notes")));
   anime_item.SetMyDateStart(TranslateFuzzyDateFrom(json["startedAt"]));
   anime_item.SetMyDateEnd(TranslateFuzzyDateFrom(json["completedAt"]));
-  anime_item.SetMyLastUpdated(StrToWstr(JsonReadStr(json, "updatedAt")));
+  anime_item.SetMyLastUpdated(ToWstr(JsonReadInt(json, "updatedAt")));
 
   return AnimeDatabase.UpdateItem(anime_item);
 }
