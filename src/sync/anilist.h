@@ -22,6 +22,10 @@
 #include "base/types.h"
 #include "sync/service.h"
 
+namespace anime {
+class Item;
+}
+
 namespace sync {
 namespace anilist {
 
@@ -54,6 +58,7 @@ private:
 
   int ParseMediaObject(const Json& json) const;
   int ParseMediaListObject(const Json& json) const;
+  void ParseMediaTitleObject(const Json& json, anime::Item& anime_item) const;
 
   bool ParseResponseBody(const std::wstring& body, Response& response, Json& json);
 

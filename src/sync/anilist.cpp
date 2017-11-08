@@ -350,9 +350,7 @@ int Service::ParseMediaObject(const Json& json) const {
   anime_item.SetId(ToWstr(anime_id), this->id());
   anime_item.SetLastModified(time(nullptr));  // current time
 
-  anime_item.SetTitle(StrToWstr(JsonReadStr(json["title"], "romaji")));
-  anime_item.SetEnglishTitle(StrToWstr(JsonReadStr(json["title"], "english")));
-  anime_item.SetJapaneseTitle(StrToWstr(JsonReadStr(json["title"], "native")));
+  anime_item.SetTitle(StrToWstr(JsonReadStr(json["title"], "userPreferred")));
   anime_item.SetType(TranslateSeriesTypeFrom(JsonReadStr(json, "format")));
   anime_item.SetSynopsis(DecodeDescription(JsonReadStr(json, "description")));
   anime_item.SetDateStart(TranslateFuzzyDateFrom(json["startDate"]));
@@ -362,6 +360,8 @@ int Service::ParseMediaObject(const Json& json) const {
   anime_item.SetImageUrl(StrToWstr(JsonReadStr(json["coverImage"], "large")));
   anime_item.SetScore(TranslateSeriesRatingFrom(JsonReadInt(json, "averageScore")));
   anime_item.SetPopularity(JsonReadInt(json, "popularity"));
+
+  ParseMediaTitleObject(json, anime_item);
 
   std::vector<std::wstring> genres;
   for (const auto& genre : json["genres"]) {
@@ -407,6 +407,48 @@ int Service::ParseMediaListObject(const Json& json) const {
   return AnimeDatabase.UpdateItem(anime_item);
 }
 
+void Service::ParseMediaTitleObject(const Json& json,
+                                    anime::Item& anime_item) const {
+  enum class TitleLanguage {
+    Romaji,
+    English,
+    Native,
+  };
+
+  static const std::map<std::string, TitleLanguage> title_languages{
+    {"romaji", TitleLanguage::Romaji},
+    {"english", TitleLanguage::English},
+    {"native", TitleLanguage::Native},
+  };
+
+  const auto& titles = json["title"];
+  const auto origin = StrToWstr(JsonReadStr(json, "countryOfOrigin"));
+
+  for (auto it = titles.begin(); it != titles.end(); ++it) {
+    auto language = title_languages.find(it.key());
+    if (language == title_languages.end() || !it->is_string())
+      continue;
+
+    const auto title = StrToWstr(it.value());
+
+    switch (language->second) {
+      case TitleLanguage::Romaji:
+        anime_item.SetTitle(title);
+        break;
+      case TitleLanguage::English:
+        anime_item.SetEnglishTitle(title);
+        break;
+      case TitleLanguage::Native:
+        if (IsEqual(origin, L"JP")) {
+          anime_item.SetJapaneseTitle(title);
+        } else if (!origin.empty()) {
+          anime_item.InsertSynonym(title);
+        }
+        break;
+    }
+  }
+}
+
 bool Service::ParseResponseBody(const std::wstring& body,
                                 Response& response, Json& json) {
   if (JsonParseString(body, json))
@@ -442,7 +484,7 @@ std::string Service::ExpandQuery(std::wstring query) const {
 
 std::wstring Service::GetMediaFields() const {
   return LR"(id
-title { romaji english native }
+title { romaji english native userPreferred }
 format
 description
 startDate { year month day }
