@@ -29,6 +29,7 @@
 #include "library/anime_episode.h"
 #include "library/anime_util.h"
 #include "library/history.h"
+#include "sync/anilist_util.h"
 #include "sync/kitsu_util.h"
 #include "sync/myanimelist_util.h"
 #include "sync/sync.h"
@@ -986,9 +987,10 @@ std::wstring TranslateScore(double value) {
     default:
     case sync::kMyAnimeList:
       return ToWstr(value, 2);
-
     case sync::kKitsu:
       return ToWstr(sync::kitsu::TranslateSeriesRatingTo(value), 2) + L"%";
+    case sync::kAniList:
+      return ToWstr(sync::anilist::TranslateSeriesRatingTo(value), 0) + L"%";
   }
 }
 

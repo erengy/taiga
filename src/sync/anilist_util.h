@@ -35,6 +35,8 @@ std::wstring DecodeDescription(std::string text);
 
 Date TranslateFuzzyDateFrom(const Json& json);
 std::string TranslateSeasonTo(const std::wstring& value);
+double TranslateSeriesRatingFrom(int value);
+double TranslateSeriesRatingTo(double value);
 int TranslateSeriesTypeFrom(const std::string& value);
 int TranslateMyStatusFrom(const std::string& value);
 

@@ -51,6 +51,14 @@ std::string TranslateSeasonTo(const std::wstring& value) {
   return WstrToStr(ToUpper_Copy(value));
 }
 
+double TranslateSeriesRatingFrom(int value) {
+  return static_cast<double>(value) / 10.0;
+}
+
+double TranslateSeriesRatingTo(double value) {
+  return value * 10.0;
+}
+
 int TranslateSeriesTypeFrom(const std::string& value) {
   static const std::map<std::string, anime::SeriesType> table{
     {"TV", anime::kTv},
