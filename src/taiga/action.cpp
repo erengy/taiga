@@ -562,6 +562,7 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
         }
         break;
       case sync::kKitsu:
+      case sync::kAniList:
         if (SeasonDatabase.LoadSeasonFromMemory(body)) {
           Settings.Set(taiga::kApp_Seasons_LastSeason,
                        SeasonDatabase.current_season.GetString());

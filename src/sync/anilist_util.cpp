@@ -47,6 +47,10 @@ Date TranslateFuzzyDateFrom(const Json& json) {
   };
 }
 
+std::string TranslateSeasonTo(const std::wstring& value) {
+  return WstrToStr(ToUpper_Copy(value));
+}
+
 int TranslateSeriesTypeFrom(const std::string& value) {
   static const std::map<std::string, anime::SeriesType> table{
     {"TV", anime::kTv},

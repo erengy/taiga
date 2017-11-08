@@ -34,6 +34,7 @@ namespace anilist {
 std::wstring DecodeDescription(std::string text);
 
 Date TranslateFuzzyDateFrom(const Json& json);
+std::string TranslateSeasonTo(const std::wstring& value);
 int TranslateSeriesTypeFrom(const std::string& value);
 int TranslateMyStatusFrom(const std::string& value);
 

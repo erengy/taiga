@@ -273,9 +273,16 @@ bool ServiceSupportsRequestType(RequestType request_type) {
 
   switch (request_type) {
     case kGetUser:
+      switch (service_id) {
+        case sync::kKitsu:
+          return true;
+        default:
+          return false;
+      }
     case kGetSeason:
       switch (service_id) {
         case sync::kKitsu:
+        case sync::kAniList:
           return true;
         default:
           return false;

@@ -331,7 +331,8 @@ void MenuList::UpdateSeason() {
     auto season_min = SeasonDatabase.available_seasons.first;
     auto season_max = SeasonDatabase.available_seasons.second;
     switch (taiga::GetCurrentServiceId()) {
-      case sync::kKitsu: {
+      case sync::kKitsu:
+      case sync::kAniList: {
         const auto next_season = ++anime::Season(GetDate());
         season_max = std::max(season_max, next_season);
         season_min = anime::Season(anime::Season::Name::kWinter, 2010);
@@ -385,7 +386,8 @@ void MenuList::UpdateSeason() {
     // Add available seasons
     create_available_seasons(*menu, season_min, season_max);
     switch (taiga::GetCurrentServiceId()) {
-      case sync::kKitsu: {
+      case sync::kKitsu:
+      case sync::kAniList: {
         menu->CreateItem();  // separator
         for (int decade = 2000; decade >= 1960; decade -= 10) {
           std::wstring submenu_name = L"SeasonDecade" + ToWstr(decade);

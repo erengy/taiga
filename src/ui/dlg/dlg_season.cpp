@@ -96,6 +96,7 @@ BOOL SeasonDialog::OnInitDialog() {
         }
         break;
       case sync::kKitsu:
+      case sync::kAniList:
         SeasonDatabase.LoadSeasonFromMemory(last_season);
         break;
     }
@@ -132,6 +133,7 @@ BOOL SeasonDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
           RefreshData();
           break;
         case sync::kKitsu:
+        case sync::kAniList:
           GetData();
           break;
       }
@@ -439,8 +441,11 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       DRAWLINE(L"Aired:");
       DRAWLINE(L"Episodes:");
       DRAWLINE(L"Genres:");
-      if (current_service == sync::kMyAnimeList) {
-        DRAWLINE(L"Producers:");
+      switch (current_service) {
+        case sync::kMyAnimeList:
+        case sync::kAniList:
+          DRAWLINE(L"Producers:");
+          break;
       }
       DRAWLINE(L"Score:");
       DRAWLINE(L"Popularity:");
@@ -456,8 +461,11 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       DRAWLINE(text);
       DRAWLINE(anime::TranslateNumber(anime_item->GetEpisodeCount(), L"Unknown"));
       DRAWLINE(anime_item->GetGenres().empty() ? L"?" : Join(anime_item->GetGenres(), L", "));
-      if (current_service == sync::kMyAnimeList) {
-        DRAWLINE(anime_item->GetProducers().empty() ? L"?" : Join(anime_item->GetProducers(), L", "));
+      switch (current_service) {
+        case sync::kMyAnimeList:
+        case sync::kAniList:
+          DRAWLINE(anime_item->GetProducers().empty() ? L"?" : Join(anime_item->GetProducers(), L", "));
+          break;
       }
       DRAWLINE(anime::TranslateScore(anime_item->GetScore()));
       DRAWLINE(L"#" + ToWstr(anime_item->GetPopularity()));
@@ -776,6 +784,7 @@ int SeasonDialog::GetLineCount() const {
   switch (taiga::GetCurrentServiceId()) {
     default:
     case sync::kMyAnimeList:
+    case sync::kAniList:
       return 6;
     case sync::kKitsu:
       return 5;  // missing producers

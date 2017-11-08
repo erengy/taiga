@@ -164,7 +164,29 @@ query ($id: Int!) {
 }
 
 void Service::GetSeason(Request& request, HttpRequest& http_request) {
-  // TODO
+  static const auto query{LR"(
+query ($season: MediaSeason, $seasonYear: Int) {
+  Page {
+    media(season: $season, seasonYear: $seasonYear, type: ANIME) {
+      {mediaFields}
+    }
+  }
+})"
+  };
+
+  const Json json{
+    {
+      "query", ExpandQuery(query)
+    },
+    {
+      "variables", {
+        {"season", TranslateSeasonTo(request.data[L"season"])},
+        {"seasonYear", ToInt(request.data[L"year"])},
+      }
+    }
+  };
+
+  http_request.body = StrToWstr(json.dump());
 }
 
 void Service::SearchTitle(Request& request, HttpRequest& http_request) {
@@ -235,7 +257,15 @@ void Service::GetMetadataById(Response& response, HttpResponse& http_response) {
 }
 
 void Service::GetSeason(Response& response, HttpResponse& http_response) {
-  // TODO
+  Json root;
+
+  if (!ParseResponseBody(http_response.body, response, root))
+    return;
+
+  for (const auto& media : root["data"]["Page"]["media"]) {
+    const auto anime_id = ParseMediaObject(media);
+    AppendString(response.data[L"ids"], ToWstr(anime_id), L",");
+  }
 }
 
 void Service::SearchTitle(Response& response, HttpResponse& http_response) {
