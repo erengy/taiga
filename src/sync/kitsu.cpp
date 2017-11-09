@@ -69,7 +69,7 @@ void Service::BuildRequest(Request& request, HttpRequest& http_request) {
   // token, but behave differently (e.g. private library entries are included)
   // when it's provided.
   if (RequestNeedsAuthentication(request.type))
-    http_request.header[L"Authorization"] = L"Bearer " + access_token_;
+    http_request.header[L"Authorization"] = L"Bearer " + user().access_token;
 
   switch (request.type) {
     BUILD_HTTP_REQUEST(kAddLibraryEntry, AddLibraryEntry);
@@ -258,7 +258,7 @@ void Service::AuthenticateUser(Response& response, HttpResponse& http_response) 
   if (!ParseResponseBody(http_response.body, response, root))
     return;
 
-  access_token_ = StrToWstr(JsonReadStr(root, "access_token"));
+  user().access_token = StrToWstr(JsonReadStr(root, "access_token"));
 }
 
 void Service::GetUser(Response& response, HttpResponse& http_response) {
@@ -380,7 +380,7 @@ bool Service::RequestNeedsAuthentication(RequestType request_type) const {
     case kGetMetadataById:
     case kGetSeason:
     case kSearchTitle:
-      return !access_token_.empty();
+      return !user().access_token.empty();
   }
 
   return false;

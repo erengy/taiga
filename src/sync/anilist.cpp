@@ -53,7 +53,7 @@ void Service::BuildRequest(Request& request, HttpRequest& http_request) {
   http_request.header[L"Content-Type"] = L"application/json";
 
   if (RequestNeedsAuthentication(request.type))
-    http_request.header[L"Authorization"] = L"Bearer " + access_token_;
+    http_request.header[L"Authorization"] = L"Bearer " + user().access_token;
 
   switch (request.type) {
     BUILD_HTTP_REQUEST(kAddLibraryEntry, AddLibraryEntry);

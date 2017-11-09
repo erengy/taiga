@@ -65,8 +65,6 @@ private:
   bool ParseResponseBody(const std::wstring& body, Response& response, Json& json);
 
   bool IsPartialLibraryRequest() const;
-
-  string_t access_token_;
 };
 
 }  // namespace kitsu

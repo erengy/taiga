@@ -76,6 +76,7 @@ struct User {
   string_t username;
   string_t rating_system;
 
+  string_t access_token;
   bool authenticated = false;
   time_t last_synchronized = 0;
 };

@@ -65,8 +65,6 @@ private:
 
   std::string ExpandQuery(std::wstring query) const;
   std::wstring GetMediaFields() const;
-
-  string_t access_token_;
 };
 
 }  // namespace anilist
