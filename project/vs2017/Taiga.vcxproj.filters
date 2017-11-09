@@ -921,6 +921,9 @@
     <ClInclude Include="..\..\src\sync\anilist.h">
       <Filter>sync\anilist</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\sync\anilist_types.h">
+      <Filter>sync\anilist</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\src\sync\anilist_util.h">
       <Filter>sync\anilist</Filter>
     </ClInclude>

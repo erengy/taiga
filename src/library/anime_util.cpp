@@ -967,6 +967,9 @@ std::wstring TranslateMyScore(int value, const std::wstring& default_char) {
     case sync::kKitsu:
       return sync::kitsu::TranslateMyRating(
           value, sync::kitsu::GetRatingSystem());
+    case sync::kAniList:
+      return sync::anilist::TranslateMyRating(
+          value, sync::anilist::GetRatingSystem());
   }
 }
 
@@ -979,6 +982,9 @@ std::wstring TranslateMyScoreFull(int value) {
     case sync::kKitsu:
       return sync::kitsu::TranslateMyRating(
           value, sync::kitsu::GetRatingSystem());
+    case sync::kAniList:
+      return sync::anilist::TranslateMyRating(
+          value, sync::anilist::GetRatingSystem());
   }
 }
 

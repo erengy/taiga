@@ -245,6 +245,8 @@ void Service::GetLibraryEntries(Response& response, HttpResponse& http_response)
       ParseMediaListObject(value);
     }
   }
+
+  ParseUserObject(root["data"]["user"]);
 }
 
 void Service::GetMetadataById(Response& response, HttpResponse& http_response) {
@@ -447,6 +449,15 @@ void Service::ParseMediaTitleObject(const Json& json,
         break;
     }
   }
+}
+
+void Service::ParseUserObject(const Json& json) {
+  user_.id = ToWstr(JsonReadInt(json, "id"));
+  user_.username = StrToWstr(JsonReadStr(json, "name"));
+  user_.rating_system =
+      StrToWstr(JsonReadStr(json["mediaListOptions"], "scoreFormat"));
+
+  Settings.Set(taiga::kSync_Service_AniList_RatingSystem, user_.rating_system);
 }
 
 bool Service::ParseResponseBody(const std::wstring& body,

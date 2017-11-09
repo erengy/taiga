@@ -23,6 +23,7 @@
 #include "library/anime_db.h"
 #include "library/anime_util.h"
 #include "library/history.h"
+#include "sync/anilist_util.h"
 #include "sync/kitsu_util.h"
 #include "sync/myanimelist_util.h"
 #include "sync/sync.h"
@@ -360,6 +361,12 @@ void PageMyInfo::Refresh(int anime_id) {
         const auto rating_system = sync::kitsu::GetRatingSystem();
         ratings = sync::kitsu::GetMyRatings(rating_system);
         current_rating = sync::kitsu::TranslateMyRating(anime_item->GetMyScore(), rating_system);
+        break;
+      }
+      case sync::kAniList: {
+        const auto rating_system = sync::anilist::GetRatingSystem();
+        ratings = sync::anilist::GetMyRatings(rating_system);
+        current_rating = sync::anilist::TranslateMyRating(anime_item->GetMyScore(), rating_system);
         break;
       }
     }

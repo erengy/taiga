@@ -59,6 +59,7 @@ private:
   int ParseMediaObject(const Json& json) const;
   int ParseMediaListObject(const Json& json) const;
   void ParseMediaTitleObject(const Json& json, anime::Item& anime_item) const;
+  void ParseUserObject(const Json& json);
 
   bool ParseResponseBody(const std::wstring& body, Response& response, Json& json);
 

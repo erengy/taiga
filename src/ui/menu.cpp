@@ -25,9 +25,10 @@
 #include "library/anime_episode.h"
 #include "library/anime_util.h"
 #include "library/discover.h"
-#include "sync/sync.h"
+#include "sync/anilist_util.h"
 #include "sync/kitsu_util.h"
 #include "sync/myanimelist_util.h"
+#include "sync/sync.h"
 #include "taiga/settings.h"
 #include "track/feed.h"
 #include "ui/menu.h"
@@ -263,6 +264,13 @@ void MenuList::UpdateScore(const anime::Item* anime_item) {
         const auto rating_system = sync::kitsu::GetRatingSystem();
         ratings = sync::kitsu::GetMyRatings(rating_system);
         current_rating = sync::kitsu::TranslateMyRating(
+            anime_item->GetMyScore(), rating_system);
+        break;
+      }
+      case sync::kAniList: {
+        const auto rating_system = sync::anilist::GetRatingSystem();
+        ratings = sync::anilist::GetMyRatings(rating_system);
+        current_rating = sync::anilist::TranslateMyRating(
             anime_item->GetMyScore(), rating_system);
         break;
       }

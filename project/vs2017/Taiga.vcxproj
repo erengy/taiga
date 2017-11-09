@@ -383,6 +383,7 @@
     <ClInclude Include="..\..\src\library\metadata.h" />
     <ClInclude Include="..\..\src\library\resource.h" />
     <ClInclude Include="..\..\src\sync\anilist.h" />
+    <ClInclude Include="..\..\src\sync\anilist_types.h" />
     <ClInclude Include="..\..\src\sync\anilist_util.h" />
     <ClInclude Include="..\..\src\sync\kitsu.h" />
     <ClInclude Include="..\..\src\sync\kitsu_types.h" />

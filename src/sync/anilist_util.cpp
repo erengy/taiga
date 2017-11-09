@@ -25,6 +25,10 @@
 #include "base/string.h"
 #include "library/anime.h"
 #include "library/anime_db.h"
+#include "sync/anilist.h"
+#include "sync/anilist_types.h"
+#include "sync/anilist_util.h"
+#include "sync/manager.h"
 #include "taiga/settings.h"
 
 namespace sync {
@@ -36,6 +40,58 @@ std::wstring DecodeDescription(std::string text) {
   ReplaceString(str, L"<br>", L"\r\n");
   ReplaceString(str, L"\r\n\r\n\r\n", L"\r\n\r\n");
   return str;
+}
+////////////////////////////////////////////////////////////////////////////////
+
+RatingSystem GetRatingSystem() {
+  const auto& service = *ServiceManager.service(sync::kAniList);
+  return TranslateRatingSystemFrom(WstrToStr(service.user().rating_system));
+}
+
+std::vector<Rating> GetMyRatings(RatingSystem rating_system) {
+  constexpr int k = anime::kUserScoreMax / 100;
+
+  switch (rating_system) {
+    case RatingSystem::Point_100:
+      // TODO
+      break;
+    case RatingSystem::Point_10_Decimal:
+      // TODO
+      break;
+    case RatingSystem::Point_10:
+      return {
+        {  0,      L"0"},
+        { 10 * k,  L"1"},
+        { 20 * k,  L"2"},
+        { 30 * k,  L"3"},
+        { 40 * k,  L"4"},
+        { 50 * k,  L"5"},
+        { 60 * k,  L"6"},
+        { 70 * k,  L"7"},
+        { 80 * k,  L"8"},
+        { 90 * k,  L"9"},
+        {100 * k, L"10"},
+      };
+    case RatingSystem::Point_5:
+      return {
+        {  0,     L"\u2606\u2606\u2606\u2606\u2606"},
+        { 20 * k, L"\u2605\u2606\u2606\u2606\u2606"},
+        { 40 * k, L"\u2605\u2605\u2606\u2606\u2606"},
+        { 60 * k, L"\u2605\u2605\u2605\u2606\u2606"},
+        { 80 * k, L"\u2605\u2605\u2605\u2605\u2606"},
+        {100 * k, L"\u2605\u2605\u2605\u2605\u2605"},
+      };
+    case RatingSystem::Point_3:
+      // TODO
+      return {
+        {0,     L"No Score"},
+        {1 * k, L":("},
+        {2 * k, L":|"},
+        {3 * k, L":)"},
+      };
+  }
+
+  return {};
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -79,6 +135,33 @@ int TranslateSeriesTypeFrom(const std::string& value) {
   return anime::kUnknownType;
 }
 
+std::wstring TranslateMyRating(int value, RatingSystem rating_system) {
+  value = (value * 100) / anime::kUserScoreMax;
+
+  switch (rating_system) {
+    case RatingSystem::Point_100:
+      return ToWstr(value);
+    case RatingSystem::Point_10_Decimal:
+      return ToWstr(static_cast<double>(value) / 10, 1);
+    case RatingSystem::Point_10:
+      return ToWstr(value / 10);
+    case RatingSystem::Point_5:
+      value = value / 20;
+      return std::wstring(static_cast<size_t>(    value), L'\u2605') +
+             std::wstring(static_cast<size_t>(5 - value), L'\u2606');
+    case RatingSystem::Point_3:
+      switch (value % 30) {
+        default: return L"No Score";
+        case 1: return L":(";
+        case 2: return L":|";
+        case 3: return L":)";
+      }
+  }
+
+  LOGW(L"Invalid value: {}", value);
+  return ToWstr(value);
+}
+
 int TranslateMyStatusFrom(const std::string& value) {
   static const std::map<std::string, anime::MyStatus> table{
     {"CURRENT", anime::kWatching},
@@ -94,6 +177,23 @@ int TranslateMyStatusFrom(const std::string& value) {
 
   LOGW(L"Invalid value: {}", StrToWstr(value));
   return anime::kNotInList;
+}
+
+RatingSystem TranslateRatingSystemFrom(const std::string& value) {
+  static const std::map<std::string, RatingSystem> table{
+    {"POINT_100", RatingSystem::Point_100},
+    {"POINT_10_DECIMAL", RatingSystem::Point_10_Decimal},
+    {"POINT_10", RatingSystem::Point_10},
+    {"POINT_5", RatingSystem::Point_5},
+    {"POINT_3", RatingSystem::Point_3},
+  };
+
+  const auto it = table.find(value);
+  if (it != table.end())
+    return it->second;
+
+  LOGW(L"Invalid value: {}", StrToWstr(value));
+  return kDefaultRatingSystem;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
