@@ -86,7 +86,25 @@ void Service::HandleResponse(Response& response, HttpResponse& http_response) {
 // Request builders
 
 void Service::AuthenticateUser(Request& request, HttpRequest& http_request) {
-  // TODO
+  static const auto query{LR"(
+{
+  Viewer {
+    id
+    name
+    mediaListOptions {
+      scoreFormat
+    }
+  }
+})"
+  };
+
+  const Json json{
+    {
+      "query", ExpandQuery(query)
+    }
+  };
+
+  http_request.body = StrToWstr(json.dump());
 }
 
 void Service::GetLibraryEntries(Request& request, HttpRequest& http_request) {
@@ -95,13 +113,6 @@ query ($userName: String!) {
   MediaListCollection (userName: $userName, type: ANIME) {
     statusLists {
       ...mediaListFragment
-    }
-    user {
-      id
-      name
-      mediaListOptions {
-        scoreFormat
-      }
     }
   }
 }
@@ -230,7 +241,12 @@ void Service::UpdateLibraryEntry(Request& request, HttpRequest& http_request) {
 // Response handlers
 
 void Service::AuthenticateUser(Response& response, HttpResponse& http_response) {
-  // TODO
+  Json root;
+
+  if (!ParseResponseBody(http_response.body, response, root))
+    return;
+
+  ParseUserObject(root["data"]["Viewer"]);
 }
 
 void Service::GetLibraryEntries(Response& response, HttpResponse& http_response) {
@@ -245,8 +261,6 @@ void Service::GetLibraryEntries(Response& response, HttpResponse& http_response)
       ParseMediaListObject(value);
     }
   }
-
-  ParseUserObject(root["data"]["user"]);
 }
 
 void Service::GetMetadataById(Response& response, HttpResponse& http_response) {
@@ -297,7 +311,19 @@ void Service::UpdateLibraryEntry(Response& response, HttpResponse& http_response
 ////////////////////////////////////////////////////////////////////////////////
 
 bool Service::RequestNeedsAuthentication(RequestType request_type) const {
-  // TODO
+  switch (request_type) {
+    case kAuthenticateUser:
+    case kAddLibraryEntry:
+    case kDeleteLibraryEntry:
+    case kUpdateLibraryEntry:
+      return true;
+    case kGetLibraryEntries:
+    case kGetMetadataById:
+    case kGetSeason:
+    case kSearchTitle:
+      return !user().access_token.empty();
+  }
+
   return false;
 }
 

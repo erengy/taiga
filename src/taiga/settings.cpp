@@ -121,6 +121,7 @@ void AppSettings::InitializeMap() {
   INITKEY(kSync_Service_AniList_Username, nullptr, L"account/anilist/username");
   INITKEY(kSync_Service_AniList_Password, nullptr, L"account/anilist/password");
   INITKEY(kSync_Service_AniList_RatingSystem, L"POINT_10", L"account/anilist/ratingsystem");
+  INITKEY(kSync_Service_AniList_Token, nullptr, L"account/anilist/token");
   INITKEY(kSync_Service_AniList_UseHttps, L"true", L"account/anilist/https");
 
   // Library
@@ -260,6 +261,8 @@ bool AppSettings::Load() {
       GetWstr(kSync_Service_Kitsu_RatingSystem);
   ServiceManager.service(sync::kAniList)->user().rating_system =
       GetWstr(kSync_Service_AniList_RatingSystem);
+  ServiceManager.service(sync::kAniList)->user().access_token =
+      GetWstr(kSync_Service_AniList_Token);
 
   // Folders
   library_folders.clear();
