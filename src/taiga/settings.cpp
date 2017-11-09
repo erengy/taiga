@@ -255,14 +255,8 @@ bool AppSettings::Load() {
   ReadLegacyValues(settings);
 
   // Services
-  switch (taiga::GetCurrentServiceId()) {
-    case sync::kKitsu: {
-      const auto rating_system = sync::kitsu::TranslateRatingSystemFrom(
-          WstrToStr(GetWstr(kSync_Service_Kitsu_RatingSystem)));
-      sync::kitsu::SetCurrentRatingSystem(rating_system);
-      break;
-    }
-  }
+  ServiceManager.service(sync::kKitsu)->user().rating_system =
+      GetWstr(kSync_Service_Kitsu_RatingSystem);
 
   // Folders
   library_folders.clear();

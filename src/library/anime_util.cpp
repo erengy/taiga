@@ -966,7 +966,7 @@ std::wstring TranslateMyScore(int value, const std::wstring& default_char) {
       return sync::myanimelist::TranslateMyRating(value, false);
     case sync::kKitsu:
       return sync::kitsu::TranslateMyRating(
-          value, sync::kitsu::GetCurrentRatingSystem());
+          value, sync::kitsu::GetRatingSystem());
   }
 }
 
@@ -978,7 +978,7 @@ std::wstring TranslateMyScoreFull(int value) {
       return sync::myanimelist::TranslateMyRating(value, true);
     case sync::kKitsu:
       return sync::kitsu::TranslateMyRating(
-          value, sync::kitsu::GetCurrentRatingSystem());
+          value, sync::kitsu::GetRatingSystem());
   }
 }
 

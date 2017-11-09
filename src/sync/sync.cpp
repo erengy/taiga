@@ -258,12 +258,12 @@ void SetActiveServiceForRequest(Request& request) {
 
 bool UserAuthenticated() {
   auto service = taiga::GetCurrentService();
-  return service->authenticated();
+  return service->user().authenticated;
 }
 
 void InvalidateUserAuthentication() {
   auto service = taiga::GetCurrentService();
-  service->set_authenticated(false);
+  service->user().authenticated = false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

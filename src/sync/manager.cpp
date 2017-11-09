@@ -153,7 +153,7 @@ void Manager::HandleError(Response& response, HttpResponse& http_response) {
   switch (response.type) {
     case kAuthenticateUser:
     case kGetUser:
-      service.set_authenticated(false);
+      service.user().authenticated = false;
       ui::OnLogout();
       ui::ChangeStatusText(response.data[L"error"]);
       break;
@@ -222,7 +222,7 @@ void Manager::HandleResponse(Response& response, HttpResponse& http_response) {
             break;
         }
       }
-      service.set_authenticated(true);
+      service.user().authenticated = true;
       ui::OnLogin();
       if (response.service_id == kKitsu) {
         // We need to make an additional request to get the user ID
@@ -235,7 +235,7 @@ void Manager::HandleResponse(Response& response, HttpResponse& http_response) {
 
     case kGetUser: {
       ui::OnLogin();
-      if (service.authenticated()) {
+      if (service.user().authenticated) {
         Synchronize();
       } else {
         GetLibraryEntries();

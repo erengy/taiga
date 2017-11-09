@@ -71,10 +71,13 @@ public:
   dictionary_t data;
 };
 
-class User {
-public:
+struct User {
   string_t id;
   string_t username;
+  string_t rating_system;
+
+  bool authenticated = false;
+  time_t last_synchronized = 0;
 };
 
 struct Rating {
@@ -91,14 +94,13 @@ public:
   virtual void HandleResponse(Response& response, HttpResponse& http_response) = 0;
   virtual bool RequestNeedsAuthentication(RequestType request_type) const;
 
-  bool authenticated() const;
   const string_t& host() const;
   enum_t id() const;
   const string_t& canonical_name() const;
   const string_t& name() const;
-  const User& user() const;
 
-  void set_authenticated(bool authenticated);
+  User& user();
+  const User& user() const;
 
 protected:
   // API end-point
@@ -108,9 +110,7 @@ protected:
   string_t canonical_name_;
   string_t name_;
   // User information
-  bool authenticated_;
   User user_;
-  time_t last_synchronized_;
 };
 
 // Creates two overloaded functions: First one is to build a request, second

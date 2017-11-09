@@ -357,7 +357,7 @@ void PageMyInfo::Refresh(int anime_id) {
         current_rating = sync::myanimelist::TranslateMyRating(anime_item->GetMyScore(), true);
         break;
       case sync::kKitsu: {
-        const auto rating_system = sync::kitsu::GetCurrentRatingSystem();
+        const auto rating_system = sync::kitsu::GetRatingSystem();
         ratings = sync::kitsu::GetMyRatings(rating_system);
         current_rating = sync::kitsu::TranslateMyRating(anime_item->GetMyScore(), rating_system);
         break;

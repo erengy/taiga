@@ -40,5 +40,7 @@ enum class RatingSystem {
   Advanced,
 };
 
+constexpr auto kDefaultRatingSystem = RatingSystem::Regular;
+
 }  // namespace kitsu
 }  // namespace sync

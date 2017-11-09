@@ -20,7 +20,6 @@
 
 #include "base/json.h"
 #include "base/types.h"
-#include "sync/kitsu_types.h"
 #include "sync/service.h"
 
 namespace sync {
@@ -37,9 +36,6 @@ public:
   void BuildRequest(Request& request, HttpRequest& http_request);
   void HandleResponse(Response& response, HttpResponse& http_response);
   bool RequestNeedsAuthentication(RequestType request_type) const;
-
-  RatingSystem rating_system() const;
-  void set_rating_system(RatingSystem rating_system);
 
 private:
   REQUEST_AND_RESPONSE(AddLibraryEntry);
@@ -71,7 +67,6 @@ private:
   bool IsPartialLibraryRequest() const;
 
   string_t access_token_;
-  RatingSystem rating_system_ = RatingSystem::Regular;
 };
 
 }  // namespace kitsu

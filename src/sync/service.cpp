@@ -35,15 +35,11 @@ Response::Response()
 ////////////////////////////////////////////////////////////////////////////////
 
 Service::Service()
-    : authenticated_(false), id_(0), last_synchronized_(0) {
+    : id_(0) {
 }
 
 bool Service::RequestNeedsAuthentication(RequestType request_type) const {
   return false;
-}
-
-bool Service::authenticated() const {
-  return authenticated_;
 }
 
 const string_t& Service::host() const {
@@ -62,12 +58,12 @@ const string_t& Service::name() const {
   return name_;
 }
 
-const User& Service::user() const {
+User& Service::user() {
   return user_;
 }
 
-void Service::set_authenticated(bool authenticated) {
-  authenticated_ = authenticated;
+const User& Service::user() const {
+  return user_;
 }
 
 }  // namespace sync

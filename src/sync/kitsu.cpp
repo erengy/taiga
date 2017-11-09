@@ -52,14 +52,6 @@ Service::Service() {
   name_ = L"Kitsu";
 }
 
-RatingSystem Service::rating_system() const {
-  return rating_system_;
-}
-
-void Service::set_rating_system(RatingSystem rating_system) {
-  rating_system_ = rating_system;
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 
 void Service::BuildRequest(Request& request, HttpRequest& http_request) {
@@ -156,9 +148,9 @@ void Service::GetLibraryEntries(Request& request, HttpRequest& http_request) {
   // 4. Client doesn't know entry was deleted
   //
   // Our "solution" to this is to allow Taiga to download the entire library
-  // after each restart (i.e. last_synchronized_ is not saved on exit).
+  // after each restart (i.e. last_synchronized is not saved on exit).
   if (IsPartialLibraryRequest()) {
-    const auto date = GetDate(last_synchronized_ - (60 * 60 * 24));  // 1 day before, to be safe
+    const auto date = GetDate(user_.last_synchronized - (60 * 60 * 24));  // 1 day before, to be safe
     http_request.url.query[L"filter[since]"] = date.to_string();
   }
 
@@ -279,11 +271,9 @@ void Service::GetUser(Response& response, HttpResponse& http_response) {
 
   user_.id = StrToWstr(JsonReadStr(user, "id"));
   user_.username = StrToWstr(JsonReadStr(user["attributes"], "name"));
+  user_.rating_system = StrToWstr(JsonReadStr(user["attributes"], "ratingSystem"));
 
-  const auto rating_system = JsonReadStr(user["attributes"], "ratingSystem");
-  rating_system_ = TranslateRatingSystemFrom(rating_system);
-  Settings.Set(taiga::kSync_Service_Kitsu_RatingSystem,
-               StrToWstr(rating_system));
+  Settings.Set(taiga::kSync_Service_Kitsu_RatingSystem, user_.rating_system);
 }
 
 void Service::GetLibraryEntries(Response& response, HttpResponse& http_response) {
@@ -309,7 +299,7 @@ void Service::GetLibraryEntries(Response& response, HttpResponse& http_response)
   }
 
   if (!next_page) {
-    last_synchronized_ = time(nullptr);  // current time
+    user_.last_synchronized = time(nullptr);  // current time
   }
 }
 
@@ -787,7 +777,7 @@ bool Service::ParseResponseBody(const std::wstring& body,
 ////////////////////////////////////////////////////////////////////////////////
 
 bool Service::IsPartialLibraryRequest() const {
-  return last_synchronized_ &&
+  return user_.last_synchronized &&
          Settings.GetBool(taiga::kSync_Service_Kitsu_PartialLibrary);
 }
 

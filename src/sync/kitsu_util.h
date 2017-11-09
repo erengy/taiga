@@ -33,8 +33,7 @@ namespace kitsu {
 
 std::wstring DecodeSynopsis(std::string text);
 
-RatingSystem GetCurrentRatingSystem();
-void SetCurrentRatingSystem(RatingSystem rating_system);
+RatingSystem GetRatingSystem();
 std::vector<Rating> GetMyRatings(RatingSystem rating_system);
 
 int TranslateAgeRatingFrom(const std::string& value);
