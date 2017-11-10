@@ -66,6 +66,7 @@ private:
 
   std::string ExpandQuery(const std::string& query) const;
   std::wstring GetMediaFields() const;
+  std::wstring GetMediaListFields() const;
 };
 
 }  // namespace anilist

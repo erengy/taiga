@@ -112,15 +112,7 @@ query ($userName: String!) {
 }
 
 fragment mediaListFragment on MediaList {
-  id
-  status
-  score(format: POINT_100)
-  progress
-  repeat
-  notes
-  startedAt { year month day }
-  completedAt { year month day }
-  updatedAt
+  {mediaListFields}
   media {
     ...mediaFragment
   }
@@ -493,6 +485,7 @@ bool Service::ParseResponseBody(const std::wstring& body,
 std::string Service::ExpandQuery(const std::string& query) const {
   auto str = StrToWstr(query);
   ReplaceString(str, L"{mediaFields}", GetMediaFields());
+  ReplaceString(str, L"{mediaListFields}", GetMediaListFields());
   return WstrToStr(str);
 }
 
@@ -512,6 +505,18 @@ genres
 synonyms
 averageScore
 popularity)";
+}
+
+std::wstring Service::GetMediaListFields() const {
+  return LR"(id
+status
+score(format: POINT_100)
+progress
+repeat
+notes
+startedAt { year month day }
+completedAt { year month day }
+updatedAt)";
 }
 
 }  // namespace anilist
