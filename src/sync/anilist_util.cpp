@@ -104,6 +104,16 @@ Date TranslateFuzzyDateFrom(const Json& json) {
   };
 }
 
+Json TranslateFuzzyDateTo(const Date& date) {
+  Json json{{"year", nullptr}, {"month", nullptr}, {"day", nullptr}};
+
+  if (date.year()) json["year"] = date.year();
+  if (date.month()) json["month"] = date.month();
+  if (date.day()) json["day"] = date.day();
+
+  return json;
+}
+
 std::string TranslateSeasonTo(const std::wstring& value) {
   return WstrToStr(ToUpper_Copy(value));
 }
@@ -177,6 +187,19 @@ int TranslateMyStatusFrom(const std::string& value) {
 
   LOGW(L"Invalid value: {}", StrToWstr(value));
   return anime::kNotInList;
+}
+
+std::string TranslateMyStatusTo(int value) {
+  switch (value) {
+    case anime::kWatching: return "CURRENT";
+    case anime::kCompleted: return "COMPLETED";
+    case anime::kOnHold: return "PAUSED";
+    case anime::kDropped: return "DROPPED";
+    case anime::kPlanToWatch: return "PLANNING";
+  }
+
+  LOGW(L"Invalid value: {}", value);
+  return "";
 }
 
 RatingSystem TranslateRatingSystemFrom(const std::string& value) {

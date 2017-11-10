@@ -184,15 +184,27 @@ query ($query: String) {
 }
 
 void Service::AddLibraryEntry(Request& request, HttpRequest& http_request) {
-  // TODO
+  http_request.body = BuildLibraryObject(request);
 }
 
 void Service::DeleteLibraryEntry(Request& request, HttpRequest& http_request) {
-  // TODO
+  static const auto query{R"(
+mutation ($id: Int) {
+  DeleteMediaListEntry (id: $id) {
+    deleted
+  }
+})"
+  };
+
+  const Json variables{
+    {"id", ToInt(request.data[canonical_name_ + L"-library-id"])},
+  };
+
+  http_request.body = BuildRequestBody(query, variables);
 }
 
 void Service::UpdateLibraryEntry(Request& request, HttpRequest& http_request) {
-  // TODO
+  http_request.body = BuildLibraryObject(request);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -255,15 +267,20 @@ void Service::SearchTitle(Response& response, HttpResponse& http_response) {
 }
 
 void Service::AddLibraryEntry(Response& response, HttpResponse& http_response) {
-  // TODO
+  UpdateLibraryEntry(response, http_response);
 }
 
 void Service::DeleteLibraryEntry(Response& response, HttpResponse& http_response) {
-  // TODO
+  // Returns: {"data":{"DeleteMediaListEntry":{"deleted":true}}}
 }
 
 void Service::UpdateLibraryEntry(Response& response, HttpResponse& http_response) {
-  // TODO
+  Json root;
+
+  if (!ParseResponseBody(http_response.body, response, root))
+    return;
+
+  ParseMediaListObject(root["data"]["SaveMediaListEntry"]);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -319,8 +336,59 @@ bool Service::RequestSucceeded(Response& response,
 ////////////////////////////////////////////////////////////////////////////////
 
 std::wstring Service::BuildLibraryObject(Request& request) const {
-  // TODO
-  return {};
+  static const auto query{R"(
+mutation (
+    $id: Int,
+    $mediaId: Int,
+    $status: MediaListStatus,
+    $scoreRaw: Int,
+    $progress: Int,
+    $repeat: Int,
+    $notes: String,
+    $startedAt: FuzzyDateInput,
+    $completedAt: FuzzyDateInput) {
+  SaveMediaListEntry (
+      id: $id,
+      mediaId: $mediaId,
+      status: $status,
+      scoreRaw: $scoreRaw,
+      progress: $progress,
+      repeat: $repeat,
+      notes: $notes,
+      startedAt: $startedAt,
+      completedAt: $completedAt) {
+    {mediaListFields}
+    media {
+      {mediaFields}
+    }
+  }
+})"
+  };
+
+  Json variables{
+    {"mediaId", ToInt(request.data[canonical_name_ + L"-id"])},
+  };
+
+  const auto library_id = ToInt(request.data[canonical_name_ + L"-library-id"]);
+  if (library_id)
+    variables["id"] = library_id;
+
+  if (request.data.count(L"status"))
+    variables["status"] = TranslateMyStatusTo(ToInt(request.data[L"status"]));
+  if (request.data.count(L"score"))
+    variables["scoreRaw"] = ToInt(request.data[L"score"]);
+  if (request.data.count(L"episode"))
+    variables["progress"] = ToInt(request.data[L"episode"]);
+  if (request.data.count(L"rewatched_times"))
+    variables["repeat"] = ToInt(request.data[L"rewatched_times"]);
+  if (request.data.count(L"notes"))
+    variables["notes"] = WstrToStr(request.data[L"notes"]);
+  if (request.data.count(L"date_start"))
+    variables["startedAt"] = TranslateFuzzyDateTo(Date(request.data[L"date_start"]));
+  if (request.data.count(L"date_finish"))
+    variables["completedAt"] = TranslateFuzzyDateTo(Date(request.data[L"date_finish"]));
+
+  return BuildRequestBody(ExpandQuery(query), variables);
 }
 
 std::wstring Service::BuildRequestBody(const std::string& query,

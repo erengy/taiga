@@ -38,12 +38,14 @@ RatingSystem GetRatingSystem();
 std::vector<Rating> GetMyRatings(RatingSystem rating_system);
 
 Date TranslateFuzzyDateFrom(const Json& json);
+Json TranslateFuzzyDateTo(const Date& date);
 std::string TranslateSeasonTo(const std::wstring& value);
 double TranslateSeriesRatingFrom(int value);
 double TranslateSeriesRatingTo(double value);
 int TranslateSeriesTypeFrom(const std::string& value);
 std::wstring TranslateMyRating(int value, RatingSystem rating_system);
 int TranslateMyStatusFrom(const std::string& value);
+std::string TranslateMyStatusTo(int value);
 RatingSystem TranslateRatingSystemFrom(const std::string& value);
 
 std::wstring GetAnimePage(const anime::Item& anime_item);
