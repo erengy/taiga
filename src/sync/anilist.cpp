@@ -148,7 +148,7 @@ query ($id: Int!) {
 
 void Service::GetSeason(Request& request, HttpRequest& http_request) {
   static const auto query{R"(
-query ($season: MediaSeason, $seasonYear: Int) {
+query ($season: MediaSeason!, $seasonYear: Int!) {
   Page {
     media(season: $season, seasonYear: $seasonYear, type: ANIME) {
       {mediaFields}
@@ -167,7 +167,7 @@ query ($season: MediaSeason, $seasonYear: Int) {
 
 void Service::SearchTitle(Request& request, HttpRequest& http_request) {
   static const auto query{R"(
-query ($query: String) {
+query ($query: String!) {
   Page {
     media(search: $query, type: ANIME) {
       {mediaFields}
@@ -189,7 +189,7 @@ void Service::AddLibraryEntry(Request& request, HttpRequest& http_request) {
 
 void Service::DeleteLibraryEntry(Request& request, HttpRequest& http_request) {
   static const auto query{R"(
-mutation ($id: Int) {
+mutation ($id: Int!) {
   DeleteMediaListEntry (id: $id) {
     deleted
   }
