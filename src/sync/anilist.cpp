@@ -86,7 +86,7 @@ void Service::HandleResponse(Response& response, HttpResponse& http_response) {
 // Request builders
 
 void Service::AuthenticateUser(Request& request, HttpRequest& http_request) {
-  static const auto query{LR"(
+  static const auto query{R"(
 {
   Viewer {
     id
@@ -98,17 +98,11 @@ void Service::AuthenticateUser(Request& request, HttpRequest& http_request) {
 })"
   };
 
-  const Json json{
-    {
-      "query", ExpandQuery(query)
-    }
-  };
-
-  http_request.body = StrToWstr(json.dump());
+  http_request.body = BuildRequestBody(ExpandQuery(query), nullptr);
 }
 
 void Service::GetLibraryEntries(Request& request, HttpRequest& http_request) {
-  static const auto query{LR"(
+  static const auto query{R"(
 query ($userName: String!) {
   MediaListCollection (userName: $userName, type: ANIME) {
     statusLists {
@@ -137,22 +131,15 @@ fragment mediaFragment on Media {
 })"
   };
 
-  const Json json{
-    {
-      "query", ExpandQuery(query)
-    },
-    {
-      "variables", {
-        {"userName", WstrToStr(request.data[canonical_name_ + L"-username"])},
-      }
-    }
+  const Json variables{
+    {"userName", WstrToStr(request.data[canonical_name_ + L"-username"])},
   };
 
-  http_request.body = StrToWstr(json.dump());
+  http_request.body = BuildRequestBody(ExpandQuery(query), variables);
 }
 
 void Service::GetMetadataById(Request& request, HttpRequest& http_request) {
-  static const auto query{LR"(
+  static const auto query{R"(
 query ($id: Int!) {
   Media (id: $id, type: ANIME) {
     {mediaFields}
@@ -160,22 +147,15 @@ query ($id: Int!) {
 })"
   };
 
-  const Json json{
-    {
-      "query", ExpandQuery(query)
-    },
-    {
-      "variables", {
-        {"id", ToInt(request.data[canonical_name_ + L"-id"])},
-      }
-    }
+  const Json variables{
+    {"id", ToInt(request.data[canonical_name_ + L"-id"])},
   };
 
-  http_request.body = StrToWstr(json.dump());
+  http_request.body = BuildRequestBody(ExpandQuery(query), variables);
 }
 
 void Service::GetSeason(Request& request, HttpRequest& http_request) {
-  static const auto query{LR"(
+  static const auto query{R"(
 query ($season: MediaSeason, $seasonYear: Int) {
   Page {
     media(season: $season, seasonYear: $seasonYear, type: ANIME) {
@@ -185,23 +165,16 @@ query ($season: MediaSeason, $seasonYear: Int) {
 })"
   };
 
-  const Json json{
-    {
-      "query", ExpandQuery(query)
-    },
-    {
-      "variables", {
-        {"season", TranslateSeasonTo(request.data[L"season"])},
-        {"seasonYear", ToInt(request.data[L"year"])},
-      }
-    }
+  const Json variables{
+    {"season", TranslateSeasonTo(request.data[L"season"])},
+    {"seasonYear", ToInt(request.data[L"year"])},
   };
 
-  http_request.body = StrToWstr(json.dump());
+  http_request.body = BuildRequestBody(ExpandQuery(query), variables);
 }
 
 void Service::SearchTitle(Request& request, HttpRequest& http_request) {
-  static const auto query{LR"(
+  static const auto query{R"(
 query ($query: String) {
   Page {
     media(search: $query, type: ANIME) {
@@ -211,18 +184,11 @@ query ($query: String) {
 })"
   };
 
-  const Json json{
-    {
-      "query", ExpandQuery(query)
-    },
-    {
-      "variables", {
-        {"query", WstrToStr(request.data[L"title"])},
-      }
-    }
+  const Json variables{
+    {"query", WstrToStr(request.data[L"title"])},
   };
 
-  http_request.body = StrToWstr(json.dump());
+  http_request.body = BuildRequestBody(ExpandQuery(query), variables);
 }
 
 void Service::AddLibraryEntry(Request& request, HttpRequest& http_request) {
@@ -363,6 +329,16 @@ bool Service::RequestSucceeded(Response& response,
 std::wstring Service::BuildLibraryObject(Request& request) const {
   // TODO
   return {};
+}
+
+std::wstring Service::BuildRequestBody(const std::string& query,
+                                       const Json& variables) const {
+  const Json json{
+    {"query", query},
+    {"variables", variables}
+  };
+
+  return StrToWstr(json.dump());
 }
 
 int Service::ParseMediaObject(const Json& json) const {
@@ -514,9 +490,10 @@ bool Service::ParseResponseBody(const std::wstring& body,
 
 ////////////////////////////////////////////////////////////////////////////////
 
-std::string Service::ExpandQuery(std::wstring query) const {
-  ReplaceString(query, L"{mediaFields}", GetMediaFields());
-  return WstrToStr(query);
+std::string Service::ExpandQuery(const std::string& query) const {
+  auto str = StrToWstr(query);
+  ReplaceString(str, L"{mediaFields}", GetMediaFields());
+  return WstrToStr(str);
 }
 
 std::wstring Service::GetMediaFields() const {

@@ -55,6 +55,7 @@ private:
   bool RequestSucceeded(Response& response, const HttpResponse& http_response);
 
   std::wstring BuildLibraryObject(Request& request) const;
+  std::wstring BuildRequestBody(const std::string& query, const Json& variables) const;
 
   int ParseMediaObject(const Json& json) const;
   int ParseMediaListObject(const Json& json) const;
@@ -63,7 +64,7 @@ private:
 
   bool ParseResponseBody(const std::wstring& body, Response& response, Json& json);
 
-  std::string ExpandQuery(std::wstring query) const;
+  std::string ExpandQuery(const std::string& query) const;
   std::wstring GetMediaFields() const;
 };
 
