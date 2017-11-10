@@ -73,6 +73,7 @@ void SettingsDialog::SetCurrentSection(SettingsSections section) {
       tab_.InsertItem(0, L"Main", kSettingsPageServicesMain);
       tab_.InsertItem(1, L"MyAnimeList", kSettingsPageServicesMal);
       tab_.InsertItem(2, L"Kitsu", kSettingsPageServicesKitsu);
+      tab_.InsertItem(3, L"AniList", kSettingsPageServicesAniList);
       break;
     case kSettingsSectionLibrary:
       tab_.InsertItem(0, L"Folders", kSettingsPageLibraryFolders);
@@ -196,6 +197,11 @@ void SettingsDialog::OnOK() {
   if (page->IsWindow()) {
     Settings.Set(taiga::kSync_Service_Kitsu_Username, page->GetDlgItemText(IDC_EDIT_USER_KITSU));
     Settings.Set(taiga::kSync_Service_Kitsu_Password, Base64Encode(page->GetDlgItemText(IDC_EDIT_PASS_KITSU)));
+  }
+  // Services > Kitsu
+  page = &pages[kSettingsPageServicesAniList];
+  if (page->IsWindow()) {
+    Settings.Set(taiga::kSync_Service_AniList_Username, page->GetDlgItemText(IDC_EDIT_USER_ANILIST));
   }
 
   // Library > Folders

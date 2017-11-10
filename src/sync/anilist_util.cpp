@@ -204,6 +204,12 @@ std::wstring GetAnimePage(const anime::Item& anime_item) {
   return L"{}/anime/{}"_format(kBaseUrl, anime_item.GetId());
 }
 
+void RequestToken() {
+  constexpr auto kTaigaClientId = 161;
+  ExecuteLink(L"https://anilist.co/api/v2/oauth/authorize"
+              L"?client_id={}&response_type=token"_format(kTaigaClientId));
+}
+
 void ViewAnimePage(int anime_id) {
   auto anime_item = AnimeDatabase.FindItem(anime_id);
 

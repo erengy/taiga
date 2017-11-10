@@ -30,6 +30,7 @@
 #include "library/anime_db.h"
 #include "library/history.h"
 #include "library/resource.h"
+#include "sync/anilist_util.h"
 #include "sync/manager.h"
 #include "taiga/announce.h"
 #include "taiga/path.h"
@@ -73,6 +74,7 @@ void SettingsPage::Create() {
     SETRESOURCEID(kSettingsPageServicesMain, IDD_SETTINGS_SERVICES_MAIN);
     SETRESOURCEID(kSettingsPageServicesMal, IDD_SETTINGS_SERVICES_MAL);
     SETRESOURCEID(kSettingsPageServicesKitsu, IDD_SETTINGS_SERVICES_KITSU);
+    SETRESOURCEID(kSettingsPageServicesAniList, IDD_SETTINGS_SERVICES_ANILIST);
     SETRESOURCEID(kSettingsPageSharingHttp, IDD_SETTINGS_SHARING_HTTP);
     SETRESOURCEID(kSettingsPageSharingMirc, IDD_SETTINGS_SHARING_MIRC);
     SETRESOURCEID(kSettingsPageSharingSkype, IDD_SETTINGS_SHARING_SKYPE);
@@ -116,6 +118,11 @@ BOOL SettingsPage::OnInitDialog() {
     case kSettingsPageServicesKitsu: {
       SetDlgItemText(IDC_EDIT_USER_KITSU, Settings[taiga::kSync_Service_Kitsu_Username].c_str());
       SetDlgItemText(IDC_EDIT_PASS_KITSU, Base64Decode(Settings[taiga::kSync_Service_Kitsu_Password]).c_str());
+      break;
+    }
+    // Services > AniList
+    case kSettingsPageServicesAniList: {
+      SetDlgItemText(IDC_EDIT_USER_ANILIST, Settings[taiga::kSync_Service_AniList_Username].c_str());
       break;
     }
 
@@ -563,6 +570,12 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
 
         ////////////////////////////////////////////////////////////////////////
 
+        // Authorize AniList
+        case IDC_BUTTON_ANILIST_AUTH: {
+          sync::anilist::RequestToken();
+          return TRUE;
+        }
+
         // Authorize Twitter
         case IDC_BUTTON_TWITTER_AUTH: {
           Twitter.RequestToken();
@@ -820,6 +833,7 @@ LRESULT SettingsPage::OnNotify(int idCtrl, LPNMHDR pnmh) {
     case NM_RETURN: {
       switch (pnmh->idFrom) {
         // Execute link
+        case IDC_LINK_ACCOUNT_ANILIST:
         case IDC_LINK_ACCOUNT_KITSU:
         case IDC_LINK_ACCOUNT_MAL:
         case IDC_LINK_TWITTER: {

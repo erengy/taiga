@@ -31,6 +31,7 @@ enum SettingsPages {
   kSettingsPageRecognitionGeneral,
   kSettingsPageRecognitionMedia,
   kSettingsPageRecognitionStream,
+  kSettingsPageServicesAniList,
   kSettingsPageServicesKitsu,
   kSettingsPageServicesMain,
   kSettingsPageServicesMal,

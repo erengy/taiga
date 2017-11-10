@@ -47,6 +47,7 @@ int TranslateMyStatusFrom(const std::string& value);
 RatingSystem TranslateRatingSystemFrom(const std::string& value);
 
 std::wstring GetAnimePage(const anime::Item& anime_item);
+void RequestToken();
 void ViewAnimePage(int anime_id);
 void ViewProfile();
 void ViewStats();
