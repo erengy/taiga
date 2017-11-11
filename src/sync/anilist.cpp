@@ -317,6 +317,11 @@ bool Service::RequestSucceeded(Response& response,
       if (errors.is_array() && !errors.empty()) {
         const auto& error = errors.front();
         error_description = StrToWstr(JsonReadStr(error, "message"));
+        if (error.count("validation")) {
+          const auto& validation = error["validation"];
+          error_description = L"Validation error: " + StrToWstr(
+              validation.front().front().get<std::string>());
+        }
       }
     }
   }
