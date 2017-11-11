@@ -321,15 +321,9 @@ bool Service::RequestSucceeded(Response& response,
     }
   }
 
-  if (error_description.empty()) {
-    error_description = L"Unknown error (" +
-        canonical_name() + L"|" +
-        ToWstr(response.type) + L"|" +
-        ToWstr(http_response.code) + L")";
-  }
+  response.data[L"error"] = error_description;
+  HandleError(http_response, response);
 
-  response.data[L"error"] = name() + L" returned an error: " +
-                            error_description;
   return false;
 }
 

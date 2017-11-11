@@ -104,6 +104,8 @@ public:
   const User& user() const;
 
 protected:
+  void HandleError(const HttpResponse& http_response, Response& response) const;
+
   // API end-point
   string_t host_;
   // Service identifiers

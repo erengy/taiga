@@ -16,7 +16,9 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "service.h"
+#include "base/format.h"
+#include "base/http.h"
+#include "sync/service.h"
 
 namespace sync {
 
@@ -64,6 +66,21 @@ User& Service::user() {
 
 const User& Service::user() const {
   return user_;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void Service::HandleError(const HttpResponse& http_response,
+                          Response& response) const {
+  auto& error = response.data[L"error"];
+
+  if (!error.empty()) {
+    error = L"{} returned an error: {}"_format(name(), error);
+  } else {
+    error = L"{} returned an unknown error. "
+            L"Request type: {} - HTTP status code: {}"_format(
+            name(), response.type, http_response.code);
+  }
 }
 
 }  // namespace sync
