@@ -551,8 +551,13 @@ bool Service::ParseResponseBody(const std::wstring& body,
 
 std::string Service::ExpandQuery(const std::string& query) const {
   auto str = StrToWstr(query);
+
   ReplaceString(str, L"{mediaFields}", GetMediaFields());
   ReplaceString(str, L"{mediaListFields}", GetMediaListFields());
+
+  ReplaceChar(str, '\n', ' ');
+  while (ReplaceString(str, L"  ", L" "));
+
   return WstrToStr(str);
 }
 
