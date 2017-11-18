@@ -20,7 +20,6 @@
 #include <uxtheme.h>
 
 #include <windows/win/common_dialogs.h>
-#include <windows/win/version.h>
 
 #include "base/base64.h"
 #include "base/crypto.h"
@@ -201,25 +200,24 @@ BOOL SettingsPage::OnInitDialog() {
     case kSettingsPageRecognitionMedia: {
       bool enabled = Settings.GetBool(taiga::kRecognition_DetectMediaPlayers);
       CheckDlgButton(IDC_CHECK_DETECT_MEDIA_PLAYER, enabled);
-      bool header_support = win::GetVersion() >= win::kVersionVista;
       win::ListView list = GetDlgItem(IDC_LIST_MEDIA);
       list.Enable(enabled);
       list.EnableGroupView(true);
-      list.InsertColumn(0, 0, 0, 0, header_support ? L"Select/deselect all" : L"Media player");
+      list.InsertColumn(0, 0, 0, 0, L"Select/deselect all");
       list.InsertGroup(0, L"Supported media players");
       list.SetExtendedStyle(LVS_EX_CHECKBOXES | LVS_EX_DOUBLEBUFFER);
       list.SetImageList(ui::Theme.GetImageList16().GetHandle());
       list.SetTheme();
-      if (header_support) {
-        win::Window header = list.GetHeader();
-        HDITEM hdi = {0};
-        header.SetStyle(HDS_CHECKBOXES, 0);
-        hdi.mask = HDI_FORMAT;
-        Header_GetItem(header.GetWindowHandle(), 0, &hdi);
-        hdi.fmt |= HDF_CHECKBOX;
-        Header_SetItem(header.GetWindowHandle(), 0, &hdi);
-        header.SetWindowHandle(nullptr);
-      }
+
+      win::Window header = list.GetHeader();
+      HDITEM hdi = {0};
+      header.SetStyle(HDS_CHECKBOXES, 0);
+      hdi.mask = HDI_FORMAT;
+      Header_GetItem(header.GetWindowHandle(), 0, &hdi);
+      hdi.fmt |= HDF_CHECKBOX;
+      Header_SetItem(header.GetWindowHandle(), 0, &hdi);
+      header.SetWindowHandle(nullptr);
+
       for (size_t i = 0; i < MediaPlayers.items.size(); i++) {
         if (MediaPlayers.items[i].type == anisthesia::PlayerType::WebBrowser)
           continue;
@@ -235,25 +233,24 @@ BOOL SettingsPage::OnInitDialog() {
     case kSettingsPageRecognitionStream: {
       bool enabled = Settings.GetBool(taiga::kRecognition_DetectStreamingMedia);
       CheckDlgButton(IDC_CHECK_DETECT_STREAMING_MEDIA, enabled);
-      bool header_support = win::GetVersion() >= win::kVersionVista;
       win::ListView list = GetDlgItem(IDC_LIST_STREAM_PROVIDER);
       list.Enable(enabled);
       list.EnableGroupView(true);
-      list.InsertColumn(0, 0, 0, 0, header_support ? L"Select/deselect all" : L"Media provider");
+      list.InsertColumn(0, 0, 0, 0, L"Select/deselect all");
       list.InsertGroup(0, L"Supported media providers");
       list.SetExtendedStyle(LVS_EX_CHECKBOXES | LVS_EX_DOUBLEBUFFER);
       list.SetImageList(ui::Theme.GetImageList16().GetHandle());
       list.SetTheme();
-      if (header_support) {
-        win::Window header = list.GetHeader();
-        HDITEM hdi = {0};
-        header.SetStyle(HDS_CHECKBOXES, 0);
-        hdi.mask = HDI_FORMAT;
-        Header_GetItem(header.GetWindowHandle(), 0, &hdi);
-        hdi.fmt |= HDF_CHECKBOX;
-        Header_SetItem(header.GetWindowHandle(), 0, &hdi);
-        header.SetWindowHandle(nullptr);
-      }
+
+      win::Window header = list.GetHeader();
+      HDITEM hdi = {0};
+      header.SetStyle(HDS_CHECKBOXES, 0);
+      hdi.mask = HDI_FORMAT;
+      Header_GetItem(header.GetWindowHandle(), 0, &hdi);
+      hdi.fmt |= HDF_CHECKBOX;
+      Header_SetItem(header.GetWindowHandle(), 0, &hdi);
+      header.SetWindowHandle(nullptr);
+
       const auto& stream_data = track::recognition::GetStreamData();
       for (int i = 0; i < static_cast<int>(stream_data.size()); i++) {
         const auto& item = stream_data.at(i);

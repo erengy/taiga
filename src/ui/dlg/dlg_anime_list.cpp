@@ -1301,8 +1301,7 @@ void AnimeListDialog::RefreshList(int index) {
   if (!IsWindow())
     return;
 
-  bool group_view = !DlgMain.search_bar.filters.text[kSidebarItemAnimeList].empty() &&
-                    win::GetVersion() > win::kVersionXp;
+  bool group_view = !DlgMain.search_bar.filters.text[kSidebarItemAnimeList].empty();
 
   // Remember current position
   int current_position = -1;

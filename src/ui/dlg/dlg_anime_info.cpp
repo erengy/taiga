@@ -19,8 +19,6 @@
 #include <windows.h>
 #include <uxtheme.h>
 
-#include <windows/win/version.h>
-
 #include "base/foreach.h"
 #include "base/format.h"
 #include "base/string.h"
@@ -357,14 +355,11 @@ void AnimeDialog::Tab::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
                    reinterpret_cast<WPARAM>(hdc), PRF_CLIENT);
 
   HRGN region = ::CreateRectRgn(0, 0, 0, 0);
-  RECT rect, lh_corner = {0}, rh_corner = {0};
+  RECT rect;
 
   int item_count = GetItemCount();
   int current_item = GetCurrentlySelected();
   int tab_height = 0;
-
-  bool is_vista = win::GetVersion() >= win::kVersionVista;
-  bool is_themed_xp = !is_vista && ::IsThemeActive();
 
   for (int i = 0; i < item_count; ++i) {
     TabCtrl_GetItemRect(GetWindowHandle(), i, &rect);
@@ -375,44 +370,19 @@ void AnimeDialog::Tab::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
       rect.top -= 2;
       if (i == 0) {
         rect.left -= 1;
-        if (!is_themed_xp)
-          rect.right += 1;
+        rect.right += 1;
       }
       if (i == item_count - 1)
         rect.right += 1;
     } else {
       rect.right -= 1;
-      if ((is_themed_xp || is_vista) && i == item_count - 1)
+      if (i == item_count - 1)
         rect.right -= 1;
-    }
-
-    if (is_themed_xp) {
-      if (i != current_item + 1) {
-        lh_corner = rect;
-        lh_corner.bottom = lh_corner.top + 1;
-        lh_corner.right = lh_corner.left + 1;
-      }
-      rh_corner = rect;
-      rh_corner.bottom = rh_corner.top + 1;
-      rh_corner.left = rh_corner.right - 1;
     }
 
     HRGN tab_region = ::CreateRectRgn(rect.left, rect.top, rect.right, rect.bottom);
     ::CombineRgn(region, region, tab_region, RGN_OR);
     ::DeleteObject(tab_region);
-
-    if (lh_corner.right > lh_corner.left) {
-      HRGN rounded_corner = ::CreateRectRgn(
-        lh_corner.left, lh_corner.top, lh_corner.right, lh_corner.bottom);
-      ::CombineRgn(region, region, rounded_corner, RGN_DIFF);
-      ::DeleteObject(rounded_corner);
-    }
-    if (rh_corner.right > rh_corner.left) {
-      HRGN rounded_corner = ::CreateRectRgn(
-        rh_corner.left, rh_corner.top, rh_corner.right, rh_corner.bottom);
-      ::CombineRgn(region, region, rounded_corner, RGN_DIFF);
-      ::DeleteObject(rounded_corner);
-    }
   }
 
   GetClientRect(&rect);
