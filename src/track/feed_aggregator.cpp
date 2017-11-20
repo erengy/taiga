@@ -380,6 +380,8 @@ void Aggregator::HandleFeedDownloadOpen(FeedItem& feed_item,
     } else if (InStr(GetFileName(app_path), L"transmission-remote", 0, true) > -1) {
       parameters = LR"(-a "{}" -w "{}")"_format(file, download_path);
       show_command = SW_HIDE;
+    } else if (InStr(GetFileName(app_path), L"qbittorrent", 0, true) > -1) {
+      parameters = LR"(--save-path="{}" --skip-dialog=true "{}")"_format(download_path, file);
     } else {
       LOGD(L"Application is not a supported torrent client.\nPath: {}", app_path);
     }
