@@ -29,7 +29,7 @@ public:
 
 private:
   std::string ConvertSizeToString(unsigned short value);
-  unsigned short ReadSize(const std::string& str, unsigned short pos);
+  unsigned short ReadSize(const std::string& str, size_t pos);
 
   const std::string magic_string_;
   const size_t min_length_;

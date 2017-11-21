@@ -46,10 +46,13 @@ bool StringCoder::Encode(const std::wstring& metadata, const std::wstring& data,
   std::string buffer;
   buffer.append(magic_string_);
   buffer.push_back(version_);
-  buffer.append(ConvertSizeToString(converted_metadata.size()));
+  buffer.append(ConvertSizeToString(
+    static_cast<unsigned short>(converted_metadata.size())));
   buffer.append(converted_metadata);
-  buffer.append(ConvertSizeToString(compressed_data.size()));
-  buffer.append(ConvertSizeToString(converted_data.size()));
+  buffer.append(ConvertSizeToString(
+    static_cast<unsigned short>(compressed_data.size())));
+  buffer.append(ConvertSizeToString(
+    static_cast<unsigned short>(converted_data.size())));
   buffer.append(compressed_data);
 
   output = StrToWstr(Base64Encode(buffer));
@@ -111,8 +114,7 @@ std::string StringCoder::ConvertSizeToString(unsigned short value) {
   return output;
 }
 
-unsigned short StringCoder::ReadSize(const std::string& str,
-                                     unsigned short pos) {
+unsigned short StringCoder::ReadSize(const std::string& str, size_t pos) {
   unsigned short result = 0;
   size_t len = sizeof(result);
 
