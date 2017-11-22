@@ -16,8 +16,6 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <windows/win/version.h>
-
 #include "base/gfx.h"
 #include "base/string.h"
 #include "library/anime_db.h"
@@ -275,9 +273,6 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
   win::Dc hdc = pCD->nmcd.hdc;
   win::Rect rect = pCD->nmcd.rc;
 
-  if (win::GetVersion() < win::kVersionVista)
-    list_.GetSubItemRect(pCD->nmcd.dwItemSpec, pCD->iSubItem, &rect);
-
   switch (pCD->nmcd.dwDrawStage) {
     case CDDS_PREPAINT: {
       // LVN_GETEMPTYMARKUP notification is sent only once, so we paint our own
@@ -310,15 +305,8 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
         break;
 
       // Draw border
-      if (win::GetVersion() > win::kVersionXp) {
-        rect.Inflate(-4, -4);
-      }
-      if (win::GetVersion() < win::kVersionVista &&
-          pCD->nmcd.uItemState & CDIS_SELECTED) {
-        hdc.FillRect(rect, GetSysColor(COLOR_HIGHLIGHT));
-      } else {
-        hdc.FillRect(rect, ui::kColorGray);
-      }
+      rect.Inflate(-4, -4);
+      hdc.FillRect(rect, ui::kColorGray);
 
       // Draw background
       rect.Inflate(-1, -1);
