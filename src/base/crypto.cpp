@@ -47,12 +47,12 @@ bool StringCoder::Encode(const std::wstring& metadata, const std::wstring& data,
   buffer.append(magic_string_);
   buffer.push_back(version_);
   buffer.append(ConvertSizeToString(
-    static_cast<unsigned short>(converted_metadata.size())));
+      static_cast<unsigned short>(converted_metadata.size())));
   buffer.append(converted_metadata);
   buffer.append(ConvertSizeToString(
-    static_cast<unsigned short>(compressed_data.size())));
+      static_cast<unsigned short>(compressed_data.size())));
   buffer.append(ConvertSizeToString(
-    static_cast<unsigned short>(converted_data.size())));
+      static_cast<unsigned short>(converted_data.size())));
   buffer.append(compressed_data);
 
   output = StrToWstr(Base64Encode(buffer));
