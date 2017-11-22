@@ -281,6 +281,9 @@ void MainDialog::InitWindowPosition() {
 ////////////////////////////////////////////////////////////////////////////////
 
 INT_PTR MainDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+  if (SnapProc(hwnd, uMsg, wParam, lParam))
+    return TRUE;
+
   switch (uMsg) {
     // Log off / Shutdown
     case WM_ENDSESSION: {

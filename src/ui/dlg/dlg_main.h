@@ -24,6 +24,7 @@
 #include <windows/win/common_controls.h>
 #include <windows/win/dialog.h>
 #include <windows/win/gdi.h>
+#include <windows/win/snappable.h>
 
 #include "library/anime_filter.h"
 
@@ -57,7 +58,7 @@ enum SidebarItems {
   kSidebarItemFeeds
 };
 
-class MainDialog : public win::Dialog {
+class MainDialog : public win::Dialog, public win::Snappable {
 public:
   MainDialog();
   virtual ~MainDialog() {}

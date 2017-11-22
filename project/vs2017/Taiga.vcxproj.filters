@@ -268,6 +268,9 @@
     <ClCompile Include="..\..\deps\src\windows\win\resizable.cpp">
       <Filter>deps\windows</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\snappable.cpp">
+      <Filter>deps\windows</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\deps\src\windows\win\string.cpp">
       <Filter>deps\windows</Filter>
     </ClCompile>
@@ -811,6 +814,9 @@
       <Filter>deps\windows</Filter>
     </ClInclude>
     <ClInclude Include="..\..\deps\src\windows\win\resizable.h">
+      <Filter>deps\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\windows\win\snappable.h">
       <Filter>deps\windows</Filter>
     </ClInclude>
     <ClInclude Include="..\..\deps\src\windows\win\string.h">
