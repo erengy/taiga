@@ -150,18 +150,29 @@ query ($id: Int!) {
 
 void Service::GetSeason(Request& request, HttpRequest& http_request) {
   static const auto query{R"(
-query ($season: MediaSeason!, $seasonYear: Int!) {
-  Page {
-    media(season: $season, seasonYear: $seasonYear, type: ANIME) {
+query ($season: MediaSeason!, $seasonYear: Int!, $page: Int) {
+  Page(page: $page) {
+    media(season: $season, seasonYear: $seasonYear, type: ANIME, sort: START_DATE) {
       {mediaFields}
+    }
+    pageInfo {
+      total
+      perPage
+      currentPage
+      lastPage
+      hasNextPage
     }
   }
 })"
   };
 
+  const int page = request.data.count(L"page_offset") ?
+      ToInt(request.data[L"page_offset"]) : 1;
+
   const Json variables{
     {"season", TranslateSeasonTo(request.data[L"season"])},
     {"seasonYear", ToInt(request.data[L"year"])},
+    {"page", page},
   };
 
   http_request.body = BuildRequestBody(ExpandQuery(query), variables);
@@ -250,9 +261,17 @@ void Service::GetSeason(Response& response, HttpResponse& http_response) {
   if (!ParseResponseBody(http_response.body, response, root))
     return;
 
-  for (const auto& media : root["data"]["Page"]["media"]) {
+  const auto& page = root["data"]["Page"];
+
+  for (const auto& media : page["media"]) {
     const auto anime_id = ParseMediaObject(media);
     AppendString(response.data[L"ids"], ToWstr(anime_id), L",");
+  }
+
+  const auto& page_info = page["pageInfo"];
+  if (JsonReadBool(page_info, "hasNextPage")) {
+    const int current_page = JsonReadInt(page_info, "currentPage");
+    response.data[L"next_page_offset"] = ToWstr(current_page + 1);
   }
 }
 
