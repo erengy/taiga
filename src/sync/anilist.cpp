@@ -30,6 +30,8 @@
 namespace sync {
 namespace anilist {
 
+constexpr auto kRepeatingMediaListStatus = "REPEATING";
+
 Service::Service() {
   host_ = L"graphql.anilist.co";
 
@@ -372,8 +374,16 @@ mutation (
   if (library_id)
     variables["id"] = library_id;
 
+  std::string status;
   if (request.data.count(L"status"))
-    variables["status"] = TranslateMyStatusTo(ToInt(request.data[L"status"]));
+    status = TranslateMyStatusTo(ToInt(request.data[L"status"]));
+  if (request.data.count(L"enable_rewatching") &&
+      ToBool(request.data[L"enable_rewatching"])) {
+    status = kRepeatingMediaListStatus;
+  }
+  if (!status.empty())
+    variables["status"] = status;
+
   if (request.data.count(L"score"))
     variables["scoreRaw"] = ToInt(request.data[L"score"]);
   if (request.data.count(L"episode"))
@@ -458,7 +468,15 @@ int Service::ParseMediaListObject(const Json& json) const {
   anime_item.AddtoUserList();
 
   anime_item.SetMyId(ToWstr(library_id));
-  anime_item.SetMyStatus(TranslateMyStatusFrom(JsonReadStr(json, "status")));
+
+  const auto status = JsonReadStr(json, "status");
+  if (status == kRepeatingMediaListStatus) {
+    anime_item.SetMyStatus(anime::kWatching);
+    anime_item.SetMyRewatching(true);
+  } else {
+    anime_item.SetMyStatus(TranslateMyStatusFrom(status));
+  }
+
   anime_item.SetMyScore(JsonReadInt(json, "score"));
   anime_item.SetMyLastWatchedEpisode(JsonReadInt(json, "progress"));
   anime_item.SetMyRewatchedTimes(JsonReadInt(json, "repeat"));

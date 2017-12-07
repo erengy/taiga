@@ -239,14 +239,22 @@ BOOL PageMyInfo::OnCommand(WPARAM wParam, LPARAM lParam) {
         int episode_value = 0;
         spin.GetPos32(episode_value);
         if (IsDlgButtonChecked(IDC_CHECK_ANIME_REWATCH)) {
-          if (taiga::GetCurrentServiceId() == sync::kKitsu)
-            combobox.SetCurSel(anime::kWatching - 1);
+          switch (taiga::GetCurrentServiceId()) {
+            case sync::kKitsu:
+            case sync::kAniList:
+              combobox.SetCurSel(anime::kWatching - 1);
+              break;
+          }
           if (anime_item->GetMyStatus() == anime::kCompleted &&
               episode_value == anime_item->GetEpisodeCount())
             spin.SetPos32(0);
         } else {
-          if (taiga::GetCurrentServiceId() == sync::kKitsu)
-            combobox.SetCurSel(anime_item->GetMyStatus() - 1);
+          switch (taiga::GetCurrentServiceId()) {
+            case sync::kKitsu:
+            case sync::kAniList:
+              combobox.SetCurSel(anime_item->GetMyStatus() - 1);
+              break;
+          }
           if (episode_value == 0)
             spin.SetPos32(anime_item->GetMyLastWatchedEpisode());
         }
