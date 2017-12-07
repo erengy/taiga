@@ -20,6 +20,7 @@
 
 #include "base/file.h"
 #include "base/format.h"
+#include "base/html.h"
 #include "base/json.h"
 #include "base/log.h"
 #include "base/string.h"
@@ -36,11 +37,16 @@ namespace anilist {
 
 std::wstring DecodeDescription(std::string text) {
   auto str = StrToWstr(text);
+
   ReplaceString(str, L"\n", L"\r\n");
   ReplaceString(str, L"<br>", L"\r\n");
   ReplaceString(str, L"\r\n\r\n\r\n", L"\r\n\r\n");
+
+  StripHtmlTags(str);
+
   return str;
 }
+
 ////////////////////////////////////////////////////////////////////////////////
 
 RatingSystem GetRatingSystem() {
