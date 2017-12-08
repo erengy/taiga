@@ -59,10 +59,52 @@ std::vector<Rating> GetMyRatings(RatingSystem rating_system) {
 
   switch (rating_system) {
     case RatingSystem::Point_100:
-      // TODO
+      return {
+        {  0,       L"0"},
+        { 10 * k,  L"10"},
+        { 15 * k,  L"15"},
+        { 20 * k,  L"20"},
+        { 25 * k,  L"25"},
+        { 30 * k,  L"30"},
+        { 35 * k,  L"35"},
+        { 40 * k,  L"40"},
+        { 45 * k,  L"45"},
+        { 50 * k,  L"50"},
+        { 55 * k,  L"55"},
+        { 60 * k,  L"60"},
+        { 65 * k,  L"65"},
+        { 70 * k,  L"70"},
+        { 75 * k,  L"75"},
+        { 80 * k,  L"80"},
+        { 85 * k,  L"85"},
+        { 90 * k,  L"90"},
+        { 95 * k,  L"95"},
+        {100 * k, L"100"},
+      };
       break;
     case RatingSystem::Point_10_Decimal:
-      // TODO
+      return {
+        {  0,       L"0"},
+        { 10 * k, L"1.0"},
+        { 15 * k, L"1.5"},
+        { 20 * k, L"2.0"},
+        { 25 * k, L"2.5"},
+        { 30 * k, L"3.0"},
+        { 35 * k, L"3.5"},
+        { 40 * k, L"4.0"},
+        { 45 * k, L"4.5"},
+        { 50 * k, L"5.0"},
+        { 55 * k, L"5.5"},
+        { 60 * k, L"6.0"},
+        { 65 * k, L"6.5"},
+        { 70 * k, L"7.0"},
+        { 75 * k, L"7.5"},
+        { 80 * k, L"8.0"},
+        { 85 * k, L"8.5"},
+        { 90 * k, L"9.0"},
+        { 95 * k, L"9.5"},
+        {100 * k,  L"10"},
+      };
       break;
     case RatingSystem::Point_10:
       return {
@@ -80,20 +122,19 @@ std::vector<Rating> GetMyRatings(RatingSystem rating_system) {
       };
     case RatingSystem::Point_5:
       return {
-        {  0,     L"\u2606\u2606\u2606\u2606\u2606"},
-        { 20 * k, L"\u2605\u2606\u2606\u2606\u2606"},
-        { 40 * k, L"\u2605\u2605\u2606\u2606\u2606"},
-        { 60 * k, L"\u2605\u2605\u2605\u2606\u2606"},
-        { 80 * k, L"\u2605\u2605\u2605\u2605\u2606"},
-        {100 * k, L"\u2605\u2605\u2605\u2605\u2605"},
+        { 0,     L"\u2606\u2606\u2606\u2606\u2606"},
+        {10 * k, L"\u2605\u2606\u2606\u2606\u2606"},
+        {30 * k, L"\u2605\u2605\u2606\u2606\u2606"},
+        {50 * k, L"\u2605\u2605\u2605\u2606\u2606"},
+        {70 * k, L"\u2605\u2605\u2605\u2605\u2606"},
+        {90 * k, L"\u2605\u2605\u2605\u2605\u2605"},
       };
     case RatingSystem::Point_3:
-      // TODO
       return {
-        {0,     L"No Score"},
-        {1 * k, L":("},
-        {2 * k, L":|"},
-        {3 * k, L":)"},
+        { 0,     L"No Score"},
+        {35 * k, L":("},
+        {60 * k, L":|"},
+        {85 * k, L":)"},
       };
   }
 
@@ -157,16 +198,29 @@ std::wstring TranslateMyRating(int value, RatingSystem rating_system) {
   switch (rating_system) {
     case RatingSystem::Point_100:
       return ToWstr(value);
+
     case RatingSystem::Point_10_Decimal:
       return ToWstr(static_cast<double>(value) / 10, 1);
+
     case RatingSystem::Point_10:
       return ToWstr(value / 10);
+
     case RatingSystem::Point_5:
-      value = value / 20;
+      if (!value) {}
+      else if (value < 30) value = 1;
+      else if (value < 50) value = 2;
+      else if (value < 70) value = 3;
+      else if (value < 90) value = 4;
+      else value = 5;
       return std::wstring(static_cast<size_t>(    value), L'\u2605') +
              std::wstring(static_cast<size_t>(5 - value), L'\u2606');
+
     case RatingSystem::Point_3:
-      switch (value % 30) {
+      if (!value) {}
+      else if (value < 36) value = 1;
+      else if (value < 61) value = 2;
+      else value = 3;
+      switch (value) {
         default: return L"No Score";
         case 1: return L":(";
         case 2: return L":|";
