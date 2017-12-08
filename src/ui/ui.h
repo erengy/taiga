@@ -60,6 +60,7 @@ void SetSharedCursor(LPCWSTR name);
 int StatusToIcon(int status);
 
 void DisplayErrorMessage(const std::wstring& text, const std::wstring& caption);
+bool EnterAuthorizationPin(const string_t& service, string_t& auth_pin);
 
 void OnHttpError(const taiga::HttpClient& http_client, const string_t& error);
 void OnHttpHeadersAvailable(const taiga::HttpClient& http_client);

@@ -95,6 +95,21 @@ void DisplayErrorMessage(const std::wstring& text,
   MessageBox(nullptr, text.c_str(), caption.c_str(), MB_OK | MB_ICONERROR);
 }
 
+bool EnterAuthorizationPin(const string_t& service, string_t& auth_pin) {
+  InputDialog dlg;
+  dlg.title = L"{} Authorization"_format(service);
+  dlg.info = L"Please enter the PIN shown on the page after "
+             L"logging into {}:"_format(service);
+  dlg.Show();
+
+  if (dlg.result == IDOK && !dlg.text.empty()) {
+    auth_pin = dlg.text;
+    return true;
+  }
+
+  return false;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 void OnHttpError(const taiga::HttpClient& http_client, const string_t& error) {
@@ -996,19 +1011,7 @@ void OnTwitterTokenRequest(bool success) {
 
 bool OnTwitterTokenEntry(string_t& auth_pin) {
   ClearStatusText();
-
-  InputDialog dlg;
-  dlg.title = L"Twitter Authorization";
-  dlg.info = L"Please enter the PIN shown on the page after logging into "
-             L"Twitter:";
-  dlg.Show();
-
-  if (dlg.result == IDOK && !dlg.text.empty()) {
-    auth_pin = dlg.text;
-    return true;
-  }
-
-  return false;
+  return EnterAuthorizationPin(L"Twitter", auth_pin);
 }
 
 void OnTwitterAuth(bool success) {

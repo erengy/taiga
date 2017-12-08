@@ -573,6 +573,10 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
         // Authorize AniList
         case IDC_BUTTON_ANILIST_AUTH: {
           sync::anilist::RequestToken();
+          std::wstring auth_pin;
+          if (ui::EnterAuthorizationPin(L"AniList", auth_pin)) {
+            Settings.Set(taiga::kSync_Service_AniList_Token, auth_pin);
+          }
           return TRUE;
         }
 

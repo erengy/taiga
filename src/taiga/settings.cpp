@@ -119,7 +119,6 @@ void AppSettings::InitializeMap() {
   INITKEY(kSync_Service_Kitsu_RatingSystem, L"regular", L"account/kitsu/ratingsystem");
   INITKEY(kSync_Service_Kitsu_UseHttps, L"true", L"account/kitsu/https");
   INITKEY(kSync_Service_AniList_Username, nullptr, L"account/anilist/username");
-  INITKEY(kSync_Service_AniList_Password, nullptr, L"account/anilist/password");
   INITKEY(kSync_Service_AniList_RatingSystem, L"POINT_10", L"account/anilist/ratingsystem");
   INITKEY(kSync_Service_AniList_Token, nullptr, L"account/anilist/token");
   INITKEY(kSync_Service_AniList_UseHttps, L"true", L"account/anilist/https");
@@ -528,7 +527,7 @@ const std::wstring GetCurrentPassword() {
   } else if (service->id() == sync::kKitsu) {
     password = Base64Decode(Settings[kSync_Service_Kitsu_Password]);
   } else if (service->id() == sync::kAniList) {
-    password = Base64Decode(Settings[kSync_Service_AniList_Password]);
+    password = Base64Decode(Settings[kSync_Service_AniList_Token]);
   }
 
   return password;

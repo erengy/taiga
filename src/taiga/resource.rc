@@ -459,7 +459,7 @@ FONT 9, "Segoe UI", 400, 0, 0
     GROUPBOX        "Account", IDC_STATIC, 7, 7, 301, 55, 0, WS_EX_LEFT
     LTEXT           "Username: (not your email address)", IDC_STATIC, 12, 18, 141, 8, SS_LEFT, WS_EX_LEFT
     EDITTEXT        IDC_EDIT_USER_ANILIST, 12, 28, 141, 12, ES_AUTOHSCROLL, WS_EX_LEFT
-    PUSHBUTTON      "Authorize...", IDC_BUTTON_ANILIST_AUTH, 160, 26, 85, 14, 0, WS_EX_LEFT
+    PUSHBUTTON      "Authorize...", IDC_BUTTON_ANILIST_AUTH, 160, 27, 85, 14, 0, WS_EX_LEFT
     CONTROL         "<a href=""URL(https://anilist.co)"">Create a new AniList account</a>", IDC_LINK_ACCOUNT_ANILIST, "SysLink", 0x50010004, 12, 47, 141, 8, 0x00000000
 }
 
