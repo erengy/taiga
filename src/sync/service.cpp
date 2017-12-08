@@ -16,7 +16,9 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "service.h"
+#include "base/format.h"
+#include "base/http.h"
+#include "sync/service.h"
 
 namespace sync {
 
@@ -35,15 +37,11 @@ Response::Response()
 ////////////////////////////////////////////////////////////////////////////////
 
 Service::Service()
-    : authenticated_(false), id_(0), last_synchronized_(0) {
+    : id_(0) {
 }
 
 bool Service::RequestNeedsAuthentication(RequestType request_type) const {
   return false;
-}
-
-bool Service::authenticated() const {
-  return authenticated_;
 }
 
 const string_t& Service::host() const {
@@ -62,12 +60,27 @@ const string_t& Service::name() const {
   return name_;
 }
 
+User& Service::user() {
+  return user_;
+}
+
 const User& Service::user() const {
   return user_;
 }
 
-void Service::set_authenticated(bool authenticated) {
-  authenticated_ = authenticated;
+////////////////////////////////////////////////////////////////////////////////
+
+void Service::HandleError(const HttpResponse& http_response,
+                          Response& response) const {
+  auto& error = response.data[L"error"];
+
+  if (!error.empty()) {
+    error = L"{} returned an error: {}"_format(name(), error);
+  } else {
+    error = L"{} returned an unknown error. "
+            L"Request type: {} - HTTP status code: {}"_format(
+            name(), response.type, http_response.code);
+  }
 }
 
 }  // namespace sync

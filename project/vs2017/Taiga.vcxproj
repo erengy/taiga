@@ -217,6 +217,8 @@
     <ClCompile Include="..\..\src\library\metadata.cpp" />
     <ClCompile Include="..\..\src\library\resource.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />
+    <ClCompile Include="..\..\src\sync\anilist.cpp" />
+    <ClCompile Include="..\..\src\sync\anilist_util.cpp" />
     <ClCompile Include="..\..\src\sync\kitsu.cpp" />
     <ClCompile Include="..\..\src\sync\kitsu_util.cpp" />
     <ClCompile Include="..\..\src\sync\manager.cpp" />
@@ -382,6 +384,9 @@
     <ClInclude Include="..\..\src\library\history.h" />
     <ClInclude Include="..\..\src\library\metadata.h" />
     <ClInclude Include="..\..\src\library\resource.h" />
+    <ClInclude Include="..\..\src\sync\anilist.h" />
+    <ClInclude Include="..\..\src\sync\anilist_types.h" />
+    <ClInclude Include="..\..\src\sync\anilist_util.h" />
     <ClInclude Include="..\..\src\sync\kitsu.h" />
     <ClInclude Include="..\..\src\sync\kitsu_types.h" />
     <ClInclude Include="..\..\src\sync\kitsu_util.h" />

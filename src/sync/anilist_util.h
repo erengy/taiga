@@ -19,9 +19,10 @@
 #pragma once
 
 #include <string>
-#include <vector>
 
-#include "sync/kitsu_types.h"
+#include "base/json.h"
+#include "base/time.h"
+#include "sync/anilist_types.h"
 #include "sync/service.h"
 
 namespace anime {
@@ -29,32 +30,29 @@ class Item;
 }
 
 namespace sync {
-namespace kitsu {
+namespace anilist {
 
-std::wstring DecodeSynopsis(std::string text);
+std::wstring DecodeDescription(std::string text);
 
 RatingSystem GetRatingSystem();
 std::vector<Rating> GetMyRatings(RatingSystem rating_system);
 
-int TranslateAgeRatingFrom(const std::string& value);
-double TranslateSeriesRatingFrom(const std::string& value);
+Date TranslateFuzzyDateFrom(const Json& json);
+Json TranslateFuzzyDateTo(const Date& date);
+std::string TranslateSeasonTo(const std::wstring& value);
+double TranslateSeriesRatingFrom(int value);
 double TranslateSeriesRatingTo(double value);
 int TranslateSeriesTypeFrom(const std::string& value);
-std::wstring TranslateMyDateFrom(const std::string& value);
-std::string TranslateMyDateTo(const std::wstring& value);
-std::wstring TranslateMyLastUpdatedFrom(const std::string& value);
 std::wstring TranslateMyRating(int value, RatingSystem rating_system);
-int TranslateMyRatingFrom(int value);
-int TranslateMyRatingTo(int value);
 int TranslateMyStatusFrom(const std::string& value);
 std::string TranslateMyStatusTo(int value);
 RatingSystem TranslateRatingSystemFrom(const std::string& value);
 
 std::wstring GetAnimePage(const anime::Item& anime_item);
+void RequestToken();
 void ViewAnimePage(int anime_id);
-void ViewFeed();
-void ViewLibrary();
 void ViewProfile();
+void ViewStats();
 
-}  // namespace kitsu
+}  // namespace anilist
 }  // namespace sync

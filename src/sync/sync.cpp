@@ -221,6 +221,7 @@ bool AddAuthenticationToRequest(Request& request) {
 void AddPageOffsetToRequest(const int offset, Request& request) {
   switch (taiga::GetCurrentServiceId()) {
     case sync::kKitsu:
+    case sync::kAniList:
       request.data[L"page_offset"] = ToWstr(offset);
       break;
   }
@@ -242,6 +243,7 @@ bool AddServiceDataToRequest(Request& request, int id) {
 
   add_data(kMyAnimeList);
   add_data(kKitsu);
+  add_data(kAniList);
 
   return true;
 }
@@ -257,12 +259,12 @@ void SetActiveServiceForRequest(Request& request) {
 
 bool UserAuthenticated() {
   auto service = taiga::GetCurrentService();
-  return service->authenticated();
+  return service->user().authenticated;
 }
 
 void InvalidateUserAuthentication() {
   auto service = taiga::GetCurrentService();
-  service->set_authenticated(false);
+  service->user().authenticated = false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -272,9 +274,16 @@ bool ServiceSupportsRequestType(RequestType request_type) {
 
   switch (request_type) {
     case kGetUser:
+      switch (service_id) {
+        case sync::kKitsu:
+          return true;
+        default:
+          return false;
+      }
     case kGetSeason:
       switch (service_id) {
         case sync::kKitsu:
+        case sync::kAniList:
           return true;
         default:
           return false;

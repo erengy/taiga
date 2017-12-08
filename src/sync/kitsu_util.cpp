@@ -41,16 +41,9 @@ std::wstring DecodeSynopsis(std::string text) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-RatingSystem GetCurrentRatingSystem() {
-  const auto& service = *reinterpret_cast<sync::kitsu::Service*>(
-      ServiceManager.service(sync::kKitsu));
-  return service.rating_system();
-}
-
-void SetCurrentRatingSystem(RatingSystem rating_system) {
-  auto& service = *reinterpret_cast<sync::kitsu::Service*>(
-      ServiceManager.service(sync::kKitsu));
-  service.set_rating_system(rating_system);
+RatingSystem GetRatingSystem() {
+  const auto& service = *ServiceManager.service(sync::kKitsu);
+  return TranslateRatingSystemFrom(WstrToStr(service.user().rating_system));
 }
 
 std::vector<Rating> GetMyRatings(RatingSystem rating_system) {
@@ -247,7 +240,7 @@ RatingSystem TranslateRatingSystemFrom(const std::string& value) {
     return it->second;
 
   LOGW(L"Invalid value: {}", StrToWstr(value));
-  return RatingSystem::Regular;
+  return kDefaultRatingSystem;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

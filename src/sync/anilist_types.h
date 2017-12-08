@@ -19,28 +19,17 @@
 #pragma once
 
 namespace sync {
-namespace kitsu {
-
-enum MyPrivacy {
-  kPrivate = 1,
-  kPublic
-};
-
-enum MyStatus {
-  kCurrentlyWatching = 1,
-  kPlanToWatch,
-  kCompleted,
-  kOnHold,
-  kDropped
-};
+namespace anilist {
 
 enum class RatingSystem {
-  Simple,
-  Regular,
-  Advanced,
+  Point_100,
+  Point_10_Decimal,
+  Point_10,
+  Point_5,
+  Point_3,
 };
 
-constexpr auto kDefaultRatingSystem = RatingSystem::Regular;
+constexpr auto kDefaultRatingSystem = RatingSystem::Point_10;
 
-}  // namespace kitsu
+}  // namespace anilist
 }  // namespace sync

@@ -25,6 +25,7 @@
 #include "library/anime_util.h"
 #include "library/discover.h"
 #include "library/history.h"
+#include "sync/anilist_util.h"
 #include "sync/kitsu_util.h"
 #include "sync/myanimelist_util.h"
 #include "sync/sync.h"
@@ -111,6 +112,9 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
       case sync::kKitsu:
         sync::kitsu::ViewAnimePage(anime_id);
         break;
+      case sync::kAniList:
+        sync::anilist::ViewAnimePage(anime_id);
+        break;
     }
 
   // ViewUpcomingAnime
@@ -143,6 +147,14 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
     sync::kitsu::ViewLibrary();
   } else if (action == L"KitsuViewProfile") {
     sync::kitsu::ViewProfile();
+
+  // AniListViewProfile()
+  // AniListViewStats()
+  //   Opens up AniList user pages.
+  } else if (action == L"AniListViewProfile") {
+    sync::anilist::ViewProfile();
+  } else if (action == L"AniListViewStats") {
+    sync::anilist::ViewStats();
 
   //////////////////////////////////////////////////////////////////////////////
 
@@ -550,6 +562,7 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
         }
         break;
       case sync::kKitsu:
+      case sync::kAniList:
         if (SeasonDatabase.LoadSeasonFromMemory(body)) {
           Settings.Set(taiga::kApp_Seasons_LastSeason,
                        SeasonDatabase.current_season.GetString());

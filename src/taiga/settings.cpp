@@ -118,6 +118,10 @@ void AppSettings::InitializeMap() {
   INITKEY(kSync_Service_Kitsu_PartialLibrary, L"true", L"account/kitsu/partiallibrary");
   INITKEY(kSync_Service_Kitsu_RatingSystem, L"regular", L"account/kitsu/ratingsystem");
   INITKEY(kSync_Service_Kitsu_UseHttps, L"true", L"account/kitsu/https");
+  INITKEY(kSync_Service_AniList_Username, nullptr, L"account/anilist/username");
+  INITKEY(kSync_Service_AniList_RatingSystem, L"POINT_10", L"account/anilist/ratingsystem");
+  INITKEY(kSync_Service_AniList_Token, nullptr, L"account/anilist/token");
+  INITKEY(kSync_Service_AniList_UseHttps, L"true", L"account/anilist/https");
 
   // Library
   INITKEY(kLibrary_FileSizeThreshold, ToWstr(kDefaultFileSizeThreshold).c_str(), L"anime/folders/scan/minfilesize");
@@ -252,14 +256,12 @@ bool AppSettings::Load() {
   ReadLegacyValues(settings);
 
   // Services
-  switch (taiga::GetCurrentServiceId()) {
-    case sync::kKitsu: {
-      const auto rating_system = sync::kitsu::TranslateRatingSystemFrom(
-          WstrToStr(GetWstr(kSync_Service_Kitsu_RatingSystem)));
-      sync::kitsu::SetCurrentRatingSystem(rating_system);
-      break;
-    }
-  }
+  ServiceManager.service(sync::kKitsu)->user().rating_system =
+      GetWstr(kSync_Service_Kitsu_RatingSystem);
+  ServiceManager.service(sync::kAniList)->user().rating_system =
+      GetWstr(kSync_Service_AniList_RatingSystem);
+  ServiceManager.service(sync::kAniList)->user().access_token =
+      GetWstr(kSync_Service_AniList_Token);
 
   // Folders
   library_folders.clear();
@@ -509,6 +511,8 @@ const std::wstring GetCurrentUsername() {
     username = Settings[kSync_Service_Mal_Username];
   } else if (service->id() == sync::kKitsu) {
     username = Settings[kSync_Service_Kitsu_Username];
+  } else if (service->id() == sync::kAniList) {
+    username = Settings[kSync_Service_AniList_Username];
   }
 
   return username;
@@ -522,6 +526,8 @@ const std::wstring GetCurrentPassword() {
     password = Base64Decode(Settings[kSync_Service_Mal_Password]);
   } else if (service->id() == sync::kKitsu) {
     password = Base64Decode(Settings[kSync_Service_Kitsu_Password]);
+  } else if (service->id() == sync::kAniList) {
+    password = Base64Decode(Settings[kSync_Service_AniList_Token]);
   }
 
   return password;

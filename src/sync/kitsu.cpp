@@ -52,14 +52,6 @@ Service::Service() {
   name_ = L"Kitsu";
 }
 
-RatingSystem Service::rating_system() const {
-  return rating_system_;
-}
-
-void Service::set_rating_system(RatingSystem rating_system) {
-  rating_system_ = rating_system;
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 
 void Service::BuildRequest(Request& request, HttpRequest& http_request) {
@@ -77,7 +69,7 @@ void Service::BuildRequest(Request& request, HttpRequest& http_request) {
   // token, but behave differently (e.g. private library entries are included)
   // when it's provided.
   if (RequestNeedsAuthentication(request.type))
-    http_request.header[L"Authorization"] = L"Bearer " + access_token_;
+    http_request.header[L"Authorization"] = L"Bearer " + user().access_token;
 
   switch (request.type) {
     BUILD_HTTP_REQUEST(kAddLibraryEntry, AddLibraryEntry);
@@ -156,9 +148,9 @@ void Service::GetLibraryEntries(Request& request, HttpRequest& http_request) {
   // 4. Client doesn't know entry was deleted
   //
   // Our "solution" to this is to allow Taiga to download the entire library
-  // after each restart (i.e. last_synchronized_ is not saved on exit).
+  // after each restart (i.e. last_synchronized is not saved on exit).
   if (IsPartialLibraryRequest()) {
-    const auto date = GetDate(last_synchronized_ - (60 * 60 * 24));  // 1 day before, to be safe
+    const auto date = GetDate(user_.last_synchronized - (60 * 60 * 24));  // 1 day before, to be safe
     http_request.url.query[L"filter[since]"] = date.to_string();
   }
 
@@ -266,7 +258,7 @@ void Service::AuthenticateUser(Response& response, HttpResponse& http_response) 
   if (!ParseResponseBody(http_response.body, response, root))
     return;
 
-  access_token_ = StrToWstr(JsonReadStr(root, "access_token"));
+  user().access_token = StrToWstr(JsonReadStr(root, "access_token"));
 }
 
 void Service::GetUser(Response& response, HttpResponse& http_response) {
@@ -279,11 +271,9 @@ void Service::GetUser(Response& response, HttpResponse& http_response) {
 
   user_.id = StrToWstr(JsonReadStr(user, "id"));
   user_.username = StrToWstr(JsonReadStr(user["attributes"], "name"));
+  user_.rating_system = StrToWstr(JsonReadStr(user["attributes"], "ratingSystem"));
 
-  const auto rating_system = JsonReadStr(user["attributes"], "ratingSystem");
-  rating_system_ = TranslateRatingSystemFrom(rating_system);
-  Settings.Set(taiga::kSync_Service_Kitsu_RatingSystem,
-               StrToWstr(rating_system));
+  Settings.Set(taiga::kSync_Service_Kitsu_RatingSystem, user_.rating_system);
 }
 
 void Service::GetLibraryEntries(Response& response, HttpResponse& http_response) {
@@ -309,7 +299,7 @@ void Service::GetLibraryEntries(Response& response, HttpResponse& http_response)
   }
 
   if (!next_page) {
-    last_synchronized_ = time(nullptr);  // current time
+    user_.last_synchronized = time(nullptr);  // current time
   }
 }
 
@@ -390,7 +380,7 @@ bool Service::RequestNeedsAuthentication(RequestType request_type) const {
     case kGetMetadataById:
     case kGetSeason:
     case kSearchTitle:
-      return !access_token_.empty();
+      return !user().access_token.empty();
   }
 
   return false;
@@ -436,15 +426,9 @@ bool Service::RequestSucceeded(Response& response,
     }
   }
 
-  if (error_description.empty()) {
-    error_description = L"Unknown error (" +
-        canonical_name() + L"|" +
-        ToWstr(response.type) + L"|" +
-        ToWstr(http_response.code) + L")";
-  }
+  response.data[L"error"] = error_description;
+  HandleError(http_response, response);
 
-  response.data[L"error"] = name() + L" returned an error: " +
-                            error_description;
   return false;
 }
 
@@ -787,7 +771,7 @@ bool Service::ParseResponseBody(const std::wstring& body,
 ////////////////////////////////////////////////////////////////////////////////
 
 bool Service::IsPartialLibraryRequest() const {
-  return last_synchronized_ &&
+  return user_.last_synchronized &&
          Settings.GetBool(taiga::kSync_Service_Kitsu_PartialLibrary);
 }
 

@@ -22,11 +22,16 @@
 #include "base/types.h"
 #include "sync/service.h"
 
+namespace anime {
+class Item;
+}
+
 namespace sync {
-namespace kitsu {
+namespace anilist {
 
 // API documentation:
-// http://docs.kitsu.apiary.io
+// https://anilist.gitbooks.io/anilist-apiv2-docs/
+// https://anilist.github.io/ApiV2-GraphQL-Docs/
 
 class Service : public sync::Service {
 public:
@@ -40,7 +45,6 @@ public:
 private:
   REQUEST_AND_RESPONSE(AddLibraryEntry);
   REQUEST_AND_RESPONSE(AuthenticateUser);
-  REQUEST_AND_RESPONSE(GetUser);
   REQUEST_AND_RESPONSE(DeleteLibraryEntry);
   REQUEST_AND_RESPONSE(GetLibraryEntries);
   REQUEST_AND_RESPONSE(GetMetadataById);
@@ -51,21 +55,19 @@ private:
   bool RequestSucceeded(Response& response, const HttpResponse& http_response);
 
   std::wstring BuildLibraryObject(Request& request) const;
-  void UseSparseFieldsetsForAnime(HttpRequest& http_request, bool minimal = false) const;
-  void UseSparseFieldsetsForLibraryEntries(HttpRequest& http_request) const;
-  void UseSparseFieldsetsForUser(HttpRequest& http_request) const;
+  std::wstring BuildRequestBody(const std::string& query, const Json& variables) const;
 
-  void ParseObject(const Json& json) const;
-  int ParseAnimeObject(const Json& json) const;
-  void ParseGenres(const Json& json, const int anime_id) const;
-  void ParseProducers(const Json& json, const int anime_id) const;
-  int ParseLibraryObject(const Json& json) const;
-  void ParseLinks(const Json& json, Response& response) const;
+  int ParseMediaObject(const Json& json) const;
+  int ParseMediaListObject(const Json& json) const;
+  void ParseMediaTitleObject(const Json& json, anime::Item& anime_item) const;
+  void ParseUserObject(const Json& json);
 
   bool ParseResponseBody(const std::wstring& body, Response& response, Json& json);
 
-  bool IsPartialLibraryRequest() const;
+  std::string ExpandQuery(const std::string& query) const;
+  std::wstring GetMediaFields() const;
+  std::wstring GetMediaListFields() const;
 };
 
-}  // namespace kitsu
+}  // namespace anilist
 }  // namespace sync

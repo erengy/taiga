@@ -23,6 +23,7 @@
 #include "library/anime_db.h"
 #include "library/anime_util.h"
 #include "library/history.h"
+#include "sync/anilist_util.h"
 #include "sync/kitsu_util.h"
 #include "sync/myanimelist_util.h"
 #include "sync/sync.h"
@@ -238,14 +239,22 @@ BOOL PageMyInfo::OnCommand(WPARAM wParam, LPARAM lParam) {
         int episode_value = 0;
         spin.GetPos32(episode_value);
         if (IsDlgButtonChecked(IDC_CHECK_ANIME_REWATCH)) {
-          if (taiga::GetCurrentServiceId() == sync::kKitsu)
-            combobox.SetCurSel(anime::kWatching - 1);
+          switch (taiga::GetCurrentServiceId()) {
+            case sync::kKitsu:
+            case sync::kAniList:
+              combobox.SetCurSel(anime::kWatching - 1);
+              break;
+          }
           if (anime_item->GetMyStatus() == anime::kCompleted &&
               episode_value == anime_item->GetEpisodeCount())
             spin.SetPos32(0);
         } else {
-          if (taiga::GetCurrentServiceId() == sync::kKitsu)
-            combobox.SetCurSel(anime_item->GetMyStatus() - 1);
+          switch (taiga::GetCurrentServiceId()) {
+            case sync::kKitsu:
+            case sync::kAniList:
+              combobox.SetCurSel(anime_item->GetMyStatus() - 1);
+              break;
+          }
           if (episode_value == 0)
             spin.SetPos32(anime_item->GetMyLastWatchedEpisode());
         }
@@ -357,9 +366,15 @@ void PageMyInfo::Refresh(int anime_id) {
         current_rating = sync::myanimelist::TranslateMyRating(anime_item->GetMyScore(), true);
         break;
       case sync::kKitsu: {
-        const auto rating_system = sync::kitsu::GetCurrentRatingSystem();
+        const auto rating_system = sync::kitsu::GetRatingSystem();
         ratings = sync::kitsu::GetMyRatings(rating_system);
         current_rating = sync::kitsu::TranslateMyRating(anime_item->GetMyScore(), rating_system);
+        break;
+      }
+      case sync::kAniList: {
+        const auto rating_system = sync::anilist::GetRatingSystem();
+        ratings = sync::anilist::GetMyRatings(rating_system);
+        current_rating = sync::anilist::TranslateMyRating(anime_item->GetMyScore(), rating_system);
         break;
       }
     }
@@ -383,6 +398,7 @@ void PageMyInfo::Refresh(int anime_id) {
       edit.SetText(anime_item->GetMyTags());
       break;
     case sync::kKitsu:
+    case sync::kAniList:
       SetDlgItemText(IDC_STATIC_TAGSNOTES, L"Notes:");
       edit.SetCueBannerText(L"Enter your notes about this anime");
       edit.SetText(anime_item->GetMyNotes());
@@ -501,6 +517,7 @@ bool PageMyInfo::Save() {
       history_item.tags = GetDlgItemText(IDC_EDIT_ANIME_TAGS);
       break;
     case sync::kKitsu:
+    case sync::kAniList:
       history_item.notes = GetDlgItemText(IDC_EDIT_ANIME_TAGS);
       break;
   }

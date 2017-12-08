@@ -29,6 +29,7 @@
 #include "library/anime_episode.h"
 #include "library/anime_util.h"
 #include "library/history.h"
+#include "sync/anilist_util.h"
 #include "sync/kitsu_util.h"
 #include "sync/myanimelist_util.h"
 #include "sync/sync.h"
@@ -965,7 +966,10 @@ std::wstring TranslateMyScore(int value, const std::wstring& default_char) {
       return sync::myanimelist::TranslateMyRating(value, false);
     case sync::kKitsu:
       return sync::kitsu::TranslateMyRating(
-          value, sync::kitsu::GetCurrentRatingSystem());
+          value, sync::kitsu::GetRatingSystem());
+    case sync::kAniList:
+      return sync::anilist::TranslateMyRating(
+          value, sync::anilist::GetRatingSystem());
   }
 }
 
@@ -977,7 +981,10 @@ std::wstring TranslateMyScoreFull(int value) {
       return sync::myanimelist::TranslateMyRating(value, true);
     case sync::kKitsu:
       return sync::kitsu::TranslateMyRating(
-          value, sync::kitsu::GetCurrentRatingSystem());
+          value, sync::kitsu::GetRatingSystem());
+    case sync::kAniList:
+      return sync::anilist::TranslateMyRating(
+          value, sync::anilist::GetRatingSystem());
   }
 }
 
@@ -986,9 +993,10 @@ std::wstring TranslateScore(double value) {
     default:
     case sync::kMyAnimeList:
       return ToWstr(value, 2);
-
     case sync::kKitsu:
       return ToWstr(sync::kitsu::TranslateSeriesRatingTo(value), 2) + L"%";
+    case sync::kAniList:
+      return ToWstr(sync::anilist::TranslateSeriesRatingTo(value), 0) + L"%";
   }
 }
 

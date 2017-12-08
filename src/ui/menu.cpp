@@ -25,9 +25,10 @@
 #include "library/anime_episode.h"
 #include "library/anime_util.h"
 #include "library/discover.h"
-#include "sync/sync.h"
+#include "sync/anilist_util.h"
 #include "sync/kitsu_util.h"
 #include "sync/myanimelist_util.h"
+#include "sync/sync.h"
 #include "taiga/settings.h"
 #include "track/feed.h"
 #include "ui/menu.h"
@@ -260,14 +261,20 @@ void MenuList::UpdateScore(const anime::Item* anime_item) {
             anime_item->GetMyScore(), true);
         break;
       case sync::kKitsu: {
-        const auto rating_system = sync::kitsu::GetCurrentRatingSystem();
+        const auto rating_system = sync::kitsu::GetRatingSystem();
         ratings = sync::kitsu::GetMyRatings(rating_system);
         current_rating = sync::kitsu::TranslateMyRating(
             anime_item->GetMyScore(), rating_system);
         break;
       }
+      case sync::kAniList: {
+        const auto rating_system = sync::anilist::GetRatingSystem();
+        ratings = sync::anilist::GetMyRatings(rating_system);
+        current_rating = sync::anilist::TranslateMyRating(
+            anime_item->GetMyScore(), rating_system);
+        break;
+      }
     }
-
 
     for (const auto& rating : ratings) {
       const bool current = rating.text == current_rating;
@@ -331,7 +338,8 @@ void MenuList::UpdateSeason() {
     auto season_min = SeasonDatabase.available_seasons.first;
     auto season_max = SeasonDatabase.available_seasons.second;
     switch (taiga::GetCurrentServiceId()) {
-      case sync::kKitsu: {
+      case sync::kKitsu:
+      case sync::kAniList: {
         const auto next_season = ++anime::Season(GetDate());
         season_max = std::max(season_max, next_season);
         season_min = anime::Season(anime::Season::Name::kWinter, 2010);
@@ -385,7 +393,8 @@ void MenuList::UpdateSeason() {
     // Add available seasons
     create_available_seasons(*menu, season_min, season_max);
     switch (taiga::GetCurrentServiceId()) {
-      case sync::kKitsu: {
+      case sync::kKitsu:
+      case sync::kAniList: {
         menu->CreateItem();  // separator
         for (int decade = 2000; decade >= 1960; decade -= 10) {
           std::wstring submenu_name = L"SeasonDecade" + ToWstr(decade);
