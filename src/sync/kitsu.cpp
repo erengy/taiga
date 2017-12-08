@@ -125,7 +125,7 @@ void Service::AuthenticateUser(Request& request, HttpRequest& http_request) {
 void Service::GetUser(Request& request, HttpRequest& http_request) {
   http_request.url.path = L"/edge/users";
 
-  http_request.url.query[L"filter[name]"] =
+  http_request.url.query[L"filter[slug]"] =
       request.data[canonical_name_ + L"-username"];
 
   UseSparseFieldsetsForUser(http_request);
@@ -270,7 +270,7 @@ void Service::GetUser(Response& response, HttpResponse& http_response) {
   const auto& user = root["data"].front();
 
   user_.id = StrToWstr(JsonReadStr(user, "id"));
-  user_.username = StrToWstr(JsonReadStr(user["attributes"], "name"));
+  user_.username = StrToWstr(JsonReadStr(user["attributes"], "slug"));
   user_.rating_system = StrToWstr(JsonReadStr(user["attributes"], "ratingSystem"));
 
   Settings.Set(taiga::kSync_Service_Kitsu_RatingSystem, user_.rating_system);
@@ -556,7 +556,8 @@ void Service::UseSparseFieldsetsForLibraryEntries(HttpRequest& http_request) con
 void Service::UseSparseFieldsetsForUser(HttpRequest& http_request) const {
   http_request.url.query[L"fields[users]"] =
       L"name,"
-      L"ratingSystem";
+      L"ratingSystem,"
+      L"slug";
 }
 
 void Service::ParseObject(const Json& json) const {
