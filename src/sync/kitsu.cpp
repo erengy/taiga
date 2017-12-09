@@ -267,6 +267,12 @@ void Service::GetUser(Response& response, HttpResponse& http_response) {
   if (!ParseResponseBody(http_response.body, response, root))
     return;
 
+  if (root["data"].empty()) {
+    response.data[L"error"] = L"Invalid username";
+    HandleError(http_response, response);
+    return;
+  }
+
   const auto& user = root["data"].front();
 
   user_.id = StrToWstr(JsonReadStr(user, "id"));
