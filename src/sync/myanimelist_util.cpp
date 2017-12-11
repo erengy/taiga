@@ -239,6 +239,10 @@ void ViewHistory() {
               Settings[taiga::kSync_Service_Mal_Username]);
 }
 
+void ViewLogin() {
+  ExecuteLink(L"https://myanimelist.net/login.php");
+}
+
 void ViewPanel() {
   ExecuteLink(L"https://myanimelist.net/panel.php");
 }

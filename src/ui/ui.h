@@ -41,6 +41,7 @@ enum class TipType {
   Torrent,
   UpdateFailed,
   NotApproved,
+  WebsiteLoginRequired,
 };
 
 class Taskbar : public win::Taskbar {
@@ -131,7 +132,7 @@ void OnTwitterAuth(bool success);
 void OnTwitterPost(bool success, const string_t& error);
 
 void OnLogin();
-void OnLogout();
+void OnLogout(bool website_login_required = false);
 
 void OnUpdateAvailable();
 void OnUpdateNotAvailable(bool relations = false, bool season = false);

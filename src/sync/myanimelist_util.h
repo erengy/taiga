@@ -51,6 +51,7 @@ std::wstring GetAnimePage(const anime::Item& anime_item);
 void ViewAnimePage(int anime_id);
 void ViewAnimeSearch(const std::wstring& title);
 void ViewHistory();
+void ViewLogin();
 void ViewPanel();
 void ViewProfile();
 void ViewUpcomingAnime();

@@ -445,6 +445,18 @@ bool Service::RequestSucceeded(Response& response,
     return false;
   }
 
+  // Website login required
+  if (http_response.code == 403) {
+    // Users that haven't logged in to MAL in the past 90 days are required to
+    // do so and clear the captcha first.
+    if (InStr(http_response.body, L"Website login required") > -1) {
+      response.data[L"error"] = http_response.body;
+      response.data[L"website_login_required"] = L"true";
+      HandleError(http_response, response);
+      return false;
+    }
+  }
+
   // Not approved
   // TODO: Remove when MAL fixes its API
   if (http_response.code == 400) {
@@ -507,6 +519,9 @@ bool Service::RequestSucceeded(Response& response,
 
   // Set the error message on failure
   switch (response.type) {
+    case kAuthenticateUser:
+      response.data[L"error"] = http_response.body;
+      break;
     case kAddLibraryEntry:
     case kDeleteLibraryEntry:
     case kUpdateLibraryEntry: {

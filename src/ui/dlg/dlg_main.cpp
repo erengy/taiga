@@ -25,6 +25,7 @@
 #include "library/anime_util.h"
 #include "library/history.h"
 #include "library/resource.h"
+#include "sync/myanimelist_util.h"
 #include "sync/service.h"
 #include "sync/sync.h"
 #include "taiga/announce.h"
@@ -722,6 +723,9 @@ void MainDialog::OnTaskbarCallback(UINT uMsg, LPARAM lParam) {
             break;
           case TipType::NotApproved:
             navigation.SetCurrentPage(kSidebarItemHistory);
+            break;
+          case TipType::WebsiteLoginRequired:
+            sync::myanimelist::ViewLogin();
             break;
         }
         ActivateWindow(GetWindowHandle());

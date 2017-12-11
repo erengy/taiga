@@ -154,7 +154,7 @@ void Manager::HandleError(Response& response, HttpResponse& http_response) {
     case kAuthenticateUser:
     case kGetUser:
       service.user().authenticated = false;
-      ui::OnLogout();
+      ui::OnLogout(response.data.count(L"website_login_required"));
       ui::ChangeStatusText(response.data[L"error"]);
       break;
     case kGetMetadataById:
