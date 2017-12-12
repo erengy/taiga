@@ -19,7 +19,7 @@
 BrandingText "${PRODUCT_NAME} v${PRODUCT_VERSION}"
 Name "${PRODUCT_NAME}"
 OutFile "..\bin\${PRODUCT_NAME}Setup.exe"
-SetCompressor lzma
+SetCompressor /SOLID lzma
 
 ; Default installation folder
 !define DEFAULT_INSTALL_DIR "$APPDATA\${PRODUCT_NAME}"
