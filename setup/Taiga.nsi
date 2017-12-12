@@ -4,11 +4,17 @@
 ; ------------------------------------------------------------------------------
 ; General
 
+; Version number
+!define VERSION_PATH "..\src\taiga\version.h"
+!searchparse /file "${VERSION_PATH}" `#define TAIGA_VERSION_MAJOR ` VERSION_MAJOR
+!searchparse /file "${VERSION_PATH}" `#define TAIGA_VERSION_MINOR ` VERSION_MINOR
+!searchparse /file "${VERSION_PATH}" `#define TAIGA_VERSION_PATCH ` VERSION_PATCH
+
 ; Definitions
 !define PRODUCT_EXE "Taiga.exe"
 !define PRODUCT_NAME "Taiga"
 !define PRODUCT_PUBLISHER "erengy"
-!define PRODUCT_VERSION "1.3"
+!define PRODUCT_VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}"
 !define PRODUCT_WEBSITE "http://taiga.moe"
 
 ; Uninstaller
