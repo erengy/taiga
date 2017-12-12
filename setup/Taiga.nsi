@@ -17,6 +17,15 @@
 !define PRODUCT_VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}"
 !define PRODUCT_WEBSITE "http://taiga.moe"
 
+; Version information
+VIAddVersionKey "CompanyName" "${PRODUCT_PUBLISHER}"
+VIAddVersionKey "FileDescription" "${PRODUCT_NAME} Setup"
+VIAddVersionKey "FileVersion" "${PRODUCT_VERSION}.0"
+VIAddVersionKey "LegalCopyright" ""
+VIAddVersionKey "ProductName" "${PRODUCT_NAME}"
+VIAddVersionKey "ProductVersion" "${PRODUCT_VERSION}.0"
+VIProductVersion "${PRODUCT_VERSION}.0"
+
 ; Uninstaller
 !define UNINST_EXE "Uninstall.exe"
 !define UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
