@@ -573,6 +573,7 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
           std::wstring auth_pin;
           if (ui::EnterAuthorizationPin(L"AniList", auth_pin)) {
             Settings.Set(taiga::kSync_Service_AniList_Token, auth_pin);
+            ServiceManager.service(sync::kAniList)->user().access_token = auth_pin;
           }
           return TRUE;
         }
