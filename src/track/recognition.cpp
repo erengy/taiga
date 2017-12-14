@@ -168,8 +168,18 @@ int Engine::Identify(anime::Episode& episode, bool give_score,
       } else if (episode.elements().empty(anitomy::kElementVolumeNumber)) {
         auto anime_item = AnimeDatabase.FindItem(episode.anime_id);
         if (anime_item) {
-          int episode_count = anime_item->GetEpisodeCount();
-          episode.set_episode_number_range(std::make_pair(1, episode_count));
+          const int last_episode = [&anime_item]() {
+            switch (anime_item->GetAiringStatus()) {
+              case anime::kFinishedAiring:
+                return anime_item->GetEpisodeCount();
+              case anime::kAiring:
+                return anime_item->GetLastAiredEpisodeNumber();
+              default:
+                return 0;
+            }
+          }();
+          if (last_episode)
+            episode.set_episode_number_range({1, last_episode});
         }
       }
     }
