@@ -47,6 +47,7 @@ public:
   void UpdateSeasonList(bool enabled = false);
   void UpdateTorrentsList(const FeedItem& feed_item);
   void UpdateSeason();
+  void UpdateServices(bool enabled = true);
   void UpdateTools();
   void UpdateTray();
   void UpdateView();

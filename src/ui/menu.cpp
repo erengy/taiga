@@ -447,6 +447,18 @@ void MenuList::UpdateSeason() {
   }
 }
 
+void MenuList::UpdateServices(bool enabled) {
+  auto menu = menu_list_.FindMenu(L"Services");
+  if (menu) {
+    for (auto& item : menu->items) {
+      if (item.action == L"Synchronize()") {
+        item.enabled = enabled;
+        break;
+      }
+    }
+  }
+}
+
 void MenuList::UpdateTools() {
   auto menu = menu_list_.FindMenu(L"Tools");
   if (menu) {

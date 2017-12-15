@@ -756,8 +756,11 @@ void MainDialog::ChangeStatus(std::wstring str) {
 }
 
 void MainDialog::EnableInput(bool enable) {
-  // Toolbar buttons
+  // Menus
+  Menus.UpdateServices(enable);
+  // Toolbars
   toolbar_main.EnableButton(kToolbarButtonSync, enable);
+  toolbar_search.Enable(enable);
   // Content
   DlgAnimeList.Enable(enable);
   DlgHistory.Enable(enable);
