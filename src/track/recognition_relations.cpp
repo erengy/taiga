@@ -87,56 +87,55 @@ static bool ParseRule(const std::wstring& rule) {
 
   std::match_results<std::wstring::const_iterator> match_results;
 
-  if (std::regex_match(rule, match_results, pattern)) {
-    auto get_id = [&](size_t index) {
-      std::vector<std::wstring> ids;
-      Split(match_results[index].str(), L"|", ids);
-      switch (taiga::GetCurrentServiceId()) {
-        case sync::kMyAnimeList:
-          return ids.size() > 0 ? ToInt(ids.at(0)) : 0;
-        case sync::kKitsu:
-          return ids.size() > 1 ? ToInt(ids.at(1)) : 0;
-        case sync::kAniList:
-          return ids.size() > 2 ? ToInt(ids.at(2)) : 0;
-        default:
-          return 0;
-      }
-    };
+  if (!std::regex_match(rule, match_results, pattern))
+    return false;
 
-    auto get_range = [&](size_t first, size_t second) {
-      std::pair<int, int> range;
-      range.first = ToInt(match_results[first].str());
-      if (match_results[second].matched) {
-        if (IsNumericString(match_results[second].str())) {
-          range.second = ToInt(match_results[second].str());
-        } else {
-          range.second = INT_MAX;
-        }
+  auto get_id = [&](size_t index) {
+    std::vector<std::wstring> ids;
+    Split(match_results[index].str(), L"|", ids);
+    switch (taiga::GetCurrentServiceId()) {
+      case sync::kMyAnimeList:
+        return ids.size() > 0 ? ToInt(ids.at(0)) : 0;
+      case sync::kKitsu:
+        return ids.size() > 1 ? ToInt(ids.at(1)) : 0;
+      case sync::kAniList:
+        return ids.size() > 2 ? ToInt(ids.at(2)) : 0;
+      default:
+        return 0;
+    }
+  };
+
+  auto get_range = [&](size_t first, size_t second) {
+    std::pair<int, int> range;
+    range.first = ToInt(match_results[first].str());
+    if (match_results[second].matched) {
+      if (IsNumericString(match_results[second].str())) {
+        range.second = ToInt(match_results[second].str());
       } else {
-        range.second = range.first;
+        range.second = INT_MAX;
       }
-      return range;
-    };
+    } else {
+      range.second = range.first;
+    }
+    return range;
+  };
 
-    int id0 = get_id(1);
-    if (!id0)
-      return false;
-    auto r0 = get_range(2, 3);
+  const int id0 = get_id(1);
+  if (id0) {
+    const auto r0 = get_range(2, 3);
 
     int id1 = get_id(4);
     if (!id1)
       id1 = id0;
-    auto r1 = get_range(5, 6);
+    const auto r1 = get_range(5, 6);
 
     relations[id0].AddRange(id1, r0, r1);
 
     if (match_results[7].matched)
       relations[id1].AddRange(id1, r0, r1);
-
-    return true;
   }
 
-  return false;
+  return true;
 }
 
 bool Engine::ReadRelations() {
