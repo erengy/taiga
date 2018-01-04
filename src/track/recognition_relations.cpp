@@ -21,6 +21,7 @@
 #include <semaver/src/semaver.hpp>
 
 #include "base/file.h"
+#include "base/format.h"
 #include "base/log.h"
 #include "sync/service.h"
 #include "taiga/path.h"
@@ -79,21 +80,24 @@ bool Relation::FindRange(int episode_number, int_pair_t& result) const {
 ////////////////////////////////////////////////////////////////////////////////
 
 static bool ParseRule(const std::wstring& rule) {
-  static std::wstring id_pattern = L"(\\d+|[?~])";
-  static std::wstring episode_pattern = L"(\\d+)(?:-(\\d+|\\?))?";
+  constexpr auto id_pattern = L"((?:\\d+|[?~])(?:\\|(?:\\d+|[?~]))*)";
+  constexpr auto episode_pattern = L"(\\d+)(?:-(\\d+|\\?))?";
   static const std::wregex pattern(
-      id_pattern + L"\\|" + id_pattern + L":" + episode_pattern + L" -> " +
-      id_pattern + L"\\|" + id_pattern + L":" + episode_pattern + L"(!)?");
+      L"{0}:{1} -> {0}:{1}(!)?"_format(id_pattern, episode_pattern));
 
   std::match_results<std::wstring::const_iterator> match_results;
 
   if (std::regex_match(rule, match_results, pattern)) {
-    auto get_id = [&](size_t first, size_t second) {
+    auto get_id = [&](size_t index) {
+      std::vector<std::wstring> ids;
+      Split(match_results[index].str(), L"|", ids);
       switch (taiga::GetCurrentServiceId()) {
         case sync::kMyAnimeList:
-          return ToInt(match_results[first].str());
+          return ids.size() > 0 ? ToInt(ids.at(0)) : 0;
         case sync::kKitsu:
-          return ToInt(match_results[second].str());
+          return ids.size() > 1 ? ToInt(ids.at(1)) : 0;
+        case sync::kAniList:
+          return ids.size() > 2 ? ToInt(ids.at(2)) : 0;
         default:
           return 0;
       }
@@ -114,19 +118,19 @@ static bool ParseRule(const std::wstring& rule) {
       return range;
     };
 
-    int id0 = get_id(1, 2);
+    int id0 = get_id(1);
     if (!id0)
       return false;
-    auto r0 = get_range(3, 4);
+    auto r0 = get_range(2, 3);
 
-    int id1 = get_id(5, 6);
+    int id1 = get_id(4);
     if (!id1)
       id1 = id0;
-    auto r1 = get_range(7, 8);
+    auto r1 = get_range(5, 6);
 
     relations[id0].AddRange(id1, r0, r1);
 
-    if (match_results[9].matched)
+    if (match_results[7].matched)
       relations[id1].AddRange(id1, r0, r1);
 
     return true;
