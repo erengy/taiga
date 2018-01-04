@@ -460,7 +460,6 @@ void Aggregator::FindFeedSource(Feed& feed) const {
   static const std::map<std::wstring, FeedSource> sources{
     {L"anidex", FeedSource::AniDex},
     {L"animebytes", FeedSource::AnimeBytes},
-    {L"haruhichan", FeedSource::Haruhichan},
     {L"minglong", FeedSource::Minglong},
     {L"nyaa.pantsu", FeedSource::NyaaPantsu},
     {L"nyaa.si", FeedSource::NyaaSi},
@@ -490,11 +489,6 @@ void Aggregator::ParseFeedItem(FeedSource source, FeedItem& feed_item) {
     case FeedSource::AniDex:
       feed_item.episode_data.file_size = InStr(feed_item.description, L"Size: ", L" |");
       parse_magnet_link();
-      break;
-
-    // Haruhichan
-    case FeedSource::Haruhichan:
-      feed_item.info_link = feed_item.description;
       break;
 
     // minglong

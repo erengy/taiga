@@ -52,7 +52,6 @@ enum class FeedSource {
   Unknown,
   AniDex,
   AnimeBytes,
-  Haruhichan,
   Minglong,
   NyaaPantsu,
   NyaaSi,
