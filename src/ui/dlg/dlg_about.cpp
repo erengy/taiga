@@ -47,7 +47,7 @@ enum ThirdPartyLibrary {
 static std::wstring GetLibraryVersion(ThirdPartyLibrary library) {
   switch (library) {
     case kDate:
-      return L"2.3";
+      return L"2.4";
     case kFmt:
       return StrToWstr(semaver::Version(
           (FMT_VERSION / 10000),
