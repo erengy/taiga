@@ -318,6 +318,7 @@ void Service::GetMetadataById(Response& response, HttpResponse& http_response) {
 
   bool title_is_truncated = false;
 
+  title = DecodeText(title);
   if (EndsWith(title, L")") && title.length() > 7)
     title = title.substr(0, title.length() - 7);
   if (EndsWith(title, L"...") && title.length() > 3) {
