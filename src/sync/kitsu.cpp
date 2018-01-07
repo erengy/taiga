@@ -1,17 +1,17 @@
 /*
 ** Taiga
 ** Copyright (C) 2010-2018, Eren Okka
-** 
+**
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
 ** the Free Software Foundation, either version 3 of the License, or
 ** (at your option) any later version.
-** 
+**
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ** GNU General Public License for more details.
-** 
+**
 ** You should have received a copy of the GNU General Public License
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
@@ -170,7 +170,7 @@ void Service::GetMetadataById(Request& request, HttpRequest& http_request) {
                           request.data[canonical_name_ + L"-id"];
 
   http_request.url.query[L"include"] =
-      L"genres,"
+      L"categories,"
       L"animeProductions,"
       L"animeProductions.producer";
 
@@ -212,7 +212,7 @@ void Service::AddLibraryEntry(Request& request, HttpRequest& http_request) {
 
   http_request.url.query[L"include"] =
       L"anime,"
-      L"anime.genres,"
+      L"anime.categories,"
       L"anime.animeProductions,"
       L"anime.animeProductions.producer";
 
@@ -239,7 +239,7 @@ void Service::UpdateLibraryEntry(Request& request, HttpRequest& http_request) {
 
   http_request.url.query[L"include"] =
       L"anime,"
-      L"anime.genres,"
+      L"anime.categories,"
       L"anime.animeProductions,"
       L"anime.animeProductions.producer";
 
@@ -317,7 +317,7 @@ void Service::GetMetadataById(Response& response, HttpResponse& http_response) {
 
   const auto anime_id = ParseAnimeObject(root["data"]);
 
-  ParseGenres(root["included"], anime_id);
+  ParseCategories(root["included"], anime_id);
   ParseProducers(root["included"], anime_id);
 }
 
@@ -370,7 +370,7 @@ void Service::UpdateLibraryEntry(Response& response, HttpResponse& http_response
     ParseObject(value);
   }
 
-  ParseGenres(root["included"], anime_id);
+  ParseCategories(root["included"], anime_id);
   ParseProducers(root["included"], anime_id);
 }
 
@@ -533,13 +533,13 @@ void Service::UseSparseFieldsetsForAnime(HttpRequest& http_request,
       L"titles,"
       // relationships
       L"animeProductions,"
-      L"genres";
+      L"categories";
   if (!minimal) {
     http_request.url.query[L"fields[anime]"] += L",synopsis";
   }
 
   http_request.url.query[L"fields[animeProductions]"] = L"producer";
-  http_request.url.query[L"fields[genres]"] = L"name";
+  http_request.url.query[L"fields[categories]"] = L"title";
   http_request.url.query[L"fields[producers]"] = L"name";
 }
 
@@ -569,7 +569,7 @@ void Service::UseSparseFieldsetsForUser(HttpRequest& http_request) const {
 void Service::ParseObject(const Json& json) const {
   enum class Type {
     Anime,
-    Genres,
+    Categories,
     LibraryEntries,
     Producers,
     Unknown,
@@ -577,7 +577,7 @@ void Service::ParseObject(const Json& json) const {
 
   const std::map<std::string, Type> table{
     {"anime", Type::Anime},
-    {"genres", Type::Genres},
+    {"categories", Type::Categories},
     {"libraryEntries", Type::LibraryEntries},
     {"producers", Type::Producers},
   };
@@ -591,7 +591,7 @@ void Service::ParseObject(const Json& json) const {
     case Type::Anime:
       ParseAnimeObject(json);
       break;
-    case Type::Genres:
+    case Type::Categories:
       break;
     case Type::LibraryEntries:
       ParseLibraryObject(json);
@@ -667,24 +667,24 @@ int Service::ParseAnimeObject(const Json& json) const {
   return AnimeDatabase.UpdateItem(anime_item);
 }
 
-void Service::ParseGenres(const Json& json, const int anime_id) const {
+void Service::ParseCategories(const Json& json, const int anime_id) const {
   auto anime_item = AnimeDatabase.FindItem(anime_id);
 
   if (!anime_item)
     return;
 
-  std::vector<std::wstring> genres;
-  
-  // Here we assume that all listed genres are related to this anime. In order
-  // to parse an array of anime objects with genres, we would need to extract
-  // genre IDs from `relationships/genres/data` for each anime.
+  std::vector<std::wstring> categories;
+
+  // Here we assume that all listed categories are related to this anime. In order
+  // to parse an array of anime objects with categories, we would need to extract
+  // category IDs from `relationships/categories/data` for each anime.
   for (const auto& value : json) {
-    if (value["type"] == "genres") {
-      genres.push_back(StrToWstr(value["attributes"]["name"]));
+    if (value["type"] == "categories") {
+      categories.push_back(StrToWstr(value["attributes"]["title"]));
     }
   }
 
-  anime_item->SetGenres(genres);
+  anime_item->SetGenres(categories);
 }
 
 void Service::ParseProducers(const Json& json, const int anime_id) const {
