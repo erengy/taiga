@@ -299,10 +299,10 @@ LRESULT FeedFilterDialog::DialogPage0::OnNotify(int idCtrl, LPNMHDR pnmh) {
             FeedFilterPreset* preset = reinterpret_cast<FeedFilterPreset*>(plvdi->item.lParam);
             if (!preset) break;
             switch (plvdi->item.iSubItem) {
-              case 0: // Filter name
+              case 0:  // Filter name
                 plvdi->item.pszText = const_cast<LPWSTR>(preset->filter.name.c_str());
                 break;
-              case 1: // Preset description
+              case 1:  // Preset description
                 plvdi->item.pszText = const_cast<LPWSTR>(preset->description.c_str());
                 break;
             }
@@ -633,7 +633,7 @@ LRESULT FeedFilterDialog::DialogPage2::OnNotify(int idCtrl, LPNMHDR pnmh) {
           if (!anime_item)
             break;
           switch (plvdi->item.iSubItem) {
-            case 0: // Anime title
+            case 0:  // Anime title
               plvdi->item.pszText = const_cast<LPWSTR>(anime_item->GetTitle().data());
               break;
           }

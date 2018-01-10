@@ -196,11 +196,11 @@ void FormatDialog::RefreshPreviewText() {
     case FormatDialogMode::Mirc: {
       // Strip IRC characters
       for (size_t i = 0; i < str.length(); i++) {
-        if (str[i] == 0x02 || // Bold
-            str[i] == 0x16 || // Reverse
-            str[i] == 0x1D || // Italic
-            str[i] == 0x1F || // Underline
-            str[i] == 0x0F) { // Disable all
+        if (str[i] == 0x02 ||  // Bold
+            str[i] == 0x16 ||  // Reverse
+            str[i] == 0x1D ||  // Italic
+            str[i] == 0x1F ||  // Underline
+            str[i] == 0x0F) {  // Disable all
           str.erase(i, 1);
           i--; continue;
         }

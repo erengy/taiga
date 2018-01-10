@@ -631,7 +631,7 @@ void GetUpcomingTitles(std::vector<int>& anime_ids) {
       continue;
 
     if (date_start > date_now &&
-        ToDayCount(date_start) < ToDayCount(date_now) + 7) { // Same week
+        ToDayCount(date_start) < ToDayCount(date_now) + 7) {  // Same week
       anime_ids.push_back(anime_item.GetId());
     }
   }

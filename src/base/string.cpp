@@ -464,7 +464,6 @@ void ReplaceChars(wstring& str, const wchar_t chars[],
   } while (pos != wstring::npos);
 }
 
-
 bool ReplaceString(wstring& str,
                    size_t offset,
                    const wstring& find_this,

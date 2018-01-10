@@ -320,7 +320,6 @@ int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2,
   return return_value * list->GetSortOrder();
 }
 
-
 int CALLBACK AnimeListCompareProc(LPARAM lParam1, LPARAM lParam2,
                                   LPARAM lParamSort) {
   if (Settings.GetBool(taiga::kApp_List_HighlightNewEpisodes) &&

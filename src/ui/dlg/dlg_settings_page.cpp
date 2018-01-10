@@ -876,7 +876,7 @@ LRESULT SettingsPage::OnNotify(int idCtrl, LPNMHDR pnmh) {
       if (!anime_item)
         break;
       switch (plvdi->item.iSubItem) {
-        case 0: // Anime title
+        case 0:  // Anime title
           plvdi->item.pszText = const_cast<LPWSTR>(anime_item->GetTitle().data());
           break;
       }

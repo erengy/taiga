@@ -35,4 +35,4 @@ LocalInformation::LocalInformation()
       use_alternative(false) {
 }
 
-} // namespace anime
+}  // namespace anime

@@ -77,4 +77,4 @@ void Test() {
   test.Stop(str, true);
 }
 
-} // namespace debug
+}  // namespace debug

@@ -110,7 +110,6 @@ BOOL AnimeDialog::OnInitDialog() {
   return TRUE;
 }
 
-
 void AnimeDialog::OnCancel() {
   EndDialog(IDCANCEL);
   ActivateWindow(DlgMain.GetWindowHandle());
