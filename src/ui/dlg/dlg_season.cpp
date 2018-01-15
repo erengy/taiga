@@ -428,7 +428,14 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
 
       DRAWLINE(L"Aired:");
       DRAWLINE(L"Episodes:");
-      DRAWLINE(L"Genres:");
+      switch (current_service) {
+        case sync::kMyAnimeList:
+        case sync::kAniList:
+          DRAWLINE(L"Genres:");
+        case sync::kKitsu:
+          DRAWLINE(L"Categories:");
+          break;
+      }
       switch (current_service) {
         case sync::kMyAnimeList:
         case sync::kAniList:

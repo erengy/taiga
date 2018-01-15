@@ -187,6 +187,12 @@ void PageSeriesInfo::Refresh(int anime_id, bool connect) {
   SetDlgItemText(IDC_EDIT_ANIME_ALT, text.c_str());
 
   // Set information
+  switch (taiga::GetCurrentServiceId()) {
+    case sync::kKitsu:
+      SetDlgItemText(IDC_STATIC_ANIME_DETAILS_NAMES,
+          L"Type:\nEpisodes:\nStatus:\nSeason:\nCategories:\nProducers:\nScore:");
+      break;
+  }
   text = anime::TranslateType(anime_item->GetType()) + L"\n" +
          anime::TranslateNumber(anime_item->GetEpisodeCount(), L"Unknown") + L"\n" +
          anime::TranslateStatus(anime_item->GetAiringStatus()) + L"\n" +
