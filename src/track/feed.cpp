@@ -82,21 +82,21 @@ bool FeedItem::operator==(const FeedItem& item) const {
   return false;
 }
 
-TorrentCategory FeedItem::GetTorrentCategory() const {
-  if (InStr(category, L"Batch") > -1)  // Respect feed's own categorization
+TorrentCategory GetTorrentCategory(const FeedItem& item) {
+  if (InStr(item.category, L"Batch") > -1)  // Respect feed's own categorization
     return TorrentCategory::Batch;
 
-  if (Meow.IsBatchRelease(episode_data))
+  if (Meow.IsBatchRelease(item.episode_data))
     return TorrentCategory::Batch;
 
-  if (!Meow.IsValidAnimeType(episode_data))
+  if (!Meow.IsValidAnimeType(item.episode_data))
     return TorrentCategory::Other;
 
-  if (anime::IsEpisodeRange(episode_data))
+  if (anime::IsEpisodeRange(item.episode_data))
     return TorrentCategory::Batch;
 
-  if (!episode_data.file_extension().empty())
-    if (!Meow.IsValidFileExtension(episode_data.file_extension()))
+  if (!item.episode_data.file_extension().empty())
+    if (!Meow.IsValidFileExtension(item.episode_data.file_extension()))
       return TorrentCategory::Other;
 
   return TorrentCategory::Anime;
@@ -161,7 +161,6 @@ void Feed::Load(const xml_document& document) {
   foreach_xmlnode_(node, channel, L"item") {
     // Read data
     FeedItem item;
-    item.category = XmlReadStrValue(node, L"category");
     item.title = XmlReadStrValue(node, L"title");
     item.link = XmlReadStrValue(node, L"link");
     item.description = XmlReadStrValue(node, L"description");

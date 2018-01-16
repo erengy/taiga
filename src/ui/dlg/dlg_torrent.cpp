@@ -450,7 +450,7 @@ void TorrentDialog::RefreshList() {
       continue;
 
     std::wstring title, number, video;
-    int group = static_cast<int>(it->GetTorrentCategory());
+    int group = static_cast<int>(it->torrent_category);
     int icon = StatusToIcon(anime::kUnknownStatus);
     auto anime_item = AnimeDatabase.FindItem(it->episode_data.anime_id);
     if (anime_item) {

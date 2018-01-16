@@ -126,6 +126,9 @@ void Aggregator::ExamineData(Feed& feed) {
         anime_item->SetLastAiredEpisodeNumber(episode_number);
       }
     }
+
+    // Categorize
+    feed_item.torrent_category = GetTorrentCategory(feed_item);
   }
 
   filter_manager.MarkNewEpisodes(feed);

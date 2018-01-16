@@ -88,8 +88,6 @@ public:
   void Discard(int option);
   bool IsDiscarded() const;
 
-  TorrentCategory GetTorrentCategory() const;
-
   bool operator<(const FeedItem& item) const;
   bool operator==(const FeedItem& item) const;
 
@@ -97,6 +95,7 @@ public:
   std::wstring info_link;
   std::wstring magnet_link;
   FeedItemState state = FeedItemState::Blank;
+  TorrentCategory torrent_category = TorrentCategory::Anime;
   Optional<size_t> seeders;
   Optional<size_t> leechers;
   Optional<size_t> downloads;
@@ -108,6 +107,8 @@ public:
     bool new_episode;
   } episode_data;
 };
+
+TorrentCategory GetTorrentCategory(const FeedItem& item);
 
 ////////////////////////////////////////////////////////////////////////////////
 
