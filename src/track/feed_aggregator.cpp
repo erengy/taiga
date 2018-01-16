@@ -491,6 +491,8 @@ void Aggregator::ParseFeedItem(FeedSource source, FeedItem& feed_item) {
     // AniDex
     case FeedSource::AniDex:
       feed_item.episode_data.file_size = InStr(feed_item.description, L"Size: ", L" |");
+      if (InStr(feed_item.description, L" Batch ") > -1)
+        feed_item.torrent_category = TorrentCategory::Batch;
       parse_magnet_link();
       break;
 

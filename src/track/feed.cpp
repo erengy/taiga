@@ -83,6 +83,9 @@ bool FeedItem::operator==(const FeedItem& item) const {
 }
 
 TorrentCategory GetTorrentCategory(const FeedItem& item) {
+  if (item.torrent_category != TorrentCategory::Anime)  // Respect our previous categorization
+    return item.torrent_category;
+
   if (InStr(item.category, L"Batch") > -1)  // Respect feed's own categorization
     return TorrentCategory::Batch;
 
