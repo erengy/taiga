@@ -41,7 +41,7 @@ bool EvaluateCondition(const FeedFilterCondition& condition,
       element = item.title;
       break;
     case kFeedFilterElement_File_Category:
-      element = item.category;
+      element = TranslateTorrentCategory(item.torrent_category);
       break;
     case kFeedFilterElement_File_Description:
       element = item.description;

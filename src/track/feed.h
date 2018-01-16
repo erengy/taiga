@@ -109,6 +109,8 @@ public:
 };
 
 TorrentCategory GetTorrentCategory(const FeedItem& item);
+std::wstring TranslateTorrentCategory(TorrentCategory category);
+TorrentCategory TranslateTorrentCategory(const std::wstring& str);
 
 ////////////////////////////////////////////////////////////////////////////////
 

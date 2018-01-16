@@ -102,6 +102,26 @@ TorrentCategory GetTorrentCategory(const FeedItem& item) {
   return TorrentCategory::Anime;
 }
 
+std::wstring TranslateTorrentCategory(TorrentCategory category) {
+  switch (category) {
+    case TorrentCategory::Anime: return L"Anime";
+    case TorrentCategory::Batch: return L"Batch";
+    case TorrentCategory::Other: return L"Other";
+    default: return L"Anime";
+  }
+}
+
+TorrentCategory TranslateTorrentCategory(const std::wstring& str) {
+  static const std::map<std::wstring, TorrentCategory> categories{
+    {L"Anime", TorrentCategory::Anime},
+    {L"Batch", TorrentCategory::Batch},
+    {L"Other", TorrentCategory::Other},
+  };
+
+  const auto it = categories.find(str);
+  return it != categories.end() ? it->second : TorrentCategory::Anime;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 Feed::Feed()
