@@ -432,6 +432,7 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
         case sync::kMyAnimeList:
         case sync::kAniList:
           DRAWLINE(L"Genres:");
+          break;
         case sync::kKitsu:
           DRAWLINE(L"Categories:");
           break;
