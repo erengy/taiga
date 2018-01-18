@@ -45,7 +45,7 @@ bool Engine::ValidateOptions(anime::Episode& episode,
                              const MatchOptions& match_options,
                              bool redirect) const {
   if (match_options.check_airing_date)
-    if (!anime::IsAiredYet(anime_item))
+    if (anime_item.GetDateStart() && !anime::IsAiredYet(anime_item))
       return false;
 
   if (match_options.check_anime_type)
