@@ -385,6 +385,7 @@ bool Service::RequestNeedsAuthentication(RequestType request_type) const {
     case kGetLibraryEntries:
     case kGetMetadataById:
     case kGetSeason:
+    case kGetUser:
     case kSearchTitle:
       return !user().access_token.empty();
   }

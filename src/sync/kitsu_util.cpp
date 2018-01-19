@@ -239,7 +239,7 @@ RatingSystem TranslateRatingSystemFrom(const std::string& value) {
   if (it != table.end())
     return it->second;
 
-  LOGW(L"Invalid value: {}", StrToWstr(value));
+  LOGD(L"Invalid value: {}", StrToWstr(value));
   return kDefaultRatingSystem;
 }
 
