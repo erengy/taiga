@@ -16,6 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <set>
+
 #include <anitomy/anitomy/keyword.h>
 
 #include "base/log.h"
@@ -172,6 +174,13 @@ bool Engine::IsValidFileExtension(const std::wstring& extension) const {
     return false;
 
   return ValidateAnitomyElement(extension, anitomy::kElementFileExtension);
+}
+
+bool Engine::IsAudioFileExtension(const std::wstring& extension) const {
+  static const std::set<std::wstring> extensions{
+    L"aac", L"aiff", L"flac", L"m4a", L"mka", L"mp3", L"ogg", L"wav", L"wma",
+  };
+  return extensions.count(ToLower_Copy(extension));
 }
 
 }  // namespace recognition

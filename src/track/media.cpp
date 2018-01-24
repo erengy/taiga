@@ -146,35 +146,58 @@ std::vector<anisthesia::Player> GetEnabledPlayers(
   return results;
 }
 
-bool VerifyMedia(const anisthesia::MediaInformation& media_information) {
-  const auto value = StrToWstr(media_information.value);
-
-  switch (media_information.type) {
-    case anisthesia::MediaInformationType::File:
-      if (!Meow.IsValidFileExtension(GetFileExtension(value)))
-        return false;
-      if (!Meow.IsValidAnimeType(value))
-        return false;
-      break;
-  }
-
-  return true;
-}
-
 bool GetTitleFromDefaultPlayer(const std::vector<anisthesia::Media>& media,
                                std::wstring& title) {
+  bool invalid_file = false;
+
   for (const auto& item : media) {
     for (const auto& information : item.information) {
       auto value = StrToWstr(information.value);
 
       switch (information.type) {
-        case anisthesia::MediaInformationType::File:
-          TrimLeft(value, L"\\?");
-          break;
-      }
+        case anisthesia::MediaInformationType::File: {
+          EraseLeft(value, LR"(\\?\)");
+          const auto file_extension = GetFileExtension(value);
 
-      title = value;
-      return true;
+          // Video file
+          if (Meow.IsValidFileExtension(file_extension)) {
+            // Invalid path
+            if (Settings.GetBool(taiga::kSync_Update_OutOfRoot) &&
+                !Settings.library_folders.empty() &&
+                !anime::IsInsideLibraryFolders(value)) {
+              invalid_file = true;
+              continue;
+            }
+            // Invalid type
+            if (!Meow.IsValidAnimeType(value)) {
+              invalid_file = true;
+              continue;
+            }
+            // Valid video file
+            title = value;
+            return true;
+          }
+
+          // Audio file
+          if (Meow.IsAudioFileExtension(file_extension)) {
+            invalid_file = true;
+            continue;
+          }
+
+          // Unknown extension
+          break;
+        }
+
+        default:
+        case anisthesia::MediaInformationType::Title:
+        case anisthesia::MediaInformationType::Unknown: {
+          if (!invalid_file) {
+            title = value;
+            return true;
+          }
+          break;
+        }
+      }
     }
   }
 
@@ -254,7 +277,11 @@ bool MediaPlayers::CheckRunningPlayers() {
   const auto enabled_players = GetEnabledPlayers(items);
   std::vector<anisthesia::win::Result> results;
 
-  if (anisthesia::win::GetResults(enabled_players, VerifyMedia, results)) {
+  const auto media_proc = [](const anisthesia::MediaInformation&) {
+    return true;  // Accept all media
+  };
+
+  if (anisthesia::win::GetResults(enabled_players, media_proc, results)) {
     // Stick with the previously detected window if possible
     if (current_result_ && anime::IsValidId(CurrentEpisode.anime_id)) {
       auto it = std::find_if(results.begin(), results.end(),
@@ -342,43 +369,28 @@ void ProcessMediaPlayerTitle(const MediaPlayer& media_player) {
       return;
 
     // Examine title and compare it with list items
-    bool ignore_file = false;
     static track::recognition::ParseOptions parse_options;
     parse_options.parse_path = true;
     parse_options.streaming_media = media_player.type == anisthesia::PlayerType::WebBrowser;
     if (Meow.Parse(MediaPlayers.current_title(), parse_options, CurrentEpisode)) {
-      bool is_inside_library_folders = true;
-      if (Settings.GetBool(taiga::kSync_Update_OutOfRoot))
-        if (!CurrentEpisode.folder.empty() && !Settings.library_folders.empty())
-          is_inside_library_folders = anime::IsInsideLibraryFolders(CurrentEpisode.folder);
-      if (is_inside_library_folders) {
-        static track::recognition::MatchOptions match_options;
-        match_options.allow_sequels = true;
-        match_options.check_airing_date = true;
-        match_options.check_anime_type = true;
-        match_options.check_episode_number = true;
-        auto anime_id = Meow.Identify(CurrentEpisode, true, match_options);
-        if (anime::IsValidId(anime_id)) {
-          // Recognized
-          anime_item = AnimeDatabase.FindItem(anime_id);
-          MediaPlayers.set_title_changed(false);
-          CurrentEpisode.Set(anime_item->GetId());
-          StartWatching(*anime_item, CurrentEpisode);
-          return;
-        } else if (!Meow.IsValidAnimeType(CurrentEpisode)) {
-          ignore_file = true;
-        } else if (!CurrentEpisode.file_extension().empty() &&
-                   !Meow.IsValidFileExtension(CurrentEpisode.file_extension())) {
-          ignore_file = true;
-        }
-      } else {
-        ignore_file = true;
+      static track::recognition::MatchOptions match_options;
+      match_options.allow_sequels = true;
+      match_options.check_airing_date = true;
+      match_options.check_anime_type = true;
+      match_options.check_episode_number = true;
+      auto anime_id = Meow.Identify(CurrentEpisode, true, match_options);
+      if (anime::IsValidId(anime_id)) {
+        // Recognized
+        anime_item = AnimeDatabase.FindItem(anime_id);
+        MediaPlayers.set_title_changed(false);
+        CurrentEpisode.Set(anime_item->GetId());
+        StartWatching(*anime_item, CurrentEpisode);
+        return;
       }
     }
     // Not recognized
     CurrentEpisode.Set(anime::ID_NOTINLIST);
-    if (!ignore_file)
-      ui::OnRecognitionFail();
+    ui::OnRecognitionFail();
 
   } else {
     if (MediaPlayers.title_changed()) {

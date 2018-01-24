@@ -64,6 +64,7 @@ public:
   bool IsValidAnimeType(const std::wstring& path) const;
   bool IsValidFileExtension(const anime::Episode& episode) const;
   bool IsValidFileExtension(const std::wstring& extension) const;
+  bool IsAudioFileExtension(const std::wstring& extension) const;
 
   bool ReadRelations();
   bool ReadRelations(const std::string& document);
