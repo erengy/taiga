@@ -237,8 +237,15 @@ LRESULT SeasonDialog::OnListNotify(LPARAM lParam) {
         const std::wstring separator = L" \u2022 ";
         text += anime::TranslateType(anime_item->GetType()) + separator +
                 anime::TranslateNumber(anime_item->GetEpisodeCount(), L"?") + L" eps." + separator +
-                anime::TranslateScore(anime_item->GetScore()) + separator +
-                L"#" + ToWstr(anime_item->GetPopularity());
+                anime::TranslateScore(anime_item->GetScore()) + separator;
+        switch (taiga::GetCurrentServiceId()) {
+          default:
+            text += L"#" + ToWstr(anime_item->GetPopularity());
+            break;
+          case sync::kAniList:
+            text += ToWstr(anime_item->GetPopularity()) + L" users";
+            break;
+        }
         if (!anime_item->GetGenres().empty())
           text += L"\n" + Join(anime_item->GetGenres(), L", ");
         if (!anime_item->GetProducers().empty())
@@ -305,6 +312,8 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       auto anime_item = AnimeDatabase.FindItem(static_cast<int>(pCD->nmcd.lItemlParam));
       if (!anime_item)
         break;
+
+      const auto current_service = taiga::GetCurrentServiceId();
 
       // Draw border
       rect.Inflate(-4, -4);
@@ -398,7 +407,14 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
             }
             break;
           case kSeasonSortByPopularity:
-            text = L"#" + ToWstr(anime_item->GetPopularity());
+            switch (current_service) {
+              default:
+                text = L"#" + ToWstr(anime_item->GetPopularity());
+                break;
+              case sync::kAniList:
+                text = ToWstr(anime_item->GetPopularity()) + L" users";
+                break;
+            }
             break;
           case kSeasonSortByScore:
             text = anime::TranslateScore(anime_item->GetScore());
@@ -418,7 +434,6 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       // Draw details
       if (view_as == kSeasonViewAsImages)
         break;
-      auto current_service = taiga::GetCurrentServiceId();
       int text_top = rect_details.top;
       #define DRAWLINE(t) \
         text = t; \
@@ -464,7 +479,14 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
           break;
       }
       DRAWLINE(anime::TranslateScore(anime_item->GetScore()));
-      DRAWLINE(L"#" + ToWstr(anime_item->GetPopularity()));
+      switch (current_service) {
+        default:
+          DRAWLINE(L"#" + ToWstr(anime_item->GetPopularity()));
+          break;
+        case sync::kAniList:
+          DRAWLINE(ToWstr(anime_item->GetPopularity()) + L" users");
+          break;
+      }
 
       #undef DRAWLINE
 
@@ -663,7 +685,14 @@ void SeasonDialog::RefreshList(bool redraw_only) {
       list_.Sort(0, -1, ui::kListSortEpisodeCount, ui::ListViewCompareProc);
       break;
     case kSeasonSortByPopularity:
-      list_.Sort(0, 1, ui::kListSortPopularity, ui::ListViewCompareProc);
+      switch (taiga::GetCurrentServiceId()) {
+        default:
+          list_.Sort(0, 1, ui::kListSortPopularity, ui::ListViewCompareProc);
+          break;
+        case sync::kAniList:
+          list_.Sort(0, -1, ui::kListSortPopularity, ui::ListViewCompareProc);
+          break;
+      }
       break;
     case kSeasonSortByScore:
       list_.Sort(0, -1, ui::kListSortScore, ui::ListViewCompareProc);
