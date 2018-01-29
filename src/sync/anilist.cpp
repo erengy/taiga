@@ -600,7 +600,12 @@ std::string Service::ExpandQuery(const std::string& query) const {
 
 std::wstring Service::GetMediaFields() const {
   return LR"(id
-title { romaji english native userPreferred }
+title {
+  romaji(stylised: true)
+  english(stylised: true)
+  native(stylised: true)
+  userPreferred
+}
 format
 description
 startDate { year month day }
