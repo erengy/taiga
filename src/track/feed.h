@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include <map>
 #include <string>
 #include <vector>
@@ -99,11 +100,11 @@ public:
   Optional<size_t> seeders;
   Optional<size_t> leechers;
   Optional<size_t> downloads;
+  uint64_t file_size = 0;
 
   class EpisodeData : public anime::Episode {
   public:
     EpisodeData() : new_episode(false) {}
-    std::wstring file_size;
     bool new_episode;
   } episode_data;
 };

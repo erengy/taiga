@@ -29,6 +29,7 @@
 #include "library/anime_util.h"
 #include "sync/service.h"
 #include "taiga/settings.h"
+#include "track/feed.h"
 
 namespace ui {
 
@@ -65,56 +66,6 @@ int SortAsEpisodeRange(const std::wstring& str1, const std::wstring& str2) {
   } else {
     return is_volume1 ? base::kLessThan : base::kGreaterThan;
   }
-}
-
-int SortAsFileSize(LPCWSTR str1, LPCWSTR str2) {
-  UINT64 size[2] = {1, 1};
-
-  for (size_t i = 0; i < 2; i++) {
-    std::wstring value = i == 0 ? str1 : str2;
-    std::wstring unit;
-
-    TrimRight(value, L".\r");
-    EraseChars(value, L" ");
-
-    if (value.length() >= 2) {
-      for (auto it = value.rbegin(); it != value.rend(); ++it) {
-        if (IsNumericChar(*it))
-          break;
-        unit.insert(unit.begin(), *it);
-      }
-      value.resize(value.length() - unit.length());
-      Trim(unit);
-    }
-
-    int index = InStr(value, L".");
-    if (index > -1) {
-      int length = value.substr(index + 1).length();
-      if (length <= 2)
-        value.append(2 - length, '0');
-      EraseChars(value, L".");
-    } else {
-      value.append(2, '0');
-    }
-
-    if (IsEqual(unit, L"KB")) {
-      size[i] *= 1000;
-    } else if (IsEqual(unit, L"KiB")) {
-      size[i] *= 1024;
-    } else if (IsEqual(unit, L"MB")) {
-      size[i] *= 1000 * 1000;
-    } else if (IsEqual(unit, L"MiB")) {
-      size[i] *= 1024 * 1024;
-    } else if (IsEqual(unit, L"GB")) {
-      size[i] *= 1000 * 1000 * 1000;
-    } else if (IsEqual(unit, L"GiB")) {
-      size[i] *= 1024 * 1024 * 1024;
-    }
-
-    size[i] *= _wtoi(value.c_str());
-  }
-
-  return CompareValues<UINT64>(size[0], size[1]);
 }
 
 int SortAsNumber(LPCWSTR str1, LPCWSTR str2) {
@@ -232,8 +183,6 @@ int SortList(int type, LPCWSTR str1, LPCWSTR str2) {
       return SortAsText(str1, str2);
     case kListSortEpisodeRange:
       return SortAsEpisodeRange(str1, str2);
-    case kListSortFileSize:
-      return SortAsFileSize(str1, str2);
     case kListSortNumber:
       return SortAsNumber(str1, str2);
     case kListSortRfc822DateTime:
@@ -288,7 +237,6 @@ int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2,
   switch (list->GetSortType()) {
     case kListSortDefault:
     case kListSortEpisodeRange:
-    case kListSortFileSize:
     case kListSortNumber:
     case kListSortRfc822DateTime:
     default: {
@@ -297,6 +245,14 @@ int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2,
       list->GetItemText(lParam1, list->GetSortColumn(), str1);
       list->GetItemText(lParam2, list->GetSortColumn(), str2);
       return_value = SortList(list->GetSortType(), str1, str2);
+      break;
+    }
+
+    case kListSortFileSize: {
+      const auto item1 = reinterpret_cast<FeedItem*>(list->GetItemParam(lParam1));
+      const auto item2 = reinterpret_cast<FeedItem*>(list->GetItemParam(lParam2));
+      if (item1 && item2)
+        return_value = CompareValues<UINT64>(item1->file_size, item2->file_size);
       break;
     }
 

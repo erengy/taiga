@@ -480,7 +480,7 @@ void TorrentDialog::RefreshList() {
                                  reinterpret_cast<LPARAM>(&(*it)));
     list_.SetItem(index, kColumnEpisode, number.c_str());
     list_.SetItem(index, kColumnGroup, it->episode_data.release_group().c_str());
-    list_.SetItem(index, kColumnSize, it->episode_data.file_size.c_str());
+    list_.SetItem(index, kColumnSize, it->file_size ? ToSizeString(it->file_size).c_str() : L"");
     list_.SetItem(index, kColumnVideo, video.c_str());
     list_.SetItem(index, kColumnSeeders, it->seeders ? ToWstr(*it->seeders).c_str() : L"");
     list_.SetItem(index, kColumnLeechers, it->leechers ? ToWstr(*it->leechers).c_str() : L"");

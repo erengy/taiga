@@ -424,6 +424,39 @@ bool SaveToFile(const std::string& data, const std::wstring& path,
 
 ////////////////////////////////////////////////////////////////////////////////
 
+UINT64 ParseSizeString(std::wstring value) {
+  TrimRight(value, L".\r");
+  EraseChars(value, L" ");
+
+  std::wstring unit;
+  if (value.length() >= 2) {
+    for (auto it = value.rbegin(); it != value.rend(); ++it) {
+      if (IsNumericChar(*it))
+        break;
+      unit.insert(unit.begin(), *it);
+    }
+    value.resize(value.length() - unit.length());
+    Trim(unit);
+  }
+
+  UINT64 size = 1;
+  if (IsEqual(unit, L"KB")) {
+    size = 1000;
+  } else if (IsEqual(unit, L"KiB")) {
+    size = 1024;
+  } else if (IsEqual(unit, L"MB")) {
+    size = 1000 * 1000;
+  } else if (IsEqual(unit, L"MiB")) {
+    size = 1024 * 1024;
+  } else if (IsEqual(unit, L"GB")) {
+    size = 1000 * 1000 * 1000;
+  } else if (IsEqual(unit, L"GiB")) {
+    size = 1024 * 1024 * 1024;
+  }
+
+  return static_cast<UINT64>(size * ToDouble(value));
+}
+
 std::wstring ToSizeString(QWORD qwSize) {
   std::wstring size, unit;
 

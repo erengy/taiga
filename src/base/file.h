@@ -62,6 +62,7 @@ bool ReadFromFile(const std::wstring& path, std::string& output);
 bool SaveToFile(LPCVOID data, DWORD length, const std::wstring& path, bool take_backup = false);
 bool SaveToFile(const std::string& data, const std::wstring& path, bool take_backup = false);
 
+UINT64 ParseSizeString(std::wstring value);
 std::wstring ToSizeString(QWORD qwSize);
 
 class FileSearchHelper {

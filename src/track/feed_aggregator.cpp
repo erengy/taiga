@@ -490,7 +490,7 @@ void Aggregator::ParseFeedItem(FeedSource source, FeedItem& feed_item) {
   switch (source) {
     // AniDex
     case FeedSource::AniDex:
-      feed_item.episode_data.file_size = InStr(feed_item.description, L"Size: ", L" |");
+      feed_item.file_size = ParseSizeString(InStr(feed_item.description, L"Size: ", L" |"));
       if (InStr(feed_item.description, L" Batch ") > -1)
         feed_item.torrent_category = TorrentCategory::Batch;
       parse_magnet_link();
@@ -498,21 +498,20 @@ void Aggregator::ParseFeedItem(FeedSource source, FeedItem& feed_item) {
 
     // minglong
     case FeedSource::Minglong:
-      feed_item.episode_data.file_size = InStr(feed_item.description, L"Size: ", L"<");
+      feed_item.file_size = ParseSizeString(InStr(feed_item.description, L"Size: ", L"<"));
       break;
 
     // Nyaa Pantsu
     case FeedSource::NyaaPantsu:
       feed_item.info_link = feed_item.guid;
-      feed_item.episode_data.file_size = ToSizeString(
-          std::wcstoull(feed_item.enclosure_length.c_str(), nullptr, 10));
+      feed_item.file_size = std::wcstoull(feed_item.enclosure_length.c_str(), nullptr, 10);
       break;
 
     // Nyaa.si
     case FeedSource::NyaaSi: {
       feed_item.info_link = feed_item.guid;
       if (feed_item.elements.count(L"nyaa:size"))
-        feed_item.episode_data.file_size = feed_item.elements[L"nyaa:size"];
+        feed_item.file_size = ParseSizeString(feed_item.elements[L"nyaa:size"]);
       auto get_torrent_stat = [&](const std::wstring& name, Optional<size_t>& result) {
         if (feed_item.elements.count(name))
           result = ToInt(feed_item.elements[name]);
@@ -525,7 +524,7 @@ void Aggregator::ParseFeedItem(FeedSource source, FeedItem& feed_item) {
 
     // Tokyo Toshokan
     case FeedSource::TokyoToshokan:
-      feed_item.episode_data.file_size = InStr(feed_item.description, L"Size: ", L"<");
+      feed_item.file_size = ParseSizeString(InStr(feed_item.description, L"Size: ", L"<"));
       parse_magnet_link();
       feed_item.description = InStr(feed_item.description, L"Comment: ", L"");
       feed_item.info_link = feed_item.guid;
