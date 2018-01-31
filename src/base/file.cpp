@@ -452,6 +452,10 @@ UINT64 ParseSizeString(std::wstring value) {
     size = 1000 * 1000 * 1000;
   } else if (IsEqual(unit, L"GiB")) {
     size = 1024 * 1024 * 1024;
+  } else if (IsEqual(unit, L"TB")) {
+    size = 1000ui64 * 1000ui64 * 1000ui64 * 1000ui64;
+  } else if (IsEqual(unit, L"TiB")) {
+    size = 1024ui64 * 1024ui64 * 1024ui64 * 1024ui64;
   }
 
   return static_cast<UINT64>(size * ToDouble(value));
@@ -460,13 +464,16 @@ UINT64 ParseSizeString(std::wstring value) {
 std::wstring ToSizeString(QWORD qwSize) {
   std::wstring size, unit;
 
-  if (qwSize > 1073741824) {      // 2^30
+  if (qwSize > 1099511627776ui64) {  // 2^40
+    size = ToWstr(static_cast<double>(qwSize) / 1099511627776ui64, 2);
+    unit = L" TiB";
+  } else if (qwSize > 1073741824) {  // 2^30
     size = ToWstr(static_cast<double>(qwSize) / 1073741824, 2);
     unit = L" GiB";
-  } else if (qwSize > 1048576) {  // 2^20
+  } else if (qwSize > 1048576) {     // 2^20
     size = ToWstr(static_cast<double>(qwSize) / 1048576, 2);
     unit = L" MiB";
-  } else if (qwSize > 1024) {     // 2^10
+  } else if (qwSize > 1024) {        // 2^10
     size = ToWstr(static_cast<double>(qwSize) / 1024, 2);
     unit = L" KiB";
   } else {
