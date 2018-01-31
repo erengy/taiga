@@ -462,13 +462,13 @@ std::wstring ToSizeString(QWORD qwSize) {
 
   if (qwSize > 1073741824) {      // 2^30
     size = ToWstr(static_cast<double>(qwSize) / 1073741824, 2);
-    unit = L" GB";
+    unit = L" GiB";
   } else if (qwSize > 1048576) {  // 2^20
     size = ToWstr(static_cast<double>(qwSize) / 1048576, 2);
-    unit = L" MB";
+    unit = L" MiB";
   } else if (qwSize > 1024) {     // 2^10
     size = ToWstr(static_cast<double>(qwSize) / 1024, 2);
-    unit = L" KB";
+    unit = L" KiB";
   } else {
     size = ToWstr(qwSize);
     unit = L" bytes";
