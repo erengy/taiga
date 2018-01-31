@@ -78,6 +78,7 @@ static const std::vector<StreamData> stream_data{
     L"Plex Web App",
     L"https://www.plex.tv",
     std::regex(
+      "^app\\.plex\\.tv/desktop|"
       "^[^/]*?plex\\.tv/web/|"
       "^localhost:32400/web/|"
       "^\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:32400/web/|"
