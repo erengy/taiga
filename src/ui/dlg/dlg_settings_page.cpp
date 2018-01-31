@@ -688,13 +688,15 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
         case 101: {
           win::ListView list = GetDlgItem(IDC_LIST_TORRENT_FILTER);
           int item_index = list.GetNextItem(-1, LVNI_SELECTED);
-          FeedFilter* feed_filter = reinterpret_cast<FeedFilter*>(list.GetItemParam(item_index));
-          for (auto it = parent->feed_filters_.begin(); it != parent->feed_filters_.end(); ++it) {
-            if (feed_filter == &(*it)) {
-              parent->feed_filters_.erase(it);
-              parent->RefreshTorrentFilterList(list.GetWindowHandle());
-              break;
+          if (item_index > -1) {
+            auto feed_filter = reinterpret_cast<FeedFilter*>(list.GetItemParam(item_index));
+            for (auto it = parent->feed_filters_.begin(); it != parent->feed_filters_.end(); ++it) {
+              if (feed_filter == &(*it)) {
+                parent->feed_filters_.erase(it);
+                break;
+              }
             }
+            list.DeleteItem(item_index);
           }
           list.SetWindowHandle(nullptr);
           return TRUE;
@@ -865,6 +867,46 @@ LRESULT SettingsPage::OnNotify(int idCtrl, LPNMHDR pnmh) {
         toolbar.EnableButton(104, index > -1 && index < count - 1);
         list.SetWindowHandle(nullptr);
         toolbar.SetWindowHandle(nullptr);
+      }
+      break;
+    }
+
+    // List key press
+    case LVN_KEYDOWN: {
+      auto pnkd = reinterpret_cast<LPNMLVKEYDOWN>(pnmh);
+      switch (pnkd->hdr.idFrom) {
+        case IDC_LIST_FOLDERS_ROOT:
+          switch (pnkd->wVKey) {
+            case VK_DELETE: {
+              win::ListView list = GetDlgItem(IDC_LIST_FOLDERS_ROOT);
+              while (list.GetSelectedCount() > 0)
+                list.DeleteItem(list.GetNextItem(-1, LVNI_SELECTED));
+              EnableDlgItem(IDC_BUTTON_REMOVEFOLDER, FALSE);
+              list.SetWindowHandle(nullptr);
+              return TRUE;
+            }
+          }
+          break;
+        case IDC_LIST_TORRENT_FILTER:
+          switch (pnkd->wVKey) {
+            case VK_DELETE: {
+              win::ListView list = GetDlgItem(IDC_LIST_TORRENT_FILTER);
+              int item_index = list.GetNextItem(-1, LVNI_SELECTED);
+              if (item_index > -1) {
+                auto feed_filter = reinterpret_cast<FeedFilter*>(list.GetItemParam(item_index));
+                for (auto it = parent->feed_filters_.begin(); it != parent->feed_filters_.end(); ++it) {
+                  if (feed_filter == &(*it)) {
+                    parent->feed_filters_.erase(it);
+                    break;
+                  }
+                }
+                list.DeleteItem(item_index);
+              }
+              list.SetWindowHandle(nullptr);
+              return TRUE;
+            }
+          }
+          break;
       }
       break;
     }
