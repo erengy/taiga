@@ -424,62 +424,50 @@ bool SaveToFile(const std::string& data, const std::wstring& path,
 
 ////////////////////////////////////////////////////////////////////////////////
 
+enum Unit : UINT64 {
+  kKB  = 1000,
+  kKiB = 1024,
+  kMB  = 1000000,
+  kMiB = 1048576,
+  kGB  = 1000000000,
+  kGiB = 1073741824,
+  kTB  = 1000000000000,
+  kTiB = 1099511627776,
+};
+
 UINT64 ParseSizeString(std::wstring value) {
-  TrimRight(value, L".\r");
-  EraseChars(value, L" ");
-
   std::wstring unit;
-  if (value.length() >= 2) {
-    for (auto it = value.rbegin(); it != value.rend(); ++it) {
-      if (IsNumericChar(*it))
-        break;
-      unit.insert(unit.begin(), *it);
-    }
-    value.resize(value.length() - unit.length());
-    Trim(unit);
+  const auto pos = value.find_first_not_of(L"0123456789.");
+  if (pos != value.npos) {
+    unit = value.substr(pos);
+    value.resize(pos);
+    Trim(unit, L"\r\n\t ");
   }
 
-  UINT64 size = 1;
-  if (IsEqual(unit, L"KB")) {
-    size = 1000;
-  } else if (IsEqual(unit, L"KiB")) {
-    size = 1024;
-  } else if (IsEqual(unit, L"MB")) {
-    size = 1000 * 1000;
-  } else if (IsEqual(unit, L"MiB")) {
-    size = 1024 * 1024;
-  } else if (IsEqual(unit, L"GB")) {
-    size = 1000 * 1000 * 1000;
-  } else if (IsEqual(unit, L"GiB")) {
-    size = 1024 * 1024 * 1024;
-  } else if (IsEqual(unit, L"TB")) {
-    size = 1000ui64 * 1000ui64 * 1000ui64 * 1000ui64;
-  } else if (IsEqual(unit, L"TiB")) {
-    size = 1024ui64 * 1024ui64 * 1024ui64 * 1024ui64;
-  }
+  const auto size = [&unit]() -> UINT64 {
+    if (IsEqual(unit, L"KB")) return Unit::kKB;
+    if (IsEqual(unit, L"KiB")) return Unit::kKiB;
+    if (IsEqual(unit, L"MB")) return Unit::kMB;
+    if (IsEqual(unit, L"MiB")) return Unit::kMiB;
+    if (IsEqual(unit, L"GB")) return Unit::kGB;
+    if (IsEqual(unit, L"GiB")) return Unit::kGiB;
+    if (IsEqual(unit, L"TB")) return Unit::kTB;
+    if (IsEqual(unit, L"TiB")) return Unit::kTiB;
+    return 1;
+  }();
 
   return static_cast<UINT64>(size * ToDouble(value));
 }
 
-std::wstring ToSizeString(QWORD qwSize) {
-  std::wstring size, unit;
+std::wstring ToSizeString(const UINT64 size) {
+  const auto to_wstr = [&size](const Unit unit) {
+    return ToWstr(static_cast<double>(size) / unit, 1);
+  };
 
-  if (qwSize > 1099511627776ui64) {  // 2^40
-    size = ToWstr(static_cast<double>(qwSize) / 1099511627776ui64, 2);
-    unit = L" TiB";
-  } else if (qwSize > 1073741824) {  // 2^30
-    size = ToWstr(static_cast<double>(qwSize) / 1073741824, 2);
-    unit = L" GiB";
-  } else if (qwSize > 1048576) {     // 2^20
-    size = ToWstr(static_cast<double>(qwSize) / 1048576, 2);
-    unit = L" MiB";
-  } else if (qwSize > 1024) {        // 2^10
-    size = ToWstr(static_cast<double>(qwSize) / 1024, 2);
-    unit = L" KiB";
-  } else {
-    size = ToWstr(qwSize);
-    unit = L" bytes";
-  }
+  if (size >= Unit::kTiB) return to_wstr(Unit::kTiB) + L" TiB";
+  if (size >= Unit::kGiB) return to_wstr(Unit::kGiB) + L" GiB";
+  if (size >= Unit::kMiB) return to_wstr(Unit::kMiB) + L" MiB";
+  if (size >= Unit::kKiB) return to_wstr(Unit::kKiB) + L" KiB";
 
-  return size + unit;
+  return ToWstr(size) + L" bytes";
 }
