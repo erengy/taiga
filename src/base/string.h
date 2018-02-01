@@ -90,6 +90,8 @@ double ToDouble(const std::string& str);
 double ToDouble(const std::wstring& str);
 int ToInt(const std::string& str);
 int ToInt(const std::wstring& str);
+UINT64 ToUint64(const std::string& str);
+UINT64 ToUint64(const std::wstring& str);
 time_t ToTime(const std::string& str);
 time_t ToTime(const std::wstring& str);
 std::string ToStr(const INT& value);

@@ -676,6 +676,14 @@ int ToInt(const wstring& str) {
   return _wtoi(str.c_str());
 }
 
+UINT64 ToUint64(const std::string& str) {
+  return std::stoull(str.c_str(), nullptr, 10);
+}
+
+UINT64 ToUint64(const std::wstring& str) {
+  return std::wcstoull(str.c_str(), nullptr, 10);
+}
+
 time_t ToTime(const std::string& str) {
   return _atoi64(str.c_str());
 }

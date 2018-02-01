@@ -47,6 +47,7 @@ enum FeedFilterElement {
   kFeedFilterElement_File_Category,
   kFeedFilterElement_File_Description,
   kFeedFilterElement_File_Link,
+  kFeedFilterElement_File_Size,
   kFeedFilterElement_Count
 };
 

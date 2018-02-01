@@ -16,6 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "base/file.h"
 #include "base/foreach.h"
 #include "base/log.h"
 #include "base/string.h"
@@ -48,6 +49,10 @@ bool EvaluateCondition(const FeedFilterCondition& condition,
       break;
     case kFeedFilterElement_File_Link:
       element = item.link;
+      break;
+    case kFeedFilterElement_File_Size:
+      element = ToWstr(item.file_size);
+      is_numeric = true;
       break;
     case kFeedFilterElement_Meta_Id:
       if (anime)
@@ -120,6 +125,8 @@ bool EvaluateCondition(const FeedFilterCondition& condition,
   switch (condition.op) {
     case kFeedFilterOperator_Equals:
       if (is_numeric) {
+        if (condition.element == kFeedFilterElement_File_Size)
+          return ToUint64(element) == ParseSizeString(value);
         if (IsEqual(value, L"True"))
           return ToInt(element) == TRUE;
         return ToInt(element) == ToInt(value);
@@ -132,6 +139,8 @@ bool EvaluateCondition(const FeedFilterCondition& condition,
       }
     case kFeedFilterOperator_NotEquals:
       if (is_numeric) {
+        if (condition.element == kFeedFilterElement_File_Size)
+          return ToUint64(element) != ParseSizeString(value);
         if (IsEqual(value, L"True"))
           return ToInt(element) == TRUE;
         return ToInt(element) != ToInt(value);
@@ -144,6 +153,8 @@ bool EvaluateCondition(const FeedFilterCondition& condition,
       }
     case kFeedFilterOperator_IsGreaterThan:
       if (is_numeric) {
+        if (condition.element == kFeedFilterElement_File_Size)
+          return ToUint64(element) > ParseSizeString(value);
         return ToInt(element) > ToInt(value);
       } else {
         if (condition.element == kFeedFilterElement_Episode_VideoResolution) {
@@ -154,6 +165,8 @@ bool EvaluateCondition(const FeedFilterCondition& condition,
       }
     case kFeedFilterOperator_IsGreaterThanOrEqualTo:
       if (is_numeric) {
+        if (condition.element == kFeedFilterElement_File_Size)
+          return ToUint64(element) >= ParseSizeString(value);
         return ToInt(element) >= ToInt(value);
       } else {
         if (condition.element == kFeedFilterElement_Episode_VideoResolution) {
@@ -164,6 +177,8 @@ bool EvaluateCondition(const FeedFilterCondition& condition,
       }
     case kFeedFilterOperator_IsLessThan:
       if (is_numeric) {
+        if (condition.element == kFeedFilterElement_File_Size)
+          return ToUint64(element) < ParseSizeString(value);
         return ToInt(element) < ToInt(value);
       } else {
         if (condition.element == kFeedFilterElement_Episode_VideoResolution) {
@@ -174,6 +189,8 @@ bool EvaluateCondition(const FeedFilterCondition& condition,
       }
     case kFeedFilterOperator_IsLessThanOrEqualTo:
       if (is_numeric) {
+        if (condition.element == kFeedFilterElement_File_Size)
+          return ToUint64(element) <= ParseSizeString(value);
         return ToInt(element) <= ToInt(value);
       } else {
         if (condition.element == kFeedFilterElement_Episode_VideoResolution) {
@@ -627,6 +644,7 @@ void FeedFilterManager::InitializeShortcodes() {
   element_shortcodes_[kFeedFilterElement_File_Category] = L"file_category";
   element_shortcodes_[kFeedFilterElement_File_Description] = L"file_description";
   element_shortcodes_[kFeedFilterElement_File_Link] = L"file_link";
+  element_shortcodes_[kFeedFilterElement_File_Size] = L"file_size";
 
   match_shortcodes_[kFeedFilterMatchAll] = L"all";
   match_shortcodes_[kFeedFilterMatchAny] = L"any";
@@ -772,6 +790,8 @@ std::wstring FeedFilterManager::TranslateElement(int element) {
       return L"File description";
     case kFeedFilterElement_File_Link:
       return L"File link";
+    case kFeedFilterElement_File_Size:
+      return L"File size";
     case kFeedFilterElement_Meta_Id:
       return L"Anime ID";
     case kFeedFilterElement_Episode_Title:

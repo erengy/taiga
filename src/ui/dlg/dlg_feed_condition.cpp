@@ -128,6 +128,13 @@ void FeedConditionDialog::OnOK() {
       value_combo_.GetText(condition.value);
   }
 
+  switch (condition.element) {
+    case kFeedFilterElement_File_Size:
+      if (IsNumericString(condition.value))
+        condition.value += L" MiB";
+      break;
+  }
+
   EndDialog(IDOK);
 }
 
@@ -174,6 +181,7 @@ void FeedConditionDialog::ChooseElement(int element_index) {
     operator_combo_.AddItem(Aggregator.filter_manager.TranslateOperator(op).c_str(), op);
 
   switch (element_index) {
+    case kFeedFilterElement_File_Size:
     case kFeedFilterElement_Meta_Id:
     case kFeedFilterElement_Episode_Number:
     case kFeedFilterElement_Meta_DateStart:
@@ -246,6 +254,13 @@ void FeedConditionDialog::ChooseElement(int element_index) {
         value_combo_.AddItem(TranslateTorrentCategory(category).c_str(),
                              static_cast<LPARAM>(category));
       }
+      break;
+    }
+    case kFeedFilterElement_File_Size: {
+      RECREATE_COMBO(CBS_DROPDOWN);
+      value_combo_.AddString(L"10 MiB");
+      value_combo_.AddString(L"100 MiB");
+      value_combo_.AddString(L"1 GiB");
       break;
     }
     case kFeedFilterElement_Meta_Id:
