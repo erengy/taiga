@@ -18,7 +18,7 @@
 
 #include <curl/include/curl/curlver.h>
 #include <fmt/fmt/format.h>
-#include <json/src/json.hpp>
+#include <json/single_include/nlohmann/json.hpp>
 #include <pugixml/src/pugixml.hpp>
 #include <utf8proc/utf8proc.h>
 #include <zlib/zlib.h>
@@ -54,7 +54,10 @@ static std::wstring GetLibraryVersion(ThirdPartyLibrary library) {
           (FMT_VERSION % 10000) / 100,
           (FMT_VERSION % 10000) % 100).to_string());
     case kJson:
-      return StrToWstr(nlohmann::json::meta()["version"]["string"]);
+      return StrToWstr(semaver::Version(
+          NLOHMANN_JSON_VERSION_MAJOR,
+          NLOHMANN_JSON_VERSION_MINOR,
+          NLOHMANN_JSON_VERSION_PATCH).to_string());
     case kLibcurl:
       return StrToWstr(semaver::Version(
           LIBCURL_VERSION_MAJOR,

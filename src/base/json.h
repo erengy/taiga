@@ -20,7 +20,7 @@
 
 #include <string>
 
-#include <json/src/json.hpp>
+#include <json/single_include/nlohmann/json.hpp>
 
 using Json = nlohmann::json;
 
