@@ -655,7 +655,7 @@ void OnAnimeWatchingStart(const anime::Item& anime_item,
     std::wstring tip_text =
         ReplaceVariables(Settings[taiga::kSync_Notify_Format], episode);
     taskbar.Tip(L"", L"", 0);
-    taskbar.Tip(tip_text.c_str(), L"Now Playing", NIIF_INFO);
+    taskbar.Tip(tip_text.c_str(), L"Now Playing", NIIF_INFO | NIIF_NOSOUND);
   }
 }
 
@@ -956,7 +956,7 @@ bool OnFeedNotify(const Feed& feed) {
   tip_text = LimitText(tip_text, 255);
   taskbar.tip_type = TipType::Torrent;
   taskbar.Tip(L"", L"", 0);
-  taskbar.Tip(tip_text.c_str(), tip_title.c_str(), NIIF_INFO);
+  taskbar.Tip(tip_text.c_str(), tip_title.c_str(), NIIF_INFO | NIIF_NOSOUND);
 
   return true;
 }
