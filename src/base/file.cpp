@@ -267,6 +267,7 @@ bool PathExists(const std::wstring& path) {
 
 void ValidateFileName(std::wstring& file) {
   EraseChars(file, L"\\/:*?\"<>|");
+  TrimRight(file, L".");
 }
 
 ////////////////////////////////////////////////////////////////////////////////

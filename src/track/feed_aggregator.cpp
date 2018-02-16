@@ -305,90 +305,93 @@ void Aggregator::HandleFeedDownloadError(Feed& feed) {
   }
 }
 
+std::wstring GetTorrentApplicationPath() {
+  switch (Settings.GetInt(taiga::kTorrent_Download_AppMode)) {
+    case 1:  // Default application
+      return GetDefaultAppPath(L".torrent");
+    case 2:  // Custom application
+      return Settings[taiga::kTorrent_Download_AppPath];
+    default:
+      return {};
+  }
+}
+
+std::wstring GetTorrentDownloadPath(const FeedItem::EpisodeData& episode_data) {
+  std::wstring path;
+
+  // Use anime folder as the download folder
+  const auto anime_item = AnimeDatabase.FindItem(episode_data.anime_id);
+  if (anime_item) {
+    const auto anime_folder = anime_item->GetFolder();
+    if (!anime_folder.empty() && FolderExists(anime_folder))
+      path = anime_folder;
+  }
+
+  // If no anime folder is set, use an alternative folder
+  if (path.empty() &&
+      Settings.GetBool(taiga::kTorrent_Download_FallbackOnFolder)) {
+    path = Settings[taiga::kTorrent_Download_Location];
+
+    // Create a subfolder using the anime title as its name
+    if (!path.empty() &&
+        Settings.GetBool(taiga::kTorrent_Download_CreateSubfolder)) {
+      auto subfolder =
+          anime_item ? anime_item->GetTitle() : episode_data.anime_title();
+      ValidateFileName(subfolder);
+      AddTrailingSlash(path);
+      path += subfolder;
+      if (CreateFolder(path) && anime_item) {
+        anime_item->SetFolder(path);
+        Settings.Save();
+      }
+    }
+  }
+
+  RemoveTrailingSlash(path);  // gets mixed up as an escape character
+
+  return path;
+}
+
 void Aggregator::HandleFeedDownloadOpen(FeedItem& feed_item,
                                         const std::wstring& file) {
   if (!Settings.GetBool(taiga::kTorrent_Download_AppOpen))
     return;
 
-  std::wstring app_path;
-  switch (Settings.GetInt(taiga::kTorrent_Download_AppMode)) {
-    case 1:  // Default application
-      app_path = GetDefaultAppPath(L".torrent", L"");
-      break;
-    case 2:  // Custom application
-      app_path = Settings[taiga::kTorrent_Download_AppPath];
-      break;
+  const auto app_path = GetTorrentApplicationPath();
+  
+  if (app_path.empty()) {
+    LOGD(L"BitTorrent client path is empty.");
+    Execute(file);
+    return;
   }
 
-  std::wstring download_path;
-  if (Settings.GetBool(taiga::kTorrent_Download_UseAnimeFolder)) {
-    // Use anime folder as the download folder
-    auto anime_id = feed_item.episode_data.anime_id;
-    auto anime_item = AnimeDatabase.FindItem(anime_id);
-    if (anime_item) {
-      std::wstring anime_folder = anime_item->GetFolder();
-      if (!anime_folder.empty() && FolderExists(anime_folder))
-        download_path = anime_folder;
-    }
-    // If no anime folder is set, use an alternative folder
-    if (download_path.empty()) {
-      if (Settings.GetBool(taiga::kTorrent_Download_FallbackOnFolder) &&
-          !Settings[taiga::kTorrent_Download_Location].empty()) {
-        download_path = Settings[taiga::kTorrent_Download_Location];
-      }
-      if (!download_path.empty() && !FolderExists(download_path)) {
-        LOGW(L"Folder doesn't exist.\nPath: {}", download_path);
-        download_path.clear();
-      }
-      // Create a subfolder using the anime title as its name
-      if (!download_path.empty() &&
-          Settings.GetBool(taiga::kTorrent_Download_CreateSubfolder)) {
-        std::wstring anime_title;
-        if (anime_item) {
-          anime_title = anime_item->GetTitle();
-        } else {
-          anime_title = feed_item.episode_data.anime_title();
-        }
-        ValidateFileName(anime_title);
-        TrimRight(anime_title, L".");
-        AddTrailingSlash(download_path);
-        download_path += anime_title;
-        if (!CreateFolder(download_path)) {
-          LOGE(L"Subfolder could not be created.\nPath: {}", download_path);
-          download_path.clear();
-        } else {
-          if (anime_item) {
-            anime_item->SetFolder(download_path);
-            Settings.Save();
-          }
-        }
-      }
-    }
-  }
-
-  TrimRight(download_path, L"\\");  // gets mixed up as an escape character
-
-  std::wstring parameters = L"\"{}\""_format(file);
+  std::wstring parameters = LR"("{}")"_format(file);
   int show_command = SW_SHOWNORMAL;
 
-  if (!download_path.empty()) {
-    // uTorrent
-    if (InStr(GetFileName(app_path), L"utorrent", 0, true) > -1) {
-      parameters = LR"(/directory "{}" "{}")"_format(download_path, file);
-    // Deluge
-    } else if (InStr(GetFileName(app_path), L"deluge-console", 0, true) > -1) {
-      parameters = LR"(add -p \"{}\" \"{}\")"_format(download_path, file);
-      show_command = SW_HIDE;
-    // Transmission
-    } else if (InStr(GetFileName(app_path), L"transmission-remote", 0, true) > -1) {
-      parameters = LR"(-a "{}" -w "{}")"_format(file, download_path);
-      show_command = SW_HIDE;
-    } else if (InStr(GetFileName(app_path), L"qbittorrent", 0, true) > -1) {
-      parameters = LR"(--save-path="{}" --skip-dialog=true "{}")"_format(download_path, file);
-    } else {
-      LOGD(L"Application is not a supported torrent client.\nPath: {}", app_path);
+  if (Settings.GetBool(taiga::kTorrent_Download_UseAnimeFolder)) {
+    const auto download_path = GetTorrentDownloadPath(feed_item.episode_data);
+    if (!download_path.empty()) {
+      const auto app_filename = GetFileName(app_path);
+      // uTorrent
+      if (InStr(app_filename, L"utorrent", 0, true) > -1) {
+        parameters = LR"(/directory "{}" "{}")"_format(download_path, file);
+      // Deluge
+      } else if (InStr(app_filename, L"deluge-console", 0, true) > -1) {
+        parameters = LR"(add -p \"{}\" \"{}\")"_format(download_path, file);
+        show_command = SW_HIDE;
+      // Transmission
+      } else if (InStr(app_filename, L"transmission-remote", 0, true) > -1) {
+        parameters = LR"(-a "{}" -w "{}")"_format(file, download_path);
+        show_command = SW_HIDE;
+      } else if (InStr(app_filename, L"qbittorrent", 0, true) > -1) {
+        parameters = LR"(--save-path="{}" --skip-dialog=true "{}")"_format(download_path, file);
+      } else {
+        LOGD(L"Unknown BitTorrent client: {}", app_path);
+      }
     }
   }
+
+  LOGD(L"Application: {}\nParameters: {}", app_path, parameters);
 
   Execute(app_path, parameters, show_command);
 }

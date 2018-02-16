@@ -800,6 +800,10 @@ wstring AddTrailingSlash(const wstring& str) {
   }
 }
 
+void RemoveTrailingSlash(wstring& str) {
+  TrimRight(str, L"/\\");
+}
+
 wstring GetFileExtension(const wstring& str) {
   return str.substr(str.find_last_of(L".") + 1);
 }

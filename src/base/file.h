@@ -49,10 +49,10 @@ bool IsValidDirectory(const WIN32_FIND_DATA& find_data);
 bool FileExists(const std::wstring& file);
 bool FolderExists(const std::wstring& folder);
 bool PathExists(const std::wstring& path);
-void ValidateFileName(std::wstring& path);
+void ValidateFileName(std::wstring& file);
 
 std::wstring ExpandEnvironmentStrings(const std::wstring& path);
-std::wstring GetDefaultAppPath(const std::wstring& extension, const std::wstring& default_value);
+std::wstring GetDefaultAppPath(const std::wstring& extension, const std::wstring& default_value = L"");
 std::wstring GetKnownFolderPath(REFKNOWNFOLDERID rfid);
 
 unsigned int PopulateFiles(std::vector<std::wstring>& file_list, const std::wstring& path, const std::wstring& extension = L"", bool recursive = false, bool trim_extension = false);
