@@ -69,7 +69,7 @@ static const std::vector<StreamData> stream_data{
     L"HIDIVE",
     L"https://www.hidive.com",
     std::regex("hidive\\.com/stream/"),
-    std::regex("(.+)"),
+    std::regex("Stream (.+) on HIDIVE"),
   },
   // Plex Web App
   {
@@ -186,6 +186,13 @@ void CleanStreamTitle(const StreamData& stream_data, std::string& title) {
     case Stream::Ann: {
       static const std::regex pattern{" \\((?:s|d)(?:, uncut)?\\)"};
       title = std::regex_replace(title, pattern, "");
+      break;
+    }
+    case Stream::Hidive: {
+      static const std::regex pattern{"(?:(Episode \\d+)|[^ ]+) of (.+)"};
+      std::smatch match;
+      if (std::regex_match(title, match, pattern))
+        title = match.str(2) + (match.length(1) ? " " + match.str(1) : "");
       break;
     }
     case Stream::Plex: {
