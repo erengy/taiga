@@ -24,6 +24,7 @@
 
 #include "file.h"
 #include "format.h"
+#include "log.h"
 #include "string.h"
 #include "time.h"
 
@@ -133,33 +134,23 @@ bool Execute(const std::wstring& path, const std::wstring& parameters,
     return false;
 
   if (path.length() > MAX_PATH)
-    return ExecuteFile(path, parameters);
+    LOGW(L"Path is longer than MAX_PATH: {}", path);
 
-  auto value = ShellExecute(nullptr, L"open", path.c_str(), parameters.c_str(),
-                            nullptr, show_command);
-  return reinterpret_cast<int>(value) > 32;
-}
+  SHELLEXECUTEINFO info = {0};
+  info.cbSize = sizeof(SHELLEXECUTEINFO);
+  info.fMask = SEE_MASK_NOASYNC | SEE_MASK_FLAG_NO_UI;
+  info.lpVerb = L"open";
+  info.lpFile = path.c_str();
+  info.lpParameters = parameters.empty() ? nullptr : parameters.c_str();
+  info.nShow = show_command;
 
-bool ExecuteFile(const std::wstring& path, std::wstring parameters) {
-  std::wstring exe_path = GetDefaultAppPath(L"." + GetFileExtension(path), L"");
-
-  if (exe_path.empty())
-    return false;
-
-  parameters = LR"("{}" "{}" {})"_format(
-      exe_path, GetExtendedLengthPath(path), parameters);
-
-  PROCESS_INFORMATION process_information = {0};
-  STARTUPINFO startup_info = {sizeof(STARTUPINFO)};
-
-  if (!CreateProcess(nullptr, const_cast<wchar_t*>(parameters.c_str()),
-                     nullptr, nullptr, FALSE, 0, nullptr, nullptr,
-                     &startup_info, &process_information)) {
+  if (::ShellExecuteEx(&info) != TRUE) {
+    auto error_message = win::FormatError(::GetLastError());
+    TrimRight(error_message, L"\r\n");
+    LOGE(L"ShellExecuteEx failed: {}\nPath: {}\nParameters: {}",
+         error_message, path, parameters);
     return false;
   }
-
-  CloseHandle(process_information.hProcess);
-  CloseHandle(process_information.hThread);
 
   return true;
 }
