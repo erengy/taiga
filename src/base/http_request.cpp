@@ -165,6 +165,16 @@ bool Client::SetRequestOptions() {
   TAIGA_CURL_SET_OPTION(CURLOPT_HTTPHEADER, header_list_);
 
   //////////////////////////////////////////////////////////////////////////////
+  // Connection options
+
+  // Abort if slower than 1 KiB/s during 30 seconds
+  TAIGA_CURL_SET_OPTION(CURLOPT_LOW_SPEED_LIMIT, 1024L);
+  TAIGA_CURL_SET_OPTION(CURLOPT_LOW_SPEED_TIME, 30L);
+
+  // Complete connection within 30 seconds (default is 300 seconds)
+  TAIGA_CURL_SET_OPTION(CURLOPT_CONNECTTIMEOUT, 30L);
+
+  //////////////////////////////////////////////////////////////////////////////
   // Security options
 
 #ifdef TAIGA_HTTP_SSL_UNSECURE
