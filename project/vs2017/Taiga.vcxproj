@@ -45,6 +45,7 @@
     <OutDir>..\..\bin\$(Configuration)\</OutDir>
     <IntDir>..\..\build\$(Configuration)\</IntDir>
     <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\Andrew\Desktop\taiga fork\taiga\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -67,7 +68,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>comctl32.lib;libcurl_a_debug.lib;Oleacc.lib;psapi.lib;shlwapi.lib;uxtheme.lib;Winmm.lib;Dwmapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>discord-rpc.lib;comctl32.lib;libcurl_a_debug.lib;Oleacc.lib;psapi.lib;shlwapi.lib;uxtheme.lib;Winmm.lib;Dwmapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <DelayLoadDLLs>comctl32.dll</DelayLoadDLLs>
       <AdditionalLibraryDirectories>..\..\deps\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
@@ -204,6 +205,7 @@
     <ClCompile Include="..\..\src\compat\crypto.cpp" />
     <ClCompile Include="..\..\src\compat\history.cpp" />
     <ClCompile Include="..\..\src\compat\settings.cpp" />
+    <ClCompile Include="..\..\src\discord-RPC\discord_rpc_functions.cpp" />
     <ClCompile Include="..\..\src\library\anime.cpp" />
     <ClCompile Include="..\..\src\library\anime_db.cpp" />
     <ClCompile Include="..\..\src\library\anime_episode.cpp" />
@@ -373,6 +375,9 @@
     <ClInclude Include="..\..\src\base\url.h" />
     <ClInclude Include="..\..\src\base\xml.h" />
     <ClInclude Include="..\..\src\compat\crypto.h" />
+    <ClInclude Include="..\..\src\discord-RPC\discord_rpc_functions.h" />
+    <ClInclude Include="..\..\src\discord-RPC\include\discord_register.h" />
+    <ClInclude Include="..\..\src\discord-RPC\include\discord_rpc.h" />
     <ClInclude Include="..\..\src\library\anime.h" />
     <ClInclude Include="..\..\src\library\anime_db.h" />
     <ClInclude Include="..\..\src\library\anime_episode.h" />

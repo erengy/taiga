@@ -85,6 +85,9 @@
     <Filter Include="ui\dlg">
       <UniqueIdentifier>{1fde5dda-2f86-4de5-a8cc-da7664cc759b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="discord-RPC">
+      <UniqueIdentifier>{566de2b3-5a22-40a0-881f-9c1bf5c78276}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\main.cpp" />
@@ -592,6 +595,9 @@
     <ClCompile Include="..\..\src\ui\dlg\dlg_update_new.cpp">
       <Filter>ui\dlg</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\discord-RPC\discord_rpc_functions.cpp">
+      <Filter>discord-RPC</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\base\base64.h">
@@ -1079,6 +1085,15 @@
     </ClInclude>
     <ClInclude Include="..\..\src\ui\dlg\dlg_update_new.h">
       <Filter>ui\dlg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\discord-RPC\include\discord_register.h">
+      <Filter>discord-RPC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\discord-RPC\include\discord_rpc.h">
+      <Filter>discord-RPC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\discord-RPC\discord_rpc_functions.h">
+      <Filter>discord-RPC</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

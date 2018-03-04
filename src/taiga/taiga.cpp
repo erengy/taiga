@@ -36,6 +36,8 @@
 #include "ui/theme.h"
 #include "ui/ui.h"
 
+#include "discord-RPC/discord_rpc_functions.h"
+
 taiga::App Taiga;
 
 namespace taiga {
@@ -96,6 +98,9 @@ BOOL App::InitInstance() {
   // Create API windows
   ::Skype.Create();
 
+  discord::discordInit();
+  discord::updateDiscordPresence();
+
   if (Settings.GetBool(kApp_Behavior_CheckForUpdates)) {
     ui::ShowDialog(ui::Dialog::Update);
   } else {
@@ -122,6 +127,8 @@ void App::Uninitialize() {
   Settings.Save();
   AnimeDatabase.SaveDatabase();
   Aggregator.SaveArchive();
+
+  Discord_Shutdown();
 
   // Exit
   PostQuitMessage();
