@@ -58,6 +58,7 @@
 #include "ui/menu.h"
 #include "ui/theme.h"
 #include "ui/ui.h"
+#include "discord-RPC/discord_rpc_functions.h"
 
 namespace ui {
 
@@ -657,6 +658,8 @@ void OnAnimeWatchingStart(const anime::Item& anime_item,
     taskbar.Tip(L"", L"", 0);
     taskbar.Tip(tip_text.c_str(), L"Now Playing", NIIF_INFO | NIIF_NOSOUND);
   }
+
+  discord::updateDiscordPresence(false, anime_item.GetTitle() + L" Episode " + std::to_wstring(episode.episode_number()));
 }
 
 void OnAnimeWatchingEnd(const anime::Item& anime_item,
@@ -672,6 +675,8 @@ void OnAnimeWatchingEnd(const anime::Item& anime_item,
     DlgAnimeList.listview.SetItemIcon(list_index, icon_index);
     DlgAnimeList.listview.RedrawItems(list_index, list_index, true);
   }
+
+  discord::updateDiscordPresence();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

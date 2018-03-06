@@ -99,7 +99,7 @@ BOOL App::InitInstance() {
   ::Skype.Create();
 
   discord::discordInit();
-  discord::updateDiscordPresence();
+  discord::updateDiscordPresence(true);
 
   if (Settings.GetBool(kApp_Behavior_CheckForUpdates)) {
     ui::ShowDialog(ui::Dialog::Update);
@@ -128,7 +128,7 @@ void App::Uninitialize() {
   AnimeDatabase.SaveDatabase();
   Aggregator.SaveArchive();
 
-  Discord_Shutdown();
+  discord::Discord_Shutdown();
 
   // Exit
   PostQuitMessage();

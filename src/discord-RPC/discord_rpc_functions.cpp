@@ -1,5 +1,6 @@
 #include "discord-RPC/discord_rpc_functions.h"
 #include <string>
+#include <ctime>
 
 namespace discord
 {
@@ -16,25 +17,35 @@ namespace discord
     Discord_Initialize(APPLICATION_ID, &handlers, 1, NULL);
   }
 
-  void updateDiscordPresence()
+  //void updateDiscordPresence()
+  //{
+  //  DiscordRichPresence discordPresence;
+  //  memset(&discordPresence, 0, sizeof(discordPresence));
+  //  discordPresence.state = "Taiga Discord Test";
+  //  discordPresence.details = "Watching something";
+  //  Discord_UpdatePresence(&discordPresence);
+  //}
+
+  void updateDiscordPresence(bool idling, const std::wstring& anime_name)
   {
-    //char buffer[256];
     DiscordRichPresence discordPresence;
     memset(&discordPresence, 0, sizeof(discordPresence));
-    discordPresence.state = "Taiga Discord Test";
-    //sprintf(buffer, "Frustration level: %d", 1);
-    discordPresence.details = "Watching something";
-    //discordPresence.startTimestamp = 0;
-    //discordPresence.endTimestamp = 250;
-    //discordPresence.largeImageKey = "canary-large";
-    //discordPresence.smallImageKey = "ptb-small";
-    //discordPresence.partyId = "party1234";
-    //discordPresence.partySize = 1;
-    //discordPresence.partyMax = 6;
-    //discordPresence.matchSecret = "xyzzy";
-    //discordPresence.joinSecret = "join";
-    //discordPresence.spectateSecret = "look";
-    //discordPresence.instance = 0;
+    //discordPresence.state = "Taiga Discord Test";
+    //discordPresence.details = "Watching something";
+
+    if (idling)
+    {
+      discordPresence.details = "Idling";
+    }
+    else
+    {
+      discordPresence.details = "Watching Anime";
+      char* tmpString = new char[255];
+      sprintf_s(tmpString, sizeof(char) * 255, "%ls", anime_name.c_str());
+      discordPresence.state = tmpString;
+      discordPresence.startTimestamp = time(0);
+    }
+
     Discord_UpdatePresence(&discordPresence);
   }
 
@@ -67,4 +78,4 @@ namespace discord
   {
 
   }
-}
+} // namespace discord
