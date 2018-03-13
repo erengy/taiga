@@ -112,6 +112,7 @@ enum AppSettingName {
   kStream_Viz,
   kStream_Vrv,
   kStream_Wakanim,
+  kStream_Yahoo,
   kStream_Youtube,
 
   // Sharing

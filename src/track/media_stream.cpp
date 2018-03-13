@@ -123,6 +123,15 @@ static const std::vector<StreamData> stream_data{
     std::regex("wakanim\\.tv/video(?:-premium)?/[^/]+/"),
     std::regex("(.+) / Streaming - Wakanim.TV"),
   },
+  // Yahoo View
+  {
+    Stream::Yahoo,
+    taiga::kStream_Yahoo,
+    L"Yahoo View",
+    L"https://view.yahoo.com",
+    std::regex("view.yahoo.com/show/[^/]+/episode/[^/]+/"),
+    std::regex("Watch .+ Free Online - (.+) \\| Yahoo View"),
+  },
   // YouTube
   {
     Stream::Youtube,

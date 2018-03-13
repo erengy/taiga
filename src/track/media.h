@@ -84,6 +84,7 @@ enum class Stream {
   Viz,
   Vrv,
   Wakanim,
+  Yahoo,
   Youtube,
 };
 
