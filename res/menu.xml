@@ -15,10 +15,10 @@
 		<item name="Library folders" sub="Folders"/>
 		<item name="Scan available episodes" action="ScanEpisodesAll()"/>
 		<item type="separator"/>
-		<item name="Play &next episode&#9;Ctrl+N" action="PlayNext()"/>
-		<item name="Play &random anime&#9;Ctrl+R" action="PlayRandomAnime()"/>
+		<item name="Play &amp;next episode&#9;Ctrl+N" action="PlayNext()"/>
+		<item name="Play &amp;random anime&#9;Ctrl+R" action="PlayRandomAnime()"/>
 		<item type="separator"/>
-		<item name="E&xit" action="Exit()"/>
+		<item name="E&amp;xit" action="Exit()"/>
 	</menu>
 	<!-- Services -->
 	<menu name="Services">
@@ -111,26 +111,26 @@
 		<item name="Search" sub="Search"/>
 		<item type="separator"/>
 		<item name="Edit" action="EditAll()"/>
-		<item name="&Delete from list...&#9;Del" action="EditDelete()"/>
+		<item name="&amp;Delete from list...&#9;Del" action="EditDelete()"/>
 		<item type="separator"/>
 		<item name="Open folder&#9;Ctrl+O" action="OpenFolder()"/>
 		<item name="Scan available episodes&#9;F5" action="ScanEpisodes()"/>
 		<item type="separator"/>
 		<!-- Note: Overwritten -->
-		<item name="Play episode"           sub="PlayEpisode"/>
-		<item name="Play &last episode"   action="PlayLast()"/>
-		<item name="Play &next episode"   action="PlayNext()"/>
-		<item name="Play &random episode" action="PlayRandom()"/>
+		<item name="Play episode"                sub="PlayEpisode"/>
+		<item name="Play &amp;last episode"   action="PlayLast()"/>
+		<item name="Play &amp;next episode"   action="PlayNext()"/>
+		<item name="Play &amp;random episode" action="PlayRandom()"/>
 	</menu>
 	<!-- Edit -->
 	<menu name="Edit">
-		<item name="Set &date"          sub="EditDate"/>
-		<item name="Set &episode..." action="EditEpisode()"/>
-		<item name="Set sco&re"         sub="EditScore"/>
-		<item name="Set &status"        sub="EditStatus"/>
-		<item name="Set &tags..."    action="EditTags()"/>
+		<item name="Set &amp;date"          sub="EditDate"/>
+		<item name="Set &amp;episode..." action="EditEpisode()"/>
+		<item name="Set sco&amp;re"         sub="EditScore"/>
+		<item name="Set &amp;status"        sub="EditStatus"/>
+		<item name="Set &amp;tags..."    action="EditTags()"/>
 		<item type="separator"/>
-		<item name="Delete from &list...&#9;Del" action="EditDelete()"/>
+		<item name="Delete from &amp;list...&#9;Del" action="EditDelete()"/>
 	</menu>
 	<!-- Date -->
 	<menu name="EditDate">
@@ -165,7 +165,7 @@
 	<menu name="Search">
 		<!-- Note: Use %title% as the search string -->
 		<item name="AniDB"              action="URL(https://anidb.net/perl-bin/animedb.pl?show=animelist&amp;adb.search=%title%&amp;noalias=1&amp;do.update=update)"/>
-		<item name="AniList"            action="URL(https://anilist.co/search?type=anime&q=%title%)"/>
+		<item name="AniList"            action="URL(https://anilist.co/search?type=anime&amp;q=%title%)"/>
 		<item name="Anime News Network" action="URL(https://www.animenewsnetwork.com/search?q=%title%)"/>
 		<item name="Kitsu"              action="URL(https://kitsu.io/anime?text=%title%)"/>
 		<item name="MyAnimeList"        action="URL(https://myanimelist.net/anime.php?q=%title%)"/>
