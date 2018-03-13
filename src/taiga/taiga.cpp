@@ -128,7 +128,7 @@ void App::Uninitialize() {
   AnimeDatabase.SaveDatabase();
   Aggregator.SaveArchive();
 
-  discord::Discord_Shutdown();
+  discord::discordShutDown();
 
   // Exit
   PostQuitMessage();

@@ -10,9 +10,6 @@
     <Filter Include="deps">
       <UniqueIdentifier>{58598ee5-0814-4581-87d0-a28008a25893}</UniqueIdentifier>
     </Filter>
-    <Filter Include="library">
-      <UniqueIdentifier>{9fac04ef-29f0-4083-a1a7-f20d503a40df}</UniqueIdentifier>
-    </Filter>
     <Filter Include="sync">
       <UniqueIdentifier>{ff7ccb38-f620-487f-b0de-e4d23f544d34}</UniqueIdentifier>
     </Filter>
@@ -70,9 +67,6 @@
     <Filter Include="deps\zlib">
       <UniqueIdentifier>{1dd6ca23-29e1-4a1b-b1fb-a3b4988da7b0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="library\anime">
-      <UniqueIdentifier>{d6043b6b-33fb-470e-bab4-28380104489e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="sync\anilist">
       <UniqueIdentifier>{b390951c-cbaf-4d02-871d-563957f7080e}</UniqueIdentifier>
     </Filter>
@@ -87,6 +81,12 @@
     </Filter>
     <Filter Include="discord-RPC">
       <UniqueIdentifier>{566de2b3-5a22-40a0-881f-9c1bf5c78276}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="taiga\library">
+      <UniqueIdentifier>{9fac04ef-29f0-4083-a1a7-f20d503a40df}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="taiga\library\anime">
+      <UniqueIdentifier>{d6043b6b-33fb-470e-bab4-28380104489e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -386,40 +386,40 @@
       <Filter>deps\zlib</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\library\discover.cpp">
-      <Filter>library</Filter>
+      <Filter>taiga\library</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\library\history.cpp">
-      <Filter>library</Filter>
+      <Filter>taiga\library</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\library\metadata.cpp">
-      <Filter>library</Filter>
+      <Filter>taiga\library</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\library\resource.cpp">
-      <Filter>library</Filter>
+      <Filter>taiga\library</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\library\anime.cpp">
-      <Filter>library\anime</Filter>
+      <Filter>taiga\library\anime</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\library\anime_util_time.cpp">
-      <Filter>library\anime</Filter>
+      <Filter>taiga\library\anime</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\library\anime_db.cpp">
-      <Filter>library\anime</Filter>
+      <Filter>taiga\library\anime</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\library\anime_episode.cpp">
-      <Filter>library\anime</Filter>
+      <Filter>taiga\library\anime</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\library\anime_filter.cpp">
-      <Filter>library\anime</Filter>
+      <Filter>taiga\library\anime</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\library\anime_item.cpp">
-      <Filter>library\anime</Filter>
+      <Filter>taiga\library\anime</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\library\anime_season.cpp">
-      <Filter>library\anime</Filter>
+      <Filter>taiga\library\anime</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\library\anime_util.cpp">
-      <Filter>library\anime</Filter>
+      <Filter>taiga\library\anime</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\sync\manager.cpp">
       <Filter>sync</Filter>
@@ -889,37 +889,37 @@
       <Filter>deps\zlib</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\library\discover.h">
-      <Filter>library</Filter>
+      <Filter>taiga\library</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\library\history.h">
-      <Filter>library</Filter>
+      <Filter>taiga\library</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\library\metadata.h">
-      <Filter>library</Filter>
+      <Filter>taiga\library</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\library\resource.h">
-      <Filter>library</Filter>
+      <Filter>taiga\library</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\library\anime.h">
-      <Filter>library\anime</Filter>
+      <Filter>taiga\library\anime</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\library\anime_db.h">
-      <Filter>library\anime</Filter>
+      <Filter>taiga\library\anime</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\library\anime_episode.h">
-      <Filter>library\anime</Filter>
+      <Filter>taiga\library\anime</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\library\anime_filter.h">
-      <Filter>library\anime</Filter>
+      <Filter>taiga\library\anime</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\library\anime_item.h">
-      <Filter>library\anime</Filter>
+      <Filter>taiga\library\anime</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\library\anime_season.h">
-      <Filter>library\anime</Filter>
+      <Filter>taiga\library\anime</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\library\anime_util.h">
-      <Filter>library\anime</Filter>
+      <Filter>taiga\library\anime</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\sync\manager.h">
       <Filter>sync</Filter>

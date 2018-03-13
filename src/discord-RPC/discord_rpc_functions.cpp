@@ -17,21 +17,17 @@ namespace discord
     Discord_Initialize(APPLICATION_ID, &handlers, 1, NULL);
   }
 
-  //void updateDiscordPresence()
-  //{
-  //  DiscordRichPresence discordPresence;
-  //  memset(&discordPresence, 0, sizeof(discordPresence));
-  //  discordPresence.state = "Taiga Discord Test";
-  //  discordPresence.details = "Watching something";
-  //  Discord_UpdatePresence(&discordPresence);
-  //}
+  void discordShutDown()
+  {
+    Discord_ClearPresence();
+    Discord_Shutdown();
+  }
+
 
   void updateDiscordPresence(bool idling, const std::wstring& anime_name)
   {
     DiscordRichPresence discordPresence;
     memset(&discordPresence, 0, sizeof(discordPresence));
-    //discordPresence.state = "Taiga Discord Test";
-    //discordPresence.details = "Watching something";
 
     if (idling)
     {
@@ -47,35 +43,40 @@ namespace discord
     }
 
     Discord_UpdatePresence(&discordPresence);
+
+    #ifdef DISCORD_DISABLE_IO_THREAD
+        Discord_UpdateConnection();
+    #endif
+        Discord_RunCallbacks();
   }
 
   static void handleDiscordReady(void)
   {
-    printf("\nDiscord: ready\n");
+    // Stub event
   }
 
   static void handleDiscordDisconnected(int errcode, const char* message)
   {
-    printf("\nDiscord: disconnected (%d: %s)\n", errcode, message);
+    // Stub event
   }
 
   static void handleDiscordError(int errcode, const char* message)
   {
-    printf("\nDiscord: error (%d: %s)\n", errcode, message);
+    // Stub event
   }
 
   static void handleDiscordJoin(const char* secret)
   {
-    printf("\nDiscord: join (%s)\n", secret);
+    // Stub event
   }
 
   static void handleDiscordSpectate(const char* secret)
   {
-    printf("\nDiscord: spectate (%s)\n", secret);
+    // Stub event
   }
 
   static void handleDiscordJoinRequest(const DiscordJoinRequest* request)
   {
-
+    // Stub event
   }
 } // namespace discord
