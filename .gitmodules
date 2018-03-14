@@ -22,7 +22,11 @@
 	path = deps/src/date
 	url = https://github.com/HowardHinnant/date.git
 
-[submodule "fmt"]
+[submodule "discord-rpc"]
+	path = deps/src/discord-rpc
+	url = https://github.com/discordapp/discord-rpc.git
+
+  [submodule "fmt"]
 	path = deps/src/fmt
 	url = https://github.com/fmtlib/fmt.git
 
@@ -38,7 +42,11 @@
 	path = deps/src/pugixml
 	url = https://github.com/zeux/pugixml.git
 
-[submodule "semaver"]
+[submodule "rapidjson"]
+	path = deps/src/rapidjson
+	url = https://github.com/Tencent/rapidjson.git
+
+  [submodule "semaver"]
 	path = deps/src/semaver
 	url = https://github.com/erengy/semaver.git
 
