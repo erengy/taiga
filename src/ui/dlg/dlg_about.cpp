@@ -20,6 +20,7 @@
 #include <fmt/fmt/format.h>
 #include <json/single_include/nlohmann/json.hpp>
 #include <pugixml/src/pugixml.hpp>
+#include <rapidjson/rapidjson.h>
 #include <utf8proc/utf8proc.h>
 #include <zlib/zlib.h>
 
@@ -36,10 +37,12 @@ namespace ui {
 
 enum ThirdPartyLibrary {
   kDate,
+  kDiscordRpc,
   kFmt,
   kJson,
   kLibcurl,
   kPugixml,
+  kRapidJson,
   kUtf8proc,
   kZlib,
 };
@@ -48,6 +51,8 @@ static std::wstring GetLibraryVersion(ThirdPartyLibrary library) {
   switch (library) {
     case kDate:
       return L"2.4";
+    case kDiscordRpc:
+      return L"3.0.0";
     case kFmt:
       return StrToWstr(semaver::Version(
           (FMT_VERSION / 10000),
@@ -68,6 +73,11 @@ static std::wstring GetLibraryVersion(ThirdPartyLibrary library) {
           (PUGIXML_VERSION / 100),
           (PUGIXML_VERSION % 100) / 10,
           (PUGIXML_VERSION % 100) % 10).to_string());
+    case kRapidJson:
+      return StrToWstr(semaver::Version(
+          RAPIDJSON_MAJOR_VERSION,
+          RAPIDJSON_MINOR_VERSION,
+          RAPIDJSON_PATCH_VERSION).to_string());
     case kUtf8proc:
       return StrToWstr(utf8proc_version());
     case kZlib:
@@ -112,11 +122,13 @@ BOOL AboutDialog::OnInitDialog() {
       L"ryban, tollyx, pavelxdd, gunt3001, synthtech\\line\\par "
       L"\\b Third-party components:\\b0\\line "
       L"{\\field{\\*\\fldinst{HYPERLINK \"https://github.com/HowardHinnant/date\"}}{\\fldrslt{date " + GetLibraryVersion(kDate) + L"}}}, "
+      L"{\\field{\\*\\fldinst{HYPERLINK \"https://github.com/discordapp/discord-rpc\"}}{\\fldrslt{Discord RPC " + GetLibraryVersion(kDiscordRpc) + L"}}}, "
       L"{\\field{\\*\\fldinst{HYPERLINK \"https://github.com/fmtlib/fmt\"}}{\\fldrslt{fmt " + GetLibraryVersion(kFmt) + L"}}}, "
       L"{\\field{\\*\\fldinst{HYPERLINK \"https://github.com/yusukekamiyamane/fugue-icons\"}}{\\fldrslt{Fugue Icons 3.4.5}}}, "
       L"{\\field{\\*\\fldinst{HYPERLINK \"https://github.com/nlohmann/json\"}}{\\fldrslt{json " + GetLibraryVersion(kJson) + L"}}}, "
       L"{\\field{\\*\\fldinst{HYPERLINK \"https://github.com/curl/curl\"}}{\\fldrslt{libcurl " + GetLibraryVersion(kLibcurl) + L"}}}, "
       L"{\\field{\\*\\fldinst{HYPERLINK \"https://github.com/zeux/pugixml\"}}{\\fldrslt{pugixml " + GetLibraryVersion(kPugixml) + L"}}}, "
+      L"{\\field{\\*\\fldinst{HYPERLINK \"https://github.com/Tencent/rapidjson\"}}{\\fldrslt{RapidJSON " + GetLibraryVersion(kRapidJson) + L"}}}, "
       L"{\\field{\\*\\fldinst{HYPERLINK \"https://github.com/JuliaLang/utf8proc\"}}{\\fldrslt{utf8proc " + GetLibraryVersion(kUtf8proc) + L"}}}, "
       L"{\\field{\\*\\fldinst{HYPERLINK \"https://github.com/madler/zlib\"}}{\\fldrslt{zlib " + GetLibraryVersion(kZlib) + L"}}}\\line\\par "
       L"\\b Links:\\b0\\line "

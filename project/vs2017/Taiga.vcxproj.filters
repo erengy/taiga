@@ -43,6 +43,9 @@
     <Filter Include="deps\date">
       <UniqueIdentifier>{01a715e8-af40-4ff8-893b-7a9491d532c6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="deps\discord-rpc">
+      <UniqueIdentifier>{5d7cb3eb-4d80-4756-9483-7c95c1d2c764}</UniqueIdentifier>
+    </Filter>
     <Filter Include="deps\fmt">
       <UniqueIdentifier>{451cd069-4306-41ae-acd9-57c5c2606e51}</UniqueIdentifier>
     </Filter>
@@ -216,6 +219,21 @@
     </ClCompile>
     <ClCompile Include="..\..\deps\src\base64\base64.cpp">
       <Filter>deps\base64</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\discord-rpc\src\connection_win.cpp">
+      <Filter>deps\discord-rpc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\discord-rpc\src\discord_register_win.cpp">
+      <Filter>deps\discord-rpc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\discord-rpc\src\discord_rpc.cpp">
+      <Filter>deps\discord-rpc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\discord-rpc\src\rpc_connection.cpp">
+      <Filter>deps\discord-rpc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\discord-rpc\src\serialization.cpp">
+      <Filter>deps\discord-rpc</Filter>
     </ClCompile>
     <ClCompile Include="..\..\deps\src\fmt\fmt\format.cc">
       <Filter>deps\fmt</Filter>
@@ -746,6 +764,27 @@
     </ClInclude>
     <ClInclude Include="..\..\deps\src\date\date.h">
       <Filter>deps\date</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\discord-rpc\include\discord_register.h">
+      <Filter>deps\discord-rpc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\discord-rpc\include\discord_rpc.h">
+      <Filter>deps\discord-rpc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\discord-rpc\src\backoff.h">
+      <Filter>deps\discord-rpc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\discord-rpc\src\connection.h">
+      <Filter>deps\discord-rpc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\discord-rpc\src\msg_queue.h">
+      <Filter>deps\discord-rpc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\discord-rpc\src\rpc_connection.h">
+      <Filter>deps\discord-rpc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\discord-rpc\src\serialization.h">
+      <Filter>deps\discord-rpc</Filter>
     </ClInclude>
     <ClInclude Include="..\..\deps\src\fmt\fmt\container.h">
       <Filter>deps\fmt</Filter>
