@@ -26,6 +26,7 @@
 #include "library/anime.h"
 #include "library/anime_episode.h"
 #include "library/anime_util.h"
+#include "sync/service.h"
 #include "taiga/announce.h"
 #include "taiga/http.h"
 #include "taiga/script.h"
@@ -147,10 +148,19 @@ void Discord::ClearPresence() const {
 void Discord::UpdatePresence(const std::string& details,
                              const std::string& state,
                              time_t timestamp) const {
+  const std::string small_image_key =
+      WstrToStr(GetCurrentService()->canonical_name());
+  const std::string small_image_text =
+      WstrToStr(GetCurrentUsername() + L" at " + GetCurrentService()->name());
+
   DiscordRichPresence presence = {0};
   presence.state = state.c_str();
   presence.details = details.c_str();
   presence.startTimestamp = timestamp;
+  presence.largeImageKey = "default";
+  presence.largeImageText = details.c_str();
+  presence.smallImageKey = small_image_key.c_str();
+  presence.smallImageText = small_image_text.c_str();
 
   Discord_UpdatePresence(&presence);
 
