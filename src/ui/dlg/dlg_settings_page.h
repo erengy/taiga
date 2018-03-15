@@ -35,6 +35,7 @@ enum SettingsPages {
   kSettingsPageServicesKitsu,
   kSettingsPageServicesMain,
   kSettingsPageServicesMal,
+  kSettingsPageSharingDiscord,
   kSettingsPageSharingHttp,
   kSettingsPageSharingMirc,
   kSettingsPageSharingSkype,

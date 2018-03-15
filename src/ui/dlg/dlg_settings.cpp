@@ -89,10 +89,11 @@ void SettingsDialog::SetCurrentSection(SettingsSections section) {
       tab_.InsertItem(2, L"Streaming media", kSettingsPageRecognitionStream);
       break;
     case kSettingsSectionSharing:
-      tab_.InsertItem(0, L"HTTP", kSettingsPageSharingHttp);
-      tab_.InsertItem(1, L"mIRC", kSettingsPageSharingMirc);
-      tab_.InsertItem(2, L"Skype", kSettingsPageSharingSkype);
-      tab_.InsertItem(3, L"Twitter", kSettingsPageSharingTwitter);
+      tab_.InsertItem(0, L"Discord", kSettingsPageSharingDiscord);
+      tab_.InsertItem(1, L"HTTP", kSettingsPageSharingHttp);
+      tab_.InsertItem(2, L"mIRC", kSettingsPageSharingMirc);
+      tab_.InsertItem(3, L"Skype", kSettingsPageSharingSkype);
+      tab_.InsertItem(4, L"Twitter", kSettingsPageSharingTwitter);
       break;
     case kSettingsSectionTorrents:
       tab_.InsertItem(0, L"Discovery", kSettingsPageTorrentsDiscovery);
@@ -276,6 +277,11 @@ void SettingsDialog::OnOK() {
     list.SetWindowHandle(nullptr);
   }
 
+  // Sharing > Discord
+  page = &pages[kSettingsPageSharingDiscord];
+  if (page->IsWindow()) {
+    Settings.Set(taiga::kShare_Discord_Enabled, page->IsDlgButtonChecked(IDC_CHECK_DISCORD));
+  }
   // Sharing > HTTP
   page = &pages[kSettingsPageSharingHttp];
   if (page->IsWindow()) {

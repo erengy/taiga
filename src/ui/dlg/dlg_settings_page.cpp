@@ -74,6 +74,7 @@ void SettingsPage::Create() {
     SETRESOURCEID(kSettingsPageServicesMal, IDD_SETTINGS_SERVICES_MAL);
     SETRESOURCEID(kSettingsPageServicesKitsu, IDD_SETTINGS_SERVICES_KITSU);
     SETRESOURCEID(kSettingsPageServicesAniList, IDD_SETTINGS_SERVICES_ANILIST);
+    SETRESOURCEID(kSettingsPageSharingDiscord, IDD_SETTINGS_SHARING_DISCORD);
     SETRESOURCEID(kSettingsPageSharingHttp, IDD_SETTINGS_SHARING_HTTP);
     SETRESOURCEID(kSettingsPageSharingMirc, IDD_SETTINGS_SHARING_MIRC);
     SETRESOURCEID(kSettingsPageSharingSkype, IDD_SETTINGS_SHARING_SKYPE);
@@ -273,6 +274,11 @@ BOOL SettingsPage::OnInitDialog() {
 
     ////////////////////////////////////////////////////////////////////////////
 
+    // Sharing > Discord
+    case kSettingsPageSharingDiscord: {
+      CheckDlgButton(IDC_CHECK_DISCORD, Settings.GetBool(taiga::kShare_Discord_Enabled));
+      break;
+    }
     // Sharing > HTTP
     case kSettingsPageSharingHttp: {
       CheckDlgButton(IDC_CHECK_HTTP, Settings.GetBool(taiga::kShare_Http_Enabled));
