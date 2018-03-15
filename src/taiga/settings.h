@@ -116,6 +116,9 @@ enum AppSettingName {
   kStream_Youtube,
 
   // Sharing
+  kShare_Discord_Enabled,
+  kShare_Discord_Format_Details,
+  kShare_Discord_Format_State,
   kShare_Http_Enabled,
   kShare_Http_Format,
   kShare_Http_Url,

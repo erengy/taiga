@@ -47,6 +47,7 @@
 	</menu>
 	<!-- Share -->
 	<menu name="Announce">
+		<item name="Discord"   action="AnnounceToDiscord(true)"/>
 		<item name="HTTP"      action="AnnounceToHTTP(true)"/>
 		<item name="mIRC"      action="AnnounceToMIRC(true)"/>
 		<item name="Skype"     action="AnnounceToSkype(true)"/>

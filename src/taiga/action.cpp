@@ -326,6 +326,11 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   //////////////////////////////////////////////////////////////////////////////
   // Sharing
 
+  // AnnounceToDiscord(force)
+  //   Updates rich presence.
+  } else if (action == L"AnnounceToDiscord") {
+    Announcer.Do(taiga::kAnnounceToDiscord, nullptr, body == L"true");
+
   // AnnounceToHTTP(force)
   //   Sends an HTTP request.
   } else if (action == L"AnnounceToHTTP") {

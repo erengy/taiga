@@ -33,10 +33,11 @@ class Episode;
 namespace taiga {
 
 enum AnnouncerModes {
-  kAnnounceToHttp      = 0x01,
-  kAnnounceToMirc      = 0x02,
-  kAnnounceToSkype     = 0x04,
-  kAnnounceToTwitter   = 0x08
+  kAnnounceToDiscord = 1 << 0,
+  kAnnounceToHttp    = 1 << 1,
+  kAnnounceToMirc    = 1 << 2,
+  kAnnounceToSkype   = 1 << 3,
+  kAnnounceToTwitter = 1 << 4,
 };
 
 class Announcer {
@@ -45,10 +46,30 @@ public:
   void Do(int modes, anime::Episode* episode = nullptr, bool force = false);
 
 private:
+  void ToDiscord(const std::wstring& details, const std::wstring& state, time_t timestamp);
   void ToHttp(const std::wstring& address, const std::wstring& data);
   bool ToMirc(const std::wstring& service, std::wstring channels, const std::wstring& data, int mode, bool use_action, bool multi_server);
   void ToSkype(const std::wstring& mood);
   void ToTwitter(const std::wstring& status_text);
+};
+
+////////////////////////////////////////////////////////////////////////////////
+// Discord
+
+class Discord {
+public:
+  ~Discord();
+
+  void Initialize() const;
+  void Shutdown() const;
+
+  void ClearPresence() const;
+  void UpdatePresence(const std::string& details, const std::string& state, time_t timestamp) const;
+
+private:
+  static void OnReady();
+  static void OnDisconnected(int errcode, const char* message);
+  static void OnError(int errcode, const char* message);
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -135,6 +156,7 @@ private:
 ////////////////////////////////////////////////////////////////////////////////
 
 extern taiga::Announcer Announcer;
+extern taiga::Discord Discord;
 extern taiga::Mirc Mirc;
 extern taiga::Skype Skype;
 extern taiga::Twitter Twitter;

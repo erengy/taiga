@@ -61,6 +61,11 @@ const std::wstring kDefaultExternalLinks =
     L"-\r\n"
     L"Anime Streaming Search Engine|http://because.moe\r\n"
     L"The Fansub Database|https://fansubdb.com";
+const std::wstring kDefaultFormatDiscordDetails =
+    L"%title%";
+const std::wstring kDefaultFormatDiscordState =
+    L"$if(%episode%,Episode %episode%$if(%total%,/%total%) )"
+    L"$if(%group%,by %group%)";
 const std::wstring kDefaultFormatHttp =
     L"user=%user%"
     L"&name=%title%"
@@ -182,6 +187,9 @@ void AppSettings::InitializeMap() {
   INITKEY(kStream_Youtube, L"true", L"recognition/streaming/providers/youtube");
 
   // Sharing
+  INITKEY(kShare_Discord_Enabled, nullptr, L"announce/discord/enabled");
+  INITKEY(kShare_Discord_Format_Details, kDefaultFormatDiscordDetails.c_str(), L"announce/discord/formatdetails");
+  INITKEY(kShare_Discord_Format_State, kDefaultFormatDiscordState.c_str(), L"announce/discord/formatstate");
   INITKEY(kShare_Http_Enabled, nullptr, L"announce/http/enabled");
   INITKEY(kShare_Http_Format, kDefaultFormatHttp.c_str(), L"announce/http/format");
   INITKEY(kShare_Http_Url, nullptr, L"announce/http/url");

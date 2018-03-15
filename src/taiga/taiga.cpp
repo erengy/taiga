@@ -93,6 +93,10 @@ BOOL App::InitInstance() {
   DummyAnime.Initialize();
   DummyEpisode.Initialize();
 
+  // Initialize Discord
+  if (Settings.GetBool(kShare_Discord_Enabled))
+    ::Discord.Initialize();
+
   // Create API windows
   ::Skype.Create();
 
@@ -111,7 +115,7 @@ void App::Uninitialize() {
     MediaPlayers.play_status = track::recognition::PlayStatus::Stopped;
     ::Announcer.Do(kAnnounceToHttp);
   }
-  ::Announcer.Clear(kAnnounceToSkype);
+  ::Announcer.Clear(kAnnounceToDiscord | kAnnounceToSkype);
 
   // Cleanup
   ConnectionManager.Shutdown();

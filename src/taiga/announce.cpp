@@ -16,6 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <discord_rpc.h>
 #include <windows/win/dde.h>
 
 #include "base/file.h"
@@ -32,6 +33,7 @@
 #include "ui/ui.h"
 
 taiga::Announcer Announcer;
+taiga::Discord Discord;
 taiga::Mirc Mirc;
 taiga::Skype Skype;
 taiga::Twitter Twitter;
@@ -39,6 +41,10 @@ taiga::Twitter Twitter;
 namespace taiga {
 
 void Announcer::Clear(int modes, bool force) {
+  if (modes & kAnnounceToDiscord)
+    if (Settings.GetBool(kShare_Discord_Enabled) || force)
+      ::Discord.ClearPresence();
+
   if (modes & kAnnounceToHttp)
     if (Settings.GetBool(kShare_Http_Enabled) || force)
       ToHttp(Settings[kShare_Http_Url], L"");
@@ -66,6 +72,20 @@ void Announcer::Do(int modes, anime::Episode* episode, bool force) {
 
   if (!anime::IsValidId(episode->anime_id))
     return;
+
+  if (modes & kAnnounceToDiscord) {
+    if (Settings.GetBool(kShare_Discord_Enabled) || force) {
+      LOGD(L"Discord");
+      auto timestamp = ::time(nullptr);
+      if (!force)
+        timestamp -= Settings.GetInt(taiga::kSync_Update_Delay);
+      ToDiscord(ReplaceVariables(Settings[kShare_Discord_Format_Details],
+                                 *episode, false, force),
+                ReplaceVariables(Settings[kShare_Discord_Format_State],
+                                 *episode, false, force),
+                timestamp);
+    }
+  }
 
   if (modes & kAnnounceToMirc) {
     if (Settings.GetBool(kShare_Mirc_Enabled) || force) {
@@ -95,6 +115,69 @@ void Announcer::Do(int modes, anime::Episode* episode, bool force) {
                                  *episode, false, force));
     }
   }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Discord
+
+constexpr auto kDiscordApplicationId = "379871385176244224";
+
+Discord::~Discord() {
+  ClearPresence();
+  Shutdown();
+}
+
+void Discord::Initialize() const {
+  DiscordEventHandlers handlers = {0};
+  handlers.ready = OnReady;
+  handlers.disconnected = OnDisconnected;
+  handlers.errored = OnError;
+
+  Discord_Initialize(kDiscordApplicationId, &handlers, FALSE, nullptr);
+}
+
+void Discord::Shutdown() const {
+  Discord_Shutdown();
+}
+
+void Discord::ClearPresence() const {
+  Discord_ClearPresence();
+}
+
+void Discord::UpdatePresence(const std::string& details,
+                             const std::string& state,
+                             time_t timestamp) const {
+  DiscordRichPresence presence = {0};
+  presence.state = state.c_str();
+  presence.details = details.c_str();
+  presence.startTimestamp = timestamp;
+
+  Discord_UpdatePresence(&presence);
+
+#ifdef DISCORD_DISABLE_IO_THREAD
+  Discord_UpdateConnection();
+#endif
+  Discord_RunCallbacks();
+}
+
+void Discord::OnReady() {
+  LOGD(L"Discord: ready");
+}
+
+void Discord::OnDisconnected(int errcode, const char* message) {
+  LOGD(L"Discord: disconnected ({}: {})", errcode, message);
+}
+
+void Discord::OnError(int errcode, const char* message) {
+  LOGD(L"Discord: error ({}: {})", errcode, message);
+}
+
+void Announcer::ToDiscord(const std::wstring& details,
+                          const std::wstring& state,
+                          time_t timestamp) {
+  ::Discord.UpdatePresence(WstrToStr(LimitText(details, 64)),
+                           WstrToStr(LimitText(state, 64)),
+                           timestamp);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
