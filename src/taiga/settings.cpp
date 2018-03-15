@@ -33,6 +33,7 @@
 #include "sync/manager.h"
 #include "sync/sync.h"
 #include "sync/kitsu_util.h"
+#include "taiga/announce.h"
 #include "taiga/path.h"
 #include "taiga/settings.h"
 #include "taiga/stats.h"
@@ -472,6 +473,18 @@ void AppSettings::ApplyChanges(const AppSettings previous) {
 
   bool enable_monitor = GetBool(kLibrary_WatchFolders);
   FolderMonitor.Enable(enable_monitor);
+
+  bool toggled_discord = GetBool(kShare_Discord_Enabled) !=
+      previous.GetBool(kShare_Discord_Enabled);
+  if (toggled_discord) {
+    if (GetBool(kShare_Discord_Enabled)) {
+      ::Discord.Initialize();
+      ::Announcer.Do(kAnnounceToDiscord);
+    } else {
+      ::Discord.ClearPresence();
+      ::Discord.Shutdown();
+    }
+  }
 
   ui::Menus.UpdateExternalLinks();
   ui::Menus.UpdateFolders();

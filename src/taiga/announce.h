@@ -67,6 +67,8 @@ public:
   void UpdatePresence(const std::string& details, const std::string& state, time_t timestamp) const;
 
 private:
+  void RunCallbacks() const;
+
   static void OnReady();
   static void OnDisconnected(int errcode, const char* message);
   static void OnError(int errcode, const char* message);

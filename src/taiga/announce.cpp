@@ -143,6 +143,7 @@ void Discord::Shutdown() const {
 
 void Discord::ClearPresence() const {
   Discord_ClearPresence();
+  RunCallbacks();
 }
 
 void Discord::UpdatePresence(const std::string& details,
@@ -163,7 +164,10 @@ void Discord::UpdatePresence(const std::string& details,
   presence.smallImageText = small_image_text.c_str();
 
   Discord_UpdatePresence(&presence);
+  RunCallbacks();
+}
 
+void Discord::RunCallbacks() const {
 #ifdef DISCORD_DISABLE_IO_THREAD
   Discord_UpdateConnection();
 #endif
