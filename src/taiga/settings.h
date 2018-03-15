@@ -184,11 +184,16 @@ public:
   bool Load();
   bool Save();
 
-  void ApplyChanges(const std::wstring& previous_service,
-                    const std::wstring& previous_user,
-                    const std::wstring& previous_theme);
+  void ApplyChanges(const AppSettings previous);
   bool HandleCompatibility();
   void RestoreDefaults();
+
+  sync::Service* GetCurrentService() const;
+  sync::ServiceId GetCurrentServiceId() const;
+  std::wstring GetUsername(sync::ServiceId service_id) const;
+  std::wstring GetPassword(sync::ServiceId service_id) const;
+  std::wstring GetCurrentUsername() const;
+  std::wstring GetCurrentPassword() const;
 
   std::vector<std::wstring> library_folders;
 
@@ -199,8 +204,8 @@ private:
 
 sync::Service* GetCurrentService();
 sync::ServiceId GetCurrentServiceId();
-const std::wstring GetCurrentUsername();
-const std::wstring GetCurrentPassword();
+std::wstring GetCurrentUsername();
+std::wstring GetCurrentPassword();
 
 }  // namespace taiga
 

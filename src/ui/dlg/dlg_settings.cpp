@@ -172,10 +172,7 @@ BOOL SettingsDialog::OnInitDialog() {
 void SettingsDialog::OnOK() {
   win::ListView list;
   SettingsPage* page = nullptr;
-
-  std::wstring previous_service = taiga::GetCurrentService()->canonical_name();
-  std::wstring previous_user = taiga::GetCurrentUsername();
-  std::wstring previous_theme = Settings[taiga::kApp_Interface_Theme];
+  const taiga::AppSettings previous_settings = Settings;
 
   // Services > Main
   page = &pages[kSettingsPageServicesMain];
@@ -362,7 +359,7 @@ void SettingsDialog::OnOK() {
   Settings.Save();
 
   // Apply changes
-  Settings.ApplyChanges(previous_service, previous_user, previous_theme);
+  Settings.ApplyChanges(previous_settings);
 
   // End dialog
   EndDialog(IDOK);

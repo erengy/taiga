@@ -420,9 +420,8 @@ bool AppSettings::Save() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void AppSettings::ApplyChanges(const std::wstring& previous_service,
-                               const std::wstring& previous_user,
-                               const std::wstring& previous_theme) {
+void AppSettings::ApplyChanges(const AppSettings previous) {
+  const auto previous_service = previous[kSync_ActiveService];
   bool changed_service = GetWstr(kSync_ActiveService) != previous_service;
   if (changed_service) {
     if (History.queue.GetItemCount() > 0) {
@@ -447,6 +446,7 @@ void AppSettings::ApplyChanges(const std::wstring& previous_service,
     }
   }
 
+  const auto previous_theme = previous[kApp_Interface_Theme];
   bool changed_theme = GetWstr(kApp_Interface_Theme) != previous_theme;
   if (changed_theme) {
     if (ui::Theme.Load()) {
@@ -456,6 +456,7 @@ void AppSettings::ApplyChanges(const std::wstring& previous_service,
     }
   }
 
+  const auto previous_user = previous.GetCurrentUsername();
   bool changed_username = GetCurrentUsername() != previous_user;
   if (changed_username || changed_service) {
     AnimeDatabase.LoadList();
@@ -486,11 +487,9 @@ void AppSettings::RestoreDefaults() {
   MoveFileEx(file.c_str(), backup.c_str(), flags);
 
   // Reload settings
-  std::wstring previous_service = GetCurrentService()->canonical_name();
-  std::wstring previous_user = GetCurrentUsername();
-  std::wstring previous_theme = GetWstr(kApp_Interface_Theme);
+  const AppSettings previous_settings = *this;
   Load();
-  ApplyChanges(previous_service, previous_user, previous_theme);
+  ApplyChanges(previous_settings);
 
   // Reload settings dialog
   ui::OnSettingsRestoreDefaults();
@@ -498,13 +497,12 @@ void AppSettings::RestoreDefaults() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-sync::Service* GetCurrentService() {
-  std::wstring service_name = Settings[kSync_ActiveService];
-  return ServiceManager.service(service_name);
+sync::Service* AppSettings::GetCurrentService() const {
+  return ServiceManager.service(GetWstr(kSync_ActiveService));
 }
 
-sync::ServiceId GetCurrentServiceId() {
-  auto service = GetCurrentService();
+sync::ServiceId AppSettings::GetCurrentServiceId() const {
+  const auto service = GetCurrentService();
 
   if (service)
     return static_cast<sync::ServiceId>(service->id());
@@ -512,34 +510,54 @@ sync::ServiceId GetCurrentServiceId() {
   return sync::kMyAnimeList;
 }
 
-const std::wstring GetCurrentUsername() {
-  std::wstring username;
-  auto service = GetCurrentService();
-
-  if (service->id() == sync::kMyAnimeList) {
-    username = Settings[kSync_Service_Mal_Username];
-  } else if (service->id() == sync::kKitsu) {
-    username = Settings[kSync_Service_Kitsu_Username];
-  } else if (service->id() == sync::kAniList) {
-    username = Settings[kSync_Service_AniList_Username];
+std::wstring AppSettings::GetUsername(sync::ServiceId service_id) const {
+  switch (service_id) {
+    case sync::kMyAnimeList:
+      return GetWstr(kSync_Service_Mal_Username);
+    case sync::kKitsu:
+      return GetWstr(kSync_Service_Kitsu_Username);
+    case sync::kAniList:
+      return GetWstr(kSync_Service_AniList_Username);
+    default:
+      return {};
   }
-
-  return username;
 }
 
-const std::wstring GetCurrentPassword() {
-  std::wstring password;
-  auto service = GetCurrentService();
-
-  if (service->id() == sync::kMyAnimeList) {
-    password = Base64Decode(Settings[kSync_Service_Mal_Password]);
-  } else if (service->id() == sync::kKitsu) {
-    password = Base64Decode(Settings[kSync_Service_Kitsu_Password]);
-  } else if (service->id() == sync::kAniList) {
-    password = Base64Decode(Settings[kSync_Service_AniList_Token]);
+std::wstring AppSettings::GetPassword(sync::ServiceId service_id) const {
+  switch (service_id) {
+    case sync::kMyAnimeList:
+      return Base64Decode(GetWstr(kSync_Service_Mal_Password));
+    case sync::kKitsu:
+      return Base64Decode(GetWstr(kSync_Service_Kitsu_Password));
+    case sync::kAniList:
+      return Base64Decode(GetWstr(kSync_Service_AniList_Token));
+    default:
+      return {};
   }
+}
 
-  return password;
+std::wstring AppSettings::GetCurrentUsername() const {
+  return GetUsername(GetCurrentServiceId());
+}
+
+std::wstring AppSettings::GetCurrentPassword() const {
+  return GetPassword(GetCurrentServiceId());
+}
+
+sync::Service* GetCurrentService() {
+  return Settings.GetCurrentService();
+}
+
+sync::ServiceId GetCurrentServiceId() {
+  return Settings.GetCurrentServiceId();
+}
+
+std::wstring GetCurrentUsername() {
+  return Settings.GetCurrentUsername();
+}
+
+std::wstring GetCurrentPassword() {
+  return Settings.GetCurrentPassword();
 }
 
 }  // namespace taiga
