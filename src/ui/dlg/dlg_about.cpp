@@ -125,7 +125,7 @@ BOOL AboutDialog::OnInitDialog() {
       L"{\\field{\\*\\fldinst{HYPERLINK \"https://github.com/discordapp/discord-rpc\"}}{\\fldrslt{Discord RPC " + GetLibraryVersion(kDiscordRpc) + L"}}}, "
       L"{\\field{\\*\\fldinst{HYPERLINK \"https://github.com/fmtlib/fmt\"}}{\\fldrslt{fmt " + GetLibraryVersion(kFmt) + L"}}}, "
       L"{\\field{\\*\\fldinst{HYPERLINK \"https://github.com/yusukekamiyamane/fugue-icons\"}}{\\fldrslt{Fugue Icons 3.4.5}}}, "
-      L"{\\field{\\*\\fldinst{HYPERLINK \"https://github.com/nlohmann/json\"}}{\\fldrslt{json " + GetLibraryVersion(kJson) + L"}}}, "
+      L"{\\field{\\*\\fldinst{HYPERLINK \"https://github.com/nlohmann/json\"}}{\\fldrslt{JSON for Modern C++ " + GetLibraryVersion(kJson) + L"}}}, "
       L"{\\field{\\*\\fldinst{HYPERLINK \"https://github.com/curl/curl\"}}{\\fldrslt{libcurl " + GetLibraryVersion(kLibcurl) + L"}}}, "
       L"{\\field{\\*\\fldinst{HYPERLINK \"https://github.com/zeux/pugixml\"}}{\\fldrslt{pugixml " + GetLibraryVersion(kPugixml) + L"}}}, "
       L"{\\field{\\*\\fldinst{HYPERLINK \"https://github.com/Tencent/rapidjson\"}}{\\fldrslt{RapidJSON " + GetLibraryVersion(kRapidJson) + L"}}}, "
