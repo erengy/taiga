@@ -378,6 +378,57 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
       History.queue.Add(history_item);
     }
 
+  // EditDateToStartedAiring
+  //   Sets date started to date started airing.
+  //   lParam is a pointer to a vector of anime IDs.
+  } else if (action == L"EditDateToStartedAiring") {
+    const auto& anime_ids = *reinterpret_cast<std::vector<int>*>(lParam);
+    for (const auto& anime_id : anime_ids) {
+      auto anime_item = AnimeDatabase.FindItem(anime_id);
+      if (!anime_item || anime_item->GetMyDateStart() || !anime_item->GetDateStart())
+        continue;
+      HistoryItem history_item;
+      history_item.anime_id = anime_id;
+      history_item.date_start = anime_item->GetDateStart();
+      history_item.mode = taiga::kHttpServiceUpdateLibraryEntry;
+      History.queue.Add(history_item);
+    }
+
+  // EditDateToFinishedAiring
+  //   Sets date completed to date finished airing.
+  //   lParam is a pointer to a vector of anime IDs.
+  } else if (action == L"EditDateToFinishedAiring") {
+    const auto& anime_ids = *reinterpret_cast<std::vector<int>*>(lParam);
+    for (const auto& anime_id : anime_ids) {
+      auto anime_item = AnimeDatabase.FindItem(anime_id);
+      if (!anime_item || anime_item->GetMyDateEnd() || !anime_item->GetDateEnd())
+        continue;
+      HistoryItem history_item;
+      history_item.anime_id = anime_id;
+      history_item.date_finish = anime_item->GetDateEnd();
+      history_item.mode = taiga::kHttpServiceUpdateLibraryEntry;
+      History.queue.Add(history_item);
+    }
+
+  // EditDateToLastUpdated
+  //   Sets date completed to last updated.
+  //   lParam is a pointer to a vector of anime IDs.
+  } else if (action == L"EditDateToLastUpdated") {
+    const auto& anime_ids = *reinterpret_cast<std::vector<int>*>(lParam);
+    for (const auto& anime_id : anime_ids) {
+      auto anime_item = AnimeDatabase.FindItem(anime_id);
+      if (!anime_item || anime_item->GetMyDateEnd())
+        continue;
+      const auto last_updated = ToTime(anime_item->GetMyLastUpdated());
+      if (!last_updated)
+        continue;
+      HistoryItem history_item;
+      history_item.anime_id = anime_id;
+      history_item.date_finish = GetDate(last_updated);
+      history_item.mode = taiga::kHttpServiceUpdateLibraryEntry;
+      History.queue.Add(history_item);
+    }
+
   // EditDelete()
   //   Removes an anime from list.
   //   lParam is a pointer to a vector of anime IDs.
