@@ -185,12 +185,12 @@ void StatsDialog::Refresh() {
   text += Stats.life_planned_to_watch + L"\n";
   switch (rating_type) {
     case RatingType::Ten:
-      text += ToWstr(Stats.score_mean, 2) + L"\n";
-      text += ToWstr(Stats.score_deviation, 2);
+      text += ToWstr(Stats.score_mean / 10.0, 2) + L"\n";
+      text += ToWstr(Stats.score_deviation / 10.0, 2);
       break;
     case RatingType::Five:
-      text += ToWstr(Stats.score_mean / 2.0, 2) + L"\n";
-      text += ToWstr(Stats.score_deviation / 2.0, 2);
+      text += ToWstr(Stats.score_mean / 20.0, 2) + L"\n";
+      text += ToWstr(Stats.score_deviation / 20.0, 2);
       break;
   }
   SetDlgItemText(IDC_STATIC_ANIME_STAT1, text.c_str());
