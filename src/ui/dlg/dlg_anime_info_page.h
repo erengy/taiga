@@ -65,6 +65,8 @@ public:
   void RefreshFansubPreference();
 
 private:
+  bool IsAdvancedScoreInput() const;
+
   bool start_date_changed_;
   bool finish_date_changed_;
 };

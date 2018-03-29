@@ -241,7 +241,7 @@ BOOL PageMyInfo::OnCommand(WPARAM wParam, LPARAM lParam) {
     case IDC_CHECK_ANIME_REWATCH:
       if (HIWORD(wParam) == BN_CLICKED) {
         win::ComboBox combobox = GetDlgItem(IDC_COMBO_ANIME_STATUS);
-        win::Spin spin = GetDlgItem(IDC_SPIN_PROGRESS);
+        win::Spin spin = GetDlgItem(IDC_SPIN_ANIME_PROGRESS);
         int episode_value = 0;
         spin.GetPos32(episode_value);
         if (IsDlgButtonChecked(IDC_CHECK_ANIME_REWATCH)) {
@@ -278,7 +278,7 @@ BOOL PageMyInfo::OnCommand(WPARAM wParam, LPARAM lParam) {
         if (combobox.GetItemData(combobox.GetCurSel()) == anime::kCompleted)
           if (anime_item->GetMyStatus() != anime::kCompleted &&
               anime_item->GetEpisodeCount() > 0)
-            SendDlgItemMessage(IDC_SPIN_PROGRESS, UDM_SETPOS32, 0, anime_item->GetEpisodeCount());
+            SendDlgItemMessage(IDC_SPIN_ANIME_PROGRESS, UDM_SETPOS32, 0, anime_item->GetEpisodeCount());
         combobox.SetWindowHandle(nullptr);
         return TRUE;
       }
@@ -302,6 +302,21 @@ LRESULT PageMyInfo::OnNotify(int idCtrl, LPNMHDR pnmh) {
     case IDC_DATETIME_FINISH:
       if (pnmh->code == DTN_DATETIMECHANGE)
         finish_date_changed_ = true;
+      break;
+
+    case IDC_SPIN_ANIME_SCORE:
+      if (pnmh->code == UDN_DELTAPOS) {
+        const std::pair<int, int> range;
+        SendDlgItemMessage(IDC_SPIN_ANIME_SCORE, UDM_GETRANGE32,
+                           reinterpret_cast<WPARAM>(&range.first),
+                           reinterpret_cast<LPARAM>(&range.second));
+        const auto nmud = *reinterpret_cast<LPNMUPDOWN>(pnmh);
+        const int proposed_value = nmud.iPos + nmud.iDelta;
+        if (range.first <= proposed_value && proposed_value <= range.second) {
+          const auto value = anime::TranslateMyScore(proposed_value, L"0");
+          SetDlgItemText(IDC_EDIT_ANIME_SCORE, value.c_str());
+        }
+      }
       break;
 
     case IDC_LINK_ANIME_FANSUB:
@@ -345,9 +360,10 @@ void PageMyInfo::Refresh(int anime_id) {
     return;
 
   // Episodes watched
-  SendDlgItemMessage(IDC_SPIN_PROGRESS, UDM_SETRANGE32, 0,
-                     anime_item->GetEpisodeCount() > 0 ? anime_item->GetEpisodeCount() : 9999);
-  SendDlgItemMessage(IDC_SPIN_PROGRESS, UDM_SETPOS32, 0, anime_item->GetMyLastWatchedEpisode());
+  win::Spin spin = GetDlgItem(IDC_SPIN_ANIME_PROGRESS);
+  spin.SetRange32(0, anime_item->GetEpisodeCount() > 0 ? anime_item->GetEpisodeCount() : 9999);
+  spin.SetPos32(anime_item->GetMyLastWatchedEpisode());
+  spin.SetWindowHandle(nullptr);
 
   // Rewatching
   CheckDlgButton(IDC_CHECK_ANIME_REWATCH, anime_item->GetMyRewatching());
@@ -362,6 +378,8 @@ void PageMyInfo::Refresh(int anime_id) {
 
   // Score
   combobox.SetWindowHandle(GetDlgItem(IDC_COMBO_ANIME_SCORE));
+  win::Edit edit = GetDlgItem(IDC_EDIT_ANIME_SCORE);
+  spin.SetWindowHandle(GetDlgItem(IDC_SPIN_ANIME_SCORE));
   if (combobox.GetCount() == 0) {
     std::vector<sync::Rating> ratings;
     std::wstring current_rating;
@@ -392,11 +410,20 @@ void PageMyInfo::Refresh(int anime_id) {
     }
     if (selected_item > -1)
       combobox.SetCurSel(selected_item);
+    edit.SetText(current_rating);
+    spin.SetRange32(0, anime::kUserScoreMax);
+    spin.SetPos32(anime_item->GetMyScore());
+    const bool use_spin_for_score_input = IsAdvancedScoreInput();
+    combobox.Show(!use_spin_for_score_input ? SW_SHOWNORMAL : SW_HIDE);
+    edit.Show(use_spin_for_score_input ? SW_SHOWNORMAL : SW_HIDE);
+    spin.Show(use_spin_for_score_input ? SW_SHOWNORMAL : SW_HIDE);
   }
   combobox.SetWindowHandle(nullptr);
+  edit.SetWindowHandle(nullptr);
+  spin.SetWindowHandle(nullptr);
 
   // Tags / Notes
-  win::Edit edit = GetDlgItem(IDC_EDIT_ANIME_TAGS);
+  edit.SetWindowHandle(GetDlgItem(IDC_EDIT_ANIME_TAGS));
   switch (taiga::GetCurrentServiceId()) {
     case sync::kMyAnimeList:
       SetDlgItemText(IDC_STATIC_TAGSNOTES, L"Tags:");
@@ -511,8 +538,19 @@ bool PageMyInfo::Save() {
 
   // Score
   win::ComboBox combobox = GetDlgItem(IDC_COMBO_ANIME_SCORE);
-  history_item.score = combobox.GetItemData(combobox.GetCurSel());
+  win::Spin spin = GetDlgItem(IDC_SPIN_ANIME_SCORE);
+  if (!IsAdvancedScoreInput()) {
+    history_item.score = combobox.GetItemData(combobox.GetCurSel());
+  } else {
+    const auto score = GetDlgItemText(IDC_EDIT_ANIME_SCORE);
+    if (IsNumericString(score)) {
+      history_item.score = ToInt(score);
+    } else {
+      history_item.score = static_cast<int>(ToDouble(score) * 10);
+    }
+  }
   combobox.SetWindowHandle(nullptr);
+  spin.SetWindowHandle(nullptr);
 
   // Status
   history_item.status = GetComboSelection(IDC_COMBO_ANIME_STATUS) + 1;
@@ -563,6 +601,21 @@ bool PageMyInfo::Save() {
   // Add item to queue
   History.queue.Add(history_item);
   return true;
+}
+
+bool PageMyInfo::IsAdvancedScoreInput() const {
+  switch (taiga::GetCurrentServiceId()) {
+    case sync::kAniList: {
+      switch (sync::anilist::GetRatingSystem()) {
+        case sync::anilist::RatingSystem::Point_100:
+        case sync::anilist::RatingSystem::Point_10_Decimal:
+          return true;
+      }
+      break;
+    }
+  }
+
+  return false;
 }
 
 }  // namespace ui
