@@ -273,6 +273,7 @@ void Manager::HandleResponse(Response& response, HttpResponse& http_response) {
         GetSeason(anime::Season(request.data[L"season"] + L" " +
                                 request.data[L"year"]), next_page);
       } else {
+        SeasonDatabase.Review();
         ui::ClearStatusText();
         ui::OnLibraryGetSeason();
         for (const auto& id : SeasonDatabase.items) {

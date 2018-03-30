@@ -187,47 +187,54 @@ void SeasonDatabase::Review(bool hide_nsfw) {
   Date date_start, date_end;
   current_season.GetInterval(date_start, date_end);
 
+  const auto is_within_date_interval =
+      [&date_start, &date_end](const anime::Item& anime_item) {
+        const Date& anime_start = anime_item.GetDateStart();
+        if (anime_start.year() && anime_start.month())
+          if (date_start <= anime_start && anime_start <= date_end)
+            return true;
+        return false;
+      };
+
+  const auto is_nsfw =
+      [&hide_nsfw](const anime::Item& anime_item) {
+        return hide_nsfw && IsNsfw(anime_item);
+      };
+
   // Check for invalid items
   for (size_t i = 0; i < items.size(); i++) {
-    int anime_id = items.at(i);
+    const int anime_id = items.at(i);
     auto anime_item = AnimeDatabase.FindItem(anime_id);
     if (anime_item) {
-      bool invalid = false;
-      // Airing date must be within the interval
-      const Date& anime_start = anime_item->GetDateStart();
-      if (anime::IsValidDate(anime_start))
-        if (anime_start < date_start || anime_start > date_end)
-          invalid = true;
-      // Filter by age rating
-      if (hide_nsfw && IsNsfw(*anime_item))
-        invalid = true;
-      if (invalid) {
+      if (is_nsfw(*anime_item) || !is_within_date_interval(*anime_item)) {
         items.erase(items.begin() + i--);
         LOGD(L"Removed item: #{} \"{}\" ({})", anime_id,
-             anime_item->GetTitle(), anime_start.to_string());
+             anime_item->GetTitle(), anime_item->GetDateStart().to_string());
       }
     }
   }
 
   // Check for missing items
-  for (const auto& pair : AnimeDatabase.items) {
-    if (std::find(items.begin(), items.end(), pair.second.GetId()) != items.end())
+  for (const auto& [anime_id, anime_item] : AnimeDatabase.items) {
+    if (std::find(items.begin(), items.end(), anime_id) != items.end())
       continue;
-    // Filter by age rating
-    if (hide_nsfw && IsNsfw(pair.second))
+    if (is_nsfw(anime_item) || !is_within_date_interval(anime_item))
       continue;
-    // Airing date must be within the interval
-    const Date& anime_start = pair.second.GetDateStart();
-    if (anime_start.year() && anime_start.month() &&
-        anime_start >= date_start && anime_start <= date_end) {
-      items.push_back(pair.second.GetId());
-      LOGD(L"\t<anime>\n"
-           L"\t\t<type>" + ToWstr(pair.second.GetType()) + L"</type>\n"
-           L"\t\t<id name=\"myanimelist\">" + ToWstr(pair.second.GetId()) + L"</id>\n"
-           L"\t\t<producers>" + Join(pair.second.GetProducers(), L", ") + L"</producers>\n"
-           L"\t\t<image>" + pair.second.GetImageUrl() + L"</image>\n"
-           L"\t\t<title>" + pair.second.GetTitle() + L"</title>\n"
-           L"\t</anime>\n");
+    items.push_back(anime_id);
+    switch (taiga::GetCurrentServiceId()) {
+      default:
+        LOGD(L"Added item: #{} \"{}\" ({})", anime_id,
+             anime_item.GetTitle(), anime_item.GetDateStart().to_string());
+        break;
+      case sync::kMyAnimeList:
+        LOGD(L"\t<anime>\n"
+             L"\t\t<type>" + ToWstr(anime_item.GetType()) + L"</type>\n"
+             L"\t\t<id name=\"myanimelist\">" + ToWstr(anime_id) + L"</id>\n"
+             L"\t\t<producers>" + Join(anime_item.GetProducers(), L", ") + L"</producers>\n"
+             L"\t\t<image>" + anime_item.GetImageUrl() + L"</image>\n"
+             L"\t\t<title>" + anime_item.GetTitle() + L"</title>\n"
+             L"\t</anime>\n");
+        break;
     }
   }
 }
