@@ -38,9 +38,10 @@ namespace anilist {
 std::wstring DecodeDescription(std::string text) {
   auto str = StrToWstr(text);
 
+  ReplaceString(str, L"\r\n", L"\n");
+  ReplaceString(str, L"<br>", L"\n");
+  while (ReplaceString(str, L"\n\n\n", L"\n\n"));
   ReplaceString(str, L"\n", L"\r\n");
-  ReplaceString(str, L"<br>", L"\r\n");
-  ReplaceString(str, L"\r\n\r\n\r\n", L"\r\n\r\n");
 
   StripHtmlTags(str);
 
