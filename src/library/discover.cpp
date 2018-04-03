@@ -206,10 +206,12 @@ void SeasonDatabase::Review(bool hide_nsfw) {
     const int anime_id = items.at(i);
     auto anime_item = AnimeDatabase.FindItem(anime_id);
     if (anime_item) {
-      if (is_nsfw(*anime_item) || !is_within_date_interval(*anime_item)) {
+      const Date& anime_start = anime_item->GetDateStart();
+      if (is_nsfw(*anime_item) ||
+          (anime::IsValidDate(anime_start) && !is_within_date_interval(*anime_item))) {
         items.erase(items.begin() + i--);
         LOGD(L"Removed item: #{} \"{}\" ({})", anime_id,
-             anime_item->GetTitle(), anime_item->GetDateStart().to_string());
+             anime_item->GetTitle(), anime_start.to_string());
       }
     }
   }
