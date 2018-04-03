@@ -39,14 +39,16 @@ std::wstring DecodeText(std::wstring text) {
 
   StripHtmlTags(text);
   DecodeHtmlEntities(text);
+  Trim(text, L" \t\r\n");
 
   return text;
 }
 
 std::wstring EraseBbcode(std::wstring& str) {
   using namespace std::regex_constants;
-  const std::wregex pattern(L"\\[/?(b|i|u|(size(=[0-9]+)?)|(url(=[^\\]]*)?))\\]",
-                            nosubs | optimize);
+  const std::wregex pattern(
+      L"\\[/?(b|i|quote|u|(color(=[#\\w]+)?)|(size(=[0-9]+)?)|(url(=[^\\]]*)?))\\]",
+      nosubs | optimize);
   return std::regex_replace(str, pattern, L"");
 }
 
