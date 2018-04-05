@@ -123,6 +123,11 @@ BOOL SettingsPage::OnInitDialog() {
     // Services > AniList
     case kSettingsPageServicesAniList: {
       SetDlgItemText(IDC_EDIT_USER_ANILIST, Settings[taiga::kSync_Service_AniList_Username].c_str());
+      if (Settings[taiga::kSync_Service_AniList_Token].empty()) {
+        SetDlgItemText(IDC_BUTTON_ANILIST_AUTH, L"Authorize...");
+      } else {
+        SetDlgItemText(IDC_BUTTON_ANILIST_AUTH, L"Re-authorize...");
+      }
       break;
     }
 
