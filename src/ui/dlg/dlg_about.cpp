@@ -52,7 +52,7 @@ static std::wstring GetLibraryVersion(ThirdPartyLibrary library) {
     case kDate:
       return L"2.4.1";
     case kDiscordRpc:
-      return L"3.1.0";
+      return L"3.2.0";
     case kFmt:
       return StrToWstr(semaver::Version(
           (FMT_VERSION / 10000),
