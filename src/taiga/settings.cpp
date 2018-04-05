@@ -543,7 +543,7 @@ std::wstring AppSettings::GetPassword(sync::ServiceId service_id) const {
     case sync::kKitsu:
       return Base64Decode(GetWstr(kSync_Service_Kitsu_Password));
     case sync::kAniList:
-      return Base64Decode(GetWstr(kSync_Service_AniList_Token));
+      return GetWstr(kSync_Service_AniList_Token);
     default:
       return {};
   }
