@@ -668,7 +668,7 @@ void FeedFilterManager::InitializeShortcodes() {
 bool FeedFilterManager::Import(const std::wstring& input,
                                std::vector<FeedFilter>& filters) {
   xml_document document;
-  xml_parse_result result = document.load(input.c_str());
+  xml_parse_result result = document.load_string(input.c_str());
 
   if (result.status != pugi::status_ok)
     return false;

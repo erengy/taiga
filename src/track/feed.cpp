@@ -162,7 +162,7 @@ bool Feed::Load(const std::wstring& data) {
   items.clear();
 
   xml_document document;
-  xml_parse_result parse_result = document.load(data.c_str());
+  xml_parse_result parse_result = document.load_string(data.c_str());
 
   if (parse_result.status != pugi::status_ok)
     return false;

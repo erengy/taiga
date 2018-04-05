@@ -210,7 +210,7 @@ void Service::AuthenticateUser(Response& response, HttpResponse& http_response) 
 
 void Service::GetLibraryEntries(Response& response, HttpResponse& http_response) {
   xml_document document;
-  xml_parse_result parse_result = document.load(http_response.body.c_str());
+  xml_parse_result parse_result = document.load_string(http_response.body.c_str());
 
   if (parse_result.status != pugi::status_ok) {
     response.data[L"error"] = L"Could not parse the list";
@@ -354,7 +354,7 @@ void Service::GetMetadataById(Response& response, HttpResponse& http_response) {
 
 void Service::SearchTitle(Response& response, HttpResponse& http_response) {
   xml_document document;
-  xml_parse_result parse_result = document.load(http_response.body.c_str());
+  xml_parse_result parse_result = document.load_string(http_response.body.c_str());
 
   if (parse_result.status != pugi::status_ok) {
     response.data[L"error"] = L"Could not parse search results";
