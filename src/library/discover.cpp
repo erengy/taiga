@@ -42,7 +42,7 @@ namespace library {
 
 SeasonDatabase::SeasonDatabase()
     : available_seasons({anime::Season::kWinter, 2011},
-                        {anime::Season::kWinter, 2018}),
+                        {anime::Season::kSpring, 2018}),
       remote_location(L"https://raw.githubusercontent.com"
                       L"/erengy/anime-seasons/master/data/") {
 }
