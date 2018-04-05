@@ -129,7 +129,9 @@ int TranslateSeriesTypeFrom(const std::wstring& value) {
     return anime::kMusic;
   }
 
-  LOGW(L"Invalid value: {}", value);
+  if (!value.empty())
+    LOGW(L"Invalid value: {}", value);
+
   return anime::kUnknownType;
 }
 

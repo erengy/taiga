@@ -144,7 +144,9 @@ int TranslateSeriesTypeFrom(const std::string& value) {
   if (it != table.end())
     return it->second;
 
-  LOGW(L"Invalid value: {}", StrToWstr(value));
+  if (!value.empty())
+    LOGW(L"Invalid value: {}", StrToWstr(value));
+
   return anime::kUnknownType;
 }
 
