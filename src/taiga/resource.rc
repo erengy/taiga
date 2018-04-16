@@ -446,8 +446,8 @@ EXSTYLE WS_EX_CONTROLPARENT
 FONT 9, "Segoe UI", 400, 0, 0
 {
     AUTOCHECKBOX    "Enable streaming media detection", IDC_CHECK_DETECT_STREAMING_MEDIA, 7, 7, 130, 8, 0, WS_EX_LEFT
-    LTEXT           "Supported web browsers: Google Chrome, Mozilla Firefox, Opera", IDC_STATIC, 7, 18, 301, 8, SS_LEFT, WS_EX_TRANSPARENT
-    CONTROL         "", IDC_LIST_STREAM_PROVIDER, WC_LISTVIEW, WS_TABSTOP | WS_BORDER | LVS_ALIGNLEFT | LVS_SHAREIMAGELISTS | LVS_SINGLESEL | LVS_REPORT, 7, 33, 301, 160, WS_EX_LEFT
+    LTEXT           "Supported web browsers are Google Chrome, Mozilla Firefox, and Opera. Works best with a browser in English language.", IDC_STATIC, 7, 18, 301, 16, SS_LEFT, WS_EX_TRANSPARENT
+    CONTROL         "", IDC_LIST_STREAM_PROVIDER, WC_LISTVIEW, WS_TABSTOP | WS_BORDER | LVS_ALIGNLEFT | LVS_SHAREIMAGELISTS | LVS_SINGLESEL | LVS_REPORT, 7, 41, 301, 167, WS_EX_LEFT
 }
 
 
