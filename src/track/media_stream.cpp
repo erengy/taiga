@@ -265,6 +265,7 @@ void IgnoreCommonWebBrowserTitles(const std::wstring& address,
     title.clear();
 
   static const std::vector<std::wstring> common_suffixes{
+    L" - Crashed",        // Chrome
     L" - Network error",  // Chrome
   };
   for (const auto& suffix : common_suffixes) {
@@ -277,6 +278,7 @@ void IgnoreCommonWebBrowserTitles(const std::wstring& address,
 
 void RemoveCommonWebBrowserAffixes(std::wstring& title) {
   static const std::vector<std::wstring> common_suffixes{
+    L" - Audio muted",    // Chrome
     L" - Audio playing",  // Chrome
   };
   for (const auto& suffix : common_suffixes) {
