@@ -220,10 +220,16 @@ bool GetTitleFromWebBrowser(const std::vector<anisthesia::Media>& media,
           tabs.push_back(value);
           break;
         case anisthesia::MediaInformationType::Title:
-          page_title = value;
+          if (page_title.empty())
+            page_title = value;
           break;
         case anisthesia::MediaInformationType::Url:
           url = value;
+          break;
+        // We prefer the regular window title, because Chrome appends the audio
+        // state to tab accessibility labels.
+        case anisthesia::MediaInformationType::Unknown:
+          page_title = value;
           break;
       }
     }

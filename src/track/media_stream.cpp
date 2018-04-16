@@ -277,6 +277,8 @@ void IgnoreCommonWebBrowserTitles(const std::wstring& address,
 }
 
 void RemoveCommonWebBrowserAffixes(std::wstring& title) {
+  // Ignoring all localized strings is not feasible, because Chrome is available
+  // in 50+ languages and translations can change over time.
   static const std::vector<std::wstring> common_suffixes{
     L" - Audio muted",    // Chrome
     L" - Audio playing",  // Chrome
