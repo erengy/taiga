@@ -278,6 +278,7 @@ void SettingsDialog::OnOK() {
   page = &pages[kSettingsPageSharingDiscord];
   if (page->IsWindow()) {
     Settings.Set(taiga::kShare_Discord_Enabled, page->IsDlgButtonChecked(IDC_CHECK_DISCORD));
+    Settings.Set(taiga::kShare_Discord_Username_Enabled, page->IsDlgButtonChecked(IDC_CHECK_DISCORD_USERNAME));
   }
   // Sharing > HTTP
   page = &pages[kSettingsPageSharingHttp];

@@ -282,6 +282,7 @@ BOOL SettingsPage::OnInitDialog() {
     // Sharing > Discord
     case kSettingsPageSharingDiscord: {
       CheckDlgButton(IDC_CHECK_DISCORD, Settings.GetBool(taiga::kShare_Discord_Enabled));
+      CheckDlgButton(IDC_CHECK_DISCORD_USERNAME, Settings.GetBool(taiga::kShare_Discord_Username_Enabled));
       break;
     }
     // Sharing > HTTP

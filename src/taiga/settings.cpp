@@ -191,6 +191,7 @@ void AppSettings::InitializeMap() {
   INITKEY(kShare_Discord_Enabled, nullptr, L"announce/discord/enabled");
   INITKEY(kShare_Discord_Format_Details, kDefaultFormatDiscordDetails.c_str(), L"announce/discord/formatdetails");
   INITKEY(kShare_Discord_Format_State, kDefaultFormatDiscordState.c_str(), L"announce/discord/formatstate");
+  INITKEY(kShare_Discord_Username_Enabled, L"true", L"announce/discord/usernameenabled");
   INITKEY(kShare_Http_Enabled, nullptr, L"announce/http/enabled");
   INITKEY(kShare_Http_Format, kDefaultFormatHttp.c_str(), L"announce/http/format");
   INITKEY(kShare_Http_Url, nullptr, L"announce/http/url");

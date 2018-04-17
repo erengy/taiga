@@ -521,7 +521,9 @@ EXSTYLE WS_EX_CONTROLPARENT
 FONT 9, "Segoe UI", 400, 0, 0
 {
     AUTOCHECKBOX    "Update rich presence", IDC_CHECK_DISCORD, 7, 7, 100, 8, 0, WS_EX_LEFT
-    LTEXT           "Note: This feature requires using the Discord desktop client. Updates may take 15 seconds (in addition to the delay time) due to Discord's rate limit.", IDC_STATIC, 7, 22, 301, 16, SS_LEFT, WS_EX_TRANSPARENT
+    GROUPBOX        "Options", IDC_STATIC, 7, 22, 301, 26, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Display username in tooltip", IDC_CHECK_DISCORD_USERNAME, 13, 33, 100, 8, 0, WS_EX_LEFT
+    LTEXT           "Note: Requires using the Discord desktop client. ""Display currently running game as a status message"" option must be enabled, but do not add Taiga as a game. Updates may be delayed for 15 seconds, in addition to the delay time setting at Recognition page.", IDC_STATIC, 7, 55, 301, 26, SS_LEFT, WS_EX_TRANSPARENT
 }
 
 

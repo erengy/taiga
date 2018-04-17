@@ -151,8 +151,13 @@ void Discord::UpdatePresence(const std::string& details,
                              time_t timestamp) const {
   const std::string small_image_key =
       WstrToStr(GetCurrentService()->canonical_name());
-  const std::string small_image_text =
-      WstrToStr(GetCurrentUsername() + L" at " + GetCurrentService()->name());
+
+  std::string small_image_text =
+      WstrToStr(GetCurrentService()->name());
+  if (Settings.GetBool(kShare_Discord_Username_Enabled)) {
+    small_image_text = WstrToStr(GetCurrentUsername() + L" at ") +
+                       small_image_text;
+  }
 
   DiscordRichPresence presence = {0};
   presence.state = state.c_str();
