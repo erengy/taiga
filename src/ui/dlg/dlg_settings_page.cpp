@@ -709,6 +709,7 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
               }
             }
             list.DeleteItem(item_index);
+            parent->UpdateTorrentFilterList(list.GetWindowHandle());
           }
           list.SetWindowHandle(nullptr);
           return TRUE;
@@ -913,6 +914,7 @@ LRESULT SettingsPage::OnNotify(int idCtrl, LPNMHDR pnmh) {
                   }
                 }
                 list.DeleteItem(item_index);
+                parent->UpdateTorrentFilterList(list.GetWindowHandle());
               }
               list.SetWindowHandle(nullptr);
               return TRUE;

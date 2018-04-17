@@ -56,6 +56,7 @@ public:
   int AddTorrentFilterToList(HWND hwnd_list, const FeedFilter& filter);
   void RefreshCache();
   void RefreshTorrentFilterList(HWND hwnd_list);
+  void UpdateTorrentFilterList(HWND hwnd_list);
   void RefreshTwitterLink();
 
 private:

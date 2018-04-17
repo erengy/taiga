@@ -519,6 +519,17 @@ void SettingsDialog::RefreshTorrentFilterList(HWND hwnd_list) {
   list.SetWindowHandle(nullptr);
 }
 
+void SettingsDialog::UpdateTorrentFilterList(HWND hwnd_list) {
+  win::ListView list = hwnd_list;
+
+  for (size_t i = 0; i < feed_filters_.size(); ++i) {
+    const auto& feed_filter = feed_filters_.at(i);
+    list.SetItemParam(i, reinterpret_cast<LPARAM>(&feed_filter));
+  }
+
+  list.SetWindowHandle(nullptr);
+}
+
 void SettingsDialog::RefreshTwitterLink() {
   std::wstring text;
 
