@@ -19,6 +19,7 @@
 #include <fstream>
 #include <shlobj.h>
 
+#include <anisthesia/src/win/util.h>
 #include <windows/win/error.h>
 #include <windows/win/registry.h>
 
@@ -27,6 +28,8 @@
 #include "log.h"
 #include "string.h"
 #include "time.h"
+
+using anisthesia::win::Handle;
 
 HANDLE OpenFileForGenericRead(const std::wstring& path) {
   return ::CreateFile(GetExtendedLengthPath(path).c_str(),
@@ -43,15 +46,14 @@ HANDLE OpenFileForGenericWrite(const std::wstring& path) {
 ////////////////////////////////////////////////////////////////////////////////
 
 unsigned long GetFileAge(const std::wstring& path) {
-  HANDLE file_handle = OpenFileForGenericRead(path);
+  Handle file_handle{OpenFileForGenericRead(path)};
 
-  if (file_handle == INVALID_HANDLE_VALUE)
+  if (file_handle.get() == INVALID_HANDLE_VALUE)
     return 0;
 
   // Get the time the file was last modified
   FILETIME ft_file;
-  BOOL result = GetFileTime(file_handle, nullptr, nullptr, &ft_file);
-  CloseHandle(file_handle);
+  BOOL result = GetFileTime(file_handle.get(), nullptr, nullptr, &ft_file);
 
   if (!result)
     return 0;
@@ -76,11 +78,10 @@ unsigned long GetFileAge(const std::wstring& path) {
 }
 
 std::wstring GetFileLastModifiedDate(const std::wstring& path) {
-  HANDLE file_handle = OpenFileForGenericRead(path);
-  if (file_handle != INVALID_HANDLE_VALUE) {
+  Handle file_handle{OpenFileForGenericRead(path)};
+  if (file_handle.get() != INVALID_HANDLE_VALUE) {
     FILETIME ft_file = {0};
-    BOOL result = GetFileTime(file_handle, nullptr, nullptr, &ft_file);
-    CloseHandle(file_handle);
+    BOOL result = GetFileTime(file_handle.get(), nullptr, nullptr, &ft_file);
     if (result) {
       SYSTEMTIME st_file = {0};
       result = FileTimeToSystemTime(&ft_file, &st_file);
@@ -95,13 +96,12 @@ std::wstring GetFileLastModifiedDate(const std::wstring& path) {
 QWORD GetFileSize(const std::wstring& path) {
   QWORD file_size = 0;
 
-  HANDLE file_handle = OpenFileForGenericRead(path);
+  Handle file_handle{OpenFileForGenericRead(path)};
 
-  if (file_handle != INVALID_HANDLE_VALUE) {
+  if (file_handle.get() != INVALID_HANDLE_VALUE) {
     LARGE_INTEGER size;
-    if (::GetFileSizeEx(file_handle, &size))
+    if (::GetFileSizeEx(file_handle.get(), &size))
       file_size = size.QuadPart;
-    CloseHandle(file_handle);
   }
 
   return file_size;
@@ -229,14 +229,8 @@ bool FileExists(const std::wstring& file) {
   if (file.empty())
     return false;
 
-  HANDLE file_handle = OpenFileForGenericRead(file);
-
-  if (file_handle != INVALID_HANDLE_VALUE) {
-    CloseHandle(file_handle);
-    return true;
-  }
-
-  return false;
+  Handle file_handle{OpenFileForGenericRead(file)};
+  return file_handle.get() != INVALID_HANDLE_VALUE;
 }
 
 bool FolderExists(const std::wstring& path) {
@@ -364,20 +358,19 @@ int PopulateFolders(std::vector<std::wstring>& folder_list,
 ////////////////////////////////////////////////////////////////////////////////
 
 bool ReadFromFile(const std::wstring& path, std::string& output) {
-  HANDLE file_handle = OpenFileForGenericRead(path);
+  Handle file_handle{OpenFileForGenericRead(path)};
 
-  if (file_handle == INVALID_HANDLE_VALUE)
+  if (file_handle.get() == INVALID_HANDLE_VALUE)
     return false;
 
   LARGE_INTEGER file_size{};
-  if (::GetFileSizeEx(file_handle, &file_size) == FALSE)
+  if (::GetFileSizeEx(file_handle.get(), &file_size) == FALSE)
     return false;
   output.resize(static_cast<size_t>(file_size.QuadPart));
 
   DWORD bytes_read = 0;
-  const BOOL result = ::ReadFile(file_handle, output.data(),
+  const BOOL result = ::ReadFile(file_handle.get(), output.data(),
                                  output.size(), &bytes_read, nullptr);
-  ::CloseHandle(file_handle);
 
   return result != FALSE && bytes_read == output.size();
 }
@@ -396,11 +389,10 @@ bool SaveToFile(LPCVOID data, DWORD length, const string_t& path,
 
   // Save the data
   BOOL result = FALSE;
-  HANDLE file_handle = OpenFileForGenericWrite(path);
-  if (file_handle != INVALID_HANDLE_VALUE) {
+  Handle file_handle{OpenFileForGenericWrite(path)};
+  if (file_handle.get() != INVALID_HANDLE_VALUE) {
     DWORD bytes_written = 0;
-    result = ::WriteFile(file_handle, data, length, &bytes_written, nullptr);
-    ::CloseHandle(file_handle);
+    result = ::WriteFile(file_handle.get(), data, length, &bytes_written, nullptr);
   }
 
   return result != FALSE;
