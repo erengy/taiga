@@ -206,6 +206,25 @@ std::wstring GetExtendedLengthPath(const std::wstring& path) {
   return prefix + path;
 }
 
+std::wstring GetNormalizedPath(std::wstring path) {
+  constexpr auto kPrefix = LR"(\\?\)";
+  constexpr auto kUnc = L"UNC";
+
+  if (StartsWith(path, kPrefix)) {
+    // "\\?\C:\path" -> "C:\path"
+    // "\\?\UNC\computer\path" -> "UNC\computer\path"
+    EraseLeft(path, kPrefix);
+
+    if (StartsWith(path, kUnc)) {
+      // "UNC\computer\path" -> "\\computer\path"
+      EraseLeft(path, kUnc);
+      path.insert(0, 1, L'\\');
+    }
+  }
+
+  return path;
+}
+
 bool IsDirectory(const WIN32_FIND_DATA& find_data) {
   return (find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
 }
@@ -308,6 +327,37 @@ std::wstring GetKnownFolderPath(REFKNOWNFOLDERID rfid) {
   CoTaskMemFree(path);
 
   return output;
+}
+
+std::wstring GetFinalPathNameByHandle(HANDLE handle) {
+  std::wstring buffer(MAX_PATH, '\0');
+
+  auto get_final_path_name_by_handle = [&]() {
+    return ::GetFinalPathNameByHandle(handle, &buffer.front(), buffer.size(),
+        FILE_NAME_NORMALIZED | VOLUME_NAME_DOS);
+  };
+
+  auto result = get_final_path_name_by_handle();
+  if (result > buffer.size()) {
+    buffer.resize(result, '\0');
+    result = get_final_path_name_by_handle();
+  }
+
+  if (result < buffer.size())
+    buffer.resize(result);
+
+  return buffer;
+}
+
+std::wstring GetFinalPath(const std::wstring& path) {
+  // FILE_FLAG_BACKUP_SEMANTICS flag is required for directories
+  Handle handle{::CreateFile(path.c_str(), 0, 0, nullptr, OPEN_EXISTING,
+                             FILE_FLAG_BACKUP_SEMANTICS, nullptr)};
+
+  if (handle.get() == INVALID_HANDLE_VALUE)
+    return path;
+
+  return GetFinalPathNameByHandle(handle.get());
 }
 
 ////////////////////////////////////////////////////////////////////////////////

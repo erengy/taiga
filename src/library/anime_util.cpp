@@ -640,9 +640,11 @@ void GetUpcomingTitles(std::vector<int>& anime_ids) {
 ////////////////////////////////////////////////////////////////////////////////
 
 bool IsInsideLibraryFolders(const std::wstring& path) {
-  for (const auto& library_folder : Settings.library_folders)
+  for (auto library_folder : Settings.library_folders) {
+    library_folder = GetNormalizedPath(GetFinalPath(library_folder));
     if (StartsWith(path, library_folder))
       return true;
+  }
 
   return false;
 }

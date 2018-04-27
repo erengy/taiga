@@ -156,7 +156,7 @@ bool GetTitleFromDefaultPlayer(const std::vector<anisthesia::Media>& media,
 
       switch (information.type) {
         case anisthesia::MediaInformationType::File: {
-          EraseLeft(value, LR"(\\?\)");
+          value = GetNormalizedPath(value);
           const auto file_extension = GetFileExtension(value);
 
           // Video file
