@@ -79,6 +79,7 @@ static const std::set<std::wstring> script_variables = {
   L"resolution",
   L"rewatching",
   L"score",
+  L"season",
   L"status",
   L"title",
   L"total",
@@ -375,6 +376,7 @@ std::wstring ReplaceVariables(std::wstring str, const anime::Episode& episode,
           REPLACE(L"watched", VALIDATE(ENCODE(anime::TranslateNumber(anime_item->GetMyLastWatchedEpisode(), L"")), L""));
           REPLACE(L"total", VALIDATE(ENCODE(anime::TranslateNumber(anime_item->GetEpisodeCount(), L"")), L""));
           REPLACE(L"score", VALIDATE(ENCODE(anime::TranslateMyScore(anime_item->GetMyScore(), L"")), L""));
+          REPLACE(L"season", VALIDATE(ENCODE(anime::TranslateDateToSeasonString(anime_item->GetDateStart())), L""));
           REPLACE(L"id", ENCODE(id));
           REPLACE(L"image", VALIDATE(ENCODE(anime_item->GetImageUrl()), L""));
           REPLACE(L"status", VALIDATE(ENCODE(ToWstr(anime_item->GetMyStatus())), L""));
