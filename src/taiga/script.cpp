@@ -488,6 +488,7 @@ std::wstring ReplaceVariables(std::wstring str, const anime::Episode& episode,
   // Clean-up
   while (ReplaceString(str, L"\n\n", L"\n"));
   while (ReplaceString(str, L"  ", L" "));
+  Trim(str, L"\t\n\r ");
 
   // Return
   return str;
