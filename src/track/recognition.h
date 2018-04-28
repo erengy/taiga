@@ -61,6 +61,7 @@ public:
 
   bool IsBatchRelease(const anime::Episode& episode) const;
   bool IsValidAnimeType(const anime::Episode& episode) const;
+  bool IsValidAnimeType(const std::wstring& path, const ParseOptions& parse_options) const;
   bool IsValidAnimeType(const std::wstring& path) const;
   bool IsValidFileExtension(const anime::Episode& episode) const;
   bool IsValidFileExtension(const std::wstring& extension) const;

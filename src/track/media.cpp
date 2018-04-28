@@ -253,6 +253,14 @@ bool GetTitleFromWebBrowser(const std::vector<anisthesia::Media>& media,
     }
   }
 
+  ParseOptions parse_options;
+  parse_options.parse_path = false;
+  parse_options.streaming_media = true;
+  if (!Meow.IsValidAnimeType(page_title, parse_options)) {
+    current_page_title.clear();
+    return false;
+  }
+
   title = page_title;
 
   if (GetTitleFromStreamingMediaProvider(url, title)) {

@@ -146,11 +146,8 @@ bool Engine::IsValidAnimeType(const anime::Episode& episode) const {
   return true;
 }
 
-bool Engine::IsValidAnimeType(const std::wstring& path) const {
-  track::recognition::ParseOptions parse_options;
-  parse_options.parse_path = true;
-  parse_options.streaming_media = false;
-
+bool Engine::IsValidAnimeType(const std::wstring& path,
+                              const ParseOptions& parse_options) const {
   anime::Episode episode;
 
   if (Parse(path, parse_options, episode))
@@ -158,6 +155,14 @@ bool Engine::IsValidAnimeType(const std::wstring& path) const {
       return false;
 
   return true;
+}
+
+bool Engine::IsValidAnimeType(const std::wstring& path) const {
+  track::recognition::ParseOptions parse_options;
+  parse_options.parse_path = true;
+  parse_options.streaming_media = false;
+
+  return IsValidAnimeType(path, parse_options);
 }
 
 bool Engine::IsValidFileExtension(const anime::Episode& episode) const {
