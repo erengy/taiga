@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <set>
 
+#include <windows/win/clipboard.h>
 #include <windows/win/version.h>
 
 #include "base/format.h"
@@ -838,8 +839,10 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
               listview.SelectAllItems();
               return TRUE;
             }
+
             if (!anime::IsValidId(anime_id))
               break;
+
             // Edit episode
             if (pnkd->wVKey == VK_ADD || pnkd->wVKey == VK_OEM_PLUS) {
               anime::IncrementEpisode(anime_id);
@@ -855,6 +858,24 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
             } else if (pnkd->wVKey >= VK_NUMPAD0 && pnkd->wVKey <= VK_NUMPAD9) {
               ExecuteAction(L"EditScore({})"_format((pnkd->wVKey - VK_NUMPAD0) * 10), 0,
                             reinterpret_cast<LPARAM>(&anime_ids));
+              return TRUE;
+            // Copy anime titles to clipboard
+            } else if (pnkd->wVKey == 'C') {
+              const auto anime_ids = GetCurrentIds();
+              if (!anime_ids.empty()) {
+                std::vector<std::wstring> anime_titles;
+                for (const auto id : anime_ids) {
+                  const auto anime_item = AnimeDatabase.FindItem(id);
+                  if (anime_item)
+                    anime_titles.push_back(anime_item->GetTitle());
+                }
+                if (!anime_titles.empty()) {
+                  const auto str = Join(anime_titles, L"\r\n");
+                  win::Clipboard clipboard(DlgMain.GetWindowHandle());
+                  clipboard.Empty();
+                  clipboard.SetText(str);
+                }
+              }
               return TRUE;
             // Open folder
             } else if (pnkd->wVKey == 'O') {
