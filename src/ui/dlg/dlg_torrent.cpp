@@ -225,16 +225,20 @@ void TorrentDialog::OnContextMenu(HWND hwnd, POINT pt) {
 
   } else if (answer == L"SelectFansub") {
     int anime_id = feed_item->episode_data.anime_id;
-    std::wstring group_name = feed_item->episode_data.release_group();
+    const auto group_name = feed_item->episode_data.release_group();
+    const auto video_resolution = feed_item->episode_data.video_resolution();
     if (anime::IsValidId(anime_id) && !group_name.empty()) {
       for (int i = 0; i < list_.GetItemCount(); i++) {
         feed_item = reinterpret_cast<FeedItem*>(list_.GetItemParam(i));
-        if (feed_item && !IsEqual(feed_item->episode_data.release_group(), group_name)) {
-          feed_item->state = FeedItemState::DiscardedNormal;
-          list_.SetCheckState(i, FALSE);
+        if (feed_item && feed_item->episode_data.anime_id == anime_id) {
+          if (!IsEqual(feed_item->episode_data.release_group(), group_name) ||
+              (!video_resolution.empty() && !IsEqual(feed_item->episode_data.video_resolution(), video_resolution))) {
+            feed_item->state = FeedItemState::DiscardedNormal;
+            list_.SetCheckState(i, FALSE);
+          }
         }
       }
-      anime::SetFansubFilter(anime_id, group_name);
+      anime::SetFansubFilter(anime_id, group_name, video_resolution);
     }
 
   } else if (answer == L"MoreTorrents") {

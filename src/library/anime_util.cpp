@@ -562,7 +562,17 @@ bool GetFansubFilter(int anime_id, std::vector<std::wstring>& groups) {
   return found;
 }
 
-bool SetFansubFilter(int anime_id, const std::wstring& group_name) {
+bool SetFansubFilter(int anime_id, const std::wstring& group_name,
+                     const std::wstring& video_resolution) {
+  const auto find_condition = [](FeedFilter& filter,
+                                 FeedFilterElement element) {
+    return std::find_if(
+        filter.conditions.begin(), filter.conditions.end(),
+        [&element](const FeedFilterCondition& condition) {
+          return condition.element == element;
+        });
+  };
+
   // Check existing filters
   foreach_(filter, Aggregator.filter_manager.filters) {
     auto id = std::find(
@@ -570,13 +580,13 @@ bool SetFansubFilter(int anime_id, const std::wstring& group_name) {
     if (id == filter->anime_ids.end())
       continue;
 
-    auto condition = std::find_if(
-        filter->conditions.begin(), filter->conditions.end(),
-        [](const FeedFilterCondition& condition) {
-          return condition.element == kFeedFilterElement_Episode_Group;
-        });
-    if (condition == filter->conditions.end())
+    const auto group_condition =
+        find_condition(*filter, kFeedFilterElement_Episode_Group);
+    if (group_condition == filter->conditions.end())
       continue;
+
+    const auto resolution_condition =
+        find_condition(*filter, kFeedFilterElement_Episode_VideoResolution);
 
     if (filter->anime_ids.size() > 1) {
       filter->anime_ids.erase(id);
@@ -589,7 +599,15 @@ bool SetFansubFilter(int anime_id, const std::wstring& group_name) {
       if (group_name.empty()) {
         Aggregator.filter_manager.filters.erase(filter);
       } else {
-        condition->value = group_name;
+        group_condition->value = group_name;
+        if (!video_resolution.empty()) {
+          if (resolution_condition != filter->conditions.end()) {
+            resolution_condition->value = video_resolution;
+          } else {
+            filter->AddCondition(kFeedFilterElement_Episode_VideoResolution,
+                                 kFeedFilterOperator_Equals, video_resolution);
+          }
+        }
       }
       return true;
     }
@@ -610,6 +628,11 @@ bool SetFansubFilter(int anime_id, const std::wstring& group_name) {
   Aggregator.filter_manager.filters.back().AddCondition(
       kFeedFilterElement_Episode_Group, kFeedFilterOperator_Equals,
       group_name);
+  if (!video_resolution.empty()) {
+    Aggregator.filter_manager.filters.back().AddCondition(
+        kFeedFilterElement_Episode_VideoResolution, kFeedFilterOperator_Equals,
+        video_resolution);
+  }
   Aggregator.filter_manager.filters.back().anime_ids.push_back(anime_id);
   return true;
 }

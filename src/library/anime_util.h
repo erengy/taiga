@@ -61,7 +61,7 @@ void AddToQueue(Item& item, const Episode& episode, bool change_status);
 void SetMyLastUpdateToNow(Item& item);
 
 bool GetFansubFilter(int anime_id, std::vector<std::wstring>& groups);
-bool SetFansubFilter(int anime_id, const std::wstring& group_name);
+bool SetFansubFilter(int anime_id, const std::wstring& group_name, const std::wstring& video_resolution);
 
 std::wstring GetImagePath(int anime_id = -1);
 

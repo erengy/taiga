@@ -337,7 +337,7 @@ LRESULT PageMyInfo::OnNotify(int idCtrl, LPNMHDR pnmh) {
             dlg.text = text;
             dlg.Show(parent->GetWindowHandle());
             if (dlg.result == IDOK && dlg.text != text)
-              if (anime::SetFansubFilter(anime_id_, dlg.text))
+              if (anime::SetFansubFilter(anime_id_, dlg.text, L""))
                 RefreshFansubPreference();
           }
           return TRUE;
