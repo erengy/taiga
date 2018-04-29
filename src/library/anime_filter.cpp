@@ -16,6 +16,10 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <algorithm>
+#include <map>
+#include <regex>
+
 #include "base/string.h"
 #include "library/anime_filter.h"
 #include "library/anime_item.h"
@@ -23,73 +27,180 @@
 
 namespace anime {
 
-Filters::Filters() {
-  Reset();
+enum class SearchField {
+  None,
+  Id,
+  Title,
+  Genre,
+  Producer,
+  Tag,
+  Type,
+  Season,
+  Year,
+};
+
+enum class SearchOperator {
+  EQ,
+  GE,
+  GT,
+  LE,
+  LT,
+};
+
+struct SearchTerm {
+  SearchField field = SearchField::None;
+  SearchOperator op = SearchOperator::EQ;
+  std::wstring value;
+};
+
+SearchTerm GetSearchTerm(const std::wstring& str) {
+  SearchTerm term;
+  term.value = str;
+
+  static const std::wregex pattern{LR"(([a-z]+):([!<=>]+)?(.+))"};
+
+  static const std::map<std::wstring, SearchField> prefixes{
+    {L"id", SearchField::Id},
+    {L"title", SearchField::Title},
+    {L"genre", SearchField::Genre},
+    {L"producer", SearchField::Producer},
+    {L"tag", SearchField::Tag},
+    {L"type", SearchField::Type},
+    {L"season", SearchField::Season},
+    {L"year", SearchField::Year},
+  };
+
+  static const std::map<std::wstring, SearchOperator> operators{
+    {L"=", SearchOperator::EQ},
+    {L">=", SearchOperator::GE},
+    {L">", SearchOperator::GT},
+    {L"<=", SearchOperator::LE},
+    {L"<", SearchOperator::LT},
+  };
+
+  std::wsmatch matches;
+
+  if (std::regex_match(str, matches, pattern)) {
+    const auto it = prefixes.find(matches[1].str());
+    if (it != prefixes.end()) {
+      term.field = it->second;
+      term.value = matches[3].str();
+      if (matches[2].matched) {
+        const auto it = operators.find(matches[2].str());
+        if (it != operators.end()) {
+          term.op = it->second;
+        }
+      }
+    }
+  }
+
+  return term;
 }
+
+bool CheckNumber(const SearchOperator op, const int a, const int b) {
+  switch (op) {
+    default:
+    case SearchOperator::EQ: return a == b;
+    case SearchOperator::GE: return a >= b;
+    case SearchOperator::GT: return a >  b;
+    case SearchOperator::LE: return a <= b;
+    case SearchOperator::LT: return a <  b;
+  }
+}
+
+bool CheckString(const std::wstring& a, const std::wstring& b) {
+  return InStr(a, b, 0, true) > -1;
+}
+
+bool CheckStrings(const std::vector<std::wstring>& v, const std::wstring& w) {
+  for (const auto& s : v) {
+    if (InStr(s, w, 0, true) > -1)
+      return true;
+  }
+  return false;
+};
+
+////////////////////////////////////////////////////////////////////////////////
 
 bool Filters::CheckItem(const Item& item, int text_index) const {
-  // Filter my status
-  for (size_t i = 0; i < my_status.size(); i++)
-    if (!my_status.at(i) && item.GetMyStatus() == i)
-      return false;
+  const auto it = text.find(text_index);
 
-  // Filter airing status
-  for (size_t i = 0; i < status.size(); i++)
-    if (!status.at(i) && item.GetAiringStatus() == i + 1)
-      return false;
+  if (it == text.end() || it->second.empty())
+    return true;
 
-  // Filter type
-  for (size_t i = 0; i < type.size(); i++)
-    if (!type.at(i) && item.GetType() == i + 1)
-      return false;
-
-  // Filter text
-  if (!FilterText(item, text_index))
-    return false;
-
-  // Item passed all filters
-  return true;
-}
-
-bool Filters::FilterText(const Item& item, int text_index) const {
   std::vector<std::wstring> words;
-  auto it = text.find(text_index);
-  auto filter_text = it != text.end() ? it->second : std::wstring();
-  Split(filter_text, L" ", words);
+  Split(it->second, L" ", words);
   RemoveEmptyStrings(words);
 
   std::vector<std::wstring> titles;
   GetAllTitles(item.GetId(), titles);
 
   const auto& genres = item.GetGenres();
+  const auto& producers = item.GetProducers();
+  const auto& tags = item.GetMyTags();
 
+  std::vector<SearchTerm> search_terms;
   for (const auto& word : words) {
-    auto check_strings = [&word](const std::vector<std::wstring>& v) {
-      for (const auto& str : v) {
-        if (InStr(str, word, 0, true) > -1)
-          return true;
+    search_terms.push_back(GetSearchTerm(word));
+  }
+
+  for (const auto& term : search_terms) {
+    switch (term.field) {
+      case SearchField::None:
+        if (!CheckStrings(titles, term.value) &&
+            !CheckStrings(genres, term.value) &&
+            !CheckString(tags, term.value)) {
+          return false;
+        }
+        break;
+
+      case SearchField::Id:
+        if (!CheckNumber(term.op, item.GetId(), ToInt(term.value)))
+          return false;
+        break;
+
+      case SearchField::Title:
+        if (!CheckStrings(titles, term.value))
+          return false;
+        break;
+
+      case SearchField::Genre:
+        if (!CheckStrings(genres, term.value))
+          return false;
+        break;
+
+      case SearchField::Producer:
+        if (!CheckStrings(producers, term.value))
+          return false;
+        break;
+
+      case SearchField::Tag:
+        if (!CheckString(tags, term.value))
+          return false;
+        break;
+
+      case SearchField::Type:
+        if (item.GetType() != TranslateType(term.value))
+          return false;
+        break;
+
+      case SearchField::Season: {
+        const auto season = TranslateDateToSeasonString(item.GetDateStart());
+        if (!CheckString(season, term.value))
+          return false;
+        break;
       }
-      return false;
-    };
-    if (!check_strings(titles) &&
-        !check_strings(genres) &&
-        InStr(item.GetMyTags(), word, 0, true) == -1)
-      return false;
+
+      case SearchField::Year: {
+        const auto year = item.GetDateStart().year();
+        if (!CheckNumber(term.op, year, ToInt(term.value)))
+          return false;
+        break;
+      }
+    }
   }
 
   return true;
-}
-
-void Filters::Reset() {
-  my_status.clear();
-  status.clear();
-  type.clear();
-
-  my_status.resize(7, true);
-  status.resize(3, true);
-  type.resize(6, true);
-
-  text.clear();
 }
 
 }  // namespace anime

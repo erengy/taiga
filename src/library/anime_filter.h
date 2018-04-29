@@ -20,7 +20,6 @@
 
 #include <map>
 #include <string>
-#include <vector>
 
 namespace anime {
 
@@ -28,19 +27,9 @@ class Item;
 
 class Filters {
 public:
-  Filters();
-  virtual ~Filters() {}
-
   bool CheckItem(const Item& item, int text_index) const;
-  void Reset();
 
-  std::vector<bool> my_status;
-  std::vector<bool> status;
-  std::vector<bool> type;
   std::map<int, std::wstring> text;
-
-private:
-  bool FilterText(const Item& item, int text_index) const;
 };
 
 }  // namespace anime
