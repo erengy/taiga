@@ -392,6 +392,7 @@ void ProcessMediaPlayerTitle(const MediaPlayer& media_player) {
       match_options.check_airing_date = true;
       match_options.check_anime_type = true;
       match_options.check_episode_number = true;
+      match_options.streaming_media = media_player.type == anisthesia::PlayerType::WebBrowser;
       auto anime_id = Meow.Identify(CurrentEpisode, true, match_options);
       if (anime::IsValidId(anime_id)) {
         // Recognized

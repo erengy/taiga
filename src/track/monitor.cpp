@@ -94,6 +94,7 @@ static anime::Item* FindAnimeItem(const DirectoryChangeNotification& notificatio
     return nullptr;
 
   static track::recognition::MatchOptions match_options;
+  match_options.streaming_media = false;
   switch (notification.type) {
     case DirectoryChangeNotification::Type::Directory:
       match_options.allow_sequels = false;

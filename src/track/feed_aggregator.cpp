@@ -116,6 +116,7 @@ void Aggregator::ExamineData(Feed& feed) {
     match_options.check_airing_date = true;
     match_options.check_anime_type = true;
     match_options.check_episode_number = true;
+    match_options.streaming_media = false;
     Meow.Identify(episode_data, false, match_options);
 
     // Update last aired episode number

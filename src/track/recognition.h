@@ -46,6 +46,7 @@ struct MatchOptions {
   bool check_airing_date = false;
   bool check_anime_type = false;
   bool check_episode_number = false;
+  bool streaming_media = false;
 };
 
 class Engine {

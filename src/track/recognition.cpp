@@ -103,19 +103,21 @@ int Engine::Identify(anime::Episode& episode, bool give_score,
     }
   };
 
-  // Look up anime title + episode number + episode title
-  if (!episode.elements().empty(anitomy::kElementEpisodeNumber) &&
-      !episode.elements().empty(anitomy::kElementEpisodeTitle)) {
-    static const auto elements =
-        {anitomy::kElementEpisodeNumber, anitomy::kElementEpisodeTitle};
-    look_up_merged_title(elements);
-  }
-  // Look up anime title + episode number
-  if (!episode.elements().empty(anitomy::kElementEpisodeNumber) &&
-      (episode.elements().empty(anitomy::kElementFileExtension) ||
-       !episode.elements().empty(anitomy::kElementAnimeType))) {
-    static const auto elements = {anitomy::kElementEpisodeNumber};
-    look_up_merged_title(elements);
+  if (!match_options.streaming_media) {
+    // Look up anime title + episode number + episode title
+    if (!episode.elements().empty(anitomy::kElementEpisodeNumber) &&
+        !episode.elements().empty(anitomy::kElementEpisodeTitle)) {
+      static const auto elements =
+          {anitomy::kElementEpisodeNumber, anitomy::kElementEpisodeTitle};
+      look_up_merged_title(elements);
+    }
+    // Look up anime title + episode number
+    if (!episode.elements().empty(anitomy::kElementEpisodeNumber) &&
+        (episode.elements().empty(anitomy::kElementFileExtension) ||
+         !episode.elements().empty(anitomy::kElementAnimeType))) {
+      static const auto elements = {anitomy::kElementEpisodeNumber};
+      look_up_merged_title(elements);
+    }
   }
 
   // Look up anime title

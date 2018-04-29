@@ -52,6 +52,7 @@ bool TaigaFileSearchHelper::OnDirectory(const std::wstring& root,
   match_options.check_airing_date = false;
   match_options.check_anime_type = false;
   match_options.check_episode_number = false;
+  match_options.streaming_media = false;
 
   Meow.Identify(episode_, false, match_options);
 
@@ -90,6 +91,7 @@ bool TaigaFileSearchHelper::OnFile(const std::wstring& root,
   match_options.check_airing_date = true;
   match_options.check_anime_type = true;
   match_options.check_episode_number = true;
+  match_options.streaming_media = false;
 
   Meow.Identify(episode_, false, match_options);
 
