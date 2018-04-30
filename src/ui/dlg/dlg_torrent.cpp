@@ -474,11 +474,9 @@ void TorrentDialog::RefreshList() {
     if (it->episode_data.release_version() != 1) {
       number += L"v" + ToWstr(it->episode_data.release_version());
     }
-    video = it->episode_data.video_terms();
-    if (!it->episode_data.video_resolution().empty()) {
-      if (!video.empty()) video += L" ";
-      video += it->episode_data.video_resolution();
-    }
+    video = it->episode_data.video_resolution();
+    AppendString(video, it->episode_data.video_terms(), L" ");
+
     int index = list_.InsertItem(it - feed->items.begin(),
                                  group, icon, 0, NULL, title.c_str(),
                                  reinterpret_cast<LPARAM>(&(*it)));
