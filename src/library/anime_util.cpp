@@ -1060,7 +1060,7 @@ int TranslateType(const std::wstring& value) {
   return it != types.end() ? it->second : anime::kUnknownType;
 }
 
-int TranslateResolution(const std::wstring& str, bool return_validity) {
+int TranslateResolution(const std::wstring& str) {
   // *###x###*
   if (str.length() > 6) {
     int pos = InStr(str, L"x", 0);
@@ -1068,7 +1068,7 @@ int TranslateResolution(const std::wstring& str, bool return_validity) {
       for (unsigned int i = 0; i < str.length(); i++)
         if (i != pos && !IsNumericChar(str.at(i)))
           return 0;
-      return return_validity ? TRUE : ToInt(str.substr(pos + 1));
+      return ToInt(str.substr(pos + 1));
     }
 
   // *###p
@@ -1077,11 +1077,16 @@ int TranslateResolution(const std::wstring& str, bool return_validity) {
       for (unsigned int i = 0; i < str.length() - 1; i++)
         if (!IsNumericChar(str.at(i)))
           return 0;
-      return return_validity ? TRUE : ToInt(str.substr(0, str.length() - 1));
+      return ToInt(str.substr(0, str.length() - 1));
     }
   }
 
   return 0;
+}
+
+std::wstring NormalizeResolution(const std::wstring& resolution) {
+  const auto height = TranslateResolution(resolution);
+  return height ? L"{}p"_format(height) : resolution;
 }
 
 }  // namespace anime
