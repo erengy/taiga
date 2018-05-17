@@ -30,6 +30,7 @@ namespace anime {
 enum class SearchField {
   None,
   Id,
+  Episodes,
   Title,
   Genre,
   Producer,
@@ -61,6 +62,7 @@ SearchTerm GetSearchTerm(const std::wstring& str) {
 
   static const std::map<std::wstring, SearchField> prefixes{
     {L"id", SearchField::Id},
+    {L"eps", SearchField::Episodes},
     {L"title", SearchField::Title},
     {L"genre", SearchField::Genre},
     {L"producer", SearchField::Producer},
@@ -156,6 +158,11 @@ bool Filters::CheckItem(const Item& item, int text_index) const {
 
       case SearchField::Id:
         if (!CheckNumber(term.op, item.GetId(), ToInt(term.value)))
+          return false;
+        break;
+
+      case SearchField::Episodes:
+        if (!CheckNumber(term.op, item.GetEpisodeCount(), ToInt(term.value)))
           return false;
         break;
 
