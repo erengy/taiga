@@ -470,7 +470,7 @@ static bool AnimeListNeedsRefresh(const HistoryItem& history_item) {
 
 static bool AnimeListNeedsResort() {
   auto sort_column = DlgAnimeList.listview.TranslateColumnName(
-      Settings[taiga::kApp_List_SortColumn]);
+      Settings[taiga::kApp_List_SortColumnPrimary]);
   switch (sort_column) {
     case kColumnUserLastUpdated:
     case kColumnUserProgress:

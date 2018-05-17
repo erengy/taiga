@@ -226,15 +226,15 @@ int SortList(int type, int order, int id1, int id2) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2,
-                                 LPARAM lParamSort) {
+static int ListViewCompare(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort,
+                           bool secondary) {
   if (!lParamSort)
     return base::kEqualTo;
 
-  win::ListView* list = reinterpret_cast<win::ListView*>(lParamSort);
+  const auto list = reinterpret_cast<win::ListView*>(lParamSort);
   int return_value = base::kEqualTo;
 
-  switch (list->GetSortType()) {
+  switch (list->GetSortType(secondary)) {
     case kListSortDefault:
     case kListSortEpisodeRange:
     case kListSortNumber:
@@ -242,9 +242,9 @@ int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2,
     default: {
       WCHAR str1[MAX_PATH];
       WCHAR str2[MAX_PATH];
-      list->GetItemText(lParam1, list->GetSortColumn(), str1);
-      list->GetItemText(lParam2, list->GetSortColumn(), str2);
-      return_value = SortList(list->GetSortType(), str1, str2);
+      list->GetItemText(lParam1, list->GetSortColumn(secondary), str1);
+      list->GetItemText(lParam2, list->GetSortColumn(secondary), str2);
+      return_value = SortList(list->GetSortType(secondary), str1, str2);
       break;
     }
 
@@ -266,21 +266,33 @@ int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2,
     case kListSortSeason:
     case kListSortStatus:
     case kListSortTitle: {
-      return_value = SortList(list->GetSortType(), list->GetSortOrder(),
+      return_value = SortList(list->GetSortType(secondary),
+                              list->GetSortOrder(secondary),
                               static_cast<int>(list->GetItemParam(lParam1)),
                               static_cast<int>(list->GetItemParam(lParam2)));
       break;
     }
   }
 
-  return return_value * list->GetSortOrder();
+  if (!secondary && return_value == base::kEqualTo) {
+    if (list->GetSortColumn(false) != list->GetSortColumn(true)) {
+      return ListViewCompare(lParam1, lParam2, lParamSort, true);
+    }
+  }
+
+  return return_value * list->GetSortOrder(secondary);
+}
+
+int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2,
+                                 LPARAM lParamSort) {
+  return ListViewCompare(lParam1, lParam2, lParamSort, false);
 }
 
 int CALLBACK AnimeListCompareProc(LPARAM lParam1, LPARAM lParam2,
                                   LPARAM lParamSort) {
   if (Settings.GetBool(taiga::kApp_List_HighlightNewEpisodes) &&
       Settings.GetBool(taiga::kApp_List_DisplayHighlightedOnTop)) {
-    win::ListView* list = reinterpret_cast<win::ListView*>(lParamSort);
+    const auto list = reinterpret_cast<win::ListView*>(lParamSort);
     auto item1 = AnimeDatabase.FindItem(list->GetItemParam(lParam1));
     auto item2 = AnimeDatabase.FindItem(list->GetItemParam(lParam2));
     if (item1 && item2) {
@@ -291,7 +303,7 @@ int CALLBACK AnimeListCompareProc(LPARAM lParam1, LPARAM lParam2,
     }
   }
 
-  return ListViewCompareProc(lParam1, lParam2, lParamSort);
+  return ListViewCompare(lParam1, lParam2, lParamSort, false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -141,8 +141,10 @@ void AppSettings::InitializeMap() {
   INITKEY(kApp_List_DisplayHighlightedOnTop, nullptr, L"program/list/filter/episodes/highlightedontop");
   INITKEY(kApp_List_ProgressDisplayAired, L"true", L"program/list/progress/showaired");
   INITKEY(kApp_List_ProgressDisplayAvailable, L"true", L"program/list/progress/showavailable");
-  INITKEY(kApp_List_SortColumn, L"anime_title", L"program/list/sort/column");
-  INITKEY(kApp_List_SortOrder, L"1", L"program/list/sort/order");
+  INITKEY(kApp_List_SortColumnPrimary, L"anime_title", L"program/list/sort/column");
+  INITKEY(kApp_List_SortColumnSecondary, L"anime_title", L"program/list/sort/column2");
+  INITKEY(kApp_List_SortOrderPrimary, L"1", L"program/list/sort/order");
+  INITKEY(kApp_List_SortOrderSecondary, L"1", L"program/list/sort/order2");
   INITKEY(kApp_Behavior_Autostart, nullptr, L"program/general/autostart");
   INITKEY(kApp_Behavior_StartMinimized, nullptr, L"program/startup/minimize");
   INITKEY(kApp_Behavior_CheckForUpdates, L"true", L"program/startup/checkversion");

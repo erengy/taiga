@@ -446,15 +446,24 @@ int AnimeListDialog::ListView::GetSortType(AnimeListColumn column) {
 }
 
 void AnimeListDialog::ListView::SortFromSettings() {
-  auto sort_column = TranslateColumnName(Settings[taiga::kApp_List_SortColumn]);
+  const auto set_options = [&](AnimeListColumn column, int order, bool secondary) {
+    if (column == kColumnUnknown || column < 0)
+      column = kColumnAnimeTitle;
 
-  if (sort_column == kColumnUnknown)
-    sort_column = kColumnAnimeTitle;
+    win::ListView::SortOptions sort_options;
+    sort_options.column = columns[column].index;
+    sort_options.order = order;
+    sort_options.type = GetSortType(column);
 
-  win::ListView::Sort(columns[sort_column].index,
-                      Settings.GetInt(taiga::kApp_List_SortOrder),
-                      GetSortType(sort_column),
-                      ui::AnimeListCompareProc);
+    SetSortOptions(sort_options, secondary);
+  };
+
+  set_options(TranslateColumnName(Settings[taiga::kApp_List_SortColumnPrimary]),
+              Settings.GetInt(taiga::kApp_List_SortOrderPrimary), false);
+  set_options(TranslateColumnName(Settings[taiga::kApp_List_SortColumnSecondary]),
+              Settings.GetInt(taiga::kApp_List_SortOrderSecondary), true);
+
+  win::ListView::Sort(ui::AnimeListCompareProc);
 
   parent->RebuildIdCache();
 }
@@ -704,14 +713,19 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
     // Column click
     case LVN_COLUMNCLICK: {
       auto lplv = reinterpret_cast<LPNMLISTVIEW>(lParam);
+      const bool same_column = lplv->iSubItem == listview.GetSortColumn();
       auto column_type = listview.FindColumnAtSubItemIndex(lplv->iSubItem);
       int order = listview.GetDefaultSortOrder(column_type);
-      if (lplv->iSubItem == listview.GetSortColumn())
+      if (same_column)
         order = listview.GetSortOrder() * -1;
       listview.Sort(lplv->iSubItem, order, listview.GetSortType(column_type), ui::AnimeListCompareProc);
       RebuildIdCache();
-      Settings.Set(taiga::kApp_List_SortColumn, listview.columns[column_type].key);
-      Settings.Set(taiga::kApp_List_SortOrder, order);
+      if (!same_column) {
+        Settings.Set(taiga::kApp_List_SortColumnSecondary, Settings[taiga::kApp_List_SortColumnPrimary]);
+        Settings.Set(taiga::kApp_List_SortOrderSecondary, Settings[taiga::kApp_List_SortOrderPrimary]);
+      }
+      Settings.Set(taiga::kApp_List_SortColumnPrimary, listview.columns[column_type].key);
+      Settings.Set(taiga::kApp_List_SortOrderPrimary, order);
       break;
     }
 
