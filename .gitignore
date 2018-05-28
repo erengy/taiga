@@ -1,12 +1,12 @@
-bin/*
-build/*
-deps/lib/*
+/bin/
+/build/
+/deps/lib/
 
-project/vs*/.vs
-project/vs*/ipch
-project/vs*/*.db
-project/vs*/*.opendb
-project/vs*/*.opensdf
-project/vs*/*.sdf
-project/vs*/*.suo
-project/vs*/*.user
+/project/vs*/.vs
+/project/vs*/ipch
+/project/vs*/*.db
+/project/vs*/*.opendb
+/project/vs*/*.opensdf
+/project/vs*/*.sdf
+/project/vs*/*.suo
+/project/vs*/*.user
