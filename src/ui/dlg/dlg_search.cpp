@@ -205,7 +205,7 @@ void SearchDialog::AddAnimeToList(int anime_id) {
     int i = list_.GetItemCount();
     list_.InsertItem(i, anime_item->IsInList() ? 1 : 0,
                      StatusToIcon(anime_item->GetAiringStatus()), 0, nullptr,
-                     anime_item->GetTitle().c_str(),
+                     anime::GetPreferredTitle(*anime_item).c_str(),
                      static_cast<LPARAM>(anime_item->GetId()));
     list_.SetItem(i, 1, anime::TranslateType(anime_item->GetType()).c_str());
     list_.SetItem(i, 2, anime::TranslateNumber(anime_item->GetEpisodeCount()).c_str());

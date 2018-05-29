@@ -634,7 +634,7 @@ LRESULT FeedFilterDialog::DialogPage2::OnNotify(int idCtrl, LPNMHDR pnmh) {
             break;
           switch (plvdi->item.iSubItem) {
             case 0:  // Anime title
-              plvdi->item.pszText = const_cast<LPWSTR>(anime_item->GetTitle().data());
+              plvdi->item.pszText = const_cast<LPWSTR>(anime::GetPreferredTitle(*anime_item).data());
               break;
           }
           break;
@@ -647,7 +647,7 @@ LRESULT FeedFilterDialog::DialogPage2::OnNotify(int idCtrl, LPNMHDR pnmh) {
             for (int i = 0; i < anime_list.GetItemCount(); i++) {
               auto anime_item = AnimeDatabase.FindItem(static_cast<int>(anime_list.GetItemParam(i)));
               if (anime_item && anime_list.GetCheckState(i))
-                AppendString(text, anime_item->GetTitle());
+                AppendString(text, anime::GetPreferredTitle(*anime_item));
             }
             if (text.empty())
               text = L"(nothing)";

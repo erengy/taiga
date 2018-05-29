@@ -363,7 +363,7 @@ void OnLibraryUpdateFailure(int id, const string_t& reason, bool not_approved) {
 
   std::wstring text;
   if (anime_item)
-    text += L"Title: " + anime_item->GetTitle() + L"\n";
+    text += L"Title: " + anime::GetPreferredTitle(*anime_item) + L"\n";
 
   if (not_approved) {
     text += L"Reason: Taiga won't be able to synchronize your list until MAL "
@@ -391,7 +391,7 @@ bool OnLibraryEntriesEditDelete(const std::vector<int> ids) {
     for (const auto& id : ids) {
       auto anime_item = AnimeDatabase.FindItem(id);
       if (anime_item)
-        AppendString(content, anime_item->GetTitle(), L"\n");
+        AppendString(content, anime::GetPreferredTitle(*anime_item), L"\n");
     }
   } else {
     content = L"Selected " + ToWstr(ids.size()) + L" entries";
@@ -499,7 +499,7 @@ void OnHistoryAddItem(const HistoryItem& history_item) {
     auto anime_item = AnimeDatabase.FindItem(history_item.anime_id);
     if (anime_item) {
       ChangeStatusText(L"\"{}\" is queued for update."_format(
-                       anime_item->GetTitle()));
+                       anime::GetPreferredTitle(*anime_item)));
     }
   }
 }
@@ -539,7 +539,7 @@ int OnHistoryProcessConfirmationQueue(anime::Episode& episode) {
     return IDNO;
 
   win::TaskDialog dlg;
-  std::wstring title = L"Anime title: " + anime_item->GetTitle();
+  std::wstring title = L"Anime title: " + anime::GetPreferredTitle(*anime_item);
   dlg.SetWindowTitle(TAIGA_APP_TITLE);
   dlg.SetMainIcon(TD_ICON_INFORMATION);
   dlg.SetMainInstruction(L"Do you want to update your anime list?");
@@ -687,7 +687,7 @@ bool OnRecognitionCancelConfirm() {
   dlg.SetWindowTitle(title.c_str());
   dlg.SetMainIcon(TD_ICON_INFORMATION);
   dlg.SetMainInstruction(L"Would you like to cancel this list update?");
-  std::wstring content = anime_item->GetTitle() +
+  std::wstring content = anime::GetPreferredTitle(*anime_item) +
       PushString(L" #", anime::GetEpisodeRange(CurrentEpisode));
   dlg.SetContent(content.c_str());
   dlg.AddButton(L"Yes", IDYES);
@@ -923,7 +923,7 @@ bool OnFeedNotify(const Feed& feed) {
     if (feed_item.state == FeedItemState::Selected) {
       const auto& episode = feed_item.episode_data;
       auto anime_item = AnimeDatabase.FindItem(episode.anime_id);
-      auto anime_title = anime_item ? anime_item->GetTitle() : episode.anime_title();
+      auto anime_title = anime_item ? anime::GetPreferredTitle(*anime_item) : episode.anime_title();
 
       auto episode_l = anime::GetEpisodeLow(episode);
       auto episode_h = anime::GetEpisodeHigh(episode);

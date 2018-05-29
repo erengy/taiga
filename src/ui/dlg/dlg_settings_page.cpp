@@ -27,6 +27,7 @@
 #include "base/log.h"
 #include "base/string.h"
 #include "library/anime_db.h"
+#include "library/anime_util.h"
 #include "library/history.h"
 #include "library/resource.h"
 #include "sync/anilist_util.h"
@@ -933,7 +934,7 @@ LRESULT SettingsPage::OnNotify(int idCtrl, LPNMHDR pnmh) {
         break;
       switch (plvdi->item.iSubItem) {
         case 0:  // Anime title
-          plvdi->item.pszText = const_cast<LPWSTR>(anime_item->GetTitle().data());
+          plvdi->item.pszText = const_cast<LPWSTR>(anime::GetPreferredTitle(*anime_item).data());
           break;
       }
       break;

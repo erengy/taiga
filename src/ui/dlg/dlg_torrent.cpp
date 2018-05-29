@@ -459,7 +459,7 @@ void TorrentDialog::RefreshList() {
     auto anime_item = AnimeDatabase.FindItem(it->episode_data.anime_id);
     if (anime_item) {
       icon = StatusToIcon(anime_item->GetAiringStatus());
-      title = anime_item->GetTitle();
+      title = anime::GetPreferredTitle(*anime_item);
     } else if (!it->episode_data.anime_title().empty()) {
       title = it->episode_data.anime_title();
     } else {

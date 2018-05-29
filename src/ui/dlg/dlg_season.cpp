@@ -232,7 +232,7 @@ LRESULT SeasonDialog::OnListNotify(LPARAM lParam) {
       }
       auto anime_item = AnimeDatabase.FindItem(list_.GetItemParam(lplv->iItem));
       if (anime_item) {
-        tooltips_.UpdateTitle(anime_item->GetTitle().c_str());
+        tooltips_.UpdateTitle(anime::GetPreferredTitle(*anime_item).c_str());
         std::wstring text;
         const std::wstring separator = L" \u2022 ";
         text += anime::TranslateType(anime_item->GetType()) + separator +
@@ -392,7 +392,7 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       }
 
       // Set title
-      std::wstring text = anime_item->GetTitle();
+      std::wstring text = anime::GetPreferredTitle(*anime_item);
       if (view_as == kSeasonViewAsImages) {
         switch (Settings.GetInt(taiga::kApp_Seasons_SortBy)) {
           case kSeasonSortByAiringDate:

@@ -152,12 +152,8 @@ int SortListByScore(const anime::Item& item1, const anime::Item& item2) {
 }
 
 int SortListByTitle(const anime::Item& item1, const anime::Item& item2) {
-  if (Settings.GetBool(taiga::kApp_List_DisplayEnglishTitles)) {
-    return CompareStrings(item1.GetEnglishTitle(true),
-                          item2.GetEnglishTitle(true));
-  } else {
-    return CompareStrings(item1.GetTitle(), item2.GetTitle());
-  }
+  return CompareStrings(anime::GetPreferredTitle(item1),
+                        anime::GetPreferredTitle(item2));
 }
 
 int SortListBySeason(const anime::Item& item1, const anime::Item& item2,

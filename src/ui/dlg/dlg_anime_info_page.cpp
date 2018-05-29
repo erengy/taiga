@@ -176,8 +176,7 @@ void PageSeriesInfo::Refresh(int anime_id, bool connect) {
     return;
 
   // Set alternative titles
-  std::wstring main_title = Settings.GetBool(taiga::kApp_List_DisplayEnglishTitles) ?
-      anime_item->GetEnglishTitle(true) : anime_item->GetTitle();
+  const auto main_title = anime::GetPreferredTitle(*anime_item);
   std::vector<std::wstring> titles;
   anime::GetAllTitles(anime_id_, titles);
   titles.erase(std::remove(titles.begin(), titles.end(), main_title), titles.end());
@@ -332,7 +331,7 @@ LRESULT PageMyInfo::OnNotify(int idCtrl, LPNMHDR pnmh) {
           } else {
             std::wstring text = Join(groups, L", ");
             InputDialog dlg;
-            dlg.title = anime_item->GetTitle();
+            dlg.title = anime::GetPreferredTitle(*anime_item);
             dlg.info = L"Please enter your fansub group preference for this title:";
             dlg.text = text;
             dlg.Show(parent->GetWindowHandle());

@@ -189,8 +189,7 @@ INT_PTR AnimeListDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
           break;
         }
 
-        std::wstring text = Settings.GetBool(taiga::kApp_List_DisplayEnglishTitles) ?
-            anime_item->GetEnglishTitle(true) : anime_item->GetTitle();
+        const auto text = anime::GetPreferredTitle(*anime_item);
 
         POINT pt;
         GetCursorPos(&pt);
@@ -262,8 +261,9 @@ INT_PTR AnimeListDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
         // Draw title
         rect.left += rect_image.Width() + 8;
         int bk_mode = dc.SetBkMode(TRANSPARENT);
+        const auto& title = anime::GetPreferredTitle(*anime_item);
         dc.AttachFont(ui::Theme.GetHeaderFont());
-        dc.DrawText(anime_item->GetTitle().c_str(), anime_item->GetTitle().length(), rect,
+        dc.DrawText(title.c_str(), title.length(), rect,
                     DT_END_ELLIPSIS | DT_NOPREFIX | DT_SINGLELINE);
         dc.DetachFont();
 
@@ -811,13 +811,8 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
       switch (column_type) {
         case kColumnAnimeTitle:
           if (plvdi->item.mask & LVIF_TEXT) {
-            if (Settings.GetBool(taiga::kApp_List_DisplayEnglishTitles)) {
-              plvdi->item.pszText = const_cast<LPWSTR>(
-                anime_item->GetEnglishTitle(true).data());
-            } else {
-              plvdi->item.pszText = const_cast<LPWSTR>(
-                anime_item->GetTitle().data());
-            }
+            plvdi->item.pszText = const_cast<LPWSTR>(
+                anime::GetPreferredTitle(*anime_item).data());
           }
           break;
       }
@@ -881,7 +876,7 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
                 for (const auto id : anime_ids) {
                   const auto anime_item = AnimeDatabase.FindItem(id);
                   if (anime_item)
-                    anime_titles.push_back(anime_item->GetTitle());
+                    anime_titles.push_back(anime::GetPreferredTitle(*anime_item));
                 }
                 if (!anime_titles.empty()) {
                   const auto str = Join(anime_titles, L"\r\n");

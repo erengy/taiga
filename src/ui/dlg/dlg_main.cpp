@@ -857,7 +857,7 @@ void MainDialog::UpdateTip() {
 
   auto anime_item = AnimeDatabase.FindItem(CurrentEpisode.anime_id);
   if (anime_item) {
-    tip += L"\nWatching: " + anime_item->GetTitle() +
+    tip += L"\nWatching: " + anime::GetPreferredTitle(*anime_item) +
            PushString(L" #", anime::GetEpisodeRange(CurrentEpisode));
   }
 
@@ -880,7 +880,7 @@ void MainDialog::UpdateTitle() {
 
   auto anime_item = AnimeDatabase.FindItem(CurrentEpisode.anime_id);
   if (anime_item) {
-    title += L" \u2013 " + anime_item->GetTitle() +
+    title += L" \u2013 " + anime::GetPreferredTitle(*anime_item) +
              PushString(L" #", anime::GetEpisodeRange(CurrentEpisode));
     if (Settings.GetBool(taiga::kSync_Update_OutOfRange) &&
         anime::GetEpisodeLow(CurrentEpisode) > anime_item->GetMyLastWatchedEpisode() + 1) {

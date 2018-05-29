@@ -221,7 +221,7 @@ void HistoryDialog::RefreshList() {
     if (it->date_finish)
       AppendString(details, L"Date completed: " + std::wstring(*it->date_finish));
 
-    list_.InsertItem(i, 0, icon, 0, nullptr, anime_item->GetTitle().c_str(),
+    list_.InsertItem(i, 0, icon, 0, nullptr, anime::GetPreferredTitle(*anime_item).c_str(),
                      static_cast<LPARAM>(it->anime_id));
     list_.SetItem(i, 1, details.c_str());
     list_.SetItem(i, 2, it->time.c_str());
@@ -240,7 +240,7 @@ void HistoryDialog::RefreshList() {
     std::wstring details;
     AppendString(details, L"Episode: " + anime::TranslateNumber(*it->episode));
 
-    list_.InsertItem(i, 1, icon, 0, nullptr, anime_item->GetTitle().c_str(),
+    list_.InsertItem(i, 1, icon, 0, nullptr, anime::GetPreferredTitle(*anime_item).c_str(),
                      static_cast<LPARAM>(it->anime_id));
     list_.SetItem(i, 1, details.c_str());
     list_.SetItem(i, 2, it->time.c_str());

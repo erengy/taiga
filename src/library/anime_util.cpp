@@ -253,7 +253,7 @@ bool PlayEpisode(int anime_id, int number) {
 
   if (file_path.empty()) {
     ui::ChangeStatusText(L"Could not find episode #{} ({})."_format(
-                         number, anime_item->GetTitle()));
+                         number, GetPreferredTitle(*anime_item)));
   } else {
     Execute(file_path);
   }
@@ -624,7 +624,7 @@ bool SetFansubFilter(int anime_id, const std::wstring& group_name,
   // Create new filter
   Aggregator.filter_manager.AddFilter(
       kFeedFilterActionPrefer, kFeedFilterMatchAll, kFeedFilterOptionDefault,
-      true, L"[Fansub] " + anime_item->GetTitle());
+      true, L"[Fansub] " + GetPreferredTitle(*anime_item));
   Aggregator.filter_manager.filters.back().AddCondition(
       kFeedFilterElement_Episode_Group, kFeedFilterOperator_Equals,
       group_name);
@@ -899,6 +899,13 @@ void IncrementEpisode(int anime_id) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+
+const std::wstring& GetPreferredTitle(const Item& item) {
+  if (Settings.GetBool(taiga::kApp_List_DisplayEnglishTitles)) {
+    return item.GetEnglishTitle(true);
+  }
+  return item.GetTitle();
+}
 
 void GetAllTitles(int anime_id, std::vector<std::wstring>& titles) {
   const auto& anime_item = *AnimeDatabase.FindItem(anime_id);

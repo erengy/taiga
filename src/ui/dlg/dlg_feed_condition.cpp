@@ -277,7 +277,7 @@ void FeedConditionDialog::ChooseElement(int element_index) {
           default:
             title_list.push_back(std::make_pair(
                 it->second.GetId(),
-                AnimeDatabase.FindItem(it->second.GetId())->GetTitle()));
+                anime::GetPreferredTitle(*AnimeDatabase.FindItem(it->second.GetId()))));
         }
       }
       std::sort(title_list.begin(), title_list.end(),

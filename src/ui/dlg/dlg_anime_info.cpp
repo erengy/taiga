@@ -525,11 +525,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
 
   // Set title
   if (anime_item) {
-    if (Settings.GetBool(taiga::kApp_List_DisplayEnglishTitles)) {
-      edit_title_.SetText(anime_item->GetEnglishTitle(true));
-    } else {
-      edit_title_.SetText(anime_item->GetTitle());
-    }
+    edit_title_.SetText(anime::GetPreferredTitle(*anime_item));
   } else if (anime_id_ == anime::ID_NOTINLIST) {
     edit_title_.SetText(CurrentEpisode.anime_title());
   } else {
@@ -547,7 +543,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
         passive_links.push_back(passive_links.empty() ? 1 : passive_links.back() + 2);
         content += L"  \u2022 <a href=\"score\" id=\"{0}\">{1}</a>"
                    L" <a href=\"Info({0})\">[?]</a>"_format(
-                   pair.first, AnimeDatabase.items[pair.first].GetTitle());
+                   pair.first, anime::GetPreferredTitle(AnimeDatabase.items[pair.first]));
         if (Taiga.debug_mode)
           content += L" [Score: {}]"_format(pair.second);
         content += L"\n";
@@ -591,7 +587,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
       auto anime_item = AnimeDatabase.FindItem(id);
       if (!anime_item || !anime_item->IsNextEpisodeAvailable())
         continue;
-      std::wstring title = L"{} #{}"_format(anime_item->GetTitle(), anime_item->GetMyLastWatchedEpisode() + 1);
+      std::wstring title = L"{} #{}"_format(anime::GetPreferredTitle(*anime_item), anime_item->GetMyLastWatchedEpisode() + 1);
       content += L"\u2022 <a href=\"PlayNext({})\">{}</a>\n"_format(id, title);
       recently_watched++;
       if (recently_watched >= 20)
@@ -666,7 +662,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
     auto add_info_lines = [&](const std::vector<int>& ids) {
       std::wstring text;
       for (const auto& id : ids) {
-        auto title = AnimeDatabase.FindItem(id)->GetTitle();
+        auto title = anime::GetPreferredTitle(*AnimeDatabase.FindItem(id));
         AppendString(text, L"<a href=\"Info({})\">{}</a>"_format(id, title), L"  \u2022  ");
       }
       content += text;

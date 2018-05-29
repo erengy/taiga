@@ -201,7 +201,7 @@ void HistoryQueue::Check(bool automatic) {
   }
 
   History.queue.updating = true;
-  ui::ChangeStatusText(L"Updating list... (" + anime_item->GetTitle() + L")");
+  ui::ChangeStatusText(L"Updating list... (" + anime::GetPreferredTitle(*anime_item) + L")");
 
   AnimeValues* anime_values = static_cast<AnimeValues*>(&items[index]);
   sync::UpdateLibraryEntry(*anime_values, items[index].anime_id,
