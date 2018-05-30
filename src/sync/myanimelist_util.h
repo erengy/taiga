@@ -39,6 +39,7 @@ int TranslateSeriesStatusFrom(int value);
 int TranslateSeriesStatusFrom(const std::wstring& value);
 int TranslateSeriesTypeFrom(int value);
 int TranslateSeriesTypeFrom(const std::wstring& value);
+int TranslateSeriesTypeTo(int value);
 std::wstring TranslateMyDateTo(const std::wstring& value);
 std::wstring TranslateMyRating(int value, bool full);
 int TranslateMyRatingFrom(int value);

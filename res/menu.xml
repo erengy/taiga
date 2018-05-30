@@ -55,6 +55,7 @@
 	</menu>
 	<!-- Tools -->
 	<menu name="Tools">
+		<item name="Export anime list" sub="Export"/>
 		<item name="External links" sub="ExternalLinks"/>
 		<item type="separator"/>
 		<item name="Enable anime recognition"    action="ToggleRecognition()" checked="1"/>
@@ -62,6 +63,10 @@
 		<item name="Enable auto synchronization" action="ToggleSynchronization()" checked="1"/>
 		<item type="separator"/>
 		<item name="Settings" action="Settings()"/>
+	</menu>
+	<!-- Export -->
+	<menu name="Export">
+		<item name="Export as MyAnimeList XML..." action="ExportAsMalXml()"/>
 	</menu>
 	<!-- External links -->
 	<menu name="ExternalLinks">

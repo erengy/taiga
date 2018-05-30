@@ -114,6 +114,21 @@ int TranslateSeriesTypeFrom(int value) {
   return anime::kUnknownType;
 }
 
+int TranslateSeriesTypeTo(int value) {
+  switch (value) {
+    case anime::kUnknownType: return kUnknownType;
+    case anime::kTv: return kTv;
+    case anime::kOva: return kOva;
+    case anime::kMovie: return kMovie;
+    case anime::kSpecial: return kSpecial;
+    case anime::kOna: return kOna;
+    case anime::kMusic: return kMusic;
+  }
+
+  LOGW(L"Invalid value: {}", value);
+  return anime::kUnknownType;
+}
+
 int TranslateSeriesTypeFrom(const std::wstring& value) {
   if (IsEqual(value, L"TV")) {
     return anime::kTv;

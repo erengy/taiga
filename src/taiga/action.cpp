@@ -18,12 +18,14 @@
 
 #include <windows/win/common_dialogs.h>
 
+#include "base/format.h"
 #include "base/log.h"
 #include "base/process.h"
 #include "base/string.h"
 #include "library/anime_db.h"
 #include "library/anime_util.h"
 #include "library/discover.h"
+#include "library/export.h"
 #include "library/history.h"
 #include "sync/anilist_util.h"
 #include "sync/kitsu_util.h"
@@ -71,6 +73,24 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   //   Exits from Taiga.
   } else if (action == L"Exit" || action == L"Quit") {
     ui::DlgMain.Destroy();
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Export
+
+  // ExportAsMalXml()
+  //   Exports library in MAL XML format.
+  } else if (action == L"ExportAsMalXml") {
+    std::wstring path;
+    if (win::BrowseForFolder(ui::GetWindowHandle(ui::Dialog::Main),
+                             L"Select Export Location", L"", path)) {
+      AddTrailingSlash(path);
+      path += L"animelist_{}.xml"_format(std::time(nullptr));
+      if (library::ExportAsMalXml(path)) {
+        ui::ChangeStatusText(L"Exported list to: " + path);
+      } else {
+        ui::ChangeStatusText(L"Could not export list to: " + path);
+      }
+    }
 
   //////////////////////////////////////////////////////////////////////////////
   // Services

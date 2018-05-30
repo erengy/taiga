@@ -403,6 +403,9 @@
     <ClCompile Include="..\..\src\library\discover.cpp">
       <Filter>library</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\library\export.cpp">
+      <Filter>library</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\src\library\history.cpp">
       <Filter>library</Filter>
     </ClCompile>
@@ -922,6 +925,9 @@
       <Filter>deps\zlib</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\library\discover.h">
+      <Filter>library</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\library\export.h">
       <Filter>library</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\library\history.h">
