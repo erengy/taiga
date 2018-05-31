@@ -186,6 +186,18 @@ void MenuList::UpdateAnnounce() {
   }
 }
 
+void MenuList::UpdateExport() {
+  auto menu = menu_list_.FindMenu(L"Export");
+  if (menu) {
+    for (auto& item : menu->items) {
+      if (item.action == L"ExportAsMalXml") {
+        item.enabled = taiga::GetCurrentServiceId() == sync::kMyAnimeList;
+        break;
+      }
+    }
+  }
+}
+
 void MenuList::UpdateExternalLinks() {
   auto menu = menu_list_.FindMenu(L"ExternalLinks");
   if (menu) {
@@ -509,6 +521,7 @@ void MenuList::UpdateView() {
 void MenuList::UpdateAll(const anime::Item* anime_item) {
   UpdateAnime(anime_item);
   UpdateAnnounce();
+  UpdateExport();
   UpdateExternalLinks();
   UpdateFolders();
   UpdateTools();

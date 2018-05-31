@@ -39,6 +39,7 @@ public:
   void UpdateAnime(const anime::Item* anime_item);
   void UpdateAnimeListHeaders();
   void UpdateAnnounce();
+  void UpdateExport();
   void UpdateExternalLinks();
   void UpdateFolders();
   void UpdateHistoryList(bool enabled = false);
