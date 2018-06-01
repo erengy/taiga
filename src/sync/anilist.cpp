@@ -238,6 +238,8 @@ void Service::GetLibraryEntries(Response& response, HttpResponse& http_response)
   if (!ParseResponseBody(http_response.body, response, root))
     return;
 
+  AnimeDatabase.ClearUserData();
+
   const auto& status_lists = root["data"]["MediaListCollection"]["statusLists"];
   for (const auto& status_list : status_lists) {
     for (const auto& value : status_list) {
