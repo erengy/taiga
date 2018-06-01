@@ -835,15 +835,15 @@ void OnSettingsServiceChange() {
 
 bool OnSettingsServiceChangeConfirm(const string_t& current_service,
                                     const string_t& new_service) {
-  win::TaskDialog dlg(TAIGA_APP_TITLE, TD_ICON_INFORMATION);
+  win::TaskDialog dlg(TAIGA_APP_TITLE, TD_ICON_WARNING);
   std::wstring instruction =
-      L"Are you sure you want to change the active service from {} to {}?"_format(
+      L"Do you want to change the active service from {} to {}?"_format(
       ServiceManager.service(current_service)->name(),
       ServiceManager.service(new_service)->name());
   dlg.SetMainInstruction(instruction.c_str());
   dlg.SetContent(L"Note that:\n"
-                 L"- Your list will not be moved from one service to another. "
-                 L"Taiga can't do that.\n"
+                 L"- Taiga cannot move your list from one service to another. "
+                 L"You must use the export and import features of these services.\n"
                  L"- Local settings associated with an anime will be lost or "
                  L"broken.");
   dlg.AddButton(L"Yes", IDYES);
