@@ -107,8 +107,10 @@ void Service::GetLibraryEntries(Request& request, HttpRequest& http_request) {
   static const auto query{R"(
 query ($userName: String!) {
   MediaListCollection (userName: $userName, type: ANIME) {
-    statusLists {
-      ...mediaListFragment
+    lists {
+      entries {
+        ...mediaListFragment
+      }
     }
   }
 }
@@ -240,10 +242,11 @@ void Service::GetLibraryEntries(Response& response, HttpResponse& http_response)
 
   AnimeDatabase.ClearUserData();
 
-  const auto& status_lists = root["data"]["MediaListCollection"]["statusLists"];
-  for (const auto& status_list : status_lists) {
-    for (const auto& value : status_list) {
-      ParseMediaListObject(value);
+  const auto& lists = root["data"]["MediaListCollection"]["lists"];
+  for (const auto& list : lists) {
+    const auto& entries = list["entries"];
+    for (const auto& entry : entries) {
+      ParseMediaListObject(entry);
     }
   }
 }
