@@ -1088,6 +1088,17 @@ int TranslateResolution(const std::wstring& str) {
     }
   }
 
+  // 1080, 720, 480
+  if (IsNumericString(str)) {
+    const auto height = ToInt(str);
+    switch (height) {
+      case 1080:
+      case 720:
+      case 480:
+        return height;
+    }
+  }
+
   return 0;
 }
 
