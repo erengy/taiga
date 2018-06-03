@@ -283,6 +283,9 @@ void Service::GetUser(Response& response, HttpResponse& http_response) {
   user_.username = StrToWstr(JsonReadStr(user["attributes"], "slug"));
   user_.rating_system = StrToWstr(JsonReadStr(user["attributes"], "ratingSystem"));
 
+  const auto display_name = StrToWstr(JsonReadStr(user["attributes"], "name"));
+
+  Settings.Set(taiga::kSync_Service_Kitsu_DisplayName, display_name);
   Settings.Set(taiga::kSync_Service_Kitsu_RatingSystem, user_.rating_system);
 }
 

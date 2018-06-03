@@ -869,7 +869,15 @@ void MainDialog::UpdateTitle() {
   if (Taiga.debug_mode)
     title += L" [debug]";
 
-  const std::wstring username = taiga::GetCurrentUsername();
+  std::wstring username;
+  switch (taiga::GetCurrentServiceId()) {
+    default:
+      username = taiga::GetCurrentUsername();
+      break;
+    case sync::kKitsu:
+      username = Settings[taiga::kSync_Service_Kitsu_DisplayName];
+      break;
+  }
   if (!username.empty())
     title += L" \u2013 " + username;
   if (Taiga.debug_mode) {
