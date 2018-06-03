@@ -284,8 +284,10 @@ void Service::GetUser(Response& response, HttpResponse& http_response) {
   user_.rating_system = StrToWstr(JsonReadStr(user["attributes"], "ratingSystem"));
 
   const auto display_name = StrToWstr(JsonReadStr(user["attributes"], "name"));
+  const auto email = StrToWstr(JsonReadStr(user["attributes"], "email"));
 
   Settings.Set(taiga::kSync_Service_Kitsu_DisplayName, display_name);
+  Settings.Set(taiga::kSync_Service_Kitsu_Email, email);
   Settings.Set(taiga::kSync_Service_Kitsu_RatingSystem, user_.rating_system);
 }
 
@@ -569,6 +571,7 @@ void Service::UseSparseFieldsetsForLibraryEntries(HttpRequest& http_request) con
 
 void Service::UseSparseFieldsetsForUser(HttpRequest& http_request) const {
   http_request.url.query[L"fields[users]"] =
+      L"email,"
       L"name,"
       L"ratingSystem,"
       L"slug";

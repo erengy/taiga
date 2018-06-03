@@ -120,6 +120,7 @@ void AppSettings::InitializeMap() {
   INITKEY(kSync_Service_Mal_Password, nullptr, L"account/myanimelist/password");
   INITKEY(kSync_Service_Mal_UseHttps, L"true", L"account/myanimelist/https");
   INITKEY(kSync_Service_Kitsu_DisplayName, nullptr, L"account/kitsu/displayname");
+  INITKEY(kSync_Service_Kitsu_Email, nullptr, L"account/kitsu/email");
   INITKEY(kSync_Service_Kitsu_Username, nullptr, L"account/kitsu/username");
   INITKEY(kSync_Service_Kitsu_Password, nullptr, L"account/kitsu/password");
   INITKEY(kSync_Service_Kitsu_PartialLibrary, L"true", L"account/kitsu/partiallibrary");

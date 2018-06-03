@@ -193,10 +193,10 @@ void SettingsDialog::OnOK() {
   // Services > Kitsu
   page = &pages[kSettingsPageServicesKitsu];
   if (page->IsWindow()) {
-    Settings.Set(taiga::kSync_Service_Kitsu_Username, page->GetDlgItemText(IDC_EDIT_USER_KITSU));
+    Settings.Set(taiga::kSync_Service_Kitsu_Email, page->GetDlgItemText(IDC_EDIT_USER_KITSU));
     Settings.Set(taiga::kSync_Service_Kitsu_Password, Base64Encode(page->GetDlgItemText(IDC_EDIT_PASS_KITSU)));
   }
-  // Services > Kitsu
+  // Services > AniList
   page = &pages[kSettingsPageServicesAniList];
   if (page->IsWindow()) {
     Settings.Set(taiga::kSync_Service_AniList_Username, page->GetDlgItemText(IDC_EDIT_USER_ANILIST));

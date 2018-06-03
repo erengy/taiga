@@ -117,7 +117,7 @@ BOOL SettingsPage::OnInitDialog() {
     }
     // Services > Kitsu
     case kSettingsPageServicesKitsu: {
-      SetDlgItemText(IDC_EDIT_USER_KITSU, Settings[taiga::kSync_Service_Kitsu_Username].c_str());
+      SetDlgItemText(IDC_EDIT_USER_KITSU, Settings[taiga::kSync_Service_Kitsu_Email].c_str());
       SetDlgItemText(IDC_EDIT_PASS_KITSU, Base64Decode(Settings[taiga::kSync_Service_Kitsu_Password]).c_str());
       break;
     }
