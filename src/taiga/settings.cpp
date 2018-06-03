@@ -528,6 +528,19 @@ sync::ServiceId AppSettings::GetCurrentServiceId() const {
   return sync::kMyAnimeList;
 }
 
+std::wstring AppSettings::GetUserDisplayName(sync::ServiceId service_id) const {
+  switch (service_id) {
+    case sync::kKitsu: {
+      const auto display_name = GetWstr(kSync_Service_Kitsu_DisplayName);
+      if (!display_name.empty())
+        return display_name;
+      break;
+    }
+  }
+
+  return GetUsername(service_id);
+}
+
 std::wstring AppSettings::GetUsername(sync::ServiceId service_id) const {
   switch (service_id) {
     case sync::kMyAnimeList:
@@ -554,6 +567,10 @@ std::wstring AppSettings::GetPassword(sync::ServiceId service_id) const {
   }
 }
 
+std::wstring AppSettings::GetCurrentUserDisplayName() const {
+  return GetUserDisplayName(GetCurrentServiceId());
+}
+
 std::wstring AppSettings::GetCurrentUsername() const {
   return GetUsername(GetCurrentServiceId());
 }
@@ -568,6 +585,10 @@ sync::Service* GetCurrentService() {
 
 sync::ServiceId GetCurrentServiceId() {
   return Settings.GetCurrentServiceId();
+}
+
+std::wstring GetCurrentUserDisplayName() {
+  return Settings.GetCurrentUserDisplayName();
 }
 
 std::wstring GetCurrentUsername() {

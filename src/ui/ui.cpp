@@ -1032,7 +1032,7 @@ void OnTwitterPost(bool success, const string_t& error) {
 ////////////////////////////////////////////////////////////////////////////////
 
 void OnLogin() {
-  ChangeStatusText(L"Logged in as " + taiga::GetCurrentUsername());
+  ChangeStatusText(L"Logged in as " + taiga::GetCurrentUserDisplayName());
 
   Menus.UpdateAll();
 

@@ -155,7 +155,7 @@ void Discord::UpdatePresence(const std::string& details,
   std::string small_image_text =
       WstrToStr(GetCurrentService()->name());
   if (Settings.GetBool(kShare_Discord_Username_Enabled)) {
-    small_image_text = WstrToStr(GetCurrentUsername() + L" at ") +
+    small_image_text = WstrToStr(GetCurrentUserDisplayName() + L" at ") +
                        small_image_text;
   }
 
