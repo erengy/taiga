@@ -208,20 +208,27 @@ void Manager::HandleResponse(Response& response, HttpResponse& http_response) {
     anime_id = ToInt(request.data[L"taiga-id"]);
   auto anime_item = AnimeDatabase.FindItem(anime_id);
 
+  const auto update_username = [&service, &response]() {
+    const auto& username = service.user().username;
+    if (!username.empty()) {
+      // Update settings with the returned value for the correct letter case
+      switch (response.service_id) {
+        case kMyAnimeList:
+          Settings.Set(taiga::kSync_Service_Mal_Username, username);
+          break;
+        case kKitsu:
+          Settings.Set(taiga::kSync_Service_Kitsu_Username, username);
+          break;
+        case kAniList:
+          Settings.Set(taiga::kSync_Service_AniList_Username, username);
+          break;
+      }
+    }
+  };
+
   switch (response.type) {
     case kAuthenticateUser: {
-      const auto& username = service.user().username;
-      if (!username.empty()) {
-        // Update settings with the returned value for the correct letter case
-        switch (response.service_id) {
-          case kMyAnimeList:
-            Settings.Set(taiga::kSync_Service_Mal_Username, username);
-            break;
-          case kKitsu:
-            Settings.Set(taiga::kSync_Service_Kitsu_Username, username);
-            break;
-        }
-      }
+      update_username();
       service.user().authenticated = true;
       ui::OnLogin();
       if (response.service_id == kKitsu) {
@@ -234,6 +241,7 @@ void Manager::HandleResponse(Response& response, HttpResponse& http_response) {
     }
 
     case kGetUser: {
+      update_username();
       ui::OnLogin();
       if (service.user().authenticated) {
         Synchronize();

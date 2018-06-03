@@ -474,7 +474,7 @@ EXSTYLE WS_EX_CONTROLPARENT
 FONT 9, "Segoe UI", 400, 0, 0
 {
     GROUPBOX        "Account", IDC_STATIC, 7, 7, 301, 55, 0, WS_EX_LEFT
-    LTEXT           "Username: (not your email address)", IDC_STATIC, 12, 18, 141, 8, SS_LEFT, WS_EX_LEFT
+    LTEXT           "Username or email address:", IDC_STATIC, 12, 18, 141, 8, SS_LEFT, WS_EX_LEFT
     EDITTEXT        IDC_EDIT_USER_KITSU, 12, 28, 141, 12, ES_AUTOHSCROLL, WS_EX_LEFT
     LTEXT           "Password:", IDC_STATIC, 160, 18, 141, 8, SS_LEFT, WS_EX_LEFT
     EDITTEXT        IDC_EDIT_PASS_KITSU, 160, 28, 141, 12, ES_AUTOHSCROLL | ES_PASSWORD, WS_EX_LEFT

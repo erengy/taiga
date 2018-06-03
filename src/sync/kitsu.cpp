@@ -125,8 +125,12 @@ void Service::AuthenticateUser(Request& request, HttpRequest& http_request) {
 void Service::GetUser(Request& request, HttpRequest& http_request) {
   http_request.url.path = L"/edge/users";
 
-  http_request.url.query[L"filter[slug]"] =
-      request.data[canonical_name_ + L"-username"];
+  if (user().authenticated) {
+    http_request.url.query[L"filter[self]"] = L"true";
+  } else {
+    const auto username = request.data[canonical_name_ + L"-username"];
+    http_request.url.query[L"filter[slug]"] = username;
+  }
 
   UseSparseFieldsetsForUser(http_request);
 }
