@@ -35,6 +35,7 @@ enum class SearchField {
   Genre,
   Producer,
   Tag,
+  Note,
   Type,
   Season,
   Year,
@@ -67,6 +68,7 @@ SearchTerm GetSearchTerm(const std::wstring& str) {
     {L"genre", SearchField::Genre},
     {L"producer", SearchField::Producer},
     {L"tag", SearchField::Tag},
+    {L"note", SearchField::Note},
     {L"type", SearchField::Type},
     {L"season", SearchField::Season},
     {L"year", SearchField::Year},
@@ -140,6 +142,7 @@ bool Filters::CheckItem(const Item& item, int text_index) const {
   const auto& genres = item.GetGenres();
   const auto& producers = item.GetProducers();
   const auto& tags = item.GetMyTags();
+  const auto& notes = item.GetMyNotes();
 
   std::vector<SearchTerm> search_terms;
   for (const auto& word : words) {
@@ -151,7 +154,8 @@ bool Filters::CheckItem(const Item& item, int text_index) const {
       case SearchField::None:
         if (!CheckStrings(titles, term.value) &&
             !CheckStrings(genres, term.value) &&
-            !CheckString(tags, term.value)) {
+            !CheckString(tags, term.value) &&
+            !CheckString(notes, term.value)) {
           return false;
         }
         break;
@@ -183,6 +187,11 @@ bool Filters::CheckItem(const Item& item, int text_index) const {
 
       case SearchField::Tag:
         if (!CheckString(tags, term.value))
+          return false;
+        break;
+
+      case SearchField::Note:
+        if (!CheckString(notes, term.value))
           return false;
         break;
 
