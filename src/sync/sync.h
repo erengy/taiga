@@ -48,6 +48,8 @@ bool RequestNeedsAuthentication(RequestType request_type, ServiceId service_id);
 void SetActiveServiceForRequest(Request& request);
 bool UserAuthenticated();
 void InvalidateUserAuthentication();
+bool IsUserAccountAvailable();
+bool IsUserAuthenticationAvailable();
 
 bool ServiceSupportsRequestType(RequestType request_type);
 RequestType ClientModeToRequestType(taiga::HttpClientMode client_mode);

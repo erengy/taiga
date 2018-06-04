@@ -34,10 +34,9 @@
 namespace sync {
 
 bool AuthenticateUser() {
-  if (taiga::GetCurrentUsername().empty() ||
-      taiga::GetCurrentPassword().empty()) {
+  if (!IsUserAuthenticationAvailable()) {
     ui::ChangeStatusText(
-        L"Cannot authenticate. Username or password not available.");
+        L"Cannot authenticate. Account settings unavailable.");
     return false;
   }
 
@@ -55,9 +54,9 @@ bool AuthenticateUser() {
 }
 
 void GetUser() {
-  if (taiga::GetCurrentUsername().empty()) {
+  if (!IsUserAccountAvailable()) {
     ui::ChangeStatusText(
-        L"Cannot get user information. Username is not available.");
+        L"Cannot get user information. Account settings unavailable.");
     return;
   }
 
@@ -205,8 +204,7 @@ void DownloadImage(int id, const string_t& image_url) {
 
 bool AddAuthenticationToRequest(Request& request) {
   if (RequestNeedsAuthentication(request.type, request.service_id))
-    if (taiga::GetCurrentUsername().empty() ||
-        taiga::GetCurrentPassword().empty())
+    if (!IsUserAuthenticationAvailable())
       return false;  // Authentication is required but not available
 
   auto service = taiga::GetCurrentService();
@@ -214,6 +212,13 @@ bool AddAuthenticationToRequest(Request& request) {
       taiga::GetCurrentUsername();
   request.data[service->canonical_name() + L"-password"] =
       taiga::GetCurrentPassword();
+
+  switch (service->id()) {
+    case sync::kKitsu:
+      request.data[service->canonical_name() + L"-email"] =
+          Settings[taiga::kSync_Service_Kitsu_Email];
+      break;
+  }
 
   return true;
 }
@@ -265,6 +270,45 @@ bool UserAuthenticated() {
 void InvalidateUserAuthentication() {
   auto service = taiga::GetCurrentService();
   service->user().authenticated = false;
+}
+
+bool IsUserAccountAvailable() {
+  constexpr auto not_empty = [](taiga::AppSettingName name) {
+    return !Settings[name].empty();
+  };
+
+  switch (taiga::GetCurrentServiceId()) {
+    case sync::kMyAnimeList:
+      return not_empty(taiga::kSync_Service_Mal_Username);
+    case sync::kKitsu:
+      return not_empty(taiga::kSync_Service_Kitsu_Email) ||
+             not_empty(taiga::kSync_Service_Kitsu_Username);
+    case sync::kAniList:
+      return not_empty(taiga::kSync_Service_AniList_Username);
+  }
+
+  return false;
+}
+
+bool IsUserAuthenticationAvailable() {
+  constexpr auto not_empty = [](taiga::AppSettingName name) {
+    return !Settings[name].empty();
+  };
+
+  switch (taiga::GetCurrentServiceId()) {
+    case sync::kMyAnimeList:
+      return not_empty(taiga::kSync_Service_Mal_Username) &&
+             not_empty(taiga::kSync_Service_Mal_Password);
+    case sync::kKitsu:
+      return (not_empty(taiga::kSync_Service_Kitsu_Email) ||
+              not_empty(taiga::kSync_Service_Kitsu_Username)) &&
+             not_empty(taiga::kSync_Service_Kitsu_Password);
+    case sync::kAniList:
+      return not_empty(taiga::kSync_Service_AniList_Username) &&
+             not_empty(taiga::kSync_Service_AniList_Token);
+  }
+
+  return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

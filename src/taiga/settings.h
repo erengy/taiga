@@ -196,9 +196,11 @@ public:
   sync::Service* GetCurrentService() const;
   sync::ServiceId GetCurrentServiceId() const;
   std::wstring GetUserDisplayName(sync::ServiceId service_id) const;
+  std::wstring GetUserEmail(sync::ServiceId service_id) const;
   std::wstring GetUsername(sync::ServiceId service_id) const;
   std::wstring GetPassword(sync::ServiceId service_id) const;
   std::wstring GetCurrentUserDisplayName() const;
+  std::wstring GetCurrentUserEmail() const;
   std::wstring GetCurrentUsername() const;
   std::wstring GetCurrentPassword() const;
 
@@ -212,6 +214,7 @@ private:
 sync::Service* GetCurrentService();
 sync::ServiceId GetCurrentServiceId();
 std::wstring GetCurrentUserDisplayName();
+std::wstring GetCurrentUserEmail();
 std::wstring GetCurrentUsername();
 std::wstring GetCurrentPassword();
 

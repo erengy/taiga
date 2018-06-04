@@ -115,10 +115,14 @@ void Service::AuthenticateUser(Request& request, HttpRequest& http_request) {
   http_request.data[L"client_id"] =
       L"dd031b32d2f56c990b1425efe6c42ad847e7fe3ab46bf1299f05ecd856bdb7dd";
 
+  auto username = request.data[canonical_name_ + L"-email"];
+  if (username.empty())
+    username = request.data[canonical_name_ + L"-username"];
+
   // Resource Owner Password Credentials Grant
   // https://tools.ietf.org/html/rfc6749#section-4.3
   http_request.data[L"grant_type"] = L"password";
-  http_request.data[L"username"] = request.data[canonical_name_ + L"-username"];
+  http_request.data[L"username"] = username;
   http_request.data[L"password"] = request.data[canonical_name_ + L"-password"];
 }
 

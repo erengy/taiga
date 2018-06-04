@@ -106,10 +106,10 @@ BOOL MainDialog::OnInitDialog() {
   // Display window
   InitWindowPosition();
 
-  if (taiga::GetCurrentUsername().empty()) {
+  if (!sync::IsUserAccountAvailable()) {
     win::TaskDialog dlg(TAIGA_APP_TITLE, TD_ICON_INFORMATION);
     dlg.SetMainInstruction(L"Welcome to Taiga!");
-    dlg.SetContent(L"Username is not set. Would you like to open settings window to set it now?");
+    dlg.SetContent(L"Would you like set up your account now?");
     dlg.AddButton(L"Yes", IDYES);
     dlg.AddButton(L"No", IDNO);
     dlg.Show(GetWindowHandle());

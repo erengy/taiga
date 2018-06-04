@@ -109,8 +109,7 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
     if (!local_search) {
       auto service = taiga::GetCurrentService();
       if (service->RequestNeedsAuthentication(sync::kSearchTitle)) {
-        if (taiga::GetCurrentUsername().empty() ||
-            taiga::GetCurrentPassword().empty()) {
+        if (!sync::IsUserAuthenticationAvailable()) {
           ui::OnSettingsAccountEmpty();
           return;
         }

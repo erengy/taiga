@@ -462,9 +462,29 @@ void AppSettings::ApplyChanges(const AppSettings previous) {
     }
   }
 
-  const auto previous_user = previous.GetCurrentUsername();
-  bool changed_username = GetCurrentUsername() != previous_user;
-  if (changed_username || changed_service) {
+  const bool changed_account = [&]() {
+    const auto equal_settings = [&](AppSettingName name) {
+      return previous[name] == GetWstr(name);
+    };
+    switch (GetCurrentServiceId()) {
+      case sync::kMyAnimeList:
+        return !equal_settings(kSync_Service_Mal_Username);
+      case sync::kKitsu:
+        return !equal_settings(kSync_Service_Kitsu_Email);
+      case sync::kAniList:
+        return !equal_settings(kSync_Service_AniList_Username);
+    }
+    return false;
+  }();
+  if (changed_account) {
+    switch (GetCurrentServiceId()) {
+      case sync::kKitsu:
+        Set(kSync_Service_Kitsu_DisplayName, std::wstring{});
+        Set(kSync_Service_Kitsu_Username, std::wstring{});
+        break;
+    }
+  }
+  if (changed_account || changed_service) {
     AnimeDatabase.LoadList();
     History.Load();
     CurrentEpisode.Set(anime::ID_UNKNOWN);
@@ -541,6 +561,15 @@ std::wstring AppSettings::GetUserDisplayName(sync::ServiceId service_id) const {
   return GetUsername(service_id);
 }
 
+std::wstring AppSettings::GetUserEmail(sync::ServiceId service_id) const {
+  switch (service_id) {
+    case sync::kKitsu:
+      return GetWstr(kSync_Service_Kitsu_Email);
+    default:
+      return {};
+  }
+}
+
 std::wstring AppSettings::GetUsername(sync::ServiceId service_id) const {
   switch (service_id) {
     case sync::kMyAnimeList:
@@ -571,6 +600,10 @@ std::wstring AppSettings::GetCurrentUserDisplayName() const {
   return GetUserDisplayName(GetCurrentServiceId());
 }
 
+std::wstring AppSettings::GetCurrentUserEmail() const {
+  return GetUserEmail(GetCurrentServiceId());
+}
+
 std::wstring AppSettings::GetCurrentUsername() const {
   return GetUsername(GetCurrentServiceId());
 }
@@ -589,6 +622,10 @@ sync::ServiceId GetCurrentServiceId() {
 
 std::wstring GetCurrentUserDisplayName() {
   return Settings.GetCurrentUserDisplayName();
+}
+
+std::wstring GetCurrentUserEmail() {
+  return Settings.GetCurrentUserEmail();
 }
 
 std::wstring GetCurrentUsername() {
