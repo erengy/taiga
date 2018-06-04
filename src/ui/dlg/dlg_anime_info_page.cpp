@@ -537,19 +537,23 @@ bool PageMyInfo::Save() {
 
   // Score
   win::ComboBox combobox = GetDlgItem(IDC_COMBO_ANIME_SCORE);
-  win::Spin spin = GetDlgItem(IDC_SPIN_ANIME_SCORE);
   if (!IsAdvancedScoreInput()) {
     history_item.score = combobox.GetItemData(combobox.GetCurSel());
   } else {
-    const auto score = GetDlgItemText(IDC_EDIT_ANIME_SCORE);
-    if (IsNumericString(score)) {
-      history_item.score = ToInt(score);
-    } else {
-      history_item.score = static_cast<int>(ToDouble(score) * 10);
+    const auto score_text = GetDlgItemText(IDC_EDIT_ANIME_SCORE);
+    switch (taiga::GetCurrentServiceId()) {
+      case sync::kAniList:
+        switch (sync::anilist::GetRatingSystem()) {
+          case sync::anilist::RatingSystem::Point_10_Decimal:
+            history_item.score = static_cast<int>(ToDouble(score_text) * 10);
+            break;
+        }
+        break;
     }
+    if (!history_item.score)
+      history_item.score = ToInt(score_text);
   }
   combobox.SetWindowHandle(nullptr);
-  spin.SetWindowHandle(nullptr);
 
   // Status
   history_item.status = GetComboSelection(IDC_COMBO_ANIME_STATUS) + 1;
