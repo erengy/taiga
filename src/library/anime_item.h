@@ -132,7 +132,7 @@ public:
 
   int GetAvailableEpisodeCount() const;
   const std::wstring& GetFolder() const;
-  int GetLastAiredEpisodeNumber(bool estimate = false) const;
+  int GetLastAiredEpisodeNumber() const;
   const std::wstring& GetNextEpisodePath() const;
   bool GetPlaying() const;
   bool GetUseAlternative() const;

@@ -175,7 +175,7 @@ int Engine::Identify(anime::Episode& episode, bool give_score,
               case anime::kFinishedAiring:
                 return anime_item->GetEpisodeCount();
               case anime::kAiring:
-                return anime_item->GetLastAiredEpisodeNumber();
+                return anime::GetLastEpisodeNumber(*anime_item);
               default:
                 return 0;
             }

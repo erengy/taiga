@@ -155,7 +155,9 @@ int EstimateLastAiredEpisodeNumber(const Item& item) {
       const int number_of_weeks = date_diff / 7;
       if (!IsValidEpisodeCount(episode_count) ||
           number_of_weeks < episode_count) {
-        return number_of_weeks + 1;
+        if (number_of_weeks < 13) {  // Not reliable for longer series
+          return number_of_weeks + 1;
+        }
       } else {
         return episode_count;
       }
@@ -804,23 +806,32 @@ void SplitEpisodeNumbers(const std::wstring& input, std::vector<int>& output) {
     output.push_back(ToInt(number));
 }
 
-int EstimateEpisodeCount(const Item& item) {
-  // If we already know the number, we don't need to estimate
-  if (item.GetEpisodeCount() > 0)
+int GetLastEpisodeNumber(const Item& item) {
+  if (item.GetAiringStatus() == kFinishedAiring)
     return item.GetEpisodeCount();
 
   int number = 0;
 
   // Estimate using user information
-  if (item.IsInList())
-    number = std::max(item.GetMyLastWatchedEpisode(),
-                      item.GetAvailableEpisodeCount());
+  number = std::max(number, item.GetMyLastWatchedEpisode());
+  if (item.GetAvailableEpisodeCount() != item.GetEpisodeCount())
+    number = std::max(number, item.GetAvailableEpisodeCount());
 
   // Estimate using local information
   number = std::max(number, item.GetLastAiredEpisodeNumber());
 
   // Estimate using airing dates of TV series
   number = std::max(number, EstimateLastAiredEpisodeNumber(item));
+
+  return number;
+}
+
+int EstimateEpisodeCount(const Item& item) {
+  // If we already know the number, we don't need to estimate
+  if (item.GetEpisodeCount() > 0)
+    return item.GetEpisodeCount();
+
+  const int number = GetLastEpisodeNumber(item);
 
   // Given all TV series aired in 2006-2016, most of them have their episodes
   // spanning one or two seasons. Following is a table of top ten values:
@@ -940,26 +951,22 @@ void GetProgressRatios(const Item& item, float& ratio_aired, float& ratio_watche
   ratio_aired = 0.0f;
   ratio_watched = 0.0f;
 
-  int eps_aired = item.GetLastAiredEpisodeNumber(true);
-  int eps_watched = item.GetMyLastWatchedEpisode(true);
+  const int eps_total = EstimateEpisodeCount(item);
+  const int eps_aired = GetLastEpisodeNumber(item);
+  const int eps_watched = item.GetMyLastWatchedEpisode(true);
 
-  if (eps_watched > eps_aired)
-    eps_aired = eps_watched;
-  if (eps_watched == 0)
-    eps_watched = -1;
-
-  int eps_total = EstimateEpisodeCount(item);
-
-  if (eps_total) {  // Episode count is known or estimated
-    if (eps_aired > 0)
+  // Episode count is known or estimated
+  if (eps_total) {
+    if (eps_aired)
       ratio_aired = eps_aired / static_cast<float>(eps_total);
-    if (eps_watched > 0)
+    if (eps_watched)
       ratio_watched = eps_watched / static_cast<float>(eps_total);
-  } else {  // Episode count is unknown
-    if (eps_aired > -1)
-      ratio_aired = 0.85f;
-    if (eps_watched > 0)
-      ratio_watched = eps_aired == -1 ? 0.8f : eps_watched / (eps_aired / ratio_aired);
+  // Episode count is unknown
+  } else {
+    if (eps_aired)
+      ratio_aired = eps_aired > eps_watched ? 0.85f : 0.8f;
+    if (eps_watched)
+      ratio_watched = std::min(0.8f, (0.8f * eps_watched) / eps_aired);
   }
 
   // Limit values so that they don't exceed total episodes

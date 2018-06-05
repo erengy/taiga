@@ -82,6 +82,7 @@ bool IsValidEpisodeNumber(int number, int total);
 bool IsValidEpisodeNumber(int number, int total, int watched);
 std::wstring JoinEpisodeNumbers(const std::vector<int>& input);
 void SplitEpisodeNumbers(const std::wstring& input, std::vector<int>& output);
+int GetLastEpisodeNumber(const Item& item);
 int EstimateEpisodeCount(const Item& item);
 void ChangeEpisode(int anime_id, int value);
 void DecrementEpisode(int anime_id);

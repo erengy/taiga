@@ -601,22 +601,7 @@ const std::wstring& Item::GetFolder() const {
   return local_info_.folder;
 }
 
-int Item::GetLastAiredEpisodeNumber(bool estimate) const {
-  if (local_info_.last_aired_episode)
-    return local_info_.last_aired_episode;
-
-  // No need to estimate if the series isn't currently airing
-  switch (GetAiringStatus()) {
-    case kFinishedAiring:
-      return GetEpisodeCount();
-    case kNotYetAired:
-    case kUnknownStatus:
-      return 0;
-  }
-
-  if (estimate)
-    return EstimateLastAiredEpisodeNumber(*this);
-
+int Item::GetLastAiredEpisodeNumber() const {
   return local_info_.last_aired_episode;
 }
 
