@@ -86,6 +86,26 @@ int SortListByAiringStatus(const anime::Item& item1, const anime::Item& item2) {
   return CompareValues<int>(item1.GetAiringStatus(), item2.GetAiringStatus());
 }
 
+int SortListByMyDateStart(const anime::Item& item1, const anime::Item& item2) {
+	Date date1 = item1.GetMyDateStart();
+	Date date2 = item2.GetMyDateStart();
+
+	if (date1 != date2)
+		if (!anime::IsValidDate(date1) || !anime::IsValidDate(date2))
+			return anime::IsValidDate(date2) ? base::kLessThan : base::kGreaterThan;
+  return CompareValues<Date>(date1, date2);
+}
+
+int SortListByMyDateCompleted(const anime::Item& item1, const anime::Item& item2) {
+	Date date1 = item1.GetMyDateEnd();
+	Date date2 = item2.GetMyDateEnd();
+
+	if (date1 != date2)
+		if (!anime::IsValidDate(date1) || !anime::IsValidDate(date2))
+			return anime::IsValidDate(date2) ? base::kLessThan : base::kGreaterThan;
+	return CompareValues<Date>(date1, date2);
+}
+
 int SortListByDateStart(const anime::Item& item1, const anime::Item& item2) {
   Date date1 = item1.GetDateStart();
   Date date2 = item2.GetDateStart();
@@ -194,6 +214,10 @@ int SortList(int type, int order, int id1, int id2) {
 
   if (item1 && item2) {
     switch (type) {
+      case kListSortMyDateStart:
+        return SortListByMyDateStart(*item1, *item2);
+      case kListSortMyDateCompleted:
+        return SortListByMyDateCompleted(*item1, *item2);
       case kListSortDateStart:
         return SortListByDateStart(*item1, *item2);
       case kListSortEpisodeCount:
@@ -252,6 +276,8 @@ static int ListViewCompare(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort,
       break;
     }
 
+    case kListSortMyDateCompleted:
+    case kListSortMyDateStart:
     case kListSortDateStart:
     case kListSortEpisodeCount:
     case kListSortLastUpdated:

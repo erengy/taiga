@@ -96,6 +96,7 @@ void GetProgressRatios(const Item& item, float& ratio_aired, float& ratio_watche
 std::wstring TranslateMyStatus(int value, bool add_count);
 std::wstring TranslateNumber(int value, const std::wstring& default_char = L"-");
 std::wstring TranslateMyScore(int value, const std::wstring& default_char = L"-");
+std::wstring TranslateMyDate(const Date& value, const std::wstring& default_char = L"-");
 std::wstring TranslateMyScoreFull(int value);
 std::wstring TranslateScore(double value);
 std::wstring TranslateStatus(int value);

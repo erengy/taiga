@@ -419,6 +419,8 @@ int AnimeListDialog::ListView::GetDefaultSortOrder(AnimeListColumn column) {
     case kColumnUserLastUpdated:
     case kColumnUserProgress:
     case kColumnUserRating:
+    case kColumnUserDateStarted:
+    case kColumnUserDateCompleted:
       return -1;
     case kColumnAnimeTitle:
     default:
@@ -428,6 +430,10 @@ int AnimeListDialog::ListView::GetDefaultSortOrder(AnimeListColumn column) {
 
 int AnimeListDialog::ListView::GetSortType(AnimeListColumn column) {
   switch (column) {
+    case kColumnUserDateStarted:
+      return ui::kListSortMyDateStart;
+    case kColumnUserDateCompleted:
+      return ui::kListSortMyDateCompleted;
     case kColumnUserLastUpdated:
       return ui::kListSortLastUpdated;
     case kColumnUserProgress:
@@ -1208,6 +1214,14 @@ LRESULT AnimeListDialog::OnListCustomDraw(LPARAM lParam) {
               anime_item->GetMyLastUpdated() == L"0")
             pCD->clrText = GetSysColor(COLOR_GRAYTEXT);
           break;
+        case kColumnUserDateStarted:
+          if (!anime::IsValidDate(anime_item->GetMyDateStart()))
+            pCD->clrText = GetSysColor(COLOR_GRAYTEXT);
+          break;
+        case kColumnUserDateCompleted:
+          if (!anime::IsValidDate(anime_item->GetMyDateEnd()))
+            pCD->clrText = GetSysColor(COLOR_GRAYTEXT);
+          break;
       }
 
       // Indicate currently playing
@@ -1437,6 +1451,12 @@ void AnimeListDialog::RefreshListItemColumns(int index, const anime::Item& anime
       case kColumnUserRating:
         text = anime::TranslateMyScore(anime_item.GetMyScore());
         break;
+      case kColumnUserDateStarted:
+        text = anime::TranslateMyDate(anime_item.GetMyDateStart());
+        break;
+      case kColumnUserDateCompleted:
+        text = anime::TranslateMyDate(anime_item.GetMyDateEnd());
+        break;
     }
     if (!text.empty())
       listview.SetItem(index, column.index, text.c_str());
@@ -1541,6 +1561,14 @@ void AnimeListDialog::ListView::InitializeColumns() {
       {kColumnAnimeSeason, true, i, i++,
        0, static_cast<unsigned short>(ScaleX(90)), static_cast<unsigned short>(ScaleX(90)),
        LVCFMT_RIGHT, L"Season", L"anime_season"})));
+  columns.insert(std::make_pair(kColumnUserDateStarted, ColumnData(
+      {kColumnUserDateStarted, false, i, i++,
+       0, static_cast<unsigned short>(ScaleX(90)), static_cast<unsigned short>(ScaleX(90)),
+       LVCFMT_RIGHT, L"Started", L"user_date_started"})));
+  columns.insert(std::make_pair(kColumnUserDateCompleted, ColumnData(
+      {kColumnUserDateCompleted, false, i, i++,
+       0, static_cast<unsigned short>(ScaleX(90)), static_cast<unsigned short>(ScaleX(90)),
+       LVCFMT_RIGHT, L"Completed", L"user_date_completed"})));
   columns.insert(std::make_pair(kColumnUserLastUpdated, ColumnData(
       {kColumnUserLastUpdated, false, i, i++,
        0, static_cast<unsigned short>(ScaleX(100)), static_cast<unsigned short>(ScaleX(85)),
@@ -1747,6 +1775,8 @@ AnimeListColumn AnimeListDialog::ListView::TranslateColumnName(const std::wstrin
     {L"user_last_updated", kColumnUserLastUpdated},
     {L"user_progress", kColumnUserProgress},
     {L"user_rating", kColumnUserRating},
+    {L"user_date_started", kColumnUserDateStarted},
+    {L"user_date_completed", kColumnUserDateCompleted},
   };
 
   auto it = names.find(name);
