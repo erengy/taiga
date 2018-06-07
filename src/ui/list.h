@@ -34,6 +34,8 @@ enum ListSortType {
   kListSortDateStart,
   kListSortEpisodeCount,
   kListSortEpisodeRange,
+  kListSortMyDateCompleted,
+  kListSortMyDateStart,
   kListSortLastUpdated,
   kListSortPopularity,
   kListSortProgress,

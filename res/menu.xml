@@ -201,6 +201,8 @@
 		<item name="Last updated" action="user_last_updated" checked="1"/>
 		<item name="Progress" action="user_progress" checked="1"/>
 		<item name="Score" action="user_rating" checked="1"/>
+		<item name="Date started" action="user_date_started" checked="1"/>
+		<item name="Date completed" action="user_date_completed" checked="1"/>
 		<item type="separator"/>
 		<item name="Reset to defaults" action="ResetAnimeListHeaders()"/>
 	</menu>
