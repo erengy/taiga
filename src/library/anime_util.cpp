@@ -976,6 +976,10 @@ void GetProgressRatios(const Item& item, float& ratio_aired, float& ratio_watche
 
 ////////////////////////////////////////////////////////////////////////////////
 
+std::wstring TranslateMyDate(const Date& value, const std::wstring& default_char) {
+  return IsValidDate(value) ? TranslateDate(value) : default_char;
+}
+
 std::wstring TranslateMyStatus(int value, bool add_count) {
   #define ADD_COUNT() (add_count ? L" (" + ToWstr(AnimeDatabase.GetItemCount(value)) + L")" : L"")
   switch (value) {
@@ -1010,10 +1014,6 @@ std::wstring TranslateMyScore(int value, const std::wstring& default_char) {
       return sync::anilist::TranslateMyRating(
           value, sync::anilist::GetRatingSystem());
   }
-}
-
-std::wstring TranslateMyDate(const Date& value, const std::wstring& default_char) {
-  return IsValidDate(value) ? TranslateDate(value) : default_char;
 }
 
 std::wstring TranslateMyScoreFull(int value) {

@@ -86,24 +86,20 @@ int SortListByAiringStatus(const anime::Item& item1, const anime::Item& item2) {
   return CompareValues<int>(item1.GetAiringStatus(), item2.GetAiringStatus());
 }
 
-int SortListByMyDateStart(const anime::Item& item1, const anime::Item& item2) {
-	Date date1 = item1.GetMyDateStart();
-	Date date2 = item2.GetMyDateStart();
+int SortListByMyDate(const Date& date1, const Date& date2) {
+  if (date1 != date2)
+    if (!anime::IsValidDate(date1) || !anime::IsValidDate(date2))
+      return anime::IsValidDate(date2) ? base::kLessThan : base::kGreaterThan;
 
-	if (date1 != date2)
-		if (!anime::IsValidDate(date1) || !anime::IsValidDate(date2))
-			return anime::IsValidDate(date2) ? base::kLessThan : base::kGreaterThan;
   return CompareValues<Date>(date1, date2);
 }
 
-int SortListByMyDateCompleted(const anime::Item& item1, const anime::Item& item2) {
-	Date date1 = item1.GetMyDateEnd();
-	Date date2 = item2.GetMyDateEnd();
+int SortListByMyDateStart(const anime::Item& item1, const anime::Item& item2) {
+  return SortListByMyDate(item1.GetMyDateStart(), item2.GetMyDateStart());
+}
 
-	if (date1 != date2)
-		if (!anime::IsValidDate(date1) || !anime::IsValidDate(date2))
-			return anime::IsValidDate(date2) ? base::kLessThan : base::kGreaterThan;
-	return CompareValues<Date>(date1, date2);
+int SortListByMyDateCompleted(const anime::Item& item1, const anime::Item& item2) {
+  return SortListByMyDate(item1.GetMyDateEnd(), item2.GetMyDateEnd());
 }
 
 int SortListByDateStart(const anime::Item& item1, const anime::Item& item2) {

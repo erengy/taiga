@@ -417,10 +417,10 @@ int AnimeListDialog::ListView::GetDefaultSortOrder(AnimeListColumn column) {
     case kColumnAnimeStatus:
     case kColumnAnimeType:
     case kColumnUserLastUpdated:
-    case kColumnUserProgress:
-    case kColumnUserRating:
     case kColumnUserDateStarted:
     case kColumnUserDateCompleted:
+    case kColumnUserProgress:
+    case kColumnUserRating:
       return -1;
     case kColumnAnimeTitle:
     default:
@@ -1772,11 +1772,11 @@ AnimeListColumn AnimeListDialog::ListView::TranslateColumnName(const std::wstrin
     {L"anime_status", kColumnAnimeStatus},
     {L"anime_title", kColumnAnimeTitle},
     {L"anime_type", kColumnAnimeType},
+    {L"user_date_started", kColumnUserDateStarted},
+    {L"user_date_completed", kColumnUserDateCompleted},
     {L"user_last_updated", kColumnUserLastUpdated},
     {L"user_progress", kColumnUserProgress},
     {L"user_rating", kColumnUserRating},
-    {L"user_date_started", kColumnUserDateStarted},
-    {L"user_date_completed", kColumnUserDateCompleted},
   };
 
   auto it = names.find(name);
