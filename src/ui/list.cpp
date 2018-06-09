@@ -172,18 +172,9 @@ int SortListByTitle(const anime::Item& item1, const anime::Item& item2) {
                         anime::GetPreferredTitle(item2));
 }
 
-int SortListBySeason(const anime::Item& item1, const anime::Item& item2,
-                     int order) {
-  anime::Season season1(item1.GetDateStart());
-  anime::Season season2(item2.GetDateStart());
-
-  if (season1 != season2)
-    return CompareValues<anime::Season>(season1, season2);
-
-  if (item1.GetAiringStatus() != item2.GetAiringStatus())
-    return SortListByAiringStatus(item1, item2);
-
-  return SortListByTitle(item1, item2) * order;
+int SortListBySeason(const anime::Item& item1, const anime::Item& item2) {
+  return CompareValues<anime::Season>(anime::Season{item1.GetDateStart()},
+                                      anime::Season{item2.GetDateStart()});
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -229,7 +220,7 @@ int SortList(int type, int order, int id1, int id2) {
       case kListSortScore:
         return SortListByScore(*item1, *item2);
       case kListSortSeason:
-        return SortListBySeason(*item1, *item2, order);
+        return SortListBySeason(*item1, *item2);
       case kListSortStatus:
         return SortListByAiringStatus(*item1, *item2);
       case kListSortTitle:
