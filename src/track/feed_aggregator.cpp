@@ -549,6 +549,10 @@ void Aggregator::CleanupDescription(std::wstring& description) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+size_t Aggregator::GetArchiveSize() const {
+  return file_archive_.size();
+}
+
 bool Aggregator::LoadArchive() {
   xml_document document;
   std::wstring path = taiga::GetPath(taiga::Path::FeedHistory);
@@ -591,6 +595,10 @@ bool Aggregator::SaveArchive() const {
 void Aggregator::AddToArchive(const std::wstring& file) {
   if (!SearchArchive(file))
     file_archive_.push_back(file);
+}
+
+void Aggregator::ClearArchive() {
+  file_archive_.clear();
 }
 
 bool Aggregator::SearchArchive(const std::wstring& file) const {

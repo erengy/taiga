@@ -551,6 +551,11 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
             DeleteFolder(path);
             CheckDlgButton(IDC_CHECK_CACHE3, FALSE);
           }
+          if (IsDlgButtonChecked(IDC_CHECK_CACHE4)) {
+            Aggregator.ClearArchive();
+            Aggregator.SaveArchive();
+            CheckDlgButton(IDC_CHECK_CACHE4, FALSE);
+          }
           parent->RefreshCache();
           EnableDlgItem(IDC_BUTTON_CACHE_CLEAR, FALSE);
           return TRUE;
@@ -620,10 +625,12 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
         // Enable/disable controls
         case IDC_CHECK_CACHE1:
         case IDC_CHECK_CACHE2:
-        case IDC_CHECK_CACHE3: {
+        case IDC_CHECK_CACHE3:
+        case IDC_CHECK_CACHE4: {
           bool enable = IsDlgButtonChecked(IDC_CHECK_CACHE1) ||
                         IsDlgButtonChecked(IDC_CHECK_CACHE2) ||
-                        IsDlgButtonChecked(IDC_CHECK_CACHE3);
+                        IsDlgButtonChecked(IDC_CHECK_CACHE3) ||
+                        IsDlgButtonChecked(IDC_CHECK_CACHE4);
           EnableDlgItem(IDC_BUTTON_CACHE_CLEAR, enable);
           return TRUE;
         }

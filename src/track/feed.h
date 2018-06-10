@@ -166,9 +166,11 @@ public:
   void ParseFeedItem(FeedSource source, FeedItem& feed_item);
   void CleanupDescription(std::wstring& description);
 
+  size_t GetArchiveSize() const;
   bool LoadArchive();
   bool SaveArchive() const;
   void AddToArchive(const std::wstring& file);
+  void ClearArchive();
   bool SearchArchive(const std::wstring& file) const;
 
   FeedFilterManager filter_manager;

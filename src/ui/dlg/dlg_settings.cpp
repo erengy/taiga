@@ -506,6 +506,10 @@ void SettingsDialog::RefreshCache() {
   // Torrent files
   text = ToWstr(Stats.torrent_count) + L" item(s), " + ToSizeString(Stats.torrent_size);
   page.SetDlgItemText(IDC_STATIC_CACHE3, text.c_str());
+
+  // Torrent history
+  text = ToWstr(Aggregator.GetArchiveSize()) + L" item(s)";
+  page.SetDlgItemText(IDC_STATIC_CACHE4, text.c_str());
 }
 
 void SettingsDialog::RefreshTorrentFilterList(HWND hwnd_list) {
