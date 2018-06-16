@@ -135,7 +135,7 @@
 		<item name="Set &amp;episode..."  action="EditEpisode()"/>
 		<item name="Set sco&amp;re"          sub="EditScore"/>
 		<item name="Set &amp;status"         sub="EditStatus"/>
-		<item name="Set &amp;tags..."     action="EditTags()"/>
+		<item name="Set &amp;tags..."     action="EditTags"/> <!-- Note: Overwritten -->
 		<item type="separator"/>
 		<item name="Delete from &amp;list...&#9;Del" action="EditDelete()"/>
 	</menu>

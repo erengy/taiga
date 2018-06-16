@@ -459,6 +459,31 @@ bool OnLibraryEntriesEditTags(const std::vector<int> ids, std::wstring& tags) {
   return false;
 }
 
+bool OnLibraryEntriesEditNotes(const std::vector<int> ids, std::wstring& notes) {
+  std::wstring value;
+  for (const auto& id : ids) {
+    auto anime_item = AnimeDatabase.FindItem(id);
+    if (anime_item) {
+      value = anime_item->GetMyNotes();
+      if (!value.empty())
+        break;
+    }
+  }
+
+  InputDialog dlg;
+  dlg.title = L"Set Notes";
+  dlg.info = L"Enter notes for the selected anime:";
+  dlg.text = value;
+  dlg.Show(DlgMain.GetWindowHandle());
+
+  if (dlg.result == IDOK) {
+    notes = dlg.text;
+    return true;
+  }
+
+  return false;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 static bool AnimeListNeedsRefresh(const HistoryItem& history_item) {

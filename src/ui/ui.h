@@ -82,6 +82,7 @@ void OnLibraryUpdateFailure(int id, const string_t& reason, bool not_approved);
 bool OnLibraryEntriesEditDelete(const std::vector<int> ids);
 int OnLibraryEntriesEditEpisode(const std::vector<int> ids);
 bool OnLibraryEntriesEditTags(const std::vector<int> ids, std::wstring& tags);
+bool OnLibraryEntriesEditNotes(const std::vector<int> ids, std::wstring& notes);
 
 void OnHistoryAddItem(const HistoryItem& history_item);
 void OnHistoryChange(const HistoryItem* history_item = nullptr);

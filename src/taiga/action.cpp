@@ -545,6 +545,22 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
       }
     }
 
+  // EditNotes(notes)
+  //   Changes anime notes.
+  //   lParam is a pointer to a vector of anime IDs.
+  } else if (action == L"EditNotes") {
+    const auto& anime_ids = *reinterpret_cast<std::vector<int>*>(lParam);
+    std::wstring notes;
+    if (ui::OnLibraryEntriesEditNotes(anime_ids, notes)) {
+      for (const auto& anime_id : anime_ids) {
+        HistoryItem history_item;
+        history_item.anime_id = anime_id;
+        history_item.notes = notes;
+        history_item.mode = taiga::kHttpServiceUpdateLibraryEntry;
+        History.queue.Add(history_item);
+      }
+    }
+
   //////////////////////////////////////////////////////////////////////////////
 
   // OpenFolder()
