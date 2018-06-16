@@ -1025,13 +1025,18 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, int index,
     const int eps_total = anime::EstimateEpisodeCount(anime_item);
     const int eps_aired = anime::GetLastEpisodeNumber(anime_item);
     const int eps_available = std::max(eps_total, eps_aired);
+    const int eps_watched = anime_item.GetMyLastWatchedEpisode(true);
     const int bar_width = eps_total ? rcBar.Width() : std::lround(rcBar.Width() * 0.8f);
     const float ep_width = static_cast<float>(bar_width) / static_cast<float>(eps_available);
     rcAvail.top = rcAvail.bottom - ScaleY(3);
     for (int i = 1; i <= eps_available; i++) {
       if (anime_item.IsEpisodeAvailable(i)) {
         rcAvail.left = rcBar.left + static_cast<int>(std::floor(ep_width * (i - 1)));
-        rcAvail.right = rcAvail.left + static_cast<int>(std::ceil(ep_width));
+        if (i == eps_watched) {
+          rcAvail.right = rcWatched.right;
+        } else {
+          rcAvail.right = rcAvail.left + static_cast<int>(std::ceil(ep_width));
+        }
         rcAvail.right = std::min(rcAvail.right, rcBar.left + bar_width);
         ui::Theme.DrawListProgress(dc.Get(), &rcAvail, ui::kListProgressAvailable);
       }
