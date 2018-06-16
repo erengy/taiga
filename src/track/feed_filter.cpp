@@ -597,6 +597,12 @@ void FeedFilterManager::InitializePresets() {
   ADD_CONDITION(kFeedFilterElement_Meta_Status, kFeedFilterOperator_Equals, ToWstr(anime::kAiring));
   ADD_CONDITION(kFeedFilterElement_User_Status, kFeedFilterOperator_Equals, ToWstr(anime::kPlanToWatch));
 
+  // Discard dropped
+  ADD_PRESET(kFeedFilterActionDiscard, kFeedFilterMatchAll, true, kFeedFilterOptionDefault,
+      L"Discard dropped",
+      L"Discards files that belong to anime that you've dropped watching");
+  ADD_CONDITION(kFeedFilterElement_User_Status, kFeedFilterOperator_Equals, ToWstr(anime::kDropped));
+
   // Discard and deactivate not-in-list anime
   ADD_PRESET(kFeedFilterActionDiscard, kFeedFilterMatchAny, true, kFeedFilterOptionDeactivate,
       L"Discard and deactivate not-in-list anime",
