@@ -68,6 +68,10 @@ RequestExecutionLevel user
 ; ------------------------------------------------------------------------------
 ; Page settings
 
+; License page
+!define MUI_LICENSEPAGE_BUTTON $(^NextBtn)
+!define MUI_LICENSEPAGE_TEXT_BOTTOM $(^ClickNext)
+
 ; Components page
 !define MUI_COMPONENTSPAGE_NODESC
 
