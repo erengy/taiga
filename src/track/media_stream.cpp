@@ -120,8 +120,8 @@ static const std::vector<StreamData> stream_data{
     taiga::kStream_Wakanim,
     L"Wakanim",
     L"https://www.wakanim.tv",
-    std::regex("wakanim\\.tv/video(?:-premium)?/[^/]+/"),
-    std::regex("(.+) / Streaming - Wakanim.TV"),
+    std::regex("wakanim\\.tv/[^/]+/v2/catalogue/episode/[^/]+/"),
+    std::regex("(.+) (?:auf|on|sur) Wakanim\\.TV.*"),
   },
   // Yahoo View
   {
@@ -217,10 +217,10 @@ void CleanStreamTitle(const StreamData& stream_data, std::string& title) {
       break;
     }
     case Stream::Wakanim: {
-      auto str = StrToWstr(title);
-      ReplaceString(str, 0, L" de ", L" ", false, false);
-      ReplaceString(str, 0, L" en VOSTFR", L" VOSTFR", false, false);
-      title = WstrToStr(str);
+      static const std::regex pattern{"(?:Episode (\\d+)|Film|Movie) - (?:ENGDUB - )?(.+)"};
+      std::smatch match;
+      if (std::regex_match(title, match, pattern))
+        title = match.str(2) + (match.length(1) ? " - Episode " + match.str(1) : "");
       break;
     }
   }
