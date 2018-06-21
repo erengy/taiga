@@ -66,6 +66,7 @@
 	</menu>
 	<!-- Export -->
 	<menu name="Export">
+		<item name="Export as Markdown..." action="ExportAsMarkdown"/>
 		<item name="Export as MyAnimeList XML..." action="ExportAsMalXml"/>
 	</menu>
 	<!-- External links -->

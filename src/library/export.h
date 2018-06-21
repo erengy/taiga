@@ -23,5 +23,6 @@
 namespace library {
 
 bool ExportAsMalXml(const std::wstring& path);
+bool ExportAsMarkdown(const std::wstring& path);
 
 }  // namespace library

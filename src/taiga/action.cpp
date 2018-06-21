@@ -92,6 +92,21 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
       }
     }
 
+  // ExportAsMarkdown()
+  //   Exports library in Markdown format.
+  } else if (action == L"ExportAsMarkdown") {
+    std::wstring path;
+    if (win::BrowseForFolder(ui::GetWindowHandle(ui::Dialog::Main),
+                             L"Select Export Location", L"", path)) {
+      AddTrailingSlash(path);
+      path += L"animelist_{}.md"_format(std::time(nullptr));
+      if (library::ExportAsMarkdown(path)) {
+        ui::ChangeStatusText(L"Exported list to: " + path);
+      } else {
+        ui::ChangeStatusText(L"Could not export list to: " + path);
+      }
+    }
+
   //////////////////////////////////////////////////////////////////////////////
   // Services
 

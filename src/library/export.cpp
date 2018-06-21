@@ -16,6 +16,9 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <algorithm>
+#include <map>
+
 #include "base/file.h"
 #include "base/format.h"
 #include "base/string.h"
@@ -23,6 +26,7 @@
 #include "base/xml.h"
 #include "library/anime_db.h"
 #include "library/anime_item.h"
+#include "library/anime_util.h"
 #include "library/export.h"
 #include "sync/myanimelist_types.h"
 #include "sync/myanimelist_util.h"
@@ -89,7 +93,7 @@ bool ExportAsMalXml(const std::wstring& path) {
   XmlWriteIntValue(node_myinfo, L"user_total_dropped", AnimeDatabase.GetItemCount(anime::kDropped));
   XmlWriteIntValue(node_myinfo, L"user_total_plantowatch", AnimeDatabase.GetItemCount(anime::kPlanToWatch));
 
-  for (const auto&[id, item] : AnimeDatabase.items) {
+  for (const auto& [id, item] : AnimeDatabase.items) {
     if (item.IsInList()) {
       xml_node node = node_myanimelist.append_child(L"anime");
       XmlWriteIntValue(node, L"series_animedb_id", item.GetId());
@@ -122,6 +126,38 @@ bool ExportAsMalXml(const std::wstring& path) {
   return document.save_file(path.c_str(), L"\t",
                             pugi::format_default,
                             pugi::xml_encoding::encoding_utf8);
+}
+
+bool ExportAsMarkdown(const std::wstring& path) {
+  std::map<int, std::vector<std::wstring>> status_lists;
+
+  for (const auto& [id, item] : AnimeDatabase.items) {
+    if (item.IsInList()) {
+      status_lists[item.GetMyStatus()].push_back(L"{} ({}/{})"_format(
+          anime::GetPreferredTitle(item),
+          item.GetMyLastWatchedEpisode(),
+          anime::TranslateNumber(item.GetEpisodeCount(), L"?")));
+    }
+  }
+
+  for (auto& [status, list] : status_lists) {
+    std::sort(list.begin(), list.end(),
+              [](const std::wstring& a, const std::wstring& b) {
+                return CompareStrings(a, b, true) < 0;
+              });
+  }
+
+  std::wstring text;
+  for (const auto& [status, list] : status_lists) {
+    if (!text.empty())
+      text += L"\r\n";
+    text += L"# {}\r\n\r\n"_format(anime::TranslateMyStatus(status, true));
+    for (const auto& line : list) {
+      text += L"- {}\r\n"_format(line);
+    }
+  }
+
+  return SaveToFile(WstrToStr(text), path, false);
 }
 
 }  // namespace library
