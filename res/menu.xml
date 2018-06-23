@@ -178,7 +178,7 @@
 	<menu name="Search">
 		<!-- Note: Use %title% as the search string -->
 		<item name="AniDB"              action="URL(https://anidb.net/perl-bin/animedb.pl?show=animelist&amp;adb.search=%title%&amp;noalias=1&amp;do.update=update)"/>
-		<item name="AniList"            action="URL(https://anilist.co/search?type=anime&amp;q=%title%)"/>
+		<item name="AniList"            action="URL(https://anilist.co/search/anime?search=%title%)"/>
 		<item name="Anime News Network" action="URL(https://www.animenewsnetwork.com/search?q=%title%)"/>
 		<item name="Kitsu"              action="URL(https://kitsu.io/anime?text=%title%)"/>
 		<item name="MyAnimeList"        action="URL(https://myanimelist.net/anime.php?q=%title%)"/>
