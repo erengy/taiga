@@ -95,7 +95,7 @@ bool EvaluateCondition(const FeedFilterCondition& condition,
       break;
     case kFeedFilterElement_Episode_Number:
       if (!item.episode_data.episode_number()) {
-        element = ToWstr(anime ? anime->GetEpisodeCount() : 1);
+        element = anime ? ToWstr(anime->GetEpisodeCount()) : L"";
       } else {
         element = ToWstr(anime::GetEpisodeHigh(item.episode_data));
       }
@@ -121,6 +121,9 @@ bool EvaluateCondition(const FeedFilterCondition& condition,
       element = item.episode_data.video_terms();
       break;
   }
+
+  if (element.empty() || value.empty())
+    is_numeric = false;
 
   switch (condition.op) {
     case kFeedFilterOperator_Equals:
