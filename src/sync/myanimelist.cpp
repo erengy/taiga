@@ -468,6 +468,17 @@ bool Service::RequestSucceeded(Response& response,
     }
   }
 
+  // API is down
+  // See: https://github.com/erengy/taiga/issues/588
+  if (http_response.code == 404) {
+    if (InStr(http_response.body, L"<title>404 Not Found</title>") > -1) {
+      response.data[L"error"] =
+          L"API is unavailable. Please contact MyAnimeList's customer service.";
+      HandleError(http_response, response);
+      return false;
+    }
+  }
+
   switch (response.type) {
     case kAddLibraryEntry:
       if (StartsWith(http_response.body, L"Created"))
