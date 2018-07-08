@@ -279,12 +279,14 @@ void Aggregator::HandleFeedDownload(Feed& feed, const std::string& data) {
     SaveToFile(data, file);
 
     if (!FileExists(file)) {
-      ui::OnFeedDownload(false, L"Torrent file doesn't exist");
+      ui::OnFeedDownloadError(L"Torrent file doesn't exist");
       return;
     }
   }
 
-  if (IsMagnetLink(*feed_item)) {
+  const bool is_magnet_link = IsMagnetLink(*feed_item);
+
+  if (is_magnet_link) {
     file = !feed_item->magnet_link.empty() ? feed_item->magnet_link :
                                              feed_item->link;
   }
@@ -292,7 +294,7 @@ void Aggregator::HandleFeedDownload(Feed& feed, const std::string& data) {
   feed_item->state = FeedItemState::DiscardedNormal;
   AddToArchive(feed_item->title);
   SaveArchive();
-  ui::OnFeedDownload(true, L"");
+  ui::OnFeedDownloadSuccess(is_magnet_link);
 
   HandleFeedDownloadOpen(*feed_item, file);
 
@@ -414,10 +416,10 @@ bool Aggregator::ValidateFeedDownload(const HttpRequest& http_request,
   if (http_response.code >= 400) {
     if (http_response.code == 404) {
       const auto location = http_request.url.Build();
-      ui::OnFeedDownload(false, L"File not found at " + location);
+      ui::OnFeedDownloadError(L"File not found at " + location);
     } else {
       const auto code = ToWstr(http_response.code);
-      ui::OnFeedDownload(false, L"Invalid HTTP response (" + code + L")");
+      ui::OnFeedDownloadError(L"Invalid HTTP response (" + code + L")");
     }
     return false;
   }
@@ -425,7 +427,7 @@ bool Aggregator::ValidateFeedDownload(const HttpRequest& http_request,
   // Check response body
   if (StartsWith(http_response.body, L"<!DOCTYPE html>")) {
     const auto location = http_request.url.Build();
-    ui::OnFeedDownload(false, L"Invalid torrent file: " + location);
+    ui::OnFeedDownloadError(L"Invalid torrent file: " + location);
     return false;
   }
 
@@ -454,8 +456,8 @@ bool Aggregator::ValidateFeedDownload(const HttpRequest& http_request,
   if (!verify_content_type()) {
     // Allow invalid MIME types when Content-Disposition field is present
     if (!has_content_disposition()) {
-      ui::OnFeedDownload(false, L"Invalid content type: " +
-                                http_response.header[L"Content-Type"]);
+      ui::OnFeedDownloadError(L"Invalid content type: " +
+                              http_response.header[L"Content-Type"]);
       return false;
     }
   }

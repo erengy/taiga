@@ -119,7 +119,8 @@ void OnEpisodeAvailabilityChange(int id);
 void OnScanAvailableEpisodesFinished();
 
 void OnFeedCheck(bool success);
-void OnFeedDownload(bool success, const string_t& error);
+void OnFeedDownloadSuccess(bool is_magnet_link);
+void OnFeedDownloadError(const string_t& message);
 bool OnFeedNotify(const Feed& feed);
 
 void OnMircNotRunning(bool testing = false);

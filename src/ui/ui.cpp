@@ -932,13 +932,17 @@ void OnFeedCheck(bool success) {
   DlgTorrent.EnableInput();
 }
 
-void OnFeedDownload(bool success, const string_t& error) {
-  ChangeStatusText(success ?
+void OnFeedDownloadSuccess(bool is_magnet_link) {
+  ChangeStatusText(!is_magnet_link ?
       L"Successfully downloaded the torrent file." :
-      L"Torrent download error: " + error);
+      L"Found magnet link for the torrent file.");
 
-  if (success)
-    DlgTorrent.RefreshList();
+  DlgTorrent.RefreshList();
+  DlgTorrent.EnableInput();
+}
+
+void OnFeedDownloadError(const string_t& message) {
+  ChangeStatusText(L"Torrent download error: " + message);
 
   DlgTorrent.EnableInput();
 }
