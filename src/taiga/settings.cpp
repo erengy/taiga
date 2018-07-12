@@ -114,7 +114,7 @@ void AppSettings::InitializeMap() {
   INITKEY(kMeta_Version, nullptr, L"meta/version");
 
   // Services
-  INITKEY(kSync_ActiveService, L"myanimelist", L"account/update/activeservice");
+  INITKEY(kSync_ActiveService, L"anilist", L"account/update/activeservice");
   INITKEY(kSync_AutoOnStart, nullptr, L"account/myanimelist/login");
   INITKEY(kSync_Service_Mal_Username, nullptr, L"account/myanimelist/username");
   INITKEY(kSync_Service_Mal_Password, nullptr, L"account/myanimelist/password");
