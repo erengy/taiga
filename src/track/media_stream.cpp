@@ -39,6 +39,15 @@ static const std::vector<StreamData> stream_data{
     std::regex("animelab\\.com/player/"),
     std::regex("AnimeLab - (.+)"),
   },
+  // Anime Digital Network
+  {
+    Stream::Adn,
+    taiga::kStream_Adn,
+    L"Anime Digital Network",
+    L"https://animedigitalnetwork.fr/video/",
+    std::regex("animedigitalnetwork.fr/video/[^/]+/[0-9]+"),
+    std::regex("(.+) - streaming -.* ADN"),
+  },
   // Anime News Network
   {
     Stream::Ann,
@@ -192,6 +201,12 @@ void CleanStreamTitle(const StreamData& stream_data, std::string& title) {
     return;
 
   switch (stream_data.id) {
+    case Stream::Adn: {
+      auto str = StrToWstr(title);
+      ReplaceString(str, L" : ", L" - ");
+      title = WstrToStr(str);
+      break;
+    }
     case Stream::Ann: {
       static const std::regex pattern{" \\((?:s|d)(?:, uncut)?\\)"};
       title = std::regex_replace(title, pattern, "");

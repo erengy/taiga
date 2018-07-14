@@ -76,6 +76,7 @@ private:
 enum class Stream {
   Unknown,
   Animelab,
+  Adn,
   Ann,
   Crunchyroll,
   Hidive,
