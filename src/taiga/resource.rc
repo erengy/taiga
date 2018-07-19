@@ -351,13 +351,14 @@ FONT 9, "Segoe UI", 400, 0, 0
     COMBOBOX        IDC_COMBO_DBLCLICK, 12, 28, 141, 30, WS_TABSTOP | CBS_DROPDOWNLIST | CBS_HASSTRINGS, WS_EX_LEFT
     LTEXT           "Middle click:", IDC_STATIC, 160, 18, 141, 8, SS_LEFT, WS_EX_LEFT
     COMBOBOX        IDC_COMBO_MDLCLICK, 160, 28, 141, 30, WS_TABSTOP | CBS_DROPDOWNLIST | CBS_HASSTRINGS, WS_EX_LEFT
-    GROUPBOX        "Appearance", IDC_STATIC, 7, 55, 301, 48, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Display English titles when possible", IDC_CHECK_LIST_ENGLISH, 12, 66, 141, 8, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Highlight anime if next episode is available in library folders", IDC_CHECK_HIGHLIGHT, 12, 77, 200, 8, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Display highlighted anime above others", IDC_CHECK_HIGHLIGHT_ONTOP, 21, 88, 161, 8, 0, WS_EX_LEFT
-    GROUPBOX        "Progress", IDC_STATIC, 7, 110, 301, 37, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Display aired episodes (estimated)", IDC_CHECK_LIST_PROGRESS_AIRED, 12, 121, 141, 8, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Display available episodes in library folders", IDC_CHECK_LIST_PROGRESS_AVAILABLE, 12, 132, 170, 8, 0, WS_EX_LEFT
+    GROUPBOX        "Appearance", IDC_STATIC, 7, 55, 301, 66, 0, WS_EX_LEFT
+    LTEXT           "Title language preference:", IDC_STATIC, 12, 66, 141, 8, SS_LEFT, WS_EX_LEFT
+    COMBOBOX        IDC_COMBO_TITLELANG, 12, 76, 141, 8, WS_TABSTOP | CBS_DROPDOWNLIST | CBS_HASSTRINGS, WS_EX_LEFT
+    AUTOCHECKBOX    "Highlight anime if next episode is available in library folders", IDC_CHECK_HIGHLIGHT, 12, 95, 200, 8, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Display highlighted anime above others", IDC_CHECK_HIGHLIGHT_ONTOP, 21, 106, 161, 8, 0, WS_EX_LEFT
+    GROUPBOX        "Progress", IDC_STATIC, 7, 128, 301, 37, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Display aired episodes (estimated)", IDC_CHECK_LIST_PROGRESS_AIRED, 12, 139, 141, 8, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Display available episodes in library folders", IDC_CHECK_LIST_PROGRESS_AVAILABLE, 12, 150, 170, 8, 0, WS_EX_LEFT
 }
 
 

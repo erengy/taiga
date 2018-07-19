@@ -75,6 +75,7 @@ enum AppSettingName {
   kApp_List_SortColumnSecondary,
   kApp_List_SortOrderPrimary,
   kApp_List_SortOrderSecondary,
+  kApp_List_TitleLanguagePreference,
   kApp_Behavior_Autostart,
   kApp_Behavior_StartMinimized,
   kApp_Behavior_CheckForUpdates,

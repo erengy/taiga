@@ -22,6 +22,7 @@
 #include "base/file.h"
 #include "base/format.h"
 #include "base/string.h"
+#include "library/anime_util.h"
 #include "library/history.h"
 #include "sync/manager.h"
 #include "taiga/resource.h"
@@ -232,7 +233,8 @@ void SettingsDialog::OnOK() {
   if (page->IsWindow()) {
     Settings.Set(taiga::kApp_List_DoubleClickAction, page->GetComboSelection(IDC_COMBO_DBLCLICK));
     Settings.Set(taiga::kApp_List_MiddleClickAction, page->GetComboSelection(IDC_COMBO_MDLCLICK));
-    Settings.Set(taiga::kApp_List_DisplayEnglishTitles, page->IsDlgButtonChecked(IDC_CHECK_LIST_ENGLISH));
+    Settings.Set(taiga::kApp_List_TitleLanguagePreference, anime::GetTitleLanguagePreferenceStr(
+        page->GetComboSelection(IDC_COMBO_TITLELANG)));
     Settings.Set(taiga::kApp_List_HighlightNewEpisodes, page->IsDlgButtonChecked(IDC_CHECK_HIGHLIGHT));
     Settings.Set(taiga::kApp_List_DisplayHighlightedOnTop, page->IsDlgButtonChecked(IDC_CHECK_HIGHLIGHT_ONTOP));
     Settings.Set(taiga::kApp_List_ProgressDisplayAired, page->IsDlgButtonChecked(IDC_CHECK_LIST_PROGRESS_AIRED));

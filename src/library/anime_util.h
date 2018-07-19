@@ -88,6 +88,8 @@ void ChangeEpisode(int anime_id, int value);
 void DecrementEpisode(int anime_id);
 void IncrementEpisode(int anime_id);
 
+int GetTitleLanguagePreferenceIndex(const std::wstring& str);
+std::wstring GetTitleLanguagePreferenceStr(const int index);
 const std::wstring& GetPreferredTitle(const Item& item);
 void GetAllTitles(int anime_id, std::vector<std::wstring>& titles);
 int GetMyRewatchedTimes(const Item& item);

@@ -164,6 +164,17 @@ bool AppSettings::HandleCompatibility() {
     }
   }
 
+  if (version <= semaver::Version(1, 3, 1)) {
+    // Set title language preference
+    if (GetWstr(kApp_List_TitleLanguagePreference).empty()) {
+      if (GetBool(kApp_List_DisplayEnglishTitles)) {
+        Set(kApp_List_TitleLanguagePreference, L"english");
+      } else {
+        Set(kApp_List_TitleLanguagePreference, L"romaji");
+      }
+    }
+  }
+
   return true;
 }
 

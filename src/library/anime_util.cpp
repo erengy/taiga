@@ -911,11 +911,32 @@ void IncrementEpisode(int anime_id) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-const std::wstring& GetPreferredTitle(const Item& item) {
-  if (Settings.GetBool(taiga::kApp_List_DisplayEnglishTitles)) {
-    return item.GetEnglishTitle(true);
+int GetTitleLanguagePreferenceIndex(const std::wstring& str) {
+  if (str == L"english") return 1;
+  if (str == L"native") return 2;
+  return 0;  // romaji
+}
+
+std::wstring GetTitleLanguagePreferenceStr(const int index) {
+  switch (index) {
+    default: return L"romaji";
+    case 1: return L"english";
+    case 2: return L"native";
   }
-  return item.GetTitle();
+}
+
+const std::wstring& GetPreferredTitle(const Item& item) {
+  switch (GetTitleLanguagePreferenceIndex(
+      Settings[taiga::kApp_List_TitleLanguagePreference])) {
+    default:
+      return item.GetTitle();
+    case 1:
+      return item.GetEnglishTitle(true);
+    case 2: {
+      const auto& native_title = item.GetJapaneseTitle();
+      return !native_title.empty() ? native_title : item.GetTitle();
+    }
+  }
 }
 
 void GetAllTitles(int anime_id, std::vector<std::wstring>& titles) {

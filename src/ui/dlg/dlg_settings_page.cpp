@@ -183,7 +183,11 @@ BOOL SettingsPage::OnInitDialog() {
       AddComboString(IDC_COMBO_MDLCLICK, L"View anime info");
       AddComboString(IDC_COMBO_MDLCLICK, L"View anime page");
       SetComboSelection(IDC_COMBO_MDLCLICK, Settings.GetInt(taiga::kApp_List_MiddleClickAction));
-      CheckDlgButton(IDC_CHECK_LIST_ENGLISH, Settings.GetBool(taiga::kApp_List_DisplayEnglishTitles));
+      AddComboString(IDC_COMBO_TITLELANG, L"Romaji");
+      AddComboString(IDC_COMBO_TITLELANG, L"English");
+      AddComboString(IDC_COMBO_TITLELANG, L"Native");
+      SetComboSelection(IDC_COMBO_TITLELANG, anime::GetTitleLanguagePreferenceIndex(
+          Settings[taiga::kApp_List_TitleLanguagePreference]));
       bool enabled = Settings.GetBool(taiga::kApp_List_HighlightNewEpisodes);
       CheckDlgButton(IDC_CHECK_HIGHLIGHT, enabled);
       CheckDlgButton(IDC_CHECK_HIGHLIGHT_ONTOP, Settings.GetBool(taiga::kApp_List_DisplayHighlightedOnTop));
