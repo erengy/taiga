@@ -130,6 +130,7 @@ void AppSettings::InitializeMap() {
 
   // Library
   INITKEY(kLibrary_FileSizeThreshold, ToWstr(kDefaultFileSizeThreshold).c_str(), L"anime/folders/scan/minfilesize");
+  INITKEY(kLibrary_MediaPlayerPath, nullptr, L"recognition/mediaplayers/launchpath");
   INITKEY(kLibrary_WatchFolders, L"true", L"anime/folders/watch/enabled");
 
   // Application

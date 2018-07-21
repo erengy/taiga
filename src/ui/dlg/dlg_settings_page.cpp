@@ -440,6 +440,7 @@ BOOL SettingsPage::OnInitDialog() {
         {taiga::kApp_Connection_ReuseActive, {L"", L"Application / Reuse active connections"}},
         {taiga::kApp_Interface_Theme, {L"", L"Application / UI theme"}},
         {taiga::kLibrary_FileSizeThreshold, {L"", L"Library / File size threshold"}},
+        {taiga::kLibrary_MediaPlayerPath, {L"", L"Library / Media player path"}},
         {taiga::kRecognition_IgnoredStrings, {L"", L"Recognition / Ignored strings"}},
         {taiga::kRecognition_LookupParentDirectories, {L"", L"Recognition / Look up parent directories"}},
         {taiga::kRecognition_DetectionInterval, {L"", L"Recognition / Media detection interval"}},

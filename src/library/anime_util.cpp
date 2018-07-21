@@ -256,11 +256,15 @@ bool PlayEpisode(int anime_id, int number) {
   if (file_path.empty()) {
     ui::ChangeStatusText(L"Could not find episode #{} ({})."_format(
                          number, GetPreferredTitle(*anime_item)));
-  } else {
-    Execute(file_path);
+    return false;
   }
 
-  return !file_path.empty();
+  const auto player_path = Settings[taiga::kLibrary_MediaPlayerPath];
+  if (player_path.empty()) {
+    return Execute(file_path);
+  } else {
+    return Execute(player_path, LR"("{}")"_format(file_path));
+  }
 }
 
 bool PlayLastEpisode(int anime_id) {

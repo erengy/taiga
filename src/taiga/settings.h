@@ -58,6 +58,7 @@ enum AppSettingName {
 
   // Library
   kLibrary_FileSizeThreshold,
+  kLibrary_MediaPlayerPath,
   kLibrary_WatchFolders,
 
   // Application
