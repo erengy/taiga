@@ -470,6 +470,13 @@ int Service::ParseMediaObject(const Json& json) const {
       anime_item.InsertSynonym(StrToWstr(synonym));
   }
 
+  std::vector<std::wstring> studios;
+  for (const auto& edge : json["studios"]["edges"]) {
+    studios.push_back(StrToWstr(JsonReadStr(edge["node"], "name")));
+  }
+  RemoveEmptyStrings(studios);
+  anime_item.SetProducers(studios);
+
   return AnimeDatabase.UpdateItem(anime_item);
 }
 
@@ -621,7 +628,8 @@ coverImage { large }
 genres
 synonyms
 averageScore
-popularity)";
+popularity
+studios { edges { node { name } } })";
 }
 
 std::wstring Service::GetMediaListFields() const {
