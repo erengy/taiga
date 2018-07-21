@@ -159,7 +159,8 @@ void SeasonDialog::OnContextMenu(HWND hwnd, POINT pt) {
       ui::Menus.UpdateSeasonList(!is_in_list);
       auto action = ui::Menus.Show(DlgMain.GetWindowHandle(), pt.x, pt.y, L"SeasonList");
       bool multi_id = StartsWith(action, L"AddToList") ||
-                      StartsWith(action, L"Season_RefreshItemData");
+                      StartsWith(action, L"Season_RefreshItemData") ||
+                      StartsWith(action, L"ViewAnimePage");
       ExecuteAction(action, TRUE, multi_id ? reinterpret_cast<LPARAM>(&anime_ids) : anime_id);
       list_.RedrawWindow();
     }

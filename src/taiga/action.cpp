@@ -136,19 +136,30 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
 
   // ViewAnimePage
   //   Opens up anime page on the active service.
-  //   lParam is an anime ID.
+  //   wParam is a BOOL value that defines lParam.
+  //   lParam is an anime ID, or a pointer to a vector of anime IDs.
   } else if (action == L"ViewAnimePage") {
-    int anime_id = static_cast<int>(lParam);
-    switch (taiga::GetCurrentServiceId()) {
-      case sync::kMyAnimeList:
-        sync::myanimelist::ViewAnimePage(anime_id);
-        break;
-      case sync::kKitsu:
-        sync::kitsu::ViewAnimePage(anime_id);
-        break;
-      case sync::kAniList:
-        sync::anilist::ViewAnimePage(anime_id);
-        break;
+    const auto view_anime_page = [](const int anime_id) {
+      switch (taiga::GetCurrentServiceId()) {
+        case sync::kMyAnimeList:
+          sync::myanimelist::ViewAnimePage(anime_id);
+          break;
+        case sync::kKitsu:
+          sync::kitsu::ViewAnimePage(anime_id);
+          break;
+        case sync::kAniList:
+          sync::anilist::ViewAnimePage(anime_id);
+          break;
+      }
+    };
+    if (!wParam) {
+      const int anime_id = static_cast<int>(lParam);
+      view_anime_page(anime_id);
+    } else {
+      const auto& anime_ids = *reinterpret_cast<std::vector<int>*>(lParam);
+      for (const auto anime_id : anime_ids) {
+        view_anime_page(anime_id);
+      }
     }
 
   // ViewUpcomingAnime
