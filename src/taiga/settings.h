@@ -46,18 +46,15 @@ enum AppSettingName {
   kSync_AutoOnStart,
   kSync_Service_Mal_Username,
   kSync_Service_Mal_Password,
-  kSync_Service_Mal_UseHttps,
   kSync_Service_Kitsu_DisplayName,
   kSync_Service_Kitsu_Email,
   kSync_Service_Kitsu_Username,
   kSync_Service_Kitsu_Password,
   kSync_Service_Kitsu_PartialLibrary,
   kSync_Service_Kitsu_RatingSystem,
-  kSync_Service_Kitsu_UseHttps,
   kSync_Service_AniList_Username,
   kSync_Service_AniList_RatingSystem,
   kSync_Service_AniList_Token,
-  kSync_Service_AniList_UseHttps,
 
   // Library
   kLibrary_FileSizeThreshold,

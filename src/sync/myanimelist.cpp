@@ -45,9 +45,7 @@ Service::Service() {
 
 void Service::BuildRequest(Request& request, HttpRequest& http_request) {
   http_request.url.host = host_;
-
-  if (Settings.GetBool(taiga::kSync_Service_Mal_UseHttps))
-    http_request.url.protocol = base::http::Protocol::Https;
+  http_request.url.protocol = base::http::Protocol::Https;
 
   // This doesn't quite help; MAL returns whatever it pleases
   http_request.header[L"Accept"] = L"text/xml, text/*";

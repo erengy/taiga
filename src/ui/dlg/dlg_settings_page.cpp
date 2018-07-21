@@ -444,8 +444,6 @@ BOOL SettingsPage::OnInitDialog() {
         {taiga::kRecognition_LookupParentDirectories, {L"", L"Recognition / Look up parent directories"}},
         {taiga::kRecognition_DetectionInterval, {L"", L"Recognition / Media detection interval"}},
         {taiga::kSync_Service_Kitsu_PartialLibrary, {L"", L"Services / Kitsu / Download partial library"}},
-        {taiga::kSync_Service_Kitsu_UseHttps, {L"", L"Services / Kitsu / Use HTTPS connections"}},
-        {taiga::kSync_Service_Mal_UseHttps, {L"", L"Services / MyAnimeList / Use HTTPS connections"}},
         {taiga::kTorrent_Filter_ArchiveMaxCount, {L"", L"Torrents / Archive limit"}},
         {taiga::kTorrent_Download_UseMagnet, {L"", L"Torrents / Use magnet links if available"}},
       });

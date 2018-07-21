@@ -44,10 +44,8 @@ Service::Service() {
 
 void Service::BuildRequest(Request& request, HttpRequest& http_request) {
   http_request.url.host = host_;
+  http_request.url.protocol = base::http::Protocol::Https;
   http_request.method = L"POST";
-
-  if (Settings.GetBool(taiga::kSync_Service_AniList_UseHttps))
-    http_request.url.protocol = base::http::Protocol::Https;
 
   http_request.header[L"Accept"] = L"application/json";
   http_request.header[L"Accept-Charset"] = L"utf-8";

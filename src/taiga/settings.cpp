@@ -118,18 +118,15 @@ void AppSettings::InitializeMap() {
   INITKEY(kSync_AutoOnStart, nullptr, L"account/myanimelist/login");
   INITKEY(kSync_Service_Mal_Username, nullptr, L"account/myanimelist/username");
   INITKEY(kSync_Service_Mal_Password, nullptr, L"account/myanimelist/password");
-  INITKEY(kSync_Service_Mal_UseHttps, L"true", L"account/myanimelist/https");
   INITKEY(kSync_Service_Kitsu_DisplayName, nullptr, L"account/kitsu/displayname");
   INITKEY(kSync_Service_Kitsu_Email, nullptr, L"account/kitsu/email");
   INITKEY(kSync_Service_Kitsu_Username, nullptr, L"account/kitsu/username");
   INITKEY(kSync_Service_Kitsu_Password, nullptr, L"account/kitsu/password");
   INITKEY(kSync_Service_Kitsu_PartialLibrary, L"true", L"account/kitsu/partiallibrary");
   INITKEY(kSync_Service_Kitsu_RatingSystem, L"regular", L"account/kitsu/ratingsystem");
-  INITKEY(kSync_Service_Kitsu_UseHttps, L"true", L"account/kitsu/https");
   INITKEY(kSync_Service_AniList_Username, nullptr, L"account/anilist/username");
   INITKEY(kSync_Service_AniList_RatingSystem, L"POINT_10", L"account/anilist/ratingsystem");
   INITKEY(kSync_Service_AniList_Token, nullptr, L"account/anilist/token");
-  INITKEY(kSync_Service_AniList_UseHttps, L"true", L"account/anilist/https");
 
   // Library
   INITKEY(kLibrary_FileSizeThreshold, ToWstr(kDefaultFileSizeThreshold).c_str(), L"anime/folders/scan/minfilesize");
