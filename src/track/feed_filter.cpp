@@ -55,8 +55,7 @@ bool EvaluateCondition(const FeedFilterCondition& condition,
       is_numeric = true;
       break;
     case kFeedFilterElement_Meta_Id:
-      if (anime)
-        element = ToWstr(anime->GetId());
+      element = ToWstr(anime ? anime->GetId() : anime::ID_UNKNOWN);
       is_numeric = true;
       break;
     case kFeedFilterElement_Episode_Title:
@@ -76,13 +75,11 @@ bool EvaluateCondition(const FeedFilterCondition& condition,
       is_numeric = true;
       break;
     case kFeedFilterElement_Meta_Status:
-      if (anime)
-        element = ToWstr(anime->GetAiringStatus());
+      element = ToWstr(anime ? anime->GetAiringStatus() : anime::kUnknownStatus);
       is_numeric = true;
       break;
     case kFeedFilterElement_Meta_Type:
-      if (anime)
-        element = ToWstr(anime->GetType());
+      element = ToWstr(anime ? anime->GetType() : anime::kUnknownType);
       is_numeric = true;
       break;
     case kFeedFilterElement_User_Status:
