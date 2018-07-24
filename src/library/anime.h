@@ -109,6 +109,7 @@ class LocalInformation {
   int last_aired_episode;
   std::vector<bool> available_episodes;
   std::wstring next_episode_path;
+  time_t next_episode_time;
   std::wstring folder;
   std::vector<std::wstring> synonyms;
   bool playing;

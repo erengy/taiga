@@ -380,6 +380,14 @@ int Database::UpdateItem(const Item& new_item) {
     item->SetMyNotes(new_item.GetMyNotes(false));
   }
 
+  // Update local information
+  {
+    if (new_item.GetLastAiredEpisodeNumber())
+      item->SetLastAiredEpisodeNumber(new_item.GetLastAiredEpisodeNumber());
+    if (new_item.GetNextEpisodeTime())
+      item->SetNextEpisodeTime(new_item.GetNextEpisodeTime());
+  }
+
   return item->GetId();
 }
 

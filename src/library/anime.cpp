@@ -32,6 +32,7 @@ MyInformation::MyInformation()
 LocalInformation::LocalInformation()
     : last_aired_episode(0),
       playing(false),
+      next_episode_time(0),
       use_alternative(false) {
 }
 

@@ -609,6 +609,10 @@ const std::wstring& Item::GetNextEpisodePath() const {
   return local_info_.next_episode_path;
 }
 
+time_t Item::GetNextEpisodeTime() const {
+  return local_info_.next_episode_time;
+}
+
 bool Item::GetPlaying() const {
   return local_info_.playing;
 }
@@ -661,6 +665,10 @@ void Item::SetLastAiredEpisodeNumber(int number) {
 
 void Item::SetNextEpisodePath(const std::wstring& path) {
   local_info_.next_episode_path = path;
+}
+
+void Item::SetNextEpisodeTime(const time_t time) {
+  local_info_.next_episode_time = time;
 }
 
 void Item::SetPlaying(bool playing) {

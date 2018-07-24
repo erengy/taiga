@@ -477,6 +477,15 @@ int Service::ParseMediaObject(const Json& json) const {
   RemoveEmptyStrings(studios);
   anime_item.SetProducers(studios);
 
+  const auto& next_airing_episode = json["nextAiringEpisode"];
+  if (!next_airing_episode.is_null()) {
+    anime_item.SetNextEpisodeTime(JsonReadInt(next_airing_episode, "airingAt"));
+    const int episode_number = JsonReadInt(next_airing_episode, "episode");
+    if (episode_number > 0) {
+      anime_item.SetLastAiredEpisodeNumber(episode_number - 1);
+    }
+  }
+
   return AnimeDatabase.UpdateItem(anime_item);
 }
 
@@ -629,7 +638,8 @@ genres
 synonyms
 averageScore
 popularity
-studios { edges { node { name } } })";
+studios { edges { node { name } } }
+nextAiringEpisode { airingAt episode })";
 }
 
 std::wstring Service::GetMediaListFields() const {
