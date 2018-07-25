@@ -128,8 +128,8 @@ QWORD GetFolderSize(const std::wstring& path, bool recursive) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool Execute(const std::wstring& path, const std::wstring& parameters,
-             int show_command) {
+static bool ShellExecute(const std::wstring& verb, const std::wstring& path,
+                         const std::wstring& parameters, int show_command) {
   if (path.empty())
     return false;
 
@@ -139,7 +139,7 @@ bool Execute(const std::wstring& path, const std::wstring& parameters,
   SHELLEXECUTEINFO info = {0};
   info.cbSize = sizeof(SHELLEXECUTEINFO);
   info.fMask = SEE_MASK_NOASYNC | SEE_MASK_FLAG_NO_UI;
-  info.lpVerb = L"open";
+  info.lpVerb = verb.empty() ? nullptr : verb.c_str();
   info.lpFile = path.c_str();
   info.lpParameters = parameters.empty() ? nullptr : parameters.c_str();
   info.nShow = show_command;
@@ -147,16 +147,21 @@ bool Execute(const std::wstring& path, const std::wstring& parameters,
   if (::ShellExecuteEx(&info) != TRUE) {
     auto error_message = win::FormatError(::GetLastError());
     TrimRight(error_message, L"\r\n");
-    LOGE(L"ShellExecuteEx failed: {}\nPath: {}\nParameters: {}",
-         error_message, path, parameters);
+    LOGE(L"ShellExecuteEx failed: {}\nVerb: {}\nPath: {}\nParameters: {}",
+         error_message, verb, path, parameters);
     return false;
   }
 
   return true;
 }
 
-void ExecuteLink(const std::wstring& link) {
-  ShellExecute(nullptr, nullptr, link.c_str(), nullptr, nullptr, SW_SHOWNORMAL);
+bool Execute(const std::wstring& path, const std::wstring& parameters,
+             int show_command) {
+  return ShellExecute(L"open", path, parameters, show_command);
+}
+
+bool ExecuteLink(const std::wstring& link) {
+  return ShellExecute({}, link, {}, SW_SHOWNORMAL);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
