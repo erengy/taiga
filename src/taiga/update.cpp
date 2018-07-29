@@ -49,6 +49,7 @@ void UpdateHelper::Check() {
   const std::wstring method = ui::DlgMain.IsWindow() ? L"manual" : L"auto";
 
   HttpRequest http_request;
+  http_request.url.protocol = base::http::Protocol::Https;
   http_request.url.host = L"taiga.moe";
   http_request.url.path = L"/update.php";
   http_request.url.query[L"channel"] = channel;

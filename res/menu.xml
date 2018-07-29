@@ -93,7 +93,7 @@
 	<!-- Help -->
 	<menu name="Help">
 		<item name="About Taiga" action="About()"/>
-		<item name="Support&#9;F1" action="URL(http://taiga.moe/#support)"/>
+		<item name="Support&#9;F1" action="URL(https://taiga.moe/#support)"/>
 		<item type="separator"/>
 		<item name="Check for updates" action="CheckUpdates()"/>
 	</menu>

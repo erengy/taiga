@@ -454,7 +454,7 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
         }
         // Help
         case VK_F1: {
-          ExecuteLink(L"http://taiga.moe/#support");
+          ExecuteLink(L"https://taiga.moe/#support");
           return TRUE;
         }
         // Various

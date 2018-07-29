@@ -15,7 +15,7 @@
 !define PRODUCT_NAME "Taiga"
 !define PRODUCT_PUBLISHER "erengy"
 !define PRODUCT_VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}"
-!define PRODUCT_WEBSITE "http://taiga.moe"
+!define PRODUCT_WEBSITE "https://taiga.moe"
 
 ; Version information
 VIAddVersionKey "CompanyName" "${PRODUCT_PUBLISHER}"
