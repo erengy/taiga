@@ -71,6 +71,15 @@ static const std::vector<StreamData> stream_data{
     ),
     std::regex("Crunchyroll - Watch (?:(.+) - (?:Movie - Movie|ONA - ONA|OVA - OVA)|(.+))"),
   },
+  // Funimation
+  {
+    Stream::Funimation,
+    taiga::kStream_Funimation,
+    L"Funimation",
+    L"https://www.funimation.com",
+    std::regex("funimation\\.com/shows/[^/]+/[^/]+/"),
+    std::regex("(?:Watch )?(.+) Anime.* (?:on|-) Funimation"),
+  },
   // HIDIVE
   {
     Stream::Hidive,
