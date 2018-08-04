@@ -618,8 +618,13 @@ void AnimeListDialog::ListView::RefreshItem(int index) {
           AppendString(text, L"Missing: " + missing_text);
         }
 
-        if (!anime::IsFinishedAiring(*anime_item) &&
-            eps_aired_estimated > anime_item->GetMyLastWatchedEpisode()) {
+        if (anime_item->GetNextEpisodeTime()) {
+          const auto next_episode_number = anime_item->GetLastAiredEpisodeNumber() + 1;
+          const auto next_episode_time = GetAbsoluteTimeString(
+              GetLocalTimeFromGmt(anime_item->GetNextEpisodeTime()), "%A %H:%M");
+          AppendString(text, L"Episode #{} airing {}"_format(next_episode_number, next_episode_time), L"\r\n");
+        } else if (!anime::IsFinishedAiring(*anime_item) &&
+                   eps_aired_estimated > anime_item->GetMyLastWatchedEpisode()) {
           AppendString(text, L"Aired: #{} (estimated)"_format(eps_aired_estimated), L"\r\n");
         }
 

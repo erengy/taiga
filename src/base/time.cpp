@@ -310,7 +310,7 @@ std::wstring ConvertRfc822ToLocal(const std::wstring& datetime) {
   return result_with_tz;
 }
 
-std::wstring GetAbsoluteTimeString(time_t unix_time) {
+std::wstring GetAbsoluteTimeString(time_t unix_time, const char* format) {
   std::tm tm;
 
   if (!unix_time || localtime_s(&tm, &unix_time))
@@ -324,6 +324,10 @@ std::wstring GetAbsoluteTimeString(time_t unix_time) {
     std::strftime(&result.at(0), result.size(), format, &tm);
     return StrToWstr(result);
   };
+
+  if (format) {
+    return strftime(format);
+  }
 
   if (1900 + tm.tm_year < today.year()) {
     return strftime("%d %B %Y");  // 01 January 2014
@@ -421,6 +425,13 @@ std::wstring GetTime(LPCWSTR format) {
   WCHAR buff[32];
   GetTimeFormat(LOCALE_SYSTEM_DEFAULT, 0, NULL, format, buff, 32);
   return buff;
+}
+
+time_t GetLocalTimeFromGmt(const time_t gmt) {
+  TIME_ZONE_INFORMATION time_zone_info = {0};
+  const auto time_zone_id = GetTimeZoneInformation(&time_zone_info);
+  const auto bias_minutes = time_zone_info.Bias + time_zone_info.DaylightBias;
+  return gmt - (bias_minutes * 60);
 }
 
 Date GetDateJapan() {

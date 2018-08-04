@@ -92,7 +92,7 @@ private:
   seconds_t seconds_;
 };
 
-std::wstring GetAbsoluteTimeString(time_t unix_time);
+std::wstring GetAbsoluteTimeString(time_t unix_time, const char* format = nullptr);
 std::wstring GetRelativeTimeString(time_t unix_time, bool append_suffix);
 
 time_t ConvertIso8601(const std::wstring& datetime);
@@ -104,6 +104,8 @@ void GetSystemTime(SYSTEMTIME& st, int utc_offset = 0);
 Date GetDate();
 Date GetDate(time_t unix_time);
 std::wstring GetTime(LPCWSTR format = L"HH':'mm':'ss");
+
+time_t GetLocalTimeFromGmt(const time_t gmt);
 
 Date GetDateJapan();
 std::wstring GetTimeJapan(LPCWSTR format = L"HH':'mm':'ss");
