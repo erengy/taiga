@@ -226,8 +226,10 @@ void HistoryQueue::Merge(bool save) {
 
   ui::OnHistoryChange();
 
-  if (save)
+  if (save) {
     history->Save();
+    AnimeDatabase.SaveList();
+  }
 }
 
 bool HistoryQueue::IsQueued(int anime_id) const {
