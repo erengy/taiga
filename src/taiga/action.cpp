@@ -305,6 +305,18 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
     if (ui::OnHistoryClear())
       History.Clear();
 
+  // ClearQueue()
+  //   Deletes or merges all queued updates.
+  } else if (action == L"ClearQueue") {
+    switch (ui::OnHistoryQueueClear()) {
+      case IDYES:  // Delete
+        History.queue.Clear();
+        break;
+      case IDNO:   // Merge
+        History.queue.Merge();
+        break;
+    }
+
   //////////////////////////////////////////////////////////////////////////////
   // Tracker
 

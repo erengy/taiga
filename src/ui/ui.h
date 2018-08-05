@@ -87,6 +87,7 @@ bool OnLibraryEntriesEditNotes(const std::vector<int> ids, std::wstring& notes);
 void OnHistoryAddItem(const HistoryItem& history_item);
 void OnHistoryChange(const HistoryItem* history_item = nullptr);
 bool OnHistoryClear();
+int OnHistoryQueueClear();
 int OnHistoryProcessConfirmationQueue(anime::Episode& episode);
 
 void OnAnimeDelete(int id, const string_t& title);

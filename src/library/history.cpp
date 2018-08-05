@@ -218,6 +218,18 @@ void HistoryQueue::Clear(bool save) {
     history->Save();
 }
 
+void HistoryQueue::Merge(bool save) {
+  while (auto history_item = GetCurrentItem()) {
+    AnimeDatabase.UpdateItem(*history_item);
+    History.queue.Remove(index, false, true, true);
+  }
+
+  ui::OnHistoryChange();
+
+  if (save)
+    history->Save();
+}
+
 bool HistoryQueue::IsQueued(int anime_id) const {
   for (const auto& item : items) {
     if (item.anime_id == anime_id)

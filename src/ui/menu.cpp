@@ -274,6 +274,10 @@ void MenuList::UpdateHistoryList(bool enabled) {
       if (item.action == L"Info()" ||
           item.action == L"Delete()") {
         item.enabled = enabled;
+      } else if (item.action == L"ClearHistory()") {
+        item.enabled = !History.items.empty();
+      } else if (item.action == L"ClearQueue()") {
+        item.enabled = History.queue.GetItemCount() && !History.queue.updating;
       }
     }
   }

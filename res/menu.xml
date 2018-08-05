@@ -227,6 +227,7 @@
 		<item name="Delete&#9;Del" action="Delete()"/>
 		<item type="separator"/>
 		<item name="Clear history..." action="ClearHistory()"/>
+		<item name="Clear queue..." action="ClearQueue()"/>
 	</menu>
 	
 	<!-- Season browser -->

@@ -644,11 +644,6 @@ void Database::UpdateItem(const HistoryItem& history_item) {
   if (history_item.mode != taiga::kHttpServiceDeleteLibraryEntry)
     anime::SetMyLastUpdateToNow(*anime_item);
 
-  SaveList();
-
-  History.queue.Remove();
-  History.queue.Check(false);
-
   ui::OnLibraryEntryChange(history_item.anime_id);
 }
 

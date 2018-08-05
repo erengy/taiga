@@ -559,6 +559,22 @@ bool OnHistoryClear() {
   return dlg.GetSelectedButtonID() == IDYES;
 }
 
+int OnHistoryQueueClear() {
+  win::TaskDialog dlg(L"Clear Queue", TD_ICON_INFORMATION);
+  dlg.SetMainInstruction(L"Do you want to clear your update queue?");
+  const std::wstring content = L"Queued updates will not be sent to {}."_format(
+      taiga::GetCurrentService()->name());
+  dlg.SetContent(content.c_str());
+
+  dlg.UseCommandLinks(true);
+  dlg.AddButton(L"Delete", IDYES);
+  dlg.AddButton(L"Merge", IDNO);
+  dlg.AddButton(L"Cancel", IDCANCEL);
+
+  dlg.Show(DlgMain.GetWindowHandle());
+  return dlg.GetSelectedButtonID();
+}
+
 int OnHistoryProcessConfirmationQueue(anime::Episode& episode) {
   auto anime_item = AnimeDatabase.FindItem(episode.anime_id);
 

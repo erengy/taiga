@@ -317,9 +317,13 @@ void Manager::HandleResponse(Response& response, HttpResponse& http_response) {
       History.queue.updating = false;
       ui::ClearStatusText();
 
-      auto history_item = History.queue.GetCurrentItem();
-      if (history_item)
+      const auto history_item = History.queue.GetCurrentItem();
+      if (history_item) {
         AnimeDatabase.UpdateItem(*history_item);
+        AnimeDatabase.SaveList();
+        History.queue.Remove();
+        History.queue.Check(false);
+      }
 
       break;
     }
