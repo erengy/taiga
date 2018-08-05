@@ -74,6 +74,7 @@ public:
   void Add(HistoryItem& item, bool save = true);
   void Check(bool automatic = true);
   void Clear(bool save = true);
+  bool IsQueued(int anime_id) const;
   HistoryItem* FindItem(int anime_id, QueueSearch search_mode);
   HistoryItem* GetCurrentItem();
   int GetItemCount();

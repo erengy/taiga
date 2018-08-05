@@ -218,6 +218,14 @@ void HistoryQueue::Clear(bool save) {
     history->Save();
 }
 
+bool HistoryQueue::IsQueued(int anime_id) const {
+  for (const auto& item : items) {
+    if (item.anime_id == anime_id)
+      return true;
+  }
+  return false;
+}
+
 HistoryItem* HistoryQueue::FindItem(int anime_id, QueueSearch search_mode) {
   for (auto it = items.rbegin(); it != items.rend(); ++it) {
     if (it->anime_id == anime_id && it->enabled) {

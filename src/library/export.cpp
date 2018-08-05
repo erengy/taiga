@@ -28,6 +28,7 @@
 #include "library/anime_item.h"
 #include "library/anime_util.h"
 #include "library/export.h"
+#include "library/history.h"
 #include "sync/myanimelist_types.h"
 #include "sync/myanimelist_util.h"
 #include "taiga/settings.h"
@@ -118,7 +119,7 @@ bool ExportAsMalXml(const std::wstring& path) {
       XmlWriteStrValue(node, L"my_tags", item.GetMyTags().c_str(), pugi::node_cdata);
       XmlWriteIntValue(node, L"my_rewatching", item.GetMyRewatching());
       XmlWriteIntValue(node, L"my_rewatching_ep", item.GetMyRewatchingEp());
-      XmlWriteIntValue(node, L"update_on_import", 0);
+      XmlWriteIntValue(node, L"update_on_import", History.queue.IsQueued(item.GetId()));
     }
   }
 
