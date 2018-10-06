@@ -149,6 +149,9 @@ std::vector<anisthesia::Player> GetEnabledPlayers(
 bool GetTitleFromDefaultPlayer(const std::vector<anisthesia::Media>& media,
                                std::wstring& title) {
   bool invalid_file = false;
+  const bool check_library_folders =
+      Settings.GetBool(taiga::kSync_Update_OutOfRoot) &&
+      !Settings.library_folders.empty();
 
   for (const auto& item : media) {
     for (const auto& information : item.information) {
@@ -159,15 +162,17 @@ bool GetTitleFromDefaultPlayer(const std::vector<anisthesia::Media>& media,
           value = GetNormalizedPath(value);
           const auto file_extension = GetFileExtension(value);
 
+          // Invalid path
+          if (check_library_folders && !anime::IsInsideLibraryFolders(value)) {
+            if (Meow.IsValidFileExtension(file_extension) ||
+                Meow.IsAudioFileExtension(file_extension)) {
+              invalid_file = true;
+            }
+            continue;
+          }
+
           // Video file
           if (Meow.IsValidFileExtension(file_extension)) {
-            // Invalid path
-            if (Settings.GetBool(taiga::kSync_Update_OutOfRoot) &&
-                !Settings.library_folders.empty() &&
-                !anime::IsInsideLibraryFolders(value)) {
-              invalid_file = true;
-              continue;
-            }
             // Invalid type
             if (!Meow.IsValidAnimeType(value)) {
               invalid_file = true;
