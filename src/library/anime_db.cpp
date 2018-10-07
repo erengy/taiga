@@ -246,7 +246,7 @@ bool Database::DeleteItem(int id) {
 
   auto anime_item = FindItem(id, false);
   if (anime_item)
-    title = anime_item->GetTitle();
+    title = anime::GetPreferredTitle(*anime_item);
 
   if (items.erase(id) > 0) {
     LOGW(L"ID: {} | Title: {}", id, title);
@@ -585,7 +585,7 @@ bool Database::DeleteListItem(int anime_id) {
 
   anime_item->RemoveFromUserList();
 
-  ui::ChangeStatusText(L"Item deleted. (" + anime_item->GetTitle() + L")");
+  ui::ChangeStatusText(L"Item deleted. (" + anime::GetPreferredTitle(*anime_item) + L")");
   ui::OnLibraryEntryDelete(anime_item->GetId());
 
   if (CurrentEpisode.anime_id == anime_id)

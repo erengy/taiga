@@ -217,7 +217,7 @@ void TorrentDialog::OnContextMenu(HWND hwnd, POINT pt) {
       }
       Aggregator.filter_manager.AddFilter(
           kFeedFilterActionDiscard, kFeedFilterMatchAll, kFeedFilterOptionDefault,
-          true, L"Discard \"{}\""_format(anime_item->GetTitle()));
+          true, L"Discard \"{}\""_format(anime::GetPreferredTitle(*anime_item)));
       Aggregator.filter_manager.filters.back().AddCondition(
           kFeedFilterElement_Meta_Id, kFeedFilterOperator_Equals,
           ToWstr(anime_item->GetId()));

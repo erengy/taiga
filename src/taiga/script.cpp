@@ -372,7 +372,7 @@ std::wstring ReplaceVariables(std::wstring str, const anime::Episode& episode,
       if (pos_end > -1) {
         std::wstring var = str.substr(pos_var + 1, pos_end - pos_var - 1);
         if (IsScriptVariable(var)) {
-          REPLACE(L"title", VALIDATE(ENCODE(anime_item->GetTitle()), ENCODE(episode.anime_title())));
+          REPLACE(L"title", VALIDATE(ENCODE(anime::GetPreferredTitle(*anime_item)), ENCODE(episode.anime_title())));
           REPLACE(L"watched", VALIDATE(ENCODE(anime::TranslateNumber(anime_item->GetMyLastWatchedEpisode(), L"")), L""));
           REPLACE(L"total", VALIDATE(ENCODE(anime::TranslateNumber(anime_item->GetEpisodeCount(), L"")), L""));
           REPLACE(L"score", VALIDATE(ENCODE(anime::TranslateMyScore(anime_item->GetMyScore(), L"")), L""));

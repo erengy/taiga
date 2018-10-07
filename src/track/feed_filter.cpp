@@ -869,7 +869,7 @@ std::wstring FeedFilterManager::TranslateValue(
       } else {
         auto anime_item = AnimeDatabase.FindItem(ToInt(condition.value));
         if (anime_item) {
-          return condition.value + L" (" + anime_item->GetTitle() + L")";
+          return condition.value + L" (" + anime::GetPreferredTitle(*anime_item) + L")";
         } else {
           return condition.value + L" (?)";
         }
