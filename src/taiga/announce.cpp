@@ -121,8 +121,6 @@ void Announcer::Do(int modes, anime::Episode* episode, bool force) {
 ////////////////////////////////////////////////////////////////////////////////
 // Discord
 
-constexpr auto kDiscordApplicationId = "379871385176244224";
-
 Discord::~Discord() {
   ClearPresence();
   Shutdown();
@@ -134,7 +132,9 @@ void Discord::Initialize() const {
   handlers.disconnected = OnDisconnected;
   handlers.errored = OnError;
 
-  Discord_Initialize(kDiscordApplicationId, &handlers, FALSE, nullptr);
+  const auto application_id = WstrToStr(Settings[kShare_Discord_ApplicationId]);
+
+  Discord_Initialize(application_id.c_str(), &handlers, FALSE, nullptr);
 }
 
 void Discord::Shutdown() const {

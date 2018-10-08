@@ -445,6 +445,7 @@ BOOL SettingsPage::OnInitDialog() {
         {taiga::kRecognition_LookupParentDirectories, {L"", L"Recognition / Look up parent directories"}},
         {taiga::kRecognition_DetectionInterval, {L"", L"Recognition / Media detection interval"}},
         {taiga::kSync_Service_Kitsu_PartialLibrary, {L"", L"Services / Kitsu / Download partial library"}},
+        {taiga::kShare_Discord_ApplicationId, {L"", L"Sharing / Discord / Application ID"}},
         {taiga::kTorrent_Filter_ArchiveMaxCount, {L"", L"Torrents / Archive limit"}},
         {taiga::kTorrent_Download_UseMagnet, {L"", L"Torrents / Use magnet links if available"}},
       });

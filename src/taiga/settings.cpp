@@ -193,6 +193,7 @@ void AppSettings::InitializeMap() {
   INITKEY(kStream_Youtube, L"true", L"recognition/streaming/providers/youtube");
 
   // Sharing
+  INITKEY(kShare_Discord_ApplicationId, kDiscordApplicationId, L"announce/discord/applicationid");
   INITKEY(kShare_Discord_Enabled, nullptr, L"announce/discord/enabled");
   INITKEY(kShare_Discord_Format_Details, kDefaultFormatDiscordDetails.c_str(), L"announce/discord/formatdetails");
   INITKEY(kShare_Discord_Format_State, kDefaultFormatDiscordState.c_str(), L"announce/discord/formatstate");

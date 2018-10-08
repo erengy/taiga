@@ -56,6 +56,8 @@ private:
 ////////////////////////////////////////////////////////////////////////////////
 // Discord
 
+constexpr auto kDiscordApplicationId = L"379871385176244224";
+
 class Discord {
 public:
   ~Discord();
