@@ -1,0 +1,16 @@
+#---------------------------------#
+#    environment configuration    #
+#---------------------------------#
+
+image: Visual Studio 2017
+
+install:
+  - git submodule update --init --recursive
+  - deps\build.bat 15
+
+#---------------------------------#
+#       build configuration       #
+#---------------------------------#
+
+build_script:
+  - msbuild "project\vs2017\Taiga.sln" /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /m /p:Configuration=Release /p:Platform="Win32"

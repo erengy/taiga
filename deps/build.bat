@@ -59,4 +59,3 @@ xcopy /s ..\builds\libcurl-vc%vc%-x86-release-static-ipv6-sspi-winssl\lib ..\..\
 cd /D %currentdir%
 
 echo Done!
-pause
