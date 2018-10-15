@@ -661,27 +661,27 @@ bool ToBool(const wstring& str) {
 }
 
 double ToDouble(const string& str) {
-  return atof(str.c_str());
+  return std::stod(str);
 }
 
 double ToDouble(const wstring& str) {
-  return _wtof(str.c_str());
+  return std::stod(str);
 }
 
 int ToInt(const string& str) {
-  return atoi(str.c_str());
+  return std::stoi(str);
 }
 
 int ToInt(const wstring& str) {
-  return _wtoi(str.c_str());
+  return std::stoi(str);
 }
 
 UINT64 ToUint64(const std::string& str) {
-  return std::stoull(str.c_str(), nullptr, 10);
+  return std::stoull(str, nullptr, 10);
 }
 
 UINT64 ToUint64(const std::wstring& str) {
-  return std::wcstoull(str.c_str(), nullptr, 10);
+  return std::stoull(str, nullptr, 10);
 }
 
 time_t ToTime(const std::string& str) {
@@ -693,39 +693,27 @@ time_t ToTime(const std::wstring& str) {
 }
 
 string ToStr(const INT& value) {
-  char buffer[65];
-  _ltoa_s(value, buffer, 65, 10);
-  return string(buffer);
+  return std::to_string(value);
 }
 
 wstring ToWstr(const INT& value) {
-  wchar_t buffer[65];
-  _ltow_s(value, buffer, 65, 10);
-  return wstring(buffer);
+  return std::to_wstring(value);
 }
 
 wstring ToWstr(const UINT& value) {
-  wchar_t buffer[65];
-  _ultow_s(value, buffer, 65, 10);
-  return wstring(buffer);
+  return std::to_wstring(value);
 }
 
 wstring ToWstr(const ULONG& value) {
-  wchar_t buffer[65];
-  _ultow_s(value, buffer, 65, 10);
-  return wstring(buffer);
+  return std::to_wstring(value);
 }
 
 wstring ToWstr(const INT64& value) {
-  wchar_t buffer[65];
-  _i64tow_s(value, buffer, 65, 10);
-  return wstring(buffer);
+  return std::to_wstring(value);
 }
 
 wstring ToWstr(const UINT64& value) {
-  wchar_t buffer[65];
-  _ui64tow_s(value, buffer, 65, 10);
-  return wstring(buffer);
+  return std::to_wstring(value);
 }
 
 string ToStr(const double& value, int count) {
