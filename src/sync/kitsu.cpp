@@ -112,6 +112,8 @@ void Service::AuthenticateUser(Request& request, HttpRequest& http_request) {
   // TODO: Register Taiga as a client and get a new ID
   http_request.data[L"client_id"] =
       L"dd031b32d2f56c990b1425efe6c42ad847e7fe3ab46bf1299f05ecd856bdb7dd";
+  http_request.data[L"client_secret"] =
+      L"54d7307928f63414defd96399fc31ba847961ceaecef3a5fd93144e960c0e151";
 
   auto username = request.data[canonical_name_ + L"-email"];
   if (username.empty())
