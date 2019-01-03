@@ -350,7 +350,7 @@ bool PlayRandomAnime() {
       return true;
   }
 
-  ui::OnAnimeEpisodeNotFound();
+  ui::OnAnimeEpisodeNotFound(L"Play Random Episode");
   return false;
 }
 
@@ -372,7 +372,26 @@ bool PlayRandomEpisode(int anime_id) {
       return true;
   }
 
-  ui::OnAnimeEpisodeNotFound();
+  ui::OnAnimeEpisodeNotFound(L"Play Random Episode");
+  return false;
+}
+
+bool StartNewRewatch(int anime_id) {
+  auto anime_item = AnimeDatabase.FindItem(anime_id);
+
+  if (!anime_item)
+    return false;
+
+  anime_item->SetMyStatus(kWatching);
+  anime_item->SetMyRewatching(true);
+  anime_item->SetMyRewatchingEp(0);
+  anime_item->SetMyLastWatchedEpisode(0);
+
+  if (PlayEpisode(anime_item->GetId(), 0)) {
+    return true;
+  }
+
+  ui::OnAnimeEpisodeNotFound(L"Start New Rewatch");
   return false;
 }
 

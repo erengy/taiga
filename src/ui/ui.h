@@ -91,7 +91,7 @@ int OnHistoryQueueClear();
 int OnHistoryProcessConfirmationQueue(anime::Episode& episode);
 
 void OnAnimeDelete(int id, const string_t& title);
-void OnAnimeEpisodeNotFound();
+void OnAnimeEpisodeNotFound(const std::wstring& title);
 bool OnAnimeFolderNotFound();
 void OnAnimeWatchingStart(const anime::Item& anime_item, const anime::Episode& episode);
 void OnAnimeWatchingEnd(const anime::Item& anime_item, const anime::Episode& episode);

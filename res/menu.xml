@@ -128,6 +128,7 @@
 		<item name="Play &amp;last episode"   action="PlayLast()"/>
 		<item name="Play &amp;next episode"   action="PlayNext()"/>
 		<item name="Play &amp;random episode" action="PlayRandom()"/>
+		<item name="Start new rewatch"        action="StartNewRewatch()"/>
 	</menu>
 	<!-- Edit -->
 	<menu name="Edit">
