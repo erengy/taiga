@@ -64,7 +64,7 @@ static const std::vector<StreamData> stream_data{
     L"Crunchyroll",
     L"http://www.crunchyroll.com",
     std::regex(
-      "crunchyroll\\.[a-z.]+/[^/]+/(?:"
+      "crunchyroll\\.[a-z.]+/[^/]+/(?:[^/]+/)?(?:"
         "episode-[0-9]+.*|"
         ".*-(?:movie|ona|ova)"
       ")-[0-9]+"
