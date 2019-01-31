@@ -382,10 +382,12 @@ bool StartNewRewatch(int anime_id) {
   if (!anime_item)
     return false;
 
-  anime_item->SetMyStatus(kWatching);
-  anime_item->SetMyRewatching(true);
-  anime_item->SetMyRewatchingEp(0);
-  anime_item->SetMyLastWatchedEpisode(0);
+  HistoryItem history_item;
+  history_item.anime_id = anime_item->GetId();
+  history_item.status = kWatching;
+  history_item.enable_rewatching = TRUE;
+  history_item.episode = 0;
+  History.queue.Add(history_item);
 
   if (PlayEpisode(anime_item->GetId(), 0)) {
     return true;

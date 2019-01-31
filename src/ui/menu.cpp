@@ -146,7 +146,9 @@ void MenuList::UpdateAnime(const anime::Item* anime_item) {
           menu->CreateItem(L"PlayRandom()", L"Play random episode\tCtrl+R");
         }
         // Start new rewatch
-        if (anime_item->GetMyLastWatchedEpisode() == anime_item->GetEpisodeCount()) {
+        if (anime::IsValidEpisodeCount(anime_item->GetEpisodeCount()) &&
+            anime_item->GetMyLastWatchedEpisode() == anime_item->GetEpisodeCount() &&
+            anime_item->GetMyRewatching() == FALSE) {
           menu->CreateItem(L"StartNewRewatch()", L"Start new rewatch");
         }
         break;
