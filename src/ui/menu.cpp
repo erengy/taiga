@@ -148,7 +148,8 @@ void MenuList::UpdateAnime(const anime::Item* anime_item) {
         // Start new rewatch
         if (anime::IsValidEpisodeCount(anime_item->GetEpisodeCount()) &&
             anime_item->GetMyLastWatchedEpisode() == anime_item->GetEpisodeCount() &&
-            anime_item->GetMyRewatching() == FALSE) {
+            anime_item->GetMyRewatching() == FALSE &&
+            anime_item->GetAiringStatus() == anime::kFinishedAiring) {
           menu->CreateItem(L"StartNewRewatch()", L"Start new rewatch");
         }
         break;
