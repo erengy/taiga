@@ -648,9 +648,9 @@ void OnAnimeDelete(int id, const string_t& title) {
   DlgSeason.RefreshList();
 }
 
-void OnAnimeEpisodeNotFound() {
+void OnAnimeEpisodeNotFound(const std::wstring& title) {
   win::TaskDialog dlg;
-  dlg.SetWindowTitle(L"Play Random Episode");
+  dlg.SetWindowTitle(title.c_str());
   dlg.SetMainIcon(TD_ICON_ERROR);
   dlg.SetMainInstruction(L"Could not find any episode to play.");
   dlg.Show(DlgMain.GetWindowHandle());

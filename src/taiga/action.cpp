@@ -676,6 +676,12 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   } else if (action == L"PlayRandomAnime") {
     anime::PlayRandomAnime();
 
+  // StartNewRewatch()
+  //   Sets status to Currently Watching and plays first episode.
+  } else if (action == L"StartNewRewatch") {
+    int anime_id = static_cast<int>(lParam);
+    anime::StartNewRewatch(anime_id);
+
   //////////////////////////////////////////////////////////////////////////////
 
   // Season_Load(file)

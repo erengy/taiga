@@ -51,6 +51,7 @@ bool PlayNextEpisode(int anime_id);
 bool PlayNextEpisodeOfLastWatchedAnime();
 bool PlayRandomAnime();
 bool PlayRandomEpisode(int anime_id);
+bool StartNewRewatch(int anime_id);
 bool LinkEpisodeToAnime(Episode& episode, int anime_id);
 void StartWatching(Item& item, Episode& episode);
 void EndWatching(Item& item, Episode episode);
