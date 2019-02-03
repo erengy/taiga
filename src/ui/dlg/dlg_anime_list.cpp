@@ -474,6 +474,60 @@ void AnimeListDialog::ListView::SortFromSettings() {
   parent->RebuildIdCache();
 }
 
+std::wstring GetAvailableEpisodesTooltip(const anime::Item& anime_item) {
+  std::wstring text;
+
+  const int eps_aired_estimated = anime::GetLastEpisodeNumber(anime_item);
+  const int eps_available = anime_item.GetAvailableEpisodeCount();
+  const int available_episodes = std::max(eps_aired_estimated, eps_available);
+
+  // Find missing episodes
+  std::vector<int> missing_episodes;
+  for (int i = 1; i <= available_episodes; ++i) {
+    if (!anime_item.IsEpisodeAvailable(i))
+      missing_episodes.push_back(i);
+  }
+  // Collapse episode ranges (e.g. "1|3|4|5" -> "1|3-5")
+  std::vector<std::pair<int, int>> missing_episode_ranges;
+  if (!missing_episodes.empty()) {
+    missing_episode_ranges.push_back({0, 0});
+    for (const auto i : missing_episodes) {
+      auto& current_pair = missing_episode_ranges.back();
+      if (current_pair.first == 0) {
+        current_pair = {i, i};
+      } else if (current_pair.second == i - 1) {
+        current_pair.second = i;
+      } else {
+        missing_episode_ranges.push_back({i, i});
+      }
+    }
+  }
+
+  if (missing_episodes.size() == available_episodes) {
+    AppendString(text, L"All episodes are missing");
+  } else if (missing_episodes.empty()) {
+    AppendString(text, L"All episodes are in library folders");
+  } else {
+    std::wstring missing_text;
+    for (const auto& range : missing_episode_ranges)  {
+      AppendString(missing_text, L"#" + ToWstr(range.first) + (range.second > range.first ?
+                                 L"-" + ToWstr(range.second) : L""));
+    }
+    AppendString(text, L"Missing: " + missing_text);
+  }
+
+  if (anime_item.GetNextEpisodeTime()) {
+    const auto next_episode_number = anime_item.GetLastAiredEpisodeNumber() + 1;
+    const auto next_episode_time = GetAbsoluteTimeString(anime_item.GetNextEpisodeTime(), "%A %H:%M");
+    AppendString(text, L"Episode #{} airing {}"_format(next_episode_number, next_episode_time), L"\r\n");
+  } else if (!anime::IsFinishedAiring(anime_item) &&
+             eps_aired_estimated > anime_item.GetMyLastWatchedEpisode()) {
+    AppendString(text, L"Aired: #{} (estimated)"_format(eps_aired_estimated), L"\r\n");
+  }
+
+  return text;
+}
+
 void AnimeListDialog::ListView::RefreshItem(int index) {
   for (int i = 0; i < 3; i++) {
     button_rect[i].SetEmpty();
@@ -577,56 +631,7 @@ void AnimeListDialog::ListView::RefreshItem(int index) {
         rect_item.right -= button_rect[1].Width();
 
       if (columns[kColumnUserProgress].visible && rect_item.PtIn(pt)) {
-        std::wstring text;
-
-        const int eps_aired_estimated = anime::GetLastEpisodeNumber(*anime_item);
-        const int eps_available = anime_item->GetAvailableEpisodeCount();
-        const int available_episodes = std::max(eps_aired_estimated, eps_available);
-
-        // Find missing episodes
-        std::vector<int> missing_episodes;
-        for (int i = 1; i <= available_episodes; ++i) {
-          if (!anime_item->IsEpisodeAvailable(i))
-            missing_episodes.push_back(i);
-        }
-        // Collapse episode ranges (e.g. "1|3|4|5" -> "1|3-5")
-        std::vector<std::pair<int, int>> missing_episode_ranges;
-        if (!missing_episodes.empty()) {
-          missing_episode_ranges.push_back({0, 0});
-          for (const auto i : missing_episodes) {
-            auto& current_pair = missing_episode_ranges.back();
-            if (current_pair.first == 0) {
-              current_pair = {i, i};
-            } else if (current_pair.second == i - 1) {
-              current_pair.second = i;
-            } else {
-              missing_episode_ranges.push_back({i, i});
-            }
-          }
-        }
-
-        if (missing_episodes.size() == available_episodes) {
-          AppendString(text, L"All episodes are missing");
-        } else if (missing_episodes.empty()) {
-          AppendString(text, L"All episodes are in library folders");
-        } else {
-          std::wstring missing_text;
-          for (const auto& range : missing_episode_ranges)  {
-            AppendString(missing_text, L"#" + ToWstr(range.first) + (range.second > range.first ?
-                                       L"-" + ToWstr(range.second) : L""));
-          }
-          AppendString(text, L"Missing: " + missing_text);
-        }
-
-        if (anime_item->GetNextEpisodeTime()) {
-          const auto next_episode_number = anime_item->GetLastAiredEpisodeNumber() + 1;
-          const auto next_episode_time = GetAbsoluteTimeString(anime_item->GetNextEpisodeTime(), "%A %H:%M");
-          AppendString(text, L"Episode #{} airing {}"_format(next_episode_number, next_episode_time), L"\r\n");
-        } else if (!anime::IsFinishedAiring(*anime_item) &&
-                   eps_aired_estimated > anime_item->GetMyLastWatchedEpisode()) {
-          AppendString(text, L"Aired: #{} (estimated)"_format(eps_aired_estimated), L"\r\n");
-        }
-
+        const std::wstring text = GetAvailableEpisodesTooltip(*anime_item);
         if (!text.empty())
           update_tooltip(kTooltipEpisodeAvailable, text.c_str(), &rect_item);
       }
