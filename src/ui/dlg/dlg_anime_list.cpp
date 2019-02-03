@@ -605,42 +605,38 @@ void AnimeListDialog::ListView::RefreshItem(int index) {
     }
   }
 
-  if (progress_bars_visible &&
-      anime_item->GetMyStatus() != anime::kDropped) {
-    if (anime_item->GetMyStatus() != anime::kCompleted ||
-        anime_item->GetMyRewatching()) {
-      if (columns[kColumnUserProgress].visible) {
-        if (anime_item->GetMyLastWatchedEpisode() > 0)
-          button_visible[0] = true;
-        if (anime_item->GetEpisodeCount() > anime_item->GetMyLastWatchedEpisode() ||
-            !anime::IsValidEpisodeCount(anime_item->GetEpisodeCount()))
-          button_visible[1] = true;
-      }
-
-      win::Rect rect_item;
-      GetSubItemRect(index, columns[kColumnUserProgress].index, &rect_item);
-      rect_item.right -= ScaleX(60);
-      rect_item.Inflate(ScaleX(-4), ScaleY(-4));
-      button_rect[0].Copy(rect_item);
-      button_rect[0].right = button_rect[0].left + rect_item.Height();
-      button_rect[1].Copy(rect_item);
-      button_rect[1].left = button_rect[1].right - rect_item.Height();
-      if (button_visible[0])
-        rect_item.left += button_rect[0].Width();
-      if (button_visible[1])
-        rect_item.right -= button_rect[1].Width();
-
-      if (columns[kColumnUserProgress].visible && rect_item.PtIn(pt)) {
-        const std::wstring text = GetAvailableEpisodesTooltip(*anime_item);
-        if (!text.empty())
-          update_tooltip(kTooltipEpisodeAvailable, text.c_str(), &rect_item);
-      }
-
-      if (button_visible[0] && button_rect[0].PtIn(pt))
-        update_tooltip(kTooltipEpisodeMinus, L"-1 episode", &button_rect[0]);
-      if (button_visible[1] && button_rect[1].PtIn(pt))
-        update_tooltip(kTooltipEpisodePlus, L"+1 episode", &button_rect[1]);
+  if (columns[kColumnUserProgress].visible && progress_bars_visible) {
+    if (anime_item->GetMyStatus() != anime::kDropped &&
+        (anime_item->GetMyStatus() != anime::kCompleted || anime_item->GetMyRewatching())) {
+      if (anime_item->GetMyLastWatchedEpisode() > 0)
+        button_visible[0] = true;
+      if (anime_item->GetEpisodeCount() > anime_item->GetMyLastWatchedEpisode() ||
+          !anime::IsValidEpisodeCount(anime_item->GetEpisodeCount()))
+        button_visible[1] = true;
     }
+
+    win::Rect rect_item;
+    GetSubItemRect(index, columns[kColumnUserProgress].index, &rect_item);
+    rect_item.right -= ScaleX(60);
+    rect_item.Inflate(ScaleX(-4), ScaleY(-4));
+    button_rect[0].Copy(rect_item);
+    button_rect[0].right = button_rect[0].left + rect_item.Height();
+    button_rect[1].Copy(rect_item);
+    button_rect[1].left = button_rect[1].right - rect_item.Height();
+    if (button_visible[0])
+      rect_item.left += button_rect[0].Width();
+    if (button_visible[1])
+      rect_item.right -= button_rect[1].Width();
+
+    if (rect_item.PtIn(pt)) {
+      const std::wstring text = GetAvailableEpisodesTooltip(*anime_item);
+      update_tooltip(kTooltipEpisodeAvailable, text.c_str(), &rect_item);
+    }
+
+    if (button_visible[0] && button_rect[0].PtIn(pt))
+      update_tooltip(kTooltipEpisodeMinus, L"-1 episode", &button_rect[0]);
+    if (button_visible[1] && button_rect[1].PtIn(pt))
+      update_tooltip(kTooltipEpisodePlus, L"+1 episode", &button_rect[1]);
   }
 
   if (columns[kColumnUserRating].visible) {
