@@ -63,13 +63,8 @@ static const std::vector<StreamData> stream_data{
     taiga::kStream_Crunchyroll,
     L"Crunchyroll",
     L"http://www.crunchyroll.com",
-    std::regex(
-      "crunchyroll\\.[a-z.]+/[^/]+/(?:[^/]+/)?(?:"
-        "episode-[0-9]+.*|"
-        ".*-(?:movie|ona|ova)"
-      ")-[0-9]+"
-    ),
-    std::regex("Crunchyroll - Watch (?:(.+) - (?:Movie - Movie|ONA - ONA|OVA - OVA)|(.+))"),
+    std::regex("crunchyroll.[a-z.]+\/[^\/]+\/(?:[^\/]+\/)?(?:episode-[0-9]+.*|.*-(?:movie|ona|ova))-[0-9]+"),
+    std::regex("(?:(.+) (?:(?=- )|Movie - Movie|ONA - ONA|OVA - OVA)|(.+)) - Watch on Crunchyroll"),
   },
   // Funimation
   {
