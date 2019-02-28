@@ -69,7 +69,7 @@ static const std::vector<StreamData> stream_data{
         ".*-(?:movie|ona|ova)"
       ")-[0-9]+"
     ),
-    std::regex("Crunchyroll - Watch (?:(.+) - (?:Movie - Movie|ONA - ONA|OVA - OVA)|(.+))"),
+    std::regex("(.+) - Watch on Crunchyroll"),
   },
   // Funimation
   {
