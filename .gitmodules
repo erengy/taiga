@@ -26,7 +26,7 @@
 	path = deps/src/discord-rpc
 	url = https://github.com/discordapp/discord-rpc.git
 
-  [submodule "fmt"]
+[submodule "fmt"]
 	path = deps/src/fmt
 	url = https://github.com/fmtlib/fmt.git
 
@@ -46,7 +46,7 @@
 	path = deps/src/rapidjson
 	url = https://github.com/Tencent/rapidjson.git
 
-  [submodule "semaver"]
+[submodule "semaver"]
 	path = deps/src/semaver
 	url = https://github.com/erengy/semaver.git
 
