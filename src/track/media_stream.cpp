@@ -129,8 +129,8 @@ static const std::vector<StreamData> stream_data{
     taiga::kStream_Vrv,
     L"VRV",
     L"https://vrv.co",
-    std::regex("vrv\\.co/watch"),
-    std::regex("VRV - Watch (.+)"),
+    std::regex("vrv\\.co/watch/"),
+    std::regex("(.+) - Watch on VRV"),
   },
   // Wakanim
   {
