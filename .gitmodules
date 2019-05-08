@@ -52,7 +52,7 @@
 
 [submodule "utf8proc"]
 	path = deps/src/utf8proc
-	url = https://github.com/erengy/utf8proc.git
+	url = https://github.com/JuliaStrings/utf8proc.git
 
 [submodule "windows"]
 	path = deps/src/windows
