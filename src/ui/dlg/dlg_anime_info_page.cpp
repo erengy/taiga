@@ -194,7 +194,7 @@ void PageSeriesInfo::Refresh(int anime_id, bool connect) {
   switch (taiga::GetCurrentServiceId()) {
     case sync::kKitsu:
       SetDlgItemText(IDC_STATIC_ANIME_DETAILS_NAMES,
-          L"Type:\nEpisodes:\nStatus:\nSeason:\nCategories:\nProducers:\nScore:\nTrailer:");
+          L"Type:\nEpisodes:\nStatus:\nSeason:\nCategories:\nProducers:\nScore:");
       break;
   }
   text = anime::TranslateType(anime_item->GetType()) + L"\n" +
