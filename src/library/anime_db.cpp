@@ -127,7 +127,7 @@ void Database::ReadDatabaseNode(xml_node& database_node) {
     item.SetDateStart(Date(XmlReadStrValue(node, L"date_start")));  // date(0)
     item.SetEpisodeLength(XmlReadIntValue(node, L"episode_length"));  // extent(1)
     item.SetEpisodeCount(XmlReadIntValue(node, L"episode_count"));    // extent(0)
-    item.SetTrailerUrl(XmlReadStrValue(node, L"trailer"));
+    item.SetTrailerUrl(XmlReadStrValue(node, L"trailer"));  // resource(2)
     item.SetSlug(XmlReadStrValue(node, L"slug"));       // resource(1)
     item.SetImageUrl(XmlReadStrValue(node, L"image"));  // resource(0)
   }
@@ -186,7 +186,7 @@ void Database::WriteDatabaseNode(xml_node& database_node) {
     XML_WD(L"date_start", pair.second.GetDateStart());
     XML_WD(L"date_end", pair.second.GetDateEnd());
     XML_WS(L"image", pair.second.GetImageUrl(), pugi::node_pcdata);
-    XML_WS(L"trailer", pair.second.GetTrailer(), pugi::node_pcdata);
+    XML_WS(L"trailer", pair.second.GetTrailerUrl(), pugi::node_pcdata);
     XML_WI(L"age_rating", pair.second.GetAgeRating());
     XML_WS(L"genres", Join(pair.second.GetGenres(), L", "), pugi::node_pcdata);
     XML_WS(L"producers", Join(pair.second.GetProducers(), L", "), pugi::node_pcdata);
@@ -336,6 +336,8 @@ int Database::UpdateItem(const Item& new_item) {
       item->SetDateEnd(new_item.GetDateEnd());
     if (!new_item.GetImageUrl().empty())
       item->SetImageUrl(new_item.GetImageUrl());
+    if (!new_item.GetTrailerUrl().empty())
+      item->SetTrailerUrl(new_item.GetTrailerUrl());
     if (new_item.GetAgeRating() != kUnknownAgeRating)
       item->SetAgeRating(new_item.GetAgeRating());
     if (!new_item.GetGenres().empty())

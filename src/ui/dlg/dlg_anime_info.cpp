@@ -19,6 +19,7 @@
 #include <windows.h>
 #include <uxtheme.h>
 
+#include "base/file.h"
 #include "base/foreach.h"
 #include "base/format.h"
 #include "base/string.h"
@@ -81,6 +82,8 @@ BOOL AnimeDialog::OnInitDialog()
   // Initialize
   sys_link_.Attach(GetDlgItem(IDC_LINK_NOWPLAYING));
   sys_link_.Hide();
+  sys_link_trailer_.Attach(GetDlgItem(IDC_LINK_ANIME_TRAILER));
+  sys_link_trailer_.Hide();
 
   // Initialize tabs
   tab_.Attach(GetDlgItem(IDC_TAB_ANIME));
@@ -237,23 +240,38 @@ LRESULT AnimeDialog::EditTitle::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, 
 
 BOOL AnimeDialog::OnCommand(WPARAM wParam, LPARAM lParam)
 {
-  if (LOWORD(wParam) == IDC_STATIC_ANIME_IMG &&
-      HIWORD(wParam) == STN_CLICKED)
+  switch (LOWORD(wParam))
   {
-    if (anime::IsValidId(anime_id_))
+  case IDC_STATIC_ANIME_IMG:
+    if (HIWORD(wParam) == STN_CLICKED)
     {
-      ExecuteAction(L"ViewAnimePage", 0, anime_id_);
-      return TRUE;
+      if (anime::IsValidId(anime_id_))
+      {
+        ExecuteAction(L"ViewAnimePage", 0, anime_id_);
+        return TRUE;
+      }
     }
-  }
 
-  return FALSE;
+    return FALSE;
+  }
 }
 
 LRESULT AnimeDialog::OnNotify(int idCtrl, LPNMHDR pnmh)
 {
   switch (idCtrl)
   {
+
+  case IDC_LINK_ANIME_TRAILER:
+  {
+
+    if ((pnmh->code == NM_CLICK) &&
+        anime::IsValidId(anime_id_))
+    {
+      auto anime_item = AnimeDatabase.FindItem(anime_id_);
+      ExecuteLink(L"https://youtu.be/{}"_format(anime_item->GetTrailerUrl()));
+      return TRUE;
+    }
+  }
   case IDC_LINK_NOWPLAYING:
   {
     switch (pnmh->code)
@@ -262,6 +280,7 @@ LRESULT AnimeDialog::OnNotify(int idCtrl, LPNMHDR pnmh)
     case NM_CLICK:
     case NM_RETURN:
     {
+
       PNMLINK pNMLink = reinterpret_cast<PNMLINK>(pnmh);
       std::wstring action = pNMLink->item.szUrl;
       if (IsEqual(pNMLink->item.szID, L"menu"))
@@ -652,6 +671,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
     {
       content += L"<a id=\"search\">Search</a> for this title.";
     }
+
     sys_link_.SetText(content);
     for (const auto i : passive_links)
     {
@@ -833,10 +853,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
         status = anime::kWatching;
       content += L"<a href=\"AddToList({})\">Add to list</a>"_format(status);
     }
-    if (anime_item->GetTrailerUrl())
-    {
-      content += L"<a href=\"{}\">Watch Trailer</a>"_format(trailerUrl);
-    }
+
     if (anime_item && mode_ == AnimeDialogMode::NowPlaying)
     {
       content += L" \u2022 <a id=\"menu\" href=\"Announce\">Share</a>";
@@ -852,6 +869,15 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
     sys_link_.SetText(content);
   }
 
+  if (!anime_item->GetTrailerUrl().empty())
+  {
+    sys_link_trailer_.SetText(L"<a id=\"WATCH_TRAILER\">Watch Trailer</a>");
+    sys_link_trailer_.Show();
+  }
+  else
+  {
+    sys_link_trailer_.Hide();
+  }
   // Toggle tabs
   if (anime_item && anime_item->IsInList() &&
       mode_ == AnimeDialogMode::AnimeInformation)

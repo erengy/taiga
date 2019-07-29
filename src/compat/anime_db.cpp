@@ -116,6 +116,7 @@ void Database::ReadDatabaseInCompatibilityMode(xml_document& document) {
     item.SetDateStart(Date(XmlReadStrValue(node, L"series_start")));
     item.SetDateEnd(Date(XmlReadStrValue(node, L"series_end")));
     item.SetImageUrl(XmlReadStrValue(node, L"series_image"));
+    item.SetTrailerUrl(XmlReadStrValue(node, L"trailer"));
     item.SetGenres(XmlReadStrValue(node, L"genres"));
     item.SetProducers(XmlReadStrValue(node, L"producers"));
     item.SetScore(ToDouble(XmlReadStrValue(node, L"score")));
@@ -141,6 +142,7 @@ void Database::ReadListInCompatibilityMode(xml_document& document) {
     anime_item.SetDateStart(XmlReadStrValue(node, L"series_start"));
     anime_item.SetDateEnd(XmlReadStrValue(node, L"series_end"));
     anime_item.SetImageUrl(XmlReadStrValue(node, L"series_image"));
+    anime_item.SetTrailerUrl(XmlReadStrValue(node, L"trailer"));
     anime_item.SetLastModified(0);
 
     anime_item.AddtoUserList();

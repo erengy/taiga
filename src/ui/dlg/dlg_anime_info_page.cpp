@@ -150,6 +150,11 @@ void PageSeriesInfo::OnSize(UINT uMsg, UINT nType, SIZE size) {
       window.GetWindowRect(GetWindowHandle(), &rect_child);
       rect_child.right = rect.right - ScaleX(kControlMargin);
       window.SetPosition(nullptr, rect_child);
+      // Details - Trailer
+      window.SetWindowHandle(GetDlgItem(IDC_LINK_ANIME_TRAILER));
+      window.GetWindowRect(GetWindowHandle(), &rect_child);
+      rect_child.right = rect.right - ScaleX(kControlMargin);
+      window.SetPosition(nullptr, rect_child);
 
       // Synopsis
       window.SetWindowHandle(GetDlgItem(IDC_EDIT_ANIME_SYNOPSIS));
@@ -189,7 +194,7 @@ void PageSeriesInfo::Refresh(int anime_id, bool connect) {
   switch (taiga::GetCurrentServiceId()) {
     case sync::kKitsu:
       SetDlgItemText(IDC_STATIC_ANIME_DETAILS_NAMES,
-          L"Type:\nEpisodes:\nStatus:\nSeason:\nCategories:\nProducers:\nScore:");
+          L"Type:\nEpisodes:\nStatus:\nSeason:\nCategories:\nProducers:\nScore:\nTrailer:");
       break;
   }
   text = anime::TranslateType(anime_item->GetType()) + L"\n" +
@@ -199,6 +204,7 @@ void PageSeriesInfo::Refresh(int anime_id, bool connect) {
          (anime_item->GetGenres().empty() ? L"Unknown" : Join(anime_item->GetGenres(), L", ")) + L"\n" +
          (anime_item->GetProducers().empty() ? L"Unknown" : Join(anime_item->GetProducers(), L", ")) + L"\n" +
          anime::TranslateScore(anime_item->GetScore());
+
   SetDlgItemText(IDC_STATIC_ANIME_DETAILS, text.c_str());
 
   // Set synopsis

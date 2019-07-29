@@ -235,6 +235,14 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
     int anime_id = body.empty() ? static_cast<int>(lParam) : ToInt(body);
     ui::ShowDlgAnimeInfo(anime_id);
 
+  // PlayTrailer()
+  } else if (action == L"PlayTrailer") {
+    int anime_id = static_cast<int>(lParam);
+    auto anime_item = AnimeDatabase.FindItem(anime_id);
+    if (anime_item && !anime_item->GetTrailerUrl().empty())
+    {
+      ExecuteLink(L"https://youtu.be/{}"_format(anime_item->GetTrailerUrl()));
+    }
   // MainDialog()
   } else if (action == L"MainDialog") {
     ui::ShowDialog(ui::Dialog::Main);

@@ -115,6 +115,7 @@
 	<!-- Right click -->
 	<menu name="RightClick">
 		<item name="Information" action="Info()"/>
+		<item name="Watch Trailer" action="PlayTrailer()"/>
 		<item name="Search" sub="Search"/>
 		<item type="separator"/>
 		<item name="Edit" action="EditAll()"/>

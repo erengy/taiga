@@ -77,7 +77,7 @@ public:
   void SetEpisodeLength(int number);
   void SetAiringStatus(int status);
   void SetTitle(const std::wstring& title);
-  void SetTrailerUrl(const std::wstring& title);
+  void SetTrailerUrl(const std::wstring& trailerUrl);
   void SetEnglishTitle(const std::wstring& title);
   void SetJapaneseTitle(const std::wstring& title);
   void InsertSynonym(const std::wstring& synonym);

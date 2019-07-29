@@ -547,6 +547,7 @@ void Service::UseSparseFieldsetsForAnime(HttpRequest& http_request,
       L"titles,"
       // relationships
       L"animeProductions,"
+      L"youtubeVideoId",
       L"categories";
   if (!minimal) {
     http_request.url.query[L"fields[anime]"] += L",synopsis";
@@ -641,6 +642,7 @@ int Service::ParseAnimeObject(const Json& json) const {
   anime_item.SetEpisodeLength(JsonReadInt(attributes, "episodeLength"));
   anime_item.SetPopularity(JsonReadInt(attributes, "popularityRank"));
   anime_item.SetImageUrl(StrToWstr(JsonReadStr(attributes["posterImage"], "small")));
+  anime_item.SetTrailerUrl(StrToWstr(JsonReadStr(attributes, "youtubeVideoId")));
   anime_item.SetSlug(StrToWstr(JsonReadStr(attributes, "slug")));
   anime_item.SetDateStart(StrToWstr(JsonReadStr(attributes, "startDate")));
   anime_item.SetType(TranslateSeriesTypeFrom(JsonReadStr(attributes, "subtype")));

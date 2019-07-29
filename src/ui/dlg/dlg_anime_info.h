@@ -85,6 +85,7 @@ protected:
   } edit_title_;
 
   win::SysLink sys_link_;
+  win::SysLink sys_link_trailer_;
 
   class Tab : public win::Tab {
   public:

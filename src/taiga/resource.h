@@ -220,3 +220,4 @@
 #define IDC_TOOLBAR_TORRENT                     1173
 #define IDC_TREE_MAIN                           1174
 #define IDC_TREE_SECTIONS                       1175
+#define IDC_LINK_ANIME_TRAILER                  1176
