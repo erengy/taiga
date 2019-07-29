@@ -54,6 +54,7 @@ public:
   int GetEpisodeLength() const;
   int GetAiringStatus(bool check_date = true) const;
   const std::wstring& GetTitle() const;
+  const std::wstring& GetTrailerUrl() const;
   const std::wstring& GetEnglishTitle(bool fallback = false) const;
   const std::wstring& GetJapaneseTitle() const;
   std::vector<std::wstring> GetSynonyms() const;
@@ -76,6 +77,7 @@ public:
   void SetEpisodeLength(int number);
   void SetAiringStatus(int status);
   void SetTitle(const std::wstring& title);
+  void SetTrailerUrl(const std::wstring& title);
   void SetEnglishTitle(const std::wstring& title);
   void SetJapaneseTitle(const std::wstring& title);
   void InsertSynonym(const std::wstring& synonym);

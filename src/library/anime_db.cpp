@@ -127,6 +127,7 @@ void Database::ReadDatabaseNode(xml_node& database_node) {
     item.SetDateStart(Date(XmlReadStrValue(node, L"date_start")));  // date(0)
     item.SetEpisodeLength(XmlReadIntValue(node, L"episode_length"));  // extent(1)
     item.SetEpisodeCount(XmlReadIntValue(node, L"episode_count"));    // extent(0)
+    item.SetTrailerUrl(XmlReadStrValue(node, L"trailer"));
     item.SetSlug(XmlReadStrValue(node, L"slug"));       // resource(1)
     item.SetImageUrl(XmlReadStrValue(node, L"image"));  // resource(0)
   }
@@ -185,6 +186,7 @@ void Database::WriteDatabaseNode(xml_node& database_node) {
     XML_WD(L"date_start", pair.second.GetDateStart());
     XML_WD(L"date_end", pair.second.GetDateEnd());
     XML_WS(L"image", pair.second.GetImageUrl(), pugi::node_pcdata);
+    XML_WS(L"trailer", pair.second.GetTrailer(), pugi::node_pcdata);
     XML_WI(L"age_rating", pair.second.GetAgeRating());
     XML_WS(L"genres", Join(pair.second.GetGenres(), L", "), pugi::node_pcdata);
     XML_WS(L"producers", Join(pair.second.GetProducers(), L", "), pugi::node_pcdata);

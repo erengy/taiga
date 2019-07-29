@@ -28,73 +28,92 @@
 #include "sync/sync.h"
 #include "ui/ui.h"
 
-anime::Database* anime::Item::database_ = &AnimeDatabase;
+anime::Database *anime::Item::database_ = &AnimeDatabase;
 
-namespace anime {
+namespace anime
+{
 
-Item::Item() {
+Item::Item()
+{
   metadata_.uid.resize(sync::kLastService + 1);
 }
 
-Item::~Item() {
+Item::~Item()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-int Item::GetId() const {
+int Item::GetId() const
+{
   assert(!metadata_.uid.empty());
 
   return ToInt(metadata_.uid.at(0));
 }
 
-const std::wstring& Item::GetId(enum_t service) const {
+const std::wstring &Item::GetId(enum_t service) const
+{
   assert(metadata_.uid.size() > service);
 
   return metadata_.uid.at(service);
 }
 
-const std::wstring& Item::GetSlug() const {
+const std::wstring &Item::GetSlug() const
+{
   if (metadata_.resource.size() > 1)
     return metadata_.resource.at(1);
 
   return EmptyString();
 }
 
-enum_t Item::GetSource() const {
+enum_t Item::GetSource() const
+{
   return metadata_.source;
 }
 
-int Item::GetType() const {
+int Item::GetType() const
+{
   return metadata_.type;
 }
 
-int Item::GetEpisodeCount() const {
+int Item::GetEpisodeCount() const
+{
   if (metadata_.extent.size() > 0)
     return metadata_.extent.at(0);
 
   return kUnknownEpisodeCount;
 }
 
-int Item::GetEpisodeLength() const {
+int Item::GetEpisodeLength() const
+{
   if (metadata_.extent.size() > 1)
     return metadata_.extent.at(1);
 
   return kUnknownEpisodeLength;
 }
 
-int Item::GetAiringStatus(bool check_date) const {
+int Item::GetAiringStatus(bool check_date) const
+{
   if (!check_date)
     return metadata_.status;
 
   return anime::GetAiringStatus(*this);
 }
+const std::wstring &Item::GetTrailerUrl() const
+{
+  if (metadata_.resource.size() > 2)
+    return metadata_.resource.at(2);
 
-const std::wstring& Item::GetTitle() const {
+  return EmptyString();
+}
+const std::wstring &Item::GetTitle() const
+{
   return metadata_.title;
 }
 
-const std::wstring& Item::GetEnglishTitle(bool fallback) const {
-  for (const auto& alt_title : metadata_.alternative)
+const std::wstring &Item::GetEnglishTitle(bool fallback) const
+{
+  for (const auto &alt_title : metadata_.alternative)
     if (alt_title.type == library::TitleType::LangEnglish)
       if (!alt_title.value.empty())
         return alt_title.value;
@@ -105,8 +124,9 @@ const std::wstring& Item::GetEnglishTitle(bool fallback) const {
   return EmptyString();
 }
 
-const std::wstring& Item::GetJapaneseTitle() const {
-  for (const auto& alt_title : metadata_.alternative)
+const std::wstring &Item::GetJapaneseTitle() const
+{
+  for (const auto &alt_title : metadata_.alternative)
     if (alt_title.type == library::TitleType::LangJapanese)
       if (!alt_title.value.empty())
         return alt_title.value;
@@ -114,82 +134,96 @@ const std::wstring& Item::GetJapaneseTitle() const {
   return EmptyString();
 }
 
-std::vector<std::wstring> Item::GetSynonyms() const {
+std::vector<std::wstring> Item::GetSynonyms() const
+{
   std::vector<std::wstring> synonyms;
 
-  for (const auto& alt_title : metadata_.alternative)
+  for (const auto &alt_title : metadata_.alternative)
     if (alt_title.type == library::TitleType::Synonym)
       synonyms.push_back(alt_title.value);
 
   return synonyms;
 }
 
-const Date& Item::GetDateStart() const {
+const Date &Item::GetDateStart() const
+{
   if (metadata_.date.size() > 0)
     return metadata_.date.at(0);
 
   return EmptyDate();
 }
 
-const Date& Item::GetDateEnd() const {
+const Date &Item::GetDateEnd() const
+{
   if (metadata_.date.size() > 1)
     return metadata_.date.at(1);
 
   return EmptyDate();
 }
 
-const std::wstring& Item::GetImageUrl() const {
+const std::wstring &Item::GetImageUrl() const
+{
   if (metadata_.resource.size() > 0)
     return metadata_.resource.at(0);
 
   return EmptyString();
 }
 
-enum_t Item::GetAgeRating() const {
+enum_t Item::GetAgeRating() const
+{
   return metadata_.audience;
 }
 
-const std::vector<std::wstring>& Item::GetGenres() const {
+const std::vector<std::wstring> &Item::GetGenres() const
+{
   return metadata_.subject;
 }
 
-int Item::GetPopularity() const {
+int Item::GetPopularity() const
+{
   if (metadata_.community.size() > 1)
     return ToInt(metadata_.community.at(1));
 
   return 0;
 }
 
-const std::vector<std::wstring>& Item::GetProducers() const {
+const std::vector<std::wstring> &Item::GetProducers() const
+{
   return metadata_.creator;
 }
 
-double Item::GetScore() const {
+double Item::GetScore() const
+{
   if (metadata_.community.size() > 0)
     return ToDouble(metadata_.community.at(0));
 
   return 0.0;
 }
 
-const std::wstring& Item::GetSynopsis() const {
+const std::wstring &Item::GetSynopsis() const
+{
   return metadata_.description;
 }
 
-const time_t Item::GetLastModified() const {
+const time_t Item::GetLastModified() const
+{
   return metadata_.modified;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void Item::SetId(const std::wstring& id, enum_t service) {
+void Item::SetId(const std::wstring &id, enum_t service)
+{
   if (metadata_.uid.size() < static_cast<size_t>(service) + 1)
     metadata_.uid.resize(service + 1);
 
   metadata_.uid.at(service) = id;
 }
 
-void Item::SetSlug(const std::wstring& slug) {
-  if (metadata_.resource.size() < 2) {
+void Item::SetSlug(const std::wstring &slug)
+{
+  if (metadata_.resource.size() < 2)
+  {
     if (slug.empty())
       return;
     metadata_.resource.resize(2);
@@ -198,15 +232,30 @@ void Item::SetSlug(const std::wstring& slug) {
   metadata_.resource.at(1) = slug;
 }
 
-void Item::SetSource(enum_t source) {
+void Item::SetTrailerUrl(const std::wstring &trailerUrl)
+{
+  if (metadata_.resource.size() < 3)
+  {
+    if (trailerUrl.empty())
+      return;
+    metadata_.resource.resize(3);
+  }
+
+  metadata_.resource.at(2) = trailerUrl;
+}
+
+void Item::SetSource(enum_t source)
+{
   metadata_.source = source;
 }
 
-void Item::SetType(int type) {
+void Item::SetType(int type)
+{
   metadata_.type = type;
 }
 
-void Item::SetEpisodeCount(int number) {
+void Item::SetEpisodeCount(int number)
+{
   if (metadata_.extent.size() < 1)
     metadata_.extent.resize(1);
 
@@ -218,8 +267,10 @@ void Item::SetEpisodeCount(int number) {
       local_info_.available_episodes.resize(number);
 }
 
-void Item::SetEpisodeLength(int number) {
-  if (metadata_.extent.size() < 2) {
+void Item::SetEpisodeLength(int number)
+{
+  if (metadata_.extent.size() < 2)
+  {
     if (number <= 0)
       return;
     metadata_.extent.resize(2);
@@ -228,17 +279,22 @@ void Item::SetEpisodeLength(int number) {
   metadata_.extent.at(1) = number;
 }
 
-void Item::SetAiringStatus(int status) {
+void Item::SetAiringStatus(int status)
+{
   metadata_.status = status;
 }
 
-void Item::SetTitle(const std::wstring& title) {
+void Item::SetTitle(const std::wstring &title)
+{
   metadata_.title = title;
 }
 
-void Item::SetEnglishTitle(const std::wstring& title) {
-  for (auto& alt_title : metadata_.alternative) {
-    if (alt_title.type == library::TitleType::LangEnglish) {
+void Item::SetEnglishTitle(const std::wstring &title)
+{
+  for (auto &alt_title : metadata_.alternative)
+  {
+    if (alt_title.type == library::TitleType::LangEnglish)
+    {
       alt_title.value = title;
       return;
     }
@@ -252,9 +308,12 @@ void Item::SetEnglishTitle(const std::wstring& title) {
   metadata_.alternative.push_back(new_title);
 }
 
-void Item::SetJapaneseTitle(const std::wstring& title) {
-  for (auto& alt_title : metadata_.alternative) {
-    if (alt_title.type == library::TitleType::LangJapanese) {
+void Item::SetJapaneseTitle(const std::wstring &title)
+{
+  for (auto &alt_title : metadata_.alternative)
+  {
+    if (alt_title.type == library::TitleType::LangJapanese)
+    {
       alt_title.value = title;
       return;
     }
@@ -268,7 +327,8 @@ void Item::SetJapaneseTitle(const std::wstring& title) {
   metadata_.alternative.push_back(new_title);
 }
 
-void Item::InsertSynonym(const std::wstring& synonym) {
+void Item::InsertSynonym(const std::wstring &synonym)
+{
   if (synonym.empty() || synonym == GetTitle() ||
       synonym == GetEnglishTitle() || synonym == GetJapaneseTitle())
     return;
@@ -276,7 +336,8 @@ void Item::InsertSynonym(const std::wstring& synonym) {
       library::Title(library::TitleType::Synonym, synonym));
 }
 
-void Item::SetSynonyms(const std::wstring& synonyms) {
+void Item::SetSynonyms(const std::wstring &synonyms)
+{
   std::vector<std::wstring> temp;
   Split(synonyms, L"; ", temp);
   RemoveEmptyStrings(temp);
@@ -284,24 +345,28 @@ void Item::SetSynonyms(const std::wstring& synonyms) {
   SetSynonyms(temp);
 }
 
-void Item::SetSynonyms(const std::vector<std::wstring>& synonyms) {
+void Item::SetSynonyms(const std::vector<std::wstring> &synonyms)
+{
   if (synonyms.empty() && metadata_.alternative.empty())
     return;
 
   auto iterator = std::remove_if(
       metadata_.alternative.begin(), metadata_.alternative.end(),
-      [](const library::Title& title) {
+      [](const library::Title &title) {
         return title.type == library::TitleType::Synonym;
       });
   metadata_.alternative.erase(iterator, metadata_.alternative.end());
 
-  for (const auto& synonym : synonyms) {
+  for (const auto &synonym : synonyms)
+  {
     InsertSynonym(synonym);
   }
 }
 
-void Item::SetDateStart(const Date& date) {
-  if (metadata_.date.size() < 1) {
+void Item::SetDateStart(const Date &date)
+{
+  if (metadata_.date.size() < 1)
+  {
     if (!IsValidDate(date))
       return;
     metadata_.date.resize(1);
@@ -310,12 +375,15 @@ void Item::SetDateStart(const Date& date) {
   metadata_.date.at(0) = date;
 }
 
-void Item::SetDateStart(const std::wstring& date) {
+void Item::SetDateStart(const std::wstring &date)
+{
   SetDateStart(Date(date));
 }
 
-void Item::SetDateEnd(const Date& date) {
-  if (metadata_.date.size() < 2) {
+void Item::SetDateEnd(const Date &date)
+{
+  if (metadata_.date.size() < 2)
+  {
     if (!IsValidDate(date))
       return;
     metadata_.date.resize(2);
@@ -324,12 +392,15 @@ void Item::SetDateEnd(const Date& date) {
   metadata_.date.at(1) = date;
 }
 
-void Item::SetDateEnd(const std::wstring& date) {
+void Item::SetDateEnd(const std::wstring &date)
+{
   SetDateEnd(Date(date));
 }
 
-void Item::SetImageUrl(const std::wstring& url) {
-  if (metadata_.resource.size() < 1) {
+void Item::SetImageUrl(const std::wstring &url)
+{
+  if (metadata_.resource.size() < 1)
+  {
     if (url.empty())
       return;
     metadata_.resource.resize(1);
@@ -338,11 +409,13 @@ void Item::SetImageUrl(const std::wstring& url) {
   metadata_.resource.at(0) = url;
 }
 
-void Item::SetAgeRating(enum_t rating) {
+void Item::SetAgeRating(enum_t rating)
+{
   metadata_.audience = rating;
 }
 
-void Item::SetGenres(const std::wstring& genres) {
+void Item::SetGenres(const std::wstring &genres)
+{
   std::vector<std::wstring> temp;
   Split(genres, L", ", temp);
   RemoveEmptyStrings(temp);
@@ -350,12 +423,15 @@ void Item::SetGenres(const std::wstring& genres) {
   SetGenres(temp);
 }
 
-void Item::SetGenres(const std::vector<std::wstring>& genres) {
+void Item::SetGenres(const std::vector<std::wstring> &genres)
+{
   metadata_.subject = genres;
 }
 
-void Item::SetPopularity(int popularity) {
-  if (metadata_.community.size() < 2) {
+void Item::SetPopularity(int popularity)
+{
+  if (metadata_.community.size() < 2)
+  {
     if (popularity <= 0)
       return;
     metadata_.community.resize(2);
@@ -364,7 +440,8 @@ void Item::SetPopularity(int popularity) {
   metadata_.community.at(1) = ToWstr(popularity);
 }
 
-void Item::SetProducers(const std::wstring& producers) {
+void Item::SetProducers(const std::wstring &producers)
+{
   std::vector<std::wstring> temp;
   Split(producers, L", ", temp);
   RemoveEmptyStrings(temp);
@@ -372,12 +449,15 @@ void Item::SetProducers(const std::wstring& producers) {
   SetProducers(temp);
 }
 
-void Item::SetProducers(const std::vector<std::wstring>& producers) {
+void Item::SetProducers(const std::vector<std::wstring> &producers)
+{
   metadata_.creator = producers;
 }
 
-void Item::SetScore(double score) {
-  if (metadata_.community.size() < 1) {
+void Item::SetScore(double score)
+{
+  if (metadata_.community.size() < 1)
+  {
     if (score <= 0.0)
       return;
     metadata_.community.resize(1);
@@ -386,205 +466,224 @@ void Item::SetScore(double score) {
   metadata_.community.at(0) = score > 0.0 ? ToWstr(score) : L"";
 }
 
-void Item::SetSynopsis(const std::wstring& synopsis) {
+void Item::SetSynopsis(const std::wstring &synopsis)
+{
   metadata_.description = synopsis;
 }
 
-void Item::SetLastModified(time_t modified) {
+void Item::SetLastModified(time_t modified)
+{
   metadata_.modified = modified;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-const std::wstring& Item::GetMyId() const {
+const std::wstring &Item::GetMyId() const
+{
   if (!my_info_.get())
     return EmptyString();
 
   return my_info_->id;
 }
 
-int Item::GetMyLastWatchedEpisode(bool check_queue) const {
+int Item::GetMyLastWatchedEpisode(bool check_queue) const
+{
   if (!my_info_.get())
     return 0;
 
-  HistoryItem* history_item = check_queue ?
-      SearchHistory(QueueSearch::Episode) : nullptr;
+  HistoryItem *history_item = check_queue ? SearchHistory(QueueSearch::Episode) : nullptr;
 
   return history_item ? *history_item->episode : my_info_->watched_episodes;
 }
 
-int Item::GetMyScore(bool check_queue) const {
+int Item::GetMyScore(bool check_queue) const
+{
   if (!my_info_.get())
     return 0;
 
-  HistoryItem* history_item = check_queue ?
-      SearchHistory(QueueSearch::Score) : nullptr;
+  HistoryItem *history_item = check_queue ? SearchHistory(QueueSearch::Score) : nullptr;
 
   return history_item ? *history_item->score : my_info_->score;
 }
 
-int Item::GetMyStatus(bool check_queue) const {
+int Item::GetMyStatus(bool check_queue) const
+{
   if (!my_info_.get())
     return kNotInList;
 
-  HistoryItem* history_item = check_queue ?
-      SearchHistory(QueueSearch::Status) : nullptr;
+  HistoryItem *history_item = check_queue ? SearchHistory(QueueSearch::Status) : nullptr;
 
   return history_item ? *history_item->status : my_info_->status;
 }
 
-int Item::GetMyRewatchedTimes(bool check_queue) const {
+int Item::GetMyRewatchedTimes(bool check_queue) const
+{
   if (!my_info_.get())
     return 0;
 
-  HistoryItem* history_item = check_queue ?
-      SearchHistory(QueueSearch::RewatchedTimes) : nullptr;
+  HistoryItem *history_item = check_queue ? SearchHistory(QueueSearch::RewatchedTimes) : nullptr;
 
   return history_item ? *history_item->rewatched_times : my_info_->rewatched_times;
 }
 
-int Item::GetMyRewatching(bool check_queue) const {
+int Item::GetMyRewatching(bool check_queue) const
+{
   if (!my_info_.get())
     return FALSE;
 
-  HistoryItem* history_item = check_queue ?
-      SearchHistory(QueueSearch::Rewatching) : nullptr;
+  HistoryItem *history_item = check_queue ? SearchHistory(QueueSearch::Rewatching) : nullptr;
 
   return history_item ? *history_item->enable_rewatching : my_info_->rewatching;
 }
 
-int Item::GetMyRewatchingEp() const {
+int Item::GetMyRewatchingEp() const
+{
   if (!my_info_.get())
     return 0;
 
   return my_info_->rewatching_ep;
 }
 
-const Date& Item::GetMyDateStart(bool check_queue) const {
+const Date &Item::GetMyDateStart(bool check_queue) const
+{
   if (!my_info_.get())
     return EmptyDate();
 
-  HistoryItem* history_item = check_queue ?
-      SearchHistory(QueueSearch::DateStart) : nullptr;
+  HistoryItem *history_item = check_queue ? SearchHistory(QueueSearch::DateStart) : nullptr;
 
   return history_item ? *history_item->date_start : my_info_->date_start;
 }
 
-const Date& Item::GetMyDateEnd(bool check_queue) const {
+const Date &Item::GetMyDateEnd(bool check_queue) const
+{
   if (!my_info_.get())
     return EmptyDate();
 
-  HistoryItem* history_item = check_queue ?
-      SearchHistory(QueueSearch::DateEnd) : nullptr;
+  HistoryItem *history_item = check_queue ? SearchHistory(QueueSearch::DateEnd) : nullptr;
 
   return history_item ? *history_item->date_finish : my_info_->date_finish;
 }
 
-const std::wstring& Item::GetMyLastUpdated() const {
+const std::wstring &Item::GetMyLastUpdated() const
+{
   if (!my_info_.get())
     return EmptyString();
 
   return my_info_->last_updated;
 }
 
-const std::wstring& Item::GetMyTags(bool check_queue) const {
+const std::wstring &Item::GetMyTags(bool check_queue) const
+{
   if (!my_info_.get())
     return EmptyString();
 
-  HistoryItem* history_item = check_queue ?
-      SearchHistory(QueueSearch::Tags) : nullptr;
+  HistoryItem *history_item = check_queue ? SearchHistory(QueueSearch::Tags) : nullptr;
 
   return history_item ? *history_item->tags : my_info_->tags;
 }
 
-const std::wstring& Item::GetMyNotes(bool check_queue) const {
+const std::wstring &Item::GetMyNotes(bool check_queue) const
+{
   if (!my_info_.get())
     return EmptyString();
 
-  HistoryItem* history_item = check_queue ?
-      SearchHistory(QueueSearch::Notes) : nullptr;
+  HistoryItem *history_item = check_queue ? SearchHistory(QueueSearch::Notes) : nullptr;
 
   return history_item ? *history_item->notes : my_info_->notes;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void Item::SetMyId(const std::wstring& id) {
+void Item::SetMyId(const std::wstring &id)
+{
   assert(my_info_.get());
 
   my_info_->id = id;
 }
 
-void Item::SetMyLastWatchedEpisode(int number) {
+void Item::SetMyLastWatchedEpisode(int number)
+{
   assert(my_info_.get());
 
   my_info_->watched_episodes = number;
 }
 
-void Item::SetMyScore(int score) {
+void Item::SetMyScore(int score)
+{
   assert(my_info_.get());
 
   my_info_->score = score;
 }
 
-void Item::SetMyStatus(int status) {
+void Item::SetMyStatus(int status)
+{
   assert(my_info_.get());
 
   my_info_->status = status;
 }
 
-void Item::SetMyRewatchedTimes(int rewatched_times) {
+void Item::SetMyRewatchedTimes(int rewatched_times)
+{
   assert(my_info_.get());
 
   my_info_->rewatched_times = rewatched_times;
 }
 
-void Item::SetMyRewatching(int rewatching) {
+void Item::SetMyRewatching(int rewatching)
+{
   assert(my_info_.get());
 
   my_info_->rewatching = rewatching;
 }
 
-void Item::SetMyRewatchingEp(int rewatching_ep) {
+void Item::SetMyRewatchingEp(int rewatching_ep)
+{
   assert(my_info_.get());
 
   my_info_->rewatching_ep = rewatching_ep;
 }
 
-void Item::SetMyDateStart(const Date& date) {
+void Item::SetMyDateStart(const Date &date)
+{
   assert(my_info_.get());
 
   my_info_->date_start = date;
 }
 
-void Item::SetMyDateStart(const std::wstring& date) {
+void Item::SetMyDateStart(const std::wstring &date)
+{
   SetMyDateStart(Date(date));
 }
 
-void Item::SetMyDateEnd(const Date& date) {
+void Item::SetMyDateEnd(const Date &date)
+{
   assert(my_info_.get());
 
   my_info_->date_finish = date;
 }
 
-void Item::SetMyDateEnd(const std::wstring& date) {
+void Item::SetMyDateEnd(const std::wstring &date)
+{
   SetMyDateEnd(Date(date));
 }
 
-void Item::SetMyLastUpdated(const std::wstring& last_updated) {
+void Item::SetMyLastUpdated(const std::wstring &last_updated)
+{
   assert(my_info_.get());
 
   my_info_->last_updated = last_updated;
 }
 
-void Item::SetMyTags(const std::wstring& tags) {
+void Item::SetMyTags(const std::wstring &tags)
+{
   assert(my_info_.get());
 
   my_info_->tags = tags;
 }
 
-void Item::SetMyNotes(const std::wstring& notes) {
+void Item::SetMyNotes(const std::wstring &notes)
+{
   assert(my_info_.get());
 
   my_info_->notes = notes;
@@ -593,51 +692,63 @@ void Item::SetMyNotes(const std::wstring& notes) {
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-int Item::GetAvailableEpisodeCount() const {
+int Item::GetAvailableEpisodeCount() const
+{
   return static_cast<int>(local_info_.available_episodes.size());
 }
 
-const std::wstring& Item::GetFolder() const {
+const std::wstring &Item::GetFolder() const
+{
   return local_info_.folder;
 }
 
-int Item::GetLastAiredEpisodeNumber() const {
+int Item::GetLastAiredEpisodeNumber() const
+{
   return local_info_.last_aired_episode;
 }
 
-const std::wstring& Item::GetNextEpisodePath() const {
+const std::wstring &Item::GetNextEpisodePath() const
+{
   return local_info_.next_episode_path;
 }
 
-time_t Item::GetNextEpisodeTime() const {
+time_t Item::GetNextEpisodeTime() const
+{
   return local_info_.next_episode_time;
 }
 
-bool Item::GetPlaying() const {
+bool Item::GetPlaying() const
+{
   return local_info_.playing;
 }
 
-bool Item::GetUseAlternative() const {
+bool Item::GetUseAlternative() const
+{
   return local_info_.use_alternative;
 }
 
-const std::vector<std::wstring>& Item::GetUserSynonyms() const {
+const std::vector<std::wstring> &Item::GetUserSynonyms() const
+{
   return local_info_.synonyms;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 bool Item::SetEpisodeAvailability(int number, bool available,
-                                  const std::wstring& path) {
+                                  const std::wstring &path)
+{
   if (number == 0)
     number = 1;
 
-  if (number <= GetEpisodeCount() || !IsValidEpisodeCount(GetEpisodeCount())) {
-    if (static_cast<size_t>(number) > local_info_.available_episodes.size()) {
+  if (number <= GetEpisodeCount() || !IsValidEpisodeCount(GetEpisodeCount()))
+  {
+    if (static_cast<size_t>(number) > local_info_.available_episodes.size())
+    {
       local_info_.available_episodes.resize(number);
     }
     local_info_.available_episodes.at(number - 1) = available;
-    if (number == GetMyLastWatchedEpisode() + 1) {
+    if (number == GetMyLastWatchedEpisode() + 1)
+    {
       SetNextEpisodePath(path);
     }
 
@@ -649,55 +760,69 @@ bool Item::SetEpisodeAvailability(int number, bool available,
   return false;
 }
 
-void Item::SetFolder(const std::wstring& folder) {
+void Item::SetFolder(const std::wstring &folder)
+{
   local_info_.folder = folder;
 }
 
-void Item::SetLastAiredEpisodeNumber(int number) {
-  if (number > local_info_.last_aired_episode) {
-    if (GetAiringStatus() == kFinishedAiring) {
+void Item::SetLastAiredEpisodeNumber(int number)
+{
+  if (number > local_info_.last_aired_episode)
+  {
+    if (GetAiringStatus() == kFinishedAiring)
+    {
       local_info_.last_aired_episode = GetEpisodeCount();
-    } else {
+    }
+    else
+    {
       local_info_.last_aired_episode = number;
     }
   }
 }
 
-void Item::SetNextEpisodePath(const std::wstring& path) {
+void Item::SetNextEpisodePath(const std::wstring &path)
+{
   local_info_.next_episode_path = path;
 }
 
-void Item::SetNextEpisodeTime(const time_t time) {
+void Item::SetNextEpisodeTime(const time_t time)
+{
   local_info_.next_episode_time = time;
 }
 
-void Item::SetPlaying(bool playing) {
+void Item::SetPlaying(bool playing)
+{
   local_info_.playing = playing;
 }
 
-void Item::SetUseAlternative(bool use_alternative) {
+void Item::SetUseAlternative(bool use_alternative)
+{
   local_info_.use_alternative = use_alternative;
 }
 
-void Item::SetUserSynonyms(const std::wstring& synonyms) {
+void Item::SetUserSynonyms(const std::wstring &synonyms)
+{
   std::vector<std::wstring> temp;
   Split(synonyms, L"; ", temp);
 
   SetUserSynonyms(temp);
 }
 
-void Item::SetUserSynonyms(const std::vector<std::wstring>& synonyms) {
+void Item::SetUserSynonyms(const std::vector<std::wstring> &synonyms)
+{
   local_info_.synonyms = synonyms;
   RemoveEmptyStrings(local_info_.synonyms);
 
-  if (!synonyms.empty() && CurrentEpisode.anime_id == anime::ID_NOTINLIST) {
+  if (!synonyms.empty() && CurrentEpisode.anime_id == anime::ID_NOTINLIST)
+  {
     CurrentEpisode.Set(anime::ID_UNKNOWN);
   }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool Item::IsEpisodeAvailable(int number) const {
+bool Item::IsEpisodeAvailable(int number) const
+{
   if (number < 1)
     number = 1;
   if (static_cast<size_t>(number) > local_info_.available_episodes.size())
@@ -706,28 +831,34 @@ bool Item::IsEpisodeAvailable(int number) const {
   return local_info_.available_episodes.at(number - 1);
 }
 
-bool Item::IsNextEpisodeAvailable() const {
+bool Item::IsNextEpisodeAvailable() const
+{
   return IsEpisodeAvailable(GetMyLastWatchedEpisode() + 1);
 }
 
-bool Item::UserSynonymsAvailable() const {
+bool Item::UserSynonymsAvailable() const
+{
   return !local_info_.synonyms.empty();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-void Item::AddtoUserList() {
-  if (!my_info_.get()) {
+void Item::AddtoUserList()
+{
+  if (!my_info_.get())
+  {
     my_info_.reset(new MyInformation);
   }
 }
 
-bool Item::IsInList() const {
+bool Item::IsInList() const
+{
   return my_info_.get() && GetMyStatus() != kNotInList;
 }
 
-void Item::RemoveFromUserList() {
+void Item::RemoveFromUserList()
+{
   assert(my_info_.use_count() <= 1);
   my_info_.reset();
   assert(my_info_.use_count() == 0);
@@ -735,8 +866,9 @@ void Item::RemoveFromUserList() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-HistoryItem* Item::SearchHistory(QueueSearch search_mode) const {
+HistoryItem *Item::SearchHistory(QueueSearch search_mode) const
+{
   return History.queue.FindItem(GetId(), search_mode);
 }
 
-}  // namespace anime
+} // namespace anime
