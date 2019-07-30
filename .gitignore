@@ -10,3 +10,6 @@
 /project/vs*/*.sdf
 /project/vs*/*.suo
 /project/vs*/*.user
+
+# Ignoring VSCode Workspace for now
+/.vscode

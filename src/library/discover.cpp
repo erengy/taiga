@@ -134,6 +134,7 @@ bool SeasonDatabase::LoadString(const std::wstring& data) {
       item.SetTitle(XmlReadStrValue(node, L"title"));
       item.SetType(XmlReadIntValue(node, L"type"));
       item.SetImageUrl(XmlReadStrValue(node, L"image"));
+      item.SetTrailerUrl(XmlReadStrValue(node, L"trailer"));
       item.SetProducers(XmlReadStrValue(node, L"producers"));
       anime_id = AnimeDatabase.UpdateItem(item);
     }

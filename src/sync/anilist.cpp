@@ -453,6 +453,7 @@ int Service::ParseMediaObject(const Json& json) const {
   anime_item.SetEpisodeCount(JsonReadInt(json, "episodes"));
   anime_item.SetEpisodeLength(JsonReadInt(json, "duration"));
   anime_item.SetImageUrl(StrToWstr(JsonReadStr(json["coverImage"], "large")));
+  anime_item.SetTrailerUrl(StrToWstr(JsonReadStr(json["media"]["trailer"], "id")));
   anime_item.SetScore(TranslateSeriesRatingFrom(JsonReadInt(json, "averageScore")));
   anime_item.SetPopularity(JsonReadInt(json, "popularity"));
 
@@ -639,6 +640,7 @@ synonyms
 averageScore
 popularity
 studios { edges { node { name } } }
+trailer { id, site }
 nextAiringEpisode { airingAt episode })";
 }
 
