@@ -869,10 +869,10 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
     sys_link_.SetText(content);
   }
 
-  if (!anime_item->GetTrailerUrl().empty())
+  if (mode_ == AnimeDialogMode::AnimeInformation && !anime_item->GetTrailerUrl().empty())
   {
     sys_link_trailer_.SetText(L"<a id=\"WATCH_TRAILER\">Watch Trailer</a>");
-    sys_link_trailer_.Show();
+    sys_link_trailer_.Show(mode_ != AnimeDialogMode::NowPlaying);
   }
   else
   {
