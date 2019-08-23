@@ -55,11 +55,13 @@ bool ThemeManager::Load() {
 
   // Icons
   std::vector<std::wstring> icons16;
-  foreach_xmlnode_(node_icon, node_icons16, L"icon")
+  for (auto node_icon : node_icons16.children(L"icon")) {
     icons16.push_back(node_icon.attribute(L"name").value());
+  }
   std::vector<std::wstring> icons24;
-  foreach_xmlnode_(node_icon, node_icons24, L"icon")
+  for (auto node_icon : node_icons24.children(L"icon")) {
     icons24.push_back(node_icon.attribute(L"name").value());
+  }
 
   // List
   #define READ_PROGRESS_DATA(x, name) \

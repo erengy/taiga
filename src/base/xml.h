@@ -27,10 +27,6 @@ using pugi::xml_document;
 using pugi::xml_node;
 using pugi::xml_parse_result;
 
-#define foreach_xmlnode_(node, parent, name) \
-    for (pugi::xml_node node = parent.child(name); node; \
-         node = node.next_sibling(name))
-
 std::wstring XmlGetNodeAsString(pugi::xml_node node);
 
 int XmlReadIntValue(pugi::xml_node& node, const wchar_t* name);

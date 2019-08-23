@@ -102,7 +102,7 @@ void Database::HandleListCompatibility(const std::wstring& meta_version) {
 void Database::ReadDatabaseInCompatibilityMode(xml_document& document) {
   xml_node animedb_node = document.child(L"animedb");
 
-  foreach_xmlnode_(node, animedb_node, L"anime") {
+  for (auto node : animedb_node.children(L"anime")) {
     std::wstring id = XmlReadStrValue(node, L"series_animedb_id");
     Item& item = items[ToInt(id)];  // Creates the item if it doesn't exist
     item.SetId(id, sync::kTaiga);
@@ -128,7 +128,7 @@ void Database::ReadDatabaseInCompatibilityMode(xml_document& document) {
 void Database::ReadListInCompatibilityMode(xml_document& document) {
   xml_node myanimelist = document.child(L"myanimelist");
 
-  foreach_xmlnode_(node, myanimelist, L"anime") {
+  for (auto node : myanimelist.children(L"anime")) {
     Item anime_item;
     anime_item.SetId(XmlReadStrValue(node, L"series_animedb_id"), sync::kMyAnimeList);
     anime_item.SetSource(sync::kMyAnimeList);

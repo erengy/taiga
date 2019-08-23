@@ -285,12 +285,13 @@ bool AppSettings::Load() {
   // Folders
   library_folders.clear();
   xml_node node_folders = settings.child(L"anime").child(L"folders");
-  foreach_xmlnode_(folder, node_folders, L"root")
+  for (auto folder : node_folders.children(L"root")) {
     library_folders.push_back(folder.attribute(L"folder").value());
+  }
 
   // Anime items
   xml_node node_items = settings.child(L"anime").child(L"items");
-  foreach_xmlnode_(item, node_items, L"item") {
+  for (auto item : node_items.children(L"item")) {
     int anime_id = item.attribute(L"id").as_int();
     auto anime_item = AnimeDatabase.FindItem(anime_id, false);
     if (!anime_item)
@@ -302,7 +303,7 @@ bool AppSettings::Load() {
 
   // Media players
   xml_node node_players = settings.child(L"recognition").child(L"mediaplayers");
-  foreach_xmlnode_(player, node_players, L"player") {
+  for (auto player : node_players.children(L"player")) {
     std::wstring name = player.attribute(L"name").value();
     bool enabled = player.attribute(L"enabled").as_bool();
     for (auto& media_player : MediaPlayers.items) {
@@ -316,7 +317,7 @@ bool AppSettings::Load() {
   // Anime list columns
   ui::DlgAnimeList.listview.InitializeColumns();
   xml_node node_list_columns = settings.child(L"program").child(L"list").child(L"columns");
-  foreach_xmlnode_(column, node_list_columns, L"column") {
+  for (auto column : node_list_columns.children(L"column")) {
     std::wstring name = column.attribute(L"name").value();
     auto column_type = ui::AnimeListDialog::ListView::TranslateColumnName(name);
     if (column_type != ui::kColumnUnknown) {

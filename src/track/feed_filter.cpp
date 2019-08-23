@@ -687,7 +687,7 @@ void FeedFilterManager::Import(const xml_node& node_filter,
                                std::vector<FeedFilter>& filters) {
   filters.clear();
 
-  foreach_xmlnode_(item, node_filter, L"item") {
+  for (auto item : node_filter.children(L"item")) {
     FeedFilter filter;
 
     filter.action = static_cast<FeedFilterAction>(GetIndexFromShortcode(
@@ -699,11 +699,11 @@ void FeedFilterManager::Import(const xml_node& node_filter,
     filter.option = static_cast<FeedFilterOption>(GetIndexFromShortcode(
         kFeedFilterShortcodeOption, item.attribute(L"option").value()));
 
-    foreach_xmlnode_(anime, item, L"anime") {
+    for (auto anime : item.children(L"anime")) {
       filter.anime_ids.push_back(anime.attribute(L"id").as_int());
     }
 
-    foreach_xmlnode_(condition, item, L"condition") {
+    for (auto condition : item.children(L"condition")) {
       filter.AddCondition(
           static_cast<FeedFilterElement>(GetIndexFromShortcode(
               kFeedFilterShortcodeElement, condition.attribute(L"element").value())),

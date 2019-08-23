@@ -566,7 +566,7 @@ bool Aggregator::LoadArchive() {
   // Read discarded
   file_archive_.clear();
   xml_node archive_node = document.child(L"archive");
-  foreach_xmlnode_(node, archive_node, L"item") {
+  for (auto node : archive_node.children(L"item")) {
     file_archive_.push_back(node.attribute(L"title").value());
   }
 

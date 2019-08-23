@@ -181,7 +181,7 @@ void Feed::Load(const xml_document& document) {
   Aggregator.FindFeedSource(*this);
 
   // Read items
-  foreach_xmlnode_(node, channel, L"item") {
+  for (auto node : channel.children(L"item")) {
     // Read data
     FeedItem item;
     item.title = XmlReadStrValue(node, L"title");

@@ -401,7 +401,7 @@ bool History::Load() {
 
   // Items
   xml_node node_items = document.child(L"history").child(L"items");
-  foreach_xmlnode_(item, node_items, L"item") {
+  for (auto item : node_items.children(L"item")) {
     HistoryItem history_item;
     history_item.anime_id = item.attribute(L"anime_id").as_int(anime::ID_NOTINLIST);
     history_item.episode = item.attribute(L"episode").as_int();
@@ -429,7 +429,7 @@ bool History::Load() {
 void History::ReadQueue(const pugi::xml_document& document) {
   xml_node node_queue = document.child(L"history").child(L"queue");
 
-  foreach_xmlnode_(item, node_queue, L"item") {
+  for (auto item : node_queue.children(L"item")) {
     HistoryItem history_item;
 
     history_item.anime_id = item.attribute(L"anime_id").as_int(anime::ID_NOTINLIST);

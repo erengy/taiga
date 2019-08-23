@@ -254,7 +254,7 @@ void Service::GetLibraryEntries(Response& response, HttpResponse& http_response)
   // - my_rewatching_ep
   // - my_last_updated
   // - my_tags
-  foreach_xmlnode_(node, node_myanimelist, L"anime") {
+  for (auto node : node_myanimelist.children(L"anime")) {
     ::anime::Item anime_item;
     anime_item.SetSource(this->id());
     anime_item.SetId(XmlReadStrValue(node, L"series_animedb_id"), this->id());
@@ -374,7 +374,7 @@ void Service::SearchTitle(Response& response, HttpResponse& http_response) {
   // - end_date
   // - synopsis (must be decoded)
   // - image
-  foreach_xmlnode_(node, node_anime, L"entry") {
+  for (auto node : node_anime.children(L"entry")) {
     ::anime::Item anime_item;
     anime_item.SetSource(this->id());
     anime_item.SetId(XmlReadStrValue(node, L"id"), this->id());

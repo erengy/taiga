@@ -46,7 +46,7 @@ std::wstring XmlReadStrValue(pugi::xml_node& node, const wchar_t* name) {
 void XmlReadChildNodes(pugi::xml_node& parent_node,
                        std::vector<std::wstring>& output,
                        const wchar_t* name) {
-  foreach_xmlnode_(child_node, parent_node, name) {
+  for (auto child_node : parent_node.children(name)) {
     output.push_back(child_node.child_value());
   }
 }

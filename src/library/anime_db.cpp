@@ -66,10 +66,10 @@ bool Database::LoadDatabase() {
 }
 
 void Database::ReadDatabaseNode(xml_node& database_node) {
-  foreach_xmlnode_(node, database_node, L"anime") {
+  for (auto node : database_node.children(L"anime")) {
     std::map<enum_t, std::wstring> id_map;
 
-    foreach_xmlnode_(id_node, node, L"id") {
+    for (auto id_node : node.children(L"id")) {
       const std::wstring name = id_node.attribute(L"name").as_string();
       if (name == L"hummingbird") {
         id_map[sync::kKitsu] = id_node.child_value();
@@ -119,8 +119,9 @@ void Database::ReadDatabaseNode(xml_node& database_node) {
     // This ordering results in less reallocations
     item.SetEnglishTitle(XmlReadStrValue(node, L"english"));  // alternative
     item.SetJapaneseTitle(XmlReadStrValue(node, L"japanese"));  // alternative
-    foreach_xmlnode_(child_node, node, L"synonym")
+    for (auto child_node : node.children(L"synonym")) {
       item.InsertSynonym(child_node.child_value());  // alternative
+    }
     item.SetPopularity(XmlReadIntValue(node, L"popularity"));  // community(1)
     item.SetScore(ToDouble(XmlReadStrValue(node, L"score")));  // community(0)
     item.SetDateEnd(Date(XmlReadStrValue(node, L"date_end")));      // date(1)
@@ -422,7 +423,7 @@ bool Database::LoadList() {
     ReadDatabaseNode(node_database);
 
     xml_node node_library = document.child(L"library");
-    foreach_xmlnode_(node, node_library, L"anime") {
+    for (auto node : node_library.children(L"anime")) {
       Item anime_item;
       anime_item.SetId(XmlReadStrValue(node, L"id"), sync::kTaiga);
       anime_item.SetSource(sync::kTaiga);

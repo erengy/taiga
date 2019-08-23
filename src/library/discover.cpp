@@ -96,10 +96,10 @@ bool SeasonDatabase::LoadString(const std::wstring& data) {
 
   items.clear();
 
-  foreach_xmlnode_(node, season_node, L"anime") {
+  for (auto node : season_node.children(L"anime")) {
     std::map<enum_t, std::wstring> id_map;
 
-    foreach_xmlnode_(id_node, node, L"id") {
+    for (auto id_node : node.children(L"id")) {
       std::wstring id = id_node.child_value();
       std::wstring name = id_node.attribute(L"name").as_string();
       enum_t service_id = ServiceManager.GetServiceIdByName(name);

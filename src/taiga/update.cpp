@@ -83,7 +83,7 @@ bool UpdateHelper::ParseData(std::wstring data) {
     return false;
 
   xml_node channel = document.child(L"rss").child(L"channel");
-  foreach_xmlnode_(item, channel, L"item") {
+  for (auto item : channel.children(L"item")) {
     items.resize(items.size() + 1);
     items.back().guid = XmlReadStrValue(item, L"guid");
     items.back().category = XmlReadStrValue(item, L"category");

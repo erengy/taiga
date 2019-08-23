@@ -52,10 +52,10 @@ void MenuList::Load() {
 
   xml_node menus = document.child(L"menus");
 
-  foreach_xmlnode_(menu, menus, L"menu") {
+  for (auto menu : menus.children(L"menu")) {
     const std::wstring name = menu.attribute(L"name").value();
     menu_list_.Create(name, menu.attribute(L"type").value());
-    foreach_xmlnode_(item, menu, L"item") {
+    for (auto item : menu.children(L"item")) {
       menu_list_.menus[name].CreateItem(
           item.attribute(L"action").value(),
           item.attribute(L"name").value(),
