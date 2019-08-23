@@ -41,6 +41,7 @@
 #include "taiga/script.h"
 #include "taiga/settings.h"
 #include "taiga/taiga.h"
+#include "taiga/update.h"
 #include "taiga/version.h"
 #include "track/media.h"
 #include "track/recognition.h"
@@ -1118,7 +1119,7 @@ void OnUpdateNotAvailable(bool relations, bool season) {
                            StrToWstr(taiga::version().to_string());
     if (relations) {
       content += L"\n\nUpdated anime relations to: " +
-                 Taiga.Updater.GetCurrentAnimeRelationsModified();
+                 taiga::updater.GetCurrentAnimeRelationsModified();
     }
     if (season) {
       switch (taiga::GetCurrentServiceId()) {

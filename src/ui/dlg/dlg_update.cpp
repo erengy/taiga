@@ -20,6 +20,7 @@
 #include "taiga/config.h"
 #include "taiga/resource.h"
 #include "taiga/taiga.h"
+#include "taiga/update.h"
 #include "ui/dlg/dlg_main.h"
 #include "ui/dlg/dlg_update.h"
 #include "ui/dialog.h"
@@ -51,7 +52,7 @@ BOOL UpdateDialog::OnInitDialog() {
   progressbar.SetMarquee(true);
 
   // Check updates
-  Taiga.Updater.Check();
+  taiga::updater.Check();
 
   return TRUE;
 }
@@ -72,9 +73,9 @@ INT_PTR UpdateDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 
 BOOL UpdateDialog::OnDestroy() {
   // Clean up
-  Taiga.Updater.Cancel();
+  taiga::updater.Cancel();
 
-  if (Taiga.Updater.IsRestartRequired()) {
+  if (taiga::updater.IsRestartRequired()) {
     if (DlgMain.IsWindow()) {
       DlgMain.PostMessage(WM_DESTROY);
     } else {

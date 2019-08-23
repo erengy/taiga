@@ -21,7 +21,6 @@
 #include <windows/win/application.h>
 
 #include "taiga/command_line.h"
-#include "taiga/update.h"
 
 namespace taiga {
 
@@ -34,16 +33,6 @@ public:
   void Uninitialize();
 
   void LoadData();
-
-  class Updater : public UpdateHelper {
-  public:
-    void OnCheck();
-    void OnCRCCheck(const std::wstring& path, std::wstring& crc);
-    void OnDone();
-    void OnProgress(int file_index);
-    bool OnRestartApp();
-    void OnRunActions();
-  } Updater;
 
   CommandLineOptions options;
 };

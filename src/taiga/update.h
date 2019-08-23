@@ -26,11 +26,10 @@
 
 namespace taiga {
 
+namespace detail {
+
 class UpdateHelper {
 public:
-  UpdateHelper();
-  virtual ~UpdateHelper() {}
-
   void Cancel();
   void Check();
   void CheckAnimeRelations();
@@ -59,10 +58,14 @@ private:
   std::wstring download_path_;
   std::unique_ptr<Item> current_item_;
   std::unique_ptr<Item> latest_item_;
-  bool new_season_available_;
-  bool restart_required_;
-  bool update_available_;
+  bool new_season_available_ = false;
+  bool restart_required_ = false;
+  bool update_available_ = false;
   std::wstring client_uid_;
 };
+
+}  // namespace detail
+
+inline detail::UpdateHelper updater;
 
 }  // namespace taiga

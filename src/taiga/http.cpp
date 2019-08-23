@@ -34,6 +34,7 @@
 #include "taiga/settings.h"
 #include "taiga/stats.h"
 #include "taiga/taiga.h"
+#include "taiga/update.h"
 #include "taiga/version.h"
 #include "track/recognition.h"
 #include "ui/ui.h"
@@ -111,9 +112,9 @@ bool HttpClient::OnRedirect(const std::wstring& address, bool refresh) {
 
   switch (mode()) {
     case kHttpTaigaUpdateDownload: {
-      std::wstring path = GetPathOnly(Taiga.Updater.GetDownloadPath());
+      std::wstring path = GetPathOnly(taiga::updater.GetDownloadPath());
       std::wstring file = GetFileName(address);
-      Taiga.Updater.SetDownloadPath(path + file);
+      taiga::updater.SetDownloadPath(path + file);
       break;
     }
   }
@@ -283,16 +284,16 @@ void HttpManager::HandleResponse(HttpResponse& response) {
       break;
 
     case kHttpTaigaUpdateCheck: {
-      if (Taiga.Updater.ParseData(response.body)) {
-        if (Taiga.Updater.IsUpdateAvailable()) {
+      if (taiga::updater.ParseData(response.body)) {
+        if (taiga::updater.IsUpdateAvailable()) {
           ui::OnUpdateAvailable();
           break;
         }
-        if (Taiga.Updater.IsAnimeRelationsAvailable()) {
-          Taiga.Updater.CheckAnimeRelations();
+        if (taiga::updater.IsAnimeRelationsAvailable()) {
+          taiga::updater.CheckAnimeRelations();
           break;
         }
-        const bool new_season = Taiga.Updater.IsNewSeasonAvailable();
+        const bool new_season = taiga::updater.IsNewSeasonAvailable();
         ui::OnUpdateNotAvailable(false, new_season);
       }
       ui::OnUpdateFinished();
@@ -300,15 +301,15 @@ void HttpManager::HandleResponse(HttpResponse& response) {
     }
     case kHttpTaigaUpdateDownload:
       if (response.GetStatusCategory() == 200 &&
-          SaveToFile(client.write_buffer_, Taiga.Updater.GetDownloadPath())) {
-        Taiga.Updater.RunInstaller();
+          SaveToFile(client.write_buffer_, taiga::updater.GetDownloadPath())) {
+        taiga::updater.RunInstaller();
       } else {
         ui::OnUpdateFailed();
       }
       ui::OnUpdateFinished();
       break;
     case kHttpTaigaUpdateRelations: {
-      const bool new_season = Taiga.Updater.IsNewSeasonAvailable();
+      const bool new_season = taiga::updater.IsNewSeasonAvailable();
       if (Meow.ReadRelations(client.write_buffer_) &&
           SaveToFile(client.write_buffer_, GetPath(Path::DatabaseAnimeRelations))) {
         LOGD(L"Updated anime relation data.");

@@ -33,12 +33,7 @@
 #include "ui/dlg/dlg_main.h"
 #include "ui/ui.h"
 
-namespace taiga {
-
-UpdateHelper::UpdateHelper()
-    : restart_required_(false),
-      update_available_(false) {
-}
+namespace taiga::detail {
 
 void UpdateHelper::Cancel() {
   ConnectionManager.CancelRequest(client_uid_);
@@ -200,4 +195,4 @@ void UpdateHelper::SetDownloadPath(const std::wstring& path) {
   download_path_ = path;
 }
 
-}  // namespace taiga
+}  // namespace taiga::detail

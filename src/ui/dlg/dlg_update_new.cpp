@@ -20,7 +20,7 @@
 #include "base/string.h"
 #include "taiga/config.h"
 #include "taiga/resource.h"
-#include "taiga/taiga.h"
+#include "taiga/update.h"
 #include "taiga/version.h"
 #include "ui/dlg/dlg_update.h"
 #include "ui/dlg/dlg_update_new.h"
@@ -52,7 +52,7 @@ BOOL NewUpdateDialog::OnInitDialog() {
       L"{\\f0 Segoe UI;}"
       L"}"
       L"\\deflang1024\\fs18";
-  for (const auto& item : Taiga.Updater.items) {
+  for (const auto& item : taiga::updater.items) {
     semaver::Version item_version(WstrToStr(item.guid));
     if (item_version > taiga::version()) {
       changelog += L"\\b Version " + item.guid + L"\\b0\\line ";
@@ -72,7 +72,7 @@ BOOL NewUpdateDialog::OnInitDialog() {
 void NewUpdateDialog::OnOK() {
   EndDialog(IDOK);
 
-  if (!Taiga.Updater.Download())
+  if (!taiga::updater.Download())
     DlgUpdate.PostMessage(WM_CLOSE);
 }
 

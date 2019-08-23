@@ -41,6 +41,7 @@
 #include "taiga/taiga.h"
 #include "taiga/timer.h"
 #include "taiga/version.h"
+#include "track/feed.h"
 #include "track/media.h"
 #include "track/monitor.h"
 #include "ui/dlg/dlg_anime_list.h"

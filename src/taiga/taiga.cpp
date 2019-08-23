@@ -31,6 +31,7 @@
 #include "taiga/settings.h"
 #include "taiga/taiga.h"
 #include "taiga/version.h"
+#include "track/feed.h"
 #include "track/media.h"
 #include "ui/dialog.h"
 #include "ui/menu.h"
