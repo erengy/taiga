@@ -377,6 +377,7 @@
     <ClInclude Include="..\..\src\base\map.h" />
     <ClInclude Include="..\..\src\base\oauth.h" />
     <ClInclude Include="..\..\src\base\optional.h" />
+    <ClInclude Include="..\..\src\base\preprocessor.h" />
     <ClInclude Include="..\..\src\base\process.h" />
     <ClInclude Include="..\..\src\base\settings.h" />
     <ClInclude Include="..\..\src\base\string.h" />

@@ -1125,6 +1125,9 @@
     <ClInclude Include="..\..\src\ui\dlg\dlg_update_new.h">
       <Filter>ui\dlg</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\base\preprocessor.h">
+      <Filter>base</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\src\taiga\resource.rc">
