@@ -41,14 +41,10 @@ taiga::App Taiga;
 
 namespace taiga {
 
-App::App()
-    : allow_multiple_instances(false),
+App::App() {
 #ifdef _DEBUG
-      debug_mode(true)
-#else
-      debug_mode(false)
+  options.debug_mode = true;
 #endif
-{
 }
 
 App::~App() {
@@ -57,7 +53,7 @@ App::~App() {
 
 BOOL App::InitInstance() {
   // Parse command line
-  ParseCommandLineArguments();
+  options = ParseCommandLine();
 
   // Initialize logger
   const auto module_path = GetModulePath();
@@ -65,12 +61,12 @@ BOOL App::InitInstance() {
   using monolog::Level;
   monolog::log.enable_console_output(false);
   monolog::log.set_path(path + TAIGA_APP_NAME L".log");
-  monolog::log.set_level(debug_mode ? Level::Debug : Level::Warning);
+  monolog::log.set_level(options.debug_mode ? Level::Debug : Level::Warning);
   LOGI(L"Version {} ({})", StrToWstr(taiga::version().to_string()),
        GetFileLastModifiedDate(module_path));
 
   // Check another instance
-  if (!allow_multiple_instances) {
+  if (!options.allow_multiple_instances) {
     if (CheckInstance(L"Taiga-33d5a63c-de90-432f-9a8b-f6f733dab258",
                       L"TaigaMainW")) {
       LOGD(L"Another instance of Taiga is running.");
@@ -124,30 +120,6 @@ void App::Uninitialize() {
 
   // Exit
   PostQuitMessage();
-}
-
-void App::ParseCommandLineArguments() {
-  int argument_count = 0;
-  LPWSTR* argument_list = CommandLineToArgvW(GetCommandLine(), &argument_count);
-
-  if (!argument_count || !argument_list)
-    return;
-
-  for (int i = 1; i < argument_count; i++) {
-    std::wstring argument = argument_list[i];
-
-    if (argument == L"-debug") {
-      debug_mode = true;
-      LOGD(argument);
-    } else if (argument == L"-allowmultipleinstances") {
-      allow_multiple_instances = true;
-      LOGD(argument);
-    } else {
-      LOGW(L"Invalid argument: {}", argument);
-    }
-  }
-
-  LocalFree(argument_list);
 }
 
 void App::LoadData() {

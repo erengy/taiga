@@ -54,7 +54,7 @@ HttpClient::HttpClient(const HttpRequest& request)
   set_allow_reuse(Settings.GetBool(kApp_Connection_ReuseActive));
 
   // Enable debug mode to log requests and responses
-  set_debug_mode(Taiga.debug_mode);
+  set_debug_mode(Taiga.options.debug_mode);
 
   // Disabling certificate revocation checks seems to work for those who get
   // "SSL connect error". See issue #312 for more information.

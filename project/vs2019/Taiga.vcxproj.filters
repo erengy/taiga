@@ -616,6 +616,9 @@
     <ClCompile Include="..\..\src\taiga\version.cpp">
       <Filter>taiga</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\taiga\command_line.cpp">
+      <Filter>taiga</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\base\base64.h">
@@ -1132,6 +1135,9 @@
       <Filter>base</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\taiga\config.h">
+      <Filter>taiga</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\taiga\command_line.h">
       <Filter>taiga</Filter>
     </ClInclude>
   </ItemGroup>

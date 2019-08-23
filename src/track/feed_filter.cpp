@@ -369,7 +369,7 @@ bool FeedFilter::Filter(Feed& feed, FeedItem& item, bool recursive) {
     }
   }
 
-  if (Taiga.debug_mode) {
+  if (Taiga.options.debug_mode) {
     std::wstring filter_text =
         (item.IsDiscarded() ? L"!FILTER :: " : L"FILTER :: ") +
         Aggregator.filter_manager.TranslateConditions(*this, condition_index);
@@ -516,7 +516,7 @@ void FeedFilterManager::FilterArchived(Feed& feed) {
       bool found = Aggregator.SearchArchive(item.title);
       if (found) {
         item.state = FeedItemState::DiscardedNormal;
-        if (Taiga.debug_mode) {
+        if (Taiga.options.debug_mode) {
           std::wstring filter_text = L"!FILTER :: Archived";
           item.description = filter_text + L" -- " + item.description;
         }

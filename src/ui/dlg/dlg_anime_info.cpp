@@ -544,7 +544,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
         content += L"  \u2022 <a href=\"score\" id=\"{0}\">{1}</a>"
                    L" <a href=\"Info({0})\">[?]</a>"_format(
                    pair.first, anime::GetPreferredTitle(AnimeDatabase.items[pair.first]));
-        if (Taiga.debug_mode)
+        if (Taiga.options.debug_mode)
           content += L" [Score: {}]"_format(pair.second);
         content += L"\n";
         if (++count >= 10)

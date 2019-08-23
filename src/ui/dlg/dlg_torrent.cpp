@@ -375,7 +375,7 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
           case CDDS_ITEMPREPAINT | CDDS_SUBITEM: {
             FeedItem* feed_item = reinterpret_cast<FeedItem*>(pCD->nmcd.lItemlParam);
             if (feed_item) {
-              if (Taiga.debug_mode) {
+              if (Taiga.options.debug_mode) {
                 // Change background color
                 switch (feed_item->state) {
                   case FeedItemState::DiscardedNormal:
