@@ -25,7 +25,8 @@
 #include "sync/manager.h"
 #include "sync/sync.h"
 #include "taiga/settings.h"
-#include "taiga/taiga.h"
+#include "taiga/version.h"
+#include "track/feed.h"
 #include "track/media.h"
 
 namespace taiga {
@@ -40,7 +41,7 @@ void AppSettings::ReadLegacyValues(const xml_node& settings) {
       const semaver::Version version(ToInt(major), ToInt(minor), ToInt(patch));
       Set(kMeta_Version, StrToWstr(version.to_string()));
     } else {
-      Set(kMeta_Version, StrToWstr(Taiga.version.to_string()));
+      Set(kMeta_Version, StrToWstr(taiga::version().to_string()));
     }
   }
 
@@ -58,11 +59,11 @@ void AppSettings::ReadLegacyValues(const xml_node& settings) {
 bool AppSettings::HandleCompatibility() {
   const semaver::Version version(WstrToStr(GetWstr(kMeta_Version)));
 
-  if (version == Taiga.version)
+  if (version == taiga::version())
     return false;
 
   LOGW(L"Upgraded from v{} to v{}", StrToWstr(version.to_string()),
-       StrToWstr(Taiga.version.to_string()));
+       StrToWstr(taiga::version().to_string()));
 
   if (version <= semaver::Version(1, 1, 7)) {
     // Convert old password encoding to base64

@@ -28,6 +28,7 @@
 #include "taiga/http.h"
 #include "taiga/settings.h"
 #include "taiga/taiga.h"
+#include "taiga/version.h"
 #include "taiga/update.h"
 #include "ui/dlg/dlg_main.h"
 #include "ui/ui.h"
@@ -44,8 +45,8 @@ void UpdateHelper::Cancel() {
 }
 
 void UpdateHelper::Check() {
-  const std::wstring channel = Taiga.version.prerelease.empty() ?
-      L"stable" : StrToWstr(Taiga.version.prerelease);
+  const std::wstring channel = taiga::version().prerelease.empty() ?
+      L"stable" : StrToWstr(taiga::version().prerelease);
   const std::wstring method = ui::DlgMain.IsWindow() ? L"manual" : L"auto";
 
   HttpRequest http_request;
@@ -54,7 +55,7 @@ void UpdateHelper::Check() {
   http_request.url.path = L"/update.php";
   http_request.url.query[L"channel"] = channel;
   http_request.url.query[L"check"] = method;
-  http_request.url.query[L"version"] = StrToWstr(Taiga.version.to_string());
+  http_request.url.query[L"version"] = StrToWstr(taiga::version().to_string());
   http_request.url.query[L"service"] = GetCurrentService()->canonical_name();
   http_request.url.query[L"username"] = GetCurrentUsername();
 
@@ -100,7 +101,7 @@ bool UpdateHelper::ParseData(std::wstring data) {
     items.back().taiga_anime_season_max = XmlReadStrValue(item, L"taiga:animeSeasonMax");
   }
 
-  auto current_version = Taiga.version;
+  auto current_version = taiga::version();
   auto latest_version = current_version;
   for (const auto& item : items) {
     semaver::Version item_version(WstrToStr(item.guid));

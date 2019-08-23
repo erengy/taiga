@@ -34,6 +34,7 @@
 #include "sync/sync.h"
 #include "sync/kitsu_util.h"
 #include "taiga/announce.h"
+#include "taiga/config.h"
 #include "taiga/path.h"
 #include "taiga/settings.h"
 #include "taiga/stats.h"
@@ -355,7 +356,7 @@ bool AppSettings::Save() {
   xml_node settings = document.append_child(L"settings");
 
   // Meta
-  Set(kMeta_Version, StrToWstr(Taiga.version.to_string()));
+  Set(kMeta_Version, StrToWstr(taiga::version().to_string()));
 
   for (enum_t i = kAppSettingNameFirst; i < kAppSettingNameLast; ++i) {
     WriteValue(settings, i);

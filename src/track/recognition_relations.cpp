@@ -26,7 +26,7 @@
 #include "sync/service.h"
 #include "taiga/path.h"
 #include "taiga/settings.h"
-#include "taiga/taiga.h"
+#include "taiga/version.h"
 #include "track/recognition.h"
 
 namespace track {
@@ -194,7 +194,7 @@ bool Engine::ReadRelations(const std::string& document) {
           auto value = match_results[2].str();
           if (name == L"version") {
             semaver::Version version(WstrToStr(value));
-            if (version > Taiga.version)
+            if (version > taiga::version())
               LOGD(L"Anime relations version is larger than application version.");
           } else if (name == L"last_modified") {
             Settings.Set(taiga::kRecognition_RelationsLastModified, value);

@@ -25,6 +25,7 @@
 #include "library/anime_db.h"
 #include "library/history.h"
 #include "taiga/announce.h"
+#include "taiga/config.h"
 #include "taiga/dummy.h"
 #include "taiga/resource.h"
 #include "taiga/settings.h"
@@ -48,12 +49,6 @@ App::App()
       debug_mode(false)
 #endif
 {
-  version.major = TAIGA_VERSION_MAJOR;
-  version.minor = TAIGA_VERSION_MINOR;
-  version.patch = TAIGA_VERSION_PATCH;
-  version.prerelease = TAIGA_VERSION_PRE;
-  if (TAIGA_VERSION_BUILD > 0)
-    version.build = ToStr(TAIGA_VERSION_BUILD);
 }
 
 App::~App() {
@@ -71,7 +66,7 @@ BOOL App::InitInstance() {
   monolog::log.enable_console_output(false);
   monolog::log.set_path(path + TAIGA_APP_NAME L".log");
   monolog::log.set_level(debug_mode ? Level::Debug : Level::Warning);
-  LOGI(L"Version {} ({})", StrToWstr(version.to_string()),
+  LOGI(L"Version {} ({})", StrToWstr(taiga::version().to_string()),
        GetFileLastModifiedDate(module_path));
 
   // Check another instance

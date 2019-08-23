@@ -21,6 +21,7 @@
 #include "taiga/config.h"
 #include "taiga/resource.h"
 #include "taiga/taiga.h"
+#include "taiga/version.h"
 #include "ui/dlg/dlg_update.h"
 #include "ui/dlg/dlg_update_new.h"
 #include "ui/theme.h"
@@ -41,7 +42,7 @@ BOOL NewUpdateDialog::OnInitDialog() {
                  L"A new version of " TAIGA_APP_NAME L" is available!");
 
   // Set details text
-  std::wstring text = L"Current version: " + StrToWstr(Taiga.version.to_string());
+  std::wstring text = L"Current version: " + StrToWstr(taiga::version().to_string());
   SetDlgItemText(IDC_STATIC_UPDATE_DETAILS, text.c_str());
 
   // Set changelog text
@@ -53,7 +54,7 @@ BOOL NewUpdateDialog::OnInitDialog() {
       L"\\deflang1024\\fs18";
   for (const auto& item : Taiga.Updater.items) {
     semaver::Version item_version(WstrToStr(item.guid));
-    if (item_version > Taiga.version) {
+    if (item_version > taiga::version()) {
       changelog += L"\\b Version " + item.guid + L"\\b0\\line ";
       std::wstring description = item.description;
       ReplaceString(description, L"\n", L"\\line ");

@@ -32,7 +32,7 @@
 #include "taiga/http.h"
 #include "taiga/path.h"
 #include "taiga/settings.h"
-#include "taiga/taiga.h"
+#include "taiga/version.h"
 #include "track/recognition.h"
 #include "ui/dlg/dlg_anime_list.h"
 #include "ui/ui.h"
@@ -136,7 +136,7 @@ bool Database::SaveDatabase() {
   xml_document document;
 
   xml_node meta_node = document.append_child(L"meta");
-  XmlWriteStrValue(meta_node, L"version", StrToWstr(Taiga.version.to_string()).c_str());
+  XmlWriteStrValue(meta_node, L"version", StrToWstr(taiga::version().to_string()).c_str());
 
   xml_node database_node = document.append_child(L"database");
   WriteDatabaseNode(database_node);
@@ -461,7 +461,7 @@ bool Database::SaveList(bool include_database) {
   xml_document document;
 
   xml_node meta_node = document.append_child(L"meta");
-  XmlWriteStrValue(meta_node, L"version", StrToWstr(Taiga.version.to_string()).c_str());
+  XmlWriteStrValue(meta_node, L"version", StrToWstr(taiga::version().to_string()).c_str());
 
   if (include_database) {
     xml_node node_database = document.append_child(L"database");

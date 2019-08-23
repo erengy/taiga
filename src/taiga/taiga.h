@@ -18,7 +18,6 @@
 
 #pragma once
 
-#include <semaver/src/semaver.hpp>
 #include <windows/win/application.h>
 
 #include "taiga/update.h"
@@ -37,7 +36,6 @@ public:
 
   bool allow_multiple_instances;
   bool debug_mode;
-  semaver::Version version;
 
   class Updater : public UpdateHelper {
   public:

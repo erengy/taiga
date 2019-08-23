@@ -27,7 +27,7 @@
 #include "taiga/announce.h"
 #include "taiga/path.h"
 #include "taiga/settings.h"
-#include "taiga/taiga.h"
+#include "taiga/version.h"
 #include "track/media.h"
 #include "track/search.h"
 #include "ui/ui.h"
@@ -472,7 +472,7 @@ bool History::Save() {
 
   // Write meta
   xml_node node_meta = document.append_child(L"meta");
-  XmlWriteStrValue(node_meta, L"version", StrToWstr(Taiga.version.to_string()).c_str());
+  XmlWriteStrValue(node_meta, L"version", StrToWstr(taiga::version().to_string()).c_str());
 
   xml_node node_history = document.append_child(L"history");
 

@@ -16,12 +16,22 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#pragma once
+#include "taiga/version.h"
 
-#include <semaver.hpp>
+#include "base/preprocessor.h"
+#include "taiga/config.h"
 
 namespace taiga {
 
-const semaver::Version& version();
+const semaver::Version& version() {
+  static const semaver::Version version(
+      TAIGA_VERSION_MAJOR,
+      TAIGA_VERSION_MINOR,
+      TAIGA_VERSION_PATCH,
+      TAIGA_VERSION_PRE,
+      TAIGA_VERSION_BUILD > 0 ? STRINGIZE(TAIGA_VERSION_BUILD) : ""
+    );
+  return version;
+}
 
 }  // namespace taiga

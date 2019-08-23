@@ -38,6 +38,7 @@
 #include "taiga/script.h"
 #include "taiga/settings.h"
 #include "taiga/taiga.h"
+#include "taiga/version.h"
 #include "track/media.h"
 #include "ui/dlg/dlg_feed_filter.h"
 #include "ui/dlg/dlg_format.h"
@@ -783,7 +784,7 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
         case 107: {
           std::wstring data;
           Aggregator.filter_manager.Export(data, parent->feed_filters_);
-          std::wstring metadata = StrToWstr(Taiga.version.to_string());
+          std::wstring metadata = StrToWstr(taiga::version().to_string());
           InputDialog dlg;
           StringCoder coder;
           if (coder.Encode(metadata, data, dlg.text)) {

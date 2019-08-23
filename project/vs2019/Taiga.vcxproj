@@ -60,7 +60,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;NOMINMAX;_WINDOWS;_WIN32_WINNT=0x0600;PUGIXML_WCHAR_MODE;FMT_EXCEPTIONS=0;UTF8PROC_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)\x\x\%(RelativeDir)</ObjectFileName>
-      <AdditionalIncludeDirectories>..\..\deps\src;..\..\deps\src\discord-rpc\include;..\..\deps\src\rapidjson\include;..\..\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\deps\src;..\..\deps\src\discord-rpc\include;..\..\deps\src\rapidjson\include;..\..\deps\src\semaver\src;..\..\src</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
@@ -87,7 +87,7 @@
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <ObjectFileName>$(IntDir)\x\x\%(RelativeDir)</ObjectFileName>
-      <AdditionalIncludeDirectories>..\..\deps\src;..\..\deps\src\discord-rpc\include;..\..\deps\src\rapidjson\include;..\..\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\deps\src;..\..\deps\src\discord-rpc\include;..\..\deps\src\rapidjson\include;..\..\deps\src\semaver\src;..\..\src</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -245,6 +245,7 @@
     <ClCompile Include="..\..\src\taiga\taiga.cpp" />
     <ClCompile Include="..\..\src\taiga\timer.cpp" />
     <ClCompile Include="..\..\src\taiga\update.cpp" />
+    <ClCompile Include="..\..\src\taiga\version.cpp" />
     <ClCompile Include="..\..\src\track\feed.cpp" />
     <ClCompile Include="..\..\src\track\feed_aggregator.cpp" />
     <ClCompile Include="..\..\src\track\feed_filter.cpp" />

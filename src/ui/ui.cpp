@@ -41,6 +41,7 @@
 #include "taiga/script.h"
 #include "taiga/settings.h"
 #include "taiga/taiga.h"
+#include "taiga/version.h"
 #include "track/media.h"
 #include "track/recognition.h"
 #include "ui/dlg/dlg_anime_info.h"
@@ -1114,7 +1115,7 @@ void OnUpdateNotAvailable(bool relations, bool season) {
     win::TaskDialog dlg(L"Update", TD_ICON_INFORMATION);
     dlg.SetMainInstruction(L"Taiga is up to date!");
     std::wstring content = L"Current version: " +
-                           StrToWstr(Taiga.version.to_string());
+                           StrToWstr(taiga::version().to_string());
     if (relations) {
       content += L"\n\nUpdated anime relations to: " +
                  Taiga.Updater.GetCurrentAnimeRelationsModified();

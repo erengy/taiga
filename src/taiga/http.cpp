@@ -28,6 +28,7 @@
 #include "library/resource.h"
 #include "sync/manager.h"
 #include "taiga/announce.h"
+#include "taiga/config.h"
 #include "taiga/http.h"
 #include "taiga/path.h"
 #include "taiga/settings.h"
