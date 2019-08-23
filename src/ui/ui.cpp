@@ -35,6 +35,7 @@
 #include "sync/manager.h"
 #include "sync/service.h"
 #include "sync/sync.h"
+#include "taiga/config.h"
 #include "taiga/http.h"
 #include "taiga/resource.h"
 #include "taiga/script.h"

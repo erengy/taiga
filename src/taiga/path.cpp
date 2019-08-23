@@ -21,6 +21,7 @@
 #include "base/file.h"
 #include "base/string.h"
 #include "sync/manager.h"
+#include "taiga/config.h"
 #include "taiga/path.h"
 #include "taiga/settings.h"
 #include "taiga/taiga.h"

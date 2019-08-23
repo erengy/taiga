@@ -1128,6 +1128,9 @@
     <ClInclude Include="..\..\src\base\preprocessor.h">
       <Filter>base</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\taiga\config.h">
+      <Filter>taiga</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\src\taiga\resource.rc">

@@ -20,8 +20,8 @@
 #include "base/gfx.h"
 #include "base/string.h"
 #include "base/xml.h"
+#include "taiga/config.h"
 #include "taiga/path.h"
-#include "taiga/taiga.h"
 #include "ui/theme.h"
 #include "ui/ui.h"
 

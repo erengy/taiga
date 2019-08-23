@@ -5,7 +5,7 @@
 #include <windows.h>
 #include <commctrl.h>
 #include <richedit.h>
-#include "version.h"
+#include "config.h"
 
 
 
@@ -15,8 +15,8 @@
 //
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 1 VERSIONINFO
-    FILEVERSION     VERSION_VALUE_DIGITAL
-    PRODUCTVERSION  VERSION_VALUE_DIGITAL
+    FILEVERSION     TAIGA_VERSION_DIGITAL
+    PRODUCTVERSION  TAIGA_VERSION_DIGITAL
     FILEOS          VOS_NT_WINDOWS32
     FILETYPE        VFT_APP
     FILESUBTYPE     VFT2_UNKNOWN
@@ -29,11 +29,11 @@ LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
         {
             VALUE "CompanyName", "erengy"
             VALUE "FileDescription", "Taiga"
-            VALUE "FileVersion", VERSION_VALUE_STRING
+            VALUE "FileVersion", TAIGA_VERSION_STRING
             VALUE "InternalName", "Taiga"
             VALUE "OriginalFilename", "Taiga.exe"
             VALUE "ProductName", "Taiga"
-            VALUE "ProductVersion", VERSION_VALUE_STRING
+            VALUE "ProductVersion", TAIGA_VERSION_STRING
         }
     }
     BLOCK "VarFileInfo"

@@ -18,13 +18,6 @@
 
 #pragma once
 
-// Each client will have its own thread
-#define TAIGA_HTTP_MULTITHREADED
-
-#ifdef _DEBUG
-#define TAIGA_HTTP_SSL_UNSECURE
-#endif
-
 // CURL definitions
 #ifndef CURL_STATICLIB
 #define CURL_STATICLIB

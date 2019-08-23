@@ -29,6 +29,7 @@
 #include "sync/service.h"
 #include "sync/sync.h"
 #include "taiga/announce.h"
+#include "taiga/config.h"
 #include "taiga/resource.h"
 #include "taiga/script.h"
 #include "taiga/settings.h"

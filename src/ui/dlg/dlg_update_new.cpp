@@ -18,6 +18,7 @@
 
 #include "base/gfx.h"
 #include "base/string.h"
+#include "taiga/config.h"
 #include "taiga/resource.h"
 #include "taiga/taiga.h"
 #include "ui/dlg/dlg_update.h"

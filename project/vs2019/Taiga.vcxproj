@@ -412,6 +412,7 @@
     <ClInclude Include="..\..\src\sync\service.h" />
     <ClInclude Include="..\..\src\sync\sync.h" />
     <ClInclude Include="..\..\src\taiga\announce.h" />
+    <ClInclude Include="..\..\src\taiga\config.h" />
     <ClInclude Include="..\..\src\taiga\debug.h" />
     <ClInclude Include="..\..\src\taiga\dummy.h" />
     <ClInclude Include="..\..\src\taiga\http.h" />

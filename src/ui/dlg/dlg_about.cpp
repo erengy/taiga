@@ -27,6 +27,7 @@
 #include "base/file.h"
 #include "base/gfx.h"
 #include "base/string.h"
+#include "taiga/config.h"
 #include "taiga/orange.h"
 #include "taiga/resource.h"
 #include "taiga/stats.h"

@@ -23,11 +23,6 @@
 
 #include "taiga/update.h"
 
-#define TAIGA_APP_NAME    L"Taiga"
-#define TAIGA_APP_TITLE   L"Taiga"
-
-#define TAIGA_PORTABLE
-
 namespace taiga {
 
 class App : public win::App {
