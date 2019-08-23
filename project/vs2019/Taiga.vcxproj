@@ -63,6 +63,7 @@
       <AdditionalIncludeDirectories>..\..\deps\src;..\..\deps\src\discord-rpc\include;..\..\deps\src\rapidjson\include;..\..\deps\src\semaver\src;..\..\src</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
