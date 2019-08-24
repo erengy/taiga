@@ -816,9 +816,6 @@
     <ClInclude Include="..\..\deps\src\fmt\fmt\time.h">
       <Filter>deps\fmt</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\deps\src\json\src\json.hpp">
-      <Filter>deps\json</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\deps\src\monolog\monolog.h">
       <Filter>deps\monolog</Filter>
     </ClInclude>
@@ -1139,6 +1136,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\taiga\command_line.h">
       <Filter>taiga</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\json\single_include\nlohmann\json.hpp">
+      <Filter>deps\json</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

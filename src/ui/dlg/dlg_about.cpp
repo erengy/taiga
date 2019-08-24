@@ -18,7 +18,7 @@
 
 #include <curl/include/curl/curlver.h>
 #include <fmt/fmt/format.h>
-#include <json/single_include/nlohmann/json.hpp>
+#include <nlohmann/json.hpp>
 #include <pugixml/src/pugixml.hpp>
 #include <rapidjson/rapidjson.h>
 #include <utf8proc/utf8proc.h>
