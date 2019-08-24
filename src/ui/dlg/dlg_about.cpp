@@ -16,7 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <curl/include/curl/curlver.h>
+#include <curl/curlver.h>
 #include <fmt/fmt/format.h>
 #include <nlohmann/json.hpp>
 #include <pugixml/src/pugixml.hpp>

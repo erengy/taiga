@@ -30,7 +30,7 @@
 #include <string>
 #include <vector>
 
-#include <curl/include/curl/curl.h>
+#include <curl/curl.h>
 #include <windows/win/thread.h>
 
 #include "map.h"
