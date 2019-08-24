@@ -20,16 +20,19 @@
 
 #include <string>
 
-#include "base/file.h"
+#include "base/file_search.h"
 #include "library/anime_episode.h"
 
-class TaigaFileSearchHelper : public FileSearchHelper {
-public:
-  TaigaFileSearchHelper();
-  ~TaigaFileSearchHelper() {}
+namespace track {
 
-  bool OnDirectory(const std::wstring& root, const std::wstring& name, const WIN32_FIND_DATA& data);
-  bool OnFile(const std::wstring& root, const std::wstring& name, const WIN32_FIND_DATA& data);
+class FileSearch : public base::FileSearch {
+ public:
+  FileSearch();
+
+  bool OnDirectory(const base::FileSearchResult& result);
+  bool OnFile(const base::FileSearchResult& result);
+
+  bool Search(const std::wstring& root);
 
   const std::wstring& path_found() const;
 
@@ -37,14 +40,16 @@ public:
   void set_episode_number(int episode_number);
   void set_path_found(const std::wstring& path_found);
 
-private:
+ private:
   int anime_id_;
   anime::Episode episode_;
   int episode_number_;
   std::wstring path_found_;
 };
 
-extern TaigaFileSearchHelper file_search_helper;
+inline FileSearch file_search_helper;
+
+}  // namespace track
 
 void ScanAvailableEpisodes(bool silent);
 void ScanAvailableEpisodes(bool silent, int anime_id, int episode_number);

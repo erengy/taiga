@@ -24,6 +24,7 @@
 #include <windows/win/registry.h>
 
 #include "file.h"
+#include "file_search.h"
 #include "format.h"
 #include "log.h"
 #include "string.h"
@@ -111,17 +112,16 @@ QWORD GetFolderSize(const std::wstring& path, bool recursive) {
   QWORD folder_size = 0;
   const QWORD max_dword = static_cast<QWORD>(MAXDWORD) + 1;
 
-  auto OnFile = [&](const std::wstring& root, const std::wstring& name,
-                    const WIN32_FIND_DATA& data) {
-    folder_size += static_cast<QWORD>(data.nFileSizeHigh) * max_dword +
-                   static_cast<QWORD>(data.nFileSizeLow);
+  const auto on_file = [&](const base::FileSearchResult& result) {
+    folder_size += static_cast<QWORD>(result.data.nFileSizeHigh) * max_dword +
+                   static_cast<QWORD>(result.data.nFileSizeLow);
     return false;
   };
 
-  FileSearchHelper helper;
-  helper.set_log_errors(false);
-  helper.set_skip_subdirectories(!recursive);
-  helper.Search(path, nullptr, OnFile);
+  base::FileSearch helper;
+  helper.options.log_errors = false;
+  helper.options.skip_subdirectories = !recursive;
+  helper.Search(path, nullptr, on_file);
 
   return folder_size;
 }
@@ -374,19 +374,19 @@ unsigned int PopulateFiles(std::vector<std::wstring>& file_list,
                            bool trim_extension) {
   unsigned int file_count = 0;
 
-  auto OnFile = [&](const std::wstring& root, const std::wstring& name,
-                    const WIN32_FIND_DATA& data) {
-    if (extension.empty() || IsEqual(GetFileExtension(name), extension)) {
-      file_list.push_back(trim_extension ? GetFileWithoutExtension(name) : name);
+  const auto on_file = [&](const base::FileSearchResult& result) {
+    if (extension.empty() || IsEqual(GetFileExtension(result.name), extension)) {
+      file_list.push_back(trim_extension ?
+                          GetFileWithoutExtension(result.name) : result.name);
       file_count++;
     }
     return false;
   };
 
-  FileSearchHelper helper;
-  helper.set_log_errors(false);
-  helper.set_skip_subdirectories(!recursive);
-  helper.Search(path, nullptr, OnFile);
+  base::FileSearch helper;
+  helper.options.log_errors = false;
+  helper.options.skip_subdirectories = !recursive;
+  helper.Search(path, nullptr, on_file);
 
   return file_count;
 }
@@ -395,17 +395,16 @@ int PopulateFolders(std::vector<std::wstring>& folder_list,
                     const std::wstring& path) {
   unsigned int folder_count = 0;
 
-  auto OnDirectory = [&](const std::wstring& root, const std::wstring& name,
-                         const WIN32_FIND_DATA& data) {
-    folder_list.push_back(name);
+  const auto on_directory = [&](const base::FileSearchResult& result) {
+    folder_list.push_back(result.name);
     folder_count++;
     return false;
   };
 
-  FileSearchHelper helper;
-  helper.set_log_errors(false);
-  helper.set_skip_subdirectories(true);
-  helper.Search(path, OnDirectory, nullptr);
+  base::FileSearch helper;
+  helper.options.log_errors = false;
+  helper.options.skip_subdirectories = true;
+  helper.Search(path, on_directory, nullptr);
 
   return folder_count;
 }

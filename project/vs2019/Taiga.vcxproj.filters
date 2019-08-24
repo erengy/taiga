@@ -1140,6 +1140,9 @@
     <ClInclude Include="..\..\deps\src\json\single_include\nlohmann\json.hpp">
       <Filter>deps\json</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\base\file_search.h">
+      <Filter>base</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\src\taiga\resource.rc">

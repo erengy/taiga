@@ -18,6 +18,7 @@
 
 #include <windows/win/common_dialogs.h>
 
+#include "base/file.h"
 #include "base/format.h"
 #include "base/log.h"
 #include "base/process.h"

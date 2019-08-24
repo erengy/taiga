@@ -18,6 +18,7 @@
 
 #include <windows/win/task_dialog.h>
 
+#include "base/file.h"
 #include "base/process.h"
 #include "base/string.h"
 #include "library/anime.h"

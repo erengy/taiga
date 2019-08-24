@@ -249,7 +249,7 @@ bool PlayEpisode(int anime_id, int number) {
   if (file_path.empty()) {
     ScanAvailableEpisodes(false, anime_item->GetId(), number);
     if (anime_item->IsEpisodeAvailable(number)) {
-      file_path = file_search_helper.path_found();
+      file_path = track::file_search_helper.path_found();
     }
   }
 

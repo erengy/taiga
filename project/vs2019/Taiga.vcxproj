@@ -369,6 +369,7 @@
     <ClInclude Include="..\..\src\base\crypto.h" />
     <ClInclude Include="..\..\src\base\file.h" />
     <ClInclude Include="..\..\src\base\file_monitor.h" />
+    <ClInclude Include="..\..\src\base\file_search.h" />
     <ClInclude Include="..\..\src\base\foreach.h" />
     <ClInclude Include="..\..\src\base\format.h" />
     <ClInclude Include="..\..\src\base\gfx.h" />
