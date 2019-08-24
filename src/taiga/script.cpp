@@ -32,6 +32,7 @@
 #include "taiga/settings.h"
 #include "taiga/taiga.h"
 #include "track/media.h"
+#include "ui/translate.h"
 #include "ui/ui.h"
 
 // The idea behind Taiga's script functions is borrowed from Mp3tag, which
@@ -373,10 +374,10 @@ std::wstring ReplaceVariables(std::wstring str, const anime::Episode& episode,
         std::wstring var = str.substr(pos_var + 1, pos_end - pos_var - 1);
         if (IsScriptVariable(var)) {
           REPLACE(L"title", VALIDATE(ENCODE(anime::GetPreferredTitle(*anime_item)), ENCODE(episode.anime_title())));
-          REPLACE(L"watched", VALIDATE(ENCODE(anime::TranslateNumber(anime_item->GetMyLastWatchedEpisode(), L"")), L""));
-          REPLACE(L"total", VALIDATE(ENCODE(anime::TranslateNumber(anime_item->GetEpisodeCount(), L"")), L""));
-          REPLACE(L"score", VALIDATE(ENCODE(anime::TranslateMyScore(anime_item->GetMyScore(), L"")), L""));
-          REPLACE(L"season", VALIDATE(ENCODE(anime::TranslateDateToSeasonString(anime_item->GetDateStart())), L""));
+          REPLACE(L"watched", VALIDATE(ENCODE(ui::TranslateNumber(anime_item->GetMyLastWatchedEpisode(), L"")), L""));
+          REPLACE(L"total", VALIDATE(ENCODE(ui::TranslateNumber(anime_item->GetEpisodeCount(), L"")), L""));
+          REPLACE(L"score", VALIDATE(ENCODE(ui::TranslateMyScore(anime_item->GetMyScore(), L"")), L""));
+          REPLACE(L"season", VALIDATE(ENCODE(ui::TranslateDateToSeasonString(anime_item->GetDateStart())), L""));
           REPLACE(L"id", ENCODE(id));
           REPLACE(L"image", VALIDATE(ENCODE(anime_item->GetImageUrl()), L""));
           REPLACE(L"status", VALIDATE(ENCODE(ToWstr(anime_item->GetMyStatus())), L""));

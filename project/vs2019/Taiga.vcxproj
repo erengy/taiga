@@ -283,6 +283,9 @@
     <ClCompile Include="..\..\src\ui\list.cpp" />
     <ClCompile Include="..\..\src\ui\menu.cpp" />
     <ClCompile Include="..\..\src\ui\theme.cpp" />
+    <ClCompile Include="..\..\src\ui\translate\anime.cpp" />
+    <ClCompile Include="..\..\src\ui\translate\base.cpp" />
+    <ClCompile Include="..\..\src\ui\translate\list.cpp" />
     <ClCompile Include="..\..\src\ui\ui.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -459,6 +462,7 @@
     <ClInclude Include="..\..\src\ui\list.h" />
     <ClInclude Include="..\..\src\ui\menu.h" />
     <ClInclude Include="..\..\src\ui\theme.h" />
+    <ClInclude Include="..\..\src\ui\translate.h" />
     <ClInclude Include="..\..\src\ui\ui.h" />
   </ItemGroup>
   <ItemGroup>

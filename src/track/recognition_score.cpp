@@ -23,6 +23,7 @@
 #include "library/anime_episode.h"
 #include "library/anime_util.h"
 #include "track/recognition.h"
+#include "ui/translate.h"
 
 namespace track {
 namespace recognition {
@@ -103,7 +104,7 @@ static double BonusScore(const anime::Episode& episode, int id) {
       if (anime_year == anime_item->GetDateStart().year())
         score += 0.1;
 
-    auto anime_type = anime::TranslateType(episode.anime_type());
+    auto anime_type = ui::TranslateType(episode.anime_type());
     if (anime_type != anime::kUnknownType)
       if (anime_type == anime_item->GetType())
         score += 0.1;

@@ -46,6 +46,7 @@
 #include "ui/dlg/dlg_feed_filter.h"
 #include "ui/dialog.h"
 #include "ui/menu.h"
+#include "ui/translate.h"
 #include "ui/ui.h"
 
 void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
@@ -692,7 +693,7 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
       case sync::kMyAnimeList:
         if (SeasonDatabase.LoadSeason(body)) {
           Settings.Set(taiga::kApp_Seasons_LastSeason,
-                       SeasonDatabase.current_season.GetString());
+                       ui::TranslateSeason(SeasonDatabase.current_season));
           SeasonDatabase.Review();
           ui::OnSeasonLoad(SeasonDatabase.IsRefreshRequired());
         }
@@ -701,7 +702,7 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
       case sync::kAniList:
         if (SeasonDatabase.LoadSeasonFromMemory(body)) {
           Settings.Set(taiga::kApp_Seasons_LastSeason,
-                       SeasonDatabase.current_season.GetString());
+                       ui::TranslateSeason(SeasonDatabase.current_season));
           ui::OnSeasonLoad(false);
           if (SeasonDatabase.items.empty()) {
             ui::DlgSeason.GetData();

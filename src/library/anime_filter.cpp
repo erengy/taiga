@@ -24,6 +24,7 @@
 #include "library/anime_filter.h"
 #include "library/anime_item.h"
 #include "library/anime_util.h"
+#include "ui/translate.h"
 
 namespace anime {
 
@@ -196,12 +197,12 @@ bool Filters::CheckItem(const Item& item, int text_index) const {
         break;
 
       case SearchField::Type:
-        if (item.GetType() != TranslateType(term.value))
+        if (item.GetType() != ui::TranslateType(term.value))
           return false;
         break;
 
       case SearchField::Season: {
-        const auto season = TranslateDateToSeasonString(item.GetDateStart());
+        const auto season = ui::TranslateDateToSeasonString(item.GetDateStart());
         if (!CheckString(season, term.value))
           return false;
         break;

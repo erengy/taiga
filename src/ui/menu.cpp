@@ -32,6 +32,7 @@
 #include "taiga/settings.h"
 #include "track/feed.h"
 #include "ui/menu.h"
+#include "ui/translate.h"
 
 #include "dlg/dlg_anime_list.h"
 #include "dlg/dlg_main.h"
@@ -392,8 +393,8 @@ void MenuList::UpdateSeason() {
     }
 
     auto create_item = [](win::Menu& menu, const anime::Season& season) {
-      menu.CreateItem(L"Season_Load(" + season.GetString() + L")",
-                      season.GetString(), L"",
+      const auto season_str = ui::TranslateSeason(season);
+      menu.CreateItem(L"Season_Load(" + season_str + L")", season_str, L"",
                       season == SeasonDatabase.current_season,
                       false, true, false, true);
     };

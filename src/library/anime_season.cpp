@@ -146,30 +146,6 @@ void Season::GetInterval(Date& date_start, Date& date_end) const {
   date_end.set_day(days_in_months[date_end.month() - 1]);
 }
 
-std::wstring Season::GetName() const {
-  static std::map<Season::Name, std::wstring> seasons{
-    {kUnknown, L"Unknown"},
-    {kWinter, L"Winter"},
-    {kSpring, L"Spring"},
-    {kSummer, L"Summer"},
-    {kFall, L"Fall"},
-  };
-
-  return seasons[name];
-}
-
-std::wstring Season::GetString() const {
-  static std::map<Season::Name, std::wstring> seasons{
-    {kUnknown, L""},
-    {kWinter, L"Winter "},
-    {kSpring, L"Spring "},
-    {kSummer, L"Summer "},
-    {kFall, L"Fall "},
-  };
-
-  return seasons[name] + ToWstr(year);
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 
 base::CompareResult Season::Compare(const Season& season) const {

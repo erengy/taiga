@@ -60,6 +60,7 @@
 #include "ui/dialog.h"
 #include "ui/menu.h"
 #include "ui/theme.h"
+#include "ui/translate.h"
 #include "ui/ui.h"
 
 namespace ui {
@@ -799,7 +800,7 @@ void OnSeasonLoadFail() {
 
 bool OnSeasonRefreshRequired() {
   win::TaskDialog dlg;
-  std::wstring title = L"Season - " + SeasonDatabase.current_season.GetString();
+  std::wstring title = L"Season - " + ui::TranslateSeason(SeasonDatabase.current_season);
   dlg.SetWindowTitle(title.c_str());
   dlg.SetMainIcon(TD_ICON_INFORMATION);
   dlg.SetMainInstruction(L"Would you like to refresh this season's data?");
@@ -1125,7 +1126,7 @@ void OnUpdateNotAvailable(bool relations, bool season) {
       switch (taiga::GetCurrentServiceId()) {
         case sync::kMyAnimeList:
           content += L"\n\nNew anime season: " +
-                     SeasonDatabase.available_seasons.second.GetString();
+                     ui::TranslateSeason(SeasonDatabase.available_seasons.second);
           break;
       }
     }

@@ -42,6 +42,7 @@
 #include "ui/list.h"
 #include "ui/menu.h"
 #include "ui/theme.h"
+#include "ui/translate.h"
 #include "ui/ui.h"
 
 namespace ui {
@@ -92,10 +93,10 @@ BOOL AnimeListDialog::OnInitDialog() {
   listview.InsertColumns();
 
   // Insert tabs and list groups
-  listview.InsertGroup(anime::kNotInList, anime::TranslateMyStatus(anime::kNotInList, false).c_str());
+  listview.InsertGroup(anime::kNotInList, ui::TranslateMyStatus(anime::kNotInList, false).c_str());
   for (int i = anime::kMyStatusFirst; i < anime::kMyStatusLast; i++) {
-    tab.InsertItem(i - 1, anime::TranslateMyStatus(i, true).c_str(), (LPARAM)i);
-    listview.InsertGroup(i, anime::TranslateMyStatus(i, false).c_str());
+    tab.InsertItem(i - 1, ui::TranslateMyStatus(i, true).c_str(), (LPARAM)i);
+    listview.InsertGroup(i, ui::TranslateMyStatus(i, false).c_str());
   }
 
   // Track mouse leave event for the list view
@@ -588,7 +589,7 @@ void AnimeListDialog::ListView::RefreshItem(int index) {
     get_subitem_rect(kColumnAnimeStatus, rect_item);
     if (rect_item.PtIn(pt)) {
       const std::wstring text = anime_item->GetPlaying() ? L"Now playing" :
-          anime::TranslateStatus(anime_item->GetAiringStatus());
+          ui::TranslateStatus(anime_item->GetAiringStatus());
       update_tooltip(kTooltipAnimeStatus, text.c_str(), &rect_item);
     }
   }
@@ -1126,7 +1127,7 @@ void AnimeListDialog::ListView::DrawProgressText(HDC hdc, RECT* rc,
   dc.SetTextColor(text_color);
 
   // Episodes watched
-  text = anime::TranslateNumber(eps_watched, L"0");
+  text = ui::TranslateNumber(eps_watched, L"0");
   rcText.right -= (rcText.Width() / 2) + ScaleX(4);
   if (!eps_watched) {
     dc.SetTextColor(::GetSysColor(COLOR_GRAYTEXT));
@@ -1140,7 +1141,7 @@ void AnimeListDialog::ListView::DrawProgressText(HDC hdc, RECT* rc,
   dc.SetTextColor(text_color);
 
   // Total episodes
-  text = anime::TranslateNumber(eps_total, L"?");
+  text = ui::TranslateNumber(eps_total, L"?");
   rcText.left = rcText.right + ScaleX(8);
   rcText.right = rc->right;
   if (!eps_total)
@@ -1168,7 +1169,7 @@ void AnimeListDialog::ListView::DrawScoreBox(HDC hdc, RECT* rc, int index,
     COLORREF text_color = dc.GetTextColor();
     dc.SetBkMode(TRANSPARENT);
 
-    std::wstring text = anime::TranslateMyScore(anime_item.GetMyScore());
+    std::wstring text = ui::TranslateMyScore(anime_item.GetMyScore());
     dc.SetTextColor(::GetSysColor(COLOR_WINDOWTEXT));
     dc.DrawText(text.c_str(), text.length(), rcBox, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 
@@ -1402,7 +1403,7 @@ void AnimeListDialog::RefreshList(int index) {
   // Set group headers
   if (group_view) {
     for (int i = anime::kMyStatusFirst; i < anime::kMyStatusLast; i++) {
-      std::wstring text = anime::TranslateMyStatus(i, false);
+      std::wstring text = ui::TranslateMyStatus(i, false);
       text += group_count.at(i) > 0 ? L" (" + ToWstr(group_count.at(i)) + L")" : L"";
       listview.SetGroupText(i, text.c_str());
     }
@@ -1442,16 +1443,16 @@ void AnimeListDialog::RefreshListItemColumns(int index, const anime::Item& anime
     std::wstring text;
     switch (column.column) {
       case kColumnAnimeRating:
-        text = anime::TranslateScore(anime_item.GetScore());
+        text = ui::TranslateScore(anime_item.GetScore());
         break;
       case kColumnAnimeSeason:
-        text = anime::TranslateDateToSeasonString(anime_item.GetDateStart());
+        text = ui::TranslateDateToSeasonString(anime_item.GetDateStart());
         break;
       case kColumnAnimeStatus:
         listview.RedrawItems(index, index, true);
         break;
       case kColumnAnimeType:
-        text = anime::TranslateType(anime_item.GetType());
+        text = ui::TranslateType(anime_item.GetType());
         break;
       case kColumnUserLastUpdated: {
         time_t time_last_updated = ToTime(anime_item.GetMyLastUpdated());
@@ -1459,13 +1460,13 @@ void AnimeListDialog::RefreshListItemColumns(int index, const anime::Item& anime
         break;
       }
       case kColumnUserRating:
-        text = anime::TranslateMyScore(anime_item.GetMyScore());
+        text = ui::TranslateMyScore(anime_item.GetMyScore());
         break;
       case kColumnUserDateStarted:
-        text = anime::TranslateMyDate(anime_item.GetMyDateStart());
+        text = ui::TranslateMyDate(anime_item.GetMyDateStart());
         break;
       case kColumnUserDateCompleted:
-        text = anime::TranslateMyDate(anime_item.GetMyDateEnd());
+        text = ui::TranslateMyDate(anime_item.GetMyDateEnd());
         break;
     }
     if (!text.empty())
@@ -1486,7 +1487,7 @@ void AnimeListDialog::RefreshTabs(int index) {
 
   // Refresh text
   for (int i = anime::kMyStatusFirst; i < anime::kMyStatusLast; i++)
-    tab.SetItemText(i - 1, anime::TranslateMyStatus(i, true).c_str());
+    tab.SetItemText(i - 1, ui::TranslateMyStatus(i, true).c_str());
 
   // Select related tab
   bool group_view = !DlgMain.search_bar.filters.text[kSidebarItemAnimeList].empty();

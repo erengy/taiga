@@ -29,6 +29,7 @@
 #include "taiga/settings.h"
 #include "taiga/taiga.h"
 #include "ui/dialog.h"
+#include "ui/translate.h"
 #include "ui/ui.h"
 
 namespace sync {
@@ -111,7 +112,7 @@ void GetSeason(const anime::Season season, const int offset) {
     return;
   AddPageOffsetToRequest(offset, request);
   request.data[L"year"] = ToWstr(season.year);
-  request.data[L"season"] = ToLower_Copy(season.GetName());
+  request.data[L"season"] = ToLower_Copy(ui::TranslateSeasonName(season.name));
   ServiceManager.MakeRequest(request);
 }
 

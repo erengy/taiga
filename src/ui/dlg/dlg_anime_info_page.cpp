@@ -37,6 +37,7 @@
 #include "ui/dlg/dlg_settings_page.h"
 #include "ui/dialog.h"
 #include "ui/theme.h"
+#include "ui/translate.h"
 #include "ui/ui.h"
 
 namespace ui {
@@ -192,13 +193,13 @@ void PageSeriesInfo::Refresh(int anime_id, bool connect) {
           L"Type:\nEpisodes:\nStatus:\nSeason:\nCategories:\nProducers:\nScore:");
       break;
   }
-  text = anime::TranslateType(anime_item->GetType()) + L"\n" +
-         anime::TranslateNumber(anime_item->GetEpisodeCount(), L"Unknown") + L"\n" +
-         anime::TranslateStatus(anime_item->GetAiringStatus()) + L"\n" +
-         anime::TranslateDateToSeasonString(anime_item->GetDateStart()) + L"\n" +
+  text = ui::TranslateType(anime_item->GetType()) + L"\n" +
+         ui::TranslateNumber(anime_item->GetEpisodeCount(), L"Unknown") + L"\n" +
+         ui::TranslateStatus(anime_item->GetAiringStatus()) + L"\n" +
+         ui::TranslateDateToSeasonString(anime_item->GetDateStart()) + L"\n" +
          (anime_item->GetGenres().empty() ? L"Unknown" : Join(anime_item->GetGenres(), L", ")) + L"\n" +
          (anime_item->GetProducers().empty() ? L"Unknown" : Join(anime_item->GetProducers(), L", ")) + L"\n" +
-         anime::TranslateScore(anime_item->GetScore());
+         ui::TranslateScore(anime_item->GetScore());
   SetDlgItemText(IDC_STATIC_ANIME_DETAILS, text.c_str());
 
   // Set synopsis
@@ -312,7 +313,7 @@ LRESULT PageMyInfo::OnNotify(int idCtrl, LPNMHDR pnmh) {
         const auto nmud = *reinterpret_cast<LPNMUPDOWN>(pnmh);
         const int proposed_value = nmud.iPos + nmud.iDelta;
         if (range.first <= proposed_value && proposed_value <= range.second) {
-          const auto value = anime::TranslateMyScore(proposed_value, L"0");
+          const auto value = ui::TranslateMyScore(proposed_value, L"0");
           SetDlgItemText(IDC_EDIT_ANIME_SCORE, value.c_str());
         }
       }
@@ -371,7 +372,7 @@ void PageMyInfo::Refresh(int anime_id) {
   win::ComboBox combobox = GetDlgItem(IDC_COMBO_ANIME_STATUS);
   if (combobox.GetCount() == 0)
     for (int i = anime::kMyStatusFirst; i < anime::kMyStatusLast; i++)
-      combobox.AddItem(anime::TranslateMyStatus(i, false).c_str(), i);
+      combobox.AddItem(ui::TranslateMyStatus(i, false).c_str(), i);
   combobox.SetCurSel(anime_item->GetMyStatus() - 1);
   combobox.SetWindowHandle(nullptr);
 

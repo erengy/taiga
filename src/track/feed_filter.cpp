@@ -29,6 +29,7 @@
 #include "taiga/taiga.h"
 #include "track/feed.h"
 #include "track/feed_filter.h"
+#include "ui/translate.h"
 
 bool EvaluateCondition(const FeedFilterCondition& condition,
                        const FeedItem& item) {
@@ -876,11 +877,11 @@ std::wstring FeedFilterManager::TranslateValue(
       }
     }
     case kFeedFilterElement_User_Status:
-      return anime::TranslateMyStatus(ToInt(condition.value), false);
+      return ui::TranslateMyStatus(ToInt(condition.value), false);
     case kFeedFilterElement_Meta_Status:
-      return anime::TranslateStatus(ToInt(condition.value));
+      return ui::TranslateStatus(ToInt(condition.value));
     case kFeedFilterElement_Meta_Type:
-      return anime::TranslateType(ToInt(condition.value));
+      return ui::TranslateType(ToInt(condition.value));
     default:
       if (condition.value.empty()) {
         return L"(empty)";

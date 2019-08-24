@@ -34,6 +34,7 @@
 #include "ui/list.h"
 #include "ui/menu.h"
 #include "ui/theme.h"
+#include "ui/translate.h"
 #include "ui/ui.h"
 
 namespace ui {
@@ -207,10 +208,10 @@ void SearchDialog::AddAnimeToList(int anime_id) {
                      StatusToIcon(anime_item->GetAiringStatus()), 0, nullptr,
                      anime::GetPreferredTitle(*anime_item).c_str(),
                      static_cast<LPARAM>(anime_item->GetId()));
-    list_.SetItem(i, 1, anime::TranslateType(anime_item->GetType()).c_str());
-    list_.SetItem(i, 2, anime::TranslateNumber(anime_item->GetEpisodeCount()).c_str());
-    list_.SetItem(i, 3, anime::TranslateScore(anime_item->GetScore()).c_str());
-    list_.SetItem(i, 4, anime::TranslateDateToSeasonString(anime_item->GetDateStart()).c_str());
+    list_.SetItem(i, 1, ui::TranslateType(anime_item->GetType()).c_str());
+    list_.SetItem(i, 2, ui::TranslateNumber(anime_item->GetEpisodeCount()).c_str());
+    list_.SetItem(i, 3, ui::TranslateScore(anime_item->GetScore()).c_str());
+    list_.SetItem(i, 4, ui::TranslateDateToSeasonString(anime_item->GetDateStart()).c_str());
   }
 }
 

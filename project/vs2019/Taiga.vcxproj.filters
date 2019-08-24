@@ -88,6 +88,9 @@
     <Filter Include="ui\dlg">
       <UniqueIdentifier>{1fde5dda-2f86-4de5-a8cc-da7664cc759b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ui\translate">
+      <UniqueIdentifier>{2c0973ec-528b-4dbd-ac4d-c1d3cec7cf6d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\main.cpp" />
@@ -619,6 +622,15 @@
     <ClCompile Include="..\..\src\taiga\command_line.cpp">
       <Filter>taiga</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\ui\translate\anime.cpp">
+      <Filter>ui\translate</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ui\translate\list.cpp">
+      <Filter>ui\translate</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ui\translate\base.cpp">
+      <Filter>ui\translate</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\base\base64.h">
@@ -1142,6 +1154,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\base\file_search.h">
       <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ui\translate.h">
+      <Filter>ui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

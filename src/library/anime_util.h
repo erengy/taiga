@@ -96,24 +96,11 @@ void GetAllTitles(int anime_id, std::vector<std::wstring>& titles);
 int GetMyRewatchedTimes(const Item& item);
 void GetProgressRatios(const Item& item, float& ratio_aired, float& ratio_watched);
 
-std::wstring TranslateMyDate(const Date& value, const std::wstring& default_char = L"-");
-std::wstring TranslateMyStatus(int value, bool add_count);
-std::wstring TranslateNumber(int value, const std::wstring& default_char = L"-");
-std::wstring TranslateMyScore(int value, const std::wstring& default_char = L"-");
-std::wstring TranslateMyScoreFull(int value);
-std::wstring TranslateScore(double value);
-std::wstring TranslateStatus(int value);
-std::wstring TranslateType(int value);
-int TranslateType(const std::wstring& value);
-
 int TranslateResolution(const std::wstring& str);
 std::wstring NormalizeResolution(const std::wstring& resolution);
 
 ////////////////////////////////////////////////////////////////////////////////
 
 bool IsValidDate(const Date& date);
-std::wstring TranslateDate(const Date& date);
-std::wstring TranslateDateToSeasonString(const Date& date);
-std::wstring TranslateSeasonToMonths(const Season& season);
 
 }  // namespace anime

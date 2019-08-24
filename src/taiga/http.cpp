@@ -37,6 +37,7 @@
 #include "taiga/update.h"
 #include "taiga/version.h"
 #include "track/recognition.h"
+#include "ui/translate.h"
 #include "ui/ui.h"
 
 taiga::HttpManager ConnectionManager;
@@ -268,7 +269,7 @@ void HttpManager::HandleResponse(HttpResponse& response) {
                           GetFileName(client.request().url.path);
         SaveToFile(client.write_buffer_, path);
         Settings.Set(taiga::kApp_Seasons_LastSeason,
-                     SeasonDatabase.current_season.GetString());
+                     ui::TranslateSeason(SeasonDatabase.current_season));
         SeasonDatabase.Review();
         ui::OnSeasonLoad(SeasonDatabase.IsRefreshRequired());
       } else {

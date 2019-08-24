@@ -33,6 +33,7 @@
 #include "sync/myanimelist_util.h"
 #include "taiga/settings.h"
 #include "taiga/version.h"
+#include "ui/translate.h"
 
 namespace library {
 
@@ -137,7 +138,7 @@ bool ExportAsMarkdown(const std::wstring& path) {
       status_lists[item.GetMyStatus()].push_back(L"{} ({}/{})"_format(
           anime::GetPreferredTitle(item),
           item.GetMyLastWatchedEpisode(),
-          anime::TranslateNumber(item.GetEpisodeCount(), L"?")));
+          ui::TranslateNumber(item.GetEpisodeCount(), L"?")));
     }
   }
 
@@ -152,7 +153,7 @@ bool ExportAsMarkdown(const std::wstring& path) {
   for (const auto& [status, list] : status_lists) {
     if (!text.empty())
       text += L"\r\n";
-    text += L"# {}\r\n\r\n"_format(anime::TranslateMyStatus(status, true));
+    text += L"# {}\r\n\r\n"_format(ui::TranslateMyStatus(status, true));
     for (const auto& line : list) {
       text += L"- {}\r\n"_format(line);
     }

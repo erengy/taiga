@@ -31,6 +31,7 @@
 #include "taiga/version.h"
 #include "taiga/update.h"
 #include "ui/dlg/dlg_main.h"
+#include "ui/translate.h"
 #include "ui/ui.h"
 
 namespace taiga::detail {
@@ -109,7 +110,7 @@ bool UpdateHelper::ParseData(std::wstring data) {
       if (season_max && season_max > SeasonDatabase.available_seasons.second) {
         new_season_available_ = true;
         SeasonDatabase.available_seasons.second = season_max;
-        Settings.Set(taiga::kApp_Seasons_MaxSeason, season_max.GetString());
+        Settings.Set(taiga::kApp_Seasons_MaxSeason, ui::TranslateSeason(season_max));
       }
       if (!item.taiga_anime_season_location.empty())
         SeasonDatabase.remote_location = item.taiga_anime_season_location;

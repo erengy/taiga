@@ -28,6 +28,7 @@
 #include "ui/dlg/dlg_feed_filter.h"
 #include "ui/list.h"
 #include "ui/theme.h"
+#include "ui/translate.h"
 #include "ui/ui.h"
 
 namespace ui {
@@ -592,7 +593,7 @@ BOOL FeedFilterDialog::DialogPage2::OnInitDialog() {
 
   // Insert list groups
   for (int i = anime::kMyStatusFirst; i < anime::kMyStatusLast; i++)
-    anime_list.InsertGroup(i, anime::TranslateMyStatus(i, false).c_str(),
+    anime_list.InsertGroup(i, ui::TranslateMyStatus(i, false).c_str(),
                            true, i != anime::kWatching);
 
   // Add anime to list

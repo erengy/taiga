@@ -32,6 +32,7 @@
 #include "ui/list.h"
 #include "ui/menu.h"
 #include "ui/theme.h"
+#include "ui/translate.h"
 #include "ui/ui.h"
 
 namespace ui {
@@ -236,9 +237,9 @@ LRESULT SeasonDialog::OnListNotify(LPARAM lParam) {
         tooltips_.UpdateTitle(anime::GetPreferredTitle(*anime_item).c_str());
         std::wstring text;
         const std::wstring separator = L" \u2022 ";
-        text += anime::TranslateType(anime_item->GetType()) + separator +
-                anime::TranslateNumber(anime_item->GetEpisodeCount(), L"?") + L" eps." + separator +
-                anime::TranslateScore(anime_item->GetScore()) + separator;
+        text += ui::TranslateType(anime_item->GetType()) + separator +
+                ui::TranslateNumber(anime_item->GetEpisodeCount(), L"?") + L" eps." + separator +
+                ui::TranslateScore(anime_item->GetScore()) + separator;
         switch (taiga::GetCurrentServiceId()) {
           default:
             text += L"#" + ToWstr(anime_item->GetPopularity());
@@ -397,10 +398,10 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       if (view_as == kSeasonViewAsImages) {
         switch (Settings.GetInt(taiga::kApp_Seasons_SortBy)) {
           case kSeasonSortByAiringDate:
-            text = anime::TranslateDate(anime_item->GetDateStart());
+            text = ui::TranslateDate(anime_item->GetDateStart());
             break;
           case kSeasonSortByEpisodes:
-            text = anime::TranslateNumber(anime_item->GetEpisodeCount(), L"");
+            text = ui::TranslateNumber(anime_item->GetEpisodeCount(), L"");
             if (text.empty()) {
               text = L"Unknown";
             } else {
@@ -418,7 +419,7 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
             }
             break;
           case kSeasonSortByScore:
-            text = anime::TranslateScore(anime_item->GetScore());
+            text = ui::TranslateScore(anime_item->GetScore());
             break;
         }
       }
@@ -466,12 +467,12 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
                        rect_details.right, rect_details.top + text_height);
       DeleteObject(hdc.DetachFont());
 
-      text = anime::TranslateDate(anime_item->GetDateStart());
+      text = ui::TranslateDate(anime_item->GetDateStart());
       text += anime_item->GetDateEnd() != anime_item->GetDateStart() ?
-              L" to " + anime::TranslateDate(anime_item->GetDateEnd()) : L"";
-      text += L" (" + anime::TranslateStatus(anime_item->GetAiringStatus()) + L")";
+              L" to " + ui::TranslateDate(anime_item->GetDateEnd()) : L"";
+      text += L" (" + ui::TranslateStatus(anime_item->GetAiringStatus()) + L")";
       DRAWLINE(text);
-      DRAWLINE(anime::TranslateNumber(anime_item->GetEpisodeCount(), L"Unknown"));
+      DRAWLINE(ui::TranslateNumber(anime_item->GetEpisodeCount(), L"Unknown"));
       DRAWLINE(anime_item->GetGenres().empty() ? L"?" : Join(anime_item->GetGenres(), L", "));
       switch (current_service) {
         case sync::kMyAnimeList:
@@ -479,7 +480,7 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
           DRAWLINE(anime_item->GetProducers().empty() ? L"?" : Join(anime_item->GetProducers(), L", "));
           break;
       }
-      DRAWLINE(anime::TranslateScore(anime_item->GetScore()));
+      DRAWLINE(ui::TranslateScore(anime_item->GetScore()));
       switch (current_service) {
         default:
           DRAWLINE(L"#" + ToWstr(anime_item->GetPopularity()));
@@ -569,7 +570,7 @@ void SeasonDialog::EnableInput(bool enable) {
 void SeasonDialog::GetData() {
   EnableInput(false);
   ui::ChangeStatusText(L"Retrieving latest data for " +
-      SeasonDatabase.current_season.GetString() + L" anime season...");
+      ui::TranslateSeason(SeasonDatabase.current_season) + L" anime season...");
 
   sync::GetSeason(SeasonDatabase.current_season, 0);
 }
@@ -618,18 +619,18 @@ void SeasonDialog::RefreshList(bool redraw_only) {
   switch (Settings.GetInt(taiga::kApp_Seasons_GroupBy)) {
     case kSeasonGroupByAiringStatus:
       for (int i = anime::kFinishedAiring; i <= anime::kNotYetAired; i++) {
-        list_.InsertGroup(i, anime::TranslateStatus(i).c_str(), true, false);
+        list_.InsertGroup(i, ui::TranslateStatus(i).c_str(), true, false);
       }
       break;
     case kSeasonGroupByListStatus:
       for (int i = anime::kNotInList; i <= anime::kPlanToWatch; i++) {
-        list_.InsertGroup(i, anime::TranslateMyStatus(i, false).c_str(), true, false);
+        list_.InsertGroup(i, ui::TranslateMyStatus(i, false).c_str(), true, false);
       }
       break;
     case kSeasonGroupByType:
     default:
       for (int i = anime::kTv; i <= anime::kMusic; i++) {
-        list_.InsertGroup(i, anime::TranslateType(i).c_str(), true, false);
+        list_.InsertGroup(i, ui::TranslateType(i).c_str(), true, false);
       }
       break;
   }
@@ -714,15 +715,15 @@ void SeasonDialog::RefreshStatus() {
   if (!SeasonDatabase.current_season)
     return;
 
-  std::wstring text = SeasonDatabase.current_season.GetString() + L", from " +
-                      anime::TranslateSeasonToMonths(SeasonDatabase.current_season);
+  std::wstring text = ui::TranslateSeason(SeasonDatabase.current_season) + L", from " +
+                      ui::TranslateSeasonToMonths(SeasonDatabase.current_season);
 
   ui::ChangeStatusText(text);
 }
 
 void SeasonDialog::RefreshToolbar() {
   toolbar_.SetButtonText(0, SeasonDatabase.current_season ?
-      SeasonDatabase.current_season.GetString().c_str() :
+      ui::TranslateSeason(SeasonDatabase.current_season).c_str() :
       L"Select season");
 
   toolbar_.EnableButton(101, SeasonDatabase.current_season);

@@ -19,6 +19,7 @@
 #include <algorithm>
 
 #include "base/file.h"
+#include "base/format.h"
 #include "base/log.h"
 #include "base/string.h"
 #include "base/xml.h"
@@ -34,6 +35,7 @@
 #include "taiga/settings.h"
 #include "taiga/taiga.h"
 #include "ui/dlg/dlg_season.h"
+#include "ui/translate.h"
 #include "ui/ui.h"
 
 library::SeasonDatabase SeasonDatabase;
@@ -48,8 +50,8 @@ SeasonDatabase::SeasonDatabase()
 }
 
 bool SeasonDatabase::LoadSeason(const anime::Season& season) {
-  std::wstring filename =
-      ToWstr(season.year) + L"_" + ToLower_Copy(season.GetName()) + L".xml";
+  std::wstring filename = L"{}_{}.xml"_format(
+      season.year, ToLower_Copy(ui::TranslateSeasonName(season.name)));
 
   return LoadFile(filename);
 }
@@ -120,7 +122,7 @@ bool SeasonDatabase::LoadString(const std::wstring& data) {
     } else {
       auto current_service_id = taiga::GetCurrentServiceId();
       if (id_map[current_service_id].empty()) {
-        LOGD(L"{} - No ID for current service: {}", current_season.GetString(),
+        LOGD(L"{} - No ID for current service: {}", ui::TranslateSeason(current_season),
              XmlReadStrValue(node, L"title"));
         continue;
       }

@@ -29,9 +29,6 @@
 #include "library/anime_episode.h"
 #include "library/anime_util.h"
 #include "library/history.h"
-#include "sync/anilist_util.h"
-#include "sync/kitsu_util.h"
-#include "sync/myanimelist_util.h"
 #include "sync/sync.h"
 #include "taiga/announce.h"
 #include "taiga/path.h"
@@ -1021,108 +1018,6 @@ void GetProgressRatios(const Item& item, float& ratio_aired, float& ratio_watche
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-
-std::wstring TranslateMyDate(const Date& value, const std::wstring& default_char) {
-  return IsValidDate(value) ? TranslateDate(value) : default_char;
-}
-
-std::wstring TranslateMyStatus(int value, bool add_count) {
-  #define ADD_COUNT() (add_count ? L" (" + ToWstr(AnimeDatabase.GetItemCount(value)) + L")" : L"")
-  switch (value) {
-    case kNotInList: return L"Not in list";
-    case kWatching: return L"Currently watching" + ADD_COUNT();
-    case kCompleted: return L"Completed" + ADD_COUNT();
-    case kOnHold: return L"On hold" + ADD_COUNT();
-    case kDropped: return L"Dropped" + ADD_COUNT();
-    case kPlanToWatch: return L"Plan to watch" + ADD_COUNT();
-    default: return L"";
-  }
-  #undef ADD_COUNT
-}
-
-std::wstring TranslateNumber(int value, const std::wstring& default_char) {
-  return value > 0 ? ToWstr(value) : default_char;
-}
-
-std::wstring TranslateMyScore(int value, const std::wstring& default_char) {
-  if (!value)
-    return default_char;
-
-  switch (taiga::GetCurrentServiceId()) {
-    default:
-      return ToWstr(value);
-    case sync::kMyAnimeList:
-      return sync::myanimelist::TranslateMyRating(value, false);
-    case sync::kKitsu:
-      return sync::kitsu::TranslateMyRating(
-          value, sync::kitsu::GetRatingSystem());
-    case sync::kAniList:
-      return sync::anilist::TranslateMyRating(
-          value, sync::anilist::GetRatingSystem());
-  }
-}
-
-std::wstring TranslateMyScoreFull(int value) {
-  switch (taiga::GetCurrentServiceId()) {
-    default:
-      return ToWstr(value);
-    case sync::kMyAnimeList:
-      return sync::myanimelist::TranslateMyRating(value, true);
-    case sync::kKitsu:
-      return sync::kitsu::TranslateMyRating(
-          value, sync::kitsu::GetRatingSystem());
-    case sync::kAniList:
-      return sync::anilist::TranslateMyRating(
-          value, sync::anilist::GetRatingSystem());
-  }
-}
-
-std::wstring TranslateScore(double value) {
-  switch (taiga::GetCurrentServiceId()) {
-    default:
-    case sync::kMyAnimeList:
-      return ToWstr(value, 2);
-    case sync::kKitsu:
-      return ToWstr(sync::kitsu::TranslateSeriesRatingTo(value), 2) + L"%";
-    case sync::kAniList:
-      return ToWstr(sync::anilist::TranslateSeriesRatingTo(value), 0) + L"%";
-  }
-}
-
-std::wstring TranslateStatus(int value) {
-  switch (value) {
-    case kAiring: return L"Currently airing";
-    case kFinishedAiring: return L"Finished airing";
-    case kNotYetAired: return L"Not yet aired";
-    default: return ToWstr(value);
-  }
-}
-
-std::wstring TranslateType(int value) {
-  switch (value) {
-    case kTv: return L"TV";
-    case kOva: return L"OVA";
-    case kMovie: return L"Movie";
-    case kSpecial: return L"Special";
-    case kOna: return L"ONA";
-    case kMusic: return L"Music";
-    default: return L"";
-  }
-}
-
-int TranslateType(const std::wstring& value) {
-  static const std::map<std::wstring, anime::SeriesType> types{
-    {L"tv", kTv},
-    {L"ova", kOva}, {L"oav", kOva},
-    {L"movie", kMovie}, {L"gekijouban", kMovie},
-    {L"special", kSpecial},
-    {L"ona", kOna},
-    {L"music", kMusic},
-  };
-
-  auto it = types.find(ToLower_Copy(value));
-  return it != types.end() ? it->second : anime::kUnknownType;
-}
 
 int TranslateResolution(const std::wstring& str) {
   // *###x###*

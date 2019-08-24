@@ -49,8 +49,6 @@ public:
   operator bool() const;
 
   void GetInterval(Date& date_start, Date& date_end) const;
-  std::wstring GetName() const;
-  std::wstring GetString() const;
 
   Name name;
   unsigned short year;

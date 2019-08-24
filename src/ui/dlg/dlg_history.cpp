@@ -34,6 +34,7 @@
 #include "ui/list.h"
 #include "ui/menu.h"
 #include "ui/theme.h"
+#include "ui/translate.h"
 #include "ui/ui.h"
 
 namespace ui {
@@ -206,12 +207,12 @@ void HistoryDialog::RefreshList() {
     if (it->mode == taiga::kHttpServiceDeleteLibraryEntry)
       AppendString(details, L"Remove from list");
     if (it->episode)
-      AppendString(details, L"Episode: " + anime::TranslateNumber(*it->episode));
+      AppendString(details, L"Episode: " + ui::TranslateNumber(*it->episode));
     if (it->score)
-      AppendString(details, L"Score: " + anime::TranslateMyScore(*it->score));
+      AppendString(details, L"Score: " + ui::TranslateMyScore(*it->score));
     if (it->status)
       AppendString(details, !it->enable_rewatching || *it->enable_rewatching != TRUE ?
-                   L"Status: " + anime::TranslateMyStatus(*it->status, false) : L"Rewatching");
+                   L"Status: " + ui::TranslateMyStatus(*it->status, false) : L"Rewatching");
     if (it->tags)
       AppendString(details, L"Tags: \"{}\""_format(*it->tags));
     if (it->notes)
@@ -238,7 +239,7 @@ void HistoryDialog::RefreshList() {
     int i = list_.GetItemCount();
     int icon = StatusToIcon(anime_item->GetAiringStatus());
     std::wstring details;
-    AppendString(details, L"Episode: " + anime::TranslateNumber(*it->episode));
+    AppendString(details, L"Episode: " + ui::TranslateNumber(*it->episode));
 
     list_.InsertItem(i, 1, icon, 0, nullptr, anime::GetPreferredTitle(*anime_item).c_str(),
                      static_cast<LPARAM>(it->anime_id));
