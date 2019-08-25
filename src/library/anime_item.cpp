@@ -16,24 +16,20 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <algorithm>
 #include <assert.h>
 
 #include "base/string.h"
 #include "base/time.h"
-#include "library/anime_db.h"
 #include "library/anime_item.h"
 #include "library/anime_util.h"
 #include "library/history.h"
-#include "sync/sync.h"
+#include "sync/service.h"
 #include "ui/ui.h"
-
-anime::Database* anime::Item::database_ = &AnimeDatabase;
 
 namespace anime {
 
 Item::Item() {
-  metadata_.uid.resize(sync::kLastService + 1);
+  series_.uids.resize(sync::kLastService + 1);
 }
 
 Item::~Item() {
@@ -42,175 +38,128 @@ Item::~Item() {
 ////////////////////////////////////////////////////////////////////////////////
 
 int Item::GetId() const {
-  assert(!metadata_.uid.empty());
-
-  return ToInt(metadata_.uid.at(0));
+  return series_.id;
 }
 
 const std::wstring& Item::GetId(enum_t service) const {
-  assert(metadata_.uid.size() > service);
+  assert(series_.uids.size() > service);
 
-  return metadata_.uid.at(service);
+  return series_.uids.at(service);
 }
 
 const std::wstring& Item::GetSlug() const {
-  if (metadata_.resource.size() > 1)
-    return metadata_.resource.at(1);
-
-  return EmptyString();
+  return series_.slug;
 }
 
 enum_t Item::GetSource() const {
-  return metadata_.source;
+  return series_.source;
 }
 
 int Item::GetType() const {
-  return metadata_.type;
+  return series_.type;
 }
 
 int Item::GetEpisodeCount() const {
-  if (metadata_.extent.size() > 0)
-    return metadata_.extent.at(0);
-
-  return kUnknownEpisodeCount;
+  return series_.episode_count;
 }
 
 int Item::GetEpisodeLength() const {
-  if (metadata_.extent.size() > 1)
-    return metadata_.extent.at(1);
-
-  return kUnknownEpisodeLength;
+  return series_.episode_length;
 }
 
 int Item::GetAiringStatus(bool check_date) const {
   if (!check_date)
-    return metadata_.status;
+    return series_.status;
 
   return anime::GetAiringStatus(*this);
 }
 
 const std::wstring& Item::GetTitle() const {
-  return metadata_.title;
+  return series_.titles.romaji;
 }
 
 const std::wstring& Item::GetEnglishTitle(bool fallback) const {
-  for (const auto& alt_title : metadata_.alternative)
-    if (alt_title.type == library::TitleType::LangEnglish)
-      if (!alt_title.value.empty())
-        return alt_title.value;
+  if (series_.titles.english.empty() && fallback)
+    return series_.titles.romaji;
 
-  if (fallback)
-    return metadata_.title;
-
-  return EmptyString();
+  return series_.titles.english;
 }
 
 const std::wstring& Item::GetJapaneseTitle() const {
-  for (const auto& alt_title : metadata_.alternative)
-    if (alt_title.type == library::TitleType::LangJapanese)
-      if (!alt_title.value.empty())
-        return alt_title.value;
-
-  return EmptyString();
+  return series_.titles.japanese;
 }
 
 std::vector<std::wstring> Item::GetSynonyms() const {
-  std::vector<std::wstring> synonyms;
-
-  for (const auto& alt_title : metadata_.alternative)
-    if (alt_title.type == library::TitleType::Synonym)
-      synonyms.push_back(alt_title.value);
-
-  return synonyms;
+  return series_.titles.synonyms;
 }
 
 const Date& Item::GetDateStart() const {
-  if (metadata_.date.size() > 0)
-    return metadata_.date.at(0);
-
-  return EmptyDate();
+  return series_.start_date;
 }
 
 const Date& Item::GetDateEnd() const {
-  if (metadata_.date.size() > 1)
-    return metadata_.date.at(1);
-
-  return EmptyDate();
+  return series_.end_date;
 }
 
 const std::wstring& Item::GetImageUrl() const {
-  if (metadata_.resource.size() > 0)
-    return metadata_.resource.at(0);
-
-  return EmptyString();
+  return series_.image_url;
 }
 
 enum_t Item::GetAgeRating() const {
-  return metadata_.audience;
+  return series_.age_rating;
 }
 
 const std::vector<std::wstring>& Item::GetGenres() const {
-  return metadata_.subject;
+  return series_.genres;
 }
 
 int Item::GetPopularity() const {
-  if (metadata_.community.size() > 1)
-    return ToInt(metadata_.community.at(1));
-
-  return 0;
+  return series_.popularity_rank;
 }
 
 const std::vector<std::wstring>& Item::GetProducers() const {
-  return metadata_.creator;
+  return series_.producers;
 }
 
 double Item::GetScore() const {
-  if (metadata_.community.size() > 0)
-    return ToDouble(metadata_.community.at(0));
-
-  return 0.0;
+  return series_.score;
 }
 
 const std::wstring& Item::GetSynopsis() const {
-  return metadata_.description;
+  return series_.synopsis;
 }
 
 const time_t Item::GetLastModified() const {
-  return metadata_.modified;
+  return series_.last_modified;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 void Item::SetId(const std::wstring& id, enum_t service) {
-  if (metadata_.uid.size() < static_cast<size_t>(service) + 1)
-    metadata_.uid.resize(service + 1);
+  if (series_.uids.size() < static_cast<size_t>(service) + 1)
+    series_.uids.resize(service + 1);
 
-  metadata_.uid.at(service) = id;
+  series_.uids.at(service) = id;
+
+  if (service == 0) {
+    series_.id = ToInt(id);
+  }
 }
 
 void Item::SetSlug(const std::wstring& slug) {
-  if (metadata_.resource.size() < 2) {
-    if (slug.empty())
-      return;
-    metadata_.resource.resize(2);
-  }
-
-  metadata_.resource.at(1) = slug;
+  series_.slug = slug;
 }
 
 void Item::SetSource(enum_t source) {
-  metadata_.source = source;
+  series_.source = source;
 }
 
 void Item::SetType(int type) {
-  metadata_.type = type;
+  series_.type = static_cast<SeriesType>(type);
 }
 
 void Item::SetEpisodeCount(int number) {
-  if (metadata_.extent.size() < 1)
-    metadata_.extent.resize(1);
-
-  metadata_.extent.at(0) = number;
+  series_.episode_count = number;
 
   // TODO: Call it separately
   if (number >= 0)
@@ -219,61 +168,30 @@ void Item::SetEpisodeCount(int number) {
 }
 
 void Item::SetEpisodeLength(int number) {
-  if (metadata_.extent.size() < 2) {
-    if (number <= 0)
-      return;
-    metadata_.extent.resize(2);
-  }
-
-  metadata_.extent.at(1) = number;
+  series_.episode_length = number;
 }
 
 void Item::SetAiringStatus(int status) {
-  metadata_.status = status;
+  series_.status = static_cast<SeriesStatus>(status);
 }
 
 void Item::SetTitle(const std::wstring& title) {
-  metadata_.title = title;
+  series_.titles.romaji = title;
 }
 
 void Item::SetEnglishTitle(const std::wstring& title) {
-  for (auto& alt_title : metadata_.alternative) {
-    if (alt_title.type == library::TitleType::LangEnglish) {
-      alt_title.value = title;
-      return;
-    }
-  }
-
-  if (title.empty())
-    return;
-
-  library::Title new_title(library::TitleType::LangEnglish, title);
-
-  metadata_.alternative.push_back(new_title);
+  series_.titles.english = title;
 }
 
 void Item::SetJapaneseTitle(const std::wstring& title) {
-  for (auto& alt_title : metadata_.alternative) {
-    if (alt_title.type == library::TitleType::LangJapanese) {
-      alt_title.value = title;
-      return;
-    }
-  }
-
-  if (title.empty())
-    return;
-
-  library::Title new_title(library::TitleType::LangJapanese, title);
-
-  metadata_.alternative.push_back(new_title);
+  series_.titles.japanese = title;
 }
 
 void Item::InsertSynonym(const std::wstring& synonym) {
   if (synonym.empty() || synonym == GetTitle() ||
       synonym == GetEnglishTitle() || synonym == GetJapaneseTitle())
     return;
-  metadata_.alternative.push_back(
-      library::Title(library::TitleType::Synonym, synonym));
+  series_.titles.synonyms.push_back(synonym);
 }
 
 void Item::SetSynonyms(const std::wstring& synonyms) {
@@ -285,15 +203,10 @@ void Item::SetSynonyms(const std::wstring& synonyms) {
 }
 
 void Item::SetSynonyms(const std::vector<std::wstring>& synonyms) {
-  if (synonyms.empty() && metadata_.alternative.empty())
+  if (synonyms.empty() && series_.titles.synonyms.empty())
     return;
 
-  auto iterator = std::remove_if(
-      metadata_.alternative.begin(), metadata_.alternative.end(),
-      [](const library::Title& title) {
-        return title.type == library::TitleType::Synonym;
-      });
-  metadata_.alternative.erase(iterator, metadata_.alternative.end());
+  series_.titles.synonyms.clear();
 
   for (const auto& synonym : synonyms) {
     InsertSynonym(synonym);
@@ -301,13 +214,7 @@ void Item::SetSynonyms(const std::vector<std::wstring>& synonyms) {
 }
 
 void Item::SetDateStart(const Date& date) {
-  if (metadata_.date.size() < 1) {
-    if (!IsValidDate(date))
-      return;
-    metadata_.date.resize(1);
-  }
-
-  metadata_.date.at(0) = date;
+  series_.start_date = date;
 }
 
 void Item::SetDateStart(const std::wstring& date) {
@@ -315,13 +222,7 @@ void Item::SetDateStart(const std::wstring& date) {
 }
 
 void Item::SetDateEnd(const Date& date) {
-  if (metadata_.date.size() < 2) {
-    if (!IsValidDate(date))
-      return;
-    metadata_.date.resize(2);
-  }
-
-  metadata_.date.at(1) = date;
+  series_.end_date = date;
 }
 
 void Item::SetDateEnd(const std::wstring& date) {
@@ -329,17 +230,11 @@ void Item::SetDateEnd(const std::wstring& date) {
 }
 
 void Item::SetImageUrl(const std::wstring& url) {
-  if (metadata_.resource.size() < 1) {
-    if (url.empty())
-      return;
-    metadata_.resource.resize(1);
-  }
-
-  metadata_.resource.at(0) = url;
+  series_.image_url = url;
 }
 
 void Item::SetAgeRating(enum_t rating) {
-  metadata_.audience = rating;
+  series_.age_rating = static_cast<AgeRating>(rating);
 }
 
 void Item::SetGenres(const std::wstring& genres) {
@@ -351,17 +246,11 @@ void Item::SetGenres(const std::wstring& genres) {
 }
 
 void Item::SetGenres(const std::vector<std::wstring>& genres) {
-  metadata_.subject = genres;
+  series_.genres = genres;
 }
 
 void Item::SetPopularity(int popularity) {
-  if (metadata_.community.size() < 2) {
-    if (popularity <= 0)
-      return;
-    metadata_.community.resize(2);
-  }
-
-  metadata_.community.at(1) = ToWstr(popularity);
+  series_.popularity_rank = popularity;
 }
 
 void Item::SetProducers(const std::wstring& producers) {
@@ -373,25 +262,19 @@ void Item::SetProducers(const std::wstring& producers) {
 }
 
 void Item::SetProducers(const std::vector<std::wstring>& producers) {
-  metadata_.creator = producers;
+  series_.producers = producers;
 }
 
 void Item::SetScore(double score) {
-  if (metadata_.community.size() < 1) {
-    if (score <= 0.0)
-      return;
-    metadata_.community.resize(1);
-  }
-
-  metadata_.community.at(0) = score > 0.0 ? ToWstr(score) : L"";
+  series_.score = score > 0.0 ? static_cast<float>(score) : 0.0f;
 }
 
 void Item::SetSynopsis(const std::wstring& synopsis) {
-  metadata_.description = synopsis;
+  series_.synopsis = synopsis;
 }
 
 void Item::SetLastModified(time_t modified) {
-  metadata_.modified = modified;
+  series_.last_modified = modified;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

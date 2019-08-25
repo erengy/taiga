@@ -22,8 +22,11 @@
 #include <vector>
 
 #include "base/time.h"
+#include "base/types.h"
 
 namespace anime {
+
+using id_t = int;
 
 // ID_NOTINLIST
 //   Used in Episode data to denote the item is not in user's list.
@@ -55,10 +58,10 @@ enum SeriesType {
   kMusic
 };
 
-const int kUnknownEpisodeCount = -1;
-const int kUnknownEpisodeLength = -1;
-const double kUnknownScore = 0.0;
-const int kUserScoreMax = 100;
+constexpr int kUnknownEpisodeCount = -1;
+constexpr int kUnknownEpisodeLength = -1;
+constexpr double kUnknownScore = 0.0;
+constexpr int kUserScoreMax = 100;
 
 enum MyStatus {
   kMyStatusFirst = 1,
@@ -80,19 +83,44 @@ enum AgeRating {
   kAgeRatingR18
 };
 
-// Invalid for anime items that are not in user's list
-class MyInformation {
- public:
-  MyInformation();
-  virtual ~MyInformation() {}
+struct Titles {
+  std::wstring romaji;
+  std::wstring english;
+  std::wstring japanese;
+  std::vector<std::wstring> synonyms;
+};
 
+struct SeriesInformation {
+  anime::id_t id = AnimeId::ID_UNKNOWN;
+  std::vector<std::wstring> uids;
+  enum_t source = 0;
+  std::time_t last_modified = 0;
+  int episode_count = kUnknownEpisodeCount;
+  int episode_length = kUnknownEpisodeLength;
+  AgeRating age_rating = AgeRating::kUnknownAgeRating;
+  SeriesStatus status = SeriesStatus::kUnknownStatus;
+  SeriesType type = SeriesType::kUnknownType;
+  Date start_date;
+  Date end_date;
+  float score = 0.0f;
+  int popularity_rank = 0;
+  std::wstring image_url;
+  std::wstring slug;
+  std::wstring synopsis;
+  Titles titles;
+  std::vector<std::wstring> genres;
+  std::vector<std::wstring> producers;
+};
+
+// Invalid for anime items that are not in user's list
+struct MyInformation {
   std::wstring id;
-  int watched_episodes;
-  int score;
-  int status;
-  int rewatched_times;
-  int rewatching;
-  int rewatching_ep;
+  int watched_episodes = 0;
+  int score = 0;
+  int status = MyStatus::kNotInList;
+  int rewatched_times = 0;
+  int rewatching = FALSE;
+  int rewatching_ep = 0;
   Date date_start;
   Date date_finish;
   std::wstring last_updated;
@@ -101,19 +129,15 @@ class MyInformation {
 };
 
 // For all kinds of other temporary information
-class LocalInformation {
- public:
-  LocalInformation();
-  virtual ~LocalInformation() {}
-
-  int last_aired_episode;
+struct LocalInformation {
+  int last_aired_episode = 0;
   std::vector<bool> available_episodes;
   std::wstring next_episode_path;
-  time_t next_episode_time;
+  time_t next_episode_time = 0;
   std::wstring folder;
   std::vector<std::wstring> synonyms;
-  bool playing;
-  bool use_alternative;
+  bool playing = false;
+  bool use_alternative = false;
 };
 
 }  // namespace anime

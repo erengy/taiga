@@ -23,7 +23,6 @@
 #include <memory>
 
 #include "anime.h"
-#include "metadata.h"
 
 enum class QueueSearch;
 
@@ -165,7 +164,7 @@ private:
   HistoryItem* SearchHistory(QueueSearch search_mode) const;
 
   // Series information, stored in db\anime.xml
-  library::Metadata metadata_;
+  SeriesInformation series_;
 
   // User information, stored in user\<username>\anime.xml - some items are not
   // in user's list, thus this member is not valid for every item.
@@ -173,9 +172,6 @@ private:
 
   // Local information, stored temporarily
   LocalInformation local_info_;
-
-  // Pointer to the parent database which holds this item
-  static Database* database_;
 };
 
 }  // namespace anime

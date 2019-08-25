@@ -221,7 +221,6 @@
     <ClCompile Include="..\..\src\library\discover.cpp" />
     <ClCompile Include="..\..\src\library\export.cpp" />
     <ClCompile Include="..\..\src\library\history.cpp" />
-    <ClCompile Include="..\..\src\library\metadata.cpp" />
     <ClCompile Include="..\..\src\library\resource.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />
     <ClCompile Include="..\..\src\sync\anilist.cpp" />
@@ -404,7 +403,6 @@
     <ClInclude Include="..\..\src\library\discover.h" />
     <ClInclude Include="..\..\src\library\export.h" />
     <ClInclude Include="..\..\src\library\history.h" />
-    <ClInclude Include="..\..\src\library\metadata.h" />
     <ClInclude Include="..\..\src\library\resource.h" />
     <ClInclude Include="..\..\src\sync\anilist.h" />
     <ClInclude Include="..\..\src\sync\anilist_types.h" />

@@ -20,20 +20,4 @@
 
 namespace anime {
 
-MyInformation::MyInformation()
-    : watched_episodes(0),
-      score(0),
-      status(kNotInList),
-      rewatched_times(0),
-      rewatching(FALSE),
-      rewatching_ep(0) {
-}
-
-LocalInformation::LocalInformation()
-    : last_aired_episode(0),
-      playing(false),
-      next_episode_time(0),
-      use_alternative(false) {
-}
-
 }  // namespace anime

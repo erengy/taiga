@@ -412,9 +412,6 @@
     <ClCompile Include="..\..\src\library\history.cpp">
       <Filter>library</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\library\metadata.cpp">
-      <Filter>library</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\library\resource.cpp">
       <Filter>library</Filter>
     </ClCompile>
@@ -946,9 +943,6 @@
       <Filter>library</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\library\history.h">
-      <Filter>library</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\library\metadata.h">
       <Filter>library</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\library\resource.h">
