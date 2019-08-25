@@ -294,7 +294,7 @@ void FeedConditionDialog::ChooseElement(int element_index) {
     case kFeedFilterElement_Meta_DateStart:
     case kFeedFilterElement_Meta_DateEnd:
       RECREATE_COMBO(CBS_DROPDOWN);
-      value_combo_.AddString(static_cast<std::wstring>(GetDate()).c_str());
+      value_combo_.AddString(GetDate().to_string().c_str());
       value_combo_.SetCueBannerText(L"YYYY-MM-DD");
       break;
     case kFeedFilterElement_Meta_Status:

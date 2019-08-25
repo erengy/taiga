@@ -478,8 +478,8 @@ bool Database::SaveList(bool include_database) {
       XmlWriteIntValue(node, L"id", item.GetId());
       XmlWriteStrValue(node, L"library_id", item.GetMyId().c_str());
       XmlWriteIntValue(node, L"progress", item.GetMyLastWatchedEpisode(false));
-      XmlWriteStrValue(node, L"date_start", std::wstring(item.GetMyDateStart()).c_str());
-      XmlWriteStrValue(node, L"date_end", std::wstring(item.GetMyDateEnd()).c_str());
+      XmlWriteStrValue(node, L"date_start", item.GetMyDateStart().to_string().c_str());
+      XmlWriteStrValue(node, L"date_end", item.GetMyDateEnd().to_string().c_str());
       XmlWriteIntValue(node, L"score", item.GetMyScore(false));
       XmlWriteIntValue(node, L"status", item.GetMyStatus(false));
       XmlWriteIntValue(node, L"rewatched_times", item.GetMyRewatchedTimes());

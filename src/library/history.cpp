@@ -130,7 +130,7 @@ void HistoryQueue::Add(HistoryItem& item, bool save) {
           }
           if (!add_new_item) {
             it->mode = taiga::kHttpServiceUpdateLibraryEntry;
-            it->time = (std::wstring)GetDate() + L" " + GetTime();
+            it->time = GetDate().to_string() + L" " + GetTime();
           }
           break;
         }
@@ -140,7 +140,7 @@ void HistoryQueue::Add(HistoryItem& item, bool save) {
   // ...or add a new one
   if (add_new_item) {
     if (item.time.empty())
-      item.time = (std::wstring)GetDate() + L" " + GetTime();
+      item.time = GetDate().to_string() + L" " + GetTime();
     items.push_back(item);
   }
 
@@ -493,7 +493,7 @@ bool History::Save() {
     #define APPEND_ATTRIBUTE_STR(x, y) \
         if (y) node_item.append_attribute(x) = (*y).c_str();
     #define APPEND_ATTRIBUTE_DATE(x, y) \
-        if (y) node_item.append_attribute(x) = std::wstring(*y).c_str();
+        if (y) node_item.append_attribute(x) = (*y).to_string().c_str();
     node_item.append_attribute(L"anime_id") = history_item.anime_id;
     node_item.append_attribute(L"mode") = TranslateModeToString(history_item.mode).c_str();
     node_item.append_attribute(L"time") = history_item.time.c_str();

@@ -23,14 +23,19 @@
 #include <string>
 #include <windows.h>
 
-#include <date/include/date/date.h>
+#include <date/date.h>
 
 #include "comparable.h"
 
+// @TODO: Rename to `Date`
+using DateFull = date::year_month_day;
+
+// @TODO: Rename to `FuzzyDate`
 class Date : public base::Comparable<Date> {
 public:
   Date();
   explicit Date(const std::wstring& date);
+  explicit Date(const DateFull& date);
   explicit Date(const SYSTEMTIME& st);
   explicit Date(unsigned short year, unsigned short month, unsigned short day);
 
@@ -40,8 +45,7 @@ public:
 
   explicit operator bool() const;
   explicit operator SYSTEMTIME() const;
-  explicit operator std::wstring() const;
-  explicit operator date::year_month_day() const;
+  explicit operator DateFull() const;
 
   std::wstring to_string() const;
 
@@ -54,7 +58,7 @@ public:
   void set_day(unsigned short day);
 
 private:
-  base::CompareResult Compare(const Date& date) const;
+  base::CompareResult Compare(const Date& date) const override;
 
   date::year year_;
   date::month month_;
@@ -99,16 +103,11 @@ time_t ConvertIso8601(const std::wstring& datetime);
 time_t ConvertRfc822(const std::wstring& datetime);
 std::wstring ConvertRfc822ToLocal(const std::wstring& datetime);
 
-void GetSystemTime(SYSTEMTIME& st, int utc_offset = 0);
-
 Date GetDate();
-Date GetDate(time_t unix_time);
+Date GetDate(const time_t unix_time);
 std::wstring GetTime(LPCWSTR format = L"HH':'mm':'ss");
 
-time_t GetLocalTimeFromGmt(const time_t gmt);
-
 Date GetDateJapan();
-std::wstring GetTimeJapan(LPCWSTR format = L"HH':'mm':'ss");
 
 std::wstring ToDateString(Duration duration);
 unsigned int ToDayCount(const Date& date);

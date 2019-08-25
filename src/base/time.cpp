@@ -19,6 +19,7 @@
 #include <cmath>
 #include <regex>
 
+#include "format.h"
 #include "string.h"
 #include "time.h"
 
@@ -34,6 +35,10 @@ Date::Date(const std::wstring& date)
     set_month(ToInt(date.substr(5, 2)));
     set_day(ToInt(date.substr(8, 2)));
   }
+}
+
+Date::Date(const DateFull& date)
+    : year_(date.year()), month_(date.month()), day_(date.day()) {
 }
 
 Date::Date(const SYSTEMTIME& st)
@@ -53,8 +58,8 @@ Date& Date::operator=(const Date& date) {
 }
 
 int Date::operator-(const Date& date) const {
-  const auto days = date::sys_days{static_cast<date::year_month_day>(*this)} -
-                    date::sys_days{static_cast<date::year_month_day>(date)};
+  const auto days = date::sys_days{static_cast<DateFull>(*this)} -
+                    date::sys_days{static_cast<DateFull>(date)};
   return days.count();
 }
 
@@ -71,19 +76,13 @@ Date::operator SYSTEMTIME() const {
   return st;
 }
 
-Date::operator std::wstring() const {
-  return to_string();
+Date::operator DateFull() const {
+  return DateFull{year_, month_, day_};
 }
 
-Date::operator date::year_month_day() const {
-  return date::year_month_day{year_, month_, day_};
-}
-
+// YYYY-MM-DD
 std::wstring Date::to_string() const {
-  // Convert to YYYY-MM-DD
-  return PadChar(ToWstr(year()), '0', 4) + L"-" +
-         PadChar(ToWstr(month()), '0', 2) + L"-" +
-         PadChar(ToWstr(day()), '0', 2);
+  return L"{:0>4}-{:0>2}-{:0>2}"_format(year(), month(), day());
 }
 
 unsigned short Date::year() const {
@@ -110,31 +109,23 @@ void Date::set_day(unsigned short day) {
   day_ = date::day{day};
 }
 
+template <typename T>
+base::CompareResult FuzzyCompareDate(const T& lhs, const T& rhs) {
+  if (!lhs) return base::kGreaterThan;
+  if (!rhs) return base::kLessThan;
+  return lhs < rhs ? base::kLessThan : base::kGreaterThan;
+}
+
 base::CompareResult Date::Compare(const Date& date) const {
-  if (year_ != date.year_) {
-    if (year() == 0)
-      return base::kGreaterThan;
-    if (date.year() == 0)
-      return base::kLessThan;
-    return year_ < date.year_ ? base::kLessThan : base::kGreaterThan;
+  if (year() != date.year()) {
+    return FuzzyCompareDate(year(), date.year());
   }
-
-  if (month_ != date.month_) {
-    if (month() == 0)
-      return base::kGreaterThan;
-    if (date.month() == 0)
-      return base::kLessThan;
-    return month_ < date.month_ ? base::kLessThan : base::kGreaterThan;
+  if (month() != date.month()) {
+    return FuzzyCompareDate(month(), date.month());
   }
-
-  if (day_ != date.day_) {
-    if (day() == 0)
-      return base::kGreaterThan;
-    if (date.day() == 0)
-      return base::kLessThan;
-    return day_ < date.day_ ? base::kLessThan : base::kGreaterThan;
+  if (day() != date.day()) {
+    return FuzzyCompareDate(day(), date.day());
   }
-
   return base::kEqualTo;
 }
 
@@ -183,6 +174,12 @@ Duration::years_t::rep Duration::years() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+
+static long GetTimeZoneBias() {
+  TIME_ZONE_INFORMATION tz_info = {0};
+  const auto tz_id = ::GetTimeZoneInformation(&tz_info);
+  return tz_info.Bias + tz_info.DaylightBias;
+}
 
 static void NeutralizeTimezone(tm& t) {
   static bool initialized = false;
@@ -295,19 +292,13 @@ std::wstring ConvertRfc822ToLocal(const std::wstring& datetime) {
   std::strftime(&result.at(0), result.size(),
                 "%a, %d %b %Y %H:%M:%S", &local_tm);
 
-  TIME_ZONE_INFORMATION time_zone_info = {0};
-  const auto time_zone_id = GetTimeZoneInformation(&time_zone_info);
-  const auto bias = time_zone_info.Bias + time_zone_info.DaylightBias;
+  const auto bias = GetTimeZoneBias();
 
-  std::wstring sign = bias <= 0 ? L"+" : L"-";
-  int hh = std::abs(bias) / 60;
-  int mm = std::abs(bias) % 60;
+  const auto sign = bias <= 0 ? L'+' : L'-';
+  const auto hh = std::abs(bias) / 60;
+  const auto mm = std::abs(bias) % 60;
 
-  std::wstring result_with_tz = StrToWstr(result) + L" " + sign +
-      PadChar(ToWstr(hh), L'0', 2) +
-      PadChar(ToWstr(mm), L'0', 2);
-
-  return result_with_tz;
+  return L"{} {}{:0>2}{:0>2}"_format(StrToWstr(result), sign, hh, mm);
 }
 
 std::wstring GetAbsoluteTimeString(time_t unix_time, const char* format) {
@@ -382,36 +373,13 @@ std::wstring GetRelativeTimeString(time_t unix_time, bool append_suffix) {
   return str;
 }
 
-void GetSystemTime(SYSTEMTIME& st, int utc_offset) {
-  // Get current time, expressed in UTC
-  GetSystemTime(&st);
-  if (utc_offset == 0)
-    return;
-
-  // Convert to FILETIME
-  FILETIME ft;
-  SystemTimeToFileTime(&st, &ft);
-  // Convert to ULARGE_INTEGER
-  ULARGE_INTEGER ul;
-  ul.LowPart = ft.dwLowDateTime;
-  ul.HighPart = ft.dwHighDateTime;
-
-  // Apply UTC offset
-  ul.QuadPart += static_cast<ULONGLONG>(utc_offset) * 60 * 60 * 10000000;
-
-  // Convert back to SYSTEMTIME
-  ft.dwLowDateTime = ul.LowPart;
-  ft.dwHighDateTime = ul.HighPart;
-  FileTimeToSystemTime(&ft, &st);
-}
-
 Date GetDate() {
   SYSTEMTIME st;
-  GetLocalTime(&st);
+  ::GetLocalTime(&st);
   return Date(st);
 }
 
-Date GetDate(time_t unix_time) {
+Date GetDate(const time_t unix_time) {
   std::tm tm;
 
   if (localtime_s(&tm, &unix_time) == 0) {
@@ -427,25 +395,11 @@ std::wstring GetTime(LPCWSTR format) {
   return buff;
 }
 
-time_t GetLocalTimeFromGmt(const time_t gmt) {
-  TIME_ZONE_INFORMATION time_zone_info = {0};
-  const auto time_zone_id = GetTimeZoneInformation(&time_zone_info);
-  const auto bias_minutes = time_zone_info.Bias + time_zone_info.DaylightBias;
-  return gmt - (bias_minutes * 60);
-}
-
 Date GetDateJapan() {
-  SYSTEMTIME st;
-  GetSystemTime(st, 9);  // JST is UTC+09
-  return Date(st);
-}
-
-std::wstring GetTimeJapan(LPCWSTR format) {
-  WCHAR buff[32];
-  SYSTEMTIME st_jst;
-  GetSystemTime(st_jst, 9);  // JST is UTC+09
-  GetTimeFormat(LOCALE_SYSTEM_DEFAULT, 0, &st_jst, format, buff, 32);
-  return buff;
+  const auto utc = std::chrono::system_clock::now();
+  // Japan Standard Time is UTC+09. There is no daylight saving time in Japan.
+  const auto jst = utc + std::chrono::hours(9);
+  return Date(std::chrono::floor<date::days>(jst));
 }
 
 std::wstring ToDateString(Duration duration) {
