@@ -30,6 +30,8 @@ namespace anime {
 class Episode;
 }
 
+struct DiscordUser;
+
 namespace taiga {
 
 enum AnnouncerModes {
@@ -71,7 +73,7 @@ public:
 private:
   void RunCallbacks() const;
 
-  static void OnReady();
+  static void OnReady(const DiscordUser* user);
   static void OnDisconnected(int errcode, const char* message);
   static void OnError(int errcode, const char* message);
 };

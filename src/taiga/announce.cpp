@@ -179,8 +179,13 @@ void Discord::RunCallbacks() const {
   Discord_RunCallbacks();
 }
 
-void Discord::OnReady() {
-  LOGD(L"Discord: ready");
+void Discord::OnReady(const DiscordUser* user) {
+  if (user) {
+    LOGD(L"Discord: ready ({}#{})",
+         StrToWstr(user->username), StrToWstr(user->discriminator));
+  } else {
+    LOGD(L"Discord: ready");
+  }
 }
 
 void Discord::OnDisconnected(int errcode, const char* message) {
