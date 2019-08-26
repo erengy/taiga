@@ -19,7 +19,6 @@
 #include <windows.h>
 #include <uxtheme.h>
 
-#include "base/foreach.h"
 #include "base/format.h"
 #include "base/string.h"
 #include "base/process.h"
@@ -568,7 +567,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
     // Recently watched
     std::vector<int> anime_ids;
     auto list_anime_ids = [&anime_ids](const std::vector<HistoryItem>& items) {
-      foreach_cr_(it, items) {
+      for (auto it = items.crbegin(); it != items.crend(); ++it) {
         if (it->episode) {
           if (std::find(anime_ids.begin(), anime_ids.end(),
                         it->anime_id) == anime_ids.end()) {

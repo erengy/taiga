@@ -645,9 +645,6 @@
     <ClInclude Include="..\..\src\base\file_monitor.h">
       <Filter>base</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\base\foreach.h">
-      <Filter>base</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\base\format.h">
       <Filter>base</Filter>
     </ClInclude>

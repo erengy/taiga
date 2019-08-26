@@ -21,7 +21,6 @@
 #include <vector>
 
 #include "base64.h"
-#include "foreach.h"
 #include "crypto.h"
 #include "string.h"
 #include "oauth.h"
@@ -53,7 +52,8 @@ std::wstring OAuth::BuildAuthorizationHeader(
 
   // Build and return OAuth header
   std::wstring oauth_header = L"OAuth ";
-  foreach_c_(it, signed_parameters) {
+  for (auto it = signed_parameters.cbegin();
+       it != signed_parameters.cend(); ++it) {
     if (it != signed_parameters.begin())
       oauth_header += L", ";
     oauth_header += it->first + L"=\"" + it->second + L"\"";

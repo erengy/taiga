@@ -16,7 +16,6 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/foreach.h"
 #include "base/log.h"
 #include "base/string.h"
 #include "base/xml.h"
@@ -103,7 +102,7 @@ void HistoryQueue::Add(HistoryItem& item, bool save) {
   // Edit previous item with the same ID...
   bool add_new_item = true;
   if (!History.queue.updating) {
-    foreach_r_(it, items) {
+    for (auto it = items.rbegin(); it != items.rend(); ++it) {
       if (it->anime_id == item.anime_id && it->enabled) {
         if (it->mode != taiga::kHttpServiceAddLibraryEntry &&
             it->mode != taiga::kHttpServiceDeleteLibraryEntry) {

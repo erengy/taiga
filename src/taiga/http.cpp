@@ -17,7 +17,6 @@
 */
 
 #include "base/file.h"
-#include "base/foreach.h"
 #include "base/format.h"
 #include "base/log.h"
 #include "base/string.h"
@@ -361,31 +360,24 @@ HttpClient* HttpManager::FindClient(base::uid_t uid) {
 }
 
 HttpClient& HttpManager::GetClient(const HttpRequest& request) {
-  HttpClient* client = nullptr;
-
-  foreach_(it, clients_) {
-    if (it->allow_reuse() && !it->busy()) {
-      if (IsEqual(it->request().url.host, request.url.host)) {
+  for (auto& client : clients_) {
+    if (client.allow_reuse() && !client.busy()) {
+      if (IsEqual(client.request().url.host, request.url.host)) {
         LOGD(L"Reusing client with the ID: {}\nClient's new ID: {}",
-             it->request().uid, request.uid);
-        client = &(*it);
+             client.request().uid, request.uid);
         // Proxy settings might have changed since then
-        client->set_proxy(Settings[kApp_Connection_ProxyHost],
-                          Settings[kApp_Connection_ProxyUsername],
-                          Settings[kApp_Connection_ProxyPassword]);
-        break;
+        client.set_proxy(Settings[kApp_Connection_ProxyHost],
+                         Settings[kApp_Connection_ProxyUsername],
+                         Settings[kApp_Connection_ProxyPassword]);
+        return client;
       }
     }
   }
 
-  if (!client) {
-    clients_.push_back(HttpClient(request));
-    client = &clients_.back();
-    LOGD(L"Created a new client. Total number of clients is now {}",
-         clients_.size());
-  }
-
-  return *client;
+  clients_.push_back(HttpClient(request));
+  LOGD(L"Created a new client. Total number of clients is now {}",
+        clients_.size());
+  return clients_.back();
 }
 
 void HttpManager::AddToQueue(HttpRequest& request, HttpClientMode mode) {

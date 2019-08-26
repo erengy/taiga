@@ -16,7 +16,6 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/foreach.h"
 #include "base/format.h"
 #include "base/gfx.h"
 #include "base/log.h"
@@ -182,7 +181,7 @@ void HistoryDialog::RefreshList() {
   list_.DeleteAllItems();
 
   // Add queued items
-  foreach_cr_(it, History.queue.items) {
+  for (auto it = History.queue.items.crbegin(); it != History.queue.items.crend(); ++it) {
     auto anime_item = AnimeDatabase.FindItem(it->anime_id);
     if (!anime_item) {
       LOGE(L"Item does not exist in the database: {}", it->anime_id);
@@ -229,7 +228,7 @@ void HistoryDialog::RefreshList() {
   }
 
   // Add recently watched
-  foreach_cr_(it, History.items) {
+  for (auto it = History.items.crbegin(); it != History.items.crend(); ++it) {
     auto anime_item = AnimeDatabase.FindItem(it->anime_id);
     if (!anime_item) {
       LOGE(L"Item does not exist in the database: {}", it->anime_id);

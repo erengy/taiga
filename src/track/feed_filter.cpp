@@ -17,7 +17,6 @@
 */
 
 #include "base/file.h"
-#include "base/foreach.h"
 #include "base/log.h"
 #include "base/string.h"
 #include "base/xml.h"
@@ -483,11 +482,12 @@ void FeedFilterManager::AddFilter(FeedFilterAction action,
 }
 
 void FeedFilterManager::Cleanup() {
-  foreach_(filter, filters) {
-    foreach_(id, filter->anime_ids) {
+  for (auto filter = filters.begin(); filter != filters.end(); ++filter) {
+    auto& ids = filter->anime_ids;
+    for (auto id = ids.begin(); id != ids.end(); ++id) {
       if (!AnimeDatabase.FindItem(*id)) {
-        if (filter->anime_ids.size() > 1) {
-          id = filter->anime_ids.erase(id) - 1;
+        if (ids.size() > 1) {
+          id = ids.erase(id) - 1;
           continue;
         } else {
           filter = filters.erase(filter) - 1;

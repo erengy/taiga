@@ -18,7 +18,6 @@
 
 #include <semaver/src/semaver.hpp>
 
-#include "base/foreach.h"
 #include "base/log.h"
 #include "base/string.h"
 #include "base/xml.h"

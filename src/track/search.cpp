@@ -17,7 +17,6 @@
 */
 
 #include "base/file.h"
-#include "base/foreach.h"
 #include "base/log.h"
 #include "base/string.h"
 #include "library/anime_db.h"
@@ -250,7 +249,8 @@ void ScanAvailableEpisodesQuick() {
 void ScanAvailableEpisodesQuick(int anime_id) {
   using track::file_search_helper;
 
-  foreach_r_(it, AnimeDatabase.items) {
+  for (auto it = AnimeDatabase.items.rbegin();
+       it != AnimeDatabase.items.rend(); ++it) {
     anime::Item& anime_item = it->second;
 
     if (anime_id != anime::ID_UNKNOWN && anime_item.GetId() != anime_id)
