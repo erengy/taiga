@@ -129,8 +129,6 @@ Section "!${PRODUCT_NAME}" SECTION_DEFAULT
   File /r "..\data\"
   SetOutPath "$INSTDIR\data\db\"
   File "..\deps\data\anime-relations\anime-relations.txt"
-  SetOutPath "$INSTDIR\data\db\season\"
-  File /r "..\deps\data\anime-seasons\data\"
 
   ; Uninstaller
   WriteUninstaller "$INSTDIR\${UNINST_EXE}"
