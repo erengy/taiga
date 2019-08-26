@@ -177,7 +177,8 @@ bool Client::SetRequestOptions() {
   //////////////////////////////////////////////////////////////////////////////
   // Security options
 
-#ifdef TAIGA_HTTP_SSL_UNSECURE
+#ifdef _DEBUG
+  // Skip SSL verifications in debug build
   TAIGA_CURL_SET_OPTION(CURLOPT_SSL_VERIFYPEER, 0L);
   TAIGA_CURL_SET_OPTION(CURLOPT_SSL_VERIFYHOST, 0L);
 #endif

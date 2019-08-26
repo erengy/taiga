@@ -43,8 +43,3 @@
 
 // Store data at the same directory as the executable
 #define TAIGA_PORTABLE
-
-// Skip SSL verifications in debug mode
-#ifdef _DEBUG
-#define TAIGA_HTTP_SSL_UNSECURE
-#endif
