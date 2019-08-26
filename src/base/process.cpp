@@ -21,14 +21,14 @@
 #include "process.h"
 
 bool CheckInstance(LPCWSTR mutex_name, LPCWSTR class_name) {
-  if (CreateMutex(NULL, FALSE, mutex_name) == NULL ||
+  if (::CreateMutexW(NULL, FALSE, mutex_name) == NULL ||
       GetLastError() == ERROR_ALREADY_EXISTS ||
       GetLastError() == ERROR_ACCESS_DENIED) {
     HWND hwnd = FindWindow(class_name, NULL);
 
-    if (IsWindow(hwnd)) {
+    if (::IsWindow(hwnd)) {
       ActivateWindow(hwnd);
-      FlashWindow(hwnd, TRUE);
+      ::FlashWindow(hwnd, TRUE);
     }
 
     return true;
@@ -38,8 +38,9 @@ bool CheckInstance(LPCWSTR mutex_name, LPCWSTR class_name) {
 }
 
 void ActivateWindow(HWND hwnd) {
-  if (IsIconic(hwnd))
+  if (::IsIconic(hwnd)) {
     ::ShowWindow(hwnd, SW_RESTORE);
+  }
 
   if (!IsWindowVisible(hwnd)) {
     WINDOWPLACEMENT wp = {0};
@@ -50,31 +51,4 @@ void ActivateWindow(HWND hwnd) {
 
   ::SetForegroundWindow(hwnd);
   ::BringWindowToTop(hwnd);
-}
-
-std::wstring GetWindowClass(HWND hwnd) {
-  WCHAR buff[MAX_PATH];
-  GetClassName(hwnd, buff, MAX_PATH);
-  return buff;
-}
-
-std::wstring GetWindowTitle(HWND hwnd) {
-  WCHAR buff[MAX_PATH];
-  GetWindowText(hwnd, buff, MAX_PATH);
-  return buff;
-}
-
-bool IsFullscreen(HWND hwnd) {
-  LONG style = GetWindowLong(hwnd, GWL_EXSTYLE);
-
-  if (style & WS_EX_TOPMOST) {
-    RECT rect;
-    GetClientRect(hwnd, &rect);
-
-    if (rect.right >= GetSystemMetrics(SM_CXSCREEN) &&
-        rect.bottom >= GetSystemMetrics(SM_CYSCREEN))
-      return true;
-  }
-
-  return false;
 }

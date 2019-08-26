@@ -18,11 +18,7 @@
 
 #pragma once
 
-#include <string>
 #include <windows.h>
 
 bool CheckInstance(LPCWSTR mutex_name, LPCWSTR class_name);
 void ActivateWindow(HWND hwnd);
-std::wstring GetWindowClass(HWND hwnd);
-std::wstring GetWindowTitle(HWND hwnd);
-bool IsFullscreen(HWND hwnd);
