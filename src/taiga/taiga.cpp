@@ -42,12 +42,6 @@ taiga::App Taiga;
 
 namespace taiga {
 
-App::App() {
-#ifdef _DEBUG
-  options.debug_mode = true;
-#endif
-}
-
 App::~App() {
   OleUninitialize();
 }
@@ -55,6 +49,9 @@ App::~App() {
 BOOL App::InitInstance() {
   // Parse command line
   options = ParseCommandLine();
+#ifdef _DEBUG
+  options.debug_mode = true;
+#endif
 
   // Initialize logger
   const auto module_path = GetModulePath();

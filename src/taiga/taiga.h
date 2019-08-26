@@ -26,7 +26,6 @@ namespace taiga {
 
 class App : public win::App {
 public:
-  App();
   ~App();
 
   BOOL InitInstance();
