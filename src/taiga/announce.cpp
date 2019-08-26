@@ -184,11 +184,11 @@ void Discord::OnReady() {
 }
 
 void Discord::OnDisconnected(int errcode, const char* message) {
-  LOGD(L"Discord: disconnected ({}: {})", errcode, message);
+  LOGD(L"Discord: disconnected ({}: {})", errcode, StrToWstr(message));
 }
 
 void Discord::OnError(int errcode, const char* message) {
-  LOGD(L"Discord: error ({}: {})", errcode, message);
+  LOGD(L"Discord: error ({}: {})", errcode, StrToWstr(message));
 }
 
 void Announcer::ToDiscord(const std::wstring& details,

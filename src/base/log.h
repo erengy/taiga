@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <fmt/fmt/format.h>
+#include <fmt/format.h>
 #include <monolog/monolog.h>
 
 namespace base {

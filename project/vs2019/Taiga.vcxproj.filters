@@ -238,18 +238,6 @@
     <ClCompile Include="..\..\deps\src\discord-rpc\src\serialization.cpp">
       <Filter>deps\discord-rpc</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\deps\src\fmt\fmt\format.cc">
-      <Filter>deps\fmt</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\deps\src\fmt\fmt\ostream.cc">
-      <Filter>deps\fmt</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\deps\src\fmt\fmt\posix.cc">
-      <Filter>deps\fmt</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\deps\src\fmt\fmt\printf.cc">
-      <Filter>deps\fmt</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\deps\src\monolog\monolog.cpp">
       <Filter>deps\monolog</Filter>
     </ClCompile>
@@ -628,6 +616,9 @@
     <ClCompile Include="..\..\src\ui\translate\base.cpp">
       <Filter>ui\translate</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\deps\src\fmt\src\format.cc">
+      <Filter>deps\fmt</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\base\base64.h">
@@ -797,27 +788,6 @@
     </ClInclude>
     <ClInclude Include="..\..\deps\src\discord-rpc\src\serialization.h">
       <Filter>deps\discord-rpc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\deps\src\fmt\fmt\container.h">
-      <Filter>deps\fmt</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\deps\src\fmt\fmt\format.h">
-      <Filter>deps\fmt</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\deps\src\fmt\fmt\ostream.h">
-      <Filter>deps\fmt</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\deps\src\fmt\fmt\posix.h">
-      <Filter>deps\fmt</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\deps\src\fmt\fmt\printf.h">
-      <Filter>deps\fmt</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\deps\src\fmt\fmt\string.h">
-      <Filter>deps\fmt</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\deps\src\fmt\fmt\time.h">
-      <Filter>deps\fmt</Filter>
     </ClInclude>
     <ClInclude Include="..\..\deps\src\monolog\monolog.h">
       <Filter>deps\monolog</Filter>
@@ -1145,6 +1115,12 @@
     </ClInclude>
     <ClInclude Include="..\..\src\ui\translate.h">
       <Filter>ui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\fmt\include\fmt\format.h">
+      <Filter>deps\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\fmt\include\fmt\chrono.h">
+      <Filter>deps\fmt</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

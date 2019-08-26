@@ -18,6 +18,6 @@
 
 #pragma once
 
-#include <fmt/fmt/format.h>
+#include <fmt/format.h>
 
 using namespace fmt::literals;
