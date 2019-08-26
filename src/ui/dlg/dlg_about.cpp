@@ -120,7 +120,7 @@ BOOL AboutDialog::OnInitDialog() {
       L"erengy (Eren Okka)\\line\\par "
       L"\\b Contributors:\\b0\\line "
       L"saka, Diablofan, slevir, LordGravewish, rr-, sunjayc, ConnorKrammer, Soinou, Jiyuu,\\line "
-      L"ryban, tollyx, pavelxdd, gunt3001, synthtech\\line\\par "
+      L"ryban, tollyx, pavelxdd, gunt3001, synthtech, cnguy\\line\\par "
       L"\\b Third-party components:\\b0\\line "
       L"{\\field{\\*\\fldinst{HYPERLINK \"https://github.com/HowardHinnant/date\"}}{\\fldrslt{date " + GetLibraryVersion(kDate) + L"}}}, "
       L"{\\field{\\*\\fldinst{HYPERLINK \"https://github.com/discordapp/discord-rpc\"}}{\\fldrslt{Discord RPC " + GetLibraryVersion(kDiscordRpc) + L"}}}, "
