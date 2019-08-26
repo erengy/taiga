@@ -363,21 +363,14 @@ HttpClient& HttpManager::GetClient(const HttpRequest& request) {
 }
 
 void HttpManager::AddToQueue(HttpRequest& request, HttpClientMode mode) {
-#ifdef TAIGA_HTTP_MULTITHREADED
   win::Lock lock(critical_section_);
 
   LOGD(L"ID: {}", request.uid);
 
   requests_.push_back(std::make_pair(request, mode));
-#else
-  HttpClient& client = GetClient(request);
-  client.set_mode(mode);
-  client.MakeRequest(request);
-#endif
 }
 
 void HttpManager::ProcessQueue() {
-#ifdef TAIGA_HTTP_MULTITHREADED
   win::Lock lock(critical_section_);
 
   unsigned int connections = 0;
@@ -415,21 +408,17 @@ void HttpManager::ProcessQueue() {
       i--;
     }
   }
-#endif
 }
 
 void HttpManager::AddConnection(const string_t& hostname) {
-#ifdef TAIGA_HTTP_MULTITHREADED
   win::Lock lock(critical_section_);
 
   connections_[hostname]++;
   LOGD(L"Connections for hostname is now {}: {}",
        connections_[hostname], hostname);
-#endif
 }
 
 void HttpManager::FreeConnection(const string_t& hostname) {
-#ifdef TAIGA_HTTP_MULTITHREADED
   win::Lock lock(critical_section_);
 
   if (connections_[hostname] > 0) {
@@ -439,7 +428,6 @@ void HttpManager::FreeConnection(const string_t& hostname) {
   } else {
     LOGE(L"Connections for hostname was already zero: {}", hostname);
   }
-#endif
 }
 
 }  // namespace taiga

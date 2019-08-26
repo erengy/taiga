@@ -193,11 +193,7 @@ bool Client::SetRequestOptions() {
 }
 
 bool Client::SendRequest() {
-#ifdef TAIGA_HTTP_MULTITHREADED
   return CreateThread(nullptr, 0, 0);
-#else
-  return Perform();
-#endif
 }
 
 bool Client::Perform() {
