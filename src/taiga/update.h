@@ -35,7 +35,6 @@ public:
   void CheckAnimeRelations();
   bool Download();
   bool IsAnimeRelationsAvailable() const;
-  bool IsNewSeasonAvailable() const;
   bool IsRestartRequired() const;
   bool IsUpdateAvailable() const;
   bool ParseData(std::wstring data);
@@ -49,8 +48,6 @@ public:
   public:
     std::wstring taiga_anime_relations_location;
     std::wstring taiga_anime_relations_modified;
-    std::wstring taiga_anime_season_location;
-    std::wstring taiga_anime_season_max;
   };
   std::vector<Item> items;
 
@@ -58,7 +55,6 @@ private:
   std::wstring download_path_;
   std::unique_ptr<Item> current_item_;
   std::unique_ptr<Item> latest_item_;
-  bool new_season_available_ = false;
   bool restart_required_ = false;
   bool update_available_ = false;
   std::wstring client_uid_;

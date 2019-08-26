@@ -261,22 +261,6 @@ void HttpManager::HandleResponse(HttpResponse& response) {
       break;
     }
 
-    case kHttpSeasonsGet: {
-      if (response.GetStatusCategory() == 200 &&
-          SeasonDatabase.LoadString(response.body)) {
-        const auto path = GetPath(Path::DatabaseSeason) +
-                          GetFileName(client.request().url.path);
-        SaveToFile(client.write_buffer_, path);
-        Settings.Set(taiga::kApp_Seasons_LastSeason,
-                     ui::TranslateSeason(SeasonDatabase.current_season));
-        SeasonDatabase.Review();
-        ui::OnSeasonLoad(SeasonDatabase.IsRefreshRequired());
-      } else {
-        ui::OnSeasonLoadFail();
-      }
-      break;
-    }
-
     case kHttpTwitterRequest:
     case kHttpTwitterAuth:
     case kHttpTwitterPost:
@@ -293,8 +277,7 @@ void HttpManager::HandleResponse(HttpResponse& response) {
           taiga::updater.CheckAnimeRelations();
           break;
         }
-        const bool new_season = taiga::updater.IsNewSeasonAvailable();
-        ui::OnUpdateNotAvailable(false, new_season);
+        ui::OnUpdateNotAvailable(false);
       }
       ui::OnUpdateFinished();
       break;
@@ -309,15 +292,14 @@ void HttpManager::HandleResponse(HttpResponse& response) {
       ui::OnUpdateFinished();
       break;
     case kHttpTaigaUpdateRelations: {
-      const bool new_season = taiga::updater.IsNewSeasonAvailable();
       if (Meow.ReadRelations(client.write_buffer_) &&
           SaveToFile(client.write_buffer_, GetPath(Path::DatabaseAnimeRelations))) {
         LOGD(L"Updated anime relation data.");
-        ui::OnUpdateNotAvailable(true, new_season);
+        ui::OnUpdateNotAvailable(true);
       } else {
         Meow.ReadRelations();
         LOGD(L"Anime relation data update failed.");
-        ui::OnUpdateNotAvailable(false, new_season);
+        ui::OnUpdateNotAvailable(false);
       }
       ui::OnUpdateFinished();
       break;

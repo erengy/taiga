@@ -380,17 +380,8 @@ void MenuList::UpdateSeason() {
   if (menu) {
     menu->items.clear();
 
-    auto season_min = SeasonDatabase.available_seasons.first;
-    auto season_max = SeasonDatabase.available_seasons.second;
-    switch (taiga::GetCurrentServiceId()) {
-      case sync::kKitsu:
-      case sync::kAniList: {
-        const auto next_season = ++anime::Season(GetDate());
-        season_max = std::max(season_max, next_season);
-        season_min = anime::Season(anime::Season::Name::kWinter, 2010);
-        break;
-      }
-    }
+    const auto season_min = anime::Season(anime::Season::Name::kWinter, 2010);
+    const auto season_max = ++anime::Season(GetDate());  // Next season
 
     auto create_item = [](win::Menu& menu, const anime::Season& season) {
       const auto season_str = ui::TranslateSeason(season);

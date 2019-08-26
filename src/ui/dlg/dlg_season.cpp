@@ -88,15 +88,11 @@ BOOL SeasonDialog::OnInitDialog() {
   if (!last_season.empty()) {
     switch (taiga::GetCurrentServiceId()) {
       case sync::kMyAnimeList:
-        if (SeasonDatabase.LoadSeason(last_season)) {
-          SeasonDatabase.Review();
-        } else {
-          Settings.Set(taiga::kApp_Seasons_LastSeason, std::wstring());
-        }
+        // @TODO
         break;
       case sync::kKitsu:
       case sync::kAniList:
-        SeasonDatabase.LoadSeasonFromMemory(last_season);
+        SeasonDatabase.Load(anime::Season(last_season));
         break;
     }
   }

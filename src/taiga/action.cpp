@@ -691,16 +691,11 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   } else if (action == L"Season_Load") {
     switch (taiga::GetCurrentServiceId()) {
       case sync::kMyAnimeList:
-        if (SeasonDatabase.LoadSeason(body)) {
-          Settings.Set(taiga::kApp_Seasons_LastSeason,
-                       ui::TranslateSeason(SeasonDatabase.current_season));
-          SeasonDatabase.Review();
-          ui::OnSeasonLoad(SeasonDatabase.IsRefreshRequired());
-        }
+        // @TODO
         break;
       case sync::kKitsu:
       case sync::kAniList:
-        if (SeasonDatabase.LoadSeasonFromMemory(body)) {
+        if (SeasonDatabase.Load(anime::Season(body))) {
           Settings.Set(taiga::kApp_Seasons_LastSeason,
                        ui::TranslateSeason(SeasonDatabase.current_season));
           ui::OnSeasonLoad(false);

@@ -249,7 +249,6 @@ void AppSettings::InitializeMap() {
   INITKEY(kApp_Option_EnableSharing, L"true", L"program/general/enablesharing");
   INITKEY(kApp_Option_EnableSync, L"true", L"program/general/enablesync");
   INITKEY(kApp_Seasons_LastSeason, nullptr, L"program/seasons/lastseason");
-  INITKEY(kApp_Seasons_MaxSeason, nullptr, L"program/seasons/maxseason");
   INITKEY(kApp_Seasons_GroupBy, ToWstr(ui::kSeasonGroupByType).c_str(), L"program/seasons/groupby");
   INITKEY(kApp_Seasons_SortBy, ToWstr(ui::kSeasonSortByTitle).c_str(), L"program/seasons/sortby");
   INITKEY(kApp_Seasons_ViewAs, ToWstr(ui::kSeasonViewAsTiles).c_str(), L"program/seasons/viewas");
@@ -327,11 +326,6 @@ bool AppSettings::Load() {
       data.width = column.attribute(L"width").as_int();
     }
   }
-
-  // Seasons
-  anime::Season season_max(GetWstr(kApp_Seasons_MaxSeason));
-  if (season_max && season_max > SeasonDatabase.available_seasons.second)
-    SeasonDatabase.available_seasons.second = season_max;
 
   // Torrent application path
   if (GetWstr(kTorrent_Download_AppPath).empty()) {

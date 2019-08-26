@@ -173,6 +173,10 @@ void Manager::HandleError(Response& response, HttpResponse& http_response) {
         }
       }
       break;
+    case kGetSeason:
+      ui::OnSeasonLoadFail();
+      ui::ChangeStatusText(response.data[L"error"]);
+      break;
     case kGetLibraryEntries:
       ui::OnLibraryChangeFailure();
       ui::ChangeStatusText(response.data[L"error"]);

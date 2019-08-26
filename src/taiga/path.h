@@ -32,7 +32,6 @@ enum class Path {
   DatabaseAnime,
   DatabaseAnimeRelations,
   DatabaseImage,
-  DatabaseSeason,
   Feed,
   FeedHistory,
   Media,

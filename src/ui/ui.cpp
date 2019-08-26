@@ -140,7 +140,6 @@ void OnHttpError(const taiga::HttpClient& http_client, const string_t& error) {
       DlgTorrent.EnableInput();
       break;
     case taiga::kHttpServiceGetSeason:
-    case taiga::kHttpSeasonsGet:
       ChangeStatusText(error);
       DlgSeason.EnableInput();
       break;
@@ -225,7 +224,6 @@ void OnHttpProgress(const taiga::HttpClient& http_client) {
       status = L"Downloading torrent file...";
       break;
     case taiga::kHttpServiceGetSeason:
-    case taiga::kHttpSeasonsGet:
       status = L"Downloading anime season data...";
       break;
     case taiga::kHttpTwitterRequest:
@@ -338,6 +336,8 @@ void OnLibraryEntryImageChange(int id) {
 
 void OnLibraryGetSeason() {
   DlgSeason.RefreshList();
+  DlgSeason.RefreshStatus();
+  DlgSeason.RefreshToolbar();
   DlgSeason.EnableInput();
 }
 
@@ -1112,7 +1112,7 @@ void OnUpdateAvailable() {
   DlgUpdateNew.Create(IDD_UPDATE_NEW, DlgUpdate.GetWindowHandle(), true);
 }
 
-void OnUpdateNotAvailable(bool relations, bool season) {
+void OnUpdateNotAvailable(bool relations) {
   if (DlgMain.IsWindow()) {
     win::TaskDialog dlg(L"Update", TD_ICON_INFORMATION);
     dlg.SetMainInstruction(L"Taiga is up to date!");
@@ -1121,14 +1121,6 @@ void OnUpdateNotAvailable(bool relations, bool season) {
     if (relations) {
       content += L"\n\nUpdated anime relations to: " +
                  taiga::updater.GetCurrentAnimeRelationsModified();
-    }
-    if (season) {
-      switch (taiga::GetCurrentServiceId()) {
-        case sync::kMyAnimeList:
-          content += L"\n\nNew anime season: " +
-                     ui::TranslateSeason(SeasonDatabase.available_seasons.second);
-          break;
-      }
     }
     dlg.SetContent(content.c_str());
     dlg.AddButton(L"OK", IDOK);

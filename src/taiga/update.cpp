@@ -73,7 +73,6 @@ bool UpdateHelper::ParseData(std::wstring data) {
   download_path_.clear();
   current_item_.reset();
   latest_item_.reset();
-  new_season_available_ = false;
   restart_required_ = false;
   update_available_ = false;
 
@@ -93,8 +92,6 @@ bool UpdateHelper::ParseData(std::wstring data) {
     items.back().pub_date = XmlReadStrValue(item, L"pubDate");
     items.back().taiga_anime_relations_location = XmlReadStrValue(item, L"taiga:animeRelationsLocation");
     items.back().taiga_anime_relations_modified = XmlReadStrValue(item, L"taiga:animeRelationsModified");
-    items.back().taiga_anime_season_location = XmlReadStrValue(item, L"taiga:animeSeasonLocation");
-    items.back().taiga_anime_season_max = XmlReadStrValue(item, L"taiga:animeSeasonMax");
   }
 
   auto current_version = taiga::version();
@@ -106,14 +103,6 @@ bool UpdateHelper::ParseData(std::wstring data) {
       latest_version = item_version;
     } else if (item_version == current_version) {
       current_item_.reset(new Item(item));
-      anime::Season season_max(item.taiga_anime_season_max);
-      if (season_max && season_max > SeasonDatabase.available_seasons.second) {
-        new_season_available_ = true;
-        SeasonDatabase.available_seasons.second = season_max;
-        Settings.Set(taiga::kApp_Seasons_MaxSeason, ui::TranslateSeason(season_max));
-      }
-      if (!item.taiga_anime_season_location.empty())
-        SeasonDatabase.remote_location = item.taiga_anime_season_location;
     }
   }
 
@@ -138,10 +127,6 @@ bool UpdateHelper::IsAnimeRelationsAvailable() const {
   }
 
   return true;
-}
-
-bool UpdateHelper::IsNewSeasonAvailable() const {
-  return new_season_available_;
 }
 
 bool UpdateHelper::IsRestartRequired() const {

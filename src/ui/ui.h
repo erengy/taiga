@@ -138,7 +138,7 @@ void OnLogin();
 void OnLogout(bool website_login_required = false);
 
 void OnUpdateAvailable();
-void OnUpdateNotAvailable(bool relations = false, bool season = false);
+void OnUpdateNotAvailable(bool relations = false);
 void OnUpdateFailed();
 void OnUpdateFinished();
 
