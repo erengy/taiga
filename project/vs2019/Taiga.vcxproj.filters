@@ -675,9 +675,6 @@
     <ClInclude Include="..\..\src\base\oauth.h">
       <Filter>base</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\base\optional.h">
-      <Filter>base</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\base\process.h">
       <Filter>base</Filter>
     </ClInclude>

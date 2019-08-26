@@ -19,10 +19,10 @@
 #pragma once
 
 #include <string>
+#include <optional>
 #include <queue>
 #include <vector>
 
-#include "base/optional.h"
 #include "base/time.h"
 #include "base/xml.h"
 #include "library/anime_episode.h"
@@ -41,15 +41,15 @@ enum class QueueSearch {
 
 class AnimeValues {
 public:
-  Optional<int> episode;
-  Optional<int> status;
-  Optional<int> score;
-  Optional<Date> date_start;
-  Optional<Date> date_finish;
-  Optional<int> enable_rewatching;
-  Optional<int> rewatched_times;
-  Optional<std::wstring> tags;
-  Optional<std::wstring> notes;
+  std::optional<int> episode;
+  std::optional<int> status;
+  std::optional<int> score;
+  std::optional<Date> date_start;
+  std::optional<Date> date_finish;
+  std::optional<int> enable_rewatching;
+  std::optional<int> rewatched_times;
+  std::optional<std::wstring> tags;
+  std::optional<std::wstring> notes;
 };
 
 class HistoryItem : public AnimeValues {

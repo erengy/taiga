@@ -518,7 +518,7 @@ void Aggregator::ParseFeedItem(FeedSource source, FeedItem& feed_item) {
       feed_item.info_link = feed_item.guid;
       if (feed_item.elements.count(L"nyaa:size"))
         feed_item.file_size = ParseSizeString(feed_item.elements[L"nyaa:size"]);
-      auto get_torrent_stat = [&](const std::wstring& name, Optional<size_t>& result) {
+      auto get_torrent_stat = [&](const std::wstring& name, std::optional<size_t>& result) {
         if (feed_item.elements.count(name))
           result = ToInt(feed_item.elements[name]);
       };

@@ -20,10 +20,10 @@
 
 #include <cstdint>
 #include <map>
+#include <optional>
 #include <string>
 #include <vector>
 
-#include "base/optional.h"
 #include "base/types.h"
 #include "library/anime_episode.h"
 #include "track/feed_filter.h"
@@ -97,9 +97,9 @@ public:
   std::wstring magnet_link;
   FeedItemState state = FeedItemState::Blank;
   TorrentCategory torrent_category = TorrentCategory::Anime;
-  Optional<size_t> seeders;
-  Optional<size_t> leechers;
-  Optional<size_t> downloads;
+  std::optional<size_t> seeders;
+  std::optional<size_t> leechers;
+  std::optional<size_t> downloads;
   uint64_t file_size = 0;
 
   class EpisodeData : public anime::Episode {

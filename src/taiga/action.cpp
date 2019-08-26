@@ -555,7 +555,7 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
         case anime::kCompleted:
           history_item.episode = anime_item->GetEpisodeCount();
           if (*history_item.episode == 0)
-            history_item.episode.Reset();
+            history_item.episode.reset();
           if (!anime::IsValidDate(anime_item->GetMyDateStart()) &&
               anime_item->GetEpisodeCount() == 1)
               history_item.date_start = GetDate();

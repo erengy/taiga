@@ -59,31 +59,31 @@ void HistoryQueue::Add(HistoryItem& item, bool save) {
   if (anime && anime->IsInList()) {
     if (item.episode)
       if (anime->GetMyLastWatchedEpisode() == *item.episode || *item.episode < 0)
-        item.episode.Reset();
+        item.episode.reset();
     if (item.score)
       if (anime->GetMyScore() == *item.score || *item.score < 0 || *item.score > anime::kUserScoreMax)
-        item.score.Reset();
+        item.score.reset();
     if (item.status)
       if (anime->GetMyStatus() == *item.status || *item.status < anime::kMyStatusFirst || *item.status >= anime::kMyStatusLast)
-        item.status.Reset();
+        item.status.reset();
     if (item.enable_rewatching)
       if (anime->GetMyRewatching() == *item.enable_rewatching)
-        item.enable_rewatching.Reset();
+        item.enable_rewatching.reset();
     if (item.rewatched_times)
       if (anime->GetMyRewatchedTimes() == *item.rewatched_times)
-        item.rewatched_times.Reset();
+        item.rewatched_times.reset();
     if (item.tags)
       if (anime->GetMyTags() == *item.tags)
-        item.tags.Reset();
+        item.tags.reset();
     if (item.notes)
       if (anime->GetMyNotes() == *item.notes)
-        item.notes.Reset();
+        item.notes.reset();
     if (item.date_start)
       if (anime->GetMyDateStart() == *item.date_start)
-        item.date_start.Reset();
+        item.date_start.reset();
     if (item.date_finish)
       if (anime->GetMyDateEnd() == *item.date_finish)
-        item.date_finish.Reset();
+        item.date_finish.reset();
   }
   switch (item.mode) {
     case taiga::kHttpServiceUpdateLibraryEntry:
