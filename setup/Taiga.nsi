@@ -5,10 +5,10 @@
 ; General
 
 ; Version number
-!define VERSION_PATH "..\src\taiga\version.h"
-!searchparse /file "${VERSION_PATH}" `#define TAIGA_VERSION_MAJOR ` VERSION_MAJOR
-!searchparse /file "${VERSION_PATH}" `#define TAIGA_VERSION_MINOR ` VERSION_MINOR
-!searchparse /file "${VERSION_PATH}" `#define TAIGA_VERSION_PATCH ` VERSION_PATCH
+!define CONFIG_PATH "..\src\taiga\config.h"
+!searchparse /file "${CONFIG_PATH}" `#define TAIGA_VERSION_MAJOR ` VERSION_MAJOR
+!searchparse /file "${CONFIG_PATH}" `#define TAIGA_VERSION_MINOR ` VERSION_MINOR
+!searchparse /file "${CONFIG_PATH}" `#define TAIGA_VERSION_PATCH ` VERSION_PATCH
 
 ; Definitions
 !define PRODUCT_EXE "Taiga.exe"
