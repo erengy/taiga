@@ -58,7 +58,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;NOMINMAX;_WINDOWS;_WIN32_WINNT=0x0600;PUGIXML_NO_XPATH;PUGIXML_WCHAR_MODE;FMT_EXCEPTIONS=0;UTF8PROC_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NOMINMAX;_WINDOWS;_WIN32_WINNT=0x0600;PUGIXML_NO_XPATH;PUGIXML_WCHAR_MODE;FMT_EXCEPTIONS=0;UTF8PROC_STATIC;CURL_STATICLIB;HTTP_ONLY;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)\x\x\%(RelativeDir)</ObjectFileName>
       <AdditionalIncludeDirectories>..\..\deps\src;..\..\deps\src\curl\include;..\..\deps\src\date\include;..\..\deps\src\discord-rpc\include;..\..\deps\src\fmt\include;..\..\deps\src\json\single_include;..\..\deps\src\rapidjson\include;..\..\deps\src\semaver\src;..\..\src</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -84,7 +84,7 @@
       <Optimization>MinSpace</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;NOMINMAX;_WINDOWS;_WIN32_WINNT=0x0600;PUGIXML_NO_XPATH;PUGIXML_WCHAR_MODE;FMT_EXCEPTIONS=0;UTF8PROC_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NOMINMAX;_WINDOWS;_WIN32_WINNT=0x0600;PUGIXML_NO_XPATH;PUGIXML_WCHAR_MODE;FMT_EXCEPTIONS=0;UTF8PROC_STATIC;CURL_STATICLIB;HTTP_ONLY;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <ObjectFileName>$(IntDir)\x\x\%(RelativeDir)</ObjectFileName>

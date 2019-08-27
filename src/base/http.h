@@ -18,14 +18,6 @@
 
 #pragma once
 
-// CURL definitions
-#ifndef CURL_STATICLIB
-#define CURL_STATICLIB
-#endif
-#ifndef HTTP_ONLY
-#define HTTP_ONLY
-#endif
-
 #include <windows.h>
 #include <string>
 #include <vector>
