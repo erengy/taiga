@@ -24,7 +24,7 @@
 
 #include <windows/win/thread.h>
 
-#define WM_MONITORCALLBACK (WM_APP + 0x32)
+constexpr unsigned int WM_MONITORCALLBACK = WM_APP + 0x32;
 
 class DirectoryChangeNotification {
 public:

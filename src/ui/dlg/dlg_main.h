@@ -28,7 +28,7 @@
 
 #include "library/anime_filter.h"
 
-#define WM_TAIGA_SHOWMENU WM_USER + 1337
+constexpr unsigned int WM_TAIGA_SHOWMENU = WM_USER + 1337;
 
 namespace ui {
 
