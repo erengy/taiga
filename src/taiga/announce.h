@@ -20,7 +20,7 @@
 
 #include <string>
 
-#include <windows/win/window.h>
+#include "link/discord.h"
 
 #include "base/oauth.h"
 #include "base/types.h"
@@ -29,8 +29,6 @@
 namespace anime {
 class Episode;
 }
-
-struct DiscordUser;
 
 namespace taiga {
 
@@ -43,6 +41,8 @@ enum AnnouncerModes {
 
 class Announcer {
 public:
+  ~Announcer();
+
   void Clear(int modes, bool force = false);
   void Do(int modes, anime::Episode* episode = nullptr, bool force = false);
 
@@ -51,29 +51,6 @@ private:
   void ToHttp(const std::wstring& address, const std::wstring& data);
   bool ToMirc(const std::wstring& service, std::wstring channels, const std::wstring& data, int mode, bool use_action, bool multi_server);
   void ToTwitter(const std::wstring& status_text);
-};
-
-////////////////////////////////////////////////////////////////////////////////
-// Discord
-
-constexpr auto kDiscordApplicationId = L"379871385176244224";
-
-class Discord {
-public:
-  ~Discord();
-
-  void Initialize() const;
-  void Shutdown() const;
-
-  void ClearPresence() const;
-  void UpdatePresence(const std::string& details, const std::string& state, time_t timestamp) const;
-
-private:
-  void RunCallbacks() const;
-
-  static void OnReady(const DiscordUser* user);
-  static void OnDisconnected(int errcode, const char* message);
-  static void OnError(int errcode, const char* message);
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -121,6 +98,5 @@ private:
 ////////////////////////////////////////////////////////////////////////////////
 
 extern taiga::Announcer Announcer;
-extern taiga::Discord Discord;
 extern taiga::Mirc Mirc;
 extern taiga::Twitter Twitter;

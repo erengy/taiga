@@ -115,7 +115,7 @@ BOOL App::InitInstance() {
 
   // Initialize Discord
   if (Settings.GetBool(kShare_Discord_Enabled))
-    ::Discord.Initialize();
+    link::discord::Initialize();
 
   if (Settings.GetBool(kApp_Behavior_CheckForUpdates)) {
     ui::ShowDialog(ui::Dialog::Update);

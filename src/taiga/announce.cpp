@@ -16,7 +16,6 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <discord_rpc.h>
 #include <windows/win/dde.h>
 
 #include "base/file.h"
@@ -34,16 +33,19 @@
 #include "ui/ui.h"
 
 taiga::Announcer Announcer;
-taiga::Discord Discord;
 taiga::Mirc Mirc;
 taiga::Twitter Twitter;
 
 namespace taiga {
 
+Announcer::~Announcer() {
+  link::discord::Shutdown();
+}
+
 void Announcer::Clear(int modes, bool force) {
   if (modes & kAnnounceToDiscord)
     if (Settings.GetBool(kShare_Discord_Enabled) || force)
-      ::Discord.ClearPresence();
+      link::discord::ClearPresence();
 
   if (modes & kAnnounceToHttp)
     if (Settings.GetBool(kShare_Http_Enabled) || force)
@@ -108,87 +110,12 @@ void Announcer::Do(int modes, anime::Episode* episode, bool force) {
 ////////////////////////////////////////////////////////////////////////////////
 // Discord
 
-Discord::~Discord() {
-  ClearPresence();
-  Shutdown();
-}
-
-void Discord::Initialize() const {
-  DiscordEventHandlers handlers = {0};
-  handlers.ready = OnReady;
-  handlers.disconnected = OnDisconnected;
-  handlers.errored = OnError;
-
-  const auto application_id = WstrToStr(Settings[kShare_Discord_ApplicationId]);
-
-  Discord_Initialize(application_id.c_str(), &handlers, FALSE, nullptr);
-}
-
-void Discord::Shutdown() const {
-  Discord_Shutdown();
-}
-
-void Discord::ClearPresence() const {
-  Discord_ClearPresence();
-  RunCallbacks();
-}
-
-void Discord::UpdatePresence(const std::string& details,
-                             const std::string& state,
-                             time_t timestamp) const {
-  const std::string small_image_key =
-      WstrToStr(GetCurrentService()->canonical_name());
-
-  std::string small_image_text =
-      WstrToStr(GetCurrentService()->name());
-  if (Settings.GetBool(kShare_Discord_Username_Enabled)) {
-    small_image_text = WstrToStr(GetCurrentUserDisplayName() + L" at ") +
-                       small_image_text;
-  }
-
-  DiscordRichPresence presence = {0};
-  presence.state = state.c_str();
-  presence.details = details.c_str();
-  presence.startTimestamp = timestamp;
-  presence.largeImageKey = "default";
-  presence.largeImageText = details.c_str();
-  presence.smallImageKey = small_image_key.c_str();
-  presence.smallImageText = small_image_text.c_str();
-
-  Discord_UpdatePresence(&presence);
-  RunCallbacks();
-}
-
-void Discord::RunCallbacks() const {
-#ifdef DISCORD_DISABLE_IO_THREAD
-  Discord_UpdateConnection();
-#endif
-  Discord_RunCallbacks();
-}
-
-void Discord::OnReady(const DiscordUser* user) {
-  if (user) {
-    LOGD(L"Discord: ready ({}#{})",
-         StrToWstr(user->username), StrToWstr(user->discriminator));
-  } else {
-    LOGD(L"Discord: ready");
-  }
-}
-
-void Discord::OnDisconnected(int errcode, const char* message) {
-  LOGD(L"Discord: disconnected ({}: {})", errcode, StrToWstr(message));
-}
-
-void Discord::OnError(int errcode, const char* message) {
-  LOGD(L"Discord: error ({}: {})", errcode, StrToWstr(message));
-}
-
 void Announcer::ToDiscord(const std::wstring& details,
                           const std::wstring& state,
                           time_t timestamp) {
-  ::Discord.UpdatePresence(WstrToStr(LimitText(details, 64)),
-                           WstrToStr(LimitText(state, 64)),
-                           timestamp);
+  link::discord::UpdatePresence(WstrToStr(LimitText(details, 64)),
+                                WstrToStr(LimitText(state, 64)),
+                                timestamp);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
