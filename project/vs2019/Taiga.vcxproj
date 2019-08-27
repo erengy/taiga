@@ -198,6 +198,7 @@
     <ClCompile Include="..\..\src\base\json.cpp" />
     <ClCompile Include="..\..\src\base\oauth.cpp" />
     <ClCompile Include="..\..\src\base\process.cpp" />
+    <ClCompile Include="..\..\src\base\rss.cpp" />
     <ClCompile Include="..\..\src\base\settings.cpp" />
     <ClCompile Include="..\..\src\base\string.cpp" />
     <ClCompile Include="..\..\src\base\time.cpp" />
@@ -380,6 +381,7 @@
     <ClInclude Include="..\..\src\base\oauth.h" />
     <ClInclude Include="..\..\src\base\preprocessor.h" />
     <ClInclude Include="..\..\src\base\process.h" />
+    <ClInclude Include="..\..\src\base\rss.h" />
     <ClInclude Include="..\..\src\base\settings.h" />
     <ClInclude Include="..\..\src\base\string.h" />
     <ClInclude Include="..\..\src\base\time.h" />

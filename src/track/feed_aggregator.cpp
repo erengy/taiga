@@ -48,10 +48,10 @@ bool Aggregator::CheckFeed(const std::wstring& source, bool automatic) {
 
   Feed& feed = GetFeed();
 
-  feed.link = source;
+  feed.channel.link = source;
 
   HttpRequest http_request;
-  http_request.url = feed.link;
+  http_request.url = feed.channel.link;
   http_request.parameter = reinterpret_cast<LPARAM>(&feed);
   http_request.header[L"Accept"] = L"application/rss+xml, */*";
   http_request.header[L"Accept-Encoding"] = L"gzip";
@@ -460,7 +460,7 @@ void Aggregator::FindFeedSource(Feed& feed) const {
     {L"tokyotosho", FeedSource::TokyoToshokan},
   };
 
-  const Url url(feed.link);
+  const Url url(feed.channel.link);
 
   for (const auto& pair : sources) {
     if (InStr(url.host, pair.first, 0, true) > -1) {
@@ -494,18 +494,18 @@ void Aggregator::ParseFeedItem(FeedSource source, FeedItem& feed_item) {
 
     // Nyaa Pantsu
     case FeedSource::NyaaPantsu:
-      feed_item.info_link = feed_item.guid;
-      feed_item.file_size = std::wcstoull(feed_item.enclosure_length.c_str(), nullptr, 10);
+      feed_item.info_link = feed_item.guid.value;
+      feed_item.file_size = std::wcstoull(feed_item.enclosure.length.c_str(), nullptr, 10);
       break;
 
     // Nyaa.si
     case FeedSource::NyaaSi: {
-      feed_item.info_link = feed_item.guid;
-      if (feed_item.elements.count(L"nyaa:size"))
-        feed_item.file_size = ParseSizeString(feed_item.elements[L"nyaa:size"]);
+      feed_item.info_link = feed_item.guid.value;
+      if (feed_item.namespace_elements.count(L"nyaa:size"))
+        feed_item.file_size = ParseSizeString(feed_item.namespace_elements[L"nyaa:size"]);
       auto get_torrent_stat = [&](const std::wstring& name, std::optional<size_t>& result) {
-        if (feed_item.elements.count(name))
-          result = ToInt(feed_item.elements[name]);
+        if (feed_item.namespace_elements.count(name))
+          result = ToInt(feed_item.namespace_elements[name]);
       };
       get_torrent_stat(L"nyaa:seeders", feed_item.seeders);
       get_torrent_stat(L"nyaa:leechers", feed_item.leechers);
@@ -518,7 +518,7 @@ void Aggregator::ParseFeedItem(FeedSource source, FeedItem& feed_item) {
       feed_item.file_size = ParseSizeString(InStr(feed_item.description, L"Size: ", L"<"));
       parse_magnet_link();
       feed_item.description = InStr(feed_item.description, L"Comment: ", L"");
-      feed_item.info_link = feed_item.guid;
+      feed_item.info_link = feed_item.guid.value;
       break;
   }
 }

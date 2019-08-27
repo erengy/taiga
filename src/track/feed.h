@@ -24,6 +24,7 @@
 #include <string>
 #include <vector>
 
+#include "base/rss.h"
 #include "base/types.h"
 #include "library/anime_episode.h"
 #include "track/feed_filter.h"
@@ -58,24 +59,7 @@ enum class TorrentCategory {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-struct GenericFeedItem {
-  std::wstring title,
-               link,
-               description,
-               author,
-               category,
-               comments,
-               enclosure_url,
-               enclosure_length,
-               enclosure_type,
-               guid,
-               pub_date,
-               source;
-
-  bool permalink = true;
-};
-
-class FeedItem : public GenericFeedItem {
+class FeedItem : public rss::Item {
 public:
   void Discard(int option);
   bool IsDiscarded() const;
@@ -83,7 +67,6 @@ public:
   bool operator<(const FeedItem& item) const;
   bool operator==(const FeedItem& item) const;
 
-  std::map<std::wstring, std::wstring> elements;
   std::wstring info_link;
   std::wstring magnet_link;
   FeedItemState state = FeedItemState::Blank;
@@ -106,26 +89,15 @@ TorrentCategory TranslateTorrentCategory(const std::wstring& str);
 
 ////////////////////////////////////////////////////////////////////////////////
 
-struct GenericFeed {
-  // Required channel elements
-  std::wstring title,
-               link,
-               description;
-
-  // Optional channel elements are not implemented.
-  // See http://www.rssboard.org/rss-specification for more information.
-
-  // Feed items
-  std::vector<FeedItem> items;
-};
-
-class Feed : public GenericFeed {
+class Feed {
 public:
   std::wstring GetDataPath();
   bool Load();
   bool Load(const std::wstring& data);
 
   FeedSource source = FeedSource::Unknown;
+  rss::Channel channel;
+  std::vector<FeedItem> items;
 
 private:
   void Load(const pugi::xml_document& document);

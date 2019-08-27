@@ -85,8 +85,8 @@ bool UpdateHelper::ParseData(std::wstring data) {
   xml_node channel = document.child(L"rss").child(L"channel");
   for (auto item : channel.children(L"item")) {
     items.resize(items.size() + 1);
-    items.back().guid = XmlReadStrValue(item, L"guid");
-    items.back().category = XmlReadStrValue(item, L"category");
+    items.back().guid.value = XmlReadStrValue(item, L"guid");
+    items.back().category.value = XmlReadStrValue(item, L"category");
     items.back().link = XmlReadStrValue(item, L"link");
     items.back().description = XmlReadStrValue(item, L"description");
     items.back().pub_date = XmlReadStrValue(item, L"pubDate");
@@ -97,7 +97,7 @@ bool UpdateHelper::ParseData(std::wstring data) {
   auto current_version = taiga::version();
   auto latest_version = current_version;
   for (const auto& item : items) {
-    semaver::Version item_version(WstrToStr(item.guid));
+    semaver::Version item_version(WstrToStr(item.guid.value));
     if (item_version > latest_version) {
       latest_item_.reset(new Item(item));
       latest_version = item_version;

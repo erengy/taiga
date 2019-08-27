@@ -35,6 +35,7 @@
 #include "taiga/taiga.h"
 #include "taiga/update.h"
 #include "taiga/version.h"
+#include "track/feed.h"
 #include "track/recognition.h"
 #include "ui/translate.h"
 #include "ui/ui.h"

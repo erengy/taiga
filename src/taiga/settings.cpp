@@ -333,7 +333,7 @@ bool AppSettings::Load() {
   if (Aggregator.filter_manager.filters.empty())
     Aggregator.filter_manager.AddPresets();
   auto& feed = Aggregator.GetFeed();
-  feed.link = GetWstr(kTorrent_Discovery_Source);
+  feed.channel.link = GetWstr(kTorrent_Discovery_Source);
   Aggregator.LoadArchive();
 
   return result.status == pugi::status_ok;

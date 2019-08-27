@@ -16,14 +16,13 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "track/feed.h"
+
 #include "base/base64.h"
-#include "base/html.h"
-#include "base/string.h"
+#include "base/url.h"
 #include "base/xml.h"
 #include "library/anime_util.h"
-#include "taiga/http.h"
 #include "taiga/path.h"
-#include "track/feed.h"
 #include "track/recognition.h"
 
 void FeedItem::Discard(int option) {
@@ -63,9 +62,9 @@ bool FeedItem::operator<(const FeedItem& item) const {
 
 bool FeedItem::operator==(const FeedItem& item) const {
   // Check for guid element first
-  if (permalink && item.permalink)
-    if (!guid.empty() || !item.guid.empty())
-      if (guid == item.guid)
+  if (guid.is_permalink && item.guid.is_permalink)
+    if (!guid.value.empty() || !item.guid.value.empty())
+      if (guid.value == item.guid.value)
         return true;
 
   // Fall back to link element
@@ -86,7 +85,7 @@ TorrentCategory GetTorrentCategory(const FeedItem& item) {
   if (item.torrent_category != TorrentCategory::Anime)  // Respect our previous categorization
     return item.torrent_category;
 
-  if (InStr(item.category, L"Batch") > -1)  // Respect feed's own categorization
+  if (InStr(item.category.value, L"Batch") > -1)  // Respect feed's own categorization
     return TorrentCategory::Batch;
 
   if (Meow.IsBatchRelease(item.episode_data))
@@ -130,8 +129,8 @@ TorrentCategory TranslateTorrentCategory(const std::wstring& str) {
 std::wstring Feed::GetDataPath() {
   std::wstring path = taiga::GetPath(taiga::Path::Feed);
 
-  if (!link.empty()) {
-    Url url(link);
+  if (!channel.link.empty()) {
+    Url url(channel.link);
     path += Base64Encode(url.host, true) + L"\\";
   }
 
@@ -167,51 +166,17 @@ bool Feed::Load(const std::wstring& data) {
 }
 
 void Feed::Load(const xml_document& document) {
-  // Read channel information
-  xml_node channel = document.child(L"rss").child(L"channel");
-  title = XmlReadStrValue(channel, L"title");
-  link = XmlReadStrValue(channel, L"link");
-  description = XmlReadStrValue(channel, L"description");
+  auto rss_feed = rss::ParseDocument(document);
+  channel = rss_feed.channel;
+
+  for (auto& item : rss_feed.items) {
+    items.push_back(FeedItem{std::move(item)});
+  }
 
   Aggregator.FindFeedSource(*this);
 
-  // Read items
-  for (auto node : channel.children(L"item")) {
-    // Read data
-    FeedItem item;
-    item.title = XmlReadStrValue(node, L"title");
-    item.link = XmlReadStrValue(node, L"link");
-    item.description = XmlReadStrValue(node, L"description");
-    item.category = XmlReadStrValue(node, L"category");
-    item.guid = XmlReadStrValue(node, L"guid");
-    item.pub_date = XmlReadStrValue(node, L"pubDate");
-
-    xml_node enclosure_node = node.child(L"enclosure");
-    if (!enclosure_node.empty()) {
-      item.enclosure_url = enclosure_node.attribute(L"url").value();
-      item.enclosure_length = enclosure_node.attribute(L"length").value();
-      item.enclosure_type = enclosure_node.attribute(L"type").value();
-    }
-
-    for (auto element : node.children()) {
-      if (InStr(element.name(), L":") > -1) {
-        item.elements[element.name()] = element.child_value();
-      }
-    }
-
-    auto permalink = XmlReadStrValue(node, L"isPermaLink");
-    if (!permalink.empty())
-      item.permalink = ToBool(permalink);
-
-    if (item.title.empty() || item.link.empty())
-      continue;
-
-    DecodeHtmlEntities(item.title);
-    DecodeHtmlEntities(item.description);
-
+  for (auto& item : items) {
     Aggregator.ParseFeedItem(source, item);
     Aggregator.CleanupDescription(item.description);
-
-    items.push_back(item);
   }
 }

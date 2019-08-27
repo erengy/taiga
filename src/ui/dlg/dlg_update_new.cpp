@@ -53,9 +53,9 @@ BOOL NewUpdateDialog::OnInitDialog() {
       L"}"
       L"\\deflang1024\\fs18";
   for (const auto& item : taiga::updater.items) {
-    semaver::Version item_version(WstrToStr(item.guid));
+    semaver::Version item_version(WstrToStr(item.guid.value));
     if (item_version > taiga::version()) {
-      changelog += L"\\b Version " + item.guid + L"\\b0\\line ";
+      changelog += L"\\b Version " + item.guid.value + L"\\b0\\line ";
       std::wstring description = item.description;
       ReplaceString(description, L"\n", L"\\line ");
       changelog += description + L"\\line\\line ";

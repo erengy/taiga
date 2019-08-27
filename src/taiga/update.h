@@ -22,7 +22,7 @@
 #include <string>
 #include <vector>
 
-#include "track/feed.h"
+#include "base/rss.h"
 
 namespace taiga {
 
@@ -44,7 +44,7 @@ public:
   std::wstring GetDownloadPath() const;
   void SetDownloadPath(const std::wstring& path);
 
-  class Item : public GenericFeedItem {
+  class Item : public rss::Item {
   public:
     std::wstring taiga_anime_relations_location;
     std::wstring taiga_anime_relations_modified;
