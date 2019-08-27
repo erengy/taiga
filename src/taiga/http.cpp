@@ -264,7 +264,7 @@ void HttpManager::HandleResponse(HttpResponse& response) {
     case kHttpTwitterRequest:
     case kHttpTwitterAuth:
     case kHttpTwitterPost:
-      ::Twitter.HandleHttpResponse(client.mode(), response);
+      link::twitter::HandleHttpResponse(client.mode(), response);
       break;
 
     case kHttpTaigaUpdateCheck: {

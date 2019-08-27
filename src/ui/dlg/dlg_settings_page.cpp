@@ -592,7 +592,7 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
 
         // Authorize Twitter
         case IDC_BUTTON_TWITTER_AUTH: {
-          Twitter.RequestToken();
+          link::twitter::RequestToken();
           return TRUE;
         }
 

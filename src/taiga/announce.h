@@ -22,10 +22,7 @@
 
 #include "link/discord.h"
 #include "link/mirc.h"
-
-#include "base/oauth.h"
-#include "base/types.h"
-#include "taiga/http.h"
+#include "link/twitter.h"
 
 namespace anime {
 class Episode;
@@ -54,30 +51,6 @@ private:
   void ToTwitter(const std::wstring& status_text);
 };
 
-////////////////////////////////////////////////////////////////////////////////
-// Twitter
-
-class Twitter {
-public:
-  Twitter();
-  ~Twitter() {}
-
-  bool RequestToken();
-  bool AccessToken(const std::wstring& key, const std::wstring& secret, const std::wstring& pin);
-  bool SetStatusText(const std::wstring& status_text);
-
-  void HandleHttpResponse(HttpClientMode mode, const HttpResponse& response);
-
-public:
-  OAuth oauth;
-
-private:
-  std::wstring status_text_;
-};
-
 }  // namespace taiga
 
-////////////////////////////////////////////////////////////////////////////////
-
 extern taiga::Announcer Announcer;
-extern taiga::Twitter Twitter;

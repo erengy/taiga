@@ -222,6 +222,7 @@
     <ClCompile Include="..\..\src\library\resource.cpp" />
     <ClCompile Include="..\..\src\link\discord.cpp" />
     <ClCompile Include="..\..\src\link\mirc.cpp" />
+    <ClCompile Include="..\..\src\link\twitter.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />
     <ClCompile Include="..\..\src\sync\anilist.cpp" />
     <ClCompile Include="..\..\src\sync\anilist_util.cpp" />
@@ -399,6 +400,7 @@
     <ClInclude Include="..\..\src\library\resource.h" />
     <ClInclude Include="..\..\src\link\discord.h" />
     <ClInclude Include="..\..\src\link\mirc.h" />
+    <ClInclude Include="..\..\src\link\twitter.h" />
     <ClInclude Include="..\..\src\sync\anilist.h" />
     <ClInclude Include="..\..\src\sync\anilist_types.h" />
     <ClInclude Include="..\..\src\sync\anilist_util.h" />
