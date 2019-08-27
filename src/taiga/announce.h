@@ -38,8 +38,7 @@ enum AnnouncerModes {
   kAnnounceToDiscord = 1 << 0,
   kAnnounceToHttp    = 1 << 1,
   kAnnounceToMirc    = 1 << 2,
-  kAnnounceToSkype   = 1 << 3,
-  kAnnounceToTwitter = 1 << 4,
+  kAnnounceToTwitter = 1 << 3,
 };
 
 class Announcer {
@@ -51,7 +50,6 @@ private:
   void ToDiscord(const std::wstring& details, const std::wstring& state, time_t timestamp);
   void ToHttp(const std::wstring& address, const std::wstring& data);
   bool ToMirc(const std::wstring& service, std::wstring channels, const std::wstring& data, int mode, bool use_action, bool multi_server);
-  void ToSkype(const std::wstring& mood);
   void ToTwitter(const std::wstring& status_text);
 };
 
@@ -98,45 +96,6 @@ private:
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-// Skype
-
-enum SkypeConnectionStatus {
-  kSkypeControlApiAttachSuccess,
-  kSkypeControlApiAttachPendingAuthorization,
-  kSkypeControlApiAttachRefused,
-  kSkypeControlApiAttachNotAvailable,
-  kSkypeControlApiAttachApiAvailable = 0x8001
-};
-
-class Skype {
-public:
-  Skype();
-  virtual ~Skype();
-
-  void Create();
-  BOOL Discover();
-  LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
-  bool SendCommand(const std::wstring& command);
-  bool GetMoodText();
-  bool SetMoodText(const std::wstring& mood);
-
-  static const UINT wm_attach;
-  static const UINT wm_discover;
-
-public:
-  HWND hwnd, hwnd_skype;
-  std::wstring current_mood, previous_mood;
-
-private:
-  class Window : public win::Window {
-  private:
-    void PreRegisterClass(WNDCLASSEX& wc);
-    void PreCreate(CREATESTRUCT& cs);
-    LRESULT WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-  } window_;
-};
-
-////////////////////////////////////////////////////////////////////////////////
 // Twitter
 
 class Twitter {
@@ -164,5 +123,4 @@ private:
 extern taiga::Announcer Announcer;
 extern taiga::Discord Discord;
 extern taiga::Mirc Mirc;
-extern taiga::Skype Skype;
 extern taiga::Twitter Twitter;

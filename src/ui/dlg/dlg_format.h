@@ -26,7 +26,6 @@ namespace ui {
 enum class FormatDialogMode {
   Http,
   Mirc,
-  Skype,
   Twitter,
   Balloon,
 };

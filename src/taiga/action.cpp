@@ -400,12 +400,6 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   } else if (action == L"AnnounceToMIRC") {
     Announcer.Do(taiga::kAnnounceToMirc, nullptr, body == L"true");
 
-  // AnnounceToSkype(force)
-  //   Changes Skype mood text.
-  //   Requires authorization.
-  } else if (action == L"AnnounceToSkype") {
-    Announcer.Do(taiga::kAnnounceToSkype, nullptr, body == L"true");
-
   // AnnounceToTwitter(force)
   //   Changes Twitter status.
   } else if (action == L"AnnounceToTwitter") {

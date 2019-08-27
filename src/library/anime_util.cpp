@@ -455,7 +455,7 @@ void EndWatching(Item& item, Episode episode) {
   // Announce
   episode.anime_id = item.GetId();
   Announcer.Do(taiga::kAnnounceToHttp, &episode);
-  Announcer.Clear(taiga::kAnnounceToDiscord | taiga::kAnnounceToSkype);
+  Announcer.Clear(taiga::kAnnounceToDiscord);
 
   episode.anime_id = anime::ID_UNKNOWN;
 

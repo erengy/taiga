@@ -86,9 +86,6 @@ BOOL App::InitInstance() {
   if (Settings.GetBool(kShare_Discord_Enabled))
     ::Discord.Initialize();
 
-  // Create API windows
-  ::Skype.Create();
-
   if (Settings.GetBool(kApp_Behavior_CheckForUpdates)) {
     ui::ShowDialog(ui::Dialog::Update);
   } else {
@@ -104,7 +101,7 @@ void App::Uninitialize() {
     MediaPlayers.play_status = track::recognition::PlayStatus::Stopped;
     ::Announcer.Do(kAnnounceToHttp);
   }
-  ::Announcer.Clear(kAnnounceToDiscord | kAnnounceToSkype);
+  ::Announcer.Clear(kAnnounceToDiscord);
 
   // Cleanup
   ConnectionManager.Shutdown();

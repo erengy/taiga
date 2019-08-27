@@ -35,7 +35,6 @@
 #define IDD_SETTINGS_SHARING_DISCORD            139
 #define IDD_SETTINGS_SHARING_HTTP               140
 #define IDD_SETTINGS_SHARING_MIRC               141
-#define IDD_SETTINGS_SHARING_SKYPE              142
 #define IDD_SETTINGS_SHARING_TWITTER            143
 #define IDD_SETTINGS_TORRENTS_DISCOVERY         144
 #define IDD_SETTINGS_TORRENTS_DOWNLOADS         145
@@ -51,7 +50,6 @@
 #define IDC_BUTTON_CANCELSEARCH                 1004
 #define IDC_BUTTON_FORMAT_HTTP                  1005
 #define IDC_BUTTON_FORMAT_MIRC                  1006
-#define IDC_BUTTON_FORMAT_SKYPE                 1007
 #define IDC_BUTTON_FORMAT_TWITTER               1008
 #define IDC_BUTTON_MIRC_TEST                    1009
 #define IDC_BUTTON_REMOVEFOLDER                 1010
@@ -84,7 +82,6 @@
 #define IDC_CHECK_MIRC_MULTISERVER              1037
 #define IDC_CHECK_NOTIFY_NOTRECOGNIZED          1038
 #define IDC_CHECK_NOTIFY_RECOGNIZED             1039
-#define IDC_CHECK_SKYPE                         1040
 #define IDC_CHECK_START_CHECKEPS                1041
 #define IDC_CHECK_START_LOGIN                   1042
 #define IDC_CHECK_START_MINIMIZE                1043

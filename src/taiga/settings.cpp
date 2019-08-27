@@ -82,9 +82,6 @@ const std::wstring kDefaultFormatMirc =
     L"$if(%episode%, \00303%episode%$if(%total%,/%total%))\003 "
     L"$if(%score%,\00314[Score: %score%]\003) "
     L"\00312%animeurl%";
-const std::wstring kDefaultFormatSkype =
-    L"Watching: <a href=\"%animeurl%\">%title%</a>"
-    L"$if(%episode%, #%episode%$if(%total%,/%total%))";
 const std::wstring kDefaultFormatTwitter =
     L"$ifequal(%episode%,%total%,Just completed: %title%"
     L"$if(%score%, (Score: %score%)) %animeurl%,"
@@ -210,8 +207,6 @@ void AppSettings::InitializeMap() {
   INITKEY(kShare_Mirc_Channels, L"#kitsu, #myanimelist, #taiga", L"announce/mirc/channels");
   INITKEY(kShare_Mirc_Format, kDefaultFormatMirc.c_str(), L"announce/mirc/format");
   INITKEY(kShare_Mirc_Service, L"mIRC", L"announce/mirc/service");
-  INITKEY(kShare_Skype_Enabled, nullptr, L"announce/skype/enabled");
-  INITKEY(kShare_Skype_Format, kDefaultFormatSkype.c_str(), L"announce/skype/format");
   INITKEY(kShare_Twitter_Enabled, nullptr, L"announce/twitter/enabled");
   INITKEY(kShare_Twitter_Format, kDefaultFormatTwitter.c_str(), L"announce/twitter/format");
   INITKEY(kShare_Twitter_OauthToken, nullptr, L"announce/twitter/oauth_token");

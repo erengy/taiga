@@ -49,10 +49,6 @@ BOOL FormatDialog::OnInitDialog() {
       SetText(L"Edit Format - mIRC");
       rich_edit_.SetText(Settings[taiga::kShare_Mirc_Format].c_str());
       break;
-    case FormatDialogMode::Skype:
-      SetText(L"Edit Format - Skype");
-      rich_edit_.SetText(Settings[taiga::kShare_Skype_Format].c_str());
-      break;
     case FormatDialogMode::Twitter:
       SetText(L"Edit Format - Twitter");
       rich_edit_.SetText(Settings[taiga::kShare_Twitter_Format].c_str());
@@ -73,9 +69,6 @@ void FormatDialog::OnOK() {
       break;
     case FormatDialogMode::Mirc:
       Settings.Set(taiga::kShare_Mirc_Format, rich_edit_.GetText());
-      break;
-    case FormatDialogMode::Skype:
-      Settings.Set(taiga::kShare_Skype_Format, rich_edit_.GetText());
       break;
     case FormatDialogMode::Twitter:
       Settings.Set(taiga::kShare_Twitter_Format, rich_edit_.GetText());
@@ -215,11 +208,6 @@ void FormatDialog::RefreshPreviewText() {
           continue;
         }
       }
-      break;
-    }
-    case FormatDialogMode::Skype: {
-      // Strip HTML codes
-      StripHtmlTags(str);
       break;
     }
   }

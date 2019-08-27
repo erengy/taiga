@@ -79,7 +79,6 @@ void SettingsPage::Create() {
     SETRESOURCEID(kSettingsPageSharingDiscord, IDD_SETTINGS_SHARING_DISCORD);
     SETRESOURCEID(kSettingsPageSharingHttp, IDD_SETTINGS_SHARING_HTTP);
     SETRESOURCEID(kSettingsPageSharingMirc, IDD_SETTINGS_SHARING_MIRC);
-    SETRESOURCEID(kSettingsPageSharingSkype, IDD_SETTINGS_SHARING_SKYPE);
     SETRESOURCEID(kSettingsPageSharingTwitter, IDD_SETTINGS_SHARING_TWITTER);
     SETRESOURCEID(kSettingsPageTorrentsDiscovery, IDD_SETTINGS_TORRENTS_DISCOVERY);
     SETRESOURCEID(kSettingsPageTorrentsDownloads, IDD_SETTINGS_TORRENTS_DOWNLOADS);
@@ -309,11 +308,6 @@ BOOL SettingsPage::OnInitDialog() {
       EnableDlgItem(IDC_EDIT_MIRC_CHANNELS, Settings.GetInt(taiga::kShare_Mirc_Mode) == 3);
       break;
     }
-    // Sharing > Skype
-    case kSettingsPageSharingSkype: {
-      CheckDlgButton(IDC_CHECK_SKYPE, Settings.GetBool(taiga::kShare_Skype_Enabled));
-      break;
-    }
     // Sharing > Twitter
     case kSettingsPageSharingTwitter: {
       CheckDlgButton(IDC_CHECK_TWITTER, Settings.GetBool(taiga::kShare_Twitter_Enabled));
@@ -504,10 +498,6 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
           return TRUE;
         case IDC_BUTTON_FORMAT_MIRC:
           DlgFormat.mode = FormatDialogMode::Mirc;
-          DlgFormat.Create(IDD_FORMAT, parent->GetWindowHandle(), true);
-          return TRUE;
-        case IDC_BUTTON_FORMAT_SKYPE:
-          DlgFormat.mode = FormatDialogMode::Skype;
           DlgFormat.Create(IDD_FORMAT, parent->GetWindowHandle(), true);
           return TRUE;
         case IDC_BUTTON_FORMAT_TWITTER:

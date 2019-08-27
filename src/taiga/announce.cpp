@@ -36,7 +36,6 @@
 taiga::Announcer Announcer;
 taiga::Discord Discord;
 taiga::Mirc Mirc;
-taiga::Skype Skype;
 taiga::Twitter Twitter;
 
 namespace taiga {
@@ -49,10 +48,6 @@ void Announcer::Clear(int modes, bool force) {
   if (modes & kAnnounceToHttp)
     if (Settings.GetBool(kShare_Http_Enabled) || force)
       ToHttp(Settings[kShare_Http_Url], L"");
-
-  if (modes & kAnnounceToSkype)
-    if (Settings.GetBool(kShare_Skype_Enabled) || force)
-      ToSkype(::Skype.previous_mood);
 }
 
 void Announcer::Do(int modes, anime::Episode* episode, bool force) {
@@ -98,14 +93,6 @@ void Announcer::Do(int modes, anime::Episode* episode, bool force) {
              Settings.GetInt(kShare_Mirc_Mode),
              Settings.GetBool(kShare_Mirc_UseMeAction),
              Settings.GetBool(kShare_Mirc_MultiServer));
-    }
-  }
-
-  if (modes & kAnnounceToSkype) {
-    if (Settings.GetBool(kShare_Skype_Enabled) || force) {
-      LOGD(L"Skype");
-      ToSkype(ReplaceVariables(Settings[kShare_Skype_Format],
-                               *episode, false, force));
     }
   }
 
@@ -329,150 +316,6 @@ bool Announcer::ToMirc(const std::wstring& service,
   } else {
     ui::OnMircDdeConnectionFail();
     return false;
-  }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Skype
-
-const UINT Skype::wm_attach = ::RegisterWindowMessage(L"SkypeControlAPIAttach");
-const UINT Skype::wm_discover = ::RegisterWindowMessage(L"SkypeControlAPIDiscover");
-
-Skype::Skype()
-    : hwnd(nullptr),
-      hwnd_skype(nullptr) {
-}
-
-Skype::~Skype() {
-  window_.Destroy();
-}
-
-void Skype::Create() {
-  hwnd = window_.Create();
-}
-
-BOOL Skype::Discover() {
-  PDWORD_PTR sendMessageResult = nullptr;
-  return SendMessageTimeout(HWND_BROADCAST, wm_discover,
-                            reinterpret_cast<WPARAM>(hwnd),
-                            0, SMTO_NORMAL, 1000, sendMessageResult);
-}
-
-bool Skype::SendCommand(const std::wstring& command) {
-  std::string str = WstrToStr(command);
-  const char* buffer = str.c_str();
-
-  COPYDATASTRUCT cds;
-  cds.dwData = 0;
-  cds.lpData = (void*)buffer;
-  cds.cbData = strlen(buffer) + 1;
-
-  if (SendMessage(hwnd_skype, WM_COPYDATA,
-                  reinterpret_cast<WPARAM>(hwnd),
-                  reinterpret_cast<LPARAM>(&cds)) == FALSE) {
-    LOGE(L"WM_COPYDATA failed.");
-    hwnd_skype = nullptr;
-    return false;
-  } else {
-    LOGD(L"WM_COPYDATA succeeded.");
-    return true;
-  }
-}
-
-bool Skype::GetMoodText() {
-  std::wstring command = L"GET PROFILE RICH_MOOD_TEXT";
-  return SendCommand(command);
-}
-
-bool Skype::SetMoodText(const std::wstring& mood) {
-  current_mood = mood;
-  std::wstring command = L"SET PROFILE RICH_MOOD_TEXT " + mood;
-  return SendCommand(command);
-}
-
-void Skype::Window::PreRegisterClass(WNDCLASSEX& wc) {
-  wc.lpszClassName = L"TaigaSkypeW";
-}
-
-void Skype::Window::PreCreate(CREATESTRUCT& cs) {
-  cs.lpszName = L"Taiga <3 Skype";
-  cs.style = WS_OVERLAPPEDWINDOW;
-}
-
-LRESULT Skype::Window::WindowProc(HWND hwnd, UINT uMsg,
-                                  WPARAM wParam, LPARAM lParam) {
-  if (::Skype.HandleMessage(uMsg, wParam, lParam))
-    return TRUE;
-
-  return WindowProcDefault(hwnd, uMsg, wParam, lParam);
-}
-
-LRESULT Skype::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
-  if (uMsg == WM_COPYDATA) {
-    if (hwnd_skype == nullptr ||
-        hwnd_skype != reinterpret_cast<HWND>(wParam))
-      return FALSE;
-
-    auto pCDS = reinterpret_cast<PCOPYDATASTRUCT>(lParam);
-    std::wstring command = StrToWstr(reinterpret_cast<LPCSTR>(pCDS->lpData));
-    LOGD(L"Received WM_COPYDATA: {}", command);
-
-    std::wstring profile_command = L"PROFILE RICH_MOOD_TEXT ";
-    if (StartsWith(command, profile_command)) {
-      std::wstring mood = command.substr(profile_command.length());
-      if (mood != current_mood && mood != previous_mood) {
-        LOGD(L"Saved previous mood message: {}", mood);
-        previous_mood = mood;
-      }
-    }
-
-    return TRUE;
-
-  } else if (uMsg == wm_attach) {
-    hwnd_skype = nullptr;
-
-    switch (lParam) {
-      case kSkypeControlApiAttachSuccess:
-        LOGD(L"Attach succeeded.");
-        hwnd_skype = reinterpret_cast<HWND>(wParam);
-        GetMoodText();
-        if (!current_mood.empty())
-          SetMoodText(current_mood);
-        break;
-      case kSkypeControlApiAttachPendingAuthorization:
-        LOGD(L"Waiting for user confirmation...");
-        break;
-      case kSkypeControlApiAttachRefused:
-        LOGE(L"User denied access to client.");
-        break;
-      case kSkypeControlApiAttachNotAvailable:
-        LOGE(L"API is not available.");
-        break;
-      case kSkypeControlApiAttachApiAvailable:
-        LOGD(L"API is now available.");
-        Discover();
-        break;
-      default:
-        LOGD(L"Received unknown message.");
-        break;
-    }
-
-    return TRUE;
-
-  } else if (uMsg == wm_discover) {
-    LOGD(L"Received SkypeControlAPIDiscover message.");
-  }
-
-  return FALSE;
-}
-
-void Announcer::ToSkype(const std::wstring& mood) {
-  ::Skype.current_mood = mood;
-
-  if (::Skype.hwnd_skype == nullptr) {
-    ::Skype.Discover();
-  } else {
-    ::Skype.SetMoodText(mood);
   }
 }
 

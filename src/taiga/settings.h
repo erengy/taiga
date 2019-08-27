@@ -136,8 +136,6 @@ enum AppSettingName {
   kShare_Mirc_Channels,
   kShare_Mirc_Format,
   kShare_Mirc_Service,
-  kShare_Skype_Enabled,
-  kShare_Skype_Format,
   kShare_Twitter_Enabled,
   kShare_Twitter_Format,
   kShare_Twitter_OauthToken,

@@ -93,8 +93,7 @@ void SettingsDialog::SetCurrentSection(SettingsSections section) {
       tab_.InsertItem(0, L"Discord", kSettingsPageSharingDiscord);
       tab_.InsertItem(1, L"HTTP", kSettingsPageSharingHttp);
       tab_.InsertItem(2, L"mIRC", kSettingsPageSharingMirc);
-      tab_.InsertItem(3, L"Skype", kSettingsPageSharingSkype);
-      tab_.InsertItem(4, L"Twitter", kSettingsPageSharingTwitter);
+      tab_.InsertItem(3, L"Twitter", kSettingsPageSharingTwitter);
       break;
     case kSettingsSectionTorrents:
       tab_.InsertItem(0, L"Discovery", kSettingsPageTorrentsDiscovery);
@@ -297,11 +296,6 @@ void SettingsDialog::OnOK() {
     Settings.Set(taiga::kShare_Mirc_MultiServer, page->IsDlgButtonChecked(IDC_CHECK_MIRC_MULTISERVER));
     Settings.Set(taiga::kShare_Mirc_UseMeAction, page->IsDlgButtonChecked(IDC_CHECK_MIRC_ACTION));
     Settings.Set(taiga::kShare_Mirc_Channels, page->GetDlgItemText(IDC_EDIT_MIRC_CHANNELS));
-  }
-  // Sharing > Skype
-  page = &pages[kSettingsPageSharingSkype];
-  if (page->IsWindow()) {
-    Settings.Set(taiga::kShare_Skype_Enabled, page->IsDlgButtonChecked(IDC_CHECK_SKYPE));
   }
   // Sharing > Twitter
   page = &pages[kSettingsPageSharingTwitter];

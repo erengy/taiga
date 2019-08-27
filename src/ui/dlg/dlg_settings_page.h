@@ -38,7 +38,6 @@ enum SettingsPages {
   kSettingsPageSharingDiscord,
   kSettingsPageSharingHttp,
   kSettingsPageSharingMirc,
-  kSettingsPageSharingSkype,
   kSettingsPageSharingTwitter,
   kSettingsPageTorrentsDiscovery,
   kSettingsPageTorrentsDownloads,
