@@ -391,24 +391,6 @@ unsigned int PopulateFiles(std::vector<std::wstring>& file_list,
   return file_count;
 }
 
-int PopulateFolders(std::vector<std::wstring>& folder_list,
-                    const std::wstring& path) {
-  unsigned int folder_count = 0;
-
-  const auto on_directory = [&](const base::FileSearchResult& result) {
-    folder_list.push_back(result.name);
-    folder_count++;
-    return false;
-  };
-
-  base::FileSearch helper;
-  helper.options.log_errors = false;
-  helper.options.skip_subdirectories = true;
-  helper.Search(path, on_directory, nullptr);
-
-  return folder_count;
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 
 bool ReadFromFile(const std::wstring& path, std::string& output) {
