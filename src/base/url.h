@@ -22,7 +22,7 @@
 
 #include "map.h"
 
-typedef base::multimap<std::wstring, std::wstring> query_t;
+using query_t = base::multimap<std::wstring, std::wstring>;
 
 namespace base {
 namespace http {

@@ -24,7 +24,7 @@
 
 namespace anime {
 
-typedef std::pair<int, int> number_range_t;
+using number_range_t = std::pair<int, int>;
 
 class Episode {
  public:

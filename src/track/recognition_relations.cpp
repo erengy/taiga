@@ -34,7 +34,7 @@ namespace recognition {
 
 class Relation {
 public:
-  typedef std::pair<int, int> int_pair_t;
+  using int_pair_t = std::pair<int, int>;
 
   void AddRange(int id, int_pair_t r1, int_pair_t r2);
   bool FindRange(int episode_number, int_pair_t& result) const;

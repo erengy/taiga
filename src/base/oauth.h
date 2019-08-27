@@ -23,7 +23,7 @@
 
 #include "url.h"
 
-typedef std::map<std::wstring, std::wstring> oauth_parameter_t;
+using oauth_parameter_t = std::map<std::wstring, std::wstring>;
 
 class OAuth {
 public:

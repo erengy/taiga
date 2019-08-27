@@ -267,7 +267,7 @@ void FeedConditionDialog::ChooseElement(int element_index) {
     case kFeedFilterElement_Meta_Id:
     case kFeedFilterElement_Episode_Title: {
       RECREATE_COMBO((element_index == kFeedFilterElement_Meta_Id ? CBS_DROPDOWNLIST : CBS_DROPDOWN));
-      typedef std::pair<int, std::wstring> anime_pair;
+      using anime_pair = std::pair<int, std::wstring>;
       std::vector<anime_pair> title_list;
       for (auto it = AnimeDatabase.items.begin(); it != AnimeDatabase.items.end(); ++it) {
         switch (it->second.GetMyStatus()) {

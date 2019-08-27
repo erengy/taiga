@@ -90,7 +90,7 @@ void Engine::ConvertRomanNumbers(std::wstring& str) const {
 
 void Engine::ConvertSeasonNumbers(std::wstring& str) const {
   // This works considerably faster than regular expressions.
-  typedef std::vector<std::wstring> season_t;
+  using season_t = std::vector<std::wstring>;
   static const std::vector<std::pair<std::wstring, season_t>> values{
     {L"1", {L"1st season", L"season 1", L"series 1", L"s1"}},
     {L"2", {L"2nd season", L"season 2", L"series 2", L"s2"}},

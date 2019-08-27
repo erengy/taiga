@@ -62,8 +62,8 @@ size_t LongestCommonSubstringLength(const std::wstring& str1, const std::wstring
 double JaroWinklerDistance(const std::wstring& str1, const std::wstring& str2);
 double LevenshteinDistance(const std::wstring& str1, const std::wstring& str2);
 
-typedef std::array<wchar_t, 3> trigram_t;
-typedef std::vector<trigram_t> trigram_container_t;
+using trigram_t = std::array<wchar_t, 3>;
+using trigram_container_t = std::vector<trigram_t>;
 void GetTrigrams(const std::wstring& str, trigram_container_t& output);
 double CompareTrigrams(const trigram_container_t& t1, const trigram_container_t& t2);
 

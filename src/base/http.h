@@ -39,7 +39,7 @@
 namespace base {
 namespace http {
 
-typedef base::multimap<std::wstring, std::wstring> header_t;
+using header_t = base::multimap<std::wstring, std::wstring>;
 
 enum class ContentEncoding {
   None,

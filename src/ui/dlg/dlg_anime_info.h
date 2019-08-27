@@ -36,7 +36,7 @@ public:
   AnimeDialog();
   virtual ~AnimeDialog() {}
 
-  typedef std::vector<std::pair<int, double>> sorted_scores_t;
+  using sorted_scores_t = std::vector<std::pair<int, double>>;
 
   INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
   void OnCancel();

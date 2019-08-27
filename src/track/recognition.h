@@ -33,8 +33,8 @@ class Item;
 namespace track {
 namespace recognition {
 
-typedef std::map<int, double> scores_t;
-typedef std::vector<std::pair<int, double>> sorted_scores_t;
+using scores_t = std::map<int, double>;
+using sorted_scores_t = std::vector<std::pair<int, double>>;
 
 struct ParseOptions {
   bool parse_path = false;
@@ -101,7 +101,7 @@ private:
   void Transliterate(std::wstring& str) const;
 
   struct Titles {
-    typedef std::map<std::wstring, std::set<int>> container_t;
+    using container_t = std::map<std::wstring, std::set<int>>;
     container_t alternative;
     container_t main;
     container_t user;

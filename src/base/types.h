@@ -33,23 +33,23 @@ class Response;
 namespace base {
 
 // Unique ID type
-typedef std::wstring uid_t;
+using uid_t = std::wstring;
 
 }  // namespace base
 
 // Default enumeration type
-typedef unsigned char enum_t;
+using enum_t = unsigned char;
 
 // Default string type
-typedef std::wstring string_t;
+using string_t = std::wstring;
 
 // Dictionary types
-typedef std::map<string_t, string_t> dictionary_t;
-typedef std::map<string_t, std::vector<string_t>> multidictionary_t;
+using dictionary_t = std::map<string_t, string_t>;
+using multidictionary_t = std::map<string_t, std::vector<string_t>>;
 
 // HTTP request and response
-typedef base::http::Request HttpRequest;
-typedef base::http::Response HttpResponse;
+using HttpRequest = base::http::Request;
+using HttpResponse = base::http::Response ;
 
 // 64-bit integral data type (quadword)
-typedef unsigned __int64 QWORD, *LPQWORD;
+using QWORD = unsigned __int64;
