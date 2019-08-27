@@ -18,32 +18,10 @@
 
 #pragma once
 
-#include "link/discord.h"
-#include "link/http.h"
-#include "link/mirc.h"
-#include "link/twitter.h"
+#include <string>
 
-namespace anime {
-class Episode;
-}
+namespace link::http {
 
-namespace taiga {
+bool Send(const std::wstring& url, const std::wstring& data);
 
-enum AnnouncerModes {
-  kAnnounceToDiscord = 1 << 0,
-  kAnnounceToHttp    = 1 << 1,
-  kAnnounceToMirc    = 1 << 2,
-  kAnnounceToTwitter = 1 << 3,
-};
-
-class Announcer {
-public:
-  ~Announcer();
-
-  void Clear(int modes, bool force = false);
-  void Do(int modes, anime::Episode* episode = nullptr, bool force = false);
-};
-
-}  // namespace taiga
-
-inline taiga::Announcer Announcer;
+}  // namespace link::http

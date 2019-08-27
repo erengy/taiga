@@ -16,34 +16,23 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#pragma once
-
-#include "link/discord.h"
 #include "link/http.h"
-#include "link/mirc.h"
-#include "link/twitter.h"
 
-namespace anime {
-class Episode;
+#include "taiga/http.h"
+
+namespace link::http {
+
+bool Send(const std::wstring& url, const std::wstring& data) {
+  if (url.empty() || data.empty())
+    return false;
+
+  HttpRequest http_request;
+  http_request.method = L"POST";
+  http_request.url = url;
+  http_request.body = data;
+  ConnectionManager.MakeRequest(http_request, taiga::kHttpSilent);
+
+  return true;
 }
 
-namespace taiga {
-
-enum AnnouncerModes {
-  kAnnounceToDiscord = 1 << 0,
-  kAnnounceToHttp    = 1 << 1,
-  kAnnounceToMirc    = 1 << 2,
-  kAnnounceToTwitter = 1 << 3,
-};
-
-class Announcer {
-public:
-  ~Announcer();
-
-  void Clear(int modes, bool force = false);
-  void Do(int modes, anime::Episode* episode = nullptr, bool force = false);
-};
-
-}  // namespace taiga
-
-inline taiga::Announcer Announcer;
+}  // namespace link::http

@@ -16,21 +16,15 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/file.h"
+#include "taiga/announce.h"
+
 #include "base/log.h"
 #include "base/string.h"
-#include "base/url.h"
-#include "library/anime.h"
 #include "library/anime_episode.h"
 #include "library/anime_util.h"
-#include "sync/service.h"
-#include "taiga/announce.h"
-#include "taiga/http.h"
 #include "taiga/script.h"
 #include "taiga/settings.h"
 #include "ui/ui.h"
-
-taiga::Announcer Announcer;
 
 namespace taiga {
 
@@ -45,7 +39,7 @@ void Announcer::Clear(int modes, bool force) {
 
   if (modes & kAnnounceToHttp)
     if (Settings.GetBool(kShare_Http_Enabled) || force)
-      ToHttp(Settings[kShare_Http_Url], L"");
+      link::http::Send(Settings[kShare_Http_Url], L"");
 }
 
 void Announcer::Do(int modes, anime::Episode* episode, bool force) {
@@ -58,9 +52,9 @@ void Announcer::Do(int modes, anime::Episode* episode, bool force) {
   if (modes & kAnnounceToHttp) {
     if (Settings.GetBool(kShare_Http_Enabled) || force) {
       LOGD(L"HTTP");
-      ToHttp(Settings[kShare_Http_Url],
-             ReplaceVariables(Settings[kShare_Http_Format],
-                              *episode, true, force));
+      const auto data = ReplaceVariables(Settings[kShare_Http_Format],
+                                         *episode, true, force);
+      link::http::Send(Settings[kShare_Http_Url], data);
     }
   }
 
@@ -70,87 +64,40 @@ void Announcer::Do(int modes, anime::Episode* episode, bool force) {
   if (modes & kAnnounceToDiscord) {
     if (Settings.GetBool(kShare_Discord_Enabled) || force) {
       LOGD(L"Discord");
-      auto timestamp = ::time(nullptr);
+      const std::wstring details = LimitText(ReplaceVariables(
+          Settings[kShare_Discord_Format_Details], *episode, false, force), 64);
+      const std::wstring state = LimitText(ReplaceVariables(
+          Settings[kShare_Discord_Format_State], *episode, false, force), 64);
+      auto timestamp = std::time(nullptr);
       if (!force)
         timestamp -= Settings.GetInt(taiga::kSync_Update_Delay);
-      ToDiscord(ReplaceVariables(Settings[kShare_Discord_Format_Details],
-                                 *episode, false, force),
-                ReplaceVariables(Settings[kShare_Discord_Format_State],
-                                 *episode, false, force),
-                timestamp);
+      link::discord::UpdatePresence(WstrToStr(details), WstrToStr(state), timestamp);
     }
   }
 
   if (modes & kAnnounceToMirc) {
     if (Settings.GetBool(kShare_Mirc_Enabled) || force) {
       LOGD(L"mIRC");
-      ToMirc(Settings[kShare_Mirc_Service],
-             Settings[kShare_Mirc_Channels],
-             ReplaceVariables(Settings[kShare_Mirc_Format],
-                              *episode, false, force),
-             Settings.GetInt(kShare_Mirc_Mode),
-             Settings.GetBool(kShare_Mirc_UseMeAction),
-             Settings.GetBool(kShare_Mirc_MultiServer));
+      const auto data = ReplaceVariables(Settings[kShare_Mirc_Format],
+                                         *episode, false, force);
+      if (!link::mirc::Send(Settings[kShare_Mirc_Service],
+                            Settings[kShare_Mirc_Channels],
+                            data, Settings.GetInt(kShare_Mirc_Mode),
+                            Settings.GetBool(kShare_Mirc_UseMeAction),
+                            Settings.GetBool(kShare_Mirc_MultiServer))) {
+        ui::OnMircDdeConnectionFail();
+      }
     }
   }
 
   if (modes & kAnnounceToTwitter) {
     if (Settings.GetBool(kShare_Twitter_Enabled) || force) {
       LOGD(L"Twitter");
-      ToTwitter(ReplaceVariables(Settings[kShare_Twitter_Format],
-                                 *episode, false, force));
+      const auto status_text = ReplaceVariables(Settings[kShare_Twitter_Format],
+                                                *episode, false, force);
+      link::twitter::SetStatusText(status_text);
     }
   }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Discord
-
-void Announcer::ToDiscord(const std::wstring& details,
-                          const std::wstring& state,
-                          time_t timestamp) {
-  link::discord::UpdatePresence(WstrToStr(LimitText(details, 64)),
-                                WstrToStr(LimitText(state, 64)),
-                                timestamp);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// HTTP
-
-void Announcer::ToHttp(const std::wstring& address, const std::wstring& data) {
-  if (address.empty() || data.empty())
-    return;
-
-  HttpRequest http_request;
-  http_request.method = L"POST";
-  http_request.url = address;
-  http_request.body = data;
-
-  ConnectionManager.MakeRequest(http_request, taiga::kHttpSilent);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// mIRC
-
-bool Announcer::ToMirc(const std::wstring& service,
-                       std::wstring channels,
-                       const std::wstring& data,
-                       int mode,
-                       bool use_action,
-                       bool multi_server) {
-  if (link::mirc::Send(service, channels, data, mode, use_action, multi_server)) {
-    return true;
-  } else {
-    ui::OnMircDdeConnectionFail();
-    return false;
-  }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Twitter
-
-void Announcer::ToTwitter(const std::wstring& status_text) {
-  link::twitter::SetStatusText(status_text);
 }
 
 }  // namespace taiga
