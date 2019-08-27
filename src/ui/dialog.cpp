@@ -16,6 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "ui/dialog.h"
+
 #include "base/process.h"
 #include "taiga/resource.h"
 #include "ui/dlg/dlg_about.h"
@@ -24,32 +26,17 @@
 #include "ui/dlg/dlg_settings.h"
 #include "ui/dlg/dlg_torrent.h"
 #include "ui/dlg/dlg_update.h"
-#include "ui/dialog.h"
 
 namespace ui {
 
-class DialogProperties {
-public:
-  DialogProperties(unsigned int resource_id, win::Dialog* dialog,
-                   Dialog parent = Dialog::None, bool modal = false);
-
-  unsigned int resource_id;
-  win::Dialog* dialog;
-  Dialog parent;
-  bool modal;
+struct DialogProperties {
+  unsigned int resource_id = 0;
+  win::Dialog* dialog = nullptr;
+  Dialog parent = Dialog::None;
+  bool modal = false;
 };
 
-DialogProperties::DialogProperties(unsigned int resource_id,
-                                   win::Dialog* dialog,
-                                   Dialog parent,
-                                   bool modal)
-    : resource_id(resource_id),
-      dialog(dialog),
-      parent(parent),
-      modal(modal) {
-}
-
-std::map<Dialog, DialogProperties> dialog_properties;
+static std::map<Dialog, DialogProperties> dialog_properties;
 
 void InitializeDialogProperties() {
   if (!dialog_properties.empty())
@@ -57,19 +44,19 @@ void InitializeDialogProperties() {
 
   dialog_properties.insert(std::make_pair(
       Dialog::About,
-      DialogProperties(IDD_ABOUT, &DlgAbout, Dialog::Main, true)));
+      DialogProperties{IDD_ABOUT, &DlgAbout, Dialog::Main, true}));
   dialog_properties.insert(std::make_pair(
       Dialog::AnimeInformation,
-      DialogProperties(IDD_ANIME_INFO, &DlgAnime, Dialog::Main, false)));
+      DialogProperties{IDD_ANIME_INFO, &DlgAnime, Dialog::Main, false}));
   dialog_properties.insert(std::make_pair(
       Dialog::Main,
-      DialogProperties(IDD_MAIN, &DlgMain)));
+      DialogProperties{IDD_MAIN, &DlgMain, Dialog::None, false}));
   dialog_properties.insert(std::make_pair(
       Dialog::Settings,
-      DialogProperties(IDD_SETTINGS, &DlgSettings, Dialog::Main, true)));
+      DialogProperties{IDD_SETTINGS, &DlgSettings, Dialog::Main, true}));
   dialog_properties.insert(std::make_pair(
       Dialog::Update,
-      DialogProperties(IDD_UPDATE, &DlgUpdate, Dialog::Main, true)));
+      DialogProperties{IDD_UPDATE, &DlgUpdate, Dialog::Main, true}));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -77,11 +64,10 @@ void InitializeDialogProperties() {
 void EndDialog(Dialog dialog) {
   InitializeDialogProperties();
 
-  auto it = dialog_properties.find(dialog);
+  const auto it = dialog_properties.find(dialog);
 
-  if (it != dialog_properties.end())
-    if (it->second.dialog)
-      it->second.dialog->EndDialog(IDABORT);
+  if (it != dialog_properties.end() && it->second.dialog)
+    it->second.dialog->EndDialog(IDABORT);
 }
 
 void EnableDialogInput(Dialog dialog, bool enable) {
@@ -98,11 +84,10 @@ void EnableDialogInput(Dialog dialog, bool enable) {
 HWND GetWindowHandle(Dialog dialog) {
   InitializeDialogProperties();
 
-  auto it = dialog_properties.find(dialog);
+  const auto it = dialog_properties.find(dialog);
 
-  if (it != dialog_properties.end())
-    if (it->second.dialog)
-      return it->second.dialog->GetWindowHandle();
+  if (it != dialog_properties.end() && it->second.dialog)
+    return it->second.dialog->GetWindowHandle();
 
   return nullptr;
 }
@@ -110,17 +95,15 @@ HWND GetWindowHandle(Dialog dialog) {
 void ShowDialog(Dialog dialog) {
   InitializeDialogProperties();
 
-  auto it = dialog_properties.find(dialog);
+  const auto it = dialog_properties.find(dialog);
 
-  if (it != dialog_properties.end()) {
-    if (it->second.dialog) {
-      if (!it->second.dialog->IsWindow()) {
-        it->second.dialog->Create(it->second.resource_id,
-                                  GetWindowHandle(it->second.parent),
-                                  it->second.modal);
-      } else {
-        ActivateWindow(it->second.dialog->GetWindowHandle());
-      }
+  if (it != dialog_properties.end() && it->second.dialog) {
+    if (!it->second.dialog->IsWindow()) {
+      it->second.dialog->Create(it->second.resource_id,
+                                GetWindowHandle(it->second.parent),
+                                it->second.modal);
+    } else {
+      ActivateWindow(it->second.dialog->GetWindowHandle());
     }
   }
 }

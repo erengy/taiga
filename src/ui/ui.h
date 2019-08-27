@@ -18,9 +18,10 @@
 
 #pragma once
 
-#include <windows/win/taskbar.h>
+#include <string>
+#include <vector>
 
-#include "base/types.h"
+#include <windows/win/taskbar.h>
 
 namespace anime {
 class Episode;
@@ -52,18 +53,18 @@ public:
 constexpr int kControlMargin = 6;
 constexpr unsigned int kAppSysTrayId = 74164;  // TAIGA ^_^
 
-extern Taskbar taskbar;
-extern win::TaskbarList taskbar_list;
+inline Taskbar taskbar;
+inline win::TaskbarList taskbar_list;
 
-void ChangeStatusText(const string_t& status);
+void ChangeStatusText(const std::wstring& status);
 void ClearStatusText();
 void SetSharedCursor(LPCWSTR name);
 int StatusToIcon(int status);
 
 void DisplayErrorMessage(const std::wstring& text, const std::wstring& caption);
-bool EnterAuthorizationPin(const string_t& service, string_t& auth_pin);
+bool EnterAuthorizationPin(const std::wstring& service, std::wstring& auth_pin);
 
-void OnHttpError(const taiga::HttpClient& http_client, const string_t& error);
+void OnHttpError(const taiga::HttpClient& http_client, const std::wstring& error);
 void OnHttpHeadersAvailable(const taiga::HttpClient& http_client);
 void OnHttpProgress(const taiga::HttpClient& http_client);
 void OnHttpReadComplete(const taiga::HttpClient& http_client);
@@ -75,9 +76,9 @@ void OnLibraryEntryChange(int id);
 void OnLibraryEntryDelete(int id);
 void OnLibraryEntryImageChange(int id);
 void OnLibraryGetSeason();
-void OnLibrarySearchTitle(int id, const string_t& results);
-void OnLibraryEntryChangeFailure(int id, const string_t& reason);
-void OnLibraryUpdateFailure(int id, const string_t& reason, bool not_approved);
+void OnLibrarySearchTitle(int id, const std::wstring& results);
+void OnLibraryEntryChangeFailure(int id, const std::wstring& reason);
+void OnLibraryUpdateFailure(int id, const std::wstring& reason, bool not_approved);
 
 bool OnLibraryEntriesEditDelete(const std::vector<int> ids);
 int OnLibraryEntriesEditEpisode(const std::vector<int> ids);
@@ -90,7 +91,7 @@ bool OnHistoryClear();
 int OnHistoryQueueClear();
 int OnHistoryProcessConfirmationQueue(anime::Episode& episode);
 
-void OnAnimeDelete(int id, const string_t& title);
+void OnAnimeDelete(int id, const std::wstring& title);
 void OnAnimeEpisodeNotFound(const std::wstring& title);
 bool OnAnimeFolderNotFound();
 void OnAnimeWatchingStart(const anime::Item& anime_item, const anime::Episode& episode);
@@ -111,7 +112,7 @@ void OnSettingsChange();
 void OnSettingsLibraryFoldersEmpty();
 void OnSettingsRestoreDefaults();
 void OnSettingsServiceChange();
-bool OnSettingsServiceChangeConfirm(const string_t& current_service, const string_t& new_service);
+bool OnSettingsServiceChangeConfirm(const std::wstring& current_service, const std::wstring& new_service);
 void OnSettingsServiceChangeFailed();
 void OnSettingsThemeChange();
 void OnSettingsUserChange();
@@ -121,7 +122,7 @@ void OnScanAvailableEpisodesFinished();
 
 void OnFeedCheck(bool success);
 void OnFeedDownloadSuccess(bool is_magnet_link);
-void OnFeedDownloadError(const string_t& message);
+void OnFeedDownloadError(const std::wstring& message);
 bool OnFeedNotify(const Feed& feed);
 
 void OnMircNotRunning(bool testing = false);
@@ -130,9 +131,9 @@ void OnMircDdeConnectionFail(bool testing = false);
 void OnMircDdeConnectionSuccess(const std::vector<std::wstring>& channels, bool testing = false);
 
 void OnTwitterTokenRequest(bool success);
-bool OnTwitterTokenEntry(string_t& auth_pin);
+bool OnTwitterTokenEntry(std::wstring& auth_pin);
 void OnTwitterAuth(bool success);
-void OnTwitterPost(bool success, const string_t& error);
+void OnTwitterPost(bool success, const std::wstring& error);
 
 void OnLogin();
 void OnLogout(bool website_login_required = false);

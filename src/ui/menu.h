@@ -57,6 +57,6 @@ private:
   win::MenuList menu_list_;
 };
 
-extern MenuList Menus;
+inline MenuList Menus;
 
 }  // namespace ui

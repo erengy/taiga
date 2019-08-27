@@ -91,16 +91,16 @@ enum ListProgressType {
   kListProgressOnHold,
   kListProgressPlanToWatch,
   kListProgressSeparator,
-  kListProgressWatching
+  kListProgressWatching,
 };
 
-const COLORREF kColorDarkBlue = RGB(46, 81, 162);
-const COLORREF kColorGray = RGB(230, 230, 230);
-const COLORREF kColorLightBlue = RGB(225, 231, 245);
-const COLORREF kColorLightGray = RGB(248, 248, 248);
-const COLORREF kColorLightGreen = RGB(225, 245, 231);
-const COLORREF kColorLightRed = RGB(245, 225, 231);
-const COLORREF kColorMainInstruction = RGB(0x00, 0x33, 0x99);
+constexpr COLORREF kColorDarkBlue = RGB(46, 81, 162);
+constexpr COLORREF kColorGray = RGB(230, 230, 230);
+constexpr COLORREF kColorLightBlue = RGB(225, 231, 245);
+constexpr COLORREF kColorLightGray = RGB(248, 248, 248);
+constexpr COLORREF kColorLightGreen = RGB(225, 245, 231);
+constexpr COLORREF kColorLightRed = RGB(245, 225, 231);
+constexpr COLORREF kColorMainInstruction = RGB(0x00, 0x33, 0x99);
 
 class ThemeManager {
 public:
@@ -137,6 +137,6 @@ private:
   std::map<ListProgressType, Progress> list_progress_;
 };
 
-extern ThemeManager Theme;
+inline ThemeManager Theme;
 
 }  // namespace ui

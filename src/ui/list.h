@@ -44,7 +44,7 @@ enum ListSortType {
   kListSortScore,
   kListSortSeason,
   kListSortStatus,
-  kListSortTitle
+  kListSortTitle,
 };
 
 int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2,

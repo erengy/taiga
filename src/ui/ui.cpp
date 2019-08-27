@@ -65,10 +65,7 @@
 
 namespace ui {
 
-Taskbar taskbar;
-win::TaskbarList taskbar_list;
-
-void ChangeStatusText(const string_t& status) {
+void ChangeStatusText(const std::wstring& status) {
   DlgMain.ChangeStatus(status);
 }
 
@@ -99,7 +96,7 @@ void DisplayErrorMessage(const std::wstring& text,
   MessageBox(nullptr, text.c_str(), caption.c_str(), MB_OK | MB_ICONERROR);
 }
 
-bool EnterAuthorizationPin(const string_t& service, string_t& auth_pin) {
+bool EnterAuthorizationPin(const std::wstring& service, std::wstring& auth_pin) {
   InputDialog dlg;
   dlg.title = L"{} Authorization"_format(service);
   dlg.info = L"Please enter the PIN shown on the page after "
@@ -116,7 +113,7 @@ bool EnterAuthorizationPin(const string_t& service, string_t& auth_pin) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void OnHttpError(const taiga::HttpClient& http_client, const string_t& error) {
+void OnHttpError(const taiga::HttpClient& http_client, const std::wstring& error) {
   switch (http_client.mode()) {
     case taiga::kHttpSilent:
     case taiga::kHttpServiceGetMetadataById:
@@ -341,8 +338,8 @@ void OnLibraryGetSeason() {
   DlgSeason.EnableInput();
 }
 
-void OnLibrarySearchTitle(int id, const string_t& results) {
-  std::vector<string_t> split_vector;
+void OnLibrarySearchTitle(int id, const std::wstring& results) {
+  std::vector<std::wstring> split_vector;
   Split(results, L",", split_vector);
   RemoveEmptyStrings(split_vector);
 
@@ -357,12 +354,12 @@ void OnLibrarySearchTitle(int id, const string_t& results) {
     DlgSearch.ParseResults(ids);
 }
 
-void OnLibraryEntryChangeFailure(int id, const string_t& reason) {
+void OnLibraryEntryChangeFailure(int id, const std::wstring& reason) {
   if (DlgAnime.GetCurrentId() == id)
     DlgAnime.UpdateTitle(false);
 }
 
-void OnLibraryUpdateFailure(int id, const string_t& reason, bool not_approved) {
+void OnLibraryUpdateFailure(int id, const std::wstring& reason, bool not_approved) {
   auto anime_item = AnimeDatabase.FindItem(id);
 
   std::wstring text;
@@ -626,7 +623,7 @@ int OnHistoryProcessConfirmationQueue(anime::Episode& episode) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void OnAnimeDelete(int id, const string_t& title) {
+void OnAnimeDelete(int id, const std::wstring& title) {
   ChangeStatusText(L"Anime is removed from the database: " + title);
 
   if (DlgAnime.GetCurrentId() == id) {
@@ -875,13 +872,13 @@ void OnSettingsServiceChange() {
   int current_page = DlgMain.navigation.GetCurrentPage();
   DlgMain.navigation.RefreshSearchText(current_page);
 
-  string_t tooltip = L"Synchronize list with " +
+  std::wstring tooltip = L"Synchronize list with " +
                      taiga::GetCurrentService()->name();
   DlgMain.toolbar_main.SetButtonTooltip(0, tooltip.c_str());
 }
 
-bool OnSettingsServiceChangeConfirm(const string_t& current_service,
-                                    const string_t& new_service) {
+bool OnSettingsServiceChangeConfirm(const std::wstring& current_service,
+                                    const std::wstring& new_service) {
   win::TaskDialog dlg(TAIGA_APP_TITLE, TD_ICON_WARNING);
   std::wstring instruction =
       L"Do you want to change the active service from {} to {}?"_format(
@@ -961,7 +958,7 @@ void OnFeedDownloadSuccess(bool is_magnet_link) {
   DlgTorrent.EnableInput();
 }
 
-void OnFeedDownloadError(const string_t& message) {
+void OnFeedDownloadError(const std::wstring& message) {
   ChangeStatusText(L"Torrent download error: " + message);
 
   DlgTorrent.EnableInput();
@@ -1060,7 +1057,7 @@ void OnTwitterTokenRequest(bool success) {
   }
 }
 
-bool OnTwitterTokenEntry(string_t& auth_pin) {
+bool OnTwitterTokenEntry(std::wstring& auth_pin) {
   ClearStatusText();
   return EnterAuthorizationPin(L"Twitter", auth_pin);
 }
@@ -1074,7 +1071,7 @@ void OnTwitterAuth(bool success) {
   DlgSettings.RefreshTwitterLink();
 }
 
-void OnTwitterPost(bool success, const string_t& error) {
+void OnTwitterPost(bool success, const std::wstring& error) {
   ChangeStatusText(success ?
       L"Twitter status updated." :
       L"Twitter status update failed. (" + error + L")");

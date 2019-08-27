@@ -16,18 +16,17 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "ui/theme.h"
+
 #include "base/format.h"
 #include "base/gfx.h"
 #include "base/string.h"
 #include "base/xml.h"
 #include "taiga/config.h"
 #include "taiga/path.h"
-#include "ui/theme.h"
 #include "ui/ui.h"
 
 namespace ui {
-
-ThemeManager Theme;
 
 ThemeManager::ThemeManager() {
   icons16_.Create(ScaleX(16), ScaleY(16));  // 16px
@@ -86,7 +85,7 @@ bool ThemeManager::Load() {
   icons16_.Remove(-1);
   icons24_.Remove(-1);
   path = GetPathOnly(taiga::GetPath(taiga::Path::ThemeCurrent));
-  HBITMAP bitmap_handle;
+  HBITMAP bitmap_handle = nullptr;
   for (size_t i = 0; i < kIconCount16px && i < icons16.size(); i++) {
     bitmap_handle = GdiPlus.LoadImage(L"{}16px\\{}.png"_format(path, icons16.at(i)),
                                       ScaleX(16), ScaleY(16));

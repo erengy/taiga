@@ -18,6 +18,8 @@
 
 #include <windows/win/string.h>
 
+#include "ui/menu.h"
+
 #include "base/format.h"
 #include "base/string.h"
 #include "base/xml.h"
@@ -31,16 +33,12 @@
 #include "sync/sync.h"
 #include "taiga/settings.h"
 #include "track/feed.h"
-#include "ui/menu.h"
+#include "ui/dlg/dlg_anime_list.h"
+#include "ui/dlg/dlg_main.h"
+#include "ui/dlg/dlg_season.h"
 #include "ui/translate.h"
 
-#include "dlg/dlg_anime_list.h"
-#include "dlg/dlg_main.h"
-#include "dlg/dlg_season.h"
-
 namespace ui {
-
-MenuList Menus;
 
 void MenuList::Load() {
   menu_list_.menus.clear();
@@ -51,7 +49,7 @@ void MenuList::Load() {
   xml_document document;
   xml_parse_result parse_result = document.load_string(menu_resource.data());
 
-  xml_node menus = document.child(L"menus");
+  const auto menus = document.child(L"menus");
 
   for (auto menu : menus.children(L"menu")) {
     const std::wstring name = menu.attribute(L"name").value();
@@ -192,7 +190,7 @@ void MenuList::UpdateAnime(const anime::Item* anime_item) {
 }
 
 void MenuList::UpdateAnimeListHeaders() {
-  auto menu = menu_list_.FindMenu(L"AnimeListHeaders");
+  const auto menu = menu_list_.FindMenu(L"AnimeListHeaders");
   if (menu) {
     for (auto& item : menu->items) {
       auto column_type = AnimeListDialog::ListView::TranslateColumnName(item.action);
@@ -204,7 +202,7 @@ void MenuList::UpdateAnimeListHeaders() {
 
 void MenuList::UpdateAnnounce() {
   // List > Announce current episode
-  auto menu = menu_list_.FindMenu(L"List");
+  const auto menu = menu_list_.FindMenu(L"List");
   if (menu) {
     for (auto& item : menu->items) {
       if (item.submenu == L"Announce") {
@@ -216,7 +214,7 @@ void MenuList::UpdateAnnounce() {
 }
 
 void MenuList::UpdateExport() {
-  auto menu = menu_list_.FindMenu(L"Export");
+  const auto menu = menu_list_.FindMenu(L"Export");
   if (menu) {
     for (auto& item : menu->items) {
       if (item.action == L"ExportAsMalXml") {
@@ -228,17 +226,15 @@ void MenuList::UpdateExport() {
 }
 
 void MenuList::UpdateExternalLinks() {
-  auto menu = menu_list_.FindMenu(L"ExternalLinks");
+  const auto menu = menu_list_.FindMenu(L"ExternalLinks");
   if (menu) {
-    // Clear menu
     menu->items.clear();
 
     std::vector<std::wstring> lines;
     Split(Settings[taiga::kApp_Interface_ExternalLinks], L"\r\n", lines);
     for (const auto& line : lines) {
       if (IsEqual(line, L"-")) {
-        // Add separator
-        menu->CreateItem();
+        menu->CreateItem();  // separator
       } else {
         std::vector<std::wstring> content;
         Split(line, L"|", content);
@@ -251,9 +247,8 @@ void MenuList::UpdateExternalLinks() {
 }
 
 void MenuList::UpdateFolders() {
-  auto menu = menu_list_.FindMenu(L"Folders");
+  const auto menu = menu_list_.FindMenu(L"Folders");
   if (menu) {
-    // Clear menu
     menu->items.clear();
 
     if (!Settings.library_folders.empty()) {
@@ -265,17 +260,16 @@ void MenuList::UpdateFolders() {
           name += L"\tAlt+" + ToWstr(i + 1);
         menu->CreateItem(L"Execute(" + library_folder + L")", name);
       }
-      // Add separator
-      menu->CreateItem();
+
+      menu->CreateItem();  // separator
     }
 
-    // Add default item
     menu->CreateItem(L"AddFolder()", L"Add new folder...");
   }
 }
 
 void MenuList::UpdateHistoryList(bool enabled) {
-  auto menu = menu_list_.FindMenu(L"HistoryList");
+  const auto menu = menu_list_.FindMenu(L"HistoryList");
   if (menu) {
     // Add to list
     for (auto& item : menu->items) {
@@ -292,7 +286,7 @@ void MenuList::UpdateHistoryList(bool enabled) {
 }
 
 void MenuList::UpdateScore(const anime::Item* anime_item) {
-  auto menu = menu_list_.FindMenu(L"EditScore");
+  const auto menu = menu_list_.FindMenu(L"EditScore");
   if (menu) {
     menu->items.clear();
 
@@ -330,7 +324,7 @@ void MenuList::UpdateScore(const anime::Item* anime_item) {
 }
 
 void MenuList::UpdateSearchList(bool enabled) {
-  auto menu = menu_list_.FindMenu(L"SearchList");
+  const auto menu = menu_list_.FindMenu(L"SearchList");
   if (menu) {
     // Add to list
     for (auto& item : menu->items) {
@@ -343,7 +337,7 @@ void MenuList::UpdateSearchList(bool enabled) {
 }
 
 void MenuList::UpdateSeasonList(bool enabled) {
-  auto menu = menu_list_.FindMenu(L"SeasonList");
+  const auto menu = menu_list_.FindMenu(L"SeasonList");
   if (menu) {
     // Add to list
     for (auto& item : menu->items) {
@@ -356,9 +350,9 @@ void MenuList::UpdateSeasonList(bool enabled) {
 }
 
 void MenuList::UpdateTorrentsList(const FeedItem& feed_item) {
-  auto menu = menu_list_.FindMenu(L"TorrentListRightClick");
+  const auto menu = menu_list_.FindMenu(L"TorrentListRightClick");
   if (menu) {
-    bool anime_identified = anime::IsValidId(feed_item.episode_data.anime_id);
+    const bool anime_identified = anime::IsValidId(feed_item.episode_data.anime_id);
     for (auto& item : menu->items) {
       // Info
       if (item.action == L"Info") {
@@ -484,7 +478,7 @@ void MenuList::UpdateSeason() {
 }
 
 void MenuList::UpdateServices(bool enabled) {
-  auto menu = menu_list_.FindMenu(L"Services");
+  const auto menu = menu_list_.FindMenu(L"Services");
   if (menu) {
     for (auto& item : menu->items) {
       if (item.action == L"Synchronize()") {
@@ -496,7 +490,7 @@ void MenuList::UpdateServices(bool enabled) {
 }
 
 void MenuList::UpdateTools() {
-  auto menu = menu_list_.FindMenu(L"Tools");
+  const auto menu = menu_list_.FindMenu(L"Tools");
   if (menu) {
     for (auto& item : menu->items) {
       // Tools > Enable anime recognition
@@ -513,7 +507,7 @@ void MenuList::UpdateTools() {
 }
 
 void MenuList::UpdateTray() {
-  auto menu = menu_list_.FindMenu(L"Tray");
+  const auto menu = menu_list_.FindMenu(L"Tray");
   if (menu) {
     // Tray > Enable recognition
     for (auto& item : menu->items) {
@@ -526,7 +520,7 @@ void MenuList::UpdateTray() {
 }
 
 void MenuList::UpdateView() {
-  auto menu = menu_list_.FindMenu(L"View");
+  const auto menu = menu_list_.FindMenu(L"View");
   if (menu) {
     for (auto& item : menu->items) {
       item.checked = false;

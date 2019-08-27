@@ -16,7 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "list.h"
+#include "ui/list.h"
 
 #include <windows/win/common_controls.h>
 #include <windows/win/gdi.h>
@@ -135,8 +135,8 @@ int SortListByLastUpdated(const anime::Item& item1, const anime::Item& item2) {
 }
 
 int SortListByPopularity(const anime::Item& item1, const anime::Item& item2) {
-  int val1 = item1.GetPopularity();
-  int val2 = item2.GetPopularity();
+  const int val1 = item1.GetPopularity();
+  const int val2 = item2.GetPopularity();
 
   if (val1 != val2)
     if (val1 == 0 || val2 == 0)
@@ -196,8 +196,8 @@ int SortList(int type, LPCWSTR str1, LPCWSTR str2) {
 }
 
 int SortList(int type, int order, int id1, int id2) {
-  auto item1 = AnimeDatabase.FindItem(id1);
-  auto item2 = AnimeDatabase.FindItem(id2);
+  const auto item1 = AnimeDatabase.FindItem(id1);
+  const auto item2 = AnimeDatabase.FindItem(id2);
 
   if (item1 && item2) {
     switch (type) {
@@ -302,8 +302,8 @@ int CALLBACK AnimeListCompareProc(LPARAM lParam1, LPARAM lParam2,
   if (Settings.GetBool(taiga::kApp_List_HighlightNewEpisodes) &&
       Settings.GetBool(taiga::kApp_List_DisplayHighlightedOnTop)) {
     const auto list = reinterpret_cast<win::ListView*>(lParamSort);
-    auto item1 = AnimeDatabase.FindItem(list->GetItemParam(lParam1));
-    auto item2 = AnimeDatabase.FindItem(list->GetItemParam(lParam2));
+    const auto item1 = AnimeDatabase.FindItem(list->GetItemParam(lParam1));
+    const auto item2 = AnimeDatabase.FindItem(list->GetItemParam(lParam2));
     if (item1 && item2) {
       bool available1 = item1->IsNextEpisodeAvailable();
       bool available2 = item2->IsNextEpisodeAvailable();
@@ -318,14 +318,14 @@ int CALLBACK AnimeListCompareProc(LPARAM lParam1, LPARAM lParam2,
 ////////////////////////////////////////////////////////////////////////////////
 
 int GetAnimeIdFromSelectedListItem(win::ListView& listview) {
-  int anime_id = static_cast<int>(GetParamFromSelectedListItem(listview));
+  const int anime_id = static_cast<int>(GetParamFromSelectedListItem(listview));
   return anime::IsValidId(anime_id) ? anime_id : anime::ID_UNKNOWN;
 }
 
 std::vector<int> GetAnimeIdsFromSelectedListItems(win::ListView& listview) {
   std::vector<int> anime_ids;
 
-  auto params = GetParamsFromSelectedListItems(listview);
+  const auto params = GetParamsFromSelectedListItems(listview);
   for (const auto& param : params) {
     anime_ids.push_back(static_cast<int>(param));
   }
@@ -338,7 +338,7 @@ LPARAM GetParamFromSelectedListItem(win::ListView& listview) {
 
   if (index > -1) {
     if (listview.GetSelectedCount() > 1) {
-      int focused_index = listview.GetNextItem(-1, LVIS_FOCUSED);
+      const int focused_index = listview.GetNextItem(-1, LVIS_FOCUSED);
       if (focused_index > -1)
         index = focused_index;
     }
@@ -363,7 +363,7 @@ std::vector<LPARAM> GetParamsFromSelectedListItems(win::ListView& listview) {
 
 void GetPopupMenuPositionForSelectedListItem(win::ListView& listview,
                                              POINT& pt) {
-  int item_index = listview.GetNextItem(-1, LVIS_SELECTED);
+  const int item_index = listview.GetNextItem(-1, LVIS_SELECTED);
 
   win::Rect rect;
   listview.GetSubItemRect(item_index, 0, &rect);
