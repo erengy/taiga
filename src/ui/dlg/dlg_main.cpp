@@ -487,8 +487,7 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
             case kSidebarItemFeeds: {
               // Check new torrents
               edit.SetText(L"");
-              Aggregator.CheckFeed(FeedCategory::Link,
-                                   Settings[taiga::kTorrent_Discovery_Source]);
+              Aggregator.CheckFeed(Settings[taiga::kTorrent_Discovery_Source]);
               return TRUE;
             }
           }

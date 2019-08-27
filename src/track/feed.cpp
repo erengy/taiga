@@ -127,11 +127,6 @@ TorrentCategory TranslateTorrentCategory(const std::wstring& str) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-Feed::Feed()
-    : category(FeedCategory::Link),
-      source(FeedSource::Unknown) {
-}
-
 std::wstring Feed::GetDataPath() {
   std::wstring path = taiga::GetPath(taiga::Path::Feed);
 
@@ -208,9 +203,8 @@ void Feed::Load(const xml_document& document) {
     if (!permalink.empty())
       item.permalink = ToBool(permalink);
 
-    if (category == FeedCategory::Link)
-      if (item.title.empty() || item.link.empty())
-        continue;
+    if (item.title.empty() || item.link.empty())
+      continue;
 
     DecodeHtmlEntities(item.title);
     DecodeHtmlEntities(item.description);

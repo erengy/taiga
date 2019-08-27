@@ -332,9 +332,8 @@ bool AppSettings::Load() {
   Aggregator.filter_manager.Import(node_filter, Aggregator.filter_manager.filters);
   if (Aggregator.filter_manager.filters.empty())
     Aggregator.filter_manager.AddPresets();
-  auto feed = Aggregator.GetFeed(FeedCategory::Link);
-  if (feed)
-    feed->link = GetWstr(kTorrent_Discovery_Source);
+  auto& feed = Aggregator.GetFeed();
+  feed.link = GetWstr(kTorrent_Discovery_Source);
   Aggregator.LoadArchive();
 
   return result.status == pugi::status_ok;

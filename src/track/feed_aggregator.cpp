@@ -38,26 +38,15 @@
 
 class Aggregator Aggregator;
 
-Aggregator::Aggregator() {
-  // Add torrent feed
-  feeds_.resize(feeds_.size() + 1);
-  feeds_.back().category = FeedCategory::Link;
+Feed& Aggregator::GetFeed() {
+  return feed_;
 }
 
-Feed* Aggregator::GetFeed(FeedCategory category) {
-  for (auto& feed : feeds_)
-    if (feed.category == category)
-      return &feed;
-
-  return nullptr;
-}
-
-bool Aggregator::CheckFeed(FeedCategory category, const std::wstring& source,
-                           bool automatic) {
+bool Aggregator::CheckFeed(const std::wstring& source, bool automatic) {
   if (source.empty())
     return false;
 
-  Feed& feed = *GetFeed(category);
+  Feed& feed = GetFeed();
 
   feed.link = source;
 
@@ -67,15 +56,11 @@ bool Aggregator::CheckFeed(FeedCategory category, const std::wstring& source,
   http_request.header[L"Accept"] = L"application/rss+xml, */*";
   http_request.header[L"Accept-Encoding"] = L"gzip";
 
-  switch (feed.category) {
-    case FeedCategory::Link:
-      if (!automatic) {
-        ui::ChangeStatusText(L"Checking new torrents via " +
-                             http_request.url.host + L"...");
-      }
-      ui::EnableDialogInput(ui::Dialog::Torrents, false);
-      break;
+  if (!automatic) {
+    ui::ChangeStatusText(
+      L"Checking new torrents via {}..."_format(http_request.url.host));
   }
+  ui::EnableDialogInput(ui::Dialog::Torrents, false);
 
   auto client_mode = automatic ?
       taiga::kHttpFeedCheckAuto : taiga::kHttpFeedCheck;
@@ -144,8 +129,8 @@ void Aggregator::ExamineData(Feed& feed) {
   std::stable_sort(feed.items.begin(), feed.items.end());
 }
 
-bool Aggregator::Download(FeedCategory category, const FeedItem* feed_item) {
-  Feed& feed = *GetFeed(category);
+bool Aggregator::Download(const FeedItem* feed_item) {
+  Feed& feed = GetFeed();
 
   if (feed_item) {
     download_queue_.push_back(feed_item->link);
@@ -252,7 +237,7 @@ void Aggregator::HandleFeedCheck(Feed& feed, const std::string& data,
         ui::OnFeedNotify(feed);
         break;
       case 2:  // Download
-        Download(feed.category, nullptr);
+        Download(nullptr);
         break;
     }
   }
@@ -299,7 +284,7 @@ void Aggregator::HandleFeedDownload(Feed& feed, const std::string& data) {
   HandleFeedDownloadOpen(*feed_item, file);
 
   if (!download_queue_.empty())
-    Download(feed.category, nullptr);
+    Download(nullptr);
 }
 
 void Aggregator::HandleFeedDownloadError(Feed& feed) {

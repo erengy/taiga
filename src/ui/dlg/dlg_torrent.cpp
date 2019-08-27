@@ -131,20 +131,18 @@ BOOL TorrentDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
     case 100: {
       DlgMain.edit.SetText(L"");
       if (GetKeyState(VK_CONTROL) & 0x8000) {
-        auto feed = Aggregator.GetFeed(FeedCategory::Link);
-        if (feed) {
-          feed->Load();
-          Aggregator.ExamineData(*feed);
-        }
+        auto& feed = Aggregator.GetFeed();
+        feed.Load();
+        Aggregator.ExamineData(feed);
         RefreshList();
       } else {
-        Aggregator.CheckFeed(FeedCategory::Link, Settings[taiga::kTorrent_Discovery_Source]);
+        Aggregator.CheckFeed(Settings[taiga::kTorrent_Discovery_Source]);
       }
       return TRUE;
     }
     // Download marked torrents
     case 101: {
-      Aggregator.Download(FeedCategory::Link, nullptr);
+      Aggregator.Download(nullptr);
       return TRUE;
     }
     // Discard marked torrents
@@ -191,7 +189,7 @@ void TorrentDialog::OnContextMenu(HWND hwnd, POINT pt) {
   std::wstring answer = ui::Menus.Show(GetWindowHandle(), pt.x, pt.y, L"TorrentListRightClick");
 
   if (answer == L"DownloadTorrent") {
-    Aggregator.Download(FeedCategory::Link, feed_item);
+    Aggregator.Download(feed_item);
 
   } else if (answer == L"Info") {
     ShowDlgAnimeInfo(feed_item->episode_data.anime_id);
@@ -339,7 +337,7 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
             auto param = GetParamFromSelectedListItem(list_);
             if (param) {
               auto feed_item = reinterpret_cast<FeedItem*>(param);
-              Aggregator.Download(FeedCategory::Link, feed_item);
+              Aggregator.Download(feed_item);
               return TRUE;
             }
             break;
@@ -355,7 +353,7 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
           if (lpnmitem->iItem == -1)
             break;
           FeedItem* feed_item = reinterpret_cast<FeedItem*>(list_.GetItemParam(lpnmitem->iItem));
-          Aggregator.Download(FeedCategory::Link, feed_item);
+          Aggregator.Download(feed_item);
         }
         break;
       }
@@ -436,9 +434,7 @@ void TorrentDialog::RefreshList() {
   if (!IsWindow())
     return;
 
-  Feed* feed = Aggregator.GetFeed(FeedCategory::Link);
-  if (!feed)
-    return;
+  auto& feed = Aggregator.GetFeed();
 
   // Disable drawing
   list_.SetRedraw(FALSE);
@@ -448,7 +444,7 @@ void TorrentDialog::RefreshList() {
   list_.last_checked_item = -1;
 
   // Add items
-  for (auto it = feed->items.begin(); it != feed->items.end(); ++it) {
+  for (auto it = feed.items.begin(); it != feed.items.end(); ++it) {
     // Skip item if it was discarded and hidden
     if (it->state == FeedItemState::DiscardedHidden)
       continue;
@@ -477,7 +473,7 @@ void TorrentDialog::RefreshList() {
     video = anime::NormalizeResolution(it->episode_data.video_resolution());
     AppendString(video, it->episode_data.video_terms(), L" ");
 
-    int index = list_.InsertItem(it - feed->items.begin(),
+    int index = list_.InsertItem(it - feed.items.begin(),
                                  group, icon, 0, NULL, title.c_str(),
                                  reinterpret_cast<LPARAM>(&(*it)));
     list_.SetItem(index, kColumnEpisode, number.c_str());
@@ -529,7 +525,7 @@ void TorrentDialog::Search(std::wstring url, std::wstring title) {
   DlgMain.ChangeStatus(L"Searching torrents for \"{}\"..."_format(title));
 
   ReplaceString(url, L"%title%", title);
-  Aggregator.CheckFeed(FeedCategory::Link, url);
+  Aggregator.CheckFeed(url);
 }
 
 void TorrentDialog::SetTimer(int ticks) {

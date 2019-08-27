@@ -40,15 +40,6 @@ enum class FeedItemState {
   Selected,
 };
 
-enum class FeedCategory {
-  // Broadcatching for torrent files and DDL
-  Link,
-  // News around the web
-  Text,
-  // Airing times for anime titles
-  Time,
-};
-
 enum class FeedSource {
   Unknown,
   AniDex,
@@ -130,15 +121,11 @@ struct GenericFeed {
 
 class Feed : public GenericFeed {
 public:
-  Feed();
-  ~Feed() {}
-
   std::wstring GetDataPath();
   bool Load();
   bool Load(const std::wstring& data);
 
-  FeedCategory category;
-  FeedSource source;
+  FeedSource source = FeedSource::Unknown;
 
 private:
   void Load(const pugi::xml_document& document);
@@ -148,13 +135,10 @@ private:
 
 class Aggregator {
 public:
-  Aggregator();
-  ~Aggregator() {}
+  Feed& GetFeed();
 
-  Feed* GetFeed(FeedCategory category);
-
-  bool CheckFeed(FeedCategory category, const std::wstring& source, bool automatic = false);
-  bool Download(FeedCategory category, const FeedItem* feed_item);
+  bool CheckFeed(const std::wstring& source, bool automatic = false);
+  bool Download(const FeedItem* feed_item);
 
   void HandleFeedCheck(Feed& feed, const std::string& data, bool automatic);
   void HandleFeedDownload(Feed& feed, const std::string& data);
@@ -176,13 +160,12 @@ public:
   FeedFilterManager filter_manager;
 
 private:
-  bool CompareFeedItems(const GenericFeedItem& item1, const GenericFeedItem& item2);
   FeedItem* FindFeedItemByLink(Feed& feed, const std::wstring& link);
   void HandleFeedDownloadOpen(FeedItem& feed_item, const std::wstring& file);
   bool IsMagnetLink(const FeedItem& feed_item) const;
 
   std::vector<std::wstring> download_queue_;
-  std::vector<Feed> feeds_;
+  Feed feed_;
   std::vector<std::wstring> file_archive_;
 };
 
