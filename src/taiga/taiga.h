@@ -20,9 +20,16 @@
 
 #include <windows/win/application.h>
 
-#include "taiga/command_line.h"
-
 namespace taiga {
+
+namespace detail {
+
+struct CommandLineOptions {
+  bool allow_multiple_instances = false;
+  bool debug_mode = false;
+};
+
+}  // namespace detail
 
 class App : public win::App {
 public:
@@ -33,7 +40,7 @@ public:
 
   void LoadData();
 
-  CommandLineOptions options;
+  detail::CommandLineOptions options;
 };
 
 }  // namespace taiga

@@ -20,20 +20,21 @@
 #include <vector>
 #include <windows.h>
 
-#include "taiga/command_line.h"
+#include "command_line.h"
+#include "string.h"
 
-#include "base/log.h"
+namespace base {
 
-namespace taiga {
-
-static std::vector<std::wstring> ParseCommandLineArgs() {
+std::vector<std::wstring> ParseCommandLineArgs() {
   std::vector<std::wstring> args;
 
   int argc = 0;
   const auto argv = ::CommandLineToArgvW(::GetCommandLineW(), &argc);
   if (argc && argv) {
     for (int i = 1; i < argc; i++) {
-      args.emplace_back(argv[i]);
+      std::wstring arg = argv[i];
+      TrimLeft(arg, L" -");
+      args.emplace_back(arg);
     }
     ::LocalFree(argv);
   }
@@ -41,30 +42,4 @@ static std::vector<std::wstring> ParseCommandLineArgs() {
   return args;
 }
 
-CommandLineOptions ParseCommandLine() {
-  CommandLineOptions options;
-
-  const auto args = ParseCommandLineArgs();
-
-  for (const auto& arg : args) {
-    bool found = false;
-
-    if (arg == L"-allowmultipleinstances") {
-      options.allow_multiple_instances = true;
-      found = true;
-    } else if (arg == L"-debug") {
-      options.debug_mode = true;
-      found = true;
-    }
-
-    if (found) {
-      LOGD(arg);
-    } else {
-      LOGW(L"Invalid argument: {}", arg);
-    }
-  }
-
-  return options;
-}
-
-}  // namespace taiga
+}  // namespace base

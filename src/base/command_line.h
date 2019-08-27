@@ -18,13 +18,11 @@
 
 #pragma once
 
-namespace taiga {
+#include <string>
+#include <vector>
 
-struct CommandLineOptions {
-  bool allow_multiple_instances = false;
-  bool debug_mode = false;
-};
+namespace base {
 
-CommandLineOptions ParseCommandLine();
+std::vector<std::wstring> ParseCommandLineArgs();
 
-}  // namespace taiga
+}  // namespace base

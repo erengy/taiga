@@ -18,6 +18,7 @@
 
 #include <windows/win/taskbar.h>
 
+#include "base/command_line.h"
 #include "base/file.h"
 #include "base/log.h"
 #include "base/process.h"
@@ -42,13 +43,43 @@ taiga::App Taiga;
 
 namespace taiga {
 
+namespace detail {
+
+CommandLineOptions ParseCommandLine() {
+  CommandLineOptions options;
+
+  const auto args = base::ParseCommandLineArgs();
+
+  for (const auto& arg : args) {
+    bool found = false;
+
+    if (arg == L"allowmultipleinstances") {
+      options.allow_multiple_instances = true;
+      found = true;
+    } else if (arg == L"debug") {
+      options.debug_mode = true;
+      found = true;
+    }
+
+    if (found) {
+      LOGD(arg);
+    } else {
+      LOGW(L"Invalid argument: {}", arg);
+    }
+  }
+
+  return options;
+}
+
+}  // namespace detail
+
 App::~App() {
   OleUninitialize();
 }
 
 BOOL App::InitInstance() {
   // Parse command line
-  options = ParseCommandLine();
+  options = detail::ParseCommandLine();
 #ifdef _DEBUG
   options.debug_mode = true;
 #endif

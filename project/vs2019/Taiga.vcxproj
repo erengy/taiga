@@ -183,6 +183,7 @@
     <ClCompile Include="..\..\deps\src\zlib\uncompr.c" />
     <ClCompile Include="..\..\deps\src\zlib\zutil.c" />
     <ClCompile Include="..\..\src\base\base64.cpp" />
+    <ClCompile Include="..\..\src\base\command_line.cpp" />
     <ClCompile Include="..\..\src\base\crypto.cpp" />
     <ClCompile Include="..\..\src\base\file.cpp" />
     <ClCompile Include="..\..\src\base\file_monitor.cpp" />
@@ -231,7 +232,6 @@
     <ClCompile Include="..\..\src\sync\sync.cpp" />
     <ClCompile Include="..\..\src\taiga\action.cpp" />
     <ClCompile Include="..\..\src\taiga\announce.cpp" />
-    <ClCompile Include="..\..\src\taiga\command_line.cpp" />
     <ClCompile Include="..\..\src\taiga\debug.cpp" />
     <ClCompile Include="..\..\src\taiga\dummy.cpp" />
     <ClCompile Include="..\..\src\taiga\http.cpp" />
@@ -359,6 +359,7 @@
     <ClInclude Include="..\..\deps\src\zlib\zlib.h" />
     <ClInclude Include="..\..\deps\src\zlib\zutil.h" />
     <ClInclude Include="..\..\src\base\base64.h" />
+    <ClInclude Include="..\..\src\base\command_line.h" />
     <ClInclude Include="..\..\src\base\comparable.h" />
     <ClInclude Include="..\..\src\base\crypto.h" />
     <ClInclude Include="..\..\src\base\file.h" />
@@ -407,7 +408,6 @@
     <ClInclude Include="..\..\src\sync\service.h" />
     <ClInclude Include="..\..\src\sync\sync.h" />
     <ClInclude Include="..\..\src\taiga\announce.h" />
-    <ClInclude Include="..\..\src\taiga\command_line.h" />
     <ClInclude Include="..\..\src\taiga\config.h" />
     <ClInclude Include="..\..\src\taiga\debug.h" />
     <ClInclude Include="..\..\src\taiga\dummy.h" />

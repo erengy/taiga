@@ -604,9 +604,6 @@
     <ClCompile Include="..\..\src\taiga\version.cpp">
       <Filter>taiga</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\taiga\command_line.cpp">
-      <Filter>taiga</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\ui\translate\anime.cpp">
       <Filter>ui\translate</Filter>
     </ClCompile>
@@ -618,6 +615,9 @@
     </ClCompile>
     <ClCompile Include="..\..\deps\src\fmt\src\format.cc">
       <Filter>deps\fmt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\base\command_line.cpp">
+      <Filter>base</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1104,9 +1104,6 @@
     <ClInclude Include="..\..\src\taiga\config.h">
       <Filter>taiga</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\taiga\command_line.h">
-      <Filter>taiga</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\deps\src\json\single_include\nlohmann\json.hpp">
       <Filter>deps\json</Filter>
     </ClInclude>
@@ -1121,6 +1118,9 @@
     </ClInclude>
     <ClInclude Include="..\..\deps\src\fmt\include\fmt\chrono.h">
       <Filter>deps\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\base\command_line.h">
+      <Filter>base</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
