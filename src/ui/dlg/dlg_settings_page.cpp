@@ -563,11 +563,11 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
           std::wstring service;
           GetDlgItemText(IDC_EDIT_MIRC_SERVICE, service);
 
-          if (!Mirc.IsRunning()) {
+          if (!link::mirc::IsRunning()) {
             ui::OnMircNotRunning(true);
           } else {
             std::vector<std::wstring> channels;
-            if (!Mirc.GetChannels(service, channels)) {
+            if (!link::mirc::GetChannels(service, channels)) {
               ui::OnMircDdeConnectionFail(true);
             } else {
               ui::OnMircDdeConnectionSuccess(channels, true);

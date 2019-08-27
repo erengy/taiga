@@ -21,6 +21,7 @@
 #include <string>
 
 #include "link/discord.h"
+#include "link/mirc.h"
 
 #include "base/oauth.h"
 #include "base/types.h"
@@ -54,25 +55,6 @@ private:
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-// mIRC
-
-enum MircChannelMode {
-  kMircChannelModeActive = 1,
-  kMircChannelModeAll,
-  kMircChannelModeCustom
-};
-
-class Mirc {
-public:
-  bool GetChannels(const std::wstring& service, std::vector<std::wstring>& channels);
-  bool IsRunning();
-  bool Send(const std::wstring& service, std::wstring channels, const std::wstring& data, int mode, bool use_action, bool multi_server);
-
-private:
-  bool SendCommands(const std::wstring& service, const std::vector<std::wstring>& commands);
-};
-
-////////////////////////////////////////////////////////////////////////////////
 // Twitter
 
 class Twitter {
@@ -98,5 +80,4 @@ private:
 ////////////////////////////////////////////////////////////////////////////////
 
 extern taiga::Announcer Announcer;
-extern taiga::Mirc Mirc;
 extern taiga::Twitter Twitter;
