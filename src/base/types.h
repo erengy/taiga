@@ -40,12 +40,9 @@ using uid_t = std::wstring;
 // Default enumeration type
 using enum_t = unsigned char;
 
-// Default string type
-using string_t = std::wstring;
-
 // Dictionary types
-using dictionary_t = std::map<string_t, string_t>;
-using multidictionary_t = std::map<string_t, std::vector<string_t>>;
+using dictionary_t = std::map<std::wstring, std::wstring>;
+using multidictionary_t = std::map<std::wstring, std::vector<std::wstring>>;
 
 // HTTP request and response
 using HttpRequest = base::http::Request;

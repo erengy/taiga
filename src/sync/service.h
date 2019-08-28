@@ -72,11 +72,11 @@ public:
 };
 
 struct User {
-  string_t id;
-  string_t username;
-  string_t rating_system;
+  std::wstring id;
+  std::wstring username;
+  std::wstring rating_system;
 
-  string_t access_token;
+  std::wstring access_token;
   bool authenticated = false;
   time_t last_synchronized = 0;
 };
@@ -95,10 +95,10 @@ public:
   virtual void HandleResponse(Response& response, HttpResponse& http_response) = 0;
   virtual bool RequestNeedsAuthentication(RequestType request_type) const;
 
-  const string_t& host() const;
+  const std::wstring& host() const;
   enum_t id() const;
-  const string_t& canonical_name() const;
-  const string_t& name() const;
+  const std::wstring& canonical_name() const;
+  const std::wstring& name() const;
 
   User& user();
   const User& user() const;
@@ -107,11 +107,11 @@ protected:
   void HandleError(const HttpResponse& http_response, Response& response) const;
 
   // API end-point
-  string_t host_;
+  std::wstring host_;
   // Service identifiers
   enum_t id_;
-  string_t canonical_name_;
-  string_t name_;
+  std::wstring canonical_name_;
+  std::wstring name_;
   // User information
   User user_;
 };

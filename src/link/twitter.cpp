@@ -101,7 +101,7 @@ void HandleHttpResponse(const taiga::HttpClientMode mode,
       if (!parameters[L"oauth_token"].empty()) {
         ExecuteLink(L"https://api.twitter.com/oauth/authorize?oauth_token=" +
                     parameters[L"oauth_token"]);
-        string_t auth_pin;
+        std::wstring auth_pin;
         if (ui::OnTwitterTokenEntry(auth_pin))
           AccessToken(parameters[L"oauth_token"],
                       parameters[L"oauth_token_secret"],
@@ -130,7 +130,7 @@ void HandleHttpResponse(const taiga::HttpClientMode mode,
       if (InStr(response.body, L"\"errors\"", 0) == -1) {
         ui::OnTwitterPost(true, L"");
       } else {
-        string_t error;
+        std::wstring error;
         int index_begin = InStr(response.body, L"\"message\":\"", 0);
         int index_end = InStr(response.body, L"\",\"", index_begin);
         if (index_begin > -1 && index_end > -1) {

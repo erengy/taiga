@@ -19,7 +19,6 @@
 #pragma once
 
 #include "service.h"
-#include "base/types.h"
 #include "library/history.h"
 #include "taiga/http.h"
 
@@ -34,7 +33,7 @@ void GetUser();
 void GetLibraryEntries(const int offset = 0);
 void GetMetadataById(int id);
 void GetSeason(const anime::Season season, const int offset);
-void SearchTitle(string_t title, int id);
+void SearchTitle(std::wstring title, int id);
 void Synchronize();
 void UpdateLibraryEntry(AnimeValues& anime_values, int id,
                         taiga::HttpClientMode http_client_mode);

@@ -116,7 +116,7 @@ void GetSeason(const anime::Season season, const int offset) {
   ServiceManager.MakeRequest(request);
 }
 
-void SearchTitle(string_t title, int id) {
+void SearchTitle(std::wstring title, int id) {
   Request request(kSearchTitle);
   SetActiveServiceForRequest(request);
   if (!AddAuthenticationToRequest(request))
@@ -190,7 +190,7 @@ void UpdateLibraryEntry(AnimeValues& anime_values, int id,
   ServiceManager.MakeRequest(request);
 }
 
-void DownloadImage(int id, const string_t& image_url) {
+void DownloadImage(int id, const std::wstring& image_url) {
   if (image_url.empty())
     return;
 

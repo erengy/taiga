@@ -184,7 +184,7 @@ void HttpManager::MakeRequest(HttpRequest& request, HttpClientMode mode) {
   ProcessQueue();
 }
 
-void HttpManager::HandleError(HttpResponse& response, const string_t& error) {
+void HttpManager::HandleError(HttpResponse& response, const std::wstring& error) {
   HttpClient& client = *FindClient(response.uid);
 
   switch (client.mode()) {
@@ -411,7 +411,7 @@ void HttpManager::ProcessQueue() {
   }
 }
 
-void HttpManager::AddConnection(const string_t& hostname) {
+void HttpManager::AddConnection(const std::wstring& hostname) {
   win::Lock lock(critical_section_);
 
   connections_[hostname]++;
@@ -419,7 +419,7 @@ void HttpManager::AddConnection(const string_t& hostname) {
        connections_[hostname], hostname);
 }
 
-void HttpManager::FreeConnection(const string_t& hostname) {
+void HttpManager::FreeConnection(const std::wstring& hostname) {
   win::Lock lock(critical_section_);
 
   if (connections_[hostname] > 0) {

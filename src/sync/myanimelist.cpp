@@ -297,21 +297,21 @@ void Service::GetMetadataById(Response& response, HttpResponse& http_response) {
   // - Rank
   // - Popularity
   // - Members
-  string_t id = InStr(http_response.body,
+  std::wstring id = InStr(http_response.body,
       L"/anime/", L"/");
-  string_t title = InStr(http_response.body,
+  std::wstring title = InStr(http_response.body,
       L"class=\"hovertitle\">", L"</a>");
-  string_t genres = InStr(http_response.body,
+  std::wstring genres = InStr(http_response.body,
       L"Genres:</span> ", L"<br />");
-  string_t status = InStr(http_response.body,
+  std::wstring status = InStr(http_response.body,
       L"Status:</span> ", L"<br />");
-  string_t type = InStr(http_response.body,
+  std::wstring type = InStr(http_response.body,
       L"Type:</span> ", L"<br />");
-  string_t episodes = InStr(http_response.body,
+  std::wstring episodes = InStr(http_response.body,
       L"Episodes:</span> ", L"<br />");
-  string_t score = InStr(http_response.body,
+  std::wstring score = InStr(http_response.body,
       L"Score:</span> ", L"<br />");
-  string_t popularity = InStr(http_response.body,
+  std::wstring popularity = InStr(http_response.body,
       L"Popularity:</span> ", L"<br />");
 
   bool title_is_truncated = false;

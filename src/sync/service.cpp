@@ -44,7 +44,7 @@ bool Service::RequestNeedsAuthentication(RequestType request_type) const {
   return false;
 }
 
-const string_t& Service::host() const {
+const std::wstring& Service::host() const {
   return host_;
 }
 
@@ -52,11 +52,11 @@ enum_t Service::id() const {
   return id_;
 }
 
-const string_t& Service::canonical_name() const {
+const std::wstring& Service::canonical_name() const {
   return canonical_name_;
 }
 
-const string_t& Service::name() const {
+const std::wstring& Service::name() const {
   return name_;
 }
 

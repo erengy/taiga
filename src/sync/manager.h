@@ -39,14 +39,14 @@ public:
   ~Manager();
 
   void MakeRequest(Request& request);
-  void HandleHttpError(HttpResponse& http_response, string_t error);
+  void HandleHttpError(HttpResponse& http_response, std::wstring error);
   void HandleHttpResponse(HttpResponse& http_response);
 
   Service* service(ServiceId service_id) const;
-  Service* service(const string_t& canonical_name) const;
+  Service* service(const std::wstring& canonical_name) const;
 
-  ServiceId GetServiceIdByName(const string_t& canonical_name) const;
-  string_t GetServiceNameById(ServiceId service_id) const;
+  ServiceId GetServiceIdByName(const std::wstring& canonical_name) const;
+  std::wstring GetServiceNameById(ServiceId service_id) const;
 
 private:
   void HandleError(Response& response, HttpResponse& http_response);

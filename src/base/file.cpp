@@ -411,7 +411,7 @@ bool ReadFromFile(const std::wstring& path, std::string& output) {
   return result != FALSE && bytes_read == output.size();
 }
 
-bool SaveToFile(LPCVOID data, DWORD length, const string_t& path,
+bool SaveToFile(LPCVOID data, DWORD length, const std::wstring& path,
                 bool take_backup) {
   // Make sure the path is available
   CreateFolder(GetPathOnly(path));

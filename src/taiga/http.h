@@ -84,7 +84,7 @@ public:
   void CancelRequest(base::uid_t uid);
   void MakeRequest(HttpRequest& request, HttpClientMode mode);
 
-  void HandleError(HttpResponse& response, const string_t& error);
+  void HandleError(HttpResponse& response, const std::wstring& error);
   void HandleRedirect(const std::wstring& current_host, const std::wstring& next_host);
   void HandleResponse(HttpResponse& response);
 
@@ -97,8 +97,8 @@ private:
 
   void AddToQueue(HttpRequest& request, HttpClientMode mode);
   void ProcessQueue();
-  void AddConnection(const string_t& hostname);
-  void FreeConnection(const string_t& hostname);
+  void AddConnection(const std::wstring& hostname);
+  void FreeConnection(const std::wstring& hostname);
 
   std::list<HttpClient> clients_;
   std::map<std::wstring, unsigned int> connections_;
