@@ -46,7 +46,7 @@ public:
   std::optional<int> score;
   std::optional<Date> date_start;
   std::optional<Date> date_finish;
-  std::optional<int> enable_rewatching;
+  std::optional<bool> enable_rewatching;
   std::optional<int> rewatched_times;
   std::optional<std::wstring> tags;
   std::optional<std::wstring> notes;

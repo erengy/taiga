@@ -327,9 +327,9 @@ int Item::GetMyRewatchedTimes(bool check_queue) const {
   return history_item ? *history_item->rewatched_times : my_info_->rewatched_times;
 }
 
-int Item::GetMyRewatching(bool check_queue) const {
+bool Item::GetMyRewatching(bool check_queue) const {
   if (!my_info_.get())
-    return FALSE;
+    return false;
 
   HistoryItem* history_item = check_queue ?
       SearchHistory(QueueSearch::Rewatching) : nullptr;
@@ -423,7 +423,7 @@ void Item::SetMyRewatchedTimes(int rewatched_times) {
   my_info_->rewatched_times = rewatched_times;
 }
 
-void Item::SetMyRewatching(int rewatching) {
+void Item::SetMyRewatching(bool rewatching) {
   assert(my_info_.get());
 
   my_info_->rewatching = rewatching;

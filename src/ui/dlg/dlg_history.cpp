@@ -210,7 +210,7 @@ void HistoryDialog::RefreshList() {
     if (it->score)
       AppendString(details, L"Score: " + ui::TranslateMyScore(*it->score));
     if (it->status)
-      AppendString(details, !it->enable_rewatching || *it->enable_rewatching != TRUE ?
+      AppendString(details, !it->enable_rewatching || *it->enable_rewatching != true ?
                    L"Status: " + ui::TranslateMyStatus(*it->status, false) : L"Rewatching");
     if (it->tags)
       AppendString(details, L"Tags: \"{}\""_format(*it->tags));

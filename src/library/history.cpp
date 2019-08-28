@@ -435,6 +435,8 @@ void History::ReadQueue(const pugi::xml_document& document) {
     history_item.mode = TranslateModeFromString(item.attribute(L"mode").value());
     history_item.time = item.attribute(L"time").value();
 
+    #define READ_ATTRIBUTE_BOOL(x, y) \
+        if (!item.attribute(y).empty()) x = item.attribute(y).as_bool();
     #define READ_ATTRIBUTE_INT(x, y) \
         if (!item.attribute(y).empty()) x = item.attribute(y).as_int();
     #define READ_ATTRIBUTE_STR(x, y) \
@@ -445,7 +447,7 @@ void History::ReadQueue(const pugi::xml_document& document) {
     READ_ATTRIBUTE_INT(history_item.episode, L"episode");
     READ_ATTRIBUTE_INT(history_item.score, L"score");
     READ_ATTRIBUTE_INT(history_item.status, L"status");
-    READ_ATTRIBUTE_INT(history_item.enable_rewatching, L"enable_rewatching");
+    READ_ATTRIBUTE_BOOL(history_item.enable_rewatching, L"enable_rewatching");
     READ_ATTRIBUTE_INT(history_item.rewatched_times, L"rewatched_times");
     READ_ATTRIBUTE_STR(history_item.tags, L"tags");
     READ_ATTRIBUTE_STR(history_item.notes, L"notes");
@@ -487,7 +489,7 @@ bool History::Save() {
   xml_node node_queue = node_history.append_child(L"queue");
   for (const auto& history_item : queue.items) {
     xml_node node_item = node_queue.append_child(L"item");
-    #define APPEND_ATTRIBUTE_INT(x, y) \
+    #define APPEND_ATTRIBUTE(x, y) \
         if (y) node_item.append_attribute(x) = *y;
     #define APPEND_ATTRIBUTE_STR(x, y) \
         if (y) node_item.append_attribute(x) = (*y).c_str();
@@ -496,18 +498,18 @@ bool History::Save() {
     node_item.append_attribute(L"anime_id") = history_item.anime_id;
     node_item.append_attribute(L"mode") = TranslateModeToString(history_item.mode).c_str();
     node_item.append_attribute(L"time") = history_item.time.c_str();
-    APPEND_ATTRIBUTE_INT(L"episode", history_item.episode);
-    APPEND_ATTRIBUTE_INT(L"score", history_item.score);
-    APPEND_ATTRIBUTE_INT(L"status", history_item.status);
-    APPEND_ATTRIBUTE_INT(L"enable_rewatching", history_item.enable_rewatching);
-    APPEND_ATTRIBUTE_INT(L"rewatched_times", history_item.rewatched_times);
+    APPEND_ATTRIBUTE(L"episode", history_item.episode);
+    APPEND_ATTRIBUTE(L"score", history_item.score);
+    APPEND_ATTRIBUTE(L"status", history_item.status);
+    APPEND_ATTRIBUTE(L"enable_rewatching", history_item.enable_rewatching);
+    APPEND_ATTRIBUTE(L"rewatched_times", history_item.rewatched_times);
     APPEND_ATTRIBUTE_STR(L"tags", history_item.tags);
     APPEND_ATTRIBUTE_STR(L"notes", history_item.notes);
     APPEND_ATTRIBUTE_DATE(L"date_start", history_item.date_start);
     APPEND_ATTRIBUTE_DATE(L"date_finish", history_item.date_finish);
     #undef APPEND_ATTRIBUTE_DATE
     #undef APPEND_ATTRIBUTE_STR
-    #undef APPEND_ATTRIBUTE_INT
+    #undef APPEND_ATTRIBUTE
   }
 
   return XmlWriteDocumentToFile(document, path);

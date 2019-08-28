@@ -598,7 +598,7 @@ int OnHistoryProcessConfirmationQueue(anime::Episode& episode) {
     episode.set_episode_number(1);
 
   if (anime_item->GetMyStatus() != anime::kNotInList &&
-      anime_item->GetMyRewatching() == FALSE) {
+      anime_item->GetMyRewatching() == false) {
     if (anime_item->GetEpisodeCount() == number) {  // Completed
       dlg.AddButton(L"Update and move\n"
                     L"Update and set as completed", IDCANCEL);

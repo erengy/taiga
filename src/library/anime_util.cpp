@@ -381,7 +381,7 @@ bool StartNewRewatch(int anime_id) {
   HistoryItem history_item;
   history_item.anime_id = anime_item->GetId();
   history_item.status = kWatching;
-  history_item.enable_rewatching = TRUE;
+  history_item.enable_rewatching = true;
   history_item.episode = 0;
   History.queue.Add(history_item);
 
@@ -484,7 +484,7 @@ bool IsUpdateAllowed(Item& item, const Episode& episode, bool ignore_update_time
       return false;
   }
 
-  if (item.GetMyStatus() == kCompleted && item.GetMyRewatching() == 0)
+  if (item.GetMyStatus() == kCompleted && !item.GetMyRewatching())
     return false;
 
   int number = GetEpisodeHigh(episode);
@@ -540,7 +540,7 @@ void AddToQueue(Item& item, const Episode& episode, bool change_status) {
   // Set rewatching status
   if (item.GetMyRewatching()) {
     if (*history_item.episode == item.GetEpisodeCount() && *history_item.episode > 0) {
-      history_item.enable_rewatching = FALSE;
+      history_item.enable_rewatching = false;
       history_item.rewatched_times = item.GetMyRewatchedTimes() + 1;
     }
   }

@@ -119,7 +119,7 @@ struct MyInformation {
   int score = 0;
   int status = MyStatus::kNotInList;
   int rewatched_times = 0;
-  int rewatching = FALSE;
+  bool rewatching = false;
   int rewatching_ep = 0;
   Date date_start;
   Date date_finish;

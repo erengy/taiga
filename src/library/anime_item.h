@@ -103,7 +103,7 @@ public:
   int GetMyScore(bool check_queue = true) const;
   int GetMyStatus(bool check_queue = true) const;
   int GetMyRewatchedTimes(bool check_queue = true) const;
-  int GetMyRewatching(bool check_queue = true) const;
+  bool GetMyRewatching(bool check_queue = true) const;
   int GetMyRewatchingEp() const;
   const Date& GetMyDateStart(bool check_queue = true) const;
   const Date& GetMyDateEnd(bool check_queue = true) const;
@@ -116,7 +116,7 @@ public:
   void SetMyScore(int score);
   void SetMyStatus(int status);
   void SetMyRewatchedTimes(int rewatched_times);
-  void SetMyRewatching(int rewatching);
+  void SetMyRewatching(bool rewatching);
   void SetMyRewatchingEp(int rewatching_ep);
   void SetMyDateStart(const Date& date);
   void SetMyDateStart(const std::wstring& date);
