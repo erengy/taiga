@@ -182,6 +182,7 @@
     <ClCompile Include="..\..\deps\src\zlib\trees.c" />
     <ClCompile Include="..\..\deps\src\zlib\uncompr.c" />
     <ClCompile Include="..\..\deps\src\zlib\zutil.c" />
+    <ClCompile Include="..\..\src\base\atf.cpp" />
     <ClCompile Include="..\..\src\base\base64.cpp" />
     <ClCompile Include="..\..\src\base\command_line.cpp" />
     <ClCompile Include="..\..\src\base\crypto.cpp" />
@@ -363,6 +364,7 @@
     <ClInclude Include="..\..\deps\src\zlib\zconf.h" />
     <ClInclude Include="..\..\deps\src\zlib\zlib.h" />
     <ClInclude Include="..\..\deps\src\zlib\zutil.h" />
+    <ClInclude Include="..\..\src\base\atf.h" />
     <ClInclude Include="..\..\src\base\base64.h" />
     <ClInclude Include="..\..\src\base\command_line.h" />
     <ClInclude Include="..\..\src\base\comparable.h" />

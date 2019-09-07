@@ -18,20 +18,14 @@
 
 #pragma once
 
+#include <map>
+#include <optional>
 #include <string>
-#include <windows.h>
 
-namespace anime {
-class Episode;
-}
+namespace atf {
 
-void ExecuteAction(std::wstring action, WPARAM wParam = 0, LPARAM lParam = 0);
+using field_map_t = std::map<std::wstring, std::optional<std::wstring>>;
 
-bool IsScriptFunction(const std::wstring& str);
-bool IsScriptVariable(const std::wstring& str);
+std::wstring Replace(std::wstring str, const field_map_t& map);
 
-std::wstring ReplaceVariables(const std::wstring& str,
-                              const anime::Episode& episode,
-                              bool url_encode = false,
-                              bool is_manual = false,
-                              bool is_preview = false);
+}  // namespace atf
