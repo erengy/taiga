@@ -16,52 +16,23 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <array>
 #include <cmath>
 
 #include "taiga/orange.h"
 
 namespace taiga {
 
-Orange orange;
-
-int Orange::note_list_[][2] = {
-  {84, 1},  // 1/2
-  {84, 2},  // 1/4
-  {86, 4},  // 1/8
-  {84, 2},  // 1/4
-  {82, 2},  // 1/4
-  {81, 2},  // 1/4
-  {77, 4},  // 1/8
-  {79, 4},  // 1/8
-  {72, 4},  // 1/8
-  {77, 1},  // 1/2
-  {76, 4},  // 1/8
-  {77, 4},  // 1/8
-  {79, 4},  // 1/8
-  {81, 2},  // 1/4
-  {79, 2},  // 1/4
-  {77, 2},  // 1/4
-  {79, 2},  // 1/4
-  {81, 4},  // 1/8
-  {84, 1},  // 1/2
-  {84, 2},  // 1/2
-  {86, 4},  // 1/8
-  {84, 2},  // 1/4
-  {82, 2},  // 1/4
-  {81, 2},  // 1/4
-  {77, 4},  // 1/8
-  {79, 4},  // 1/8
-  {72, 4},  // 1/8
-  {77, 1},  // 1/2
-  {76, 4},  // 1/8
-  {77, 4},  // 1/8
-  {76, 4},  // 1/8
-  {74, 1}   // 1/1
-};
-
-Orange::Orange()
-    : play_(false) {
-}
+constexpr std::array<std::pair<int, float>, 32> notes{{
+      {84, 1/2.f}, {84, 1/4.f}, {86, 1/8.f}, {84, 1/4.f},
+      {82, 1/4.f}, {81, 1/4.f}, {77, 1/8.f}, {79, 1/8.f},
+      {72, 1/8.f}, {77, 1/2.f}, {76, 1/8.f}, {77, 1/8.f},
+      {79, 1/8.f}, {81, 1/4.f}, {79, 1/4.f}, {77, 1/4.f},
+      {79, 1/4.f}, {81, 1/8.f}, {84, 1/2.f}, {84, 1/4.f},
+      {86, 1/8.f}, {84, 1/4.f}, {82, 1/4.f}, {81, 1/4.f},
+      {77, 1/8.f}, {79, 1/8.f}, {72, 1/8.f}, {77, 1/2.f},
+      {76, 1/8.f}, {77, 1/8.f}, {76, 1/8.f}, {74, 1/2.f},
+    }};
 
 Orange::~Orange() {
   Stop();
@@ -69,44 +40,41 @@ Orange::~Orange() {
 
 void Orange::Start() {
   Stop();
-  play_ = true;
+  playing_ = true;
 
   if (!GetThreadHandle())
     CreateThread(nullptr, 0, 0);
 }
 
 void Orange::Stop() {
-  play_ = false;
+  playing_ = false;
 
   if (GetThreadHandle()) {
-    WaitForSingleObject(GetThreadHandle(), INFINITE);
+    ::WaitForSingleObject(GetThreadHandle(), INFINITE);
     CloseThreadHandle();
   }
 }
 
 DWORD Orange::ThreadProc() {
-  size_t note_count = 32;
-  size_t note_index = 0;
-
-  while (play_ && note_index < note_count) {
-    int note = note_list_[note_index][0];
-
-    DWORD frequency = static_cast<DWORD>(NoteToFrequency(note));
-    DWORD duration = 800 / note_list_[note_index][1];
-
-    Beep(frequency, duration);
-
-    note_index++;
+  constexpr auto get_frequency = [](const int note) {
+    if (note < 0 || note > 119)
+      return -1.0f;
+    return 440.0f * std::pow(2.0f, static_cast<float>(note - 57) / 12.0f);
   };
 
+  constexpr auto get_duration = [](const float duration) {
+    return 1600 * duration;
+  };
+
+  for (const auto& [note, duration] : notes) {
+    if (!playing_)
+      break;
+
+    ::Beep(static_cast<DWORD>(get_frequency(note)),
+           static_cast<DWORD>(get_duration(duration)));
+  }
+
   return 0;
-}
-
-float Orange::NoteToFrequency(int n) {
-  if (n < 0 || n > 119)
-    return -1.0f;
-
-  return 440.0f * std::pow(2.0f, static_cast<float>(n - 57) / 12.0f);
 }
 
 }  // namespace taiga

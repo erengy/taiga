@@ -24,7 +24,6 @@ namespace taiga {
 
 class Orange : public win::Thread {
 public:
-  Orange();
   ~Orange();
 
   void Start();
@@ -33,12 +32,9 @@ public:
   DWORD ThreadProc();
 
 private:
-  float NoteToFrequency(int n);
-
-  static int note_list_[][2];
-  bool play_;
+  bool playing_ = false;
 };
 
-extern Orange orange;
+inline Orange orange;
 
 }  // namespace taiga
