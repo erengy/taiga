@@ -584,7 +584,7 @@ int OnHistoryProcessConfirmationQueue(anime::Episode& episode) {
 
   win::TaskDialog dlg;
   std::wstring title = L"Anime title: " + anime::GetPreferredTitle(*anime_item);
-  dlg.SetWindowTitle(TAIGA_APP_TITLE);
+  dlg.SetWindowTitle(TAIGA_APP_NAME);
   dlg.SetMainIcon(TD_ICON_INFORMATION);
   dlg.SetMainInstruction(L"Do you want to update your anime list?");
   dlg.SetContent(title.c_str());
@@ -817,7 +817,7 @@ bool OnSeasonRefreshRequired() {
 ////////////////////////////////////////////////////////////////////////////////
 
 void OnSettingsAccountEmpty() {
-  win::TaskDialog dlg(TAIGA_APP_TITLE, TD_ICON_INFORMATION);
+  win::TaskDialog dlg(TAIGA_APP_NAME, TD_ICON_INFORMATION);
   dlg.SetMainInstruction(L"Would you like to set your account information?");
   dlg.SetContent(L"Anime search requires authentication, which means, you need "
                  L"to enter a valid username and password to search "
@@ -851,7 +851,7 @@ void OnSettingsChange() {
 }
 
 void OnSettingsLibraryFoldersEmpty() {
-  win::TaskDialog dlg(TAIGA_APP_TITLE, TD_ICON_INFORMATION);
+  win::TaskDialog dlg(TAIGA_APP_NAME, TD_ICON_INFORMATION);
   dlg.SetMainInstruction(L"Would you like to set library folders first?");
   dlg.SetContent(L"You need to have at least one library folder set before "
                  L"scanning available episodes.");
@@ -879,7 +879,7 @@ void OnSettingsServiceChange() {
 
 bool OnSettingsServiceChangeConfirm(const std::wstring& current_service,
                                     const std::wstring& new_service) {
-  win::TaskDialog dlg(TAIGA_APP_TITLE, TD_ICON_WARNING);
+  win::TaskDialog dlg(TAIGA_APP_NAME, TD_ICON_WARNING);
   std::wstring instruction =
       L"Do you want to change the active service from {} to {}?"_format(
       ServiceManager.service(current_service)->name(),
@@ -898,7 +898,7 @@ bool OnSettingsServiceChangeConfirm(const std::wstring& current_service,
 }
 
 void OnSettingsServiceChangeFailed() {
-  win::TaskDialog dlg(TAIGA_APP_TITLE, TD_ICON_ERROR);
+  win::TaskDialog dlg(TAIGA_APP_NAME, TD_ICON_ERROR);
   dlg.SetMainInstruction(L"You cannot change the active service while there "
                          L"are queued items in your History.");
   dlg.SetContent(L"Synchronize your list or clear the queue, and try again.");
@@ -1127,7 +1127,7 @@ void OnUpdateNotAvailable(bool relations) {
 
 void OnUpdateFailed() {
   win::TaskDialog dlg;
-  dlg.SetWindowTitle(TAIGA_APP_TITLE);
+  dlg.SetWindowTitle(TAIGA_APP_NAME);
   dlg.SetMainIcon(TD_ICON_ERROR);
   dlg.SetMainInstruction(L"Could not download the latest update.");
   dlg.Show(DlgUpdate.GetWindowHandle());

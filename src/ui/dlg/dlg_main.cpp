@@ -85,7 +85,7 @@ BOOL MainDialog::OnInitDialog() {
   taiga::timers.Initialize();
 
   // Add icon to taskbar
-  taskbar.Create(GetWindowHandle(), kAppSysTrayId, nullptr, TAIGA_APP_TITLE);
+  taskbar.Create(GetWindowHandle(), kAppSysTrayId, nullptr, TAIGA_APP_NAME);
 
   ChangeStatus();
   UpdateTip();
@@ -109,7 +109,7 @@ BOOL MainDialog::OnInitDialog() {
   InitWindowPosition();
 
   if (!sync::IsUserAccountAvailable()) {
-    win::TaskDialog dlg(TAIGA_APP_TITLE, TD_ICON_INFORMATION);
+    win::TaskDialog dlg(TAIGA_APP_NAME, TD_ICON_INFORMATION);
     dlg.SetMainInstruction(L"Welcome to Taiga!");
     dlg.SetContent(L"Would you like set up your account now?");
     dlg.AddButton(L"Yes", IDYES);
@@ -627,7 +627,7 @@ void MainDialog::OnDropFiles(HDROP hDropInfo) {
     anime::Episode episode;
     track::recognition::ParseOptions parse_options;
     Meow.Parse(buffer, parse_options, episode);
-    MessageBox(ReplaceVariables(Settings[taiga::kSync_Notify_Format], episode).c_str(), TAIGA_APP_TITLE, MB_OK);
+    MessageBox(ReplaceVariables(Settings[taiga::kSync_Notify_Format], episode).c_str(), TAIGA_APP_NAME, MB_OK);
   }
 #endif
 }
@@ -692,7 +692,7 @@ void MainDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
 void MainDialog::OnTaskbarCallback(UINT uMsg, LPARAM lParam) {
   // Taskbar creation notification
   if (uMsg == WM_TASKBARCREATED) {
-    taskbar.Create(GetWindowHandle(), kAppSysTrayId, nullptr, TAIGA_APP_TITLE);
+    taskbar.Create(GetWindowHandle(), kAppSysTrayId, nullptr, TAIGA_APP_NAME);
 
   // Windows 7 taskbar interface
   } else if (uMsg == WM_TASKBARBUTTONCREATED) {
@@ -852,7 +852,7 @@ void MainDialog::UpdateStatusTimer() {
 }
 
 void MainDialog::UpdateTip() {
-  std::wstring tip = TAIGA_APP_TITLE;
+  std::wstring tip = TAIGA_APP_NAME;
   if (Taiga.options.debug_mode)
     tip += L" [debug]";
 
@@ -866,7 +866,7 @@ void MainDialog::UpdateTip() {
 }
 
 void MainDialog::UpdateTitle() {
-  std::wstring title = TAIGA_APP_TITLE;
+  std::wstring title = TAIGA_APP_NAME;
   if (Taiga.options.debug_mode)
     title += L" [debug]";
 

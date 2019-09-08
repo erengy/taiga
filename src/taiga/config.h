@@ -28,7 +28,6 @@
 #include "../base/preprocessor.h"
 
 #define TAIGA_APP_NAME  L"Taiga"
-#define TAIGA_APP_TITLE L"Taiga"  // @TODO: Remove
 #define TAIGA_APP_MUTEX L"Taiga-33d5a63c-de90-432f-9a8b-f6f733dab258"
 
 #define TAIGA_VERSION_MAJOR 1

@@ -16,13 +16,12 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <map>
+#include "taiga/path.h"
 
 #include "base/file.h"
 #include "base/string.h"
 #include "sync/manager.h"
 #include "taiga/config.h"
-#include "taiga/path.h"
 #include "taiga/settings.h"
 #include "taiga/taiga.h"
 

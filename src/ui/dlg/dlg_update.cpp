@@ -43,7 +43,7 @@ BOOL UpdateDialog::OnInitDialog() {
   Theme.CreateFonts(GetDC());
 
   // Set title
-  SetText(TAIGA_APP_TITLE);
+  SetText(TAIGA_APP_NAME);
 
   // Set progress text
   SetDlgItemText(IDC_STATIC_UPDATE_PROGRESS, L"Checking updates...");

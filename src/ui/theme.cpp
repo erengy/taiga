@@ -39,7 +39,7 @@ bool ThemeManager::Load() {
   xml_parse_result parse_result = document.load_file(path.c_str());
 
   if (parse_result.status != pugi::status_ok) {
-    ui::DisplayErrorMessage(L"Could not read theme file:\n" + path, TAIGA_APP_TITLE);
+    ui::DisplayErrorMessage(L"Could not read theme file:\n" + path, TAIGA_APP_NAME);
     return false;
   }
 
