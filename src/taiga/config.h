@@ -18,11 +18,18 @@
 
 #pragma once
 
+// @NOTE: Make sure to update the following files after changing the names of
+// macros defined here:
+//
+// - /setup/Taiga.nsi
+// - /src/taiga/resource.rc
+
 // Relative path to avoid RC1015 error with version.rc
 #include "../base/preprocessor.h"
 
 #define TAIGA_APP_NAME  L"Taiga"
-#define TAIGA_APP_TITLE L"Taiga"
+#define TAIGA_APP_TITLE L"Taiga"  // @TODO: Remove
+#define TAIGA_APP_MUTEX L"Taiga-33d5a63c-de90-432f-9a8b-f6f733dab258"
 
 #define TAIGA_VERSION_MAJOR 1
 #define TAIGA_VERSION_MINOR 4

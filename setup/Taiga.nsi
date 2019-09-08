@@ -4,8 +4,9 @@
 ; ------------------------------------------------------------------------------
 ; General
 
-; Version number
+; Configuration
 !define CONFIG_PATH "..\src\taiga\config.h"
+!searchparse /file "${CONFIG_PATH}" `#define TAIGA_APP_MUTEX ` PRODUCT_MUTEX
 !searchparse /file "${CONFIG_PATH}" `#define TAIGA_VERSION_MAJOR ` VERSION_MAJOR
 !searchparse /file "${CONFIG_PATH}" `#define TAIGA_VERSION_MINOR ` VERSION_MINOR
 !searchparse /file "${CONFIG_PATH}" `#define TAIGA_VERSION_PATCH ` VERSION_PATCH
@@ -195,7 +196,7 @@ Function CheckInstance
   IntOp $secondsWaited 0 + 0
 
   checkInstanceLoop:
-    System::Call "kernel32::OpenMutex(i 0x100000, b 0, t 'Taiga-33d5a63c-de90-432f-9a8b-f6f733dab258') i .R0"
+    System::Call "kernel32::OpenMutex(i 0x100000, b 0, t '${PRODUCT_MUTEX}') i .R0"
     IntCmp $R0 0 skipInstanceCheck
     System::Call "kernel32::CloseHandle(i $R0)"
 

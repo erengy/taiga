@@ -96,8 +96,7 @@ BOOL App::InitInstance() {
 
   // Check another instance
   if (!options.allow_multiple_instances) {
-    if (CheckInstance(L"Taiga-33d5a63c-de90-432f-9a8b-f6f733dab258",
-                      L"TaigaMainW")) {
+    if (CheckInstance(TAIGA_APP_MUTEX, L"TaigaMainW")) {
       LOGD(L"Another instance of Taiga is running.");
       return FALSE;
     }
