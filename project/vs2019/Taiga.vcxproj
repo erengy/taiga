@@ -60,7 +60,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;NOMINMAX;_WINDOWS;_WIN32_WINNT=0x0600;PUGIXML_NO_XPATH;PUGIXML_WCHAR_MODE;FMT_EXCEPTIONS=0;UTF8PROC_STATIC;CURL_STATICLIB;HTTP_ONLY;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)\x\x\%(RelativeDir)</ObjectFileName>
-      <AdditionalIncludeDirectories>..\..\deps\src;..\..\deps\src\curl\include;..\..\deps\src\date\include;..\..\deps\src\discord-rpc\include;..\..\deps\src\fmt\include;..\..\deps\src\json\single_include;..\..\deps\src\rapidjson\include;..\..\deps\src\semaver\src;..\..\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\deps\src;..\..\deps\src\curl\include;..\..\deps\src\date\include;..\..\deps\src\discord-rpc\include;..\..\deps\src\fmt\include;..\..\deps\src\json\single_include;..\..\deps\src\rapidjson\include;..\..\deps\src\semaver\include;..\..\src</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -88,7 +88,7 @@
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <ObjectFileName>$(IntDir)\x\x\%(RelativeDir)</ObjectFileName>
-      <AdditionalIncludeDirectories>..\..\deps\src;..\..\deps\src\curl\include;..\..\deps\src\date\include;..\..\deps\src\discord-rpc\include;..\..\deps\src\fmt\include;..\..\deps\src\json\single_include;..\..\deps\src\rapidjson\include;..\..\deps\src\semaver\src;..\..\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\deps\src;..\..\deps\src\curl\include;..\..\deps\src\date\include;..\..\deps\src\discord-rpc\include;..\..\deps\src\fmt\include;..\..\deps\src\json\single_include;..\..\deps\src\rapidjson\include;..\..\deps\src\semaver\include;..\..\src</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -330,7 +330,7 @@
     <ClInclude Include="..\..\deps\src\monolog\monolog.h" />
     <ClInclude Include="..\..\deps\src\pugixml\src\pugiconfig.hpp" />
     <ClInclude Include="..\..\deps\src\pugixml\src\pugixml.hpp" />
-    <ClInclude Include="..\..\deps\src\semaver\src\semaver.hpp" />
+    <ClInclude Include="..\..\deps\src\semaver\include\semaver.hpp" />
     <ClInclude Include="..\..\deps\src\utf8proc\utf8proc.h" />
     <ClInclude Include="..\..\deps\src\utf8proc\utf8proc_data.c" />
     <ClInclude Include="..\..\deps\src\windows\win\application.h" />

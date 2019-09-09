@@ -18,7 +18,7 @@
 
 #include <regex>
 
-#include <semaver/src/semaver.hpp>
+#include <semaver.hpp>
 
 #include "base/file.h"
 #include "base/format.h"
@@ -193,7 +193,7 @@ bool Engine::ReadRelations(const std::string& document) {
           auto name = match_results[1].str();
           auto value = match_results[2].str();
           if (name == L"version") {
-            semaver::Version version(WstrToStr(value));
+            const semaver::Version version(WstrToStr(value));
             if (version > taiga::version())
               LOGD(L"Anime relations version is larger than application version.");
           } else if (name == L"last_modified") {

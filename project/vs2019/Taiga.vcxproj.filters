@@ -819,9 +819,6 @@
     <ClInclude Include="..\..\deps\src\pugixml\src\pugixml.hpp">
       <Filter>deps\pugixml</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\deps\src\semaver\src\semaver.hpp">
-      <Filter>deps\semaver</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\deps\src\utf8proc\utf8proc.h">
       <Filter>deps\utf8proc</Filter>
     </ClInclude>
@@ -1160,6 +1157,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\base\atf.h">
       <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\semaver\include\semaver.hpp">
+      <Filter>deps\semaver</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
