@@ -488,7 +488,7 @@ int SettingsDialog::AddTorrentFilterToList(HWND hwnd_list, const FeedFilter& fil
 
 void SettingsDialog::RefreshCache() {
   std::wstring text;
-  Stats.CalculateLocalData();
+  taiga::stats.CalculateLocalData();
   SettingsPage& page = pages[kSettingsPageLibraryCache];
 
   // History
@@ -496,11 +496,11 @@ void SettingsDialog::RefreshCache() {
   page.SetDlgItemText(IDC_STATIC_CACHE1, text.c_str());
 
   // Image files
-  text = ToWstr(Stats.image_count) + L" item(s), " + ToSizeString(Stats.image_size);
+  text = ToWstr(taiga::stats.image_count) + L" item(s), " + ToSizeString(taiga::stats.image_size);
   page.SetDlgItemText(IDC_STATIC_CACHE2, text.c_str());
 
   // Torrent files
-  text = ToWstr(Stats.torrent_count) + L" item(s), " + ToSizeString(Stats.torrent_size);
+  text = ToWstr(taiga::stats.torrent_count) + L" item(s), " + ToSizeString(taiga::stats.torrent_size);
   page.SetDlgItemText(IDC_STATIC_CACHE3, text.c_str());
 
   // Torrent history

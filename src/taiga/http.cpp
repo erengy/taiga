@@ -98,7 +98,7 @@ void HttpClient::OnError(CURLcode error_code) {
 
   ui::OnHttpError(*this, error_text);
 
-  Stats.connections_failed++;
+  taiga::stats.connections_failed++;
 
   ConnectionManager.HandleError(response_, error_text);
 }
@@ -161,7 +161,7 @@ bool HttpClient::OnProgress() {
 void HttpClient::OnReadComplete() {
   ui::OnHttpReadComplete(*this);
 
-  Stats.connections_succeeded++;
+  taiga::stats.connections_succeeded++;
 
   ConnectionManager.HandleResponse(response_);
 }

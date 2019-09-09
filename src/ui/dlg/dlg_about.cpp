@@ -152,7 +152,7 @@ BOOL AboutDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
       // Icon click
       if (HIWORD(wParam) == STN_DBLCLK) {
         SetText(L"Orange");
-        Stats.tigers_harmed++;
+        taiga::stats.tigers_harmed++;
         taiga::orange.Start();
         return TRUE;
       }

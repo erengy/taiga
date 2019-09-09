@@ -18,16 +18,13 @@
 
 #pragma once
 
+#include <array>
 #include <string>
-#include <vector>
 
 namespace taiga {
 
 class Statistics {
 public:
-  Statistics();
-  ~Statistics() {}
-
   void CalculateAll();
   int CalculateAnimeCount();
   int CalculateEpisodeCount();
@@ -36,27 +33,26 @@ public:
   void CalculateLocalData();
   float CalculateMeanScore();
   float CalculateScoreDeviation();
-  const std::vector<float>& CalculateScoreDistribution();
+  const std::array<float, 11>& CalculateScoreDistribution();
 
-public:
-  int anime_count;
-  int connections_failed;
-  int connections_succeeded;
-  int episode_count;
-  unsigned int image_count;
-  unsigned long long image_size;
+  int anime_count = 0;
+  int connections_failed = 0;
+  int connections_succeeded = 0;
+  int episode_count = 0;
+  unsigned int image_count = 0;
+  unsigned long long image_size = 0;
   std::wstring life_planned_to_watch;
   std::wstring life_spent_watching;
-  float score_mean;
-  float score_deviation;
-  std::vector<int> score_count;
-  std::vector<float> score_distribution;
-  int tigers_harmed;
-  unsigned int torrent_count;
-  unsigned long long torrent_size;
-  int uptime;
+  float score_mean = 0.0f;
+  float score_deviation = 0.0f;
+  std::array<int, 11> score_count{0};
+  std::array<float, 11> score_distribution{0.0f};
+  int tigers_harmed = 0;
+  unsigned int torrent_count = 0;
+  unsigned long long torrent_size = 0;
+  int uptime = 0;
 };
 
-}  // namespace taiga
+inline taiga::Statistics stats;
 
-extern taiga::Statistics Stats;
+}  // namespace taiga

@@ -473,7 +473,7 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
               return TRUE;
             case kSidebarItemStats:
               // Refresh stats
-              Stats.CalculateAll();
+              taiga::stats.CalculateAll();
               DlgStats.Refresh();
               return TRUE;
             case kSidebarItemSearch:

@@ -95,7 +95,7 @@ void Timer::OnTimeout() {
       break;
 
     case kTimerStats:
-      Stats.CalculateAll();
+      taiga::stats.CalculateAll();
       break;
 
     case kTimerTorrents:
@@ -168,7 +168,7 @@ void TimerManager::UpdateUi() {
 }
 
 void TimerManager::OnTick() {
-  Stats.uptime++;
+  ++taiga::stats.uptime;
 
   UpdateEnabledState();
 

@@ -17,33 +17,17 @@
 */
 
 #include <algorithm>
+#include <cmath>
+#include <vector>
+
+#include "taiga/stats.h"
 
 #include "base/file.h"
 #include "library/anime_db.h"
 #include "library/anime_util.h"
 #include "taiga/path.h"
-#include "taiga/stats.h"
-
-taiga::Statistics Stats;
 
 namespace taiga {
-
-Statistics::Statistics()
-    : anime_count(0),
-      connections_failed(0),
-      connections_succeeded(0),
-      episode_count(0),
-      image_count(0),
-      image_size(0),
-      score_mean(0.0f),
-      score_deviation(0.0f),
-      score_count(11, 0),
-      score_distribution(11, 0.0f),
-      tigers_harmed(0),
-      torrent_count(0),
-      torrent_size(0),
-      uptime(0) {
-}
 
 void Statistics::CalculateAll() {
   CalculateAnimeCount();
@@ -59,9 +43,10 @@ void Statistics::CalculateAll() {
 int Statistics::CalculateAnimeCount() {
   anime_count = 0;
 
-  for (const auto& pair : AnimeDatabase.items)
-    if (pair.second.IsInList())
-      anime_count++;
+  for (const auto& [id, item] : AnimeDatabase.items) {
+    if (item.IsInList())
+      ++anime_count;
+  }
 
   return anime_count;
 }
@@ -69,13 +54,13 @@ int Statistics::CalculateAnimeCount() {
 int Statistics::CalculateEpisodeCount() {
   episode_count = 0;
 
-  for (const auto& pair : AnimeDatabase.items) {
-    if (!pair.second.IsInList())
+  for (const auto& [id, item] : AnimeDatabase.items) {
+    if (!item.IsInList())
       continue;
 
-    episode_count += pair.second.GetMyLastWatchedEpisode();
-    episode_count += anime::GetMyRewatchedTimes(pair.second) *
-                     pair.second.GetEpisodeCount();
+    episode_count += item.GetMyLastWatchedEpisode();
+    episode_count += anime::GetMyRewatchedTimes(item) *
+                     item.GetEpisodeCount();
   }
 
   return episode_count;
@@ -84,9 +69,7 @@ int Statistics::CalculateEpisodeCount() {
 const std::wstring& Statistics::CalculateLifePlannedToWatch() {
   int seconds = 0;
 
-  for (const auto& pair : AnimeDatabase.items) {
-    const auto& item = pair.second;
-
+  for (const auto& [id, item] : AnimeDatabase.items) {
     switch (item.GetMyStatus()) {
       case anime::kNotInList:
       case anime::kCompleted:
@@ -94,7 +77,8 @@ const std::wstring& Statistics::CalculateLifePlannedToWatch() {
         continue;
     }
 
-    int episodes = EstimateEpisodeCount(item) - item.GetMyLastWatchedEpisode();
+    const int episodes = EstimateEpisodeCount(item) -
+                         item.GetMyLastWatchedEpisode();
 
     seconds += (EstimateDuration(item) * 60) * episodes;
   }
@@ -106,9 +90,7 @@ const std::wstring& Statistics::CalculateLifePlannedToWatch() {
 const std::wstring& Statistics::CalculateLifeSpentWatching() {
   int seconds = 0;
 
-  for (const auto& pair : AnimeDatabase.items) {
-    const auto& item = pair.second;
-
+  for (const auto& [id, item] : AnimeDatabase.items) {
     if (!item.IsInList())
       continue;
 
@@ -128,10 +110,9 @@ void Statistics::CalculateLocalData() {
 
   image_count = PopulateFiles(file_list, anime::GetImagePath());
   image_size = GetFolderSize(anime::GetImagePath(), false);
-
   file_list.clear();
-  std::wstring path = taiga::GetPath(taiga::Path::Feed);
 
+  const auto path = taiga::GetPath(taiga::Path::Feed);
   torrent_count = PopulateFiles(file_list, path, L"torrent", true);
   torrent_size = GetFolderSize(path, true);
 }
@@ -140,12 +121,12 @@ float Statistics::CalculateMeanScore() {
   float items_scored = 0.0f;
   float sum_scores = 0.0f;
 
-  for (const auto& pair : AnimeDatabase.items) {
-    if (!pair.second.IsInList())
+  for (const auto& [id, item] : AnimeDatabase.items) {
+    if (!item.IsInList())
       continue;
 
-    if (pair.second.GetMyScore() > 0) {
-      sum_scores += static_cast<float>(pair.second.GetMyScore());
+    if (item.GetMyScore() > 0) {
+      sum_scores += static_cast<float>(item.GetMyScore());
       items_scored++;
     }
   }
@@ -159,42 +140,42 @@ float Statistics::CalculateScoreDeviation() {
   float items_scored = 0.0f;
   float sum_squares = 0.0f;
 
-  for (const auto& pair : AnimeDatabase.items) {
-    if (!pair.second.IsInList())
+  for (const auto& [id, item] : AnimeDatabase.items) {
+    if (!item.IsInList())
       continue;
 
-    if (pair.second.GetMyScore() > 0) {
-      float score = static_cast<float>(pair.second.GetMyScore());
+    if (item.GetMyScore() > 0) {
+      float score = static_cast<float>(item.GetMyScore());
       sum_squares += pow(score - score_mean, 2);
       items_scored++;
     }
   }
 
-  score_deviation = items_scored > 0 ? sqrt(sum_squares / items_scored) : 0.0f;
+  score_deviation = items_scored > 0 ?
+      std::sqrt(sum_squares / items_scored) : 0.0f;
 
   return score_deviation;
 }
 
-const std::vector<float>& Statistics::CalculateScoreDistribution() {
-  for (auto& value : score_count)
-    value = 0;
-  for (auto& value : score_distribution)
-    value = 0.0f;
+const std::array<float, 11>& Statistics::CalculateScoreDistribution() {
+  score_count.fill(0);
+  score_distribution.fill(0.0f);
 
   float extreme_value = 1.0f;
 
-  for (const auto& pair : AnimeDatabase.items) {
-    int score = pair.second.GetMyScore();
+  for (const auto& [id, item] : AnimeDatabase.items) {
+    const int score = item.GetMyScore();
     if (score > 0) {
       const auto score_index = static_cast<size_t>(std::floor(score / 10.0));
-      score_count[score_index]++;
-      score_distribution[score_index]++;
+      ++score_count[score_index];
+      ++score_distribution[score_index];
       extreme_value = std::max(score_distribution[score_index], extreme_value);
     }
   }
 
-  for (auto& value : score_distribution)
+  for (auto& value : score_distribution) {
     value = value / extreme_value;
+  }
 
   return score_distribution;
 }

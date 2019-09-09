@@ -45,7 +45,7 @@ BOOL StatsDialog::OnInitDialog() {
   }
 
   // Calculate and display statistics
-  Stats.CalculateAll();
+  taiga::stats.CalculateAll();
   Refresh();
 
   return TRUE;
@@ -79,15 +79,15 @@ INT_PTR StatsDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
           if (i < 10)
             rect.top += bar_height;
 
-          if (Stats.score_distribution[i] > 0.0f) {
-            int bar_width = static_cast<int>(bar_max * Stats.score_distribution[i]);
+          if (taiga::stats.score_distribution[i] > 0.0f) {
+            int bar_width = static_cast<int>(bar_max * taiga::stats.score_distribution[i]);
             rect.bottom = rect.top + bar_height - 2;
             rect.right = rect.left + bar_width;
             dc.FillRect(rect, ui::kColorDarkBlue);
           }
 
-          if (Stats.score_count[i] > 0.0f) {
-            std::wstring text = ToWstr(Stats.score_count[i]);
+          if (taiga::stats.score_count[i] > 0.0f) {
+            std::wstring text = ToWstr(taiga::stats.score_count[i]);
             win::Rect rect_text = rect;
             rect_text.left = rect_text.right += 8;
             rect_text.right = dis->rcItem.right;
@@ -179,18 +179,18 @@ void StatsDialog::Refresh() {
 
   // Anime list
   std::wstring text;
-  text += ToWstr(Stats.anime_count) + L"\n";
-  text += ToWstr(Stats.episode_count) + L"\n";
-  text += Stats.life_spent_watching + L"\n";
-  text += Stats.life_planned_to_watch + L"\n";
+  text += ToWstr(taiga::stats.anime_count) + L"\n";
+  text += ToWstr(taiga::stats.episode_count) + L"\n";
+  text += taiga::stats.life_spent_watching + L"\n";
+  text += taiga::stats.life_planned_to_watch + L"\n";
   switch (rating_type) {
     case RatingType::Ten:
-      text += ToWstr(Stats.score_mean / 10.0, 2) + L"\n";
-      text += ToWstr(Stats.score_deviation / 10.0, 2);
+      text += ToWstr(taiga::stats.score_mean / 10.0, 2) + L"\n";
+      text += ToWstr(taiga::stats.score_deviation / 10.0, 2);
       break;
     case RatingType::Five:
-      text += ToWstr(Stats.score_mean / 20.0, 2) + L"\n";
-      text += ToWstr(Stats.score_deviation / 20.0, 2);
+      text += ToWstr(taiga::stats.score_mean / 20.0, 2) + L"\n";
+      text += ToWstr(taiga::stats.score_deviation / 20.0, 2);
       break;
   }
   SetDlgItemText(IDC_STATIC_ANIME_STAT1, text.c_str());
@@ -215,18 +215,18 @@ void StatsDialog::Refresh() {
   // Database
   text.clear();
   text += ToWstr(AnimeDatabase.items.size()) + L"\n";
-  text += ToWstr(Stats.image_count) + L" (" + ToSizeString(Stats.image_size) + L")\n";
-  text += ToWstr(Stats.torrent_count) + L" (" + ToSizeString(Stats.torrent_size) + L")";
+  text += ToWstr(taiga::stats.image_count) + L" (" + ToSizeString(taiga::stats.image_size) + L")\n";
+  text += ToWstr(taiga::stats.torrent_count) + L" (" + ToSizeString(taiga::stats.torrent_size) + L")";
   SetDlgItemText(IDC_STATIC_ANIME_STAT3, text.c_str());
 
   // Taiga
   text.clear();
-  text += ToWstr(Stats.connections_succeeded + Stats.connections_failed);
-  if (Stats.connections_failed > 0)
-    text += L" (" + ToWstr(Stats.connections_failed) + L" failed)";
+  text += ToWstr(taiga::stats.connections_succeeded + taiga::stats.connections_failed);
+  if (taiga::stats.connections_failed > 0)
+    text += L" (" + ToWstr(taiga::stats.connections_failed) + L" failed)";
   text += L"\n";
-  text += ToDateString(Stats.uptime) + L"\n";
-  text += ToWstr(Stats.tigers_harmed);
+  text += ToDateString(taiga::stats.uptime) + L"\n";
+  text += ToWstr(taiga::stats.tigers_harmed);
   SetDlgItemText(IDC_STATIC_ANIME_STAT4, text.c_str());
 }
 

@@ -481,7 +481,7 @@ void AppSettings::ApplyChanges(const AppSettings previous) {
     AnimeDatabase.LoadList();
     History.Load();
     CurrentEpisode.Set(anime::ID_UNKNOWN);
-    Stats.CalculateAll();
+    taiga::stats.CalculateAll();
     sync::InvalidateUserAuthentication();
     ui::OnSettingsUserChange();
     ui::OnSettingsServiceChange();
