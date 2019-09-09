@@ -21,8 +21,7 @@
 namespace base {
 
 Timer::Timer(unsigned int id, int interval, bool repeat)
-    : enabled_(true),
-      id_(id),
+    : id_(id),
       interval_(interval),
       repeat_(repeat),
       ticks_(interval) {
@@ -101,20 +100,14 @@ void Timer::Tick() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-TimerManager::TimerManager()
-    : hwnd_(nullptr), id_(0) {
-}
-
 TimerManager::~TimerManager() {
-  if (id_ != 0)
+  if (id_)
     ::KillTimer(hwnd_, id_);
 }
 
 Timer* TimerManager::timer(unsigned int id) {
-  if (timers_.find(id) != timers_.end())
-    return timers_[id];
-
-  return nullptr;
+  const auto it = timers_.find(id);
+  return it != timers_.end() ? it->second : nullptr;
 }
 
 bool TimerManager::Initialize(HWND hwnd, TIMERPROC proc) {
@@ -125,7 +118,7 @@ bool TimerManager::Initialize(HWND hwnd, TIMERPROC proc) {
 }
 
 void TimerManager::InsertTimer(const Timer* timer) {
-  timers_.insert(std::make_pair(timer->id(), const_cast<Timer*>(timer)));
+  timers_.insert({timer->id(), const_cast<Timer*>(timer)});
 }
 
 }  // namespace base

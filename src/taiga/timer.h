@@ -22,7 +22,7 @@
 
 namespace taiga {
 
-enum TimerIds {
+enum TimerId {
   kTimerAnimeList = 1,
   kTimerDetection,
   kTimerHistory,
@@ -39,7 +39,7 @@ public:
   ~Timer() {}
 
 protected:
-  void OnTimeout();
+  void OnTimeout() override;
 };
 
 class TimerManager : public base::TimerManager {
@@ -51,12 +51,12 @@ public:
   void UpdateUi();
 
 protected:
-  void OnTick();
+  void OnTick() override;
 
 private:
   static void CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime);
 };
 
-extern TimerManager timers;
+inline TimerManager timers;
 
 }  // namespace taiga

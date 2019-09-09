@@ -51,16 +51,15 @@ protected:
   virtual void OnTimeout() = 0;
 
 private:
-  bool enabled_;
-  unsigned int id_;
-  int interval_;
-  bool repeat_;
-  int ticks_;
+  bool enabled_ = true;
+  unsigned int id_ = 0;
+  int interval_ = 0;
+  bool repeat_ = true;
+  int ticks_ = 0;
 };
 
 class TimerManager {
 public:
-  TimerManager();
   virtual ~TimerManager();
 
   Timer* timer(unsigned int id);
@@ -71,8 +70,8 @@ public:
   virtual void OnTick() = 0;
 
 protected:
-  HWND hwnd_;
-  UINT_PTR id_;
+  HWND hwnd_ = nullptr;
+  UINT_PTR id_ = 0;
   std::map<unsigned int, Timer*> timers_;
 };
 

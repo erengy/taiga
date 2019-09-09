@@ -16,6 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "taiga/timer.h"
+
 #include "base/log.h"
 #include "base/string.h"
 #include "library/anime.h"
@@ -27,7 +29,6 @@
 #include "taiga/http.h"
 #include "taiga/settings.h"
 #include "taiga/stats.h"
-#include "taiga/timer.h"
 #include "track/feed.h"
 #include "track/media.h"
 #include "track/search.h"
@@ -38,16 +39,14 @@
 
 namespace taiga {
 
-Timer timer_anime_list(kTimerAnimeList, 60);    //  1 minute
-Timer timer_detection(kTimerDetection, 3);      //  3 seconds
-Timer timer_history(kTimerHistory, 5 * 60);     //  5 minutes
-Timer timer_library(kTimerLibrary, 30 * 60);    // 30 minutes
-Timer timer_media(kTimerMedia, 2 * 60, false);  //  2 minutes
-Timer timer_memory(kTimerMemory, 10 * 60);      // 10 minutes
-Timer timer_stats(kTimerStats, 10);             // 10 seconds
-Timer timer_torrents(kTimerTorrents, 60 * 60);  // 60 minutes
-
-TimerManager timers;
+static Timer timer_anime_list(kTimerAnimeList, 60);    //  1 minute
+static Timer timer_detection(kTimerDetection, 3);      //  3 seconds
+static Timer timer_history(kTimerHistory, 5 * 60);     //  5 minutes
+static Timer timer_library(kTimerLibrary, 30 * 60);    // 30 minutes
+static Timer timer_media(kTimerMedia, 2 * 60, false);  //  2 minutes
+static Timer timer_memory(kTimerMemory, 10 * 60);      // 10 minutes
+static Timer timer_stats(kTimerStats, 10);             // 10 seconds
+static Timer timer_torrents(kTimerTorrents, 60 * 60);  // 60 minutes
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -172,8 +171,9 @@ void TimerManager::OnTick() {
 
   UpdateEnabledState();
 
-  for (const auto& pair : timers_)
-    pair.second->Tick();
+  for (const auto& [id, timer] : timers_) {
+    timer->Tick();
+  }
 
   UpdateUi();
 }
