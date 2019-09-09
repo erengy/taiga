@@ -23,17 +23,9 @@
 
 namespace taiga {
 
-class DummyAnime : public anime::Item {
-public:
-  void Initialize();
-};
+void InitializeDummies();
 
-class DummyEpisode : public anime::Episode {
-public:
-  void Initialize();
-};
-
-extern class DummyAnime DummyAnime;
-extern class DummyEpisode DummyEpisode;
+inline anime::Item dummy_anime;
+inline anime::Episode dummy_episode;
 
 }  // namespace taiga

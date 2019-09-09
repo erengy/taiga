@@ -106,7 +106,7 @@ std::wstring ReplaceVariables(const std::wstring& str,
 
   auto anime_item = AnimeDatabase.FindItem(episode.anime_id);
   if (!anime_item && is_preview)
-    anime_item = &taiga::DummyAnime;
+    anime_item = &taiga::dummy_anime;
  
   fields[L"title"] = anime_item ?
       anime::GetPreferredTitle(*anime_item) : episode.anime_title();

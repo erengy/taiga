@@ -180,7 +180,7 @@ void FormatDialog::RefreshPreviewText() {
   // Replace variables
   std::wstring str;
   GetDlgItemText(IDC_RICHEDIT_FORMAT, str);
-  anime::Episode* episode = &taiga::DummyEpisode;
+  anime::Episode* episode = &taiga::dummy_episode;
   if (CurrentEpisode.anime_id > 0)
     episode = &CurrentEpisode;
   str = ReplaceVariables(str, *episode, false, false, true);

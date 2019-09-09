@@ -109,8 +109,7 @@ BOOL App::InitInstance() {
   // Load data
   LoadData();
 
-  DummyAnime.Initialize();
-  DummyEpisode.Initialize();
+  InitializeDummies();
 
   // Initialize Discord
   if (Settings.GetBool(kShare_Discord_Enabled))
