@@ -258,6 +258,11 @@ bool AppSettings::Load() {
   std::wstring path = taiga::GetPath(taiga::Path::Settings);
   xml_parse_result result = document.load_file(path.c_str());
 
+  if (!result) {
+    LOGE(L"Could not read application settings.\nPath: {}\nReason: {}",
+         path, StrToWstr(result.description()));
+  }
+
   xml_node settings = document.child(L"settings");
 
   InitializeMap();
