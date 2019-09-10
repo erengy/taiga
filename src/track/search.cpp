@@ -16,6 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "track/search.h"
+
 #include "base/file.h"
 #include "base/log.h"
 #include "base/string.h"
@@ -24,15 +26,9 @@
 #include "taiga/settings.h"
 #include "taiga/taiga.h"
 #include "track/recognition.h"
-#include "track/search.h"
 #include "ui/ui.h"
 
 namespace track {
-
-FileSearch::FileSearch()
-    : anime_id_(anime::ID_UNKNOWN),
-      episode_number_(0) {
-}
 
 bool FileSearch::OnDirectory(const base::FileSearchResult& result) {
   static track::recognition::ParseOptions parse_options;
@@ -53,13 +49,13 @@ bool FileSearch::OnDirectory(const base::FileSearchResult& result) {
 
   Meow.Identify(episode_, false, match_options);
 
-  anime::Item* anime_item = AnimeDatabase.FindItem(episode_.anime_id);
+  const auto anime_item = AnimeDatabase.FindItem(episode_.anime_id);
 
   if (anime_item && Meow.IsValidAnimeType(episode_)) {
     if (anime_item->GetFolder().empty())
       anime_item->SetFolder(AddTrailingSlash(result.root) + result.name);
 
-    if (anime::IsValidId(anime_id_) && anime_id_ == anime_item->GetId()) {
+    if (anime_id_ && anime_id_.value() == anime_item->GetId()) {
       path_found_ = AddTrailingSlash(result.root) + result.name;
       if (options.skip_files)
         return true;
@@ -70,7 +66,7 @@ bool FileSearch::OnDirectory(const base::FileSearchResult& result) {
 }
 
 bool FileSearch::OnFile(const base::FileSearchResult& result) {
-  auto path = AddTrailingSlash(result.root) + result.name;
+  const auto path = AddTrailingSlash(result.root) + result.name;
 
   static track::recognition::ParseOptions parse_options;
   parse_options.parse_path = true;
@@ -90,26 +86,27 @@ bool FileSearch::OnFile(const base::FileSearchResult& result) {
 
   Meow.Identify(episode_, false, match_options);
 
-  anime::Item* anime_item = AnimeDatabase.FindItem(episode_.anime_id);
+  const auto anime_item = AnimeDatabase.FindItem(episode_.anime_id);
 
   if (anime_item && Meow.IsValidAnimeType(episode_) &&
       Meow.IsValidFileExtension(episode_)) {
-    int upper_bound = anime::GetEpisodeHigh(episode_);
-    int lower_bound = anime::GetEpisodeLow(episode_);
+    const int upper_bound = anime::GetEpisodeHigh(episode_);
+    const int lower_bound = anime::GetEpisodeLow(episode_);
 
     if (!anime::IsValidEpisodeNumber(upper_bound,
                                      anime_item->GetEpisodeCount()) ||
         !anime::IsValidEpisodeNumber(lower_bound,
                                      anime_item->GetEpisodeCount())) {
-      std::wstring episode_number = anime::GetEpisodeRange(episode_);
+      const auto episode_number = anime::GetEpisodeRange(episode_);
       LOGD(L"Invalid episode number: {}\nFile: {}", episode_number, path);
       return false;
     }
 
-    for (int i = lower_bound; i <= upper_bound; ++i)
+    for (int i = lower_bound; i <= upper_bound; ++i) {
       anime_item->SetEpisodeAvailability(i, true, path);
+    }
 
-    if (anime::IsValidId(anime_id_) && anime_id_ == anime_item->GetId()) {
+    if (anime_id_ && anime_id_.value() == anime_item->GetId()) {
       // Check if we've found the episode we were looking for
       if (episode_number_ > 0 && episode_number_ >= lower_bound &&
           episode_number_ <= upper_bound) {
@@ -142,7 +139,11 @@ const std::wstring& FileSearch::path_found() const {
 }
 
 void FileSearch::set_anime_id(int anime_id) {
-  anime_id_ = anime_id;
+  if (anime::IsValidId(anime_id)) {
+    anime_id_ = anime_id;
+  } else {
+    anime_id_.reset();
+  }
 }
 
 void FileSearch::set_episode_number(int episode_number) {

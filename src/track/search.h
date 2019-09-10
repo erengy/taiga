@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <optional>
 #include <string>
 
 #include "base/file_search.h"
@@ -26,12 +27,7 @@
 namespace track {
 
 class FileSearch : public base::FileSearch {
- public:
-  FileSearch();
-
-  bool OnDirectory(const base::FileSearchResult& result);
-  bool OnFile(const base::FileSearchResult& result);
-
+public:
   bool Search(const std::wstring& root);
 
   const std::wstring& path_found() const;
@@ -40,10 +36,13 @@ class FileSearch : public base::FileSearch {
   void set_episode_number(int episode_number);
   void set_path_found(const std::wstring& path_found);
 
- private:
-  int anime_id_;
+private:
+  bool OnDirectory(const base::FileSearchResult& result);
+  bool OnFile(const base::FileSearchResult& result);
+
+  std::optional<int> anime_id_;
   anime::Episode episode_;
-  int episode_number_;
+  int episode_number_ = 0;
   std::wstring path_found_;
 };
 
