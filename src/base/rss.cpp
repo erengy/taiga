@@ -23,7 +23,7 @@
 
 namespace rss {
 
-Channel ParseChannel(const xml_node& node) {
+Channel ParseChannel(const XmlNode& node) {
   Channel channel;
 
   channel.title = node.child_value(L"title");
@@ -33,7 +33,7 @@ Channel ParseChannel(const xml_node& node) {
   return channel;
 }
 
-Item ParseItem(const xml_node& node) {
+Item ParseItem(const XmlNode& node) {
   Item item;
 
   item.title = node.child_value(L"title");
@@ -68,7 +68,7 @@ Item ParseItem(const xml_node& node) {
   return item;
 }
 
-Feed ParseDocument(const xml_document& document) {
+Feed ParseDocument(const XmlDocument& document) {
   Feed feed;
 
   const auto channel_node = document.child(L"rss").child(L"channel");

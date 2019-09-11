@@ -254,16 +254,16 @@ void AppSettings::InitializeMap() {
 ////////////////////////////////////////////////////////////////////////////////
 
 bool AppSettings::Load() {
-  xml_document document;
-  std::wstring path = taiga::GetPath(taiga::Path::Settings);
-  xml_parse_result result = document.load_file(path.c_str());
+  XmlDocument document;
+  const auto path = taiga::GetPath(taiga::Path::Settings);
+  const auto parse_result = document.load_file(path.c_str());
 
-  if (!result) {
+  if (!parse_result) {
     LOGE(L"Could not read application settings.\nPath: {}\nReason: {}",
-         path, StrToWstr(result.description()));
+         path, StrToWstr(parse_result.description()));
   }
 
-  xml_node settings = document.child(L"settings");
+  auto settings = document.child(L"settings");
 
   InitializeMap();
 
@@ -283,13 +283,13 @@ bool AppSettings::Load() {
 
   // Folders
   library_folders.clear();
-  xml_node node_folders = settings.child(L"anime").child(L"folders");
+  auto node_folders = settings.child(L"anime").child(L"folders");
   for (auto folder : node_folders.children(L"root")) {
     library_folders.push_back(folder.attribute(L"folder").value());
   }
 
   // Anime items
-  xml_node node_items = settings.child(L"anime").child(L"items");
+  auto node_items = settings.child(L"anime").child(L"items");
   for (auto item : node_items.children(L"item")) {
     int anime_id = item.attribute(L"id").as_int();
     auto anime_item = AnimeDatabase.FindItem(anime_id, false);
@@ -301,7 +301,7 @@ bool AppSettings::Load() {
   }
 
   // Media players
-  xml_node node_players = settings.child(L"recognition").child(L"mediaplayers");
+  auto node_players = settings.child(L"recognition").child(L"mediaplayers");
   for (auto player : node_players.children(L"player")) {
     std::wstring name = player.attribute(L"name").value();
     bool enabled = player.attribute(L"enabled").as_bool();
@@ -315,7 +315,7 @@ bool AppSettings::Load() {
 
   // Anime list columns
   ui::DlgAnimeList.listview.InitializeColumns();
-  xml_node node_list_columns = settings.child(L"program").child(L"list").child(L"columns");
+  auto node_list_columns = settings.child(L"program").child(L"list").child(L"columns");
   for (auto column : node_list_columns.children(L"column")) {
     std::wstring name = column.attribute(L"name").value();
     auto column_type = ui::AnimeListDialog::ListView::TranslateColumnName(name);
@@ -333,7 +333,7 @@ bool AppSettings::Load() {
   }
 
   // Torrent filters
-  xml_node node_filter = settings.child(L"rss").child(L"torrent").child(L"filter");
+  auto node_filter = settings.child(L"rss").child(L"torrent").child(L"filter");
   Aggregator.filter_manager.Import(node_filter, Aggregator.filter_manager.filters);
   if (Aggregator.filter_manager.filters.empty())
     Aggregator.filter_manager.AddPresets();
@@ -341,14 +341,14 @@ bool AppSettings::Load() {
   feed.channel.link = GetWstr(kTorrent_Discovery_Source);
   Aggregator.LoadArchive();
 
-  return result.status == pugi::status_ok;
+  return parse_result.status == pugi::status_ok;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 bool AppSettings::Save() {
-  xml_document document;
-  xml_node settings = document.append_child(L"settings");
+  XmlDocument document;
+  auto settings = document.append_child(L"settings");
 
   // Meta
   Set(kMeta_Version, StrToWstr(taiga::version().to_string()));
@@ -358,21 +358,21 @@ bool AppSettings::Save() {
   }
 
   // Library folders
-  xml_node folders = settings.child(L"anime").child(L"folders");
+  auto folders = settings.child(L"anime").child(L"folders");
   for (const auto& folder : library_folders) {
-    xml_node root = folders.append_child(L"root");
+    auto root = folders.append_child(L"root");
     root.append_attribute(L"folder") = folder.c_str();
   }
 
   // Anime items
-  xml_node items = settings.child(L"anime").append_child(L"items");
+  auto items = settings.child(L"anime").append_child(L"items");
   for (const auto& pair : AnimeDatabase.items) {
     const auto& anime_item = pair.second;
     if (anime_item.GetFolder().empty() &&
         !anime_item.UserSynonymsAvailable() &&
         !anime_item.GetUseAlternative())
       continue;
-    xml_node item = items.append_child(L"item");
+    auto item = items.append_child(L"item");
     item.append_attribute(L"id") = anime_item.GetId();
     if (!anime_item.GetFolder().empty())
       item.append_attribute(L"folder") = anime_item.GetFolder().c_str();
@@ -383,18 +383,18 @@ bool AppSettings::Save() {
   }
 
   // Media players
-  xml_node mediaplayers = settings.child(L"recognition").child(L"mediaplayers");
+  auto mediaplayers = settings.child(L"recognition").child(L"mediaplayers");
   for (const auto& media_player : MediaPlayers.items) {
-    xml_node player = mediaplayers.append_child(L"player");
+    auto player = mediaplayers.append_child(L"player");
     player.append_attribute(L"name") = StrToWstr(media_player.name).c_str();
     player.append_attribute(L"enabled") = media_player.enabled;
   }
 
   // Anime list columns
-  xml_node list_columns = settings.child(L"program").child(L"list").append_child(L"columns");
+  auto list_columns = settings.child(L"program").child(L"list").append_child(L"columns");
   for (const auto& it : ui::DlgAnimeList.listview.columns) {
     const auto& column = it.second;
-    xml_node node = list_columns.append_child(L"column");
+    auto node = list_columns.append_child(L"column");
     node.append_attribute(L"name") = column.key.c_str();
     node.append_attribute(L"order") = column.order;
     node.append_attribute(L"visible") = column.visible;
@@ -402,7 +402,7 @@ bool AppSettings::Save() {
   }
 
   // Torrent filters
-  xml_node torrent_filter = settings.child(L"rss").child(L"torrent").child(L"filter");
+  auto torrent_filter = settings.child(L"rss").child(L"torrent").child(L"filter");
   Aggregator.filter_manager.Export(torrent_filter, Aggregator.filter_manager.filters);
 
   // Write to registry

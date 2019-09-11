@@ -31,7 +31,7 @@
 
 namespace taiga {
 
-void AppSettings::ReadLegacyValues(const xml_node& settings) {
+void AppSettings::ReadLegacyValues(const XmlNode& settings) {
   // Meta
   if (GetWstr(kMeta_Version).empty()) {
     const auto major = ReadValue(settings, L"meta/version/major", true, L"");

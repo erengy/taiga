@@ -674,17 +674,17 @@ void FeedFilterManager::InitializeShortcodes() {
 
 bool FeedFilterManager::Import(const std::wstring& input,
                                std::vector<FeedFilter>& filters) {
-  xml_document document;
-  xml_parse_result result = document.load_string(input.c_str());
+  XmlDocument document;
+  const auto parse_result = document.load_string(input.c_str());
 
-  if (result.status != pugi::status_ok)
+  if (!parse_result)
     return false;
 
   Import(document, filters);
   return true;
 }
 
-void FeedFilterManager::Import(const xml_node& node_filter,
+void FeedFilterManager::Import(const XmlNode& node_filter,
                                std::vector<FeedFilter>& filters) {
   filters.clear();
 
@@ -719,15 +719,15 @@ void FeedFilterManager::Import(const xml_node& node_filter,
 
 void FeedFilterManager::Export(std::wstring& output,
                                const std::vector<FeedFilter>& filters) {
-  xml_document node_filter;
+  XmlDocument node_filter;
   Export(node_filter, filters);
-  output = XmlGetNodeAsString(node_filter);
+  output = XmlDump(node_filter);
 }
 
 void FeedFilterManager::Export(pugi::xml_node& node_filter,
                                const std::vector<FeedFilter>& filters) {
   for (const auto& feed_filter : filters) {
-    xml_node item = node_filter.append_child(L"item");
+    auto item = node_filter.append_child(L"item");
     item.append_attribute(L"action") =
         Aggregator.filter_manager.GetShortcodeFromIndex(
             kFeedFilterShortcodeAction, feed_filter.action).c_str();
@@ -741,12 +741,12 @@ void FeedFilterManager::Export(pugi::xml_node& node_filter,
     item.append_attribute(L"name") = feed_filter.name.c_str();
 
     for (const auto& id : feed_filter.anime_ids) {
-      xml_node anime = item.append_child(L"anime");
+      auto anime = item.append_child(L"anime");
       anime.append_attribute(L"id") = id;
     }
 
     for (const auto& condition : feed_filter.conditions) {
-      xml_node node = item.append_child(L"condition");
+      auto node = item.append_child(L"condition");
       node.append_attribute(L"element") =
           Aggregator.filter_manager.GetShortcodeFromIndex(
               kFeedFilterShortcodeElement, condition.element).c_str();

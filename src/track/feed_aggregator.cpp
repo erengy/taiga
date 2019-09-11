@@ -541,16 +541,16 @@ size_t Aggregator::GetArchiveSize() const {
 }
 
 bool Aggregator::LoadArchive() {
-  xml_document document;
+  XmlDocument document;
   std::wstring path = taiga::GetPath(taiga::Path::FeedHistory);
-  xml_parse_result parse_result = document.load_file(path.c_str());
+  const auto parse_result = document.load_file(path.c_str());
 
-  if (parse_result.status != pugi::status_ok)
+  if (!parse_result)
     return false;
 
   // Read discarded
   file_archive_.clear();
-  xml_node archive_node = document.child(L"archive");
+  auto archive_node = document.child(L"archive");
   for (auto node : archive_node.children(L"item")) {
     file_archive_.push_back(node.attribute(L"title").value());
   }
@@ -559,8 +559,8 @@ bool Aggregator::LoadArchive() {
 }
 
 bool Aggregator::SaveArchive() const {
-  xml_document document;
-  xml_node archive_node = document.append_child(L"archive");
+  XmlDocument document;
+  auto archive_node = document.append_child(L"archive");
 
   size_t max_count = Settings.GetInt(taiga::kTorrent_Filter_ArchiveMaxCount);
 
@@ -570,7 +570,7 @@ bool Aggregator::SaveArchive() const {
     if (length > max_count)
       i = length - max_count;
     for ( ; i < file_archive_.size(); i++) {
-      xml_node xml_item = archive_node.append_child(L"item");
+      auto xml_item = archive_node.append_child(L"item");
       xml_item.append_attribute(L"title") = file_archive_[i].c_str();
     }
   }

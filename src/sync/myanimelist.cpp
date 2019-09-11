@@ -154,11 +154,11 @@ void Service::UpdateLibraryEntry(Request& request, HttpRequest& http_request) {
   if (request.data[L"action"] == L"delete")
     return;
 
-  xml_document document;
-  xml_node node_declaration = document.append_child(pugi::node_declaration);
+  XmlDocument document;
+  auto node_declaration = document.append_child(pugi::node_declaration);
   node_declaration.append_attribute(L"version") = L"1.0";
   node_declaration.append_attribute(L"encoding") = L"UTF-8";
-  xml_node node_entry = document.append_child(L"entry");
+  auto node_entry = document.append_child(L"entry");
 
   // MAL allows setting a new value to "times_rewatched" and others, but
   // there's no way to get the current value. So we avoid them altogether.
@@ -191,11 +191,11 @@ void Service::UpdateLibraryEntry(Request& request, HttpRequest& http_request) {
       } else if (StartsWith(*tag, L"date")) {
         value = TranslateMyDateTo(value);
       }
-      XmlWriteStrValue(node_entry, tag->c_str(), value.c_str());
+      XmlWriteStr(node_entry, tag->c_str(), value.c_str());
     }
   }
 
-  http_request.data[L"data"] = XmlGetNodeAsString(document);
+  http_request.data[L"data"] = XmlDump(document);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -207,15 +207,15 @@ void Service::AuthenticateUser(Response& response, HttpResponse& http_response) 
 }
 
 void Service::GetLibraryEntries(Response& response, HttpResponse& http_response) {
-  xml_document document;
-  xml_parse_result parse_result = document.load_string(http_response.body.c_str());
+  XmlDocument document;
+  const auto parse_result = document.load_string(http_response.body.c_str());
 
-  if (parse_result.status != pugi::status_ok) {
+  if (!parse_result) {
     response.data[L"error"] = L"Could not parse the list";
     return;
   }
 
-  xml_node node_myanimelist = document.child(L"myanimelist");
+  auto node_myanimelist = document.child(L"myanimelist");
 
   // Available tags:
   // - user_id
@@ -226,9 +226,9 @@ void Service::GetLibraryEntries(Response& response, HttpResponse& http_response)
   // - user_dropped
   // - user_plantowatch
   // - user_days_spent_watching
-  xml_node node_myinfo = node_myanimelist.child(L"myinfo");
-  user_.id = XmlReadStrValue(node_myinfo, L"user_id");
-  user_.username = XmlReadStrValue(node_myinfo, L"user_name");
+  auto node_myinfo = node_myanimelist.child(L"myinfo");
+  user_.id = XmlReadStr(node_myinfo, L"user_id");
+  user_.username = XmlReadStr(node_myinfo, L"user_name");
   // We ignore the remaining tags, because MAL can be very slow at updating
   // their values, and we can easily calculate them ourselves anyway.
 
@@ -257,28 +257,28 @@ void Service::GetLibraryEntries(Response& response, HttpResponse& http_response)
   for (auto node : node_myanimelist.children(L"anime")) {
     ::anime::Item anime_item;
     anime_item.SetSource(this->id());
-    anime_item.SetId(XmlReadStrValue(node, L"series_animedb_id"), this->id());
+    anime_item.SetId(XmlReadStr(node, L"series_animedb_id"), this->id());
     anime_item.SetLastModified(time(nullptr));  // current time
 
-    anime_item.SetTitle(XmlReadStrValue(node, L"series_title"));
-    anime_item.SetSynonyms(XmlReadStrValue(node, L"series_synonyms"));
-    anime_item.SetType(TranslateSeriesTypeFrom(XmlReadIntValue(node, L"series_type")));
-    anime_item.SetEpisodeCount(XmlReadIntValue(node, L"series_episodes"));
-    anime_item.SetAiringStatus(TranslateSeriesStatusFrom(XmlReadIntValue(node, L"series_status")));
-    anime_item.SetDateStart(XmlReadStrValue(node, L"series_start"));
-    anime_item.SetDateEnd(XmlReadStrValue(node, L"series_end"));
-    anime_item.SetImageUrl(XmlReadStrValue(node, L"series_image"));
+    anime_item.SetTitle(XmlReadStr(node, L"series_title"));
+    anime_item.SetSynonyms(XmlReadStr(node, L"series_synonyms"));
+    anime_item.SetType(TranslateSeriesTypeFrom(XmlReadInt(node, L"series_type")));
+    anime_item.SetEpisodeCount(XmlReadInt(node, L"series_episodes"));
+    anime_item.SetAiringStatus(TranslateSeriesStatusFrom(XmlReadInt(node, L"series_status")));
+    anime_item.SetDateStart(XmlReadStr(node, L"series_start"));
+    anime_item.SetDateEnd(XmlReadStr(node, L"series_end"));
+    anime_item.SetImageUrl(XmlReadStr(node, L"series_image"));
 
     anime_item.AddtoUserList();
-    anime_item.SetMyLastWatchedEpisode(XmlReadIntValue(node, L"my_watched_episodes"));
-    anime_item.SetMyDateStart(XmlReadStrValue(node, L"my_start_date"));
-    anime_item.SetMyDateEnd(XmlReadStrValue(node, L"my_finish_date"));
-    anime_item.SetMyScore(TranslateMyRatingFrom(XmlReadIntValue(node, L"my_score")));
-    anime_item.SetMyStatus(TranslateMyStatusFrom(XmlReadIntValue(node, L"my_status")));
-    anime_item.SetMyRewatching(XmlReadIntValue(node, L"my_rewatching"));
-    anime_item.SetMyRewatchingEp(XmlReadIntValue(node, L"my_rewatching_ep"));
-    anime_item.SetMyLastUpdated(XmlReadStrValue(node, L"my_last_updated"));
-    anime_item.SetMyTags(XmlReadStrValue(node, L"my_tags"));
+    anime_item.SetMyLastWatchedEpisode(XmlReadInt(node, L"my_watched_episodes"));
+    anime_item.SetMyDateStart(XmlReadStr(node, L"my_start_date"));
+    anime_item.SetMyDateEnd(XmlReadStr(node, L"my_finish_date"));
+    anime_item.SetMyScore(TranslateMyRatingFrom(XmlReadInt(node, L"my_score")));
+    anime_item.SetMyStatus(TranslateMyStatusFrom(XmlReadInt(node, L"my_status")));
+    anime_item.SetMyRewatching(XmlReadInt(node, L"my_rewatching"));
+    anime_item.SetMyRewatchingEp(XmlReadInt(node, L"my_rewatching_ep"));
+    anime_item.SetMyLastUpdated(XmlReadStr(node, L"my_last_updated"));
+    anime_item.SetMyTags(XmlReadStr(node, L"my_tags"));
 
     AnimeDatabase.UpdateItem(anime_item);
   }
@@ -351,15 +351,15 @@ void Service::GetMetadataById(Response& response, HttpResponse& http_response) {
 }
 
 void Service::SearchTitle(Response& response, HttpResponse& http_response) {
-  xml_document document;
-  xml_parse_result parse_result = document.load_string(http_response.body.c_str());
+  XmlDocument document;
+  const auto parse_result = document.load_string(http_response.body.c_str());
 
-  if (parse_result.status != pugi::status_ok) {
+  if (!parse_result) {
     response.data[L"error"] = L"Could not parse search results";
     return;
   }
 
-  xml_node node_anime = document.child(L"anime");
+  auto node_anime = document.child(L"anime");
 
   // Available tags:
   // - id
@@ -377,20 +377,20 @@ void Service::SearchTitle(Response& response, HttpResponse& http_response) {
   for (auto node : node_anime.children(L"entry")) {
     ::anime::Item anime_item;
     anime_item.SetSource(this->id());
-    anime_item.SetId(XmlReadStrValue(node, L"id"), this->id());
-    anime_item.SetTitle(DecodeText(XmlReadStrValue(node, L"title")));
-    anime_item.SetEnglishTitle(DecodeText(XmlReadStrValue(node, L"english")));
-    anime_item.SetSynonyms(DecodeText(XmlReadStrValue(node, L"synonyms")));
-    anime_item.SetEpisodeCount(XmlReadIntValue(node, L"episodes"));
-    anime_item.SetScore(ToDouble(XmlReadStrValue(node, L"score")));
-    anime_item.SetType(TranslateSeriesTypeFrom(XmlReadStrValue(node, L"type")));
-    anime_item.SetAiringStatus(TranslateSeriesStatusFrom(XmlReadStrValue(node, L"status")));
-    anime_item.SetDateStart(XmlReadStrValue(node, L"start_date"));
-    anime_item.SetDateEnd(XmlReadStrValue(node, L"end_date"));
-    std::wstring synopsis = EraseBbcode(DecodeText(XmlReadStrValue(node, L"synopsis")));
+    anime_item.SetId(XmlReadStr(node, L"id"), this->id());
+    anime_item.SetTitle(DecodeText(XmlReadStr(node, L"title")));
+    anime_item.SetEnglishTitle(DecodeText(XmlReadStr(node, L"english")));
+    anime_item.SetSynonyms(DecodeText(XmlReadStr(node, L"synonyms")));
+    anime_item.SetEpisodeCount(XmlReadInt(node, L"episodes"));
+    anime_item.SetScore(ToDouble(XmlReadStr(node, L"score")));
+    anime_item.SetType(TranslateSeriesTypeFrom(XmlReadStr(node, L"type")));
+    anime_item.SetAiringStatus(TranslateSeriesStatusFrom(XmlReadStr(node, L"status")));
+    anime_item.SetDateStart(XmlReadStr(node, L"start_date"));
+    anime_item.SetDateEnd(XmlReadStr(node, L"end_date"));
+    std::wstring synopsis = EraseBbcode(DecodeText(XmlReadStr(node, L"synopsis")));
     if (!StartsWith(synopsis, L"No synopsis has been added for this series yet"))
       anime_item.SetSynopsis(synopsis);
-    anime_item.SetImageUrl(XmlReadStrValue(node, L"image"));
+    anime_item.SetImageUrl(XmlReadStr(node, L"image"));
     anime_item.SetLastModified(time(nullptr));  // current time
 
     int anime_id = AnimeDatabase.UpdateItem(anime_item);

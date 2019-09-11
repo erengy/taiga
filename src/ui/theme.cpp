@@ -34,22 +34,22 @@ ThemeManager::ThemeManager() {
 }
 
 bool ThemeManager::Load() {
-  xml_document document;
+  XmlDocument document;
   std::wstring path = taiga::GetPath(taiga::Path::ThemeCurrent);
-  xml_parse_result parse_result = document.load_file(path.c_str());
+  const auto parse_result = document.load_file(path.c_str());
 
-  if (parse_result.status != pugi::status_ok) {
+  if (!parse_result) {
     ui::DisplayErrorMessage(L"Could not read theme file:\n" + path, TAIGA_APP_NAME);
     return false;
   }
 
-  xml_node node_icons16 =
+  auto node_icons16 =
       document.child(L"theme").child(L"icons").child(L"set_16px");
-  xml_node node_icons24 =
+  auto node_icons24 =
       document.child(L"theme").child(L"icons").child(L"set_24px");
-  xml_node node_image =
+  auto node_image =
       document.child(L"theme").child(L"list").child(L"background").child(L"image");
-  xml_node node_progress =
+  auto node_progress =
       document.child(L"theme").child(L"list").child(L"progress");
 
   // Icons

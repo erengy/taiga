@@ -386,20 +386,20 @@ bool History::Load() {
   items.clear();
   queue.items.clear();
 
-  xml_document document;
+  XmlDocument document;
   std::wstring path = taiga::GetPath(taiga::Path::UserHistory);
-  xml_parse_result parse_result = document.load_file(path.c_str());
+  const auto parse_result = document.load_file(path.c_str());
 
-  if (parse_result.status != pugi::status_ok)
+  if (!parse_result)
     return false;
 
   // Meta
-  xml_node node_meta = document.child(L"meta");
-  const auto meta_version = XmlReadStrValue(node_meta, L"version");
+  auto node_meta = document.child(L"meta");
+  const auto meta_version = XmlReadStr(node_meta, L"version");
   semaver::Version version(WstrToStr(meta_version));
 
   // Items
-  xml_node node_items = document.child(L"history").child(L"items");
+  auto node_items = document.child(L"history").child(L"items");
   for (auto item : node_items.children(L"item")) {
     HistoryItem history_item;
     history_item.anime_id = item.attribute(L"anime_id").as_int(anime::ID_NOTINLIST);
@@ -426,7 +426,7 @@ bool History::Load() {
 }
 
 void History::ReadQueue(const pugi::xml_document& document) {
-  xml_node node_queue = document.child(L"history").child(L"queue");
+  auto node_queue = document.child(L"history").child(L"queue");
 
   for (auto item : node_queue.children(L"item")) {
     HistoryItem history_item;
@@ -468,27 +468,27 @@ void History::ReadQueue(const pugi::xml_document& document) {
 }
 
 bool History::Save() {
-  xml_document document;
-  std::wstring path = taiga::GetPath(taiga::Path::UserHistory);
+  XmlDocument document;
+  const auto path = taiga::GetPath(taiga::Path::UserHistory);
 
   // Write meta
-  xml_node node_meta = document.append_child(L"meta");
-  XmlWriteStrValue(node_meta, L"version", StrToWstr(taiga::version().to_string()).c_str());
+  auto node_meta = document.append_child(L"meta");
+  XmlWriteStr(node_meta, L"version", StrToWstr(taiga::version().to_string()).c_str());
 
-  xml_node node_history = document.append_child(L"history");
+  auto node_history = document.append_child(L"history");
 
   // Write items
-  xml_node node_items = node_history.append_child(L"items");
+  auto node_items = node_history.append_child(L"items");
   for (const auto& history_item : items) {
-    xml_node node_item = node_items.append_child(L"item");
+    auto node_item = node_items.append_child(L"item");
     node_item.append_attribute(L"anime_id") = history_item.anime_id;
     node_item.append_attribute(L"episode") = *history_item.episode;
     node_item.append_attribute(L"time") = history_item.time.c_str();
   }
   // Write queue
-  xml_node node_queue = node_history.append_child(L"queue");
+  auto node_queue = node_history.append_child(L"queue");
   for (const auto& history_item : queue.items) {
-    xml_node node_item = node_queue.append_child(L"item");
+    auto node_item = node_queue.append_child(L"item");
     #define APPEND_ATTRIBUTE(x, y) \
         if (y) node_item.append_attribute(x) = *y;
     #define APPEND_ATTRIBUTE_STR(x, y) \

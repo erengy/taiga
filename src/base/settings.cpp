@@ -98,7 +98,7 @@ void Settings::InitializeKey(enum_t name, const wchar_t* default_value,
   }
 }
 
-std::wstring Settings::ReadValue(const xml_node& node_parent,
+std::wstring Settings::ReadValue(const XmlNode& node_parent,
                                  const std::wstring& path,
                                  const bool attribute,
                                  const std::wstring& default_value) {
@@ -107,7 +107,7 @@ std::wstring Settings::ReadValue(const xml_node& node_parent,
 
   const wchar_t* node_name = node_names.back().c_str();
 
-  xml_node current_node = node_parent;
+  auto current_node = node_parent;
   for (int i = 0; i < static_cast<int>(node_names.size()) - 1; i++) {
     current_node = current_node.child(node_names.at(i).c_str());
   }
@@ -115,17 +115,17 @@ std::wstring Settings::ReadValue(const xml_node& node_parent,
   if (attribute) {
     return current_node.attribute(node_name).as_string(default_value.c_str());
   } else {
-    return XmlReadStrValue(current_node, node_name);
+    return XmlReadStr(current_node, node_name);
   }
 }
 
-void Settings::ReadValue(const xml_node& node_parent, enum_t name) {
+void Settings::ReadValue(const XmlNode& node_parent, enum_t name) {
   Setting& item = map_[name];
   item.value = ReadValue(node_parent, item.path,
                          item.attribute, item.default_value);
 }
 
-void Settings::WriteValue(const xml_node& node_parent, enum_t name) {
+void Settings::WriteValue(const XmlNode& node_parent, enum_t name) {
   Setting& item = map_[name];
 
   std::vector<std::wstring> node_names;
@@ -133,7 +133,7 @@ void Settings::WriteValue(const xml_node& node_parent, enum_t name) {
 
   const wchar_t* node_name = node_names.back().c_str();
 
-  xml_node current_node = node_parent;
+  auto current_node = node_parent;
   for (int i = 0; i < static_cast<int>(node_names.size()) - 1; i++) {
     std::wstring child_name = node_names.at(i);
     if (!current_node.child(child_name.c_str())) {
@@ -146,7 +146,7 @@ void Settings::WriteValue(const xml_node& node_parent, enum_t name) {
   if (item.attribute) {
     current_node.append_attribute(node_name) = item.value.c_str();
   } else {
-    XmlWriteStrValue(current_node, node_name, item.value.c_str());
+    XmlWriteStr(current_node, node_name, item.value.c_str());
   }
 }
 

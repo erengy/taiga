@@ -140,12 +140,12 @@ std::wstring Feed::GetDataPath() {
 bool Feed::Load() {
   items.clear();
 
-  xml_document document;
+  XmlDocument document;
   std::wstring file = GetDataPath() + L"feed.xml";
   const unsigned int options = pugi::parse_default | pugi::parse_trim_pcdata;
-  xml_parse_result parse_result = document.load_file(file.c_str(), options);
+  const auto parse_result = document.load_file(file.c_str(), options);
 
-  if (parse_result.status != pugi::status_ok)
+  if (!parse_result)
     return false;
 
   Load(document);
@@ -155,17 +155,17 @@ bool Feed::Load() {
 bool Feed::Load(const std::wstring& data) {
   items.clear();
 
-  xml_document document;
-  xml_parse_result parse_result = document.load_string(data.c_str());
+  XmlDocument document;
+  const auto parse_result = document.load_string(data.c_str());
 
-  if (parse_result.status != pugi::status_ok)
+  if (!parse_result)
     return false;
 
   Load(document);
   return true;
 }
 
-void Feed::Load(const xml_document& document) {
+void Feed::Load(const XmlDocument& document) {
   auto rss_feed = rss::ParseDocument(document);
   channel = rss_feed.channel;
 

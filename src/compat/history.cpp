@@ -49,7 +49,7 @@ void History::HandleCompatibility(const std::wstring& meta_version) {
 }
 
 void History::ReadQueueInCompatibilityMode(const pugi::xml_document& document) {
-  xml_node node_queue = document.child(L"history").child(L"queue");
+  auto node_queue = document.child(L"history").child(L"queue");
 
   for (auto item : node_queue.children(L"item")) {
     HistoryItem history_item;

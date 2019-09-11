@@ -99,60 +99,60 @@ void Database::HandleListCompatibility(const std::wstring& meta_version) {
     SaveList();
 }
 
-void Database::ReadDatabaseInCompatibilityMode(xml_document& document) {
-  xml_node animedb_node = document.child(L"animedb");
+void Database::ReadDatabaseInCompatibilityMode(XmlDocument& document) {
+  auto animedb_node = document.child(L"animedb");
 
   for (auto node : animedb_node.children(L"anime")) {
-    std::wstring id = XmlReadStrValue(node, L"series_animedb_id");
+    std::wstring id = XmlReadStr(node, L"series_animedb_id");
     Item& item = items[ToInt(id)];  // Creates the item if it doesn't exist
     item.SetId(id, sync::kTaiga);
     item.SetId(id, sync::kMyAnimeList);
-    item.SetTitle(XmlReadStrValue(node, L"series_title"));
-    item.SetEnglishTitle(XmlReadStrValue(node, L"series_english"));
-    item.SetSynonyms(XmlReadStrValue(node, L"series_synonyms"));
-    item.SetType(sync::myanimelist::TranslateSeriesTypeFrom(XmlReadIntValue(node, L"series_type")));
-    item.SetEpisodeCount(XmlReadIntValue(node, L"series_episodes"));
-    item.SetAiringStatus(sync::myanimelist::TranslateSeriesStatusFrom(XmlReadIntValue(node, L"series_status")));
-    item.SetDateStart(Date(XmlReadStrValue(node, L"series_start")));
-    item.SetDateEnd(Date(XmlReadStrValue(node, L"series_end")));
-    item.SetImageUrl(XmlReadStrValue(node, L"series_image"));
-    item.SetGenres(XmlReadStrValue(node, L"genres"));
-    item.SetProducers(XmlReadStrValue(node, L"producers"));
-    item.SetScore(ToDouble(XmlReadStrValue(node, L"score")));
-    item.SetPopularity(XmlReadIntValue(node, L"popularity"));
-    item.SetSynopsis(XmlReadStrValue(node, L"synopsis"));
-    item.SetLastModified(ToTime(XmlReadStrValue(node, L"last_modified")));
+    item.SetTitle(XmlReadStr(node, L"series_title"));
+    item.SetEnglishTitle(XmlReadStr(node, L"series_english"));
+    item.SetSynonyms(XmlReadStr(node, L"series_synonyms"));
+    item.SetType(sync::myanimelist::TranslateSeriesTypeFrom(XmlReadInt(node, L"series_type")));
+    item.SetEpisodeCount(XmlReadInt(node, L"series_episodes"));
+    item.SetAiringStatus(sync::myanimelist::TranslateSeriesStatusFrom(XmlReadInt(node, L"series_status")));
+    item.SetDateStart(Date(XmlReadStr(node, L"series_start")));
+    item.SetDateEnd(Date(XmlReadStr(node, L"series_end")));
+    item.SetImageUrl(XmlReadStr(node, L"series_image"));
+    item.SetGenres(XmlReadStr(node, L"genres"));
+    item.SetProducers(XmlReadStr(node, L"producers"));
+    item.SetScore(ToDouble(XmlReadStr(node, L"score")));
+    item.SetPopularity(XmlReadInt(node, L"popularity"));
+    item.SetSynopsis(XmlReadStr(node, L"synopsis"));
+    item.SetLastModified(ToTime(XmlReadStr(node, L"last_modified")));
   }
 }
 
-void Database::ReadListInCompatibilityMode(xml_document& document) {
-  xml_node myanimelist = document.child(L"myanimelist");
+void Database::ReadListInCompatibilityMode(XmlDocument& document) {
+  auto myanimelist = document.child(L"myanimelist");
 
   for (auto node : myanimelist.children(L"anime")) {
     Item anime_item;
-    anime_item.SetId(XmlReadStrValue(node, L"series_animedb_id"), sync::kMyAnimeList);
+    anime_item.SetId(XmlReadStr(node, L"series_animedb_id"), sync::kMyAnimeList);
     anime_item.SetSource(sync::kMyAnimeList);
 
-    anime_item.SetTitle(XmlReadStrValue(node, L"series_title"));
-    anime_item.SetSynonyms(XmlReadStrValue(node, L"series_synonyms"));
-    anime_item.SetType(sync::myanimelist::TranslateSeriesTypeFrom(XmlReadIntValue(node, L"series_type")));
-    anime_item.SetEpisodeCount(XmlReadIntValue(node, L"series_episodes"));
-    anime_item.SetAiringStatus(sync::myanimelist::TranslateSeriesStatusFrom(XmlReadIntValue(node, L"series_status")));
-    anime_item.SetDateStart(XmlReadStrValue(node, L"series_start"));
-    anime_item.SetDateEnd(XmlReadStrValue(node, L"series_end"));
-    anime_item.SetImageUrl(XmlReadStrValue(node, L"series_image"));
+    anime_item.SetTitle(XmlReadStr(node, L"series_title"));
+    anime_item.SetSynonyms(XmlReadStr(node, L"series_synonyms"));
+    anime_item.SetType(sync::myanimelist::TranslateSeriesTypeFrom(XmlReadInt(node, L"series_type")));
+    anime_item.SetEpisodeCount(XmlReadInt(node, L"series_episodes"));
+    anime_item.SetAiringStatus(sync::myanimelist::TranslateSeriesStatusFrom(XmlReadInt(node, L"series_status")));
+    anime_item.SetDateStart(XmlReadStr(node, L"series_start"));
+    anime_item.SetDateEnd(XmlReadStr(node, L"series_end"));
+    anime_item.SetImageUrl(XmlReadStr(node, L"series_image"));
     anime_item.SetLastModified(0);
 
     anime_item.AddtoUserList();
-    anime_item.SetMyLastWatchedEpisode(XmlReadIntValue(node, L"my_watched_episodes"));
-    anime_item.SetMyDateStart(XmlReadStrValue(node, L"my_start_date"));
-    anime_item.SetMyDateEnd(XmlReadStrValue(node, L"my_finish_date"));
-    anime_item.SetMyScore(XmlReadIntValue(node, L"my_score"));
-    anime_item.SetMyStatus(sync::myanimelist::TranslateMyStatusFrom(XmlReadIntValue(node, L"my_status")));
-    anime_item.SetMyRewatching(XmlReadIntValue(node, L"my_rewatching"));
-    anime_item.SetMyRewatchingEp(XmlReadIntValue(node, L"my_rewatching_ep"));
-    anime_item.SetMyLastUpdated(XmlReadStrValue(node, L"my_last_updated"));
-    anime_item.SetMyTags(XmlReadStrValue(node, L"my_tags"));
+    anime_item.SetMyLastWatchedEpisode(XmlReadInt(node, L"my_watched_episodes"));
+    anime_item.SetMyDateStart(XmlReadStr(node, L"my_start_date"));
+    anime_item.SetMyDateEnd(XmlReadStr(node, L"my_finish_date"));
+    anime_item.SetMyScore(XmlReadInt(node, L"my_score"));
+    anime_item.SetMyStatus(sync::myanimelist::TranslateMyStatusFrom(XmlReadInt(node, L"my_status")));
+    anime_item.SetMyRewatching(XmlReadInt(node, L"my_rewatching"));
+    anime_item.SetMyRewatchingEp(XmlReadInt(node, L"my_rewatching_ep"));
+    anime_item.SetMyLastUpdated(XmlReadStr(node, L"my_last_updated"));
+    anime_item.SetMyTags(XmlReadStr(node, L"my_tags"));
 
     UpdateItem(anime_item);
   }

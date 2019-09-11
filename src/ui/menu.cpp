@@ -46,8 +46,8 @@ void MenuList::Load() {
   std::wstring menu_resource;
   win::ReadStringFromResource(L"IDR_MENU", L"DATA", menu_resource);
 
-  xml_document document;
-  xml_parse_result parse_result = document.load_string(menu_resource.data());
+  XmlDocument document;
+  const auto parse_result = document.load_string(menu_resource.data());
 
   const auto menus = document.child(L"menus");
 

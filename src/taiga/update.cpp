@@ -76,22 +76,22 @@ bool UpdateHelper::ParseData(std::wstring data) {
   restart_required_ = false;
   update_available_ = false;
 
-  xml_document document;
-  xml_parse_result parse_result = document.load_string(data.c_str());
+  XmlDocument document;
+  const auto parse_result = document.load_string(data.c_str());
 
-  if (parse_result.status != pugi::status_ok)
+  if (!parse_result)
     return false;
 
-  xml_node channel = document.child(L"rss").child(L"channel");
+  auto channel = document.child(L"rss").child(L"channel");
   for (auto item : channel.children(L"item")) {
     items.resize(items.size() + 1);
-    items.back().guid.value = XmlReadStrValue(item, L"guid");
-    items.back().category.value = XmlReadStrValue(item, L"category");
-    items.back().link = XmlReadStrValue(item, L"link");
-    items.back().description = XmlReadStrValue(item, L"description");
-    items.back().pub_date = XmlReadStrValue(item, L"pubDate");
-    items.back().taiga_anime_relations_location = XmlReadStrValue(item, L"taiga:animeRelationsLocation");
-    items.back().taiga_anime_relations_modified = XmlReadStrValue(item, L"taiga:animeRelationsModified");
+    items.back().guid.value = XmlReadStr(item, L"guid");
+    items.back().category.value = XmlReadStr(item, L"category");
+    items.back().link = XmlReadStr(item, L"link");
+    items.back().description = XmlReadStr(item, L"description");
+    items.back().pub_date = XmlReadStr(item, L"pubDate");
+    items.back().taiga_anime_relations_location = XmlReadStr(item, L"taiga:animeRelationsLocation");
+    items.back().taiga_anime_relations_modified = XmlReadStr(item, L"taiga:animeRelationsModified");
   }
 
   auto current_version = taiga::version();

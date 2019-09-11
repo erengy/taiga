@@ -19,31 +19,32 @@
 #pragma once
 
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include <pugixml/src/pugixml.hpp>
 
-using pugi::xml_document;
-using pugi::xml_node;
-using pugi::xml_parse_result;
+using XmlAttribute = pugi::xml_attribute;
+using XmlDocument = pugi::xml_document;
+using XmlNode = pugi::xml_node;
 
-std::wstring XmlGetNodeAsString(pugi::xml_node node);
+XmlAttribute XmlAttr(XmlNode& node, const std::wstring_view name);
+XmlNode XmlChild(XmlNode& node, const std::wstring_view name);
 
-int XmlReadIntValue(pugi::xml_node& node, const wchar_t* name);
-std::wstring XmlReadStrValue(pugi::xml_node& node, const wchar_t* name);
+std::wstring XmlDump(const XmlNode node);
 
-void XmlReadChildNodes(pugi::xml_node& parent_node,
-                       std::vector<std::wstring>& output,
-                       const wchar_t* name);
-void XmlWriteChildNodes(pugi::xml_node& parent_node,
+int XmlReadInt(const XmlNode& node, const std::wstring_view name);
+std::wstring XmlReadStr(const XmlNode& node, const std::wstring_view name);
+
+void XmlWriteInt(XmlNode& node, const std::wstring_view name, const int value);
+void XmlWriteStr(XmlNode& node, const std::wstring_view name,
+                 const std::wstring_view value,
+                 pugi::xml_node_type node_type = pugi::node_pcdata);
+
+void XmlWriteChildNodes(XmlNode& parent_node,
                         const std::vector<std::wstring>& input,
-                        const wchar_t* name,
+                        const std::wstring_view name,
                         pugi::xml_node_type node_type = pugi::node_pcdata);
 
-void XmlWriteIntValue(pugi::xml_node& node, const wchar_t* name, int value);
-void XmlWriteStrValue(pugi::xml_node& node, const wchar_t* name,
-                      const wchar_t* value,
-                      pugi::xml_node_type node_type = pugi::node_pcdata);
-
-bool XmlWriteDocumentToFile(const pugi::xml_document& document,
-                            const std::wstring& path);
+bool XmlWriteDocumentToFile(const XmlDocument& document,
+                            const std::wstring_view path);
