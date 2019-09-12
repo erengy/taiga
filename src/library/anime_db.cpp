@@ -168,13 +168,13 @@ void Database::WriteDatabaseNode(XmlNode& database_node) {
     #define XML_WC(n, v, t) \
       if (!v.empty()) XmlWriteChildNodes(anime_node, v, n, t)
     #define XML_WD(n, v) \
-      if (v) XmlWriteStr(anime_node, n, v.to_string().c_str())
+      if (v) XmlWriteStr(anime_node, n, v.to_string())
     #define XML_WI(n, v) \
       if (v > 0) XmlWriteInt(anime_node, n, v)
     #define XML_WS(n, v, t) \
-      if (!v.empty()) XmlWriteStr(anime_node, n, v.c_str(), t)
+      if (!v.empty()) XmlWriteStr(anime_node, n, v, t)
     #define XML_WF(n, v, t) \
-      if (v > 0.0) XmlWriteStr(anime_node, n, ToWstr(v).c_str(), t)
+      if (v > 0.0) XmlWriteStr(anime_node, n, ToWstr(v), t)
     XML_WS(L"source", source, pugi::node_pcdata);
     XML_WS(L"slug", item.GetSlug(), pugi::node_pcdata);
     XML_WS(L"title", item.GetTitle(), pugi::node_cdata);
@@ -477,18 +477,18 @@ bool Database::SaveList(bool include_database) {
     if (item.IsInList()) {
       auto node = node_library.append_child(L"anime");
       XmlWriteInt(node, L"id", item.GetId());
-      XmlWriteStr(node, L"library_id", item.GetMyId().c_str());
+      XmlWriteStr(node, L"library_id", item.GetMyId());
       XmlWriteInt(node, L"progress", item.GetMyLastWatchedEpisode(false));
-      XmlWriteStr(node, L"date_start", item.GetMyDateStart().to_string().c_str());
-      XmlWriteStr(node, L"date_end", item.GetMyDateEnd().to_string().c_str());
+      XmlWriteStr(node, L"date_start", item.GetMyDateStart().to_string());
+      XmlWriteStr(node, L"date_end", item.GetMyDateEnd().to_string());
       XmlWriteInt(node, L"score", item.GetMyScore(false));
       XmlWriteInt(node, L"status", item.GetMyStatus(false));
       XmlWriteInt(node, L"rewatched_times", item.GetMyRewatchedTimes());
       XmlWriteInt(node, L"rewatching", item.GetMyRewatching(false));
       XmlWriteInt(node, L"rewatching_ep", item.GetMyRewatchingEp());
-      XmlWriteStr(node, L"tags", item.GetMyTags(false).c_str());
-      XmlWriteStr(node, L"notes", item.GetMyNotes(false).c_str());
-      XmlWriteStr(node, L"last_updated", item.GetMyLastUpdated().c_str());
+      XmlWriteStr(node, L"tags", item.GetMyTags(false));
+      XmlWriteStr(node, L"notes", item.GetMyNotes(false));
+      XmlWriteStr(node, L"last_updated", item.GetMyLastUpdated());
     }
   }
 

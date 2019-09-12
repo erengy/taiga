@@ -191,7 +191,7 @@ void Service::UpdateLibraryEntry(Request& request, HttpRequest& http_request) {
       } else if (StartsWith(*tag, L"date")) {
         value = TranslateMyDateTo(value);
       }
-      XmlWriteStr(node_entry, tag->c_str(), value.c_str());
+      XmlWriteStr(node_entry, *tag, value);
     }
   }
 

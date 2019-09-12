@@ -88,7 +88,7 @@ bool ExportAsMalXml(const std::wstring& path) {
 
   auto node_myinfo = node_myanimelist.append_child(L"myinfo");
   XmlWriteInt(node_myinfo, L"user_id", 0);
-  XmlWriteStr(node_myinfo, L"user_name", taiga::GetCurrentUsername().c_str());
+  XmlWriteStr(node_myinfo, L"user_name", taiga::GetCurrentUsername());
   XmlWriteInt(node_myinfo, L"user_export_type", 1);  // anime
   XmlWriteInt(node_myinfo, L"user_total_anime", count_total_anime());
   XmlWriteInt(node_myinfo, L"user_total_watching", AnimeDatabase.GetItemCount(anime::kWatching));
@@ -101,25 +101,25 @@ bool ExportAsMalXml(const std::wstring& path) {
     if (item.IsInList()) {
       auto node = node_myanimelist.append_child(L"anime");
       XmlWriteInt(node, L"series_animedb_id", item.GetId());
-      XmlWriteStr(node, L"series_title", item.GetTitle().c_str(), pugi::node_cdata);
+      XmlWriteStr(node, L"series_title", item.GetTitle(), pugi::node_cdata);
       XmlWriteStr(node, L"series_type", tr_series_type(item.GetType()));
       XmlWriteInt(node, L"series_episodes", item.GetEpisodeCount());
 
       XmlWriteInt(node, L"my_id", 0);
       XmlWriteInt(node, L"my_watched_episodes", item.GetMyLastWatchedEpisode());
-      XmlWriteStr(node, L"my_start_date", item.GetMyDateStart().to_string().c_str());
-      XmlWriteStr(node, L"my_finish_date", item.GetMyDateEnd().to_string().c_str());
+      XmlWriteStr(node, L"my_start_date", item.GetMyDateStart().to_string());
+      XmlWriteStr(node, L"my_finish_date", item.GetMyDateEnd().to_string());
       XmlWriteStr(node, L"my_fansub_group", L"", pugi::node_cdata);
       XmlWriteStr(node, L"my_rated", L"");
       XmlWriteInt(node, L"my_score", sync::myanimelist::TranslateMyRatingTo(item.GetMyScore()));
       XmlWriteStr(node, L"my_dvd", L"");
       XmlWriteStr(node, L"my_storage", L"");
       XmlWriteStr(node, L"my_status", tr_my_status(item.GetMyStatus()));
-      XmlWriteStr(node, L"my_comments", item.GetMyNotes().c_str(), pugi::node_cdata);
+      XmlWriteStr(node, L"my_comments", item.GetMyNotes(), pugi::node_cdata);
       XmlWriteInt(node, L"my_times_watched", item.GetMyRewatchedTimes());
       XmlWriteStr(node, L"my_rewatch_value", L"");
       XmlWriteInt(node, L"my_downloaded_eps", 0);
-      XmlWriteStr(node, L"my_tags", item.GetMyTags().c_str(), pugi::node_cdata);
+      XmlWriteStr(node, L"my_tags", item.GetMyTags(), pugi::node_cdata);
       XmlWriteInt(node, L"my_rewatching", item.GetMyRewatching());
       XmlWriteInt(node, L"my_rewatching_ep", item.GetMyRewatchingEp());
       XmlWriteInt(node, L"update_on_import", History.queue.IsQueued(item.GetId()));

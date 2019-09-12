@@ -146,7 +146,7 @@ void Settings::WriteValue(const XmlNode& node_parent, enum_t name) {
   if (item.attribute) {
     current_node.append_attribute(node_name) = item.value.c_str();
   } else {
-    XmlWriteStr(current_node, node_name, item.value.c_str());
+    XmlWriteStr(current_node, node_name, item.value);
   }
 }
 
