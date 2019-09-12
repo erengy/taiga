@@ -22,7 +22,7 @@
 #include <string_view>
 #include <vector>
 
-#include <pugixml/src/pugixml.hpp>
+#include <pugixml.hpp>
 
 using XmlAttribute = pugi::xml_attribute;
 using XmlDocument = pugi::xml_document;

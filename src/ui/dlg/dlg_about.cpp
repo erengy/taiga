@@ -19,7 +19,7 @@
 #include <curl/curlver.h>
 #include <fmt/format.h>
 #include <nlohmann/json.hpp>
-#include <pugixml/src/pugixml.hpp>
+#include <pugixml.hpp>
 #include <rapidjson/rapidjson.h>
 #include <utf8proc/utf8proc.h>
 #include <zlib/zlib.h>
