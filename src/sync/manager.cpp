@@ -57,9 +57,10 @@ Service* Manager::service(ServiceId service_id) const {
 }
 
 Service* Manager::service(const std::wstring& canonical_name) const {
-  for (const auto& pair : services_)
-    if (canonical_name == pair.second.get()->canonical_name())
-      return pair.second.get();
+  for (const auto& [id, service] : services_) {
+    if (canonical_name == service.get()->canonical_name())
+      return service.get();
+  }
 
   return nullptr;
 }
@@ -85,9 +86,9 @@ std::wstring Manager::GetServiceNameById(ServiceId service_id) const {
 ////////////////////////////////////////////////////////////////////////////////
 
 void Manager::MakeRequest(Request& request) {
-  for (const auto& pair : services_) {
+  for (const auto& [service_id, service] : services_) {
     if (request.service_id == kAllServices ||
-        request.service_id == pair.first) {
+        request.service_id == service_id) {
       // Create a new HTTP request, and store its UID alongside the service
       // request until we receive a response
       HttpRequest http_request;
@@ -95,10 +96,10 @@ void Manager::MakeRequest(Request& request) {
 
       // Make sure we store the actual service ID
       if (request.service_id == kAllServices)
-        requests_[http_request.uid].service_id = pair.first;
+        requests_[http_request.uid].service_id = service_id;
 
       // Let the service build the HTTP request
-      pair.second->BuildRequest(request, http_request);
+      service->BuildRequest(request, http_request);
       http_request.url.Crack(http_request.url.Build());
 
       // Make the request

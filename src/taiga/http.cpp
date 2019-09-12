@@ -375,8 +375,9 @@ void HttpManager::ProcessQueue() {
   win::Lock lock(critical_section_);
 
   unsigned int connections = 0;
-  for (const auto& pair : connections_)
+  for (const auto& pair : connections_) {
     connections += pair.second;
+  }
 
   for (size_t i = 0; i < requests_.size(); i++) {
     if (shutdown_) {

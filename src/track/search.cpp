@@ -159,8 +159,8 @@ void FileSearch::set_path_found(const std::wstring& path_found) {
 ////////////////////////////////////////////////////////////////////////////////
 
 void ScanAvailableEpisodes(bool silent) {
-  for (auto& pair : AnimeDatabase.items) {
-    anime::ValidateFolder(pair.second);
+  for (auto& [id, item] : AnimeDatabase.items) {
+    anime::ValidateFolder(item);
   }
 
   ScanAvailableEpisodes(silent, anime::ID_UNKNOWN, 0);

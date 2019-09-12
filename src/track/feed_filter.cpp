@@ -967,9 +967,10 @@ int FeedFilterManager::GetIndexFromShortcode(FeedFilterShortcodeType type,
       break;
   }
 
-  for (const auto& pair : *shortcodes)
+  for (const auto& pair : *shortcodes) {
     if (IsEqual(pair.second, shortcode))
       return pair.first;
+  }
 
   LOGD(L"Shortcode: \"{}\" for type \"{}\" is not found.", shortcode, type);
 

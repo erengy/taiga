@@ -598,14 +598,14 @@ BOOL FeedFilterDialog::DialogPage2::OnInitDialog() {
 
   // Add anime to list
   int list_index = 0;
-  for (const auto& pair : AnimeDatabase.items) {
-    if (!pair.second.IsInList())
+  for (const auto& [id, anime_item] : AnimeDatabase.items) {
+    if (!anime_item.IsInList())
       continue;
-    anime_list.InsertItem(list_index, pair.second.GetMyStatus(),
-                          StatusToIcon(pair.second.GetAiringStatus()), 0, nullptr,
-                          LPSTR_TEXTCALLBACK, static_cast<int>(pair.second.GetId()));
+    anime_list.InsertItem(list_index, anime_item.GetMyStatus(),
+                          StatusToIcon(anime_item.GetAiringStatus()), 0, nullptr,
+                          LPSTR_TEXTCALLBACK, static_cast<int>(anime_item.GetId()));
     for (const auto& anime_id : parent->filter.anime_ids) {
-      if (anime_id == pair.second.GetId()) {
+      if (anime_id == anime_item.GetId()) {
         anime_list.SetCheckState(list_index, TRUE);
         break;
       }

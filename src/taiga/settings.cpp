@@ -366,8 +366,7 @@ bool AppSettings::Save() {
 
   // Anime items
   auto items = settings.child(L"anime").append_child(L"items");
-  for (const auto& pair : AnimeDatabase.items) {
-    const auto& anime_item = pair.second;
+  for (const auto& [id, anime_item] : AnimeDatabase.items) {
     if (anime_item.GetFolder().empty() &&
         !anime_item.UserSynonymsAvailable() &&
         !anime_item.GetUseAlternative())

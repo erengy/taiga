@@ -101,11 +101,12 @@ void Database::ReadDatabaseNode(XmlNode& database_node) {
       }
     }
 
-    int id = ToInt(id_map[sync::kTaiga]);
+    const int id = ToInt(id_map[sync::kTaiga]);
     Item& item = items[id];  // Creates the item if it doesn't exist
 
-    for (const auto& pair : id_map)
-      item.SetId(pair.second, pair.first);
+    for (const auto& [service, id] : id_map) {
+      item.SetId(id, service);
+    }
 
     item.SetSource(source);
     item.SetTitle(XmlReadStr(node, L"title"));
@@ -148,11 +149,11 @@ bool Database::SaveDatabase() {
 }
 
 void Database::WriteDatabaseNode(XmlNode& database_node) {
-  for (const auto& pair : items) {
+  for (const auto& [id, item] : items) {
     auto anime_node = database_node.append_child(L"anime");
 
     for (int i = 0; i <= sync::kLastService; i++) {
-      std::wstring id = pair.second.GetId(i);
+      std::wstring id = item.GetId(i);
       if (!id.empty()) {
         auto child = anime_node.append_child(L"id");
         std::wstring name = ServiceManager.GetServiceNameById(static_cast<sync::ServiceId>(i));
@@ -162,7 +163,7 @@ void Database::WriteDatabaseNode(XmlNode& database_node) {
     }
 
     std::wstring source = ServiceManager.GetServiceNameById(
-        static_cast<sync::ServiceId>(pair.second.GetSource()));
+        static_cast<sync::ServiceId>(item.GetSource()));
 
     #define XML_WC(n, v, t) \
       if (!v.empty()) XmlWriteChildNodes(anime_node, v, n, t)
@@ -175,25 +176,25 @@ void Database::WriteDatabaseNode(XmlNode& database_node) {
     #define XML_WF(n, v, t) \
       if (v > 0.0) XmlWriteStr(anime_node, n, ToWstr(v).c_str(), t)
     XML_WS(L"source", source, pugi::node_pcdata);
-    XML_WS(L"slug", pair.second.GetSlug(), pugi::node_pcdata);
-    XML_WS(L"title", pair.second.GetTitle(), pugi::node_cdata);
-    XML_WS(L"english", pair.second.GetEnglishTitle(), pugi::node_cdata);
-    XML_WS(L"japanese", pair.second.GetJapaneseTitle(), pugi::node_cdata);
-    XML_WC(L"synonym", pair.second.GetSynonyms(), pugi::node_cdata);
-    XML_WI(L"type", pair.second.GetType());
-    XML_WI(L"status", pair.second.GetAiringStatus());
-    XML_WI(L"episode_count", pair.second.GetEpisodeCount());
-    XML_WI(L"episode_length", pair.second.GetEpisodeLength());
-    XML_WD(L"date_start", pair.second.GetDateStart());
-    XML_WD(L"date_end", pair.second.GetDateEnd());
-    XML_WS(L"image", pair.second.GetImageUrl(), pugi::node_pcdata);
-    XML_WI(L"age_rating", pair.second.GetAgeRating());
-    XML_WS(L"genres", Join(pair.second.GetGenres(), L", "), pugi::node_pcdata);
-    XML_WS(L"producers", Join(pair.second.GetProducers(), L", "), pugi::node_pcdata);
-    XML_WF(L"score", pair.second.GetScore(), pugi::node_pcdata);
-    XML_WI(L"popularity", pair.second.GetPopularity());
-    XML_WS(L"synopsis", pair.second.GetSynopsis(), pugi::node_cdata);
-    XML_WS(L"modified", ToWstr(pair.second.GetLastModified()), pugi::node_pcdata);
+    XML_WS(L"slug", item.GetSlug(), pugi::node_pcdata);
+    XML_WS(L"title", item.GetTitle(), pugi::node_cdata);
+    XML_WS(L"english", item.GetEnglishTitle(), pugi::node_cdata);
+    XML_WS(L"japanese", item.GetJapaneseTitle(), pugi::node_cdata);
+    XML_WC(L"synonym", item.GetSynonyms(), pugi::node_cdata);
+    XML_WI(L"type", item.GetType());
+    XML_WI(L"status", item.GetAiringStatus());
+    XML_WI(L"episode_count", item.GetEpisodeCount());
+    XML_WI(L"episode_length", item.GetEpisodeLength());
+    XML_WD(L"date_start", item.GetDateStart());
+    XML_WD(L"date_end", item.GetDateEnd());
+    XML_WS(L"image", item.GetImageUrl(), pugi::node_pcdata);
+    XML_WI(L"age_rating", item.GetAgeRating());
+    XML_WS(L"genres", Join(item.GetGenres(), L", "), pugi::node_pcdata);
+    XML_WS(L"producers", Join(item.GetProducers(), L", "), pugi::node_pcdata);
+    XML_WF(L"score", item.GetScore(), pugi::node_pcdata);
+    XML_WI(L"popularity", item.GetPopularity());
+    XML_WS(L"synopsis", item.GetSynopsis(), pugi::node_cdata);
+    XML_WS(L"modified", ToWstr(item.GetLastModified()), pugi::node_pcdata);
     #undef XML_WF
     #undef XML_WS
     #undef XML_WI
@@ -472,8 +473,7 @@ bool Database::SaveList(bool include_database) {
 
   auto node_library = document.append_child(L"library");
 
-  for (const auto& pair : items) {
-    auto& item = pair.second;
+  for (const auto& [id, item] : items) {
     if (item.IsInList()) {
       auto node = node_library.append_child(L"anime");
       XmlWriteInt(node, L"id", item.GetId());
@@ -573,8 +573,9 @@ void Database::AddToList(int anime_id, int status) {
 }
 
 void Database::ClearUserData() {
-  for (auto& pair : items)
-    pair.second.RemoveFromUserList();
+  for (auto& [id, item] : items) {
+    item.RemoveFromUserList();
+  }
 }
 
 bool Database::DeleteListItem(int anime_id) {

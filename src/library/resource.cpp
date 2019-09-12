@@ -84,9 +84,8 @@ bool ImageDatabase::Reload(int anime_id) {
 }
 
 void ImageDatabase::FreeMemory() {
-  for (const auto& pair : ::AnimeDatabase.items) {
+  for (const auto& [anime_id, anime_item] : ::AnimeDatabase.items) {
     bool erase = true;
-    int anime_id = pair.first;
 
     if (items_.find(anime_id) == items_.end())
       continue;

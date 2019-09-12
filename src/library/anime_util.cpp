@@ -47,8 +47,7 @@ bool IsValidId(int anime_id) {
 }
 
 bool ListHasMissingIds() {
-  for (const auto& pair : AnimeDatabase.items) {
-    const auto& item = pair.second;
+  for (const auto& [id, item] : AnimeDatabase.items) {
     if (item.GetMyStatus(false) != kNotInList && item.GetMyId().empty()) {
       return true;
     }
@@ -320,8 +319,7 @@ bool PlayRandomAnime() {
 
   std::vector<int> valid_ids;
 
-  for (auto& pair : AnimeDatabase.items) {
-    anime::Item& anime_item = pair.second;
+  for (auto& [id, anime_item] : AnimeDatabase.items) {
     if (!anime_item.IsInList())
       continue;
     if (!anime_item.IsNextEpisodeAvailable())
@@ -669,9 +667,7 @@ std::wstring GetImagePath(int anime_id) {
 }
 
 void GetUpcomingTitles(std::vector<int>& anime_ids) {
-  for (const auto& pair : AnimeDatabase.items) {
-    const anime::Item& anime_item = pair.second;
-
+  for (const auto& [id, anime_item] : AnimeDatabase.items) {
     const Date& date_start = anime_item.GetDateStart();
     const Date& date_now = GetDateJapan();
 

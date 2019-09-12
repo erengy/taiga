@@ -240,10 +240,10 @@ void Client::BuildRequestHeader() {
       request_.header[L"Content-Type"] = L"application/x-www-form-urlencoded";
 
   // Append available header fields
-  for (const auto& pair : request_.header) {
-    std::string header = WstrToStr(pair.first);
-    if (!pair.second.empty()) {
-      header += ": " + WstrToStr(pair.second);
+  for (const auto& [name, value] : request_.header) {
+    std::string header = WstrToStr(name);
+    if (!value.empty()) {
+      header += ": " + WstrToStr(value);
     } else {
       header += ";";
     }

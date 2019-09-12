@@ -621,8 +621,8 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
 
     // Available episodes
     int available_episodes = 0;
-    for (const auto& pair : AnimeDatabase.items) {
-      if (pair.second.IsInList() && pair.second.IsNextEpisodeAvailable())
+    for (const auto& [id, item] : AnimeDatabase.items) {
+      if (item.IsInList() && item.IsNextEpisodeAvailable())
         available_episodes++;
     }
     if (available_episodes > 0) {
@@ -632,27 +632,27 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
 
     // Airing times
     std::vector<int> recently_started, recently_finished, upcoming;
-    for (const auto& pair : AnimeDatabase.items) {
-      if (pair.second.GetMyStatus() != anime::kPlanToWatch)
+    for (const auto& [anime_id, item] : AnimeDatabase.items) {
+      if (item.GetMyStatus() != anime::kPlanToWatch)
         continue;
-      const Date& date_start = pair.second.GetDateStart();
-      const Date& date_end = pair.second.GetDateEnd();
+      const Date& date_start = item.GetDateStart();
+      const Date& date_end = item.GetDateEnd();
       if (date_start.year() && date_start.month() && date_start.day()) {
         date_diff = date_now - date_start;
         if (date_diff > 0 && date_diff <= day_limit) {
-          recently_started.push_back(pair.first);
+          recently_started.push_back(anime_id);
           continue;
         }
         date_diff = date_start - date_now;
         if (date_diff > 0 && date_diff <= day_limit) {
-          upcoming.push_back(pair.first);
+          upcoming.push_back(anime_id);
           continue;
         }
       }
       if (date_end.year() && date_end.month() && date_end.day()) {
         date_diff = date_now - date_end;
         if (date_diff > 0 && date_diff <= day_limit) {
-          recently_finished.push_back(pair.first);
+          recently_finished.push_back(anime_id);
           continue;
         }
       }

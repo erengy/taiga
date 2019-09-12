@@ -1368,9 +1368,7 @@ void AnimeListDialog::RefreshList(int index) {
   std::vector<int> group_count(anime::kMyStatusLast);
   int group_index = -1;
   int i = 0;
-  for (const auto& pair : AnimeDatabase.items) {
-    const anime::Item& anime_item = pair.second;
-
+  for (const auto& [anime_id, anime_item] : AnimeDatabase.items) {
     if (!anime_item.IsInList())
       continue;
     if (IsDeletedFromList(anime_item))

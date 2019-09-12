@@ -83,8 +83,7 @@ void Database::HandleListCompatibility(const std::wstring& meta_version) {
 
   // Convert from 10-point scale to 100-point scale
   if (version < semaver::Version(1, 3, 0, "alpha.2")) {
-    for (auto& pair : items) {
-      auto& item = pair.second;
+    for (auto& [id, item] : items) {
       const auto score = item.GetMyScore(false);
       if (0 < score && score <= 10) {
         item.SetMyScore(score * 10);
