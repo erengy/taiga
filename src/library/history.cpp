@@ -387,16 +387,15 @@ bool History::Load() {
   queue.items.clear();
 
   XmlDocument document;
-  std::wstring path = taiga::GetPath(taiga::Path::UserHistory);
-  const auto parse_result = document.load_file(path.c_str());
+  const auto path = taiga::GetPath(taiga::Path::UserHistory);
+  const auto parse_result = XmlLoadFileToDocument(document, path);
 
   if (!parse_result)
     return false;
 
   // Meta
-  auto node_meta = document.child(L"meta");
-  const auto meta_version = XmlReadStr(node_meta, L"version");
-  semaver::Version version(WstrToStr(meta_version));
+  const auto meta_version = XmlReadMetaVersion(document);
+  const semaver::Version version(WstrToStr(meta_version));
 
   // Items
   auto node_items = document.child(L"history").child(L"items");
@@ -469,11 +468,9 @@ void History::ReadQueue(const pugi::xml_document& document) {
 
 bool History::Save() {
   XmlDocument document;
-  const auto path = taiga::GetPath(taiga::Path::UserHistory);
 
   // Write meta
-  auto node_meta = document.append_child(L"meta");
-  XmlWriteStr(node_meta, L"version", StrToWstr(taiga::version().to_string()).c_str());
+  XmlWriteMetaVersion(document, StrToWstr(taiga::version().to_string()));
 
   auto node_history = document.append_child(L"history");
 
@@ -512,7 +509,8 @@ bool History::Save() {
     #undef APPEND_ATTRIBUTE
   }
 
-  return XmlWriteDocumentToFile(document, path);
+  const auto path = taiga::GetPath(taiga::Path::UserHistory);
+  return XmlSaveDocumentToFile(document, path);
 }
 
 int History::TranslateModeFromString(const std::wstring& mode) {

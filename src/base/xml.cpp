@@ -88,11 +88,27 @@ void XmlWriteChildNodes(XmlNode& parent_node,
   }
 }
 
-bool XmlWriteDocumentToFile(const XmlDocument& document,
-                            const std::wstring_view path) {
-  CreateFolder(GetPathOnly(std::wstring{path}));
+pugi::xml_parse_result XmlLoadFileToDocument(XmlDocument& document,
+                                             const std::wstring_view path,
+                                             const unsigned int options,
+                                             const pugi::xml_encoding encoding) {
+  return document.load_file(path.data(), options, encoding);
+}
 
-  constexpr auto indent = L"\x09";  // horizontal tab
-  constexpr auto flags = pugi::format_default | pugi::format_write_bom;
-  return document.save_file(path.data(), indent, flags);
+bool XmlSaveDocumentToFile(const XmlDocument& document,
+                           const std::wstring_view path,
+                           const std::wstring_view indent,
+                           const unsigned int flags,
+                           const pugi::xml_encoding encoding) {
+  CreateFolder(GetPathOnly(std::wstring{path}));
+  return document.save_file(path.data(), indent.data(), flags, encoding);
+}
+
+std::wstring XmlReadMetaVersion(const XmlDocument& document) {
+  return XmlReadStr(document.child(L"meta"), L"version");
+}
+
+void XmlWriteMetaVersion(XmlDocument& document,
+                         const std::wstring_view version) {
+  XmlWriteStr(XmlChild(document, L"meta"), L"version", version);
 }

@@ -542,8 +542,8 @@ size_t Aggregator::GetArchiveSize() const {
 
 bool Aggregator::LoadArchive() {
   XmlDocument document;
-  std::wstring path = taiga::GetPath(taiga::Path::FeedHistory);
-  const auto parse_result = document.load_file(path.c_str());
+  const auto path = taiga::GetPath(taiga::Path::FeedHistory);
+  const auto parse_result = XmlLoadFileToDocument(document, path);
 
   if (!parse_result)
     return false;
@@ -575,8 +575,8 @@ bool Aggregator::SaveArchive() const {
     }
   }
 
-  std::wstring path = taiga::GetPath(taiga::Path::FeedHistory);
-  return XmlWriteDocumentToFile(document, path);
+  const auto path = taiga::GetPath(taiga::Path::FeedHistory);
+  return XmlSaveDocumentToFile(document, path);
 }
 
 void Aggregator::AddToArchive(const std::wstring& file) {

@@ -41,10 +41,23 @@ void XmlWriteStr(XmlNode& node, const std::wstring_view name,
                  const std::wstring_view value,
                  pugi::xml_node_type node_type = pugi::node_pcdata);
 
-void XmlWriteChildNodes(XmlNode& parent_node,
-                        const std::vector<std::wstring>& input,
-                        const std::wstring_view name,
-                        pugi::xml_node_type node_type = pugi::node_pcdata);
+void XmlWriteChildNodes(
+    XmlNode& parent_node,
+    const std::vector<std::wstring>& input,
+    const std::wstring_view name,
+    pugi::xml_node_type node_type = pugi::node_pcdata);
 
-bool XmlWriteDocumentToFile(const XmlDocument& document,
-                            const std::wstring_view path);
+pugi::xml_parse_result XmlLoadFileToDocument(
+    XmlDocument& document,
+    const std::wstring_view path,
+    const unsigned int options = pugi::parse_default,
+    const pugi::xml_encoding encoding = pugi::xml_encoding::encoding_auto);
+bool XmlSaveDocumentToFile(
+    const XmlDocument& document,
+    const std::wstring_view path,
+    const std::wstring_view indent = L"\t",
+    const unsigned int flags = pugi::format_default,
+    const pugi::xml_encoding encoding = pugi::xml_encoding::encoding_utf8);
+
+std::wstring XmlReadMetaVersion(const XmlDocument& document);
+void XmlWriteMetaVersion(XmlDocument& document, const std::wstring_view version);

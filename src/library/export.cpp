@@ -126,10 +126,7 @@ bool ExportAsMalXml(const std::wstring& path) {
     }
   }
 
-  CreateFolder(GetPathOnly(path));
-  return document.save_file(path.c_str(), L"\t",
-                            pugi::format_default,
-                            pugi::xml_encoding::encoding_utf8);
+  return XmlSaveDocumentToFile(document, path);
 }
 
 bool ExportAsMarkdown(const std::wstring& path) {

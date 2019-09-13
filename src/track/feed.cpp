@@ -141,9 +141,9 @@ bool Feed::Load() {
   items.clear();
 
   XmlDocument document;
-  std::wstring file = GetDataPath() + L"feed.xml";
-  const unsigned int options = pugi::parse_default | pugi::parse_trim_pcdata;
-  const auto parse_result = document.load_file(file.c_str(), options);
+  const auto path = GetDataPath() + L"feed.xml";
+  constexpr auto options = pugi::parse_default | pugi::parse_trim_pcdata;
+  const auto parse_result = XmlLoadFileToDocument(document, path, options);
 
   if (!parse_result)
     return false;

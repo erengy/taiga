@@ -35,8 +35,8 @@ ThemeManager::ThemeManager() {
 
 bool ThemeManager::Load() {
   XmlDocument document;
-  std::wstring path = taiga::GetPath(taiga::Path::ThemeCurrent);
-  const auto parse_result = document.load_file(path.c_str());
+  const auto path = taiga::GetPath(taiga::Path::ThemeCurrent);
+  const auto parse_result = XmlLoadFileToDocument(document, path);
 
   if (!parse_result) {
     ui::DisplayErrorMessage(L"Could not read theme file:\n" + path, TAIGA_APP_NAME);
@@ -84,16 +84,16 @@ bool ThemeManager::Load() {
   // Load icons
   icons16_.Remove(-1);
   icons24_.Remove(-1);
-  path = GetPathOnly(taiga::GetPath(taiga::Path::ThemeCurrent));
+  const auto theme_path = GetPathOnly(taiga::GetPath(taiga::Path::ThemeCurrent));
   HBITMAP bitmap_handle = nullptr;
   for (size_t i = 0; i < kIconCount16px && i < icons16.size(); i++) {
-    bitmap_handle = GdiPlus.LoadImage(L"{}16px\\{}.png"_format(path, icons16.at(i)),
+    bitmap_handle = GdiPlus.LoadImage(L"{}16px\\{}.png"_format(theme_path, icons16.at(i)),
                                       ScaleX(16), ScaleY(16));
     icons16_.AddBitmap(bitmap_handle, CLR_NONE);
     DeleteObject(bitmap_handle);
   }
   for (size_t i = 0; i < kIconCount24px && i < icons24.size(); i++) {
-    bitmap_handle = GdiPlus.LoadImage(L"{}24px\\{}.png"_format(path, icons24.at(i)),
+    bitmap_handle = GdiPlus.LoadImage(L"{}24px\\{}.png"_format(theme_path, icons24.at(i)),
                                       ScaleX(24), ScaleY(24));
     icons24_.AddBitmap(bitmap_handle, CLR_NONE);
     DeleteObject(bitmap_handle);

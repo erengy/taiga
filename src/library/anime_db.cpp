@@ -46,13 +46,12 @@ bool Database::LoadDatabase() {
   constexpr auto options = pugi::parse_default & ~pugi::parse_eol;
 
   XmlDocument document;
-  const auto parse_result = document.load_file(path.c_str(), options);
+  const auto parse_result = XmlLoadFileToDocument(document, path, options);
 
   if (!parse_result)
     return false;
 
-  auto meta_node = document.child(L"meta");
-  std::wstring meta_version = XmlReadStr(meta_node, L"version");
+  const auto meta_version = XmlReadMetaVersion(document);
 
   if (!meta_version.empty()) {
     auto database_node = document.child(L"database");
@@ -138,14 +137,11 @@ void Database::ReadDatabaseNode(XmlNode& database_node) {
 bool Database::SaveDatabase() {
   XmlDocument document;
 
-  auto meta_node = document.append_child(L"meta");
-  XmlWriteStr(meta_node, L"version", StrToWstr(taiga::version().to_string()).c_str());
+  XmlWriteMetaVersion(document, StrToWstr(taiga::version().to_string()));
+  WriteDatabaseNode(XmlChild(document, L"database"));
 
-  auto database_node = document.append_child(L"database");
-  WriteDatabaseNode(database_node);
-
-  std::wstring path = taiga::GetPath(taiga::Path::DatabaseAnime);
-  return XmlWriteDocumentToFile(document, path);
+  const auto path = taiga::GetPath(taiga::Path::DatabaseAnime);
+  return XmlSaveDocumentToFile(document, path);
 }
 
 void Database::WriteDatabaseNode(XmlNode& database_node) {
@@ -404,8 +400,8 @@ bool Database::LoadList() {
     return false;
 
   XmlDocument document;
-  std::wstring path = taiga::GetPath(taiga::Path::UserLibrary);
-  const auto parse_result = document.load_file(path.c_str());
+  const auto path = taiga::GetPath(taiga::Path::UserLibrary);
+  const auto parse_result = XmlLoadFileToDocument(document, path);
 
   if (!parse_result) {
     if (parse_result.status == pugi::status_file_not_found) {
@@ -417,8 +413,7 @@ bool Database::LoadList() {
     return false;
   }
 
-  auto meta_node = document.child(L"meta");
-  std::wstring meta_version = XmlReadStr(meta_node, L"version");
+  const auto meta_version = XmlReadMetaVersion(document);
 
   if (!meta_version.empty()) {
     auto node_database = document.child(L"database");
@@ -463,12 +458,10 @@ bool Database::SaveList(bool include_database) {
 
   XmlDocument document;
 
-  auto meta_node = document.append_child(L"meta");
-  XmlWriteStr(meta_node, L"version", StrToWstr(taiga::version().to_string()).c_str());
+  XmlWriteMetaVersion(document, StrToWstr(taiga::version().to_string()));
 
   if (include_database) {
-    auto node_database = document.append_child(L"database");
-    WriteDatabaseNode(node_database);
+    WriteDatabaseNode(XmlChild(document, L"database"));
   }
 
   auto node_library = document.append_child(L"library");
@@ -492,8 +485,8 @@ bool Database::SaveList(bool include_database) {
     }
   }
 
-  std::wstring path = taiga::GetPath(taiga::Path::UserLibrary);
-  return XmlWriteDocumentToFile(document, path);
+  const auto path = taiga::GetPath(taiga::Path::UserLibrary);
+  return XmlSaveDocumentToFile(document, path);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

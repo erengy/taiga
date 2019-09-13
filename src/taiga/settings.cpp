@@ -256,7 +256,7 @@ void AppSettings::InitializeMap() {
 bool AppSettings::Load() {
   XmlDocument document;
   const auto path = taiga::GetPath(taiga::Path::Settings);
-  const auto parse_result = document.load_file(path.c_str());
+  const auto parse_result = XmlLoadFileToDocument(document, path);
 
   if (!parse_result) {
     LOGE(L"Could not read application settings.\nPath: {}\nReason: {}",
@@ -417,8 +417,8 @@ bool AppSettings::Save() {
   }
   reg.CloseKey();
 
-  std::wstring path = taiga::GetPath(taiga::Path::Settings);
-  return XmlWriteDocumentToFile(document, path);
+  const auto path = taiga::GetPath(taiga::Path::Settings);
+  return XmlSaveDocumentToFile(document, path);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
