@@ -16,11 +16,12 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "file_search.h"
+#include <set>
 
 #include <windows/win/error.h>
 
 #include "file.h"
+#include "file_search.h"
 #include "log.h"
 #include "string.h"
 
@@ -34,9 +35,8 @@ struct FileSearchHandleDeleter {
 using FileSearchHandle = std::unique_ptr<HANDLE, FileSearchHandleDeleter>;
 
 ////////////////////////////////////////////////////////////////////////////////
-
-// @TODO: Search breadth-first instead of depth-first
 // @TODO: Use std::filesystem?
+
 bool FileSearch::Search(const std::wstring& root,
                         callback_function_t on_directory,
                         callback_function_t on_file) const {
@@ -45,8 +45,8 @@ bool FileSearch::Search(const std::wstring& root,
   if (options.skip_directories && options.skip_files)
     return false;
 
-  bool result = false;
   const auto path = AddTrailingSlash(GetExtendedLengthPath(root)) + L"*";
+  std::set<std::wstring> subdirectories;
 
   WIN32_FIND_DATA data;
   FileSearchHandle handle(::FindFirstFile(path.c_str(), &data));
@@ -69,24 +69,30 @@ bool FileSearch::Search(const std::wstring& root,
     if (IsDirectory(data)) {
       if (!IsValidDirectory(data))
         continue;
-      if (!options.skip_directories && on_directory)
-        result = on_directory({root, data.cFileName, data});
-      if (!options.skip_subdirectories && !result)
-        result = Search(AddTrailingSlash(root) + data.cFileName,
-                        on_directory, on_file);
+      if (!options.skip_directories)
+        if (on_directory && on_directory({root, data.cFileName, data}))
+          return true;
+      if (!options.skip_subdirectories)
+        subdirectories.insert(AddTrailingSlash(root) + data.cFileName);
+
     // File
     } else {
       if (options.skip_files)
         continue;
       if (data.nFileSizeLow < options.min_file_size)
         continue;
-      if (on_file)
-        result = on_file({root, data.cFileName, data});
+      if (on_file && on_file({root, data.cFileName, data}))
+        return true;
     }
 
-  } while (!result && ::FindNextFile(handle.get(), &data));
+  } while (::FindNextFile(handle.get(), &data));
 
-  return result;
+  for (const auto& subdirectory : subdirectories) {
+    if (Search(subdirectory, on_directory, on_file))
+      return true;
+  }
+
+  return false;
 }
 
 }  // namespace base
