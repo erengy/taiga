@@ -116,25 +116,23 @@ void Database::ReadDatabaseNode(XmlNode& database_node) {
     item.SetProducers(XmlReadStr(node, L"producers"));
     item.SetSynopsis(XmlReadStr(node, L"synopsis"));
     item.SetLastModified(ToTime(XmlReadStr(node, L"modified")));
-
-    // This ordering results in less reallocations
-    item.SetEnglishTitle(XmlReadStr(node, L"english"));  // alternative
-    item.SetJapaneseTitle(XmlReadStr(node, L"japanese"));  // alternative
+    item.SetEnglishTitle(XmlReadStr(node, L"english"));
+    item.SetJapaneseTitle(XmlReadStr(node, L"japanese"));
     for (auto child_node : node.children(L"synonym")) {
-      item.InsertSynonym(child_node.child_value());  // alternative
+      item.InsertSynonym(child_node.child_value());
     }
-    item.SetPopularity(XmlReadInt(node, L"popularity"));  // community(1)
-    item.SetScore(ToDouble(XmlReadStr(node, L"score")));  // community(0)
-    item.SetDateEnd(Date(XmlReadStr(node, L"date_end")));      // date(1)
-    item.SetDateStart(Date(XmlReadStr(node, L"date_start")));  // date(0)
-    item.SetEpisodeLength(XmlReadInt(node, L"episode_length"));  // extent(1)
-    item.SetEpisodeCount(XmlReadInt(node, L"episode_count"));    // extent(0)
-    item.SetSlug(XmlReadStr(node, L"slug"));       // resource(1)
-    item.SetImageUrl(XmlReadStr(node, L"image"));  // resource(0)
+    item.SetPopularity(XmlReadInt(node, L"popularity"));
+    item.SetScore(ToDouble(XmlReadStr(node, L"score")));
+    item.SetDateEnd(Date(XmlReadStr(node, L"date_end")));
+    item.SetDateStart(Date(XmlReadStr(node, L"date_start")));
+    item.SetEpisodeLength(XmlReadInt(node, L"episode_length"));
+    item.SetEpisodeCount(XmlReadInt(node, L"episode_count"));
+    item.SetSlug(XmlReadStr(node, L"slug"));
+    item.SetImageUrl(XmlReadStr(node, L"image"));
   }
 }
 
-bool Database::SaveDatabase() {
+bool Database::SaveDatabase() const {
   XmlDocument document;
 
   XmlWriteMetaVersion(document, StrToWstr(taiga::version().to_string()));
@@ -144,7 +142,7 @@ bool Database::SaveDatabase() {
   return XmlSaveDocumentToFile(document, path);
 }
 
-void Database::WriteDatabaseNode(XmlNode& database_node) {
+void Database::WriteDatabaseNode(XmlNode& database_node) const {
   for (const auto& [id, item] : items) {
     auto anime_node = database_node.append_child(L"anime");
 
@@ -408,7 +406,7 @@ bool Database::LoadList() {
       if (CheckOldUserDirectory())
         return LoadList();
     } else {
-      ui::DisplayErrorMessage(L"Could not read anime list.", path.c_str());
+      ui::DisplayErrorMessage(L"Could not read anime list.", path);
     }
     return false;
   }
@@ -452,7 +450,7 @@ bool Database::LoadList() {
   return true;
 }
 
-bool Database::SaveList(bool include_database) {
+bool Database::SaveList(bool include_database) const {
   if (items.empty())
     return false;
 
@@ -491,6 +489,7 @@ bool Database::SaveList(bool include_database) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+// @TODO: Move to util
 int Database::GetItemCount(int status, bool check_history) {
   // Get current count
   int count = 0;

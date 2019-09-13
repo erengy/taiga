@@ -46,6 +46,7 @@ bool IsValidId(int anime_id) {
   return anime_id > ID_UNKNOWN;
 }
 
+// @TODO: Remove
 bool ListHasMissingIds() {
   for (const auto& [id, item] : AnimeDatabase.items) {
     if (item.GetMyStatus(false) != kNotInList && item.GetMyId().empty()) {
@@ -319,7 +320,7 @@ bool PlayRandomAnime() {
 
   std::vector<int> valid_ids;
 
-  for (auto& [id, anime_item] : AnimeDatabase.items) {
+  for (const auto& [id, anime_item] : AnimeDatabase.items) {
     if (!anime_item.IsInList())
       continue;
     if (!anime_item.IsNextEpisodeAvailable())

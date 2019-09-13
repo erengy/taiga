@@ -269,16 +269,15 @@ void FeedConditionDialog::ChooseElement(int element_index) {
       RECREATE_COMBO((element_index == kFeedFilterElement_Meta_Id ? CBS_DROPDOWNLIST : CBS_DROPDOWN));
       using anime_pair = std::pair<int, std::wstring>;
       std::vector<anime_pair> title_list;
-      for (auto it = AnimeDatabase.items.begin(); it != AnimeDatabase.items.end(); ++it) {
-        switch (it->second.GetMyStatus()) {
+      for (const auto& [id, item] : AnimeDatabase.items) {
+        switch (item.GetMyStatus()) {
           case anime::kNotInList:
           case anime::kCompleted:
           case anime::kDropped:
             continue;
           default:
-            title_list.push_back(std::make_pair(
-                it->second.GetId(),
-                anime::GetPreferredTitle(*AnimeDatabase.FindItem(it->second.GetId()))));
+            title_list.push_back(std::make_pair(id, anime::GetPreferredTitle(item)));
+            break;
         }
       }
       std::sort(title_list.begin(), title_list.end(),

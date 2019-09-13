@@ -33,7 +33,7 @@ namespace anime {
 class Database {
 public:
   bool LoadDatabase();
-  bool SaveDatabase();
+  bool SaveDatabase() const;
 
   Item* FindItem(int id, bool log_error = true);
   Item* FindItem(const std::wstring& id, enum_t service, bool log_error = true);
@@ -44,7 +44,7 @@ public:
 
 public:
   bool LoadList();
-  bool SaveList(bool include_database = false);
+  bool SaveList(bool include_database = false) const;
 
   int GetItemCount(int status, bool check_history = true);
 
@@ -58,7 +58,7 @@ public:
 
 private:
   void ReadDatabaseNode(pugi::xml_node& database_node);
-  void WriteDatabaseNode(pugi::xml_node& database_node);
+  void WriteDatabaseNode(pugi::xml_node& database_node) const;
 
   bool CheckOldUserDirectory();
   void HandleCompatibility(const std::wstring& meta_version);
