@@ -69,4 +69,4 @@ private:
 
 }  // namespace anime
 
-extern anime::Database AnimeDatabase;
+inline anime::Database AnimeDatabase;

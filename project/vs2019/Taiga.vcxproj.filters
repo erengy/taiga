@@ -640,6 +640,9 @@
     <ClCompile Include="..\..\src\base\atf.cpp">
       <Filter>base</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\library\anime_list.cpp">
+      <Filter>library\anime</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\base\base64.h">
