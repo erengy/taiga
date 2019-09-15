@@ -21,6 +21,7 @@
 #include "base/file.h"
 #include "base/format.h"
 #include "base/log.h"
+#include "base/random.h"
 #include "media/anime.h"
 #include "media/anime_db.h"
 #include "media/anime_util.h"
@@ -152,13 +153,9 @@ bool PlayRandomAnime() {
     valid_ids.push_back(anime_item.GetId());
   }
 
-  size_t max_value = valid_ids.size();
+  Random::shuffle(valid_ids);
 
-  srand(static_cast<unsigned int>(GetTickCount()));
-
-  for (const auto& unused : valid_ids) {
-    size_t index = rand() % max_value;
-    int anime_id = valid_ids.at(index);
+  for (const auto& anime_id : valid_ids) {
     if (PlayNextEpisode(anime_id))
       return true;
   }
@@ -177,10 +174,8 @@ bool PlayRandomEpisode(int anime_id) {
       anime_item->GetEpisodeCount() : anime_item->GetMyLastWatchedEpisode() + 1;
   const int max_tries = anime_item->GetFolder().empty() ? 3 : 10;
 
-  srand(static_cast<unsigned int>(GetTickCount()));
-
   for (int i = 0; i < std::min(total, max_tries); i++) {
-    int episode_number = rand() % total + 1;
+    const int episode_number = Random::get(1, total);
     if (PlayEpisode(anime_item->GetId(), episode_number))
       return true;
   }

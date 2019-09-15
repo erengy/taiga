@@ -106,6 +106,9 @@
     <Filter Include="track\torrents">
       <UniqueIdentifier>{ace9aed7-39a5-4f01-86df-477c7298724c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="deps\random">
+      <UniqueIdentifier>{aef09e7a-0321-4422-9192-472e39604900}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\main.cpp" />
@@ -1178,6 +1181,12 @@
     </ClInclude>
     <ClInclude Include="..\..\src\track\media.h">
       <Filter>track\recognition</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\random\include\effolkronium\random.hpp">
+      <Filter>deps\random</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\base\random.h">
+      <Filter>base</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -43,6 +43,7 @@ enum ThirdPartyLibrary {
   kJson,
   kLibcurl,
   kPugixml,
+  kRandom,
   kRapidJson,
   kUtf8proc,
   kZlib,
@@ -74,6 +75,8 @@ static std::wstring GetLibraryVersion(ThirdPartyLibrary library) {
           (PUGIXML_VERSION / 100),
           (PUGIXML_VERSION % 100) / 10,
           (PUGIXML_VERSION % 100) % 10).to_string());
+    case kRandom:
+      return L"1.3.0";
     case kRapidJson:
       return StrToWstr(semaver::Version(
           RAPIDJSON_MAJOR_VERSION,
@@ -129,6 +132,7 @@ BOOL AboutDialog::OnInitDialog() {
       L"{\\field{\\*\\fldinst{HYPERLINK \"https://github.com/nlohmann/json\"}}{\\fldrslt{JSON for Modern C++ " + GetLibraryVersion(kJson) + L"}}}, "
       L"{\\field{\\*\\fldinst{HYPERLINK \"https://github.com/curl/curl\"}}{\\fldrslt{libcurl " + GetLibraryVersion(kLibcurl) + L"}}}, "
       L"{\\field{\\*\\fldinst{HYPERLINK \"https://github.com/zeux/pugixml\"}}{\\fldrslt{pugixml " + GetLibraryVersion(kPugixml) + L"}}}, "
+      L"{\\field{\\*\\fldinst{HYPERLINK \"https://github.com/effolkronium/random\"}}{\\fldrslt{Random " + GetLibraryVersion(kRandom) + L"}}}, "
       L"{\\field{\\*\\fldinst{HYPERLINK \"https://github.com/Tencent/rapidjson\"}}{\\fldrslt{RapidJSON " + GetLibraryVersion(kRapidJson) + L"}}}, "
       L"{\\field{\\*\\fldinst{HYPERLINK \"https://github.com/JuliaLang/utf8proc\"}}{\\fldrslt{utf8proc " + GetLibraryVersion(kUtf8proc) + L"}}}, "
       L"{\\field{\\*\\fldinst{HYPERLINK \"https://github.com/madler/zlib\"}}{\\fldrslt{zlib " + GetLibraryVersion(kZlib) + L"}}}\\line\\par "
