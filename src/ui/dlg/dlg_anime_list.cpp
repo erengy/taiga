@@ -35,6 +35,7 @@
 #include "taiga/settings.h"
 #include "taiga/taiga.h"
 #include "taiga/timer.h"
+#include "track/play.h"
 #include "ui/dlg/dlg_anime_list.h"
 #include "ui/dlg/dlg_main.h"
 #include "ui/dlg/dlg_torrent.h"
@@ -400,7 +401,7 @@ void AnimeListDialog::ListView::ExecuteAction(AnimeListAction action,
       ::ExecuteAction(L"OpenFolder", 0, anime_id);
       break;
     case kAnimeListActionPlayNext:
-      anime::PlayNextEpisode(anime_id);
+      track::PlayNextEpisode(anime_id);
       break;
     case kAnimeListActionInfo:
       ShowDlgAnimeInfo(anime_id);
@@ -902,11 +903,11 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
               return TRUE;
             // Play next episode
             } else if (pnkd->wVKey == 'N') {
-              anime::PlayNextEpisode(anime_id);
+              track::PlayNextEpisode(anime_id);
               return TRUE;
             // Play random episode
             } else if (pnkd->wVKey == 'R') {
-              anime::PlayRandomEpisode(anime_id);
+              track::PlayRandomEpisode(anime_id);
               return TRUE;
             }
           }

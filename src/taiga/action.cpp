@@ -36,6 +36,7 @@
 #include "taiga/resource.h"
 #include "taiga/settings.h"
 #include "track/monitor.h"
+#include "track/play.h"
 #include "track/recognition.h"
 #include "track/search.h"
 #include "ui/dlg/dlg_main.h"
@@ -640,14 +641,14 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   } else if (action == L"PlayEpisode") {
     int number = ToInt(body);
     int anime_id = static_cast<int>(lParam);
-    anime::PlayEpisode(anime_id, number);
+    track::PlayEpisode(anime_id, number);
 
   // PlayLast()
   //   Searches for the last watched episode of an anime and plays it.
   //   lParam is an anime ID.
   } else if (action == L"PlayLast") {
     int anime_id = static_cast<int>(lParam);
-    anime::PlayLastEpisode(anime_id);
+    track::PlayLastEpisode(anime_id);
 
   // PlayNext([anime_id])
   //   Searches for the next episode of an anime and plays it.
@@ -655,9 +656,9 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   } else if (action == L"PlayNext") {
     int anime_id = body.empty() ? static_cast<int>(lParam) : ToInt(body);
     if (anime::IsValidId(anime_id)) {
-      anime::PlayNextEpisode(anime_id);
+      track::PlayNextEpisode(anime_id);
     } else {
-      anime::PlayNextEpisodeOfLastWatchedAnime();
+      track::PlayNextEpisodeOfLastWatchedAnime();
     }
 
   // PlayRandom()
@@ -665,12 +666,12 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   //   lParam is an anime ID.
   } else if (action == L"PlayRandom") {
     int anime_id = body.empty() ? static_cast<int>(lParam) : ToInt(body);
-    anime::PlayRandomEpisode(anime_id);
+    track::PlayRandomEpisode(anime_id);
 
   // PlayRandomAnime()
   //   Searches for a random episode of a random anime and plays it.
   } else if (action == L"PlayRandomAnime") {
-    anime::PlayRandomAnime();
+    track::PlayRandomAnime();
 
   // StartNewRewatch()
   //   Sets status to Currently Watching and plays first episode.

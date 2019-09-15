@@ -45,12 +45,6 @@ bool MetadataNeedsRefresh(const Item& item);
 
 bool IsNsfw(const Item& item);
 
-bool PlayEpisode(int anime_id, int number);
-bool PlayLastEpisode(int anime_id);
-bool PlayNextEpisode(int anime_id);
-bool PlayNextEpisodeOfLastWatchedAnime();
-bool PlayRandomAnime();
-bool PlayRandomEpisode(int anime_id);
 bool StartNewRewatch(int anime_id);
 bool LinkEpisodeToAnime(Episode& episode, int anime_id);
 void StartWatching(Item& item, Episode& episode);

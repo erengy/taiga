@@ -255,6 +255,7 @@
     <ClCompile Include="..\..\src\track\media.cpp" />
     <ClCompile Include="..\..\src\track\media_stream.cpp" />
     <ClCompile Include="..\..\src\track\monitor.cpp" />
+    <ClCompile Include="..\..\src\track\play.cpp" />
     <ClCompile Include="..\..\src\track\recognition.cpp" />
     <ClCompile Include="..\..\src\track\recognition_normalize.cpp" />
     <ClCompile Include="..\..\src\track\recognition_relations.cpp" />
@@ -437,6 +438,7 @@
     <ClInclude Include="..\..\src\track\feed_filter.h" />
     <ClInclude Include="..\..\src\track\media.h" />
     <ClInclude Include="..\..\src\track\monitor.h" />
+    <ClInclude Include="..\..\src\track\play.h" />
     <ClInclude Include="..\..\src\track\recognition.h" />
     <ClInclude Include="..\..\src\track\search.h" />
     <ClInclude Include="..\..\src\ui\dialog.h" />

@@ -39,6 +39,7 @@
 #include "taiga/timer.h"
 #include "track/media.h"
 #include "track/monitor.h"
+#include "track/play.h"
 #include "track/recognition.h"
 #include "track/search.h"
 #include "ui/dialog.h"
@@ -433,7 +434,7 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
         // Play next episode
         case 'N': {
           if ((GetKeyState(VK_CONTROL) & 0x8000) && !is_anime_list_focused()) {
-            anime::PlayNextEpisodeOfLastWatchedAnime();
+            track::PlayNextEpisodeOfLastWatchedAnime();
             return TRUE;
           }
           break;
@@ -441,7 +442,7 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
         // Play random anime
         case 'R': {
           if ((GetKeyState(VK_CONTROL) & 0x8000) && !is_anime_list_focused()) {
-            anime::PlayRandomAnime();
+            track::PlayRandomAnime();
             return TRUE;
           }
           break;

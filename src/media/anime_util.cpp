@@ -37,6 +37,7 @@
 #include "taiga/timer.h"
 #include "track/feed.h"
 #include "track/media.h"
+#include "track/play.h"
 #include "track/recognition.h"
 #include "track/search.h"
 #include "ui/ui.h"
@@ -214,164 +215,6 @@ bool IsNsfw(const Item& item) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool PlayEpisode(int anime_id, int number) {
-  auto anime_item = anime::db.Find(anime_id);
-
-  if (!anime_item)
-    return false;
-
-  if (number > anime_item->GetEpisodeCount() &&
-      IsValidEpisodeCount(anime_item->GetEpisodeCount()))
-    return false;
-
-  if (number == 0)
-    number = 1;
-
-  std::wstring file_path;
-
-  // Check saved episode path
-  if (number == anime_item->GetMyLastWatchedEpisode() + 1) {
-    const std::wstring& next_episode_path = anime_item->GetNextEpisodePath();
-    if (!next_episode_path.empty()) {
-      if (FileExists(next_episode_path)) {
-        file_path = next_episode_path;
-      } else {
-        LOGD(L"File doesn't exist anymore.\nPath: {}", next_episode_path);
-        anime_item->SetEpisodeAvailability(number, false, L"");
-      }
-    }
-  }
-
-  // Scan available episodes
-  if (file_path.empty()) {
-    ScanAvailableEpisodes(false, anime_item->GetId(), number);
-    if (anime_item->IsEpisodeAvailable(number)) {
-      file_path = track::file_search_helper.path_found();
-    }
-  }
-
-  if (file_path.empty()) {
-    ui::ChangeStatusText(L"Could not find episode #{} ({})."_format(
-                         number, GetPreferredTitle(*anime_item)));
-    return false;
-  }
-
-  const auto player_path = Settings[taiga::kLibrary_MediaPlayerPath];
-  if (player_path.empty()) {
-    return Execute(file_path);
-  } else {
-    return Execute(player_path, LR"("{}")"_format(file_path));
-  }
-}
-
-bool PlayLastEpisode(int anime_id) {
-  auto anime_item = anime::db.Find(anime_id);
-
-  if (!anime_item)
-    return false;
-
-  return PlayEpisode(anime_id, anime_item->GetMyLastWatchedEpisode());
-}
-
-bool PlayNextEpisode(int anime_id) {
-  auto anime_item = anime::db.Find(anime_id);
-
-  if (!anime_item)
-    return false;
-
-  int number = anime_item->GetMyLastWatchedEpisode() + 1;
-
-  if (IsValidEpisodeCount(anime_item->GetEpisodeCount()))
-    if (number > anime_item->GetEpisodeCount())
-      number = 1;  // Play the first episode of completed series
-
-  return PlayEpisode(anime_id, number);
-}
-
-bool PlayNextEpisodeOfLastWatchedAnime() {
-  int anime_id = ID_UNKNOWN;
-
-  auto get_id_from_history_items = [](const std::vector<HistoryItem>& items) {
-    for (auto it = items.rbegin(); it != items.rend(); ++it) {
-      const auto& item = *it;
-      if (item.episode) {
-        auto anime_item = anime::db.Find(item.anime_id);
-        if (anime_item && anime_item->GetMyStatus() != anime::kCompleted)
-          return item.anime_id;
-      }
-    }
-    return static_cast<int>(anime::ID_UNKNOWN);
-  };
-
-  if (!anime::IsValidId(anime_id))
-    anime_id = get_id_from_history_items(History.queue.items);
-  if (!anime::IsValidId(anime_id))
-    anime_id = get_id_from_history_items(History.items);
-
-  return PlayNextEpisode(anime_id);
-}
-
-bool PlayRandomAnime() {
-  static time_t time_last_checked = 0;
-  time_t time_now = time(nullptr);
-  if (time_now > time_last_checked + (60 * 2)) {  // 2 minutes
-    ScanAvailableEpisodesQuick();
-    time_last_checked = time_now;
-  }
-
-  std::vector<int> valid_ids;
-
-  for (const auto& [id, anime_item] : anime::db.items) {
-    if (!anime_item.IsInList())
-      continue;
-    if (!anime_item.IsNextEpisodeAvailable())
-      continue;
-    switch (anime_item.GetMyStatus()) {
-      case anime::kNotInList:
-      case anime::kCompleted:
-      case anime::kDropped:
-        continue;
-    }
-    valid_ids.push_back(anime_item.GetId());
-  }
-
-  size_t max_value = valid_ids.size();
-
-  srand(static_cast<unsigned int>(GetTickCount()));
-
-  for (const auto& unused : valid_ids) {
-    size_t index = rand() % max_value;
-    int anime_id = valid_ids.at(index);
-    if (PlayNextEpisode(anime_id))
-      return true;
-  }
-
-  ui::OnAnimeEpisodeNotFound(L"Play Random Episode");
-  return false;
-}
-
-bool PlayRandomEpisode(int anime_id) {
-  auto anime_item = anime::db.Find(anime_id);
-
-  if (!anime_item)
-    return false;
-
-  const int total = anime_item->GetMyStatus() == kCompleted ?
-      anime_item->GetEpisodeCount() : anime_item->GetMyLastWatchedEpisode() + 1;
-  const int max_tries = anime_item->GetFolder().empty() ? 3 : 10;
-
-  srand(static_cast<unsigned int>(GetTickCount()));
-
-  for (int i = 0; i < std::min(total, max_tries); i++) {
-    int episode_number = rand() % total + 1;
-    if (PlayEpisode(anime_item->GetId(), episode_number))
-      return true;
-  }
-
-  ui::OnAnimeEpisodeNotFound(L"Play Random Episode");
-  return false;
-}
-
 bool StartNewRewatch(int anime_id) {
   auto anime_item = anime::db.Find(anime_id);
 
@@ -385,7 +228,7 @@ bool StartNewRewatch(int anime_id) {
   history_item.episode = 0;
   History.queue.Add(history_item);
 
-  if (PlayEpisode(anime_item->GetId(), 0)) {
+  if (track::PlayEpisode(anime_item->GetId(), 0)) {
     return true;
   }
 
