@@ -297,7 +297,7 @@ void RequestToken() {
 }
 
 void ViewAnimePage(int anime_id) {
-  auto anime_item = anime::db.FindItem(anime_id);
+  auto anime_item = anime::db.Find(anime_id);
 
   if (anime_item)
     ExecuteLink(GetAnimePage(*anime_item));

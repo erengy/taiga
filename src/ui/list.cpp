@@ -196,8 +196,8 @@ int SortList(int type, LPCWSTR str1, LPCWSTR str2) {
 }
 
 int SortList(int type, int order, int id1, int id2) {
-  const auto item1 = anime::db.FindItem(id1);
-  const auto item2 = anime::db.FindItem(id2);
+  const auto item1 = anime::db.Find(id1);
+  const auto item2 = anime::db.Find(id2);
 
   if (item1 && item2) {
     switch (type) {
@@ -302,8 +302,8 @@ int CALLBACK AnimeListCompareProc(LPARAM lParam1, LPARAM lParam2,
   if (Settings.GetBool(taiga::kApp_List_HighlightNewEpisodes) &&
       Settings.GetBool(taiga::kApp_List_DisplayHighlightedOnTop)) {
     const auto list = reinterpret_cast<win::ListView*>(lParamSort);
-    const auto item1 = anime::db.FindItem(list->GetItemParam(lParam1));
-    const auto item2 = anime::db.FindItem(list->GetItemParam(lParam2));
+    const auto item1 = anime::db.Find(list->GetItemParam(lParam1));
+    const auto item2 = anime::db.Find(list->GetItemParam(lParam2));
     if (item1 && item2) {
       bool available1 = item1->IsNextEpisodeAvailable();
       bool available2 = item2->IsNextEpisodeAvailable();

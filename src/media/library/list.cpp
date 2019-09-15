@@ -153,7 +153,7 @@ int Database::GetItemCount(int status, bool check_history) {
         if (status == *history_item.status) {
           count++;
         } else {
-          auto anime_item = FindItem(history_item.anime_id);
+          auto anime_item = Find(history_item.anime_id);
           if (anime_item && status == anime_item->GetMyStatus(false))
             count--;
         }
@@ -167,7 +167,7 @@ int Database::GetItemCount(int status, bool check_history) {
 ////////////////////////////////////////////////////////////////////////////////
 
 void Database::AddToList(int anime_id, int status) {
-  auto anime_item = FindItem(anime_id);
+  auto anime_item = Find(anime_id);
 
   if (!anime_item || anime_item->IsInList())
     return;
@@ -212,7 +212,7 @@ void Database::ClearUserData() {
 }
 
 bool Database::DeleteListItem(int anime_id) {
-  auto anime_item = FindItem(anime_id);
+  auto anime_item = Find(anime_id);
 
   if (!anime_item)
     return false;
@@ -231,7 +231,7 @@ bool Database::DeleteListItem(int anime_id) {
 }
 
 void Database::UpdateItem(const HistoryItem& history_item) {
-  auto anime_item = FindItem(history_item.anime_id);
+  auto anime_item = Find(history_item.anime_id);
 
   if (!anime_item)
     return;

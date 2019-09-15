@@ -147,7 +147,7 @@ void SeasonDialog::OnContextMenu(HWND hwnd, POINT pt) {
       auto anime_ids = GetAnimeIdsFromSelectedListItems(list_);
       bool is_in_list = true;
       for (const auto& anime_id : anime_ids) {
-        auto anime_item = anime::db.FindItem(anime_id);
+        auto anime_item = anime::db.Find(anime_id);
         if (anime_item && !anime_item->IsInList()) {
           is_in_list = false;
           break;
@@ -228,7 +228,7 @@ LRESULT SeasonDialog::OnListNotify(LPARAM lParam) {
         list_.GetSubItemRect(lplv->iItem, 0, &rect_item);
         tooltips_.NewToolRect(0, &rect_item);
       }
-      auto anime_item = anime::db.FindItem(list_.GetItemParam(lplv->iItem));
+      auto anime_item = anime::db.Find(list_.GetItemParam(lplv->iItem));
       if (anime_item) {
         tooltips_.UpdateTitle(anime::GetPreferredTitle(*anime_item).c_str());
         std::wstring text;
@@ -307,7 +307,7 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
     }
 
     case CDDS_ITEMPOSTPAINT: {
-      auto anime_item = anime::db.FindItem(static_cast<int>(pCD->nmcd.lItemlParam));
+      auto anime_item = anime::db.Find(static_cast<int>(pCD->nmcd.lItemlParam));
       if (!anime_item)
         break;
 
@@ -578,7 +578,7 @@ void SeasonDialog::RefreshData(int anime_id) {
     if (anime_id > 0 && anime_id != id)
       continue;
 
-    auto anime_item = anime::db.FindItem(id);
+    auto anime_item = anime::db.Find(id);
     if (!anime_item)
       continue;
 
@@ -639,7 +639,7 @@ void SeasonDialog::RefreshList(bool redraw_only) {
   // Add items
   list_.DeleteAllItems();
   for (auto i = SeasonDatabase.items.begin(); i != SeasonDatabase.items.end(); ++i) {
-    auto anime_item = anime::db.FindItem(*i);
+    auto anime_item = anime::db.Find(*i);
     if (!anime_item)
       continue;
     bool passed_filters = true;

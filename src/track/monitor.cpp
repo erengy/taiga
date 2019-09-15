@@ -113,7 +113,7 @@ static anime::Item* FindAnimeItem(const DirectoryChangeNotification& notificatio
 
   auto anime_id = Meow.Identify(episode, false, match_options);
 
-  return anime::db.FindItem(anime_id);
+  return anime::db.Find(anime_id);
 }
 
 void FolderMonitor::OnDirectory(const DirectoryChangeNotification& notification) const {

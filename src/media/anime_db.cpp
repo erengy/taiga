@@ -192,7 +192,7 @@ void Database::WriteDatabaseNode(XmlNode& database_node) const {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-Item* Database::FindItem(int id, bool log_error) {
+Item* Database::Find(int id, bool log_error) {
   if (IsValidId(id)) {
     auto it = items.find(id);
     if (it != items.end())
@@ -204,8 +204,7 @@ Item* Database::FindItem(int id, bool log_error) {
   return nullptr;
 }
 
-Item* Database::FindItem(const std::wstring& id, enum_t service,
-                         bool log_error) {
+Item* Database::Find(const std::wstring& id, enum_t service, bool log_error) {
   if (!id.empty()) {
     for (auto& pair : items)
       if (id == pair.second.GetId(service))
@@ -234,7 +233,7 @@ void Database::ClearInvalidItems() {
 bool Database::DeleteItem(int id) {
   std::wstring title;
 
-  auto anime_item = FindItem(id, false);
+  auto anime_item = Find(id, false);
   if (anime_item)
     title = anime::GetPreferredTitle(*anime_item);
 
@@ -268,7 +267,7 @@ int Database::UpdateItem(const Item& new_item) {
   Item* item = nullptr;
 
   for (enum_t i = sync::kTaiga; i <= sync::kLastService; i++) {
-    item = FindItem(new_item.GetId(i), i, false);
+    item = Find(new_item.GetId(i), i, false);
     if (item)
       break;
   }

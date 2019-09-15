@@ -149,7 +149,7 @@ void Manager::HandleError(Response& response, HttpResponse& http_response) {
   int anime_id = ::anime::ID_UNKNOWN;
   if (request.data.count(L"taiga-id"))
     anime_id = ToInt(request.data[L"taiga-id"]);
-  auto anime_item = anime::db.FindItem(anime_id);
+  auto anime_item = anime::db.Find(anime_id);
 
   switch (response.type) {
     case kAuthenticateUser:
@@ -211,7 +211,7 @@ void Manager::HandleResponse(Response& response, HttpResponse& http_response) {
   int anime_id = ::anime::ID_UNKNOWN;
   if (request.data.count(L"taiga-id"))
     anime_id = ToInt(request.data[L"taiga-id"]);
-  auto anime_item = anime::db.FindItem(anime_id);
+  auto anime_item = anime::db.Find(anime_id);
 
   const auto update_username = [&service, &response]() {
     const auto& username = service.user().username;

@@ -89,7 +89,7 @@ void History::ReadQueueInCompatibilityMode(const pugi::xml_document& document) {
       }
     }
 
-    if (anime::db.FindItem(history_item.anime_id)) {
+    if (anime::db.Find(history_item.anime_id)) {
       queue.Add(history_item, false);
     } else {
       LOGW(L"Item does not exist in the database.\n"

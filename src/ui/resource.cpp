@@ -45,7 +45,7 @@ bool ImageDatabase::Load(int anime_id, bool load, bool download) {
     items_[anime_id].data = anime_id;
     if (download) {
       // Refresh if current file is too old
-      auto anime_item = anime::db.FindItem(anime_id);
+      auto anime_item = anime::db.Find(anime_id);
       if (anime_item && anime_item->GetAiringStatus() != anime::kFinishedAiring) {
         // Check last modified date (>= 7 days)
         if (GetFileAge(anime::GetImagePath(anime_id)) / (60 * 60 * 24) >= 7) {
@@ -59,7 +59,7 @@ bool ImageDatabase::Load(int anime_id, bool load, bool download) {
   }
 
   if (download) {
-    auto anime_item = anime::db.FindItem(anime_id);
+    auto anime_item = anime::db.Find(anime_id);
     if (anime_item)
       sync::DownloadImage(anime_id, anime_item->GetImageUrl());
   }

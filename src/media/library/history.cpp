@@ -47,7 +47,7 @@ HistoryQueue::HistoryQueue()
 }
 
 void HistoryQueue::Add(HistoryItem& item, bool save) {
-  auto anime = anime::db.FindItem(item.anime_id);
+  auto anime = anime::db.Find(item.anime_id);
 
   // Add to user list
   if (anime && !anime->IsInList())
@@ -180,7 +180,7 @@ void HistoryQueue::Check(bool automatic) {
     return;
   }
 
-  auto anime_item = anime::db.FindItem(items[index].anime_id);
+  auto anime_item = anime::db.Find(items[index].anime_id);
   if (!anime_item) {
     LOGW(L"Item not found in list, removing... ID: {}", items[index].anime_id);
     Remove(index, true, true, false);
@@ -330,7 +330,7 @@ void HistoryQueue::Remove(int index, bool save, bool refresh, bool to_history) {
     }
 
     if (history_item.episode) {
-      auto anime_item = anime::db.FindItem(history_item.anime_id);
+      auto anime_item = anime::db.Find(history_item.anime_id);
       if (anime_item &&
           anime_item->GetMyLastWatchedEpisode() == *history_item.episode) {
         // Next episode path is no longer valid
@@ -405,7 +405,7 @@ bool History::Load() {
     history_item.episode = item.attribute(L"episode").as_int();
     history_item.time = item.attribute(L"time").value();
 
-    if (anime::db.FindItem(history_item.anime_id)) {
+    if (anime::db.Find(history_item.anime_id)) {
       items.push_back(history_item);
     } else {
       LOGW(L"Item does not exist in the database.\n"
@@ -457,7 +457,7 @@ void History::ReadQueue(const pugi::xml_document& document) {
     #undef READ_ATTRIBUTE_STR
     #undef READ_ATTRIBUTE_INT
 
-    if (anime::db.FindItem(history_item.anime_id)) {
+    if (anime::db.Find(history_item.anime_id)) {
       queue.Add(history_item, false);
     } else {
       LOGW(L"Item does not exist in the database.\n"
@@ -555,7 +555,7 @@ void ConfirmationQueue::Process() {
     int choice = ui::OnHistoryProcessConfirmationQueue(episode);
     if (choice != IDNO) {
       bool change_status = (choice == IDCANCEL);
-      auto anime_item = anime::db.FindItem(episode.anime_id);
+      auto anime_item = anime::db.Find(episode.anime_id);
       if (anime_item)
         AddToQueue(*anime_item, episode, change_status);
     }

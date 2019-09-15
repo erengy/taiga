@@ -96,7 +96,7 @@ static double CustomScore(const std::wstring& title, const std::wstring& str) {
 
 static double BonusScore(const anime::Episode& episode, int id) {
   double score = 0.0;
-  auto anime_item = anime::db.FindItem(id);
+  auto anime_item = anime::db.Find(id);
 
   if (anime_item) {
     auto anime_year = episode.anime_year();

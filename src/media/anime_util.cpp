@@ -215,7 +215,7 @@ bool IsNsfw(const Item& item) {
 ////////////////////////////////////////////////////////////////////////////////
 
 bool PlayEpisode(int anime_id, int number) {
-  auto anime_item = anime::db.FindItem(anime_id);
+  auto anime_item = anime::db.Find(anime_id);
 
   if (!anime_item)
     return false;
@@ -265,7 +265,7 @@ bool PlayEpisode(int anime_id, int number) {
 }
 
 bool PlayLastEpisode(int anime_id) {
-  auto anime_item = anime::db.FindItem(anime_id);
+  auto anime_item = anime::db.Find(anime_id);
 
   if (!anime_item)
     return false;
@@ -274,7 +274,7 @@ bool PlayLastEpisode(int anime_id) {
 }
 
 bool PlayNextEpisode(int anime_id) {
-  auto anime_item = anime::db.FindItem(anime_id);
+  auto anime_item = anime::db.Find(anime_id);
 
   if (!anime_item)
     return false;
@@ -295,7 +295,7 @@ bool PlayNextEpisodeOfLastWatchedAnime() {
     for (auto it = items.rbegin(); it != items.rend(); ++it) {
       const auto& item = *it;
       if (item.episode) {
-        auto anime_item = anime::db.FindItem(item.anime_id);
+        auto anime_item = anime::db.Find(item.anime_id);
         if (anime_item && anime_item->GetMyStatus() != anime::kCompleted)
           return item.anime_id;
       }
@@ -351,7 +351,7 @@ bool PlayRandomAnime() {
 }
 
 bool PlayRandomEpisode(int anime_id) {
-  auto anime_item = anime::db.FindItem(anime_id);
+  auto anime_item = anime::db.Find(anime_id);
 
   if (!anime_item)
     return false;
@@ -373,7 +373,7 @@ bool PlayRandomEpisode(int anime_id) {
 }
 
 bool StartNewRewatch(int anime_id) {
-  auto anime_item = anime::db.FindItem(anime_id);
+  auto anime_item = anime::db.Find(anime_id);
 
   if (!anime_item)
     return false;
@@ -394,7 +394,7 @@ bool StartNewRewatch(int anime_id) {
 }
 
 bool LinkEpisodeToAnime(Episode& episode, int anime_id) {
-  auto anime_item = anime::db.FindItem(anime_id);
+  auto anime_item = anime::db.Find(anime_id);
 
   if (!anime_item)
     return false;
@@ -641,7 +641,7 @@ bool SetFansubFilter(int anime_id, const std::wstring& group_name,
   if (group_name.empty())
     return false;
 
-  auto anime_item = anime::db.FindItem(anime_id);
+  auto anime_item = anime::db.Find(anime_id);
 
   if (!anime_item)
     return false;
@@ -883,7 +883,7 @@ int EstimateEpisodeCount(const Item& item) {
 }
 
 void ChangeEpisode(int anime_id, int value) {
-  auto anime_item = anime::db.FindItem(anime_id);
+  auto anime_item = anime::db.Find(anime_id);
 
   if (!anime_item)
     return;
@@ -901,7 +901,7 @@ void ChangeEpisode(int anime_id, int value) {
 }
 
 void DecrementEpisode(int anime_id) {
-  auto anime_item = anime::db.FindItem(anime_id);
+  auto anime_item = anime::db.Find(anime_id);
 
   if (!anime_item)
     return;
@@ -920,7 +920,7 @@ void DecrementEpisode(int anime_id) {
 }
 
 void IncrementEpisode(int anime_id) {
-  auto anime_item = anime::db.FindItem(anime_id);
+  auto anime_item = anime::db.Find(anime_id);
 
   if (!anime_item)
     return;
@@ -961,7 +961,7 @@ const std::wstring& GetPreferredTitle(const Item& item) {
 }
 
 void GetAllTitles(int anime_id, std::vector<std::wstring>& titles) {
-  const auto& anime_item = *anime::db.FindItem(anime_id);
+  const auto& anime_item = *anime::db.Find(anime_id);
 
   auto insert_title = [&titles](const std::wstring& title) {
     if (!title.empty())

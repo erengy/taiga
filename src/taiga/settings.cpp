@@ -292,7 +292,7 @@ bool AppSettings::Load() {
   auto node_items = settings.child(L"anime").child(L"items");
   for (auto item : node_items.children(L"item")) {
     int anime_id = item.attribute(L"id").as_int();
-    auto anime_item = anime::db.FindItem(anime_id, false);
+    auto anime_item = anime::db.Find(anime_id, false);
     if (!anime_item)
       anime_item = &anime::db.items[anime_id];
     anime_item->SetFolder(item.attribute(L"folder").value());

@@ -234,7 +234,7 @@ INT_PTR AnimeListDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
         win::Rect rect = dis->rcItem;
 
         int anime_id = dis->itemData;
-        auto anime_item = anime::db.FindItem(anime_id);
+        auto anime_item = anime::db.Find(anime_id);
         if (!anime_item)
           return TRUE;
 
@@ -553,7 +553,7 @@ void AnimeListDialog::ListView::RefreshItem(int index) {
   }
 
   int anime_id = GetItemParam(index);
-  auto anime_item = anime::db.FindItem(anime_id);
+  auto anime_item = anime::db.Find(anime_id);
 
   if (!anime_item || !anime_item->IsInList())
     return;
@@ -701,7 +701,7 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
       if (listview.drag_image.GetHandle()) {
         int icon_index = ui::kIcon16_DocumentA;
         int anime_id = listview.GetItemParam(lplv->iItem);
-        auto anime_item = anime::db.FindItem(anime_id);
+        auto anime_item = anime::db.Find(anime_id);
         if (anime_item)
           icon_index = ui::StatusToIcon(anime_item->GetAiringStatus());
         listview.drag_image.BeginDrag(icon_index, 0, 0);
@@ -814,7 +814,7 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
     // Text callback
     case LVN_GETDISPINFO: {
       NMLVDISPINFO* plvdi = reinterpret_cast<NMLVDISPINFO*>(lParam);
-      auto anime_item = anime::db.FindItem(static_cast<int>(plvdi->item.lParam));
+      auto anime_item = anime::db.Find(static_cast<int>(plvdi->item.lParam));
       if (!anime_item)
         break;
       auto column_type = listview.FindColumnAtSubItemIndex(plvdi->item.iSubItem);
@@ -884,7 +884,7 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
               if (!anime_ids.empty()) {
                 std::vector<std::wstring> anime_titles;
                 for (const auto id : anime_ids) {
-                  const auto anime_item = anime::db.FindItem(id);
+                  const auto anime_item = anime::db.Find(id);
                   if (anime_item)
                     anime_titles.push_back(anime::GetPreferredTitle(*anime_item));
                 }
@@ -1195,7 +1195,7 @@ LRESULT AnimeListDialog::OnListCustomDraw(LPARAM lParam) {
       return CDRF_NOTIFYSUBITEMDRAW;
 
     case CDDS_ITEMPREPAINT | CDDS_SUBITEM: {
-      auto anime_item = anime::db.FindItem(static_cast<int>(pCD->nmcd.lItemlParam));
+      auto anime_item = anime::db.Find(static_cast<int>(pCD->nmcd.lItemlParam));
       if (!anime_item)
         break;
 
@@ -1248,7 +1248,7 @@ LRESULT AnimeListDialog::OnListCustomDraw(LPARAM lParam) {
     }
 
     case CDDS_ITEMPOSTPAINT | CDDS_SUBITEM: {
-      auto anime_item = anime::db.FindItem(static_cast<int>(pCD->nmcd.lItemlParam));
+      auto anime_item = anime::db.Find(static_cast<int>(pCD->nmcd.lItemlParam));
       if (!anime_item)
         break;
 
@@ -1321,7 +1321,7 @@ std::vector<int> AnimeListDialog::GetCurrentIds() {
 }
 
 anime::Item* AnimeListDialog::GetCurrentItem() {
-  return anime::db.FindItem(GetCurrentId());
+  return anime::db.Find(GetCurrentId());
 }
 
 int AnimeListDialog::GetCurrentStatus() {
@@ -1426,7 +1426,7 @@ void AnimeListDialog::RefreshListItem(int anime_id) {
   int index = GetListIndex(anime_id);
 
   if (index > -1 && listview.IsItemVisible(index)) {
-    auto anime_item = anime::db.FindItem(anime_id);
+    auto anime_item = anime::db.Find(anime_id);
     if (anime_item)
       RefreshListItemColumns(index, *anime_item);
     listview.RedrawItems(index, index, true);
@@ -1753,7 +1753,7 @@ void AnimeListDialog::ListView::RefreshLastUpdateColumn() {
   time_t time_now = time(nullptr);
 
   for (int i = 0; i < item_count; ++i) {
-    auto anime_item = anime::db.FindItem(GetItemParam(i));
+    auto anime_item = anime::db.Find(GetItemParam(i));
     if (!anime_item)
       continue;
     time_t time_last_updated = ToTime(anime_item->GetMyLastUpdated());

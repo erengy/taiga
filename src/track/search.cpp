@@ -49,7 +49,7 @@ bool FileSearch::OnDirectory(const base::FileSearchResult& result) {
 
   Meow.Identify(episode_, false, match_options);
 
-  const auto anime_item = anime::db.FindItem(episode_.anime_id);
+  const auto anime_item = anime::db.Find(episode_.anime_id);
 
   if (anime_item && Meow.IsValidAnimeType(episode_)) {
     if (anime_item->GetFolder().empty())
@@ -86,7 +86,7 @@ bool FileSearch::OnFile(const base::FileSearchResult& result) {
 
   Meow.Identify(episode_, false, match_options);
 
-  const auto anime_item = anime::db.FindItem(episode_.anime_id);
+  const auto anime_item = anime::db.Find(episode_.anime_id);
 
   if (anime_item && Meow.IsValidAnimeType(episode_) &&
       Meow.IsValidFileExtension(episode_)) {
@@ -189,7 +189,7 @@ void ScanAvailableEpisodes(bool silent, int anime_id, int episode_number) {
       Settings.GetInt(taiga::kLibrary_FileSizeThreshold);
   file_search_helper.set_path_found(L"");
 
-  auto anime_item = anime::db.FindItem(anime_id);
+  auto anime_item = anime::db.Find(anime_id);
   bool found = false;
 
   if (anime_item) {

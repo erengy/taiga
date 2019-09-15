@@ -354,7 +354,7 @@ void ProcessMediaPlayerStatus(const MediaPlayer* media_player) {
 
   // Media player is not running
   } else {
-    auto anime_item = anime::db.FindItem(CurrentEpisode.anime_id, false);
+    auto anime_item = anime::db.Find(CurrentEpisode.anime_id, false);
 
     // Media player was running, and the media was recognized
     if (anime_item) {
@@ -381,7 +381,7 @@ void ProcessMediaPlayerStatus(const MediaPlayer* media_player) {
 }
 
 void ProcessMediaPlayerTitle(const MediaPlayer& media_player) {
-  auto anime_item = anime::db.FindItem(CurrentEpisode.anime_id);
+  auto anime_item = anime::db.Find(CurrentEpisode.anime_id);
 
   if (CurrentEpisode.anime_id == anime::ID_UNKNOWN) {
     if (!Settings.GetBool(taiga::kApp_Option_EnableRecognition))
@@ -401,7 +401,7 @@ void ProcessMediaPlayerTitle(const MediaPlayer& media_player) {
       auto anime_id = Meow.Identify(CurrentEpisode, true, match_options);
       if (anime::IsValidId(anime_id)) {
         // Recognized
-        anime_item = anime::db.FindItem(anime_id);
+        anime_item = anime::db.Find(anime_id);
         MediaPlayers.set_title_changed(false);
         CurrentEpisode.Set(anime_item->GetId());
         StartWatching(*anime_item, CurrentEpisode);

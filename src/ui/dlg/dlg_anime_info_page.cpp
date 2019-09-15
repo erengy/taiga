@@ -168,7 +168,7 @@ void PageSeriesInfo::Refresh(int anime_id, bool connect) {
     return;
 
   anime_id_ = anime_id;
-  auto anime_item = anime::db.FindItem(anime_id_);
+  auto anime_item = anime::db.Find(anime_id_);
 
   // Update window title
   parent->UpdateTitle(false);
@@ -216,7 +216,7 @@ void PageSeriesInfo::Refresh(int anime_id, bool connect) {
 ////////////////////////////////////////////////////////////////////////////////
 
 BOOL PageMyInfo::OnCommand(WPARAM wParam, LPARAM lParam) {
-  auto anime_item = anime::db.FindItem(anime_id_);
+  auto anime_item = anime::db.Find(anime_id_);
 
   if (!anime_item)
     return FALSE;
@@ -289,7 +289,7 @@ BOOL PageMyInfo::OnCommand(WPARAM wParam, LPARAM lParam) {
 }
 
 LRESULT PageMyInfo::OnNotify(int idCtrl, LPNMHDR pnmh) {
-  auto anime_item = anime::db.FindItem(anime_id_);
+  auto anime_item = anime::db.Find(anime_id_);
 
   if (!anime_item)
     return 0;
@@ -354,7 +354,7 @@ void PageMyInfo::Refresh(int anime_id) {
     return;
 
   anime_id_ = anime_id;
-  auto anime_item = anime::db.FindItem(anime_id_);
+  auto anime_item = anime::db.Find(anime_id_);
 
   if (!anime_item || !anime_item->IsInList())
     return;
@@ -514,7 +514,7 @@ void PageMyInfo::RefreshFansubPreference() {
 }
 
 bool PageMyInfo::Save() {
-  auto anime_item = anime::db.FindItem(anime_id_);
+  auto anime_item = anime::db.Find(anime_id_);
 
   if (!anime_item)
     return false;

@@ -683,7 +683,7 @@ int Service::ParseAnimeObject(const Json& json) const {
 }
 
 void Service::ParseCategories(const Json& json, const int anime_id) const {
-  auto anime_item = anime::db.FindItem(anime_id);
+  auto anime_item = anime::db.Find(anime_id);
 
   if (!anime_item)
     return;
@@ -703,7 +703,7 @@ void Service::ParseCategories(const Json& json, const int anime_id) const {
 }
 
 void Service::ParseProducers(const Json& json, const int anime_id) const {
-  auto anime_item = anime::db.FindItem(anime_id);
+  auto anime_item = anime::db.Find(anime_id);
 
   if (!anime_item)
     return;

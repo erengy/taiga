@@ -204,7 +204,7 @@ void TorrentDialog::OnContextMenu(HWND hwnd, POINT pt) {
     Aggregator.SaveArchive();
 
   } else if (answer == L"DiscardTorrents") {
-    auto anime_item = anime::db.FindItem(feed_item->episode_data.anime_id);
+    auto anime_item = anime::db.Find(feed_item->episode_data.anime_id);
     if (anime_item) {
       for (int i = 0; i < list_.GetItemCount(); i++) {
         feed_item = reinterpret_cast<FeedItem*>(list_.GetItemParam(i));
@@ -452,7 +452,7 @@ void TorrentDialog::RefreshList() {
     std::wstring title, number, video;
     int group = static_cast<int>(it->torrent_category);
     int icon = StatusToIcon(anime::kUnknownStatus);
-    auto anime_item = anime::db.FindItem(it->episode_data.anime_id);
+    auto anime_item = anime::db.Find(it->episode_data.anime_id);
     if (anime_item) {
       icon = StatusToIcon(anime_item->GetAiringStatus());
       title = anime::GetPreferredTitle(*anime_item);
@@ -506,7 +506,7 @@ void TorrentDialog::RefreshList() {
 }
 
 void TorrentDialog::Search(std::wstring url, int anime_id) {
-  auto anime_item = anime::db.FindItem(anime_id);
+  auto anime_item = anime::db.Find(anime_id);
 
   if (!anime_item)
     return;

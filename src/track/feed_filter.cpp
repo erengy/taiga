@@ -35,7 +35,7 @@ bool EvaluateCondition(const FeedFilterCondition& condition,
   bool is_numeric = false;
   std::wstring element;
   std::wstring value = ReplaceVariables(condition.value, item.episode_data);
-  auto anime = anime::db.FindItem(item.episode_data.anime_id);
+  auto anime = anime::db.Find(item.episode_data.anime_id);
 
   switch (condition.element) {
     case kFeedFilterElement_File_Title:
@@ -485,7 +485,7 @@ void FeedFilterManager::Cleanup() {
   for (auto filter = filters.begin(); filter != filters.end(); ++filter) {
     auto& ids = filter->anime_ids;
     for (auto id = ids.begin(); id != ids.end(); ++id) {
-      if (!anime::db.FindItem(*id)) {
+      if (!anime::db.Find(*id)) {
         if (ids.size() > 1) {
           id = ids.erase(id) - 1;
           continue;
@@ -528,7 +528,7 @@ void FeedFilterManager::FilterArchived(Feed& feed) {
 
 void FeedFilterManager::MarkNewEpisodes(Feed& feed) {
   for (auto& feed_item : feed.items) {
-    auto anime_item = anime::db.FindItem(feed_item.episode_data.anime_id);
+    auto anime_item = anime::db.Find(feed_item.episode_data.anime_id);
     if (anime_item) {
       int number = anime::GetEpisodeHigh(feed_item.episode_data);
       if (number > anime_item->GetMyLastWatchedEpisode())
@@ -868,7 +868,7 @@ std::wstring FeedFilterManager::TranslateValue(
       if (condition.value.empty()) {
         return L"(?)";
       } else {
-        auto anime_item = anime::db.FindItem(ToInt(condition.value));
+        auto anime_item = anime::db.Find(ToInt(condition.value));
         if (anime_item) {
           return condition.value + L" (" + anime::GetPreferredTitle(*anime_item) + L")";
         } else {

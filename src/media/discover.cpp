@@ -56,7 +56,7 @@ bool SeasonDatabase::IsRefreshRequired() {
   bool required = false;
 
   for (const auto& anime_id : items) {
-    auto anime_item = anime::db.FindItem(anime_id);
+    auto anime_item = anime::db.Find(anime_id);
     if (anime_item) {
       const Date& date_start = anime_item->GetDateStart();
       if (!anime::IsValidDate(date_start) || anime_item->GetSynopsis().empty())
@@ -99,7 +99,7 @@ void SeasonDatabase::Review(bool hide_nsfw) {
   // Check for invalid items
   for (size_t i = 0; i < items.size(); i++) {
     const int anime_id = items.at(i);
-    auto anime_item = anime::db.FindItem(anime_id);
+    auto anime_item = anime::db.Find(anime_id);
     if (anime_item) {
       const Date& anime_start = anime_item->GetDateStart();
       if (is_nsfw(*anime_item) ||
