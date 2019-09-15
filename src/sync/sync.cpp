@@ -236,7 +236,7 @@ void AddPageOffsetToRequest(const int offset, Request& request) {
 bool AddServiceDataToRequest(Request& request, int id) {
   request.data[L"taiga-id"] = ToWstr(id);
 
-  auto anime_item = AnimeDatabase.FindItem(id);
+  auto anime_item = anime::db.FindItem(id);
 
   if (!anime_item)
     return false;

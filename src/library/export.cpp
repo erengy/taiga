@@ -40,7 +40,7 @@ namespace library {
 bool ExportAsMalXml(const std::wstring& path) {
   constexpr auto count_total_anime = []() {
     int count = 0;
-    for (const auto& [id, item] : AnimeDatabase.items) {
+    for (const auto& [id, item] : anime::db.items) {
       if (item.IsInList()) {
         count += 1;
       }
@@ -91,13 +91,13 @@ bool ExportAsMalXml(const std::wstring& path) {
   XmlWriteStr(node_myinfo, L"user_name", taiga::GetCurrentUsername());
   XmlWriteInt(node_myinfo, L"user_export_type", 1);  // anime
   XmlWriteInt(node_myinfo, L"user_total_anime", count_total_anime());
-  XmlWriteInt(node_myinfo, L"user_total_watching", AnimeDatabase.GetItemCount(anime::kWatching));
-  XmlWriteInt(node_myinfo, L"user_total_completed", AnimeDatabase.GetItemCount(anime::kCompleted));
-  XmlWriteInt(node_myinfo, L"user_total_onhold", AnimeDatabase.GetItemCount(anime::kOnHold));
-  XmlWriteInt(node_myinfo, L"user_total_dropped", AnimeDatabase.GetItemCount(anime::kDropped));
-  XmlWriteInt(node_myinfo, L"user_total_plantowatch", AnimeDatabase.GetItemCount(anime::kPlanToWatch));
+  XmlWriteInt(node_myinfo, L"user_total_watching", anime::db.GetItemCount(anime::kWatching));
+  XmlWriteInt(node_myinfo, L"user_total_completed", anime::db.GetItemCount(anime::kCompleted));
+  XmlWriteInt(node_myinfo, L"user_total_onhold", anime::db.GetItemCount(anime::kOnHold));
+  XmlWriteInt(node_myinfo, L"user_total_dropped", anime::db.GetItemCount(anime::kDropped));
+  XmlWriteInt(node_myinfo, L"user_total_plantowatch", anime::db.GetItemCount(anime::kPlanToWatch));
 
-  for (const auto& [id, item] : AnimeDatabase.items) {
+  for (const auto& [id, item] : anime::db.items) {
     if (item.IsInList()) {
       auto node = node_myanimelist.append_child(L"anime");
       XmlWriteInt(node, L"series_animedb_id", item.GetId());
@@ -132,7 +132,7 @@ bool ExportAsMalXml(const std::wstring& path) {
 bool ExportAsMarkdown(const std::wstring& path) {
   std::map<int, std::vector<std::wstring>> status_lists;
 
-  for (const auto& [id, item] : AnimeDatabase.items) {
+  for (const auto& [id, item] : anime::db.items) {
     if (item.IsInList()) {
       status_lists[item.GetMyStatus()].push_back(L"{} ({}/{})"_format(
           anime::GetPreferredTitle(item),

@@ -67,6 +67,6 @@ private:
   void ReadListInCompatibilityMode(pugi::xml_document& document);
 };
 
-}  // namespace anime
+inline Database db;
 
-inline anime::Database AnimeDatabase;
+}  // namespace anime

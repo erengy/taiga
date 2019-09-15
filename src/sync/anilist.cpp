@@ -238,7 +238,7 @@ void Service::GetLibraryEntries(Response& response, HttpResponse& http_response)
   if (!ParseResponseBody(http_response.body, response, root))
     return;
 
-  AnimeDatabase.ClearUserData();
+  anime::db.ClearUserData();
 
   const auto& lists = root["data"]["MediaListCollection"]["lists"];
   for (const auto& list : lists) {
@@ -486,7 +486,7 @@ int Service::ParseMediaObject(const Json& json) const {
     }
   }
 
-  return AnimeDatabase.UpdateItem(anime_item);
+  return anime::db.UpdateItem(anime_item);
 }
 
 int Service::ParseMediaListObject(const Json& json) const {
@@ -523,7 +523,7 @@ int Service::ParseMediaListObject(const Json& json) const {
   anime_item.SetMyDateEnd(TranslateFuzzyDateFrom(json["completedAt"]));
   anime_item.SetMyLastUpdated(ToWstr(JsonReadInt(json, "updatedAt")));
 
-  return AnimeDatabase.UpdateItem(anime_item);
+  return anime::db.UpdateItem(anime_item);
 }
 
 void Service::ParseMediaTitleObject(const Json& json,

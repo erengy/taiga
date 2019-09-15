@@ -80,7 +80,7 @@ void SearchDialog::OnContextMenu(HWND hwnd, POINT pt) {
       auto anime_ids = GetAnimeIdsFromSelectedListItems(list_);
       bool is_in_list = true;
       for (const auto& anime_id : anime_ids) {
-        auto anime_item = AnimeDatabase.FindItem(anime_id);
+        auto anime_item = anime::db.FindItem(anime_id);
         if (anime_item && !anime_item->IsInList()) {
           is_in_list = false;
           break;
@@ -200,7 +200,7 @@ void SearchDialog::ParseResults(const std::vector<int>& ids) {
 }
 
 void SearchDialog::AddAnimeToList(int anime_id) {
-  auto anime_item = AnimeDatabase.FindItem(anime_id);
+  auto anime_item = anime::db.FindItem(anime_id);
 
   if (anime_item) {
     int i = list_.GetItemCount();

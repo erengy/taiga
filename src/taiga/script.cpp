@@ -104,7 +104,7 @@ std::wstring ReplaceVariables(const std::wstring& str,
     fields[name] = std::nullopt;
   }
 
-  auto anime_item = AnimeDatabase.FindItem(episode.anime_id);
+  auto anime_item = anime::db.FindItem(episode.anime_id);
   if (!anime_item && is_preview)
     anime_item = &taiga::dummy_anime;
  

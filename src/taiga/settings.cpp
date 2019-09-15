@@ -292,9 +292,9 @@ bool AppSettings::Load() {
   auto node_items = settings.child(L"anime").child(L"items");
   for (auto item : node_items.children(L"item")) {
     int anime_id = item.attribute(L"id").as_int();
-    auto anime_item = AnimeDatabase.FindItem(anime_id, false);
+    auto anime_item = anime::db.FindItem(anime_id, false);
     if (!anime_item)
-      anime_item = &AnimeDatabase.items[anime_id];
+      anime_item = &anime::db.items[anime_id];
     anime_item->SetFolder(item.attribute(L"folder").value());
     anime_item->SetUserSynonyms(item.attribute(L"titles").value());
     anime_item->SetUseAlternative(item.attribute(L"use_alternative").as_bool());
@@ -366,7 +366,7 @@ bool AppSettings::Save() {
 
   // Anime items
   auto items = settings.child(L"anime").append_child(L"items");
-  for (const auto& [id, anime_item] : AnimeDatabase.items) {
+  for (const auto& [id, anime_item] : anime::db.items) {
     if (anime_item.GetFolder().empty() &&
         !anime_item.UserSynonymsAvailable() &&
         !anime_item.GetUseAlternative())
@@ -431,15 +431,15 @@ void AppSettings::ApplyChanges(const AppSettings previous) {
       ui::OnSettingsServiceChangeFailed();
       Set(kSync_ActiveService, previous_service);
       changed_service = false;
-    } else if (!AnimeDatabase.items.empty()) {
+    } else if (!anime::db.items.empty()) {
       if (ui::OnSettingsServiceChangeConfirm(previous_service,
                                              GetWstr(kSync_ActiveService))) {
         std::wstring current_service = GetWstr(kSync_ActiveService);
         Set(kSync_ActiveService, previous_service);
-        AnimeDatabase.SaveList(true);
+        anime::db.SaveList(true);
         Set(kSync_ActiveService, current_service);
-        AnimeDatabase.items.clear();
-        AnimeDatabase.SaveDatabase();
+        anime::db.items.clear();
+        anime::db.SaveDatabase();
         ImageDatabase.Clear();
         SeasonDatabase.Reset();
       } else {
@@ -482,7 +482,7 @@ void AppSettings::ApplyChanges(const AppSettings previous) {
     }
   }
   if (changed_account || changed_service) {
-    AnimeDatabase.LoadList();
+    anime::db.LoadList();
     History.Load();
     CurrentEpisode.Set(anime::ID_UNKNOWN);
     taiga::stats.CalculateAll();

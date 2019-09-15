@@ -139,7 +139,7 @@ void App::Uninitialize() {
 
   // Save
   Settings.Save();
-  AnimeDatabase.SaveDatabase();
+  anime::db.SaveDatabase();
   Aggregator.SaveArchive();
 
   // Exit
@@ -156,9 +156,9 @@ void App::LoadData() {
   ui::Theme.Load();
   ui::Menus.Load();
 
-  AnimeDatabase.LoadDatabase();
-  AnimeDatabase.LoadList();
-  AnimeDatabase.ClearInvalidItems();
+  anime::db.LoadDatabase();
+  anime::db.LoadList();
+  anime::db.ClearInvalidItems();
 
   History.Load();
 }

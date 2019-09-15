@@ -43,7 +43,7 @@ void Statistics::CalculateAll() {
 int Statistics::CalculateAnimeCount() {
   anime_count = 0;
 
-  for (const auto& [id, item] : AnimeDatabase.items) {
+  for (const auto& [id, item] : anime::db.items) {
     if (item.IsInList())
       ++anime_count;
   }
@@ -54,7 +54,7 @@ int Statistics::CalculateAnimeCount() {
 int Statistics::CalculateEpisodeCount() {
   episode_count = 0;
 
-  for (const auto& [id, item] : AnimeDatabase.items) {
+  for (const auto& [id, item] : anime::db.items) {
     if (!item.IsInList())
       continue;
 
@@ -69,7 +69,7 @@ int Statistics::CalculateEpisodeCount() {
 const std::wstring& Statistics::CalculateLifePlannedToWatch() {
   int seconds = 0;
 
-  for (const auto& [id, item] : AnimeDatabase.items) {
+  for (const auto& [id, item] : anime::db.items) {
     switch (item.GetMyStatus()) {
       case anime::kNotInList:
       case anime::kCompleted:
@@ -90,7 +90,7 @@ const std::wstring& Statistics::CalculateLifePlannedToWatch() {
 const std::wstring& Statistics::CalculateLifeSpentWatching() {
   int seconds = 0;
 
-  for (const auto& [id, item] : AnimeDatabase.items) {
+  for (const auto& [id, item] : anime::db.items) {
     if (!item.IsInList())
       continue;
 
@@ -121,7 +121,7 @@ float Statistics::CalculateMeanScore() {
   float items_scored = 0.0f;
   float sum_scores = 0.0f;
 
-  for (const auto& [id, item] : AnimeDatabase.items) {
+  for (const auto& [id, item] : anime::db.items) {
     if (!item.IsInList())
       continue;
 
@@ -140,7 +140,7 @@ float Statistics::CalculateScoreDeviation() {
   float items_scored = 0.0f;
   float sum_squares = 0.0f;
 
-  for (const auto& [id, item] : AnimeDatabase.items) {
+  for (const auto& [id, item] : anime::db.items) {
     if (!item.IsInList())
       continue;
 
@@ -163,7 +163,7 @@ const std::array<float, 11>& Statistics::CalculateScoreDistribution() {
 
   float extreme_value = 1.0f;
 
-  for (const auto& [id, item] : AnimeDatabase.items) {
+  for (const auto& [id, item] : anime::db.items) {
     const int score = item.GetMyScore();
     if (score > 0) {
       const auto score_index = static_cast<size_t>(std::floor(score / 10.0));

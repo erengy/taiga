@@ -49,7 +49,7 @@ bool FileSearch::OnDirectory(const base::FileSearchResult& result) {
 
   Meow.Identify(episode_, false, match_options);
 
-  const auto anime_item = AnimeDatabase.FindItem(episode_.anime_id);
+  const auto anime_item = anime::db.FindItem(episode_.anime_id);
 
   if (anime_item && Meow.IsValidAnimeType(episode_)) {
     if (anime_item->GetFolder().empty())
@@ -86,7 +86,7 @@ bool FileSearch::OnFile(const base::FileSearchResult& result) {
 
   Meow.Identify(episode_, false, match_options);
 
-  const auto anime_item = AnimeDatabase.FindItem(episode_.anime_id);
+  const auto anime_item = anime::db.FindItem(episode_.anime_id);
 
   if (anime_item && Meow.IsValidAnimeType(episode_) &&
       Meow.IsValidFileExtension(episode_)) {
@@ -159,7 +159,7 @@ void FileSearch::set_path_found(const std::wstring& path_found) {
 ////////////////////////////////////////////////////////////////////////////////
 
 void ScanAvailableEpisodes(bool silent) {
-  for (auto& [id, item] : AnimeDatabase.items) {
+  for (auto& [id, item] : anime::db.items) {
     anime::ValidateFolder(item);
   }
 
@@ -189,7 +189,7 @@ void ScanAvailableEpisodes(bool silent, int anime_id, int episode_number) {
       Settings.GetInt(taiga::kLibrary_FileSizeThreshold);
   file_search_helper.set_path_found(L"");
 
-  auto anime_item = AnimeDatabase.FindItem(anime_id);
+  auto anime_item = anime::db.FindItem(anime_id);
   bool found = false;
 
   if (anime_item) {
@@ -250,8 +250,8 @@ void ScanAvailableEpisodesQuick() {
 void ScanAvailableEpisodesQuick(int anime_id) {
   using track::file_search_helper;
 
-  for (auto it = AnimeDatabase.items.rbegin();
-       it != AnimeDatabase.items.rend(); ++it) {
+  for (auto it = anime::db.items.rbegin();
+       it != anime::db.items.rend(); ++it) {
     anime::Item& anime_item = it->second;
 
     if (anime_id != anime::ID_UNKNOWN && anime_item.GetId() != anime_id)

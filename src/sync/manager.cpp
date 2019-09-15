@@ -149,7 +149,7 @@ void Manager::HandleError(Response& response, HttpResponse& http_response) {
   int anime_id = ::anime::ID_UNKNOWN;
   if (request.data.count(L"taiga-id"))
     anime_id = ToInt(request.data[L"taiga-id"]);
-  auto anime_item = AnimeDatabase.FindItem(anime_id);
+  auto anime_item = anime::db.FindItem(anime_id);
 
   switch (response.type) {
     case kAuthenticateUser:
@@ -162,10 +162,10 @@ void Manager::HandleError(Response& response, HttpResponse& http_response) {
       ui::OnLibraryEntryChangeFailure(anime_id, response.data[L"error"]);
       if (response.data.count(L"invalid_id")) {
         const bool in_list = anime_item && anime_item->IsInList();
-        if (AnimeDatabase.DeleteItem(anime_id)) {
-          AnimeDatabase.SaveDatabase();
+        if (anime::db.DeleteItem(anime_id)) {
+          anime::db.SaveDatabase();
           if (in_list)
-            AnimeDatabase.SaveList();
+            anime::db.SaveList();
         }
       } else {
         // Try making the other request, even though this one failed
@@ -211,7 +211,7 @@ void Manager::HandleResponse(Response& response, HttpResponse& http_response) {
   int anime_id = ::anime::ID_UNKNOWN;
   if (request.data.count(L"taiga-id"))
     anime_id = ToInt(request.data[L"taiga-id"]);
-  auto anime_item = AnimeDatabase.FindItem(anime_id);
+  auto anime_item = anime::db.FindItem(anime_id);
 
   const auto update_username = [&service, &response]() {
     const auto& username = service.user().username;
@@ -308,8 +308,8 @@ void Manager::HandleResponse(Response& response, HttpResponse& http_response) {
       if (next_page > 0) {
         GetLibraryEntries(next_page);
       } else {
-        AnimeDatabase.SaveDatabase();
-        AnimeDatabase.SaveList();
+        anime::db.SaveDatabase();
+        anime::db.SaveList();
         ui::ChangeStatusText(L"Successfully downloaded the list.");
         ui::OnLibraryChange();
       }
@@ -324,8 +324,8 @@ void Manager::HandleResponse(Response& response, HttpResponse& http_response) {
 
       const auto history_item = History.queue.GetCurrentItem();
       if (history_item) {
-        AnimeDatabase.UpdateItem(*history_item);
-        AnimeDatabase.SaveList();
+        anime::db.UpdateItem(*history_item);
+        anime::db.SaveList();
         History.queue.Remove();
         History.queue.Check(false);
       }

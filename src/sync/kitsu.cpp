@@ -306,7 +306,7 @@ void Service::GetLibraryEntries(Response& response, HttpResponse& http_response)
   const auto next_page = ToInt(response.data[L"next_page_offset"]);
 
   if (!IsPartialLibraryRequest() && first_page) {
-    AnimeDatabase.ClearUserData();
+    anime::db.ClearUserData();
   }
 
   for (const auto& value : root["data"]) {
@@ -679,11 +679,11 @@ int Service::ParseAnimeObject(const Json& json) const {
     }
   }
 
-  return AnimeDatabase.UpdateItem(anime_item);
+  return anime::db.UpdateItem(anime_item);
 }
 
 void Service::ParseCategories(const Json& json, const int anime_id) const {
-  auto anime_item = AnimeDatabase.FindItem(anime_id);
+  auto anime_item = anime::db.FindItem(anime_id);
 
   if (!anime_item)
     return;
@@ -703,7 +703,7 @@ void Service::ParseCategories(const Json& json, const int anime_id) const {
 }
 
 void Service::ParseProducers(const Json& json, const int anime_id) const {
-  auto anime_item = AnimeDatabase.FindItem(anime_id);
+  auto anime_item = anime::db.FindItem(anime_id);
 
   if (!anime_item)
     return;
@@ -748,7 +748,7 @@ int Service::ParseLibraryObject(const Json& json) const {
   anime_item.SetMyStatus(TranslateMyStatusFrom(JsonReadStr(attributes, "status")));
   anime_item.SetMyLastUpdated(TranslateMyLastUpdatedFrom(JsonReadStr(attributes, "updatedAt")));
 
-  return AnimeDatabase.UpdateItem(anime_item);
+  return anime::db.UpdateItem(anime_item);
 }
 
 void Service::ParseLinks(const Json& json, Response& response) const {

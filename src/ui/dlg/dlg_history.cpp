@@ -182,7 +182,7 @@ void HistoryDialog::RefreshList() {
 
   // Add queued items
   for (auto it = History.queue.items.crbegin(); it != History.queue.items.crend(); ++it) {
-    auto anime_item = AnimeDatabase.FindItem(it->anime_id);
+    auto anime_item = anime::db.FindItem(it->anime_id);
     if (!anime_item) {
       LOGE(L"Item does not exist in the database: {}", it->anime_id);
       continue;
@@ -229,7 +229,7 @@ void HistoryDialog::RefreshList() {
 
   // Add recently watched
   for (auto it = History.items.crbegin(); it != History.items.crend(); ++it) {
-    auto anime_item = AnimeDatabase.FindItem(it->anime_id);
+    auto anime_item = anime::db.FindItem(it->anime_id);
     if (!anime_item) {
       LOGE(L"Item does not exist in the database: {}", it->anime_id);
       continue;

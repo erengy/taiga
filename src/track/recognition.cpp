@@ -147,7 +147,7 @@ int Engine::Identify(anime::Episode& episode, bool give_score,
   // Figure out which ID is the one we're looking for
   if (anime::IsValidId(episode.anime_id)) {
     // We had a redirection while validating IDs
-    if (!AnimeDatabase.FindItem(episode.anime_id, false)) {
+    if (!anime::db.FindItem(episode.anime_id, false)) {
       episode.anime_id = anime::ID_UNKNOWN;
       LOGD(L"Redirection failed, because destination ID is not available in the "
            L"database.");
@@ -168,7 +168,7 @@ int Engine::Identify(anime::Episode& episode, bool give_score,
       if (!episode.file_extension().empty()) {
         episode.set_episode_number(1);
       } else if (episode.elements().empty(anitomy::kElementVolumeNumber)) {
-        auto anime_item = AnimeDatabase.FindItem(episode.anime_id);
+        auto anime_item = anime::db.FindItem(episode.anime_id);
         if (anime_item) {
           const int last_episode = [&anime_item]() {
             switch (anime_item->GetAiringStatus()) {
@@ -215,7 +215,7 @@ void Engine::InitializeTitles() {
 
   if (!initialized) {
     initialized = true;
-    for (const auto& it : AnimeDatabase.items) {
+    for (const auto& it : anime::db.items) {
       UpdateTitles(it.second);
     }
 

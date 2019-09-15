@@ -598,7 +598,7 @@ BOOL FeedFilterDialog::DialogPage2::OnInitDialog() {
 
   // Add anime to list
   int list_index = 0;
-  for (const auto& [id, anime_item] : AnimeDatabase.items) {
+  for (const auto& [id, anime_item] : anime::db.items) {
     if (!anime_item.IsInList())
       continue;
     anime_list.InsertItem(list_index, anime_item.GetMyStatus(),
@@ -630,7 +630,7 @@ LRESULT FeedFilterDialog::DialogPage2::OnNotify(int idCtrl, LPNMHDR pnmh) {
         // Text callback
         case LVN_GETDISPINFO: {
           NMLVDISPINFO* plvdi = reinterpret_cast<NMLVDISPINFO*>(pnmh);
-          auto anime_item = AnimeDatabase.FindItem(static_cast<int>(plvdi->item.lParam));
+          auto anime_item = anime::db.FindItem(static_cast<int>(plvdi->item.lParam));
           if (!anime_item)
             break;
           switch (plvdi->item.iSubItem) {
@@ -646,7 +646,7 @@ LRESULT FeedFilterDialog::DialogPage2::OnNotify(int idCtrl, LPNMHDR pnmh) {
           if (pnmv->uOldState != 0 && (pnmv->uNewState == 0x1000 || pnmv->uNewState == 0x2000)) {
             std::wstring text;
             for (int i = 0; i < anime_list.GetItemCount(); i++) {
-              auto anime_item = AnimeDatabase.FindItem(static_cast<int>(anime_list.GetItemParam(i)));
+              auto anime_item = anime::db.FindItem(static_cast<int>(anime_list.GetItemParam(i)));
               if (anime_item && anime_list.GetCheckState(i))
                 AppendString(text, anime::GetPreferredTitle(*anime_item));
             }
@@ -669,7 +669,7 @@ bool FeedFilterDialog::DialogPage2::BuildFilter(FeedFilter& filter) {
 
   for (int i = 0; i < anime_list.GetItemCount(); i++) {
     if (anime_list.GetCheckState(i)) {
-      auto anime_item = AnimeDatabase.FindItem(static_cast<int>(anime_list.GetItemParam(i)));
+      auto anime_item = anime::db.FindItem(static_cast<int>(anime_list.GetItemParam(i)));
       if (anime_item)
         filter.anime_ids.push_back(anime_item->GetId());
     }

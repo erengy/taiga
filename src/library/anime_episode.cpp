@@ -40,7 +40,7 @@ void Episode::Clear() {
 void Episode::Set(int anime_id) {
   this->anime_id = anime_id;
   this->processed = false;
-  ui::Menus.UpdateAll(AnimeDatabase.FindItem(anime_id));
+  ui::Menus.UpdateAll(anime::db.FindItem(anime_id));
 }
 
 ////////////////////////////////////////////////////////////////////////////////

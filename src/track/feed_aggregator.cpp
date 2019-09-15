@@ -106,7 +106,7 @@ void Aggregator::ExamineData(Feed& feed) {
 
     // Update last aired episode number
     if (anime::IsValidId(episode_data.anime_id)) {
-      auto anime_item = AnimeDatabase.FindItem(episode_data.anime_id);
+      auto anime_item = anime::db.FindItem(episode_data.anime_id);
       if (anime_item) {
         int episode_number = anime::GetEpisodeHigh(episode_data);
         anime_item->SetLastAiredEpisodeNumber(episode_number);
@@ -308,7 +308,7 @@ std::wstring GetTorrentDownloadPath(const FeedItem::EpisodeData& episode_data) {
   std::wstring path;
 
   // Use anime folder as the download folder
-  const auto anime_item = AnimeDatabase.FindItem(episode_data.anime_id);
+  const auto anime_item = anime::db.FindItem(episode_data.anime_id);
   if (anime_item) {
     const auto anime_folder = anime_item->GetFolder();
     if (!anime_folder.empty() && FolderExists(anime_folder))

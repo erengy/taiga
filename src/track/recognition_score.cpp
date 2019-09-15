@@ -57,7 +57,7 @@ int Engine::ScoreTitle(anime::Episode& episode, const std::set<int>& anime_ids,
       calculate_trigram_results(id);
     }
   } else {
-    for (const auto& it : AnimeDatabase.items) {
+    for (const auto& it : anime::db.items) {
       if (ValidateOptions(episode, it.second, match_options, false))
         calculate_trigram_results(it.first);
     }
@@ -96,7 +96,7 @@ static double CustomScore(const std::wstring& title, const std::wstring& str) {
 
 static double BonusScore(const anime::Episode& episode, int id) {
   double score = 0.0;
-  auto anime_item = AnimeDatabase.FindItem(id);
+  auto anime_item = anime::db.FindItem(id);
 
   if (anime_item) {
     auto anime_year = episode.anime_year();

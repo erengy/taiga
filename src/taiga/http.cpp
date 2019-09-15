@@ -234,7 +234,7 @@ void HttpManager::HandleResponse(HttpResponse& response) {
         if (ImageDatabase.Reload(anime_id))
           ui::OnLibraryEntryImageChange(anime_id);
       } else if (response.code == 404) {
-        const auto anime_item = AnimeDatabase.FindItem(anime_id);
+        const auto anime_item = anime::db.FindItem(anime_id);
         if (anime_item)
           anime_item->SetImageUrl({});
       }

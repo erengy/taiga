@@ -215,7 +215,7 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   //   lParam is an anime ID.
   } else if (action == L"URL") {
     int anime_id = static_cast<int>(lParam);
-    auto anime_item = AnimeDatabase.FindItem(anime_id);
+    auto anime_item = anime::db.FindItem(anime_id);
     if (anime_item) {
       std::wstring title = anime_item->GetTitle();
       ReplaceString(body, L"%title%", EncodeUrl(title));
@@ -293,11 +293,11 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
     int status = ToInt(body);
     if (!wParam) {
       int anime_id = static_cast<int>(lParam);
-      AnimeDatabase.AddToList(anime_id, status);
+      anime::db.AddToList(anime_id, status);
     } else {
       const auto& anime_ids = *reinterpret_cast<std::vector<int>*>(lParam);
       for (const auto& anime_id : anime_ids) {
-        AnimeDatabase.AddToList(anime_id, status);
+        anime::db.AddToList(anime_id, status);
       }
     }
 
@@ -354,7 +354,7 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
       CurrentEpisode.Set(anime::ID_UNKNOWN);
     } else {
       ui::ChangeStatusText(L"Automatic anime recognition is now disabled.");
-      auto anime_item = AnimeDatabase.FindItem(CurrentEpisode.anime_id);
+      auto anime_item = anime::db.FindItem(CurrentEpisode.anime_id);
       CurrentEpisode.Set(anime::ID_NOTINLIST);
       if (anime_item)
         EndWatching(*anime_item, CurrentEpisode);
@@ -437,7 +437,7 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   } else if (action == L"EditDateToStartedAiring") {
     const auto& anime_ids = *reinterpret_cast<std::vector<int>*>(lParam);
     for (const auto& anime_id : anime_ids) {
-      auto anime_item = AnimeDatabase.FindItem(anime_id);
+      auto anime_item = anime::db.FindItem(anime_id);
       if (!anime_item || anime_item->GetMyDateStart() || !anime_item->GetDateStart())
         continue;
       HistoryItem history_item;
@@ -453,7 +453,7 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   } else if (action == L"EditDateToFinishedAiring") {
     const auto& anime_ids = *reinterpret_cast<std::vector<int>*>(lParam);
     for (const auto& anime_id : anime_ids) {
-      auto anime_item = AnimeDatabase.FindItem(anime_id);
+      auto anime_item = anime::db.FindItem(anime_id);
       if (!anime_item || anime_item->GetMyDateEnd() || !anime_item->GetDateEnd())
         continue;
       HistoryItem history_item;
@@ -469,7 +469,7 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   } else if (action == L"EditDateToLastUpdated") {
     const auto& anime_ids = *reinterpret_cast<std::vector<int>*>(lParam);
     for (const auto& anime_id : anime_ids) {
-      auto anime_item = AnimeDatabase.FindItem(anime_id);
+      auto anime_item = anime::db.FindItem(anime_id);
       if (!anime_item || anime_item->GetMyDateEnd())
         continue;
       const auto last_updated = ToTime(anime_item->GetMyLastUpdated());
@@ -542,7 +542,7 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
     for (const auto& anime_id : anime_ids) {
       HistoryItem history_item;
       history_item.status = ToInt(body);
-      auto anime_item = AnimeDatabase.FindItem(anime_id);
+      auto anime_item = anime::db.FindItem(anime_id);
       if (!anime_item)
         continue;
       switch (*history_item.status) {
@@ -602,7 +602,7 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   //   lParam is an anime ID.
   } else if (action == L"OpenFolder") {
     int anime_id = static_cast<int>(lParam);
-    auto anime_item = AnimeDatabase.FindItem(anime_id);
+    auto anime_item = anime::db.FindItem(anime_id);
     if (!anime_item || !anime_item->IsInList())
       return;
     if (!anime::ValidateFolder(*anime_item))

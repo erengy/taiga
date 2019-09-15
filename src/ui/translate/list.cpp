@@ -76,7 +76,7 @@ std::wstring TranslateMyScoreFull(const int value) {
 std::wstring TranslateMyStatus(const int value, bool add_count) {
   const auto with_count = [&value, &add_count](std::wstring str) {
     if (add_count)
-      str += L" (" + ToWstr(AnimeDatabase.GetItemCount(value)) + L")";
+      str += L" (" + ToWstr(anime::db.GetItemCount(value)) + L")";
     return str;
   };
 

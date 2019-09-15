@@ -232,7 +232,7 @@ void Service::GetLibraryEntries(Response& response, HttpResponse& http_response)
   // We ignore the remaining tags, because MAL can be very slow at updating
   // their values, and we can easily calculate them ourselves anyway.
 
-  AnimeDatabase.ClearUserData();
+  anime::db.ClearUserData();
 
   // Available tags:
   // - series_animedb_id
@@ -280,7 +280,7 @@ void Service::GetLibraryEntries(Response& response, HttpResponse& http_response)
     anime_item.SetMyLastUpdated(XmlReadStr(node, L"my_last_updated"));
     anime_item.SetMyTags(XmlReadStr(node, L"my_tags"));
 
-    AnimeDatabase.UpdateItem(anime_item);
+    anime::db.UpdateItem(anime_item);
   }
 }
 
@@ -347,7 +347,7 @@ void Service::GetMetadataById(Response& response, HttpResponse& http_response) {
   anime_item.SetScore(ToDouble(score));
   anime_item.SetLastModified(time(nullptr));  // current time
 
-  AnimeDatabase.UpdateItem(anime_item);
+  anime::db.UpdateItem(anime_item);
 }
 
 void Service::SearchTitle(Response& response, HttpResponse& http_response) {
@@ -393,7 +393,7 @@ void Service::SearchTitle(Response& response, HttpResponse& http_response) {
     anime_item.SetImageUrl(XmlReadStr(node, L"image"));
     anime_item.SetLastModified(time(nullptr));  // current time
 
-    int anime_id = AnimeDatabase.UpdateItem(anime_item);
+    int anime_id = anime::db.UpdateItem(anime_item);
 
     // We return a list of IDs so that we can display the results afterwards
     AppendString(response.data[L"ids"], ToWstr(anime_id), L",");

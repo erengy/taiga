@@ -113,7 +113,7 @@ static anime::Item* FindAnimeItem(const DirectoryChangeNotification& notificatio
 
   auto anime_id = Meow.Identify(episode, false, match_options);
 
-  return AnimeDatabase.FindItem(anime_id);
+  return anime::db.FindItem(anime_id);
 }
 
 void FolderMonitor::OnDirectory(const DirectoryChangeNotification& notification) const {
@@ -126,7 +126,7 @@ void FolderMonitor::OnDirectory(const DirectoryChangeNotification& notification)
     std::wstring old_path = notification.path;
     old_path += notification.action == FILE_ACTION_REMOVED ?
         notification.filename.first : notification.filename.second;
-    for (auto& item : AnimeDatabase.items) {
+    for (auto& item : anime::db.items) {
       if (IsEqual(item.second.GetFolder(), old_path)) {
         anime_item = &item.second;
         break;

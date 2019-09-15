@@ -34,7 +34,7 @@ namespace recognition {
 bool Engine::ValidateOptions(anime::Episode& episode, int anime_id,
                              const MatchOptions& match_options,
                              bool redirect) const {
-  auto anime_item = AnimeDatabase.FindItem(anime_id);
+  auto anime_item = anime::db.FindItem(anime_id);
 
   if (!anime_item)
     return false;

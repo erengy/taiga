@@ -269,7 +269,7 @@ void FeedConditionDialog::ChooseElement(int element_index) {
       RECREATE_COMBO((element_index == kFeedFilterElement_Meta_Id ? CBS_DROPDOWNLIST : CBS_DROPDOWN));
       using anime_pair = std::pair<int, std::wstring>;
       std::vector<anime_pair> title_list;
-      for (const auto& [id, item] : AnimeDatabase.items) {
+      for (const auto& [id, item] : anime::db.items) {
         switch (item.GetMyStatus()) {
           case anime::kNotInList:
           case anime::kCompleted:

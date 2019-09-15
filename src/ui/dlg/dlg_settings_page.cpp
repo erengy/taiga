@@ -931,7 +931,7 @@ LRESULT SettingsPage::OnNotify(int idCtrl, LPNMHDR pnmh) {
     // Text callback
     case LVN_GETDISPINFO: {
       NMLVDISPINFO* plvdi = reinterpret_cast<NMLVDISPINFO*>(pnmh);
-      auto anime_item = AnimeDatabase.FindItem(static_cast<int>(plvdi->item.lParam));
+      auto anime_item = anime::db.FindItem(static_cast<int>(plvdi->item.lParam));
       if (!anime_item)
         break;
       switch (plvdi->item.iSubItem) {

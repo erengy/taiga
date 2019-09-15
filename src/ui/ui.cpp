@@ -360,7 +360,7 @@ void OnLibraryEntryChangeFailure(int id, const std::wstring& reason) {
 }
 
 void OnLibraryUpdateFailure(int id, const std::wstring& reason, bool not_approved) {
-  auto anime_item = AnimeDatabase.FindItem(id);
+  auto anime_item = anime::db.FindItem(id);
 
   std::wstring text;
   if (anime_item)
@@ -390,7 +390,7 @@ bool OnLibraryEntriesEditDelete(const std::vector<int> ids) {
   std::wstring content;
   if (ids.size() < 20) {
     for (const auto& id : ids) {
-      auto anime_item = AnimeDatabase.FindItem(id);
+      auto anime_item = anime::db.FindItem(id);
       if (anime_item)
         AppendString(content, anime::GetPreferredTitle(*anime_item), L"\n");
     }
@@ -415,7 +415,7 @@ int OnLibraryEntriesEditEpisode(const std::vector<int> ids) {
   std::set<int> current;
   int number_max = 1900;
   for (const auto& id : ids) {
-    auto anime_item = AnimeDatabase.FindItem(id);
+    auto anime_item = anime::db.FindItem(id);
     if (!anime_item)
       continue;
     current.insert(anime_item->GetMyLastWatchedEpisode());
@@ -440,7 +440,7 @@ int OnLibraryEntriesEditEpisode(const std::vector<int> ids) {
 bool OnLibraryEntriesEditTags(const std::vector<int> ids, std::wstring& tags) {
   std::set<std::wstring> current;
   for (const auto& id : ids) {
-    auto anime_item = AnimeDatabase.FindItem(id);
+    auto anime_item = anime::db.FindItem(id);
     if (anime_item)
       current.insert(anime_item->GetMyTags());
   }
@@ -463,7 +463,7 @@ bool OnLibraryEntriesEditTags(const std::vector<int> ids, std::wstring& tags) {
 bool OnLibraryEntriesEditNotes(const std::vector<int> ids, std::wstring& notes) {
   std::wstring value;
   for (const auto& id : ids) {
-    auto anime_item = AnimeDatabase.FindItem(id);
+    auto anime_item = anime::db.FindItem(id);
     if (anime_item) {
       value = anime_item->GetMyNotes();
       if (!value.empty())
@@ -524,7 +524,7 @@ void OnHistoryAddItem(const HistoryItem& history_item) {
   }
 
   if (!sync::UserAuthenticated()) {
-    auto anime_item = AnimeDatabase.FindItem(history_item.anime_id);
+    auto anime_item = anime::db.FindItem(history_item.anime_id);
     if (anime_item) {
       ChangeStatusText(L"\"{}\" is queued for update."_format(
                        anime::GetPreferredTitle(*anime_item)));
@@ -577,7 +577,7 @@ int OnHistoryQueueClear() {
 }
 
 int OnHistoryProcessConfirmationQueue(anime::Episode& episode) {
-  auto anime_item = AnimeDatabase.FindItem(episode.anime_id);
+  auto anime_item = anime::db.FindItem(episode.anime_id);
 
   if (!anime_item)
     return IDNO;
@@ -721,7 +721,7 @@ void OnAnimeWatchingEnd(const anime::Item& anime_item,
 ////////////////////////////////////////////////////////////////////////////////
 
 bool OnRecognitionCancelConfirm() {
-  auto anime_item = AnimeDatabase.FindItem(CurrentEpisode.anime_id);
+  auto anime_item = anime::db.FindItem(CurrentEpisode.anime_id);
 
   if (!anime_item)
     return false;
@@ -970,7 +970,7 @@ bool OnFeedNotify(const Feed& feed) {
   for (const auto& feed_item : feed.items) {
     if (feed_item.state == FeedItemState::Selected) {
       const auto& episode = feed_item.episode_data;
-      auto anime_item = AnimeDatabase.FindItem(episode.anime_id);
+      auto anime_item = anime::db.FindItem(episode.anime_id);
       auto anime_title = anime_item ? anime::GetPreferredTitle(*anime_item) : episode.anime_title();
 
       auto episode_l = anime::GetEpisodeLow(episode);

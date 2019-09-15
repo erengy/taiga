@@ -82,7 +82,7 @@ void Timer::OnTimeout() {
                      taiga::kAnnounceToHttp |
                      taiga::kAnnounceToMirc);
       if (!Settings.GetBool(taiga::kSync_Update_WaitPlayer)) {
-        auto anime_item = AnimeDatabase.FindItem(CurrentEpisode.anime_id);
+        auto anime_item = anime::db.FindItem(CurrentEpisode.anime_id);
         if (anime_item)
           anime::UpdateList(*anime_item, CurrentEpisode);
       }

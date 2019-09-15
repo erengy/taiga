@@ -115,7 +115,7 @@ void AnimeDialog::OnCancel() {
 }
 
 void AnimeDialog::OnOK() {
-  auto anime_item = AnimeDatabase.FindItem(anime_id_);
+  auto anime_item = anime::db.FindItem(anime_id_);
 
   if (anime_item && anime_item->IsInList())
     if (!page_my_info.Save())
@@ -304,7 +304,7 @@ BOOL AnimeDialog::PreTranslateMessage(MSG* pMsg) {
         page_series_info.Refresh(anime_id_, false);
         if (anime::IsValidId(anime_id_)) {
           UpdateTitle(true);
-          auto anime_item = AnimeDatabase.FindItem(anime_id_);
+          auto anime_item = anime::db.FindItem(anime_id_);
           if (anime_item) {
             sync::GetMetadataById(anime_id_);
             sync::DownloadImage(anime_id_, anime_item->GetImageUrl());
@@ -442,7 +442,7 @@ void AnimeDialog::SetCurrentPage(AnimePageType index) {
   if (!IsWindow())
     return;
 
-  auto anime_item = AnimeDatabase.FindItem(anime_id_);
+  auto anime_item = anime::db.FindItem(anime_id_);
   bool anime_in_list = anime_item && anime_item->IsInList();
 
   switch (index) {
@@ -510,7 +510,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
   if (!IsWindow())
     return;
 
-  auto anime_item = AnimeDatabase.FindItem(anime_id_);
+  auto anime_item = anime::db.FindItem(anime_id_);
 
   // Load image
   if (image) {
@@ -542,7 +542,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
         passive_links.push_back(passive_links.empty() ? 1 : passive_links.back() + 2);
         content += L"  \u2022 <a href=\"score\" id=\"{0}\">{1}</a>"
                    L" <a href=\"Info({0})\">[?]</a>"_format(
-                   pair.first, anime::GetPreferredTitle(AnimeDatabase.items[pair.first]));
+                   pair.first, anime::GetPreferredTitle(anime::db.items[pair.first]));
         if (Taiga.options.debug_mode)
           content += L" [Score: {}]"_format(pair.second);
         content += L"\n";
@@ -571,7 +571,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
         if (it->episode) {
           if (std::find(anime_ids.begin(), anime_ids.end(),
                         it->anime_id) == anime_ids.end()) {
-            auto anime_item = AnimeDatabase.FindItem(it->anime_id);
+            auto anime_item = anime::db.FindItem(it->anime_id);
             if (anime_item)
               if (anime_item->GetMyStatus() == anime::kWatching || anime_item->GetMyRewatching())
                 anime_ids.push_back(it->anime_id);
@@ -583,7 +583,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
     list_anime_ids(History.items);
     int recently_watched = 0;
     for (const auto& id : anime_ids) {
-      auto anime_item = AnimeDatabase.FindItem(id);
+      auto anime_item = anime::db.FindItem(id);
       if (!anime_item || !anime_item->IsNextEpisodeAvailable())
         continue;
       std::wstring title = L"{} #{}"_format(anime::GetPreferredTitle(*anime_item), anime_item->GetMyLastWatchedEpisode() + 1);
@@ -621,7 +621,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
 
     // Available episodes
     int available_episodes = 0;
-    for (const auto& [id, item] : AnimeDatabase.items) {
+    for (const auto& [id, item] : anime::db.items) {
       if (item.IsInList() && item.IsNextEpisodeAvailable())
         available_episodes++;
     }
@@ -632,7 +632,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
 
     // Airing times
     std::vector<int> recently_started, recently_finished, upcoming;
-    for (const auto& [anime_id, item] : AnimeDatabase.items) {
+    for (const auto& [anime_id, item] : anime::db.items) {
       if (item.GetMyStatus() != anime::kPlanToWatch)
         continue;
       const Date& date_start = item.GetDateStart();
@@ -661,7 +661,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
     auto add_info_lines = [&](const std::vector<int>& ids) {
       std::wstring text;
       for (const auto& id : ids) {
-        auto title = anime::GetPreferredTitle(*AnimeDatabase.FindItem(id));
+        auto title = anime::GetPreferredTitle(*anime::db.FindItem(id));
         AppendString(text, L"<a href=\"Info({})\">{}</a>"_format(id, title), L"  \u2022  ");
       }
       content += text;
@@ -778,7 +778,7 @@ void AnimeDialog::UpdateControlPositions(const SIZE* size) {
   }
 
   // Content
-  auto anime_item = AnimeDatabase.FindItem(anime_id_);
+  auto anime_item = anime::db.FindItem(anime_id_);
   bool anime_in_list = anime_item && anime_item->IsInList();
   if (mode_ == AnimeDialogMode::NowPlaying && !anime::IsValidId(anime_id_)) {
     rect.left += ScaleX(kControlMargin);
