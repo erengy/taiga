@@ -34,6 +34,10 @@
 	path = deps/src/monolog
 	url = https://github.com/erengy/monolog.git
 
+[submodule "random"]
+	path = deps/src/random
+	url = https://github.com/effolkronium/random.git
+
 [submodule "pugixml"]
 	path = deps/src/pugixml
 	url = https://github.com/zeux/pugixml.git
