@@ -21,7 +21,7 @@
 #include "base/string.h"
 #include "base/xml.h"
 #include "compat/crypto.h"
-#include "library/anime.h"
+#include "media/anime.h"
 #include "sync/manager.h"
 #include "sync/sync.h"
 #include "taiga/settings.h"

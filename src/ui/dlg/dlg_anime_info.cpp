@@ -22,10 +22,10 @@
 #include "base/format.h"
 #include "base/string.h"
 #include "base/process.h"
-#include "library/anime_db.h"
-#include "library/anime_util.h"
-#include "library/history.h"
-#include "library/resource.h"
+#include "media/anime_db.h"
+#include "media/anime_util.h"
+#include "media/library/history.h"
+#include "ui/resource.h"
 #include "sync/sync.h"
 #include "taiga/resource.h"
 #include "taiga/script.h"
@@ -156,7 +156,7 @@ BOOL AnimeDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         dc.FillRect(rect, ::GetSysColor(COLOR_WINDOW));
         rect.Inflate(-1, -1);
         // Paint image
-        auto image = ImageDatabase.GetImage(anime_id_);
+        auto image = ui::image_db.GetImage(anime_id_);
         if (anime::IsValidId(anime_id_) && image) {
           dc.SetStretchBltMode(HALFTONE);
           dc.StretchBlt(rect.left, rect.top, rect.Width(), rect.Height(),
@@ -514,7 +514,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
 
   // Load image
   if (image) {
-    ImageDatabase.Load(anime_id_, true, connect);
+    ui::image_db.Load(anime_id_, true, connect);
     win::Rect rect;
     GetClientRect(&rect);
     SIZE size = {rect.Width(), rect.Height()};
@@ -750,7 +750,7 @@ void AnimeDialog::UpdateControlPositions(const SIZE* size) {
   if (current_page_ != AnimePageType::None) {
     win::Rect rect_image = rect;
     rect_image.right = rect_image.left + ScaleX(150);
-    auto image = ImageDatabase.GetImage(anime_id_);
+    auto image = ui::image_db.GetImage(anime_id_);
     if (image) {
       rect_image = ResizeRect(rect_image,
                               image->rect.Width(), image->rect.Height(),

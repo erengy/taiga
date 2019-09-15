@@ -22,7 +22,7 @@
 
 #include "base/string.h"
 #include "base/time.h"
-#include "library/anime_season.h"
+#include "media/anime_season.h"
 
 namespace anime {
 

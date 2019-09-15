@@ -20,9 +20,9 @@
 
 #include "base/format.h"
 #include "base/string.h"
-#include "library/anime_db.h"
-#include "library/anime_util.h"
-#include "library/history.h"
+#include "media/anime_db.h"
+#include "media/anime_util.h"
+#include "media/library/history.h"
 #include "sync/anilist_util.h"
 #include "sync/kitsu_util.h"
 #include "sync/myanimelist_util.h"

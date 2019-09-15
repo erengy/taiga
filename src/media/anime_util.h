@@ -21,8 +21,8 @@
 #include <string>
 #include <vector>
 
-#include "library/anime.h"
-#include "library/anime_episode.h"
+#include "media/anime.h"
+#include "track/episode.h"
 
 class Date;
 

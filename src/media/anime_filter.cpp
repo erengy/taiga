@@ -21,9 +21,9 @@
 #include <regex>
 
 #include "base/string.h"
-#include "library/anime_filter.h"
-#include "library/anime_item.h"
-#include "library/anime_util.h"
+#include "media/anime_filter.h"
+#include "media/anime_item.h"
+#include "media/anime_util.h"
 #include "ui/translate.h"
 
 namespace anime {

@@ -21,7 +21,7 @@
 #include "base/base64.h"
 #include "base/url.h"
 #include "base/xml.h"
-#include "library/anime_util.h"
+#include "media/anime_util.h"
 #include "taiga/path.h"
 #include "track/recognition.h"
 

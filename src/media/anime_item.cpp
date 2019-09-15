@@ -20,9 +20,9 @@
 
 #include "base/string.h"
 #include "base/time.h"
-#include "library/anime_item.h"
-#include "library/anime_util.h"
-#include "library/history.h"
+#include "media/anime_item.h"
+#include "media/anime_util.h"
+#include "media/library/history.h"
 #include "sync/service.h"
 #include "ui/ui.h"
 

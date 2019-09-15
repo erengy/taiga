@@ -19,7 +19,7 @@
 #pragma once
 
 #include "service.h"
-#include "library/history.h"
+#include "media/library/history.h"
 #include "taiga/http.h"
 
 namespace anime {

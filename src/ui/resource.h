@@ -18,33 +18,33 @@
 
 #pragma once
 
-#include <string>
+#include <map>
 
-#include "library/anime_season.h"
+#include "base/gfx.h"
 
-namespace library {
+namespace ui {
 
-class SeasonDatabase {
+class ImageDatabase {
 public:
-  bool Load(const anime::Season& season);
+  ImageDatabase() {}
+  virtual ~ImageDatabase() {}
 
-  // Checkes if a significant portion of season data is empty and requires
-  // refreshing.
-  bool IsRefreshRequired();
+  // Loads a picture into memory, downloads a new file if requested.
+  bool Load(int anime_id, bool load, bool download);
 
-  void Reset();
+  bool Reload(int anime_id);
 
-  // Improves season data by excluding invalid items (i.e. postpones series) and
-  // adding missing ones from the anime database.
-  void Review(bool hide_nsfw = true);
+  // Releases image data from memory if an image is not in sight.
+  void FreeMemory();
+  void Clear();
 
-  // Only IDs are stored here, actual info is kept in anime::Database.
-  std::vector<int> items;
+  // Returns a pointer to requested image if available.
+  base::Image* GetImage(int anime_id);
 
-  // Current season (e.g. "Spring 2012")
-  anime::Season current_season;
+private:
+  std::map<int, base::Image> items_;
 };
 
-}  // namespace library
+inline ImageDatabase image_db;
 
-extern library::SeasonDatabase SeasonDatabase;
+}  // namespace ui

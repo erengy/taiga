@@ -22,10 +22,10 @@
 
 #include "base/log.h"
 #include "base/string.h"
-#include "library/anime.h"
-#include "library/anime_db.h"
-#include "library/anime_episode.h"
-#include "library/anime_util.h"
+#include "media/anime.h"
+#include "media/anime_db.h"
+#include "track/episode.h"
+#include "media/anime_util.h"
 #include "track/recognition.h"
 
 namespace track {

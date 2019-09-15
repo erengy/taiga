@@ -17,9 +17,9 @@
 */
 
 #include "base/string.h"
-#include "library/anime.h"
-#include "library/anime_db.h"
-#include "library/anime_episode.h"
+#include "media/anime.h"
+#include "media/anime_db.h"
+#include "track/episode.h"
 #include "ui/menu.h"
 
 anime::Episode CurrentEpisode;

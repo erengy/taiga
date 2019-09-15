@@ -18,10 +18,10 @@
 
 #include "base/gfx.h"
 #include "base/string.h"
-#include "library/anime_db.h"
-#include "library/anime_util.h"
-#include "library/discover.h"
-#include "library/resource.h"
+#include "media/anime_db.h"
+#include "media/anime_util.h"
+#include "media/discover.h"
+#include "ui/resource.h"
 #include "sync/sync.h"
 #include "taiga/resource.h"
 #include "taiga/script.h"
@@ -342,8 +342,8 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
           rect_details.right, rect_image.bottom);
 
       // Draw image
-      if (ImageDatabase.Load(anime_item->GetId(), false, false)) {
-        auto image = ImageDatabase.GetImage(anime_item->GetId());
+      if (ui::image_db.Load(anime_item->GetId(), false, false)) {
+        auto image = ui::image_db.GetImage(anime_item->GetId());
         rect_image = ResizeRect(rect_image,
                                 image->rect.Width(),
                                 image->rect.Height(),
@@ -586,7 +586,7 @@ void SeasonDialog::RefreshData(int anime_id) {
     if (anime_id > 0) {
       sync::DownloadImage(anime_id, anime_item->GetImageUrl());
     } else {
-      ImageDatabase.Load(id, true, true);
+      ui::image_db.Load(id, true, true);
     }
 
     // Get details

@@ -20,11 +20,11 @@
 
 #include "base/log.h"
 #include "base/string.h"
-#include "library/anime.h"
-#include "library/anime_db.h"
-#include "library/anime_util.h"
-#include "library/history.h"
-#include "library/resource.h"
+#include "media/anime.h"
+#include "media/anime_db.h"
+#include "media/anime_util.h"
+#include "media/library/history.h"
+#include "ui/resource.h"
 #include "taiga/announce.h"
 #include "taiga/http.h"
 #include "taiga/settings.h"
@@ -90,7 +90,7 @@ void Timer::OnTimeout() {
 
     case kTimerMemory:
       ConnectionManager.FreeMemory();
-      ImageDatabase.FreeMemory();
+      ui::image_db.FreeMemory();
       break;
 
     case kTimerStats:

@@ -19,7 +19,7 @@
 #include "base/file.h"
 #include "base/gfx.h"
 #include "base/string.h"
-#include "library/anime_db.h"
+#include "media/anime_db.h"
 #include "sync/kitsu_util.h"
 #include "sync/service.h"
 #include "taiga/resource.h"

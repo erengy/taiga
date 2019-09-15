@@ -25,7 +25,7 @@
 #include "base/format.h"
 #include "base/time.h"
 #include "base/string.h"
-#include "library/anime_util.h"
+#include "media/anime_util.h"
 
 namespace ui {
 

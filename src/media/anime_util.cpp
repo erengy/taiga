@@ -23,11 +23,12 @@
 #include "base/log.h"
 #include "base/process.h"
 #include "base/string.h"
-#include "library/anime.h"
-#include "library/anime_db.h"
-#include "library/anime_episode.h"
-#include "library/anime_util.h"
-#include "library/history.h"
+#include "base/time.h"
+#include "media/anime.h"
+#include "media/anime_db.h"
+#include "track/episode.h"
+#include "media/anime_util.h"
+#include "media/library/history.h"
 #include "sync/sync.h"
 #include "taiga/announce.h"
 #include "taiga/path.h"
@@ -1055,6 +1056,12 @@ int TranslateResolution(const std::wstring& str) {
 std::wstring NormalizeResolution(const std::wstring& resolution) {
   const auto height = TranslateResolution(resolution);
   return height ? L"{}p"_format(height) : resolution;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+bool IsValidDate(const Date& date) {
+  return date.year() > 0;
 }
 
 }  // namespace anime

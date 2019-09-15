@@ -26,7 +26,7 @@
 
 #include "base/rss.h"
 #include "base/types.h"
-#include "library/anime_episode.h"
+#include "track/episode.h"
 #include "track/feed_filter.h"
 
 namespace pugi {

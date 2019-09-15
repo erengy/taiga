@@ -16,13 +16,13 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "library/anime_db.h"
+#include "media/anime_db.h"
 
 #include "base/log.h"
 #include "base/string.h"
 #include "base/xml.h"
-#include "library/anime_util.h"
-#include "library/history.h"
+#include "media/anime_util.h"
+#include "media/library/history.h"
 #include "sync/service.h"
 #include "taiga/http.h"
 #include "taiga/path.h"

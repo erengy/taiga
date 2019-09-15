@@ -22,7 +22,7 @@
 #include "base/process.h"
 #include "base/string.h"
 #include "base/url.h"
-#include "library/anime_episode.h"
+#include "track/episode.h"
 #include "taiga/settings.h"
 #include "track/media.h"
 

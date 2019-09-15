@@ -21,10 +21,10 @@
 #include "base/log.h"
 #include "base/string.h"
 #include "base/url.h"
-#include "library/anime_db.h"
-#include "library/anime_util.h"
-#include "library/discover.h"
-#include "library/resource.h"
+#include "media/anime_db.h"
+#include "media/anime_util.h"
+#include "media/discover.h"
+#include "ui/resource.h"
 #include "sync/manager.h"
 #include "taiga/announce.h"
 #include "taiga/config.h"
@@ -231,7 +231,7 @@ void HttpManager::HandleResponse(HttpResponse& response) {
       const int anime_id = static_cast<int>(response.parameter);
       if (response.GetStatusCategory() == 200) {
         SaveToFile(client.write_buffer_, anime::GetImagePath(anime_id));
-        if (ImageDatabase.Reload(anime_id))
+        if (ui::image_db.Reload(anime_id))
           ui::OnLibraryEntryImageChange(anime_id);
       } else if (response.code == 404) {
         const auto anime_item = anime::db.FindItem(anime_id);

@@ -23,8 +23,8 @@
 #include "taiga/stats.h"
 
 #include "base/file.h"
-#include "library/anime_db.h"
-#include "library/anime_util.h"
+#include "media/anime_db.h"
+#include "media/anime_util.h"
 #include "taiga/path.h"
 
 namespace taiga {

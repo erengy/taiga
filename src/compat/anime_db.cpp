@@ -22,7 +22,7 @@
 #include "base/log.h"
 #include "base/string.h"
 #include "base/xml.h"
-#include "library/anime_db.h"
+#include "media/anime_db.h"
 #include "sync/myanimelist_util.h"
 #include "sync/service.h"
 #include "taiga/path.h"

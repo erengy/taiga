@@ -22,7 +22,7 @@
 #include <string>
 
 #include "base/file_search.h"
-#include "library/anime_episode.h"
+#include "track/episode.h"
 
 namespace track {
 

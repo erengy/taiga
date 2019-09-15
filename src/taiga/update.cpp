@@ -23,7 +23,7 @@
 #include "base/time.h"
 #include "base/url.h"
 #include "base/xml.h"
-#include "library/discover.h"
+#include "media/discover.h"
 #include "sync/service.h"
 #include "taiga/http.h"
 #include "taiga/settings.h"

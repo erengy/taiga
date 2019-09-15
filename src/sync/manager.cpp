@@ -17,11 +17,11 @@
 */
 
 #include "base/string.h"
-#include "library/anime_db.h"
-#include "library/anime_season.h"
-#include "library/discover.h"
-#include "library/history.h"
-#include "library/resource.h"
+#include "media/anime_db.h"
+#include "media/anime_season.h"
+#include "media/discover.h"
+#include "media/library/history.h"
+#include "ui/resource.h"
 #include "sync/anilist.h"
 #include "sync/kitsu.h"
 #include "sync/manager.h"
@@ -290,7 +290,7 @@ void Manager::HandleResponse(Response& response, HttpResponse& http_response) {
         ui::ClearStatusText();
         ui::OnLibraryGetSeason();
         for (const auto& id : SeasonDatabase.items) {
-          ImageDatabase.Load(id, true, true);
+          ui::image_db.Load(id, true, true);
         }
       }
       break;

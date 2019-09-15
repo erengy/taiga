@@ -26,10 +26,10 @@
 #include "base/file.h"
 #include "base/log.h"
 #include "base/string.h"
-#include "library/anime_db.h"
-#include "library/anime_util.h"
-#include "library/history.h"
-#include "library/resource.h"
+#include "media/anime_db.h"
+#include "media/anime_util.h"
+#include "media/library/history.h"
+#include "ui/resource.h"
 #include "sync/anilist_util.h"
 #include "sync/manager.h"
 #include "taiga/announce.h"
@@ -538,7 +538,7 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
             CheckDlgButton(IDC_CHECK_CACHE1, FALSE);
           }
           if (IsDlgButtonChecked(IDC_CHECK_CACHE2)) {
-            ImageDatabase.Clear();
+            ui::image_db.Clear();
             CheckDlgButton(IDC_CHECK_CACHE2, FALSE);
           }
           if (IsDlgButtonChecked(IDC_CHECK_CACHE3)) {

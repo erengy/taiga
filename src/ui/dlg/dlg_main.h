@@ -26,7 +26,7 @@
 #include <windows/win/gdi.h>
 #include <windows/win/snappable.h>
 
-#include "library/anime_filter.h"
+#include "media/anime_filter.h"
 
 constexpr unsigned int WM_TAIGA_SHOWMENU = WM_USER + 1337;
 

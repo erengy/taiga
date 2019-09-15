@@ -25,11 +25,11 @@
 #include "base/log.h"
 #include "base/string.h"
 #include "base/xml.h"
-#include "library/anime_db.h"
-#include "library/anime_season.h"
-#include "library/discover.h"
-#include "library/history.h"
-#include "library/resource.h"
+#include "media/anime_db.h"
+#include "media/anime_season.h"
+#include "media/discover.h"
+#include "media/library/history.h"
+#include "ui/resource.h"
 #include "sync/manager.h"
 #include "sync/sync.h"
 #include "sync/kitsu_util.h"
@@ -440,7 +440,7 @@ void AppSettings::ApplyChanges(const AppSettings previous) {
         Set(kSync_ActiveService, current_service);
         anime::db.items.clear();
         anime::db.SaveDatabase();
-        ImageDatabase.Clear();
+        ui::image_db.Clear();
         SeasonDatabase.Reset();
       } else {
         Set(kSync_ActiveService, previous_service);

@@ -19,7 +19,7 @@
 #include <windowsx.h>
 
 #include "base/string.h"
-#include "library/history.h"
+#include "media/library/history.h"
 #include "sync/sync.h"
 #include "taiga/debug.h"
 #include "taiga/resource.h"

@@ -21,8 +21,8 @@
 #include <string>
 
 #include "base/time.h"
-#include "library/anime.h"
-#include "library/anime_season.h"
+#include "media/anime.h"
+#include "media/anime_season.h"
 
 namespace ui {
 

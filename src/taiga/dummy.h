@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include "library/anime_episode.h"
-#include "library/anime_item.h"
+#include "track/episode.h"
+#include "media/anime_item.h"
 
 namespace taiga {
 

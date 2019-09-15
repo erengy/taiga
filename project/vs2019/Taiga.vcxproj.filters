@@ -10,9 +10,6 @@
     <Filter Include="deps">
       <UniqueIdentifier>{58598ee5-0814-4581-87d0-a28008a25893}</UniqueIdentifier>
     </Filter>
-    <Filter Include="library">
-      <UniqueIdentifier>{9fac04ef-29f0-4083-a1a7-f20d503a40df}</UniqueIdentifier>
-    </Filter>
     <Filter Include="sync">
       <UniqueIdentifier>{ff7ccb38-f620-487f-b0de-e4d23f544d34}</UniqueIdentifier>
     </Filter>
@@ -73,9 +70,6 @@
     <Filter Include="deps\zlib">
       <UniqueIdentifier>{1dd6ca23-29e1-4a1b-b1fb-a3b4988da7b0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="library\anime">
-      <UniqueIdentifier>{d6043b6b-33fb-470e-bab4-28380104489e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="sync\anilist">
       <UniqueIdentifier>{b390951c-cbaf-4d02-871d-563957f7080e}</UniqueIdentifier>
     </Filter>
@@ -93,6 +87,15 @@
     </Filter>
     <Filter Include="link">
       <UniqueIdentifier>{2a28c4c6-119f-44bc-b65e-63b902b26747}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="media">
+      <UniqueIdentifier>{6d14270c-63bd-4f09-b615-0f76b9f01ce2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="media\anime">
+      <UniqueIdentifier>{d6043b6b-33fb-470e-bab4-28380104489e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="media\library">
+      <UniqueIdentifier>{9fac04ef-29f0-4083-a1a7-f20d503a40df}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -394,42 +397,6 @@
     <ClCompile Include="..\..\deps\src\zlib\zutil.c">
       <Filter>deps\zlib</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\library\discover.cpp">
-      <Filter>library</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\library\export.cpp">
-      <Filter>library</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\library\history.cpp">
-      <Filter>library</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\library\resource.cpp">
-      <Filter>library</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\library\anime.cpp">
-      <Filter>library\anime</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\library\anime_util_time.cpp">
-      <Filter>library\anime</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\library\anime_db.cpp">
-      <Filter>library\anime</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\library\anime_episode.cpp">
-      <Filter>library\anime</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\library\anime_filter.cpp">
-      <Filter>library\anime</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\library\anime_item.cpp">
-      <Filter>library\anime</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\library\anime_season.cpp">
-      <Filter>library\anime</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\library\anime_util.cpp">
-      <Filter>library\anime</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\sync\manager.cpp">
       <Filter>sync</Filter>
     </ClCompile>
@@ -640,8 +607,41 @@
     <ClCompile Include="..\..\src\base\atf.cpp">
       <Filter>base</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\library\anime_list.cpp">
-      <Filter>library\anime</Filter>
+    <ClCompile Include="..\..\src\ui\resource.cpp">
+      <Filter>ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\track\episode.cpp">
+      <Filter>track</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\media\library\export.cpp">
+      <Filter>media\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\media\library\history.cpp">
+      <Filter>media\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\media\library\list.cpp">
+      <Filter>media\library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\media\discover.cpp">
+      <Filter>media</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\media\anime.cpp">
+      <Filter>media\anime</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\media\anime_db.cpp">
+      <Filter>media\anime</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\media\anime_filter.cpp">
+      <Filter>media\anime</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\media\anime_item.cpp">
+      <Filter>media\anime</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\media\anime_season.cpp">
+      <Filter>media\anime</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\media\anime_util.cpp">
+      <Filter>media\anime</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -921,39 +921,6 @@
     <ClInclude Include="..\..\deps\src\zlib\zutil.h">
       <Filter>deps\zlib</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\library\discover.h">
-      <Filter>library</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\library\export.h">
-      <Filter>library</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\library\history.h">
-      <Filter>library</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\library\resource.h">
-      <Filter>library</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\library\anime.h">
-      <Filter>library\anime</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\library\anime_db.h">
-      <Filter>library\anime</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\library\anime_episode.h">
-      <Filter>library\anime</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\library\anime_filter.h">
-      <Filter>library\anime</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\library\anime_item.h">
-      <Filter>library\anime</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\library\anime_season.h">
-      <Filter>library\anime</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\library\anime_util.h">
-      <Filter>library\anime</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\sync\manager.h">
       <Filter>sync</Filter>
     </ClInclude>
@@ -1163,6 +1130,39 @@
     </ClInclude>
     <ClInclude Include="..\..\deps\src\semaver\include\semaver.hpp">
       <Filter>deps\semaver</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ui\resource.h">
+      <Filter>ui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\track\episode.h">
+      <Filter>track</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\media\library\export.h">
+      <Filter>media\library</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\media\library\history.h">
+      <Filter>media\library</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\media\discover.h">
+      <Filter>media</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\media\anime.h">
+      <Filter>media\anime</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\media\anime_db.h">
+      <Filter>media\anime</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\media\anime_filter.h">
+      <Filter>media\anime</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\media\anime_item.h">
+      <Filter>media\anime</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\media\anime_season.h">
+      <Filter>media\anime</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\media\anime_util.h">
+      <Filter>media\anime</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

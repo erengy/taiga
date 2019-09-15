@@ -21,8 +21,8 @@
 #include "base/log.h"
 #include "base/string.h"
 #include "base/xml.h"
-#include "library/anime_db.h"
-#include "library/history.h"
+#include "media/anime_db.h"
+#include "media/library/history.h"
 #include "sync/sync.h"
 
 void History::HandleCompatibility(const std::wstring& meta_version) {

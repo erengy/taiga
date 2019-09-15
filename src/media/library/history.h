@@ -25,7 +25,7 @@
 
 #include "base/time.h"
 #include "base/xml.h"
-#include "library/anime_episode.h"
+#include "track/episode.h"
 
 enum class QueueSearch {
   DateStart,

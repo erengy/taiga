@@ -17,26 +17,24 @@
 */
 
 #include "base/file.h"
-#include "library/anime.h"
-#include "library/anime_db.h"
-#include "library/anime_util.h"
-#include "library/discover.h"
-#include "library/resource.h"
+#include "media/anime.h"
+#include "media/anime_db.h"
+#include "media/anime_util.h"
+#include "media/discover.h"
+#include "ui/resource.h"
 #include "sync/sync.h"
 #include "taiga/path.h"
 #include "ui/dlg/dlg_anime_info.h"
 #include "ui/dlg/dlg_season.h"
 
-anime::ImageDatabase ImageDatabase;
-
-namespace anime {
+namespace ui {
 
 bool ImageDatabase::Load(int anime_id, bool load, bool download) {
-  if (!IsValidId(anime_id))
+  if (!anime::IsValidId(anime_id))
     return false;
 
   if (items_.find(anime_id) != items_.end()) {
-    if (IsValidId(items_[anime_id].data)) {
+    if (anime::IsValidId(items_[anime_id].data)) {
       return true;
     } else if (!load) {
       return false;
@@ -48,7 +46,7 @@ bool ImageDatabase::Load(int anime_id, bool load, bool download) {
     if (download) {
       // Refresh if current file is too old
       auto anime_item = anime::db.FindItem(anime_id);
-      if (anime_item && anime_item->GetAiringStatus() != kFinishedAiring) {
+      if (anime_item && anime_item->GetAiringStatus() != anime::kFinishedAiring) {
         // Check last modified date (>= 7 days)
         if (GetFileAge(anime::GetImagePath(anime_id)) / (60 * 60 * 24) >= 7) {
           sync::DownloadImage(anime_id, anime_item->GetImageUrl());
@@ -70,7 +68,7 @@ bool ImageDatabase::Load(int anime_id, bool load, bool download) {
 }
 
 bool ImageDatabase::Reload(int anime_id) {
-  if (!IsValidId(anime_id))
+  if (!anime::IsValidId(anime_id))
     return false;
 
   if (items_[anime_id].Load(anime::GetImagePath(anime_id))) {
@@ -120,4 +118,4 @@ base::Image* ImageDatabase::GetImage(int anime_id) {
   return nullptr;
 }
 
-}  // namespace anime
+}  // namespace ui

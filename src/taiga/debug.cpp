@@ -17,7 +17,7 @@
 */
 
 #include "base/string.h"
-#include "library/anime_db.h"
+#include "media/anime_db.h"
 #include "taiga/debug.h"
 #include "ui/dlg/dlg_main.h"
 #include "ui/dialog.h"

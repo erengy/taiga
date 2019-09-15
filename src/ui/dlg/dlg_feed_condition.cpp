@@ -21,8 +21,8 @@
 #include <windows/win/gdi.h>
 
 #include "base/string.h"
-#include "library/anime_db.h"
-#include "library/anime_util.h"
+#include "media/anime_db.h"
+#include "media/anime_util.h"
 #include "taiga/resource.h"
 #include "ui/dlg/dlg_feed_condition.h"
 #include "ui/translate.h"

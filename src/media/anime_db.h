@@ -20,7 +20,7 @@
 
 #include <map>
 
-#include "library/anime_item.h"
+#include "media/anime_item.h"
 
 class HistoryItem;
 namespace pugi {

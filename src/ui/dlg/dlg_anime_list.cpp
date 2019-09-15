@@ -25,10 +25,10 @@
 #include "base/format.h"
 #include "base/gfx.h"
 #include "base/string.h"
-#include "library/anime_db.h"
-#include "library/anime_filter.h"
-#include "library/anime_util.h"
-#include "library/resource.h"
+#include "media/anime_db.h"
+#include "media/anime_filter.h"
+#include "media/anime_util.h"
+#include "ui/resource.h"
 #include "sync/service.h"
 #include "taiga/resource.h"
 #include "taiga/script.h"
@@ -247,8 +247,8 @@ INT_PTR AnimeListDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
         win::Rect rect_image = rect;
         rect_image.right = rect_image.left + static_cast<int>(rect_image.Height() / 1.4);
         dc.FillRect(rect_image, ui::kColorGray);
-        if (ImageDatabase.Load(anime_id, false, false)) {
-          auto image = ImageDatabase.GetImage(anime_id);
+        if (ui::image_db.Load(anime_id, false, false)) {
+          auto image = ui::image_db.GetImage(anime_id);
           int sbm = dc.SetStretchBltMode(HALFTONE);
           dc.StretchBlt(rect_image.left, rect_image.top,
                         rect_image.Width(), rect_image.Height(),

@@ -18,9 +18,9 @@
 
 #include "base/log.h"
 #include "base/string.h"
-#include "library/anime_db.h"
-#include "library/anime_episode.h"
-#include "library/anime_util.h"
+#include "media/anime_db.h"
+#include "track/episode.h"
+#include "media/anime_util.h"
 #include "taiga/settings.h"
 #include "track/monitor.h"
 #include "track/recognition.h"
