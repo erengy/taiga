@@ -97,6 +97,15 @@
     <Filter Include="media\library">
       <UniqueIdentifier>{9fac04ef-29f0-4083-a1a7-f20d503a40df}</UniqueIdentifier>
     </Filter>
+    <Filter Include="track\recognition">
+      <UniqueIdentifier>{6a572608-0475-41ce-a80f-9755eed93a1c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="track\files">
+      <UniqueIdentifier>{edc8e3af-4dfc-442c-84e6-15b989941d4f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="track\torrents">
+      <UniqueIdentifier>{ace9aed7-39a5-4f01-86df-477c7298724c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\main.cpp" />
@@ -463,42 +472,6 @@
     <ClCompile Include="..\..\src\taiga\update.cpp">
       <Filter>taiga</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\track\feed.cpp">
-      <Filter>track</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\track\feed_aggregator.cpp">
-      <Filter>track</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\track\feed_filter.cpp">
-      <Filter>track</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\track\media.cpp">
-      <Filter>track</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\track\media_stream.cpp">
-      <Filter>track</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\track\monitor.cpp">
-      <Filter>track</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\track\recognition.cpp">
-      <Filter>track</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\track\recognition_normalize.cpp">
-      <Filter>track</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\track\recognition_relations.cpp">
-      <Filter>track</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\track\recognition_score.cpp">
-      <Filter>track</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\track\recognition_validate.cpp">
-      <Filter>track</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\track\search.cpp">
-      <Filter>track</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\ui\dialog.cpp">
       <Filter>ui</Filter>
     </ClCompile>
@@ -643,8 +616,44 @@
     <ClCompile Include="..\..\src\media\anime_util.cpp">
       <Filter>media\anime</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\track\recognition.cpp">
+      <Filter>track\recognition</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\track\recognition_normalize.cpp">
+      <Filter>track\recognition</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\track\recognition_relations.cpp">
+      <Filter>track\recognition</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\track\recognition_score.cpp">
+      <Filter>track\recognition</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\track\recognition_validate.cpp">
+      <Filter>track\recognition</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\track\search.cpp">
+      <Filter>track\files</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\src\track\play.cpp">
-      <Filter>track</Filter>
+      <Filter>track\files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\track\monitor.cpp">
+      <Filter>track\files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\track\feed.cpp">
+      <Filter>track\torrents</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\track\feed_aggregator.cpp">
+      <Filter>track\torrents</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\track\feed_filter.cpp">
+      <Filter>track\torrents</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\track\media_stream.cpp">
+      <Filter>track\recognition</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\track\media.cpp">
+      <Filter>track\recognition</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1002,24 +1011,6 @@
     <ClInclude Include="..\..\src\taiga\version.h">
       <Filter>taiga</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\track\feed.h">
-      <Filter>track</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\track\feed_filter.h">
-      <Filter>track</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\track\media.h">
-      <Filter>track</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\track\monitor.h">
-      <Filter>track</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\track\recognition.h">
-      <Filter>track</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\track\search.h">
-      <Filter>track</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\ui\dialog.h">
       <Filter>ui</Filter>
     </ClInclude>
@@ -1167,8 +1158,26 @@
     <ClInclude Include="..\..\src\media\anime_util.h">
       <Filter>media\anime</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\track\recognition.h">
+      <Filter>track\recognition</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\track\search.h">
+      <Filter>track\files</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\src\track\play.h">
-      <Filter>track</Filter>
+      <Filter>track\files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\track\monitor.h">
+      <Filter>track\files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\track\feed.h">
+      <Filter>track\torrents</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\track\feed_filter.h">
+      <Filter>track\torrents</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\track\media.h">
+      <Filter>track\recognition</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
