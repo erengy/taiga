@@ -25,6 +25,7 @@
 
 #include "base/rss.h"
 #include "track/episode.h"
+#include "track/feed_source.h"
 
 namespace pugi {
 class xml_document;
@@ -40,23 +41,11 @@ enum class FeedItemState {
   Selected,
 };
 
-enum class FeedSource {
-  Unknown,
-  AniDex,
-  AnimeBytes,
-  Minglong,
-  NyaaPantsu,
-  NyaaSi,
-  TokyoToshokan,
-};
-
 enum class TorrentCategory {
   Anime,
   Batch,
   Other,
 };
-
-////////////////////////////////////////////////////////////////////////////////
 
 class FeedItem : public rss::Item {
 public:
@@ -77,20 +66,14 @@ public:
 
   class EpisodeData : public anime::Episode {
   public:
-    EpisodeData() : new_episode(false) {}
-    bool new_episode;
+    bool new_episode = false;
   } episode_data;
 };
 
-TorrentCategory GetTorrentCategory(const FeedItem& item);
-std::wstring TranslateTorrentCategory(TorrentCategory category);
-TorrentCategory TranslateTorrentCategory(const std::wstring& str);
-
-////////////////////////////////////////////////////////////////////////////////
-
 class Feed {
 public:
-  std::wstring GetDataPath();
+  std::wstring GetDataPath() const;
+
   bool Load();
   bool Load(const std::wstring& data);
 
@@ -101,5 +84,9 @@ public:
 private:
   void Load(const pugi::xml_document& document);
 };
+
+TorrentCategory GetTorrentCategory(const FeedItem& item);
+std::wstring TranslateTorrentCategory(TorrentCategory category);
+TorrentCategory TranslateTorrentCategory(const std::wstring& str);
 
 }  // namespace track

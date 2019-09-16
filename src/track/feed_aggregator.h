@@ -39,10 +39,7 @@ public:
   void HandleFeedDownloadError(Feed& feed);
   bool ValidateFeedDownload(const HttpRequest& http_request, HttpResponse& http_response);
 
-  void FindFeedSource(Feed& feed) const;
   void ExamineData(Feed& feed);
-  void ParseFeedItem(FeedSource source, FeedItem& feed_item);
-  void CleanupDescription(std::wstring& description);
 
   size_t GetArchiveSize() const;
   bool LoadArchive();

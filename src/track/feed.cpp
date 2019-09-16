@@ -19,15 +19,29 @@
 #include "track/feed.h"
 
 #include "base/base64.h"
+#include "base/html.h"
+#include "base/string.h"
 #include "base/url.h"
 #include "base/xml.h"
 #include "media/anime_util.h"
 #include "taiga/path.h"
-#include "track/feed_aggregator.h"
 #include "track/feed_filter.h"
 #include "track/recognition.h"
 
 namespace track {
+
+static void TidyFeedItemDescription(std::wstring& description) {
+  ReplaceString(description, L"</p>", L"\n");
+  ReplaceString(description, L"<br/>", L"\n");
+  ReplaceString(description, L"<br />", L"\n");
+  StripHtmlTags(description);
+  Trim(description, L" \n");
+  while (ReplaceString(description, L"\n\n", L"\n"));
+  ReplaceString(description, L"\n", L" | ");
+  while (ReplaceString(description, L"  ", L" "));
+}
+
+////////////////////////////////////////////////////////////////////////////////
 
 void FeedItem::Discard(int option) {
   switch (option) {
@@ -56,8 +70,7 @@ bool FeedItem::IsDiscarded() const {
 }
 
 bool FeedItem::operator<(const FeedItem& item) const {
-  // Initialize priority list
-  static const int state_priorities[] = {1, 2, 3, 4, 0};
+  constexpr int state_priorities[] = {1, 2, 3, 4, 0};
 
   // Sort items by the priority of their state
   return state_priorities[static_cast<size_t>(this->state)] <
@@ -86,10 +99,12 @@ bool FeedItem::operator==(const FeedItem& item) const {
 }
 
 TorrentCategory GetTorrentCategory(const FeedItem& item) {
-  if (item.torrent_category != TorrentCategory::Anime)  // Respect our previous categorization
+  // Respect our previous categorization
+  if (item.torrent_category != TorrentCategory::Anime)
     return item.torrent_category;
 
-  if (InStr(item.category.value, L"Batch") > -1)  // Respect feed's own categorization
+  // Respect feed's own categorization
+  if (InStr(item.category.value, L"Batch") > -1)
     return TorrentCategory::Batch;
 
   if (Meow.IsBatchRelease(item.episode_data))
@@ -130,7 +145,7 @@ TorrentCategory TranslateTorrentCategory(const std::wstring& str) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-std::wstring Feed::GetDataPath() {
+std::wstring Feed::GetDataPath() const {
   std::wstring path = taiga::GetPath(taiga::Path::Feed);
 
   if (!channel.link.empty()) {
@@ -177,11 +192,11 @@ void Feed::Load(const XmlDocument& document) {
     items.push_back(FeedItem{std::move(item)});
   }
 
-  track::aggregator.FindFeedSource(*this);
+  source = GetFeedSource(channel.link);
 
   for (auto& item : items) {
-    track::aggregator.ParseFeedItem(source, item);
-    track::aggregator.CleanupDescription(item.description);
+    ParseFeedItemFromSource(source, item);
+    TidyFeedItemDescription(item.description);
   }
 }
 

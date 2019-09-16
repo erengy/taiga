@@ -658,6 +658,9 @@
     <ClCompile Include="..\..\src\track\scanner.cpp">
       <Filter>track\files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\track\feed_source.cpp">
+      <Filter>track\torrents</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\base\base64.h">
@@ -1189,6 +1192,9 @@
       <Filter>track\files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\track\feed_aggregator.h">
+      <Filter>track\torrents</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\track\feed_source.h">
       <Filter>track\torrents</Filter>
     </ClInclude>
   </ItemGroup>

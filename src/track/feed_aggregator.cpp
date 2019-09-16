@@ -23,7 +23,6 @@
 
 #include "base/file.h"
 #include "base/format.h"
-#include "base/html.h"
 #include "base/log.h"
 #include "base/string.h"
 #include "base/time.h"
@@ -449,90 +448,6 @@ bool Aggregator::ValidateFeedDownload(const HttpRequest& http_request,
   }
 
   return true;
-}
-
-void Aggregator::FindFeedSource(Feed& feed) const {
-  static const std::map<std::wstring, FeedSource> sources{
-    {L"anidex", FeedSource::AniDex},
-    {L"animebytes", FeedSource::AnimeBytes},
-    {L"minglong", FeedSource::Minglong},
-    {L"nyaa.pantsu", FeedSource::NyaaPantsu},
-    {L"nyaa.si", FeedSource::NyaaSi},
-    {L"tokyotosho", FeedSource::TokyoToshokan},
-  };
-
-  const Url url(feed.channel.link);
-
-  for (const auto& pair : sources) {
-    if (InStr(url.host, pair.first, 0, true) > -1) {
-      feed.source = pair.second;
-      return;
-    }
-  }
-}
-
-void Aggregator::ParseFeedItem(FeedSource source, FeedItem& feed_item) {
-  auto parse_magnet_link = [&feed_item]() {
-    feed_item.magnet_link = InStr(feed_item.description,
-                                  L"<a href=\"magnet:?", L"\">");
-    if (!feed_item.magnet_link.empty())
-      feed_item.magnet_link = L"magnet:?" + feed_item.magnet_link;
-  };
-
-  switch (source) {
-    // AniDex
-    case FeedSource::AniDex:
-      feed_item.file_size = ParseSizeString(InStr(feed_item.description, L"Size: ", L" |"));
-      if (InStr(feed_item.description, L" Batch ") > -1)
-        feed_item.torrent_category = TorrentCategory::Batch;
-      parse_magnet_link();
-      break;
-
-    // minglong
-    case FeedSource::Minglong:
-      feed_item.file_size = ParseSizeString(InStr(feed_item.description, L"Size: ", L"<"));
-      break;
-
-    // Nyaa Pantsu
-    case FeedSource::NyaaPantsu:
-      feed_item.info_link = feed_item.guid.value;
-      feed_item.file_size = std::wcstoull(feed_item.enclosure.length.c_str(), nullptr, 10);
-      break;
-
-    // Nyaa.si
-    case FeedSource::NyaaSi: {
-      feed_item.info_link = feed_item.guid.value;
-      if (feed_item.namespace_elements.count(L"nyaa:size"))
-        feed_item.file_size = ParseSizeString(feed_item.namespace_elements[L"nyaa:size"]);
-      auto get_torrent_stat = [&](const std::wstring& name, std::optional<size_t>& result) {
-        if (feed_item.namespace_elements.count(name))
-          result = ToInt(feed_item.namespace_elements[name]);
-      };
-      get_torrent_stat(L"nyaa:seeders", feed_item.seeders);
-      get_torrent_stat(L"nyaa:leechers", feed_item.leechers);
-      get_torrent_stat(L"nyaa:downloads", feed_item.downloads);
-      break;
-    }
-
-    // Tokyo Toshokan
-    case FeedSource::TokyoToshokan:
-      feed_item.file_size = ParseSizeString(InStr(feed_item.description, L"Size: ", L"<"));
-      parse_magnet_link();
-      feed_item.description = InStr(feed_item.description, L"Comment: ", L"");
-      feed_item.info_link = feed_item.guid.value;
-      break;
-  }
-}
-
-void Aggregator::CleanupDescription(std::wstring& description) {
-  ReplaceString(description, L"</p>", L"\n");
-  ReplaceString(description, L"<br/>", L"\n");
-  ReplaceString(description, L"<br />", L"\n");
-  StripHtmlTags(description);
-  Trim(description, L" \n");
-  while (ReplaceString(description, L"\n\n", L"\n"));
-  ReplaceString(description, L"\n", L" | ");
-  while (ReplaceString(description, L"  ", L" "));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
