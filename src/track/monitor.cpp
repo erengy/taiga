@@ -16,28 +16,18 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "track/monitor.h"
+
 #include "base/log.h"
 #include "base/string.h"
 #include "media/anime_db.h"
-#include "track/episode.h"
 #include "media/anime_util.h"
 #include "taiga/settings.h"
-#include "track/monitor.h"
+#include "track/episode.h"
 #include "track/recognition.h"
 #include "track/search.h"
 
-class FolderMonitor FolderMonitor;
-
-void FolderMonitor::Enable(bool enabled) {
-  Stop();
-  Clear();
-
-  if (enabled) {
-    for (const auto& folder : Settings.library_folders)
-      Add(folder);
-    Start();
-  }
-}
+namespace track {
 
 static void ChangeAnimeFolder(anime::Item& anime_item,
                               const std::wstring& path) {
@@ -56,24 +46,8 @@ static void ChangeAnimeFolder(anime::Item& anime_item,
   ScanAvailableEpisodesQuick(anime_item.GetId());
 }
 
-void FolderMonitor::HandleChangeNotification(
-    const DirectoryChangeNotification& notification) const {
-  switch (notification.type) {
-    case DirectoryChangeNotification::Type::Directory:
-      OnDirectory(notification);
-      break;
-    case DirectoryChangeNotification::Type::File:
-      OnFile(notification);
-      break;
-    default:
-      LOGD(L"Unknown change type\nPath: {}\nFilename: {}",
-           notification.path, notification.filename.first);
-      break;
-  }
-}
-
-static anime::Item* FindAnimeItem(const DirectoryChangeNotification& notification,
-                                  anime::Episode& episode) {
+static anime::Item* FindAnimeItem(
+    const DirectoryChangeNotification& notification, anime::Episode& episode) {
   std::wstring path;
   static track::recognition::ParseOptions parse_options;
   switch (notification.type) {
@@ -111,16 +85,47 @@ static anime::Item* FindAnimeItem(const DirectoryChangeNotification& notificatio
       break;
   }
 
-  auto anime_id = Meow.Identify(episode, false, match_options);
+  const auto anime_id = Meow.Identify(episode, false, match_options);
 
   return anime::db.Find(anime_id);
 }
 
-void FolderMonitor::OnDirectory(const DirectoryChangeNotification& notification) const {
+////////////////////////////////////////////////////////////////////////////////
+
+void Monitor::Enable(bool enabled) {
+  Stop();
+  Clear();
+
+  if (enabled) {
+    for (const auto& folder : Settings.library_folders) {
+      Add(folder);
+    }
+    Start();
+  }
+}
+
+void Monitor::HandleChangeNotification(
+    const DirectoryChangeNotification& notification) const {
+  switch (notification.type) {
+    case DirectoryChangeNotification::Type::Directory:
+      OnDirectory(notification);
+      break;
+    case DirectoryChangeNotification::Type::File:
+      OnFile(notification);
+      break;
+    default:
+      LOGD(L"Unknown change type\nPath: {}\nFilename: {}",
+           notification.path, notification.filename.first);
+      break;
+  }
+}
+
+void Monitor::OnDirectory(
+    const DirectoryChangeNotification& notification) const {
   anime::Item* anime_item = nullptr;
 
-  bool new_path_available = notification.action != FILE_ACTION_REMOVED;
-  bool old_path_available = notification.action >= FILE_ACTION_REMOVED;
+  const bool new_path_available = notification.action != FILE_ACTION_REMOVED;
+  const bool old_path_available = notification.action >= FILE_ACTION_REMOVED;
 
   if (old_path_available) {
     std::wstring old_path = notification.path;
@@ -149,16 +154,16 @@ void FolderMonitor::OnDirectory(const DirectoryChangeNotification& notification)
   }
 }
 
-void FolderMonitor::OnFile(const DirectoryChangeNotification& notification) const {
+void Monitor::OnFile(const DirectoryChangeNotification& notification) const {
   anime::Episode episode;
-  auto anime_item = FindAnimeItem(notification, episode);
+  const auto anime_item = FindAnimeItem(notification, episode);
 
   if (!anime_item)
     return;
   if (!Meow.IsValidAnimeType(episode) || !Meow.IsValidFileExtension(episode))
     return;
 
-  bool path_available = notification.action != FILE_ACTION_REMOVED;
+  const bool path_available = notification.action != FILE_ACTION_REMOVED;
 
   // Set anime folder
   if (path_available && anime_item->GetFolder().empty()) {
@@ -166,9 +171,9 @@ void FolderMonitor::OnFile(const DirectoryChangeNotification& notification) cons
   }
 
   // Set episode availability
-  int lower_bound = anime::GetEpisodeLow(episode);
-  int upper_bound = anime::GetEpisodeHigh(episode);
-  std::wstring path = notification.path + notification.filename.first;
+  const int lower_bound = anime::GetEpisodeLow(episode);
+  const int upper_bound = anime::GetEpisodeHigh(episode);
+  const std::wstring path = notification.path + notification.filename.first;
   for (int number = lower_bound; number <= upper_bound; ++number) {
     if (anime_item->SetEpisodeAvailability(number, path_available, path)) {
       LOGD(L"{} #{} is {}.", anime_item->GetTitle(), number,
@@ -176,3 +181,5 @@ void FolderMonitor::OnFile(const DirectoryChangeNotification& notification) cons
     }
   }
 }
+
+}  // namespace track

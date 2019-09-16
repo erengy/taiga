@@ -331,7 +331,7 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
                              L"Add a Library Folder", L"", path)) {
       Settings.library_folders.push_back(path);
       if (Settings.GetBool(taiga::kLibrary_WatchFolders))
-        FolderMonitor.Enable();
+        track::monitor.Enable();
       ui::ShowDlgSettings(ui::kSettingsSectionLibrary, ui::kSettingsPageLibraryFolders);
     }
 

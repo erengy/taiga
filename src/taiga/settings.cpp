@@ -494,7 +494,7 @@ void AppSettings::ApplyChanges(const AppSettings previous) {
   }
 
   bool enable_monitor = GetBool(kLibrary_WatchFolders);
-  FolderMonitor.Enable(enable_monitor);
+  track::monitor.Enable(enable_monitor);
 
   bool toggled_discord = GetBool(kShare_Discord_Enabled) !=
       previous.GetBool(kShare_Discord_Enabled);

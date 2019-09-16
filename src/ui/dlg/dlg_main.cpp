@@ -120,8 +120,8 @@ BOOL MainDialog::OnInitDialog() {
       ShowDlgSettings(kSettingsSectionServices, kSettingsPageServicesMain);
   }
   if (Settings.GetBool(taiga::kLibrary_WatchFolders)) {
-    FolderMonitor.SetWindowHandle(GetWindowHandle());
-    FolderMonitor.Enable();
+    track::monitor.SetWindowHandle(GetWindowHandle());
+    track::monitor.Enable();
   }
 
   return TRUE;
@@ -297,7 +297,7 @@ INT_PTR MainDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 
     // Monitor anime folders
     case WM_MONITORCALLBACK: {
-      FolderMonitor.Callback(*reinterpret_cast<DirectoryChangeEntry*>(lParam));
+      track::monitor.Callback(*reinterpret_cast<DirectoryChangeEntry*>(lParam));
       return TRUE;
     }
 

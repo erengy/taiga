@@ -20,14 +20,18 @@
 
 #include "base/file_monitor.h"
 
-class FolderMonitor : public DirectoryMonitor {
+namespace track {
+
+class Monitor : public DirectoryMonitor {
 public:
   void Enable(bool enabled = true);
-  void HandleChangeNotification(const DirectoryChangeNotification& notification) const;
+  void HandleChangeNotification(const DirectoryChangeNotification& notification) const override;
 
 private:
   void OnDirectory(const DirectoryChangeNotification& notification) const;
   void OnFile(const DirectoryChangeNotification& notification) const;
 };
 
-extern class FolderMonitor FolderMonitor;
+inline Monitor monitor;
+
+}  // namespace track
