@@ -25,7 +25,7 @@
 #include "taiga/settings.h"
 #include "track/episode.h"
 #include "track/recognition.h"
-#include "track/search.h"
+#include "track/scanner.h"
 
 namespace track {
 

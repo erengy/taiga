@@ -26,7 +26,7 @@
 
 namespace track {
 
-class FileSearch : public base::FileSearch {
+class Scanner : public base::FileSearch {
 public:
   bool Search(const std::wstring& root);
 
@@ -46,7 +46,7 @@ private:
   std::wstring path_found_;
 };
 
-inline FileSearch file_search_helper;
+inline Scanner scanner;
 
 }  // namespace track
 

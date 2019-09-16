@@ -634,9 +634,6 @@
     <ClCompile Include="..\..\src\track\recognition_validate.cpp">
       <Filter>track\recognition</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\track\search.cpp">
-      <Filter>track\files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\track\play.cpp">
       <Filter>track\files</Filter>
     </ClCompile>
@@ -657,6 +654,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\track\media.cpp">
       <Filter>track\recognition</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\track\scanner.cpp">
+      <Filter>track\files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1164,9 +1164,6 @@
     <ClInclude Include="..\..\src\track\recognition.h">
       <Filter>track\recognition</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\track\search.h">
-      <Filter>track\files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\track\play.h">
       <Filter>track\files</Filter>
     </ClInclude>
@@ -1187,6 +1184,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\base\random.h">
       <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\track\scanner.h">
+      <Filter>track\files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

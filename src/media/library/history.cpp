@@ -28,7 +28,7 @@
 #include "taiga/settings.h"
 #include "taiga/version.h"
 #include "track/media.h"
-#include "track/search.h"
+#include "track/scanner.h"
 #include "ui/ui.h"
 
 class ConfirmationQueue ConfirmationQueue;

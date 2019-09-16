@@ -261,7 +261,7 @@
     <ClCompile Include="..\..\src\track\recognition_relations.cpp" />
     <ClCompile Include="..\..\src\track\recognition_score.cpp" />
     <ClCompile Include="..\..\src\track\recognition_validate.cpp" />
-    <ClCompile Include="..\..\src\track\search.cpp" />
+    <ClCompile Include="..\..\src\track\scanner.cpp" />
     <ClCompile Include="..\..\src\ui\dialog.cpp" />
     <ClCompile Include="..\..\src\ui\dlg\dlg_about.cpp" />
     <ClCompile Include="..\..\src\ui\dlg\dlg_anime_info.cpp" />
@@ -442,7 +442,7 @@
     <ClInclude Include="..\..\src\track\monitor.h" />
     <ClInclude Include="..\..\src\track\play.h" />
     <ClInclude Include="..\..\src\track\recognition.h" />
-    <ClInclude Include="..\..\src\track\search.h" />
+    <ClInclude Include="..\..\src\track\scanner.h" />
     <ClInclude Include="..\..\src\ui\dialog.h" />
     <ClInclude Include="..\..\src\ui\dlg\dlg_about.h" />
     <ClInclude Include="..\..\src\ui\dlg\dlg_anime_info.h" />

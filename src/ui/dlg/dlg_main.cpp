@@ -41,7 +41,7 @@
 #include "track/monitor.h"
 #include "track/play.h"
 #include "track/recognition.h"
-#include "track/search.h"
+#include "track/scanner.h"
 #include "ui/dialog.h"
 #include "ui/dlg/dlg_anime_info.h"
 #include "ui/dlg/dlg_anime_list.h"

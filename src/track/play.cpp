@@ -27,7 +27,7 @@
 #include "media/anime_util.h"
 #include "media/library/history.h"
 #include "taiga/settings.h"
-#include "track/search.h"
+#include "track/scanner.h"
 #include "ui/ui.h"
 
 namespace track {
@@ -64,7 +64,7 @@ bool PlayEpisode(int anime_id, int number) {
   if (file_path.empty()) {
     ScanAvailableEpisodes(false, anime_item->GetId(), number);
     if (anime_item->IsEpisodeAvailable(number)) {
-      file_path = track::file_search_helper.path_found();
+      file_path = track::scanner.path_found();
     }
   }
 

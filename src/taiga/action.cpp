@@ -38,7 +38,7 @@
 #include "track/monitor.h"
 #include "track/play.h"
 #include "track/recognition.h"
-#include "track/search.h"
+#include "track/scanner.h"
 #include "ui/dlg/dlg_main.h"
 #include "ui/dlg/dlg_search.h"
 #include "ui/dlg/dlg_season.h"

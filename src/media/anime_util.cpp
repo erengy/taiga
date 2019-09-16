@@ -39,7 +39,7 @@
 #include "track/media.h"
 #include "track/play.h"
 #include "track/recognition.h"
-#include "track/search.h"
+#include "track/scanner.h"
 #include "ui/ui.h"
 
 namespace anime {

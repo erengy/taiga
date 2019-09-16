@@ -16,7 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "track/search.h"
+#include "track/scanner.h"
 
 #include "base/file.h"
 #include "base/log.h"
@@ -30,7 +30,7 @@
 
 namespace track {
 
-bool FileSearch::OnDirectory(const base::FileSearchResult& result) {
+bool Scanner::OnDirectory(const base::FileSearchResult& result) {
   static track::recognition::ParseOptions parse_options;
   parse_options.parse_path = false;
   parse_options.streaming_media = false;
@@ -65,7 +65,7 @@ bool FileSearch::OnDirectory(const base::FileSearchResult& result) {
   return false;
 }
 
-bool FileSearch::OnFile(const base::FileSearchResult& result) {
+bool Scanner::OnFile(const base::FileSearchResult& result) {
   const auto path = AddTrailingSlash(result.root) + result.name;
 
   static track::recognition::ParseOptions parse_options;
@@ -123,7 +123,7 @@ bool FileSearch::OnFile(const base::FileSearchResult& result) {
   return false;
 }
 
-bool FileSearch::Search(const std::wstring& root) {
+bool Scanner::Search(const std::wstring& root) {
   return base::FileSearch::Search(root,
       [this](const base::FileSearchResult& result) {
         return OnDirectory(result);
@@ -134,11 +134,11 @@ bool FileSearch::Search(const std::wstring& root) {
   );
 }
 
-const std::wstring& FileSearch::path_found() const {
+const std::wstring& Scanner::path_found() const {
   return path_found_;
 }
 
-void FileSearch::set_anime_id(int anime_id) {
+void Scanner::set_anime_id(int anime_id) {
   if (anime::IsValidId(anime_id)) {
     anime_id_ = anime_id;
   } else {
@@ -146,11 +146,11 @@ void FileSearch::set_anime_id(int anime_id) {
   }
 }
 
-void FileSearch::set_episode_number(int episode_number) {
+void Scanner::set_episode_number(int episode_number) {
   episode_number_ = episode_number;
 }
 
-void FileSearch::set_path_found(const std::wstring& path_found) {
+void Scanner::set_path_found(const std::wstring& path_found) {
   path_found_ = path_found;
 }
 
@@ -167,7 +167,7 @@ void ScanAvailableEpisodes(bool silent) {
 }
 
 void ScanAvailableEpisodes(bool silent, int anime_id, int episode_number) {
-  using track::file_search_helper;
+  using track::scanner;
 
   // Check if any library folder is available
   if (!silent && Settings.library_folders.empty()) {
@@ -181,13 +181,13 @@ void ScanAvailableEpisodes(bool silent, int anime_id, int episode_number) {
     ui::ChangeStatusText(L"Scanning available episodes...");
   }
 
-  file_search_helper.set_anime_id(anime_id);
-  file_search_helper.set_episode_number(episode_number);
+  scanner.set_anime_id(anime_id);
+  scanner.set_episode_number(episode_number);
   // Casting file size threshold to int shouldn't be a problem, as the value
   // is never supposed to exceed INT_MAX (i.e. ~2GB).
-  file_search_helper.options.min_file_size =
+  scanner.options.min_file_size =
       Settings.GetInt(taiga::kLibrary_FileSizeThreshold);
-  file_search_helper.set_path_found(L"");
+  scanner.set_path_found(L"");
 
   auto anime_item = anime::db.Find(anime_id);
   bool found = false;
@@ -198,20 +198,20 @@ void ScanAvailableEpisodes(bool silent, int anime_id, int episode_number) {
 
     // Search the anime folder for available episodes
     if (!anime_item->GetFolder().empty()) {
-      file_search_helper.options.skip_directories = true;
-      file_search_helper.options.skip_files = false;
-      file_search_helper.options.skip_subdirectories = false;
-      found = file_search_helper.Search(anime_item->GetFolder());
+      scanner.options.skip_directories = true;
+      scanner.options.skip_files = false;
+      scanner.options.skip_subdirectories = false;
+      found = scanner.Search(anime_item->GetFolder());
     }
 
     // Search the cached episode path
     if (!found && !anime_item->GetNextEpisodePath().empty()) {
       std::wstring next_episode_path = GetPathOnly(anime_item->GetNextEpisodePath());
       if (!IsEqual(next_episode_path, anime_item->GetFolder())) {
-        file_search_helper.options.skip_directories = true;
-        file_search_helper.options.skip_files = false;
-        file_search_helper.options.skip_subdirectories = true;
-        found = file_search_helper.Search(next_episode_path);
+        scanner.options.skip_directories = true;
+        scanner.options.skip_files = false;
+        scanner.options.skip_subdirectories = true;
+        found = scanner.Search(next_episode_path);
       }
     }
   }
@@ -224,10 +224,10 @@ void ScanAvailableEpisodes(bool silent, int anime_id, int episode_number) {
       bool skip_directories = false;
       if (anime_item && !anime_item->GetFolder().empty())
         skip_directories = true;
-      file_search_helper.options.skip_directories = skip_directories;
-      file_search_helper.options.skip_files = false;
-      file_search_helper.options.skip_subdirectories = false;
-      if (file_search_helper.Search(folder)) {
+      scanner.options.skip_directories = skip_directories;
+      scanner.options.skip_files = false;
+      scanner.options.skip_subdirectories = false;
+      if (scanner.Search(folder)) {
         found = true;
         break;
       }
@@ -248,7 +248,7 @@ void ScanAvailableEpisodesQuick() {
 }
 
 void ScanAvailableEpisodesQuick(int anime_id) {
-  using track::file_search_helper;
+  using track::scanner;
 
   for (auto it = anime::db.items.rbegin();
        it != anime::db.items.rend(); ++it) {
@@ -261,15 +261,15 @@ void ScanAvailableEpisodesQuick(int anime_id) {
     if (!FolderExists(anime_item.GetFolder()))
       continue;
 
-    file_search_helper.set_anime_id(anime_item.GetId());
-    file_search_helper.set_episode_number(0);
-    file_search_helper.options.min_file_size =
+    scanner.set_anime_id(anime_item.GetId());
+    scanner.set_episode_number(0);
+    scanner.options.min_file_size =
         Settings.GetInt(taiga::kLibrary_FileSizeThreshold);
-    file_search_helper.options.skip_directories = true;
-    file_search_helper.options.skip_files = false;
-    file_search_helper.options.skip_subdirectories = false;
+    scanner.options.skip_directories = true;
+    scanner.options.skip_files = false;
+    scanner.options.skip_subdirectories = false;
 
-    file_search_helper.Search(anime_item.GetFolder());
+    scanner.Search(anime_item.GetFolder());
   }
 
   ui::OnScanAvailableEpisodesFinished();

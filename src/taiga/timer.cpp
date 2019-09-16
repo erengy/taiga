@@ -31,7 +31,7 @@
 #include "taiga/stats.h"
 #include "track/feed.h"
 #include "track/media.h"
-#include "track/search.h"
+#include "track/scanner.h"
 #include "ui/dlg/dlg_anime_list.h"
 #include "ui/dlg/dlg_main.h"
 #include "ui/dlg/dlg_stats.h"
