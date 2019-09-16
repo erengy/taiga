@@ -27,7 +27,7 @@ namespace anime {
 class Episode;
 class Item;
 };
-class HistoryItem;
+struct QueueItem;
 namespace taiga {
 class HttpClient;
 }
@@ -87,8 +87,8 @@ int OnLibraryEntriesEditEpisode(const std::vector<int> ids);
 bool OnLibraryEntriesEditTags(const std::vector<int> ids, std::wstring& tags);
 bool OnLibraryEntriesEditNotes(const std::vector<int> ids, std::wstring& notes);
 
-void OnHistoryAddItem(const HistoryItem& history_item);
-void OnHistoryChange(const HistoryItem* history_item = nullptr);
+void OnHistoryAddItem(const QueueItem& queue_item);
+void OnHistoryChange(const QueueItem* queue_item = nullptr);
 bool OnHistoryClear();
 int OnHistoryQueueClear();
 int OnHistoryProcessConfirmationQueue(anime::Episode& episode);

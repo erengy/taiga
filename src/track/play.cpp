@@ -109,7 +109,7 @@ bool PlayNextEpisode(int anime_id) {
 bool PlayNextEpisodeOfLastWatchedAnime() {
   int anime_id = anime::ID_UNKNOWN;
 
-  auto get_id_from_history_items = [](const std::vector<HistoryItem>& items) {
+  auto get_id_from_history_items = [](const std::vector<QueueItem>& items) {
     for (auto it = items.rbegin(); it != items.rend(); ++it) {
       const auto& item = *it;
       if (item.episode) {
@@ -123,8 +123,9 @@ bool PlayNextEpisodeOfLastWatchedAnime() {
 
   if (!anime::IsValidId(anime_id))
     anime_id = get_id_from_history_items(History.queue.items);
-  if (!anime::IsValidId(anime_id))
-    anime_id = get_id_from_history_items(History.items);
+  // @TODO
+  //if (!anime::IsValidId(anime_id))
+  //  anime_id = get_id_from_history_items(History.items);
 
   return PlayNextEpisode(anime_id);
 }

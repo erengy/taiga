@@ -26,6 +26,12 @@
 #include "media/library/queue.h"
 #include "track/episode.h"
 
+struct HistoryItem {
+  int anime_id = 0;
+  int episode = 0;
+  std::wstring time;
+};
+
 class History {
 public:
   History();

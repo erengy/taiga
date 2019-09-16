@@ -322,9 +322,9 @@ void Manager::HandleResponse(Response& response, HttpResponse& http_response) {
       History.queue.updating = false;
       ui::ClearStatusText();
 
-      const auto history_item = History.queue.GetCurrentItem();
-      if (history_item) {
-        anime::db.UpdateItem(*history_item);
+      const auto queue_item = History.queue.GetCurrentItem();
+      if (queue_item) {
+        anime::db.UpdateItem(*queue_item);
         anime::db.SaveList();
         History.queue.Remove();
         History.queue.Check(false);

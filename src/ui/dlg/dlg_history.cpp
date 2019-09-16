@@ -238,7 +238,7 @@ void HistoryDialog::RefreshList() {
     int i = list_.GetItemCount();
     int icon = StatusToIcon(anime_item->GetAiringStatus());
     std::wstring details;
-    AppendString(details, L"Episode: " + ui::TranslateNumber(*it->episode));
+    AppendString(details, L"Episode: " + ui::TranslateNumber(it->episode));
 
     list_.InsertItem(i, 1, icon, 0, nullptr, anime::GetPreferredTitle(*anime_item).c_str(),
                      static_cast<LPARAM>(it->anime_id));

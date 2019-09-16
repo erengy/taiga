@@ -566,21 +566,24 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
 
     // Recently watched
     std::vector<int> anime_ids;
-    auto list_anime_ids = [&anime_ids](const std::vector<HistoryItem>& items) {
-      for (auto it = items.crbegin(); it != items.crend(); ++it) {
-        if (it->episode) {
-          if (std::find(anime_ids.begin(), anime_ids.end(),
-                        it->anime_id) == anime_ids.end()) {
-            auto anime_item = anime::db.Find(it->anime_id);
-            if (anime_item)
-              if (anime_item->GetMyStatus() == anime::kWatching || anime_item->GetMyRewatching())
-                anime_ids.push_back(it->anime_id);
-          }
-        }
+    auto list_anime_ids = [&anime_ids](int anime_id) {
+      if (std::find(anime_ids.begin(), anime_ids.end(), anime_id) == anime_ids.end()) {
+        auto anime_item = anime::db.Find(anime_id);
+        if (anime_item)
+          if (anime_item->GetMyStatus() == anime::kWatching || anime_item->GetMyRewatching())
+            anime_ids.push_back(anime_id);
       }
     };
-    list_anime_ids(History.queue.items);
-    list_anime_ids(History.items);
+    for (auto it = History.queue.items.crbegin(); it != History.queue.items.crend(); ++it) {
+      if (it->episode) {
+        list_anime_ids(it->anime_id);
+      }
+    }
+    for (auto it = History.items.crbegin(); it != History.items.crend(); ++it) {
+      if (it->episode) {
+        list_anime_ids(it->anime_id);
+      }
+    }
     int recently_watched = 0;
     for (const auto& id : anime_ids) {
       auto anime_item = anime::db.Find(id);
@@ -600,15 +603,15 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
       content = L"Continue Watching:\n" + content + L"\n";
     }
     int watched_last_week = 0;
-    for (const auto& history_item : History.queue.items) {
-      if (!history_item.episode || *history_item.episode == 0)
+    for (const auto& queue_item : History.queue.items) {
+      if (!queue_item.episode || *queue_item.episode == 0)
         continue;
-      date_diff = date_now - Date(history_item.time.substr(0, 10));
+      date_diff = date_now - Date(queue_item.time.substr(0, 10));
       if (date_diff <= day_limit)
         watched_last_week++;
     }
     for (const auto& history_item : History.items) {
-      if (!history_item.episode || *history_item.episode == 0)
+      if (history_item.episode == 0)
         continue;
       date_diff = date_now - Date(history_item.time.substr(0, 10));
       if (date_diff <= day_limit)

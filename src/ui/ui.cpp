@@ -488,11 +488,11 @@ bool OnLibraryEntriesEditNotes(const std::vector<int> ids, std::wstring& notes) 
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static bool AnimeListNeedsRefresh(const HistoryItem& history_item) {
-  return history_item.mode == taiga::kHttpServiceAddLibraryEntry ||
-         history_item.mode == taiga::kHttpServiceDeleteLibraryEntry ||
-         history_item.status ||
-         history_item.enable_rewatching;
+static bool AnimeListNeedsRefresh(const QueueItem& queue_item) {
+  return queue_item.mode == taiga::kHttpServiceAddLibraryEntry ||
+         queue_item.mode == taiga::kHttpServiceDeleteLibraryEntry ||
+         queue_item.status ||
+         queue_item.enable_rewatching;
 }
 
 static bool AnimeListNeedsResort() {
@@ -509,23 +509,23 @@ static bool AnimeListNeedsResort() {
   return false;
 }
 
-void OnHistoryAddItem(const HistoryItem& history_item) {
+void OnHistoryAddItem(const QueueItem& queue_item) {
   DlgHistory.RefreshList();
   DlgSearch.RefreshList();
   DlgMain.treeview.RefreshHistoryCounter();
   DlgNowPlaying.Refresh(false, false, false);
 
-  if (AnimeListNeedsRefresh(history_item)) {
+  if (AnimeListNeedsRefresh(queue_item)) {
     DlgAnimeList.RefreshList();
     DlgAnimeList.RefreshTabs();
   } else {
-    DlgAnimeList.RefreshListItem(history_item.anime_id);
+    DlgAnimeList.RefreshListItem(queue_item.anime_id);
     if (AnimeListNeedsResort())
       DlgAnimeList.listview.SortFromSettings();
   }
 
   if (!sync::UserAuthenticated()) {
-    auto anime_item = anime::db.Find(history_item.anime_id);
+    auto anime_item = anime::db.Find(queue_item.anime_id);
     if (anime_item) {
       ChangeStatusText(L"\"{}\" is queued for update."_format(
                        anime::GetPreferredTitle(*anime_item)));
@@ -533,17 +533,17 @@ void OnHistoryAddItem(const HistoryItem& history_item) {
   }
 }
 
-void OnHistoryChange(const HistoryItem* history_item) {
+void OnHistoryChange(const QueueItem* queue_item) {
   DlgHistory.RefreshList();
   DlgSearch.RefreshList();
   DlgMain.treeview.RefreshHistoryCounter();
   DlgNowPlaying.Refresh(false, false, false);
 
-  if (!history_item || AnimeListNeedsRefresh(*history_item)) {
+  if (!queue_item || AnimeListNeedsRefresh(*queue_item)) {
     DlgAnimeList.RefreshList();
     DlgAnimeList.RefreshTabs();
   } else {
-    DlgAnimeList.RefreshListItem(history_item->anime_id);
+    DlgAnimeList.RefreshListItem(queue_item->anime_id);
     if (AnimeListNeedsResort())
       DlgAnimeList.listview.SortFromSettings();
   }

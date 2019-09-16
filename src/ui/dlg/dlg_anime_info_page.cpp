@@ -520,13 +520,13 @@ bool PageMyInfo::Save() {
     return false;
 
   // Create item
-  HistoryItem history_item;
-  history_item.anime_id = anime_id_;
-  history_item.mode = taiga::kHttpServiceUpdateLibraryEntry;
+  QueueItem queue_item;
+  queue_item.anime_id = anime_id_;
+  queue_item.mode = taiga::kHttpServiceUpdateLibraryEntry;
 
   // Episodes watched
-  history_item.episode = GetDlgItemInt(IDC_EDIT_ANIME_PROGRESS);
-  if (!anime::IsValidEpisodeNumber(*history_item.episode, anime_item->GetEpisodeCount())) {
+  queue_item.episode = GetDlgItemInt(IDC_EDIT_ANIME_PROGRESS);
+  if (!anime::IsValidEpisodeNumber(*queue_item.episode, anime_item->GetEpisodeCount())) {
     std::wstring msg = L"Please enter a valid episode number between 0-{}."_format(
         anime_item->GetEpisodeCount());
     MessageBox(msg.c_str(), L"Episodes watched", MB_OK | MB_ICONERROR);
@@ -534,39 +534,39 @@ bool PageMyInfo::Save() {
   }
 
   // Rewatching
-  history_item.enable_rewatching = IsDlgButtonChecked(IDC_CHECK_ANIME_REWATCH);
+  queue_item.enable_rewatching = IsDlgButtonChecked(IDC_CHECK_ANIME_REWATCH);
 
   // Score
   win::ComboBox combobox = GetDlgItem(IDC_COMBO_ANIME_SCORE);
   if (!IsAdvancedScoreInput()) {
-    history_item.score = combobox.GetItemData(combobox.GetCurSel());
+    queue_item.score = combobox.GetItemData(combobox.GetCurSel());
   } else {
     const auto score_text = GetDlgItemText(IDC_EDIT_ANIME_SCORE);
     switch (taiga::GetCurrentServiceId()) {
       case sync::kAniList:
         switch (sync::anilist::GetRatingSystem()) {
           case sync::anilist::RatingSystem::Point_10_Decimal:
-            history_item.score = static_cast<int>(ToDouble(score_text) * 10);
+            queue_item.score = static_cast<int>(ToDouble(score_text) * 10);
             break;
         }
         break;
     }
-    if (!history_item.score)
-      history_item.score = ToInt(score_text);
+    if (!queue_item.score)
+      queue_item.score = ToInt(score_text);
   }
   combobox.SetWindowHandle(nullptr);
 
   // Status
-  history_item.status = GetComboSelection(IDC_COMBO_ANIME_STATUS) + 1;
+  queue_item.status = GetComboSelection(IDC_COMBO_ANIME_STATUS) + 1;
 
   // Tags / Notes
   switch (taiga::GetCurrentServiceId()) {
     case sync::kMyAnimeList:
-      history_item.tags = GetDlgItemText(IDC_EDIT_ANIME_TAGS);
+      queue_item.tags = GetDlgItemText(IDC_EDIT_ANIME_TAGS);
       break;
     case sync::kKitsu:
     case sync::kAniList:
-      history_item.notes = GetDlgItemText(IDC_EDIT_ANIME_TAGS);
+      queue_item.notes = GetDlgItemText(IDC_EDIT_ANIME_TAGS);
       break;
   }
 
@@ -575,9 +575,9 @@ bool PageMyInfo::Save() {
     SYSTEMTIME stMyStart = {0};
     if (SendDlgItemMessage(IDC_DATETIME_START, DTM_GETSYSTEMTIME, 0,
                            reinterpret_cast<LPARAM>(&stMyStart)) == GDT_NONE) {
-      history_item.date_start = Date();
+      queue_item.date_start = Date();
     } else {
-      history_item.date_start = Date(stMyStart.wYear, stMyStart.wMonth, stMyStart.wDay);
+      queue_item.date_start = Date(stMyStart.wYear, stMyStart.wMonth, stMyStart.wDay);
     }
   }
   // Finish date
@@ -585,9 +585,9 @@ bool PageMyInfo::Save() {
     SYSTEMTIME stMyFinish = {0};
     if (SendDlgItemMessage(IDC_DATETIME_FINISH, DTM_GETSYSTEMTIME, 0,
                            reinterpret_cast<LPARAM>(&stMyFinish)) == GDT_NONE) {
-      history_item.date_finish = Date();
+      queue_item.date_finish = Date();
     } else {
-      history_item.date_finish = Date(stMyFinish.wYear, stMyFinish.wMonth, stMyFinish.wDay);
+      queue_item.date_finish = Date(stMyFinish.wYear, stMyFinish.wMonth, stMyFinish.wDay);
     }
   }
 
@@ -603,7 +603,7 @@ bool PageMyInfo::Save() {
   Settings.Save();
 
   // Add item to queue
-  History.queue.Add(history_item);
+  History.queue.Add(queue_item);
   return true;
 }
 

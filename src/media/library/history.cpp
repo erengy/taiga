@@ -72,7 +72,7 @@ bool History::Load() {
     } else {
       LOGW(L"Item does not exist in the database.\n"
            L"ID: {}\nEpisode: {}\nTime: {}",
-           history_item.anime_id, *history_item.episode, history_item.time);
+           history_item.anime_id, history_item.episode, history_item.time);
     }
   }
   // Queue events
@@ -90,11 +90,11 @@ void History::ReadQueue(const pugi::xml_document& document) {
   auto node_queue = document.child(L"history").child(L"queue");
 
   for (auto item : node_queue.children(L"item")) {
-    HistoryItem history_item;
+    QueueItem queue_item;
 
-    history_item.anime_id = item.attribute(L"anime_id").as_int(anime::ID_NOTINLIST);
-    history_item.mode = TranslateModeFromString(item.attribute(L"mode").value());
-    history_item.time = item.attribute(L"time").value();
+    queue_item.anime_id = item.attribute(L"anime_id").as_int(anime::ID_NOTINLIST);
+    queue_item.mode = TranslateModeFromString(item.attribute(L"mode").value());
+    queue_item.time = item.attribute(L"time").value();
 
     #define READ_ATTRIBUTE_BOOL(x, y) \
         if (!item.attribute(y).empty()) x = item.attribute(y).as_bool();
@@ -105,25 +105,25 @@ void History::ReadQueue(const pugi::xml_document& document) {
     #define READ_ATTRIBUTE_DATE(x, y) \
         if (!item.attribute(y).empty()) x = (Date)item.attribute(y).as_string();
 
-    READ_ATTRIBUTE_INT(history_item.episode, L"episode");
-    READ_ATTRIBUTE_INT(history_item.score, L"score");
-    READ_ATTRIBUTE_INT(history_item.status, L"status");
-    READ_ATTRIBUTE_BOOL(history_item.enable_rewatching, L"enable_rewatching");
-    READ_ATTRIBUTE_INT(history_item.rewatched_times, L"rewatched_times");
-    READ_ATTRIBUTE_STR(history_item.tags, L"tags");
-    READ_ATTRIBUTE_STR(history_item.notes, L"notes");
-    READ_ATTRIBUTE_DATE(history_item.date_start, L"date_start");
-    READ_ATTRIBUTE_DATE(history_item.date_finish, L"date_finish");
+    READ_ATTRIBUTE_INT(queue_item.episode, L"episode");
+    READ_ATTRIBUTE_INT(queue_item.score, L"score");
+    READ_ATTRIBUTE_INT(queue_item.status, L"status");
+    READ_ATTRIBUTE_BOOL(queue_item.enable_rewatching, L"enable_rewatching");
+    READ_ATTRIBUTE_INT(queue_item.rewatched_times, L"rewatched_times");
+    READ_ATTRIBUTE_STR(queue_item.tags, L"tags");
+    READ_ATTRIBUTE_STR(queue_item.notes, L"notes");
+    READ_ATTRIBUTE_DATE(queue_item.date_start, L"date_start");
+    READ_ATTRIBUTE_DATE(queue_item.date_finish, L"date_finish");
 
     #undef READ_ATTRIBUTE_DATE
     #undef READ_ATTRIBUTE_STR
     #undef READ_ATTRIBUTE_INT
 
-    if (anime::db.Find(history_item.anime_id)) {
-      queue.Add(history_item, false);
+    if (anime::db.Find(queue_item.anime_id)) {
+      queue.Add(queue_item, false);
     } else {
       LOGW(L"Item does not exist in the database.\n"
-           L"ID: {}", history_item.anime_id);
+           L"ID: {}", queue_item.anime_id);
     }
   }
 }
@@ -141,12 +141,12 @@ bool History::Save() {
   for (const auto& history_item : items) {
     auto node_item = node_items.append_child(L"item");
     node_item.append_attribute(L"anime_id") = history_item.anime_id;
-    node_item.append_attribute(L"episode") = *history_item.episode;
+    node_item.append_attribute(L"episode") = history_item.episode;
     node_item.append_attribute(L"time") = history_item.time.c_str();
   }
   // Write queue
   auto node_queue = node_history.append_child(L"queue");
-  for (const auto& history_item : queue.items) {
+  for (const auto& queue_item : queue.items) {
     auto node_item = node_queue.append_child(L"item");
     #define APPEND_ATTRIBUTE(x, y) \
         if (y) node_item.append_attribute(x) = *y;
@@ -154,18 +154,18 @@ bool History::Save() {
         if (y) node_item.append_attribute(x) = (*y).c_str();
     #define APPEND_ATTRIBUTE_DATE(x, y) \
         if (y) node_item.append_attribute(x) = (*y).to_string().c_str();
-    node_item.append_attribute(L"anime_id") = history_item.anime_id;
-    node_item.append_attribute(L"mode") = TranslateModeToString(history_item.mode).c_str();
-    node_item.append_attribute(L"time") = history_item.time.c_str();
-    APPEND_ATTRIBUTE(L"episode", history_item.episode);
-    APPEND_ATTRIBUTE(L"score", history_item.score);
-    APPEND_ATTRIBUTE(L"status", history_item.status);
-    APPEND_ATTRIBUTE(L"enable_rewatching", history_item.enable_rewatching);
-    APPEND_ATTRIBUTE(L"rewatched_times", history_item.rewatched_times);
-    APPEND_ATTRIBUTE_STR(L"tags", history_item.tags);
-    APPEND_ATTRIBUTE_STR(L"notes", history_item.notes);
-    APPEND_ATTRIBUTE_DATE(L"date_start", history_item.date_start);
-    APPEND_ATTRIBUTE_DATE(L"date_finish", history_item.date_finish);
+    node_item.append_attribute(L"anime_id") = queue_item.anime_id;
+    node_item.append_attribute(L"mode") = TranslateModeToString(queue_item.mode).c_str();
+    node_item.append_attribute(L"time") = queue_item.time.c_str();
+    APPEND_ATTRIBUTE(L"episode", queue_item.episode);
+    APPEND_ATTRIBUTE(L"score", queue_item.score);
+    APPEND_ATTRIBUTE(L"status", queue_item.status);
+    APPEND_ATTRIBUTE(L"enable_rewatching", queue_item.enable_rewatching);
+    APPEND_ATTRIBUTE(L"rewatched_times", queue_item.rewatched_times);
+    APPEND_ATTRIBUTE_STR(L"tags", queue_item.tags);
+    APPEND_ATTRIBUTE_STR(L"notes", queue_item.notes);
+    APPEND_ATTRIBUTE_DATE(L"date_start", queue_item.date_start);
+    APPEND_ATTRIBUTE_DATE(L"date_finish", queue_item.date_finish);
     #undef APPEND_ATTRIBUTE_DATE
     #undef APPEND_ATTRIBUTE_STR
     #undef APPEND_ATTRIBUTE

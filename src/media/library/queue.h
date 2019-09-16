@@ -52,8 +52,7 @@ public:
   std::optional<std::wstring> notes;
 };
 
-class HistoryItem : public AnimeValues {
-public:
+struct QueueItem : AnimeValues {
   bool enabled = true;
   int anime_id = 0;
   int mode = 0;
@@ -65,28 +64,25 @@ class History;
 
 class HistoryQueue {
 public:
-  void Add(HistoryItem& item, bool save = true);
+  void Add(QueueItem& item, bool save = true);
   void Check(bool automatic = true);
   void Clear(bool save = true);
   void Merge(bool save = true);
   bool IsQueued(int anime_id) const;
-  HistoryItem* FindItem(int anime_id, QueueSearch search_mode);
-  HistoryItem* GetCurrentItem();
+  QueueItem* FindItem(int anime_id, QueueSearch search_mode);
+  QueueItem* GetCurrentItem();
   int GetItemCount();
   void Remove(int index = -1, bool save = true, bool refresh = true, bool to_history = true);
   void RemoveDisabled(bool save = true, bool refresh = true);
 
   size_t index = 0;
-  std::vector<HistoryItem> items;
+  std::vector<QueueItem> items;
   History* history = nullptr;
   bool updating = false;
 };
 
 class ConfirmationQueue {
 public:
-  ConfirmationQueue();
-  virtual ~ConfirmationQueue() {}
-
   void Add(const anime::Episode& episode);
   void Process();
 

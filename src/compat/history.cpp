@@ -52,11 +52,11 @@ void History::ReadQueueInCompatibilityMode(const pugi::xml_document& document) {
   auto node_queue = document.child(L"history").child(L"queue");
 
   for (auto item : node_queue.children(L"item")) {
-    HistoryItem history_item;
+    QueueItem queue_item;
 
-    history_item.anime_id = item.attribute(L"anime_id").as_int(anime::ID_NOTINLIST);
-    history_item.mode = item.attribute(L"mode").as_int();
-    history_item.time = item.attribute(L"time").value();
+    queue_item.anime_id = item.attribute(L"anime_id").as_int(anime::ID_NOTINLIST);
+    queue_item.mode = item.attribute(L"mode").as_int();
+    queue_item.time = item.attribute(L"time").value();
 
     #define READ_ATTRIBUTE_INT(x, y) \
         if (!item.attribute(y).empty()) x = item.attribute(y).as_int();
@@ -65,35 +65,35 @@ void History::ReadQueueInCompatibilityMode(const pugi::xml_document& document) {
     #define READ_ATTRIBUTE_DATE(x, y) \
         if (!item.attribute(y).empty()) x = (Date)item.attribute(y).as_string();
 
-    READ_ATTRIBUTE_INT(history_item.episode, L"episode");
-    READ_ATTRIBUTE_INT(history_item.score, L"score");
-    READ_ATTRIBUTE_INT(history_item.status, L"status");
-    READ_ATTRIBUTE_INT(history_item.enable_rewatching, L"enable_rewatching");
-    READ_ATTRIBUTE_STR(history_item.tags, L"tags");
-    READ_ATTRIBUTE_DATE(history_item.date_start, L"date_start");
-    READ_ATTRIBUTE_DATE(history_item.date_finish, L"date_finish");
+    READ_ATTRIBUTE_INT(queue_item.episode, L"episode");
+    READ_ATTRIBUTE_INT(queue_item.score, L"score");
+    READ_ATTRIBUTE_INT(queue_item.status, L"status");
+    READ_ATTRIBUTE_INT(queue_item.enable_rewatching, L"enable_rewatching");
+    READ_ATTRIBUTE_STR(queue_item.tags, L"tags");
+    READ_ATTRIBUTE_DATE(queue_item.date_start, L"date_start");
+    READ_ATTRIBUTE_DATE(queue_item.date_finish, L"date_finish");
 
     #undef READ_ATTRIBUTE_DATE
     #undef READ_ATTRIBUTE_STR
     #undef READ_ATTRIBUTE_INT
 
-    Date date_item(history_item.time);
+    Date date_item(queue_item.time);
     Date date_limit(L"2014-06-20");  // Release date of v1.1.0
     if (date_item < date_limit) {
-      if (history_item.mode == 3) {         // HTTP_MAL_AnimeAdd
-        history_item.mode = taiga::kHttpServiceAddLibraryEntry;
-      } else if (history_item.mode == 5) {  // HTTP_MAL_AnimeDelete
-        history_item.mode = taiga::kHttpServiceDeleteLibraryEntry;
-      } else if (history_item.mode == 7) {  // HTTP_MAL_AnimeUpdate
-        history_item.mode = taiga::kHttpServiceUpdateLibraryEntry;
+      if (queue_item.mode == 3) {         // HTTP_MAL_AnimeAdd
+        queue_item.mode = taiga::kHttpServiceAddLibraryEntry;
+      } else if (queue_item.mode == 5) {  // HTTP_MAL_AnimeDelete
+        queue_item.mode = taiga::kHttpServiceDeleteLibraryEntry;
+      } else if (queue_item.mode == 7) {  // HTTP_MAL_AnimeUpdate
+        queue_item.mode = taiga::kHttpServiceUpdateLibraryEntry;
       }
     }
 
-    if (anime::db.Find(history_item.anime_id)) {
-      queue.Add(history_item, false);
+    if (anime::db.Find(queue_item.anime_id)) {
+      queue.Add(queue_item, false);
     } else {
       LOGW(L"Item does not exist in the database.\n"
-           L"ID: {}", history_item.anime_id);
+           L"ID: {}", queue_item.anime_id);
     }
   }
 }

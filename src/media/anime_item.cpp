@@ -291,50 +291,50 @@ int Item::GetMyLastWatchedEpisode(bool check_queue) const {
   if (!my_info_.get())
     return 0;
 
-  HistoryItem* history_item = check_queue ?
-      SearchHistory(QueueSearch::Episode) : nullptr;
+  QueueItem* queue_item = check_queue ?
+      SearchQueue(QueueSearch::Episode) : nullptr;
 
-  return history_item ? *history_item->episode : my_info_->watched_episodes;
+  return queue_item ? *queue_item->episode : my_info_->watched_episodes;
 }
 
 int Item::GetMyScore(bool check_queue) const {
   if (!my_info_.get())
     return 0;
 
-  HistoryItem* history_item = check_queue ?
-      SearchHistory(QueueSearch::Score) : nullptr;
+  QueueItem* queue_item = check_queue ?
+      SearchQueue(QueueSearch::Score) : nullptr;
 
-  return history_item ? *history_item->score : my_info_->score;
+  return queue_item ? *queue_item->score : my_info_->score;
 }
 
 int Item::GetMyStatus(bool check_queue) const {
   if (!my_info_.get())
     return kNotInList;
 
-  HistoryItem* history_item = check_queue ?
-      SearchHistory(QueueSearch::Status) : nullptr;
+  QueueItem* queue_item = check_queue ?
+      SearchQueue(QueueSearch::Status) : nullptr;
 
-  return history_item ? *history_item->status : my_info_->status;
+  return queue_item ? *queue_item->status : my_info_->status;
 }
 
 int Item::GetMyRewatchedTimes(bool check_queue) const {
   if (!my_info_.get())
     return 0;
 
-  HistoryItem* history_item = check_queue ?
-      SearchHistory(QueueSearch::RewatchedTimes) : nullptr;
+  QueueItem* queue_item = check_queue ?
+      SearchQueue(QueueSearch::RewatchedTimes) : nullptr;
 
-  return history_item ? *history_item->rewatched_times : my_info_->rewatched_times;
+  return queue_item ? *queue_item->rewatched_times : my_info_->rewatched_times;
 }
 
 bool Item::GetMyRewatching(bool check_queue) const {
   if (!my_info_.get())
     return false;
 
-  HistoryItem* history_item = check_queue ?
-      SearchHistory(QueueSearch::Rewatching) : nullptr;
+  QueueItem* queue_item = check_queue ?
+      SearchQueue(QueueSearch::Rewatching) : nullptr;
 
-  return history_item ? *history_item->enable_rewatching : my_info_->rewatching;
+  return queue_item ? *queue_item->enable_rewatching : my_info_->rewatching;
 }
 
 int Item::GetMyRewatchingEp() const {
@@ -348,20 +348,20 @@ const Date& Item::GetMyDateStart(bool check_queue) const {
   if (!my_info_.get())
     return EmptyDate();
 
-  HistoryItem* history_item = check_queue ?
-      SearchHistory(QueueSearch::DateStart) : nullptr;
+  QueueItem* queue_item = check_queue ?
+      SearchQueue(QueueSearch::DateStart) : nullptr;
 
-  return history_item ? *history_item->date_start : my_info_->date_start;
+  return queue_item ? *queue_item->date_start : my_info_->date_start;
 }
 
 const Date& Item::GetMyDateEnd(bool check_queue) const {
   if (!my_info_.get())
     return EmptyDate();
 
-  HistoryItem* history_item = check_queue ?
-      SearchHistory(QueueSearch::DateEnd) : nullptr;
+  QueueItem* queue_item = check_queue ?
+      SearchQueue(QueueSearch::DateEnd) : nullptr;
 
-  return history_item ? *history_item->date_finish : my_info_->date_finish;
+  return queue_item ? *queue_item->date_finish : my_info_->date_finish;
 }
 
 const std::wstring& Item::GetMyLastUpdated() const {
@@ -375,20 +375,20 @@ const std::wstring& Item::GetMyTags(bool check_queue) const {
   if (!my_info_.get())
     return EmptyString();
 
-  HistoryItem* history_item = check_queue ?
-      SearchHistory(QueueSearch::Tags) : nullptr;
+  QueueItem* queue_item = check_queue ?
+      SearchQueue(QueueSearch::Tags) : nullptr;
 
-  return history_item ? *history_item->tags : my_info_->tags;
+  return queue_item ? *queue_item->tags : my_info_->tags;
 }
 
 const std::wstring& Item::GetMyNotes(bool check_queue) const {
   if (!my_info_.get())
     return EmptyString();
 
-  HistoryItem* history_item = check_queue ?
-      SearchHistory(QueueSearch::Notes) : nullptr;
+  QueueItem* queue_item = check_queue ?
+      SearchQueue(QueueSearch::Notes) : nullptr;
 
-  return history_item ? *history_item->notes : my_info_->notes;
+  return queue_item ? *queue_item->notes : my_info_->notes;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -618,7 +618,7 @@ void Item::RemoveFromUserList() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-HistoryItem* Item::SearchHistory(QueueSearch search_mode) const {
+QueueItem* Item::SearchQueue(QueueSearch search_mode) const {
   return History.queue.FindItem(GetId(), search_mode);
 }
 

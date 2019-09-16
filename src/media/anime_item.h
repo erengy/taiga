@@ -32,7 +32,7 @@ class Episode;
 class Item;
 }
 class Date;
-class HistoryItem;
+struct QueueItem;
 
 namespace anime {
 
@@ -161,7 +161,7 @@ public:
 
 private:
   // Helper function
-  HistoryItem* SearchHistory(QueueSearch search_mode) const;
+  QueueItem* SearchQueue(QueueSearch search_mode) const;
 
   // Series information, stored in db\anime.xml
   SeriesInformation series_;

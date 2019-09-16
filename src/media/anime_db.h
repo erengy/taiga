@@ -22,7 +22,7 @@
 
 #include "media/anime_item.h"
 
-class HistoryItem;
+struct QueueItem;
 namespace pugi {
 class xml_document;
 class xml_node;
@@ -51,7 +51,7 @@ public:
   void AddToList(int anime_id, int status);
   void ClearUserData();
   bool DeleteListItem(int anime_id);
-  void UpdateItem(const HistoryItem& history_item);
+  void UpdateItem(const QueueItem& queue_item);
 
 public:
   std::map<int, Item> items;

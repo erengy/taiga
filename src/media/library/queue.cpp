@@ -32,7 +32,7 @@
 #include "track/scanner.h"
 #include "ui/ui.h"
 
-void HistoryQueue::Add(HistoryItem& item, bool save) {
+void HistoryQueue::Add(QueueItem& item, bool save) {
   auto anime = anime::db.Find(item.anime_id);
 
   // Add to user list
@@ -204,8 +204,8 @@ void HistoryQueue::Clear(bool save) {
 }
 
 void HistoryQueue::Merge(bool save) {
-  while (auto history_item = GetCurrentItem()) {
-    anime::db.UpdateItem(*history_item);
+  while (auto queue_item = GetCurrentItem()) {
+    anime::db.UpdateItem(*queue_item);
     History.queue.Remove(index, false, true, true);
   }
 
@@ -225,7 +225,7 @@ bool HistoryQueue::IsQueued(int anime_id) const {
   return false;
 }
 
-HistoryItem* HistoryQueue::FindItem(int anime_id, QueueSearch search_mode) {
+QueueItem* HistoryQueue::FindItem(int anime_id, QueueSearch search_mode) {
   for (auto it = items.rbegin(); it != items.rend(); ++it) {
     if (it->anime_id == anime_id && it->enabled) {
       switch (search_mode) {
@@ -282,7 +282,7 @@ HistoryItem* HistoryQueue::FindItem(int anime_id, QueueSearch search_mode) {
   return nullptr;
 }
 
-HistoryItem* HistoryQueue::GetCurrentItem() {
+QueueItem* HistoryQueue::GetCurrentItem() {
   if (!items.empty())
     return &items.at(index);
 
@@ -305,9 +305,13 @@ void HistoryQueue::Remove(int index, bool save, bool refresh, bool to_history) {
 
   if (index < static_cast<int>(items.size())) {
     auto it = items.begin() + index;
-    const HistoryItem history_item = *it;
+    const QueueItem queue_item = *it;
 
-    if (to_history && history_item.episode && *history_item.episode > 0) {
+    if (to_history && queue_item.episode && *queue_item.episode > 0) {
+      HistoryItem history_item;
+      history_item.anime_id = queue_item.anime_id;
+      history_item.episode = *queue_item.episode;
+      history_item.time = queue_item.time;
       history->items.push_back(history_item);
       if (history->limit > 0 &&
           static_cast<int>(history->items.size()) > history->limit) {
@@ -315,10 +319,10 @@ void HistoryQueue::Remove(int index, bool save, bool refresh, bool to_history) {
       }
     }
 
-    if (history_item.episode) {
-      auto anime_item = anime::db.Find(history_item.anime_id);
+    if (queue_item.episode) {
+      auto anime_item = anime::db.Find(queue_item.anime_id);
       if (anime_item &&
-          anime_item->GetMyLastWatchedEpisode() == *history_item.episode) {
+          anime_item->GetMyLastWatchedEpisode() == *queue_item.episode) {
         // Next episode path is no longer valid
         anime_item->SetNextEpisodePath(L"");
       }
@@ -327,7 +331,7 @@ void HistoryQueue::Remove(int index, bool save, bool refresh, bool to_history) {
     items.erase(it);
 
     if (refresh)
-      ui::OnHistoryChange(&history_item);
+      ui::OnHistoryChange(&queue_item);
   }
 
   if (save)

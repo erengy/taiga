@@ -147,13 +147,13 @@ int Database::GetItemCount(int status, bool check_history) {
 
   // Search queued items for status changes
   if (check_history) {
-    for (const auto& history_item : History.queue.items) {
-      if (history_item.status ||
-          history_item.mode == taiga::kHttpServiceDeleteLibraryEntry) {
-        if (status == *history_item.status) {
+    for (const auto& queue_item : History.queue.items) {
+      if (queue_item.status ||
+          queue_item.mode == taiga::kHttpServiceDeleteLibraryEntry) {
+        if (status == *queue_item.status) {
           count++;
         } else {
-          auto anime_item = Find(history_item.anime_id);
+          auto anime_item = Find(queue_item.anime_id);
           if (anime_item && status == anime_item->GetMyStatus(false))
             count--;
         }
@@ -184,17 +184,17 @@ void Database::AddToList(int anime_id, int status) {
 
   anime_item->AddtoUserList();
 
-  HistoryItem history_item;
-  history_item.anime_id = anime_id;
-  history_item.status = status;
+  QueueItem queue_item;
+  queue_item.anime_id = anime_id;
+  queue_item.status = status;
   if (status == anime::kCompleted) {
-    history_item.episode = anime_item->GetEpisodeCount();
+    queue_item.episode = anime_item->GetEpisodeCount();
     if (anime_item->GetEpisodeCount() == 1)
-      history_item.date_start = GetDate();
-    history_item.date_finish = GetDate();
+      queue_item.date_start = GetDate();
+    queue_item.date_finish = GetDate();
   }
-  history_item.mode = taiga::kHttpServiceAddLibraryEntry;
-  History.queue.Add(history_item);
+  queue_item.mode = taiga::kHttpServiceAddLibraryEntry;
+  History.queue.Add(queue_item);
 
   SaveDatabase();
   SaveList();
@@ -230,8 +230,8 @@ bool Database::DeleteListItem(int anime_id) {
   return true;
 }
 
-void Database::UpdateItem(const HistoryItem& history_item) {
-  auto anime_item = Find(history_item.anime_id);
+void Database::UpdateItem(const QueueItem& queue_item) {
+  auto anime_item = Find(queue_item.anime_id);
 
   if (!anime_item)
     return;
@@ -239,48 +239,48 @@ void Database::UpdateItem(const HistoryItem& history_item) {
   anime_item->AddtoUserList();
 
   // Edit episode
-  if (history_item.episode) {
-    anime_item->SetMyLastWatchedEpisode(*history_item.episode);
+  if (queue_item.episode) {
+    anime_item->SetMyLastWatchedEpisode(*queue_item.episode);
   }
   // Edit score
-  if (history_item.score) {
-    anime_item->SetMyScore(*history_item.score);
+  if (queue_item.score) {
+    anime_item->SetMyScore(*queue_item.score);
   }
   // Edit status
-  if (history_item.status) {
-    anime_item->SetMyStatus(*history_item.status);
+  if (queue_item.status) {
+    anime_item->SetMyStatus(*queue_item.status);
   }
   // Edit rewatching status
-  if (history_item.enable_rewatching) {
-    anime_item->SetMyRewatching(*history_item.enable_rewatching);
+  if (queue_item.enable_rewatching) {
+    anime_item->SetMyRewatching(*queue_item.enable_rewatching);
   }
-  if (history_item.rewatched_times) {
-    anime_item->SetMyRewatchedTimes(*history_item.rewatched_times);
+  if (queue_item.rewatched_times) {
+    anime_item->SetMyRewatchedTimes(*queue_item.rewatched_times);
   }
   // Edit tags
-  if (history_item.tags) {
-    anime_item->SetMyTags(*history_item.tags);
+  if (queue_item.tags) {
+    anime_item->SetMyTags(*queue_item.tags);
   }
   // Edit notes
-  if (history_item.notes) {
-    anime_item->SetMyNotes(*history_item.notes);
+  if (queue_item.notes) {
+    anime_item->SetMyNotes(*queue_item.notes);
   }
   // Edit dates
-  if (history_item.date_start) {
-    anime_item->SetMyDateStart(*history_item.date_start);
+  if (queue_item.date_start) {
+    anime_item->SetMyDateStart(*queue_item.date_start);
   }
-  if (history_item.date_finish) {
-    anime_item->SetMyDateEnd(*history_item.date_finish);
+  if (queue_item.date_finish) {
+    anime_item->SetMyDateEnd(*queue_item.date_finish);
   }
   // Delete
-  if (history_item.mode == taiga::kHttpServiceDeleteLibraryEntry) {
+  if (queue_item.mode == taiga::kHttpServiceDeleteLibraryEntry) {
     DeleteListItem(anime_item->GetId());
   }
 
-  if (history_item.mode != taiga::kHttpServiceDeleteLibraryEntry)
+  if (queue_item.mode != taiga::kHttpServiceDeleteLibraryEntry)
     anime::SetMyLastUpdateToNow(*anime_item);
 
-  ui::OnLibraryEntryChange(history_item.anime_id);
+  ui::OnLibraryEntryChange(queue_item.anime_id);
 }
 
 }  // namespace anime
