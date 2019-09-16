@@ -31,7 +31,9 @@ class HistoryItem;
 namespace taiga {
 class HttpClient;
 }
+namespace track {
 class Feed;
+}
 
 namespace ui {
 
@@ -123,7 +125,7 @@ void OnScanAvailableEpisodesFinished();
 void OnFeedCheck(bool success);
 void OnFeedDownloadSuccess(bool is_magnet_link);
 void OnFeedDownloadError(const std::wstring& message);
-bool OnFeedNotify(const Feed& feed);
+bool OnFeedNotify(const track::Feed& feed);
 
 void OnMircNotRunning(bool testing = false);
 void OnMircDdeInitFail(bool testing = false);

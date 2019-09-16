@@ -1188,6 +1188,9 @@
     <ClInclude Include="..\..\src\track\scanner.h">
       <Filter>track\files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\track\feed_aggregator.h">
+      <Filter>track\torrents</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\src\taiga\resource.rc">

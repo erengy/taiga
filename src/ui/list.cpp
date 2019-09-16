@@ -256,8 +256,8 @@ static int ListViewCompare(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort,
     }
 
     case kListSortFileSize: {
-      const auto item1 = reinterpret_cast<FeedItem*>(list->GetItemParam(lParam1));
-      const auto item2 = reinterpret_cast<FeedItem*>(list->GetItemParam(lParam2));
+      const auto item1 = reinterpret_cast<track::FeedItem*>(list->GetItemParam(lParam1));
+      const auto item2 = reinterpret_cast<track::FeedItem*>(list->GetItemParam(lParam2));
       if (item1 && item2)
         return_value = CompareValues<UINT64>(item1->file_size, item2->file_size);
       break;

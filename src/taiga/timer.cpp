@@ -29,7 +29,7 @@
 #include "taiga/http.h"
 #include "taiga/settings.h"
 #include "taiga/stats.h"
-#include "track/feed.h"
+#include "track/feed_aggregator.h"
 #include "track/media.h"
 #include "track/scanner.h"
 #include "ui/dlg/dlg_anime_list.h"
@@ -98,7 +98,7 @@ void Timer::OnTimeout() {
       break;
 
     case kTimerTorrents:
-      Aggregator.CheckFeed(Settings[taiga::kTorrent_Discovery_Source], true);
+      track::aggregator.CheckFeed(Settings[taiga::kTorrent_Discovery_Source], true);
       break;
   }
 }

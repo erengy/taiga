@@ -26,6 +26,8 @@ namespace pugi {
 class xml_node;
 }
 
+namespace track {
+
 enum FeedFilterElement {
   kFeedFilterElement_None = -1,
   kFeedFilterElement_Meta_Id,
@@ -187,3 +189,5 @@ private:
   std::map<int, std::wstring> operator_shortcodes_;
   std::map<int, std::wstring> option_shortcodes_;
 };
+
+}  // namespace track

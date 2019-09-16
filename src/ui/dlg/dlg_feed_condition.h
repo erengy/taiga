@@ -18,9 +18,10 @@
 
 #pragma once
 
-#include "track/feed.h"
 #include <windows/win/common_controls.h>
 #include <windows/win/dialog.h>
+
+#include "track/feed_filter.h"
 
 namespace ui {
 
@@ -38,7 +39,7 @@ public:
 
   void ChooseElement(int index);
 
-  FeedFilterCondition condition;
+  track::FeedFilterCondition condition;
 
 private:
   win::ComboBox element_combo_, operator_combo_, value_combo_;

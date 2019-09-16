@@ -39,6 +39,7 @@
 #include "taiga/timer.h"
 #include "track/media.h"
 #include "track/monitor.h"
+#include "track/feed_aggregator.h"
 #include "track/play.h"
 #include "track/recognition.h"
 #include "track/scanner.h"
@@ -488,7 +489,7 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
             case kSidebarItemFeeds: {
               // Check new torrents
               edit.SetText(L"");
-              Aggregator.CheckFeed(Settings[taiga::kTorrent_Discovery_Source]);
+              track::aggregator.CheckFeed(Settings[taiga::kTorrent_Discovery_Source]);
               return TRUE;
             }
           }

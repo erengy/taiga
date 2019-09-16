@@ -32,7 +32,7 @@
 #include "taiga/settings.h"
 #include "taiga/taiga.h"
 #include "taiga/version.h"
-#include "track/feed.h"
+#include "track/feed_aggregator.h"
 #include "track/media.h"
 #include "ui/dialog.h"
 #include "ui/menu.h"
@@ -140,7 +140,7 @@ void App::Uninitialize() {
   // Save
   Settings.Save();
   anime::db.SaveDatabase();
-  Aggregator.SaveArchive();
+  track::aggregator.SaveArchive();
 
   // Exit
   PostQuitMessage();

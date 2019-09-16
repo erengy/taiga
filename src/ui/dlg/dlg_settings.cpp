@@ -29,6 +29,7 @@
 #include "taiga/resource.h"
 #include "taiga/settings.h"
 #include "taiga/stats.h"
+#include "track/feed_aggregator.h"
 #include "track/media.h"
 #include "track/monitor.h"
 #include "ui/dlg/dlg_settings.h"
@@ -335,13 +336,13 @@ void SettingsDialog::OnOK() {
     Settings.Set(taiga::kTorrent_Filter_Enabled, page->IsDlgButtonChecked(IDC_CHECK_TORRENT_FILTER));
     list.SetWindowHandle(page->GetDlgItem(IDC_LIST_TORRENT_FILTER));
     for (int i = 0; i < list.GetItemCount(); i++) {
-      FeedFilter* filter = reinterpret_cast<FeedFilter*>(list.GetItemParam(i));
+      const auto filter = reinterpret_cast<track::FeedFilter*>(list.GetItemParam(i));
       if (filter) filter->enabled = list.GetCheckState(i) == TRUE;
     }
     list.SetWindowHandle(nullptr);
-    Aggregator.filter_manager.filters.clear();
+    track::aggregator.filter_manager.filters.clear();
     for (auto it = feed_filters_.begin(); it != feed_filters_.end(); ++it)
-      Aggregator.filter_manager.filters.push_back(*it);
+      track::aggregator.filter_manager.filters.push_back(*it);
   }
 
   // Advanced
@@ -465,16 +466,16 @@ LRESULT SettingsDialog::TreeView::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam
 
 ////////////////////////////////////////////////////////////////////////////////
 
-int SettingsDialog::AddTorrentFilterToList(HWND hwnd_list, const FeedFilter& filter) {
+int SettingsDialog::AddTorrentFilterToList(HWND hwnd_list, const track::FeedFilter& filter) {
   win::ListView list = hwnd_list;
   int index = list.GetItemCount();
   int group = filter.anime_ids.empty() ? 0 : 1;
 
   int icon = ui::kIcon16_Funnel;
   switch (filter.action) {
-    case kFeedFilterActionDiscard: icon = ui::kIcon16_FunnelCross; break;
-    case kFeedFilterActionSelect:  icon = ui::kIcon16_FunnelTick;  break;
-    case kFeedFilterActionPrefer:  icon = ui::kIcon16_FunnelPlus;  break;
+    case track::kFeedFilterActionDiscard: icon = ui::kIcon16_FunnelCross; break;
+    case track::kFeedFilterActionSelect:  icon = ui::kIcon16_FunnelTick;  break;
+    case track::kFeedFilterActionPrefer:  icon = ui::kIcon16_FunnelPlus;  break;
   }
 
   // Insert item
@@ -504,7 +505,7 @@ void SettingsDialog::RefreshCache() {
   page.SetDlgItemText(IDC_STATIC_CACHE3, text.c_str());
 
   // Torrent history
-  text = ToWstr(Aggregator.GetArchiveSize()) + L" item(s)";
+  text = ToWstr(track::aggregator.GetArchiveSize()) + L" item(s)";
   page.SetDlgItemText(IDC_STATIC_CACHE4, text.c_str());
 }
 

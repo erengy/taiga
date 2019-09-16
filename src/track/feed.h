@@ -19,19 +19,18 @@
 #pragma once
 
 #include <cstdint>
-#include <map>
 #include <optional>
 #include <string>
 #include <vector>
 
 #include "base/rss.h"
-#include "base/types.h"
 #include "track/episode.h"
-#include "track/feed_filter.h"
 
 namespace pugi {
 class xml_document;
 }
+
+namespace track {
 
 enum class FeedItemState {
   Blank,
@@ -103,42 +102,4 @@ private:
   void Load(const pugi::xml_document& document);
 };
 
-////////////////////////////////////////////////////////////////////////////////
-
-class Aggregator {
-public:
-  Feed& GetFeed();
-
-  bool CheckFeed(const std::wstring& source, bool automatic = false);
-  bool Download(const FeedItem* feed_item);
-
-  void HandleFeedCheck(Feed& feed, const std::string& data, bool automatic);
-  void HandleFeedDownload(Feed& feed, const std::string& data);
-  void HandleFeedDownloadError(Feed& feed);
-  bool ValidateFeedDownload(const HttpRequest& http_request, HttpResponse& http_response);
-
-  void FindFeedSource(Feed& feed) const;
-  void ExamineData(Feed& feed);
-  void ParseFeedItem(FeedSource source, FeedItem& feed_item);
-  void CleanupDescription(std::wstring& description);
-
-  size_t GetArchiveSize() const;
-  bool LoadArchive();
-  bool SaveArchive() const;
-  void AddToArchive(const std::wstring& file);
-  void ClearArchive();
-  bool SearchArchive(const std::wstring& file) const;
-
-  FeedFilterManager filter_manager;
-
-private:
-  FeedItem* FindFeedItemByLink(Feed& feed, const std::wstring& link);
-  void HandleFeedDownloadOpen(FeedItem& feed_item, const std::wstring& file);
-  bool IsMagnetLink(const FeedItem& feed_item) const;
-
-  std::vector<std::wstring> download_queue_;
-  Feed feed_;
-  std::vector<std::wstring> file_archive_;
-};
-
-extern class Aggregator Aggregator;
+}  // namespace track

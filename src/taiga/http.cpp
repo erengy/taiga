@@ -36,6 +36,7 @@
 #include "taiga/update.h"
 #include "taiga/version.h"
 #include "track/feed.h"
+#include "track/feed_aggregator.h"
 #include "track/recognition.h"
 #include "ui/translate.h"
 #include "ui/ui.h"
@@ -243,20 +244,20 @@ void HttpManager::HandleResponse(HttpResponse& response) {
 
     case kHttpFeedCheck:
     case kHttpFeedCheckAuto: {
-      Feed* feed = reinterpret_cast<Feed*>(response.parameter);
+      const auto feed = reinterpret_cast<track::Feed*>(response.parameter);
       if (feed) {
         bool automatic = client.mode() == kHttpFeedCheckAuto;
-        Aggregator.HandleFeedCheck(*feed, client.write_buffer_, automatic);
+        track::aggregator.HandleFeedCheck(*feed, client.write_buffer_, automatic);
       }
       break;
     }
     case kHttpFeedDownload: {
-      auto feed = reinterpret_cast<Feed*>(response.parameter);
+      const auto feed = reinterpret_cast<track::Feed*>(response.parameter);
       if (feed) {
-        if (Aggregator.ValidateFeedDownload(client.request(), response)) {
-          Aggregator.HandleFeedDownload(*feed, client.write_buffer_);
+        if (track::aggregator.ValidateFeedDownload(client.request(), response)) {
+          track::aggregator.HandleFeedDownload(*feed, client.write_buffer_);
         } else {
-          Aggregator.HandleFeedDownloadError(*feed);
+          track::aggregator.HandleFeedDownloadError(*feed);
         }
       }
       break;

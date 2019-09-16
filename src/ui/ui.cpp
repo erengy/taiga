@@ -43,6 +43,7 @@
 #include "taiga/taiga.h"
 #include "taiga/update.h"
 #include "taiga/version.h"
+#include "track/feed.h"
 #include "track/media.h"
 #include "track/recognition.h"
 #include "ui/dlg/dlg_anime_info.h"
@@ -964,11 +965,11 @@ void OnFeedDownloadError(const std::wstring& message) {
   DlgTorrent.EnableInput();
 }
 
-bool OnFeedNotify(const Feed& feed) {
+bool OnFeedNotify(const track::Feed& feed) {
   std::map<std::wstring, std::set<std::wstring>> found_episodes;
 
   for (const auto& feed_item : feed.items) {
-    if (feed_item.state == FeedItemState::Selected) {
+    if (feed_item.state == track::FeedItemState::Selected) {
       const auto& episode = feed_item.episode_data;
       auto anime_item = anime::db.Find(episode.anime_id);
       auto anime_title = anime_item ? anime::GetPreferredTitle(*anime_item) : episode.anime_title();

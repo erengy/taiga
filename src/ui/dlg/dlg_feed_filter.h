@@ -18,9 +18,10 @@
 
 #pragma once
 
-#include "track/feed.h"
 #include <windows/win/common_controls.h>
 #include <windows/win/dialog.h>
+
+#include "track/feed_filter.h"
 
 namespace ui {
 
@@ -37,7 +38,7 @@ public:
 
   void ChoosePage(int index);
 
-  FeedFilter filter;
+  track::FeedFilter filter;
 
 private:
   int current_page_;
@@ -58,7 +59,7 @@ private:
   public:
     BOOL OnInitDialog();
     LRESULT OnNotify(int idCtrl, LPNMHDR pnmh);
-    bool BuildFilter(FeedFilter& filter);
+    bool BuildFilter(track::FeedFilter& filter);
   public:
     win::ListView preset_list;
   } page_0_;
@@ -69,8 +70,8 @@ private:
     BOOL OnCommand(WPARAM wParam, LPARAM lParam);
     BOOL OnInitDialog();
     LRESULT OnNotify(int idCtrl, LPNMHDR pnmh);
-    bool BuildFilter(FeedFilter& filter);
-    void AddConditionToList(const FeedFilterCondition& condition, int index = -1);
+    bool BuildFilter(track::FeedFilter& filter);
+    void AddConditionToList(const track::FeedFilterCondition& condition, int index = -1);
     void RefreshConditionList();
     void ChangeAction();
   public:
@@ -85,7 +86,7 @@ private:
   public:
     BOOL OnInitDialog();
     LRESULT OnNotify(int idCtrl, LPNMHDR pnmh);
-    bool BuildFilter(FeedFilter& filter);
+    bool BuildFilter(track::FeedFilter& filter);
   public:
     win::ListView anime_list;
   } page_2_;

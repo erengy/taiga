@@ -16,6 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "track/feed_filter.h"
+
 #include "base/file.h"
 #include "base/log.h"
 #include "base/string.h"
@@ -27,8 +29,10 @@
 #include "taiga/settings.h"
 #include "taiga/taiga.h"
 #include "track/feed.h"
-#include "track/feed_filter.h"
+#include "track/feed_aggregator.h"
 #include "ui/translate.h"
+
+namespace track {
 
 bool EvaluateCondition(const FeedFilterCondition& condition,
                        const FeedItem& item) {
@@ -372,7 +376,7 @@ bool FeedFilter::Filter(Feed& feed, FeedItem& item, bool recursive) {
   if (Taiga.options.debug_mode) {
     std::wstring filter_text =
         (item.IsDiscarded() ? L"!FILTER :: " : L"FILTER :: ") +
-        Aggregator.filter_manager.TranslateConditions(*this, condition_index);
+        aggregator.filter_manager.TranslateConditions(*this, condition_index);
     item.description = filter_text + L" -- " + item.description;
   }
 
@@ -514,7 +518,7 @@ void FeedFilterManager::Filter(Feed& feed, bool preferences) {
 void FeedFilterManager::FilterArchived(Feed& feed) {
   for (auto& item : feed.items) {
     if (!item.IsDiscarded()) {
-      bool found = Aggregator.SearchArchive(item.title);
+      bool found = aggregator.SearchArchive(item.title);
       if (found) {
         item.state = FeedItemState::DiscardedNormal;
         if (Taiga.options.debug_mode) {
@@ -729,13 +733,13 @@ void FeedFilterManager::Export(pugi::xml_node& node_filter,
   for (const auto& feed_filter : filters) {
     auto item = node_filter.append_child(L"item");
     item.append_attribute(L"action") =
-        Aggregator.filter_manager.GetShortcodeFromIndex(
+        aggregator.filter_manager.GetShortcodeFromIndex(
             kFeedFilterShortcodeAction, feed_filter.action).c_str();
     item.append_attribute(L"match") =
-        Aggregator.filter_manager.GetShortcodeFromIndex(
+        aggregator.filter_manager.GetShortcodeFromIndex(
             kFeedFilterShortcodeMatch, feed_filter.match).c_str();
     item.append_attribute(L"option") =
-        Aggregator.filter_manager.GetShortcodeFromIndex(
+        aggregator.filter_manager.GetShortcodeFromIndex(
             kFeedFilterShortcodeOption, feed_filter.option).c_str();
     item.append_attribute(L"enabled") = feed_filter.enabled;
     item.append_attribute(L"name") = feed_filter.name.c_str();
@@ -748,10 +752,10 @@ void FeedFilterManager::Export(pugi::xml_node& node_filter,
     for (const auto& condition : feed_filter.conditions) {
       auto node = item.append_child(L"condition");
       node.append_attribute(L"element") =
-          Aggregator.filter_manager.GetShortcodeFromIndex(
+          aggregator.filter_manager.GetShortcodeFromIndex(
               kFeedFilterShortcodeElement, condition.element).c_str();
       node.append_attribute(L"operator") =
-          Aggregator.filter_manager.GetShortcodeFromIndex(
+          aggregator.filter_manager.GetShortcodeFromIndex(
               kFeedFilterShortcodeOperator, condition.op).c_str();
       node.append_attribute(L"value") = condition.value.c_str();
     }
@@ -976,3 +980,5 @@ int FeedFilterManager::GetIndexFromShortcode(FeedFilterShortcodeType type,
 
   return -1;
 }
+
+}  // namespace track

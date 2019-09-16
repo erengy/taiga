@@ -39,6 +39,7 @@
 #include "taiga/settings.h"
 #include "taiga/taiga.h"
 #include "taiga/version.h"
+#include "track/feed_aggregator.h"
 #include "track/media.h"
 #include "ui/dlg/dlg_feed_filter.h"
 #include "ui/dlg/dlg_format.h"
@@ -395,9 +396,9 @@ BOOL SettingsPage::OnInitDialog() {
       list.SetColumnWidth(0, LVSCW_AUTOSIZE_USEHEADER);
       list.InsertGroup(0, L"General filters", true, false);
       list.InsertGroup(1, L"Limited filters", true, false);
-      parent->feed_filters_.resize(Aggregator.filter_manager.filters.size());
-      std::copy(Aggregator.filter_manager.filters.begin(),
-                Aggregator.filter_manager.filters.end(),
+      parent->feed_filters_.resize(track::aggregator.filter_manager.filters.size());
+      std::copy(track::aggregator.filter_manager.filters.begin(),
+                track::aggregator.filter_manager.filters.end(),
                 parent->feed_filters_.begin());
       parent->RefreshTorrentFilterList(list.GetWindowHandle());
       list.SetWindowHandle(nullptr);
@@ -547,8 +548,8 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
             CheckDlgButton(IDC_CHECK_CACHE3, FALSE);
           }
           if (IsDlgButtonChecked(IDC_CHECK_CACHE4)) {
-            Aggregator.ClearArchive();
-            Aggregator.SaveArchive();
+            track::aggregator.ClearArchive();
+            track::aggregator.SaveArchive();
             CheckDlgButton(IDC_CHECK_CACHE4, FALSE);
           }
           parent->RefreshCache();
@@ -690,7 +691,7 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
           ExecuteAction(L"TorrentAddFilter", TRUE, reinterpret_cast<LPARAM>(parent->GetWindowHandle()));
           if (!DlgFeedFilter.filter.conditions.empty()) {
             if (DlgFeedFilter.filter.name.empty())
-              DlgFeedFilter.filter.name = Aggregator.filter_manager.CreateNameFromConditions(DlgFeedFilter.filter);
+              DlgFeedFilter.filter.name = track::aggregator.filter_manager.CreateNameFromConditions(DlgFeedFilter.filter);
             parent->feed_filters_.push_back(DlgFeedFilter.filter);
             win::ListView list = GetDlgItem(IDC_LIST_TORRENT_FILTER);
             parent->RefreshTorrentFilterList(list.GetWindowHandle());
@@ -704,7 +705,7 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
           win::ListView list = GetDlgItem(IDC_LIST_TORRENT_FILTER);
           int item_index = list.GetNextItem(-1, LVNI_SELECTED);
           if (item_index > -1) {
-            auto feed_filter = reinterpret_cast<FeedFilter*>(list.GetItemParam(item_index));
+            auto feed_filter = reinterpret_cast<track::FeedFilter*>(list.GetItemParam(item_index));
             for (auto it = parent->feed_filters_.begin(); it != parent->feed_filters_.end(); ++it) {
               if (feed_filter == &(*it)) {
                 parent->feed_filters_.erase(it);
@@ -754,7 +755,7 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
             StringCoder coder;
             bool parsed = coder.Decode(dlg.text, metadata, data);
             if (parsed) {
-              parsed = Aggregator.filter_manager.Import(data, parent->feed_filters_);
+              parsed = track::aggregator.filter_manager.Import(data, parent->feed_filters_);
               if (parsed) {
                 parent->RefreshTorrentFilterList(GetDlgItem(IDC_LIST_TORRENT_FILTER));
               }
@@ -773,7 +774,7 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
         // Export filters
         case 107: {
           std::wstring data;
-          Aggregator.filter_manager.Export(data, parent->feed_filters_);
+          track::aggregator.filter_manager.Export(data, parent->feed_filters_);
           std::wstring metadata = StrToWstr(taiga::version().to_string());
           InputDialog dlg;
           StringCoder coder;
@@ -873,7 +874,7 @@ LRESULT SettingsPage::OnNotify(int idCtrl, LPNMHDR pnmh) {
         win::Toolbar toolbar = GetDlgItem(IDC_TOOLBAR_FEED_FILTER);
         LPNMLISTVIEW pnmv = reinterpret_cast<LPNMLISTVIEW>(pnmh);
         if (pnmv->uOldState != 0 && (pnmv->uNewState == 0x1000 || pnmv->uNewState == 0x2000)) {
-          auto feed_filter = reinterpret_cast<FeedFilter*>(list.GetItemParam(pnmv->iItem));
+          auto feed_filter = reinterpret_cast<track::FeedFilter*>(list.GetItemParam(pnmv->iItem));
           feed_filter->enabled = list.GetCheckState(pnmv->iItem) == TRUE;
         }
         int index = list.GetNextItem(-1, LVNI_SELECTED);
@@ -909,7 +910,7 @@ LRESULT SettingsPage::OnNotify(int idCtrl, LPNMHDR pnmh) {
               win::ListView list = GetDlgItem(IDC_LIST_TORRENT_FILTER);
               int item_index = list.GetNextItem(-1, LVNI_SELECTED);
               if (item_index > -1) {
-                auto feed_filter = reinterpret_cast<FeedFilter*>(list.GetItemParam(item_index));
+                auto feed_filter = reinterpret_cast<track::FeedFilter*>(list.GetItemParam(item_index));
                 for (auto it = parent->feed_filters_.begin(); it != parent->feed_filters_.end(); ++it) {
                   if (feed_filter == &(*it)) {
                     parent->feed_filters_.erase(it);
@@ -972,7 +973,7 @@ LRESULT SettingsPage::OnNotify(int idCtrl, LPNMHDR pnmh) {
       // Torrent filters
       } else if (lpnmitem->hdr.hwndFrom == GetDlgItem(IDC_LIST_TORRENT_FILTER)) {
         win::ListView list = lpnmitem->hdr.hwndFrom;
-        FeedFilter* feed_filter = reinterpret_cast<FeedFilter*>(list.GetItemParam(lpnmitem->iItem));
+        const auto feed_filter = reinterpret_cast<track::FeedFilter*>(list.GetItemParam(lpnmitem->iItem));
         if (feed_filter) {
           DlgFeedFilter.filter = *feed_filter;
           DlgFeedFilter.Create(IDD_FEED_FILTER, parent->GetWindowHandle());

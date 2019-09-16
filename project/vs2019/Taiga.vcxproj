@@ -437,6 +437,7 @@
     <ClInclude Include="..\..\src\taiga\version.h" />
     <ClInclude Include="..\..\src\track\episode.h" />
     <ClInclude Include="..\..\src\track\feed.h" />
+    <ClInclude Include="..\..\src\track\feed_aggregator.h" />
     <ClInclude Include="..\..\src\track\feed_filter.h" />
     <ClInclude Include="..\..\src\track\media.h" />
     <ClInclude Include="..\..\src\track\monitor.h" />

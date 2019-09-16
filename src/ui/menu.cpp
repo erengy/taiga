@@ -349,7 +349,7 @@ void MenuList::UpdateSeasonList(bool enabled) {
   }
 }
 
-void MenuList::UpdateTorrentsList(const FeedItem& feed_item) {
+void MenuList::UpdateTorrentsList(const track::FeedItem& feed_item) {
   const auto menu = menu_list_.FindMenu(L"TorrentListRightClick");
   if (menu) {
     const bool anime_identified = anime::IsValidId(feed_item.episode_data.anime_id);

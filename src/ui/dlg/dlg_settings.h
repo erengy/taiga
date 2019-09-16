@@ -21,9 +21,10 @@
 #include <map>
 #include <vector>
 
-#include "track/feed.h"
 #include <windows/win/common_controls.h>
 #include <windows/win/dialog.h>
+
+#include "track/feed_filter.h"
 #include "ui/dlg/dlg_settings_page.h"
 
 namespace ui {
@@ -53,7 +54,7 @@ public:
   void SetCurrentSection(SettingsSections section);
   void SetCurrentPage(SettingsPages page);
 
-  int AddTorrentFilterToList(HWND hwnd_list, const FeedFilter& filter);
+  int AddTorrentFilterToList(HWND hwnd_list, const track::FeedFilter& filter);
   void RefreshCache();
   void RefreshTorrentFilterList(HWND hwnd_list);
   void UpdateTorrentFilterList(HWND hwnd_list);
@@ -71,7 +72,7 @@ private:
   std::map<int, std::pair<std::wstring, std::wstring>> advanced_settings_;
   SettingsSections current_section_;
   SettingsPages current_page_;
-  std::vector<FeedFilter> feed_filters_;
+  std::vector<track::FeedFilter> feed_filters_;
   std::vector<SettingsPage> pages;
 };
 

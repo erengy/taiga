@@ -26,7 +26,8 @@
 #include "sync/sync.h"
 #include "taiga/settings.h"
 #include "taiga/version.h"
-#include "track/feed.h"
+#include "track/feed_aggregator.h"
+#include "track/feed_filter.h"
 #include "track/media.h"
 
 namespace taiga {
@@ -73,13 +74,13 @@ bool AppSettings::HandleCompatibility() {
     Set(kSync_Service_Kitsu_Password, Base64Encode(password));
 
     // Update torrent filters
-    for (auto& filter : Aggregator.filter_manager.filters) {
+    for (auto& filter : track::aggregator.filter_manager.filters) {
       if (filter.name == L"Discard unknown titles") {
         if (filter.conditions.size() == 1) {
           auto& condition = filter.conditions.front();
-          if (condition.element == kFeedFilterElement_Meta_Id) {
+          if (condition.element == track::kFeedFilterElement_Meta_Id) {
             filter.name = L"Discard and deactivate not-in-list anime";
-            condition.element = kFeedFilterElement_User_Status;
+            condition.element = track::kFeedFilterElement_User_Status;
             condition.value = ToWstr(anime::kNotInList);
           }
         }

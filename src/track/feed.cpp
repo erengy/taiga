@@ -23,7 +23,11 @@
 #include "base/xml.h"
 #include "media/anime_util.h"
 #include "taiga/path.h"
+#include "track/feed_aggregator.h"
+#include "track/feed_filter.h"
 #include "track/recognition.h"
+
+namespace track {
 
 void FeedItem::Discard(int option) {
   switch (option) {
@@ -173,10 +177,12 @@ void Feed::Load(const XmlDocument& document) {
     items.push_back(FeedItem{std::move(item)});
   }
 
-  Aggregator.FindFeedSource(*this);
+  track::aggregator.FindFeedSource(*this);
 
   for (auto& item : items) {
-    Aggregator.ParseFeedItem(source, item);
-    Aggregator.CleanupDescription(item.description);
+    track::aggregator.ParseFeedItem(source, item);
+    track::aggregator.CleanupDescription(item.description);
   }
 }
+
+}  // namespace track

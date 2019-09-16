@@ -19,6 +19,8 @@
 #include <algorithm>
 #include <regex>
 
+#include "track/feed_aggregator.h"
+
 #include "base/file.h"
 #include "base/format.h"
 #include "base/html.h"
@@ -31,12 +33,11 @@
 #include "taiga/http.h"
 #include "taiga/path.h"
 #include "taiga/settings.h"
-#include "track/feed.h"
 #include "track/recognition.h"
 #include "ui/dialog.h"
 #include "ui/ui.h"
 
-class Aggregator Aggregator;
+namespace track {
 
 Feed& Aggregator::GetFeed() {
   return feed_;
@@ -592,3 +593,5 @@ bool Aggregator::SearchArchive(const std::wstring& file) const {
   auto it = std::find(file_archive_.begin(), file_archive_.end(), file);
   return it != file_archive_.end();
 }
+
+}  // namespace track

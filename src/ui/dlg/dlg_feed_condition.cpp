@@ -24,6 +24,8 @@
 #include "media/anime_db.h"
 #include "media/anime_util.h"
 #include "taiga/resource.h"
+#include "track/feed_aggregator.h"
+#include "track/feed_filter.h"
 #include "ui/dlg/dlg_feed_condition.h"
 #include "ui/translate.h"
 
@@ -50,8 +52,9 @@ BOOL FeedConditionDialog::OnInitDialog() {
   value_combo_.Attach(GetDlgItem(IDC_COMBO_FEED_VALUE));
 
   // Add elements
-  for (int i = 0; i < kFeedFilterElement_Count; i++)
-    element_combo_.AddItem(Aggregator.filter_manager.TranslateElement(i).c_str(), i);
+  for (int i = 0; i < track::kFeedFilterElement_Count; i++) {
+    element_combo_.AddItem(track::aggregator.filter_manager.TranslateElement(i).c_str(), i);
+  }
 
   // Set element
   element_combo_.SetCurSel(condition.element);
@@ -60,7 +63,7 @@ BOOL FeedConditionDialog::OnInitDialog() {
   operator_combo_.SetCurSel(operator_combo_.FindItemData(condition.op));
   // Set value
   switch (condition.element) {
-    case kFeedFilterElement_Meta_Id: {
+    case track::kFeedFilterElement_Meta_Id: {
       value_combo_.SetCurSel(0);
       for (int i = 0; i < value_combo_.GetCount(); i++) {
         int anime_id = static_cast<int>(value_combo_.GetItemData(i));
@@ -71,16 +74,16 @@ BOOL FeedConditionDialog::OnInitDialog() {
       }
       break;
     }
-    case kFeedFilterElement_User_Status: {
+    case track::kFeedFilterElement_User_Status: {
       int value = ToInt(condition.value);
       value_combo_.SetCurSel(value);
       break;
     }
-    case kFeedFilterElement_Meta_Status:
-    case kFeedFilterElement_Meta_Type:
+    case track::kFeedFilterElement_Meta_Status:
+    case track::kFeedFilterElement_Meta_Type:
       value_combo_.SetCurSel(ToInt(condition.value) - 1);
       break;
-    case kFeedFilterElement_Local_EpisodeAvailable:
+    case track::kFeedFilterElement_Local_EpisodeAvailable:
       value_combo_.SetCurSel(condition.value == L"True" ? 1 : 0);
       break;
     default:
@@ -108,21 +111,21 @@ INT_PTR FeedConditionDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 
 void FeedConditionDialog::OnCancel() {
   // We will check against this in FeedFilterDialog later on
-  condition.element = kFeedFilterElement_None;
+  condition.element = track::kFeedFilterElement_None;
 
   EndDialog(IDCANCEL);
 }
 
 void FeedConditionDialog::OnOK() {
   // Set values
-  condition.element = static_cast<FeedFilterElement>(element_combo_.GetCurSel());
-  condition.op = static_cast<FeedFilterOperator>(
+  condition.element = static_cast<track::FeedFilterElement>(element_combo_.GetCurSel());
+  condition.op = static_cast<track::FeedFilterOperator>(
         operator_combo_.GetItemData(operator_combo_.GetCurSel()));
   switch (condition.element) {
-    case kFeedFilterElement_Meta_Id:
-    case kFeedFilterElement_Meta_Status:
-    case kFeedFilterElement_Meta_Type:
-    case kFeedFilterElement_User_Status:
+    case track::kFeedFilterElement_Meta_Id:
+    case track::kFeedFilterElement_Meta_Status:
+    case track::kFeedFilterElement_Meta_Type:
+    case track::kFeedFilterElement_User_Status:
       condition.value = ToWstr(value_combo_.GetItemData(value_combo_.GetCurSel()));
       break;
     default:
@@ -130,7 +133,7 @@ void FeedConditionDialog::OnOK() {
   }
 
   switch (condition.element) {
-    case kFeedFilterElement_File_Size:
+    case track::kFeedFilterElement_File_Size:
       if (IsNumericString(condition.value))
         condition.value += L" MiB";
       break;
@@ -179,46 +182,46 @@ void FeedConditionDialog::ChooseElement(int element_index) {
   operator_combo_.ResetContent();
 
   #define ADD_OPERATOR(op) \
-    operator_combo_.AddItem(Aggregator.filter_manager.TranslateOperator(op).c_str(), op);
+    operator_combo_.AddItem(track::aggregator.filter_manager.TranslateOperator(op).c_str(), op);
 
   switch (element_index) {
-    case kFeedFilterElement_File_Size:
-    case kFeedFilterElement_Meta_Id:
-    case kFeedFilterElement_Episode_Number:
-    case kFeedFilterElement_Meta_DateStart:
-    case kFeedFilterElement_Meta_DateEnd:
-    case kFeedFilterElement_Meta_Episodes:
-      ADD_OPERATOR(kFeedFilterOperator_Equals);
-      ADD_OPERATOR(kFeedFilterOperator_NotEquals);
-      ADD_OPERATOR(kFeedFilterOperator_IsGreaterThan);
-      ADD_OPERATOR(kFeedFilterOperator_IsGreaterThanOrEqualTo);
-      ADD_OPERATOR(kFeedFilterOperator_IsLessThan);
-      ADD_OPERATOR(kFeedFilterOperator_IsLessThanOrEqualTo);
+    case track::kFeedFilterElement_File_Size:
+    case track::kFeedFilterElement_Meta_Id:
+    case track::kFeedFilterElement_Episode_Number:
+    case track::kFeedFilterElement_Meta_DateStart:
+    case track::kFeedFilterElement_Meta_DateEnd:
+    case track::kFeedFilterElement_Meta_Episodes:
+      ADD_OPERATOR(track::kFeedFilterOperator_Equals);
+      ADD_OPERATOR(track::kFeedFilterOperator_NotEquals);
+      ADD_OPERATOR(track::kFeedFilterOperator_IsGreaterThan);
+      ADD_OPERATOR(track::kFeedFilterOperator_IsGreaterThanOrEqualTo);
+      ADD_OPERATOR(track::kFeedFilterOperator_IsLessThan);
+      ADD_OPERATOR(track::kFeedFilterOperator_IsLessThanOrEqualTo);
       break;
-    case kFeedFilterElement_File_Category:
-    case kFeedFilterElement_Local_EpisodeAvailable:
-    case kFeedFilterElement_Meta_Status:
-    case kFeedFilterElement_Meta_Type:
-    case kFeedFilterElement_User_Status:
-      ADD_OPERATOR(kFeedFilterOperator_Equals);
-      ADD_OPERATOR(kFeedFilterOperator_NotEquals);
+    case track::kFeedFilterElement_File_Category:
+    case track::kFeedFilterElement_Local_EpisodeAvailable:
+    case track::kFeedFilterElement_Meta_Status:
+    case track::kFeedFilterElement_Meta_Type:
+    case track::kFeedFilterElement_User_Status:
+      ADD_OPERATOR(track::kFeedFilterOperator_Equals);
+      ADD_OPERATOR(track::kFeedFilterOperator_NotEquals);
       break;
-    case kFeedFilterElement_User_Tags:
-    case kFeedFilterElement_Episode_Title:
-    case kFeedFilterElement_Episode_Group:
-    case kFeedFilterElement_Episode_VideoType:
-    case kFeedFilterElement_File_Title:
-    case kFeedFilterElement_File_Description:
-    case kFeedFilterElement_File_Link:
-      ADD_OPERATOR(kFeedFilterOperator_Equals);
-      ADD_OPERATOR(kFeedFilterOperator_NotEquals);
-      ADD_OPERATOR(kFeedFilterOperator_BeginsWith);
-      ADD_OPERATOR(kFeedFilterOperator_EndsWith);
-      ADD_OPERATOR(kFeedFilterOperator_Contains);
-      ADD_OPERATOR(kFeedFilterOperator_NotContains);
+    case track::kFeedFilterElement_User_Tags:
+    case track::kFeedFilterElement_Episode_Title:
+    case track::kFeedFilterElement_Episode_Group:
+    case track::kFeedFilterElement_Episode_VideoType:
+    case track::kFeedFilterElement_File_Title:
+    case track::kFeedFilterElement_File_Description:
+    case track::kFeedFilterElement_File_Link:
+      ADD_OPERATOR(track::kFeedFilterOperator_Equals);
+      ADD_OPERATOR(track::kFeedFilterOperator_NotEquals);
+      ADD_OPERATOR(track::kFeedFilterOperator_BeginsWith);
+      ADD_OPERATOR(track::kFeedFilterOperator_EndsWith);
+      ADD_OPERATOR(track::kFeedFilterOperator_Contains);
+      ADD_OPERATOR(track::kFeedFilterOperator_NotContains);
       break;
     default:
-      for (int i = 0; i < kFeedFilterOperator_Count; i++) {
+      for (int i = 0; i < track::kFeedFilterOperator_Count; i++) {
         ADD_OPERATOR(i);
       }
   }
@@ -244,12 +247,12 @@ void FeedConditionDialog::ChooseElement(int element_index) {
         GetWindowHandle(), nullptr, nullptr);
 
   switch (element_index) {
-    case kFeedFilterElement_File_Category: {
+    case track::kFeedFilterElement_File_Category: {
       RECREATE_COMBO(CBS_DROPDOWNLIST);
-      static const std::vector<TorrentCategory> categories{
-        TorrentCategory::Anime,
-        TorrentCategory::Batch,
-        TorrentCategory::Other,
+      static const std::vector<track::TorrentCategory> categories{
+        track::TorrentCategory::Anime,
+        track::TorrentCategory::Batch,
+        track::TorrentCategory::Other,
       };
       for (auto category : categories) {
         value_combo_.AddItem(TranslateTorrentCategory(category).c_str(),
@@ -257,16 +260,16 @@ void FeedConditionDialog::ChooseElement(int element_index) {
       }
       break;
     }
-    case kFeedFilterElement_File_Size: {
+    case track::kFeedFilterElement_File_Size: {
       RECREATE_COMBO(CBS_DROPDOWN);
       value_combo_.AddString(L"10 MiB");
       value_combo_.AddString(L"100 MiB");
       value_combo_.AddString(L"1 GiB");
       break;
     }
-    case kFeedFilterElement_Meta_Id:
-    case kFeedFilterElement_Episode_Title: {
-      RECREATE_COMBO((element_index == kFeedFilterElement_Meta_Id ? CBS_DROPDOWNLIST : CBS_DROPDOWN));
+    case track::kFeedFilterElement_Meta_Id:
+    case track::kFeedFilterElement_Episode_Title: {
+      RECREATE_COMBO((element_index == track::kFeedFilterElement_Meta_Id ? CBS_DROPDOWNLIST : CBS_DROPDOWN));
       using anime_pair = std::pair<int, std::wstring>;
       std::vector<anime_pair> title_list;
       for (const auto& [id, item] : anime::db.items) {
@@ -284,25 +287,25 @@ void FeedConditionDialog::ChooseElement(int element_index) {
         [](const anime_pair& a1, const anime_pair& a2) {
           return CompareStrings(a1.second, a2.second) < 0;
         });
-      if (element_index == kFeedFilterElement_Meta_Id)
+      if (element_index == track::kFeedFilterElement_Meta_Id)
         value_combo_.AddString(L"(Unknown)");
       for (const auto& pair : title_list)
         value_combo_.AddItem(pair.second.c_str(), pair.first);
       break;
     }
-    case kFeedFilterElement_Meta_DateStart:
-    case kFeedFilterElement_Meta_DateEnd:
+    case track::kFeedFilterElement_Meta_DateStart:
+    case track::kFeedFilterElement_Meta_DateEnd:
       RECREATE_COMBO(CBS_DROPDOWN);
       value_combo_.AddString(GetDate().to_string().c_str());
       value_combo_.SetCueBannerText(L"YYYY-MM-DD");
       break;
-    case kFeedFilterElement_Meta_Status:
+    case track::kFeedFilterElement_Meta_Status:
       RECREATE_COMBO(CBS_DROPDOWNLIST);
       value_combo_.AddItem(ui::TranslateStatus(anime::kFinishedAiring).c_str(), anime::kFinishedAiring);
       value_combo_.AddItem(ui::TranslateStatus(anime::kAiring).c_str(), anime::kAiring);
       value_combo_.AddItem(ui::TranslateStatus(anime::kNotYetAired).c_str(), anime::kNotYetAired);
       break;
-    case kFeedFilterElement_Meta_Type:
+    case track::kFeedFilterElement_Meta_Type:
       RECREATE_COMBO(CBS_DROPDOWNLIST);
       value_combo_.AddItem(ui::TranslateType(anime::kTv).c_str(), anime::kTv);
       value_combo_.AddItem(ui::TranslateType(anime::kOva).c_str(), anime::kOva);
@@ -311,7 +314,7 @@ void FeedConditionDialog::ChooseElement(int element_index) {
       value_combo_.AddItem(ui::TranslateType(anime::kOna).c_str(), anime::kOna);
       value_combo_.AddItem(ui::TranslateType(anime::kMusic).c_str(), anime::kMusic);
       break;
-    case kFeedFilterElement_User_Status:
+    case track::kFeedFilterElement_User_Status:
       RECREATE_COMBO(CBS_DROPDOWNLIST);
       value_combo_.AddItem(ui::TranslateMyStatus(anime::kNotInList, false).c_str(), anime::kNotInList);
       value_combo_.AddItem(ui::TranslateMyStatus(anime::kWatching, false).c_str(), anime::kWatching);
@@ -320,32 +323,32 @@ void FeedConditionDialog::ChooseElement(int element_index) {
       value_combo_.AddItem(ui::TranslateMyStatus(anime::kDropped, false).c_str(), anime::kDropped);
       value_combo_.AddItem(ui::TranslateMyStatus(anime::kPlanToWatch, false).c_str(), anime::kPlanToWatch);
       break;
-    case kFeedFilterElement_Episode_Number:
-    case kFeedFilterElement_Meta_Episodes:
+    case track::kFeedFilterElement_Episode_Number:
+    case track::kFeedFilterElement_Meta_Episodes:
       RECREATE_COMBO(CBS_DROPDOWN);
       value_combo_.AddString(L"%watched%");
       value_combo_.AddString(L"%total%");
       break;
-    case kFeedFilterElement_Episode_Version:
+    case track::kFeedFilterElement_Episode_Version:
       RECREATE_COMBO(CBS_DROPDOWN);
       value_combo_.AddString(L"2");
       value_combo_.AddString(L"3");
       value_combo_.AddString(L"4");
       value_combo_.AddString(L"0");
       break;
-    case kFeedFilterElement_Local_EpisodeAvailable:
+    case track::kFeedFilterElement_Local_EpisodeAvailable:
       RECREATE_COMBO(CBS_DROPDOWNLIST);
       value_combo_.AddString(L"False");
       value_combo_.AddString(L"True");
       break;
-    case kFeedFilterElement_Episode_VideoResolution:
+    case track::kFeedFilterElement_Episode_VideoResolution:
       RECREATE_COMBO(CBS_DROPDOWN);
       value_combo_.AddString(L"1080p");
       value_combo_.AddString(L"720p");
       value_combo_.AddString(L"480p");
       value_combo_.AddString(L"400p");
       break;
-    case kFeedFilterElement_Episode_VideoType:
+    case track::kFeedFilterElement_Episode_VideoType:
       RECREATE_COMBO(CBS_DROPDOWN);
       value_combo_.AddString(L"h264");
       value_combo_.AddString(L"x264");
