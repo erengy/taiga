@@ -20,56 +20,57 @@
 
 #include "base/log.h"
 #include "base/string.h"
-#include "base/xml.h"
 #include "media/library/history.h"
 #include "media/anime_db.h"
 #include "media/anime_util.h"
 #include "sync/sync.h"
 #include "taiga/announce.h"
-#include "taiga/path.h"
 #include "taiga/settings.h"
-#include "taiga/version.h"
 #include "track/media.h"
 #include "track/scanner.h"
 #include "ui/ui.h"
 
+static void ValidateQueueItem(QueueItem& item, const anime::Item& anime_item) {
+  if (item.episode)
+    if (anime_item.GetMyLastWatchedEpisode() == *item.episode || *item.episode < 0)
+      item.episode.reset();
+  if (item.score)
+    if (anime_item.GetMyScore() == *item.score || *item.score < 0 || *item.score > anime::kUserScoreMax)
+      item.score.reset();
+  if (item.status)
+    if (anime_item.GetMyStatus() == *item.status || *item.status < anime::kMyStatusFirst || *item.status >= anime::kMyStatusLast)
+      item.status.reset();
+  if (item.enable_rewatching)
+    if (anime_item.GetMyRewatching() == *item.enable_rewatching)
+      item.enable_rewatching.reset();
+  if (item.rewatched_times)
+    if (anime_item.GetMyRewatchedTimes() == *item.rewatched_times)
+      item.rewatched_times.reset();
+  if (item.tags)
+    if (anime_item.GetMyTags() == *item.tags)
+      item.tags.reset();
+  if (item.notes)
+    if (anime_item.GetMyNotes() == *item.notes)
+      item.notes.reset();
+  if (item.date_start)
+    if (anime_item.GetMyDateStart() == *item.date_start)
+      item.date_start.reset();
+  if (item.date_finish)
+    if (anime_item.GetMyDateEnd() == *item.date_finish)
+      item.date_finish.reset();
+}
+
 void HistoryQueue::Add(QueueItem& item, bool save) {
-  auto anime = anime::db.Find(item.anime_id);
+  const auto anime_item = anime::db.Find(item.anime_id);
 
   // Add to user list
-  if (anime && !anime->IsInList())
+  if (anime_item && !anime_item->IsInList())
     if (item.mode != taiga::kHttpServiceDeleteLibraryEntry)
-      anime->AddtoUserList();
+      anime_item->AddtoUserList();
 
   // Validate values
-  if (anime && anime->IsInList()) {
-    if (item.episode)
-      if (anime->GetMyLastWatchedEpisode() == *item.episode || *item.episode < 0)
-        item.episode.reset();
-    if (item.score)
-      if (anime->GetMyScore() == *item.score || *item.score < 0 || *item.score > anime::kUserScoreMax)
-        item.score.reset();
-    if (item.status)
-      if (anime->GetMyStatus() == *item.status || *item.status < anime::kMyStatusFirst || *item.status >= anime::kMyStatusLast)
-        item.status.reset();
-    if (item.enable_rewatching)
-      if (anime->GetMyRewatching() == *item.enable_rewatching)
-        item.enable_rewatching.reset();
-    if (item.rewatched_times)
-      if (anime->GetMyRewatchedTimes() == *item.rewatched_times)
-        item.rewatched_times.reset();
-    if (item.tags)
-      if (anime->GetMyTags() == *item.tags)
-        item.tags.reset();
-    if (item.notes)
-      if (anime->GetMyNotes() == *item.notes)
-        item.notes.reset();
-    if (item.date_start)
-      if (anime->GetMyDateStart() == *item.date_start)
-        item.date_start.reset();
-    if (item.date_finish)
-      if (anime->GetMyDateEnd() == *item.date_finish)
-        item.date_finish.reset();
+  if (anime_item && anime_item->IsInList()) {
+    ValidateQueueItem(item, *anime_item);
   }
   switch (item.mode) {
     case taiga::kHttpServiceUpdateLibraryEntry:
@@ -130,14 +131,14 @@ void HistoryQueue::Add(QueueItem& item, bool save) {
     items.push_back(item);
   }
 
-  if (anime && save) {
+  if (anime_item && save) {
     // Save
     history->Save();
 
     // Announce
     if (item.episode) {
       anime::Episode episode;
-      episode.anime_id = anime->GetId();
+      episode.anime_id = anime_item->GetId();
       episode.set_episode_number(*item.episode);
       MediaPlayers.play_status = track::recognition::PlayStatus::Updated;
       Announcer.Do(taiga::kAnnounceToHttp | taiga::kAnnounceToTwitter, &episode);
@@ -145,8 +146,8 @@ void HistoryQueue::Add(QueueItem& item, bool save) {
 
     // Check new episode
     if (item.episode) {
-      anime->SetNextEpisodePath(L"");
-      ScanAvailableEpisodesQuick(anime->GetId());
+      anime_item->SetNextEpisodePath(L"");
+      ScanAvailableEpisodesQuick(anime_item->GetId());
     }
 
     ui::OnHistoryAddItem(item);
