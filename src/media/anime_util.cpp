@@ -318,7 +318,7 @@ bool IsDeletedFromList(const Item& item) {
   return false;
 }
 
-bool IsUpdateAllowed(Item& item, const Episode& episode, bool ignore_update_time) {
+bool IsUpdateAllowed(const Item& item, const Episode& episode, bool ignore_update_time) {
   if (episode.processed)
     return false;
 
@@ -346,7 +346,7 @@ bool IsUpdateAllowed(Item& item, const Episode& episode, bool ignore_update_time
   return true;
 }
 
-void UpdateList(Item& item, Episode& episode) {
+void UpdateList(const Item& item, Episode& episode) {
   if (!IsUpdateAllowed(item, episode, false))
     return;
 
@@ -360,7 +360,7 @@ void UpdateList(Item& item, Episode& episode) {
   }
 }
 
-void AddToQueue(Item& item, const Episode& episode, bool change_status) {
+void AddToQueue(const Item& item, const Episode& episode, bool change_status) {
   // Create history item
   library::QueueItem queue_item;
   queue_item.anime_id = item.GetId();
@@ -650,54 +650,6 @@ int EstimateEpisodeCount(const Item& item) {
   // This is a series that has aired for more than a year, which means we cannot
   // estimate for how long it is going to continue.
   return 0;
-}
-
-void ChangeEpisode(int anime_id, int value) {
-  auto anime_item = anime::db.Find(anime_id);
-
-  if (!anime_item)
-    return;
-
-  if (!IsValidEpisodeNumber(value, anime_item->GetEpisodeCount()))
-    return;
-
-  Episode episode;
-  episode.set_episode_number(value);
-
-  // Allow changing the status to Completed
-  bool change_status = value == anime_item->GetEpisodeCount() && value > 0;
-
-  AddToQueue(*anime_item, episode, change_status);
-}
-
-void DecrementEpisode(int anime_id) {
-  auto anime_item = anime::db.Find(anime_id);
-
-  if (!anime_item)
-    return;
-
-  int watched = anime_item->GetMyLastWatchedEpisode();
-  auto queue_item = library::queue.FindItem(anime_item->GetId(),
-                                            library::QueueSearch::Episode);
-
-  if (queue_item && *queue_item->episode == watched &&
-      watched > anime_item->GetMyLastWatchedEpisode(false)) {
-    queue_item->enabled = false;
-    library::queue.RemoveDisabled();
-  } else {
-    ChangeEpisode(anime_id, watched - 1);
-  }
-}
-
-void IncrementEpisode(int anime_id) {
-  auto anime_item = anime::db.Find(anime_id);
-
-  if (!anime_item)
-    return;
-
-  int watched = anime_item->GetMyLastWatchedEpisode();
-
-  ChangeEpisode(anime_id, watched + 1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

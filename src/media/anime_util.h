@@ -50,9 +50,9 @@ bool LinkEpisodeToAnime(Episode& episode, int anime_id);
 void StartWatching(Item& item, Episode& episode);
 void EndWatching(Item& item, Episode episode);
 bool IsDeletedFromList(const Item& item);
-bool IsUpdateAllowed(Item& item, const Episode& episode, bool ignore_update_time);
-void UpdateList(Item& item, Episode& episode);
-void AddToQueue(Item& item, const Episode& episode, bool change_status);
+bool IsUpdateAllowed(const Item& item, const Episode& episode, bool ignore_update_time);
+void UpdateList(const Item& item, Episode& episode);
+void AddToQueue(const Item& item, const Episode& episode, bool change_status);
 void SetMyLastUpdateToNow(Item& item);
 
 bool GetFansubFilter(int anime_id, std::vector<std::wstring>& groups);
@@ -71,9 +71,6 @@ bool IsValidEpisodeNumber(int number, int total);
 bool IsValidEpisodeNumber(int number, int total, int watched);
 int GetLastEpisodeNumber(const Item& item);
 int EstimateEpisodeCount(const Item& item);
-void ChangeEpisode(int anime_id, int value);
-void DecrementEpisode(int anime_id);
-void IncrementEpisode(int anime_id);
 
 int GetTitleLanguagePreferenceIndex(const std::wstring& str);
 std::wstring GetTitleLanguagePreferenceStr(const int index);

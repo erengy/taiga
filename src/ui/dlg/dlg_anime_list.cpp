@@ -25,6 +25,7 @@
 #include "base/format.h"
 #include "base/gfx.h"
 #include "base/string.h"
+#include "media/library/list_util.h"
 #include "media/anime_db.h"
 #include "media/anime_filter.h"
 #include "media/anime_util.h"

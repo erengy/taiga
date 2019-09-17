@@ -28,6 +28,7 @@
 #include "media/discover.h"
 #include "media/library/export.h"
 #include "media/library/history.h"
+#include "media/library/list_util.h"
 #include "sync/anilist_util.h"
 #include "sync/kitsu_util.h"
 #include "sync/myanimelist_util.h"
