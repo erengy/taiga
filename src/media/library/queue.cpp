@@ -30,6 +30,8 @@
 #include "track/scanner.h"
 #include "ui/ui.h"
 
+namespace library {
+
 static void ValidateQueueItem(QueueItem& item, const anime::Item& anime_item) {
   if (item.episode)
     if (anime_item.GetMyLastWatchedEpisode() == *item.episode || *item.episode < 0)
@@ -60,7 +62,7 @@ static void ValidateQueueItem(QueueItem& item, const anime::Item& anime_item) {
       item.date_finish.reset();
 }
 
-void HistoryQueue::Add(QueueItem& item, bool save) {
+void Queue::Add(QueueItem& item, bool save) {
   const auto anime_item = anime::db.Find(item.anime_id);
 
   // Add to user list
@@ -89,7 +91,7 @@ void HistoryQueue::Add(QueueItem& item, bool save) {
 
   // Edit previous item with the same ID...
   bool add_new_item = true;
-  if (!History.queue.updating) {
+  if (!updating) {
     for (auto it = items.rbegin(); it != items.rend(); ++it) {
       if (it->anime_id == item.anime_id && it->enabled) {
         if (it->mode != taiga::kHttpServiceAddLibraryEntry &&
@@ -157,7 +159,7 @@ void HistoryQueue::Add(QueueItem& item, bool save) {
   }
 }
 
-void HistoryQueue::Check(bool automatic) {
+void Queue::Check(bool automatic) {
   if (items.empty())
     return;
 
@@ -187,13 +189,13 @@ void HistoryQueue::Check(bool automatic) {
     return;
   }
 
-  History.queue.updating = true;
+  updating = true;
   ui::ChangeStatusText(L"Updating list... (" + anime::GetPreferredTitle(*anime_item) + L")");
 
   sync::UpdateLibraryEntry(items[index]);
 }
 
-void HistoryQueue::Clear(bool save) {
+void Queue::Clear(bool save) {
   items.clear();
   index = 0;
 
@@ -203,10 +205,10 @@ void HistoryQueue::Clear(bool save) {
     history->Save();
 }
 
-void HistoryQueue::Merge(bool save) {
+void Queue::Merge(bool save) {
   while (auto queue_item = GetCurrentItem()) {
     anime::db.UpdateItem(*queue_item);
-    History.queue.Remove(index, false, true, true);
+    Remove(index, false, true, true);
   }
 
   ui::OnHistoryChange();
@@ -217,7 +219,7 @@ void HistoryQueue::Merge(bool save) {
   }
 }
 
-bool HistoryQueue::IsQueued(int anime_id) const {
+bool Queue::IsQueued(int anime_id) const {
   for (const auto& item : items) {
     if (item.anime_id == anime_id)
       return true;
@@ -225,7 +227,7 @@ bool HistoryQueue::IsQueued(int anime_id) const {
   return false;
 }
 
-QueueItem* HistoryQueue::FindItem(int anime_id, QueueSearch search_mode) {
+QueueItem* Queue::FindItem(int anime_id, QueueSearch search_mode) {
   for (auto it = items.rbegin(); it != items.rend(); ++it) {
     if (it->anime_id == anime_id && it->enabled) {
       switch (search_mode) {
@@ -282,14 +284,14 @@ QueueItem* HistoryQueue::FindItem(int anime_id, QueueSearch search_mode) {
   return nullptr;
 }
 
-QueueItem* HistoryQueue::GetCurrentItem() {
+QueueItem* Queue::GetCurrentItem() {
   if (!items.empty())
     return &items.at(index);
 
   return nullptr;
 }
 
-int HistoryQueue::GetItemCount() {
+int Queue::GetItemCount() {
   int count = 0;
 
   for (auto it = items.begin(); it != items.end(); ++it)
@@ -299,7 +301,7 @@ int HistoryQueue::GetItemCount() {
   return count;
 }
 
-void HistoryQueue::Remove(int index, bool save, bool refresh, bool to_history) {
+void Queue::Remove(int index, bool save, bool refresh, bool to_history) {
   if (index == -1)
     index = this->index;
 
@@ -338,7 +340,7 @@ void HistoryQueue::Remove(int index, bool save, bool refresh, bool to_history) {
     history->Save();
 }
 
-void HistoryQueue::RemoveDisabled(bool save, bool refresh) {
+void Queue::RemoveDisabled(bool save, bool refresh) {
   bool needs_refresh = false;
 
   for (size_t i = 0; i < items.size(); i++) {
@@ -381,3 +383,5 @@ void ConfirmationQueue::Process() {
 
   in_process_ = false;
 }
+
+}  // namespace library

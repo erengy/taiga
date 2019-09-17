@@ -143,7 +143,7 @@ void Synchronize() {
     return;
   }
 
-  if (History.queue.GetItemCount()) {
+  if (library::queue.GetItemCount()) {
     if (taiga::GetCurrentServiceId() == sync::kKitsu) {
       // Library IDs can be missing if the user has recently upgraded from a
       // previous installation without Kitsu support.
@@ -152,13 +152,13 @@ void Synchronize() {
         return;
       }
     }
-    History.queue.Check(false);
+    library::queue.Check(false);
   } else {
     GetLibraryEntries();
   }
 }
 
-void UpdateLibraryEntry(const QueueItem& queue_item) {
+void UpdateLibraryEntry(const library::QueueItem& queue_item) {
   const auto request_type = ClientModeToRequestType(
       static_cast<taiga::HttpClientMode>(queue_item.mode));
 

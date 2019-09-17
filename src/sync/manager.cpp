@@ -185,7 +185,7 @@ void Manager::HandleError(Response& response, HttpResponse& http_response) {
     case kAddLibraryEntry:
     case kDeleteLibraryEntry:
     case kUpdateLibraryEntry:
-      History.queue.updating = false;
+      library::queue.updating = false;
       ui::OnLibraryUpdateFailure(anime_id, response.data[L"error"],
                                  response.data.count(L"not_approved"));
       break;
@@ -319,15 +319,15 @@ void Manager::HandleResponse(Response& response, HttpResponse& http_response) {
     case kAddLibraryEntry:
     case kDeleteLibraryEntry:
     case kUpdateLibraryEntry: {
-      History.queue.updating = false;
+      library::queue.updating = false;
       ui::ClearStatusText();
 
-      const auto queue_item = History.queue.GetCurrentItem();
+      const auto queue_item = library::queue.GetCurrentItem();
       if (queue_item) {
         anime::db.UpdateItem(*queue_item);
         anime::db.SaveList();
-        History.queue.Remove();
-        History.queue.Check(false);
+        library::queue.Remove();
+        library::queue.Check(false);
       }
 
       break;

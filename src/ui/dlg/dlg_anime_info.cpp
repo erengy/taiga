@@ -574,12 +574,12 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
             anime_ids.push_back(anime_id);
       }
     };
-    for (auto it = History.queue.items.crbegin(); it != History.queue.items.crend(); ++it) {
+    for (auto it = library::queue.items.crbegin(); it != library::queue.items.crend(); ++it) {
       if (it->episode) {
         list_anime_ids(it->anime_id);
       }
     }
-    for (auto it = History.items.crbegin(); it != History.items.crend(); ++it) {
+    for (auto it = library::history.items.crbegin(); it != library::history.items.crend(); ++it) {
       if (it->episode) {
         list_anime_ids(it->anime_id);
       }
@@ -603,14 +603,14 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
       content = L"Continue Watching:\n" + content + L"\n";
     }
     int watched_last_week = 0;
-    for (const auto& queue_item : History.queue.items) {
+    for (const auto& queue_item : library::queue.items) {
       if (!queue_item.episode || *queue_item.episode == 0)
         continue;
       date_diff = date_now - Date(queue_item.time.substr(0, 10));
       if (date_diff <= day_limit)
         watched_last_week++;
     }
-    for (const auto& history_item : History.items) {
+    for (const auto& history_item : library::history.items) {
       if (history_item.episode == 0)
         continue;
       date_diff = date_now - Date(history_item.time.substr(0, 10));

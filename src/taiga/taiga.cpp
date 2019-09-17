@@ -160,7 +160,7 @@ void App::LoadData() {
   anime::db.LoadList();
   anime::db.ClearInvalidItems();
 
-  History.Load();
+  library::history.Load();
 }
 
 }  // namespace taiga

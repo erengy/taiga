@@ -192,7 +192,7 @@ void MainDialog::CreateDialogControls() {
   treeview.hti.push_back(treeview.InsertItem(L"Search", ui::kIcon16_Search, kSidebarItemSearch, nullptr));
   treeview.hti.push_back(treeview.InsertItem(L"Seasons", ui::kIcon16_Calendar, kSidebarItemSeasons, nullptr));
   treeview.hti.push_back(treeview.InsertItem(L"Torrents", ui::kIcon16_Feed, kSidebarItemFeeds, nullptr));
-  if (History.queue.GetItemCount() > 0) {
+  if (library::queue.GetItemCount() > 0) {
     treeview.RefreshHistoryCounter();
   }
 
@@ -722,7 +722,7 @@ void MainDialog::OnTaskbarCallback(UINT uMsg, LPARAM lParam) {
             navigation.SetCurrentPage(kSidebarItemFeeds);
             break;
           case TipType::UpdateFailed:
-            History.queue.Check(false);
+            library::queue.Check(false);
             break;
           case TipType::NotApproved:
             navigation.SetCurrentPage(kSidebarItemHistory);

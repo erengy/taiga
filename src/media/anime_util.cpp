@@ -222,12 +222,12 @@ bool StartNewRewatch(int anime_id) {
   if (!anime_item)
     return false;
 
-  QueueItem queue_item;
+  library::QueueItem queue_item;
   queue_item.anime_id = anime_item->GetId();
   queue_item.status = kWatching;
   queue_item.enable_rewatching = true;
   queue_item.episode = 0;
-  History.queue.Add(queue_item);
+  library::queue.Add(queue_item);
 
   if (track::PlayEpisode(anime_item->GetId(), 0)) {
     return true;
@@ -309,7 +309,7 @@ void EndWatching(Item& item, Episode episode) {
 ////////////////////////////////////////////////////////////////////////////////
 
 bool IsDeletedFromList(const Item& item) {
-  for (const auto& queue_item : History.queue.items)
+  for (const auto& queue_item : library::queue.items)
     if (queue_item.anime_id == item.GetId())
       if (queue_item.mode == taiga::kHttpServiceDeleteLibraryEntry)
         return true;
@@ -352,8 +352,8 @@ void UpdateList(Item& item, Episode& episode) {
   episode.processed = true;
 
   if (Settings.GetBool(taiga::kSync_Update_AskToConfirm)) {
-    ConfirmationQueue.Add(episode);
-    ConfirmationQueue.Process();
+    library::confirmation_queue.Add(episode);
+    library::confirmation_queue.Process();
   } else {
     AddToQueue(item, episode, true);
   }
@@ -361,7 +361,7 @@ void UpdateList(Item& item, Episode& episode) {
 
 void AddToQueue(Item& item, const Episode& episode, bool change_status) {
   // Create history item
-  QueueItem queue_item;
+  library::QueueItem queue_item;
   queue_item.anime_id = item.GetId();
 
   // Set episode number
@@ -402,7 +402,7 @@ void AddToQueue(Item& item, const Episode& episode, bool change_status) {
   }
 
   // Add to queue
-  History.queue.Add(queue_item);
+  library::queue.Add(queue_item);
 }
 
 void SetMyLastUpdateToNow(Item& item) {
@@ -751,13 +751,13 @@ void DecrementEpisode(int anime_id) {
     return;
 
   int watched = anime_item->GetMyLastWatchedEpisode();
-  auto queue_item = History.queue.FindItem(anime_item->GetId(),
-                                             QueueSearch::Episode);
+  auto queue_item = library::queue.FindItem(anime_item->GetId(),
+                                            library::QueueSearch::Episode);
 
   if (queue_item && *queue_item->episode == watched &&
       watched > anime_item->GetMyLastWatchedEpisode(false)) {
     queue_item->enabled = false;
-    History.queue.RemoveDisabled();
+    library::queue.RemoveDisabled();
   } else {
     ChangeEpisode(anime_id, watched - 1);
   }

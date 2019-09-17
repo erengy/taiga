@@ -181,7 +181,7 @@ void HistoryDialog::RefreshList() {
   list_.DeleteAllItems();
 
   // Add queued items
-  for (auto it = History.queue.items.crbegin(); it != History.queue.items.crend(); ++it) {
+  for (auto it = library::queue.items.crbegin(); it != library::queue.items.crend(); ++it) {
     auto anime_item = anime::db.Find(it->anime_id);
     if (!anime_item) {
       LOGE(L"Item does not exist in the database: {}", it->anime_id);
@@ -228,7 +228,7 @@ void HistoryDialog::RefreshList() {
   }
 
   // Add recently watched
-  for (auto it = History.items.crbegin(); it != History.items.crend(); ++it) {
+  for (auto it = library::history.items.crbegin(); it != library::history.items.crend(); ++it) {
     auto anime_item = anime::db.Find(it->anime_id);
     if (!anime_item) {
       LOGE(L"Item does not exist in the database: {}", it->anime_id);
@@ -256,7 +256,7 @@ void HistoryDialog::RefreshList() {
 }
 
 bool HistoryDialog::RemoveSelectedItems() {
-  if (History.queue.updating) {
+  if (library::queue.updating) {
     MessageBox(L"History cannot be modified while an update is in progress.",
                L"Error", MB_ICONERROR);
     return false;
@@ -268,17 +268,17 @@ bool HistoryDialog::RemoveSelectedItems() {
   while (list_.GetSelectedCount() > 0) {
     int item_index = list_.GetNextItem(-1, LVNI_SELECTED);
     list_.DeleteItem(item_index);
-    if (item_index < static_cast<int>(History.queue.items.size())) {
-      item_index = History.queue.items.size() - item_index - 1;
-      History.queue.Remove(item_index, false, false, false);
+    if (item_index < static_cast<int>(library::queue.items.size())) {
+      item_index = library::queue.items.size() - item_index - 1;
+      library::queue.Remove(item_index, false, false, false);
     } else {
-      item_index -= History.queue.items.size();
-      item_index = History.items.size() - item_index - 1;
-      History.items.erase(History.items.begin() + item_index);
+      item_index -= library::queue.items.size();
+      item_index = library::history.items.size() - item_index - 1;
+      library::history.items.erase(library::history.items.begin() + item_index);
     }
   }
 
-  History.Save();
+  library::history.Save();
 
   ui::OnHistoryChange();
 

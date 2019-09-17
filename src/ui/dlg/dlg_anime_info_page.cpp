@@ -520,7 +520,7 @@ bool PageMyInfo::Save() {
     return false;
 
   // Create item
-  QueueItem queue_item;
+  library::QueueItem queue_item;
   queue_item.anime_id = anime_id_;
   queue_item.mode = taiga::kHttpServiceUpdateLibraryEntry;
 
@@ -603,7 +603,7 @@ bool PageMyInfo::Save() {
   Settings.Save();
 
   // Add item to queue
-  History.queue.Add(queue_item);
+  library::queue.Add(queue_item);
   return true;
 }
 

@@ -291,8 +291,8 @@ int Item::GetMyLastWatchedEpisode(bool check_queue) const {
   if (!my_info_.get())
     return 0;
 
-  QueueItem* queue_item = check_queue ?
-      SearchQueue(QueueSearch::Episode) : nullptr;
+  library::QueueItem* queue_item = check_queue ?
+      SearchQueue(library::QueueSearch::Episode) : nullptr;
 
   return queue_item ? *queue_item->episode : my_info_->watched_episodes;
 }
@@ -301,8 +301,8 @@ int Item::GetMyScore(bool check_queue) const {
   if (!my_info_.get())
     return 0;
 
-  QueueItem* queue_item = check_queue ?
-      SearchQueue(QueueSearch::Score) : nullptr;
+  library::QueueItem* queue_item = check_queue ?
+      SearchQueue(library::QueueSearch::Score) : nullptr;
 
   return queue_item ? *queue_item->score : my_info_->score;
 }
@@ -311,8 +311,8 @@ int Item::GetMyStatus(bool check_queue) const {
   if (!my_info_.get())
     return kNotInList;
 
-  QueueItem* queue_item = check_queue ?
-      SearchQueue(QueueSearch::Status) : nullptr;
+  library::QueueItem* queue_item = check_queue ?
+      SearchQueue(library::QueueSearch::Status) : nullptr;
 
   return queue_item ? *queue_item->status : my_info_->status;
 }
@@ -321,8 +321,8 @@ int Item::GetMyRewatchedTimes(bool check_queue) const {
   if (!my_info_.get())
     return 0;
 
-  QueueItem* queue_item = check_queue ?
-      SearchQueue(QueueSearch::RewatchedTimes) : nullptr;
+  library::QueueItem* queue_item = check_queue ?
+      SearchQueue(library::QueueSearch::RewatchedTimes) : nullptr;
 
   return queue_item ? *queue_item->rewatched_times : my_info_->rewatched_times;
 }
@@ -331,8 +331,8 @@ bool Item::GetMyRewatching(bool check_queue) const {
   if (!my_info_.get())
     return false;
 
-  QueueItem* queue_item = check_queue ?
-      SearchQueue(QueueSearch::Rewatching) : nullptr;
+  library::QueueItem* queue_item = check_queue ?
+      SearchQueue(library::QueueSearch::Rewatching) : nullptr;
 
   return queue_item ? *queue_item->enable_rewatching : my_info_->rewatching;
 }
@@ -348,8 +348,8 @@ const Date& Item::GetMyDateStart(bool check_queue) const {
   if (!my_info_.get())
     return EmptyDate();
 
-  QueueItem* queue_item = check_queue ?
-      SearchQueue(QueueSearch::DateStart) : nullptr;
+  library::QueueItem* queue_item = check_queue ?
+      SearchQueue(library::QueueSearch::DateStart) : nullptr;
 
   return queue_item ? *queue_item->date_start : my_info_->date_start;
 }
@@ -358,8 +358,8 @@ const Date& Item::GetMyDateEnd(bool check_queue) const {
   if (!my_info_.get())
     return EmptyDate();
 
-  QueueItem* queue_item = check_queue ?
-      SearchQueue(QueueSearch::DateEnd) : nullptr;
+  library::QueueItem* queue_item = check_queue ?
+      SearchQueue(library::QueueSearch::DateEnd) : nullptr;
 
   return queue_item ? *queue_item->date_finish : my_info_->date_finish;
 }
@@ -375,8 +375,8 @@ const std::wstring& Item::GetMyTags(bool check_queue) const {
   if (!my_info_.get())
     return EmptyString();
 
-  QueueItem* queue_item = check_queue ?
-      SearchQueue(QueueSearch::Tags) : nullptr;
+  library::QueueItem* queue_item = check_queue ?
+      SearchQueue(library::QueueSearch::Tags) : nullptr;
 
   return queue_item ? *queue_item->tags : my_info_->tags;
 }
@@ -385,8 +385,8 @@ const std::wstring& Item::GetMyNotes(bool check_queue) const {
   if (!my_info_.get())
     return EmptyString();
 
-  QueueItem* queue_item = check_queue ?
-      SearchQueue(QueueSearch::Notes) : nullptr;
+  library::QueueItem* queue_item = check_queue ?
+      SearchQueue(library::QueueSearch::Notes) : nullptr;
 
   return queue_item ? *queue_item->notes : my_info_->notes;
 }
@@ -618,8 +618,8 @@ void Item::RemoveFromUserList() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-QueueItem* Item::SearchQueue(QueueSearch search_mode) const {
-  return History.queue.FindItem(GetId(), search_mode);
+library::QueueItem* Item::SearchQueue(library::QueueSearch search_mode) const {
+  return library::queue.FindItem(GetId(), search_mode);
 }
 
 }  // namespace anime

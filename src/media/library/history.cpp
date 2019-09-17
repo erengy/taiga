@@ -16,12 +16,13 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "media/library/history.h"
+
 #include "base/log.h"
 #include "base/string.h"
 #include "base/xml.h"
 #include "media/anime_db.h"
 #include "media/anime_util.h"
-#include "media/library/history.h"
 #include "sync/sync.h"
 #include "taiga/announce.h"
 #include "taiga/path.h"
@@ -30,6 +31,8 @@
 #include "track/media.h"
 #include "track/scanner.h"
 #include "ui/ui.h"
+
+namespace library {
 
 History::History() {  
   queue.history = this;
@@ -196,3 +199,5 @@ std::wstring History::TranslateModeToString(int mode) {
       return L"update";
   }
 }
+
+}  // namespace library

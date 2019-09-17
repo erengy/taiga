@@ -56,7 +56,7 @@ LRESULT MainDialog::MainTree::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LP
 
 void MainDialog::MainTree::RefreshHistoryCounter() {
   std::wstring text = L"History";
-  int count = History.queue.GetItemCount();
+  int count = library::queue.GetItemCount();
   if (count > 0) text += L" (" + ToWstr(count) + L")";
   SetItem(hti.at(kSidebarItemHistory), text.c_str());
 }

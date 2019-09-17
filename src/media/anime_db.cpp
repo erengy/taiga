@@ -240,16 +240,16 @@ bool Database::DeleteItem(int id) {
   if (items.erase(id) > 0) {
     LOGW(L"ID: {} | Title: {}", id, title);
 
-    auto delete_history_items = [](int id, std::vector<QueueItem>& items) {
+    auto delete_history_items = [](int id, std::vector<library::QueueItem>& items) {
       items.erase(std::remove_if(items.begin(), items.end(),
-          [&id](const QueueItem& item) {
+          [&id](const library::QueueItem& item) {
             return item.anime_id == id;
           }), items.end());
     };
 
     // @TODO
     //delete_history_items(id, History.items);
-    delete_history_items(id, History.queue.items);
+    delete_history_items(id, library::queue.items);
 
     auto& items = SeasonDatabase.items;
     items.erase(std::remove(items.begin(), items.end(), id), items.end());

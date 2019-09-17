@@ -24,15 +24,18 @@
 
 #include "anime.h"
 
-enum class QueueSearch;
+class Date;
 
 namespace anime {
 class Database;
 class Episode;
 class Item;
 }
-class Date;
+
+namespace library {
+enum class QueueSearch;
 struct QueueItem;
+}
 
 namespace anime {
 
@@ -161,7 +164,7 @@ public:
 
 private:
   // Helper function
-  QueueItem* SearchQueue(QueueSearch search_mode) const;
+  library::QueueItem* SearchQueue(library::QueueSearch search_mode) const;
 
   // Series information, stored in db\anime.xml
   SeriesInformation series_;

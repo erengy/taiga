@@ -25,6 +25,8 @@
 #include "media/library/history.h"
 #include "sync/sync.h"
 
+namespace library {
+
 void History::HandleCompatibility(const std::wstring& meta_version) {
   const semaver::Version version(WstrToStr(meta_version));
   bool need_to_save = false;
@@ -97,3 +99,5 @@ void History::ReadQueueInCompatibilityMode(const pugi::xml_document& document) {
     }
   }
 }
+
+}  // namespace library

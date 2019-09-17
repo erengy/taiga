@@ -122,7 +122,7 @@ bool ExportAsMalXml(const std::wstring& path) {
       XmlWriteStr(node, L"my_tags", item.GetMyTags(), pugi::node_cdata);
       XmlWriteInt(node, L"my_rewatching", item.GetMyRewatching());
       XmlWriteInt(node, L"my_rewatching_ep", item.GetMyRewatchingEp());
-      XmlWriteInt(node, L"update_on_import", History.queue.IsQueued(item.GetId()));
+      XmlWriteInt(node, L"update_on_import", library::queue.IsQueued(item.GetId()));
     }
   }
 

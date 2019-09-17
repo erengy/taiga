@@ -493,7 +493,7 @@ void SettingsDialog::RefreshCache() {
   SettingsPage& page = pages[kSettingsPageLibraryCache];
 
   // History
-  text = ToWstr(History.items.size()) + L" item(s)";
+  text = ToWstr(library::history.items.size()) + L" item(s)";
   page.SetDlgItemText(IDC_STATIC_CACHE1, text.c_str());
 
   // Image files

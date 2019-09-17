@@ -488,7 +488,7 @@ bool OnLibraryEntriesEditNotes(const std::vector<int> ids, std::wstring& notes) 
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static bool AnimeListNeedsRefresh(const QueueItem& queue_item) {
+static bool AnimeListNeedsRefresh(const library::QueueItem& queue_item) {
   return queue_item.mode == taiga::kHttpServiceAddLibraryEntry ||
          queue_item.mode == taiga::kHttpServiceDeleteLibraryEntry ||
          queue_item.status ||
@@ -509,7 +509,7 @@ static bool AnimeListNeedsResort() {
   return false;
 }
 
-void OnHistoryAddItem(const QueueItem& queue_item) {
+void OnHistoryAddItem(const library::QueueItem& queue_item) {
   DlgHistory.RefreshList();
   DlgSearch.RefreshList();
   DlgMain.treeview.RefreshHistoryCounter();
@@ -533,7 +533,7 @@ void OnHistoryAddItem(const QueueItem& queue_item) {
   }
 }
 
-void OnHistoryChange(const QueueItem* queue_item) {
+void OnHistoryChange(const library::QueueItem* queue_item) {
   DlgHistory.RefreshList();
   DlgSearch.RefreshList();
   DlgMain.treeview.RefreshHistoryCounter();

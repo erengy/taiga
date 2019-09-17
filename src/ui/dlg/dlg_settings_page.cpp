@@ -535,7 +535,7 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
         case IDC_BUTTON_CACHE_CLEAR: {
           if (IsDlgButtonChecked(IDC_CHECK_CACHE1)) {
             if (ui::OnHistoryClear())
-              History.Clear();
+              library::history.Clear();
             CheckDlgButton(IDC_CHECK_CACHE1, FALSE);
           }
           if (IsDlgButtonChecked(IDC_CHECK_CACHE2)) {

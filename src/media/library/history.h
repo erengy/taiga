@@ -26,6 +26,8 @@
 #include "media/library/queue.h"
 #include "track/episode.h"
 
+namespace library {
+
 struct HistoryItem {
   int anime_id = 0;
   int episode = 0;
@@ -43,7 +45,6 @@ public:
   void HandleCompatibility(const std::wstring& meta_version);
 
   std::vector<HistoryItem> items;
-  HistoryQueue queue;
   int limit = 0;  // 0 for unlimited
 
 private:
@@ -54,4 +55,6 @@ private:
   std::wstring TranslateModeToString(int mode);
 };
 
-inline class History History;
+inline class History history;
+
+}  // namespace library

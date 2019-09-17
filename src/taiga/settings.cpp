@@ -428,7 +428,7 @@ void AppSettings::ApplyChanges(const AppSettings previous) {
   const auto previous_service = previous[kSync_ActiveService];
   bool changed_service = GetWstr(kSync_ActiveService) != previous_service;
   if (changed_service) {
-    if (History.queue.GetItemCount() > 0) {
+    if (library::queue.GetItemCount() > 0) {
       ui::OnSettingsServiceChangeFailed();
       Set(kSync_ActiveService, previous_service);
       changed_service = false;
@@ -484,7 +484,7 @@ void AppSettings::ApplyChanges(const AppSettings previous) {
   }
   if (changed_account || changed_service) {
     anime::db.LoadList();
-    History.Load();
+    library::history.Load();
     CurrentEpisode.Set(anime::ID_UNKNOWN);
     taiga::stats.CalculateAll();
     sync::InvalidateUserAuthentication();

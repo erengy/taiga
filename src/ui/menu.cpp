@@ -25,6 +25,8 @@
 #include "base/xml.h"
 #include "media/anime_db.h"
 #include "track/episode.h"
+#include "media/library/history.h"
+#include "media/library/queue.h"
 #include "media/anime_util.h"
 #include "media/discover.h"
 #include "sync/anilist_util.h"
@@ -277,9 +279,9 @@ void MenuList::UpdateHistoryList(bool enabled) {
           item.action == L"Delete()") {
         item.enabled = enabled;
       } else if (item.action == L"ClearHistory()") {
-        item.enabled = !History.items.empty();
+        item.enabled = !library::history.items.empty();
       } else if (item.action == L"ClearQueue()") {
-        item.enabled = History.queue.GetItemCount() && !History.queue.updating;
+        item.enabled = library::queue.GetItemCount() && !library::queue.updating;
       }
     }
   }

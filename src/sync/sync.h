@@ -24,7 +24,9 @@
 namespace anime {
 class Season;
 }
+namespace library {
 struct QueueItem;
+}
 
 namespace sync {
 
@@ -35,7 +37,7 @@ void GetMetadataById(int id);
 void GetSeason(const anime::Season season, const int offset);
 void SearchTitle(std::wstring title, int id);
 void Synchronize();
-void UpdateLibraryEntry(const QueueItem& queue_item);
+void UpdateLibraryEntry(const library::QueueItem& queue_item);
 
 void DownloadImage(int id, const std::wstring& image_url);
 

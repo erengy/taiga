@@ -147,7 +147,7 @@ int Database::GetItemCount(int status, bool check_history) {
 
   // Search queued items for status changes
   if (check_history) {
-    for (const auto& queue_item : History.queue.items) {
+    for (const auto& queue_item : library::queue.items) {
       if (queue_item.status ||
           queue_item.mode == taiga::kHttpServiceDeleteLibraryEntry) {
         if (status == *queue_item.status) {
@@ -184,7 +184,7 @@ void Database::AddToList(int anime_id, int status) {
 
   anime_item->AddtoUserList();
 
-  QueueItem queue_item;
+  library::QueueItem queue_item;
   queue_item.anime_id = anime_id;
   queue_item.status = status;
   if (status == anime::kCompleted) {
@@ -194,7 +194,7 @@ void Database::AddToList(int anime_id, int status) {
     queue_item.date_finish = GetDate();
   }
   queue_item.mode = taiga::kHttpServiceAddLibraryEntry;
-  History.queue.Add(queue_item);
+  library::queue.Add(queue_item);
 
   SaveDatabase();
   SaveList();
@@ -230,7 +230,7 @@ bool Database::DeleteListItem(int anime_id) {
   return true;
 }
 
-void Database::UpdateItem(const QueueItem& queue_item) {
+void Database::UpdateItem(const library::QueueItem& queue_item) {
   auto anime_item = Find(queue_item.anime_id);
 
   if (!anime_item)

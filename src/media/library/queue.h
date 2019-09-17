@@ -27,6 +27,10 @@
 #include "base/xml.h"
 #include "track/episode.h"
 
+namespace library {
+
+class History;
+
 enum class QueueSearch {
   DateStart,
   DateEnd,
@@ -57,9 +61,7 @@ struct QueueItem {
   std::optional<std::wstring> notes;
 };
 
-class History;
-
-class HistoryQueue {
+class Queue {
 public:
   void Add(QueueItem& item, bool save = true);
   void Check(bool automatic = true);
@@ -88,4 +90,7 @@ private:
   std::queue<anime::Episode> queue_;
 };
 
-inline class ConfirmationQueue ConfirmationQueue;
+inline Queue queue;
+inline ConfirmationQueue confirmation_queue;
+
+}  // namespace library

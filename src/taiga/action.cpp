@@ -306,17 +306,17 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   //   Deletes all history items.
   } else if (action == L"ClearHistory") {
     if (ui::OnHistoryClear())
-      History.Clear();
+      library::history.Clear();
 
   // ClearQueue()
   //   Deletes or merges all queued updates.
   } else if (action == L"ClearQueue") {
     switch (ui::OnHistoryQueueClear()) {
       case IDYES:  // Delete
-        History.queue.Clear();
+        library::queue.Clear();
         break;
       case IDNO:   // Merge
-        History.queue.Merge();
+        library::queue.Merge();
         break;
     }
 
@@ -421,7 +421,7 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   } else if (action == L"EditDateClear") {
     const auto& anime_ids = *reinterpret_cast<std::vector<int>*>(lParam);
     for (const auto& anime_id : anime_ids) {
-      QueueItem queue_item;
+      library::QueueItem queue_item;
       queue_item.anime_id = anime_id;
       int value = ToInt(body);
       if (value == 0 || value == 2)
@@ -429,7 +429,7 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
       if (value == 1 || value == 2)
         queue_item.date_finish = Date();
       queue_item.mode = taiga::kHttpServiceUpdateLibraryEntry;
-      History.queue.Add(queue_item);
+      library::queue.Add(queue_item);
     }
 
   // EditDateToStartedAiring
@@ -441,11 +441,11 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
       auto anime_item = anime::db.Find(anime_id);
       if (!anime_item || anime_item->GetMyDateStart() || !anime_item->GetDateStart())
         continue;
-      QueueItem queue_item;
+      library::QueueItem queue_item;
       queue_item.anime_id = anime_id;
       queue_item.date_start = anime_item->GetDateStart();
       queue_item.mode = taiga::kHttpServiceUpdateLibraryEntry;
-      History.queue.Add(queue_item);
+      library::queue.Add(queue_item);
     }
 
   // EditDateToFinishedAiring
@@ -457,11 +457,11 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
       auto anime_item = anime::db.Find(anime_id);
       if (!anime_item || anime_item->GetMyDateEnd() || !anime_item->GetDateEnd())
         continue;
-      QueueItem queue_item;
+      library::QueueItem queue_item;
       queue_item.anime_id = anime_id;
       queue_item.date_finish = anime_item->GetDateEnd();
       queue_item.mode = taiga::kHttpServiceUpdateLibraryEntry;
-      History.queue.Add(queue_item);
+      library::queue.Add(queue_item);
     }
 
   // EditDateToLastUpdated
@@ -476,11 +476,11 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
       const auto last_updated = ToTime(anime_item->GetMyLastUpdated());
       if (!last_updated)
         continue;
-      QueueItem queue_item;
+      library::QueueItem queue_item;
       queue_item.anime_id = anime_id;
       queue_item.date_finish = GetDate(last_updated);
       queue_item.mode = taiga::kHttpServiceUpdateLibraryEntry;
-      History.queue.Add(queue_item);
+      library::queue.Add(queue_item);
     }
 
   // EditDelete()
@@ -490,10 +490,10 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
     const auto& anime_ids = *reinterpret_cast<std::vector<int>*>(lParam);
     if (ui::OnLibraryEntriesEditDelete(anime_ids)) {
       for (const auto& anime_id : anime_ids) {
-        QueueItem queue_item;
+        library::QueueItem queue_item;
         queue_item.anime_id = anime_id;
         queue_item.mode = taiga::kHttpServiceDeleteLibraryEntry;
-        History.queue.Add(queue_item);
+        library::queue.Add(queue_item);
       }
     }
 
@@ -527,11 +527,11 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   } else if (action == L"EditScore") {
     const auto& anime_ids = *reinterpret_cast<std::vector<int>*>(lParam);
     for (const auto& anime_id : anime_ids) {
-      QueueItem queue_item;
+      library::QueueItem queue_item;
       queue_item.anime_id = anime_id;
       queue_item.score = ToInt(body);
       queue_item.mode = taiga::kHttpServiceUpdateLibraryEntry;
-      History.queue.Add(queue_item);
+      library::queue.Add(queue_item);
     }
 
   // EditStatus(value)
@@ -541,7 +541,7 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   } else if (action == L"EditStatus") {
     const auto& anime_ids = *reinterpret_cast<std::vector<int>*>(lParam);
     for (const auto& anime_id : anime_ids) {
-      QueueItem queue_item;
+      library::QueueItem queue_item;
       queue_item.status = ToInt(body);
       auto anime_item = anime::db.Find(anime_id);
       if (!anime_item)
@@ -560,7 +560,7 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
       }
       queue_item.anime_id = anime_id;
       queue_item.mode = taiga::kHttpServiceUpdateLibraryEntry;
-      History.queue.Add(queue_item);
+      library::queue.Add(queue_item);
     }
 
   // EditTags(tags)
@@ -572,11 +572,11 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
     std::wstring tags;
     if (ui::OnLibraryEntriesEditTags(anime_ids, tags)) {
       for (const auto& anime_id : anime_ids) {
-        QueueItem queue_item;
+        library::QueueItem queue_item;
         queue_item.anime_id = anime_id;
         queue_item.tags = tags;
         queue_item.mode = taiga::kHttpServiceUpdateLibraryEntry;
-        History.queue.Add(queue_item);
+        library::queue.Add(queue_item);
       }
     }
 
@@ -588,11 +588,11 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
     std::wstring notes;
     if (ui::OnLibraryEntriesEditNotes(anime_ids, notes)) {
       for (const auto& anime_id : anime_ids) {
-        QueueItem queue_item;
+        library::QueueItem queue_item;
         queue_item.anime_id = anime_id;
         queue_item.notes = notes;
         queue_item.mode = taiga::kHttpServiceUpdateLibraryEntry;
-        History.queue.Add(queue_item);
+        library::queue.Add(queue_item);
       }
     }
 
