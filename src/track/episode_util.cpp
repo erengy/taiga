@@ -38,7 +38,7 @@ static std::wstring GetElementRange(anitomy::ElementCategory category,
   if (element_count > 1) {
     const auto range = episode.GetElementAsRange(category);
     if (range.second > range.first)
-      return ToWstr(range.first) + L"-" + ToWstr(range.second);
+      return L"{}-{}"_format(range.first, range.second);
   }
 
   if (element_count > 0)
@@ -49,8 +49,7 @@ static std::wstring GetElementRange(anitomy::ElementCategory category,
 
 std::wstring GetEpisodeRange(const Episode& episode) {
   if (IsEpisodeRange(episode))
-    return ToWstr(GetEpisodeLow(episode)) + L"-" +
-           ToWstr(GetEpisodeHigh(episode));
+    return L"{}-{}"_format(GetEpisodeLow(episode), GetEpisodeHigh(episode));
 
   if (!episode.elements().empty(anitomy::kElementEpisodeNumber))
     return ToWstr(episode.episode_number());
@@ -64,7 +63,7 @@ std::wstring GetVolumeRange(const Episode& episode) {
 
 std::wstring GetEpisodeRange(const number_range_t& range) {
   if (range.second > range.first)
-    return ToWstr(range.first) + L"-" + ToWstr(range.second);
+    return L"{}-{}"_format(range.first, range.second);
 
   return ToWstr(range.first);
 }
@@ -77,7 +76,7 @@ bool IsEpisodeRange(const Episode& episode) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-int TranslateResolution(const std::wstring& str) {
+int GetVideoResolutionHeight(const std::wstring& str) {
   // *###x###*
   if (str.length() > 6) {
     int pos = InStr(str, L"x", 0);
@@ -112,8 +111,8 @@ int TranslateResolution(const std::wstring& str) {
   return 0;
 }
 
-std::wstring NormalizeResolution(const std::wstring& resolution) {
-  const auto height = TranslateResolution(resolution);
+std::wstring NormalizeVideoResolution(const std::wstring& resolution) {
+  const auto height = GetVideoResolutionHeight(resolution);
   return height ? L"{}p"_format(height) : resolution;
 }
 

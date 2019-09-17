@@ -32,7 +32,7 @@ std::wstring GetVolumeRange(const Episode& episode);
 std::wstring GetEpisodeRange(const number_range_t& range);
 bool IsEpisodeRange(const Episode& episode);
 
-int TranslateResolution(const std::wstring& str);
-std::wstring NormalizeResolution(const std::wstring& resolution);
+int GetVideoResolutionHeight(const std::wstring& str);
+std::wstring NormalizeVideoResolution(const std::wstring& resolution);
 
 }  // namespace anime
