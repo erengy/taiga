@@ -24,8 +24,9 @@
 #include "base/string.h"
 #include "media/anime.h"
 #include "media/anime_db.h"
-#include "track/episode.h"
 #include "media/anime_util.h"
+#include "track/episode.h"
+#include "track/episode_util.h"
 #include "track/recognition.h"
 
 namespace track {

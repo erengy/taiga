@@ -21,9 +21,9 @@
 #include "base/log.h"
 #include "base/string.h"
 #include "media/anime_db.h"
-#include "media/anime_util.h"
 #include "taiga/settings.h"
 #include "track/episode.h"
+#include "track/episode_util.h"
 #include "track/recognition.h"
 #include "track/scanner.h"
 

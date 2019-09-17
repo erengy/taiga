@@ -43,6 +43,7 @@
 #include "taiga/taiga.h"
 #include "taiga/update.h"
 #include "taiga/version.h"
+#include "track/episode_util.h"
 #include "track/feed.h"
 #include "track/media.h"
 #include "track/recognition.h"

@@ -250,6 +250,7 @@
     <ClCompile Include="..\..\src\taiga\update.cpp" />
     <ClCompile Include="..\..\src\taiga\version.cpp" />
     <ClCompile Include="..\..\src\track\episode.cpp" />
+    <ClCompile Include="..\..\src\track\episode_util.cpp" />
     <ClCompile Include="..\..\src\track\feed.cpp" />
     <ClCompile Include="..\..\src\track\feed_aggregator.cpp" />
     <ClCompile Include="..\..\src\track\feed_filter.cpp" />
@@ -439,6 +440,7 @@
     <ClInclude Include="..\..\src\taiga\update.h" />
     <ClInclude Include="..\..\src\taiga\version.h" />
     <ClInclude Include="..\..\src\track\episode.h" />
+    <ClInclude Include="..\..\src\track\episode_util.h" />
     <ClInclude Include="..\..\src\track\feed.h" />
     <ClInclude Include="..\..\src\track\feed_aggregator.h" />
     <ClInclude Include="..\..\src\track\feed_filter.h" />

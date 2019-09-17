@@ -25,6 +25,7 @@
 #include "media/anime_util.h"
 #include "taiga/settings.h"
 #include "taiga/taiga.h"
+#include "track/episode_util.h"
 #include "track/recognition.h"
 #include "ui/ui.h"
 

@@ -28,6 +28,7 @@
 #include "taiga/script.h"
 #include "taiga/settings.h"
 #include "taiga/taiga.h"
+#include "track/episode_util.h"
 #include "track/feed.h"
 #include "track/feed_aggregator.h"
 #include "ui/translate.h"

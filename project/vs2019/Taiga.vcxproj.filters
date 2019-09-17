@@ -664,6 +664,9 @@
     <ClCompile Include="..\..\src\media\library\queue.cpp">
       <Filter>media\library</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\track\episode_util.cpp">
+      <Filter>track</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\base\base64.h">
@@ -1202,6 +1205,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\media\library\queue.h">
       <Filter>media\library</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\track\episode_util.h">
+      <Filter>track</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

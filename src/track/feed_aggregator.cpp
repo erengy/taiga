@@ -32,6 +32,7 @@
 #include "taiga/http.h"
 #include "taiga/path.h"
 #include "taiga/settings.h"
+#include "track/episode_util.h"
 #include "track/recognition.h"
 #include "ui/dialog.h"
 #include "ui/ui.h"

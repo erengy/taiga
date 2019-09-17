@@ -27,6 +27,7 @@
 #include "media/anime.h"
 #include "media/anime_db.h"
 #include "track/episode.h"
+#include "track/episode_util.h"
 #include "media/anime_util.h"
 #include "media/library/history.h"
 #include "sync/sync.h"
@@ -558,52 +559,6 @@ bool ValidateFolder(Item& item) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-int GetEpisodeHigh(const Episode& episode) {
-  return episode.episode_number_range().second;
-}
-
-int GetEpisodeLow(const Episode& episode) {
-  return episode.episode_number_range().first;
-}
-
-static std::wstring GetElementRange(anitomy::ElementCategory category,
-                                    const Episode& episode) {
-  const auto element_count = episode.elements().count(category);
-
-  if (element_count > 1) {
-    const auto range = episode.GetElementAsRange(category);
-    if (range.second > range.first)
-      return ToWstr(range.first) + L"-" + ToWstr(range.second);
-  }
-
-  if (element_count > 0)
-    return ToWstr(episode.GetElementAsInt(category));
-
-  return std::wstring();
-}
-
-std::wstring GetEpisodeRange(const Episode& episode) {
-  if (IsEpisodeRange(episode))
-    return ToWstr(GetEpisodeLow(episode)) + L"-" +
-           ToWstr(GetEpisodeHigh(episode));
-
-  if (!episode.elements().empty(anitomy::kElementEpisodeNumber))
-    return ToWstr(episode.episode_number());
-
-  return std::wstring();
-}
-
-std::wstring GetVolumeRange(const Episode& episode) {
-  return GetElementRange(anitomy::kElementVolumeNumber, episode);
-}
-
-std::wstring GetEpisodeRange(const number_range_t& range) {
-  if (range.second > range.first)
-    return ToWstr(range.first) + L"-" + ToWstr(range.second);
-
-  return ToWstr(range.first);
-}
-
 bool IsAllEpisodesAvailable(const Item& item) {
   if (!IsValidEpisodeCount(item.GetEpisodeCount()))
     return false;
@@ -619,12 +574,6 @@ bool IsAllEpisodesAvailable(const Item& item) {
   }
 
   return all_episodes_available;
-}
-
-bool IsEpisodeRange(const Episode& episode) {
-  if (episode.elements().count(anitomy::kElementEpisodeNumber) < 2)
-    return false;
-  return GetEpisodeHigh(episode) > GetEpisodeLow(episode);
 }
 
 bool IsValidEpisodeCount(int number) {
@@ -646,29 +595,6 @@ bool IsValidEpisodeNumber(int number, int total, int watched) {
     return false;
 
   return true;
-}
-
-std::wstring JoinEpisodeNumbers(const std::vector<int>& input) {
-  std::wstring output;
-
-  for (const auto& number : input) {
-    if (!output.empty())
-      output += L"-";
-    output += ToWstr(number);
-  }
-
-  return output;
-}
-
-void SplitEpisodeNumbers(const std::wstring& input, std::vector<int>& output) {
-  if (input.empty())
-    return;
-
-  std::vector<std::wstring> numbers;
-  Split(input, L"-", numbers);
-
-  for (const auto& number : numbers)
-    output.push_back(ToInt(number));
 }
 
 int GetLastEpisodeNumber(const Item& item) {
@@ -822,7 +748,7 @@ void GetAllTitles(int anime_id, std::vector<std::wstring>& titles) {
     insert_title(synonym);
 }
 
-// TODO: We may get rid of this function once MAL fixes their API
+// @TODO: We may get rid of this function once MAL fixes their API
 int GetMyRewatchedTimes(const Item& item) {
   const int rewatched_times = item.GetMyRewatchedTimes();
 
@@ -858,48 +784,6 @@ void GetProgressRatios(const Item& item, float& ratio_aired, float& ratio_watche
   // Limit values so that they don't exceed total episodes
   ratio_aired = std::min(ratio_aired, 1.0f);
   ratio_watched = std::min(ratio_watched, 1.0f);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-int TranslateResolution(const std::wstring& str) {
-  // *###x###*
-  if (str.length() > 6) {
-    int pos = InStr(str, L"x", 0);
-    if (pos > -1) {
-      for (unsigned int i = 0; i < str.length(); i++)
-        if (i != pos && !IsNumericChar(str.at(i)))
-          return 0;
-      return ToInt(str.substr(pos + 1));
-    }
-
-  // *###p
-  } else if (str.length() > 3) {
-    if (str.at(str.length() - 1) == 'p') {
-      for (unsigned int i = 0; i < str.length() - 1; i++)
-        if (!IsNumericChar(str.at(i)))
-          return 0;
-      return ToInt(str.substr(0, str.length() - 1));
-    }
-  }
-
-  // 1080, 720, 480
-  if (IsNumericString(str)) {
-    const auto height = ToInt(str);
-    switch (height) {
-      case 1080:
-      case 720:
-      case 480:
-        return height;
-    }
-  }
-
-  return 0;
-}
-
-std::wstring NormalizeResolution(const std::wstring& resolution) {
-  const auto height = TranslateResolution(resolution);
-  return height ? L"{}p"_format(height) : resolution;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

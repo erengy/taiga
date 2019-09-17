@@ -65,18 +65,10 @@ void GetUpcomingTitles(std::vector<int>& anime_ids);
 bool IsInsideLibraryFolders(const std::wstring& path);
 bool ValidateFolder(Item& item);
 
-int GetEpisodeHigh(const Episode& episode);
-int GetEpisodeLow(const Episode& episode);
-std::wstring GetEpisodeRange(const Episode& episode);
-std::wstring GetVolumeRange(const Episode& episode);
-std::wstring GetEpisodeRange(const number_range_t& range);
 bool IsAllEpisodesAvailable(const Item& item);
-bool IsEpisodeRange(const Episode& episode);
 bool IsValidEpisodeCount(int number);
 bool IsValidEpisodeNumber(int number, int total);
 bool IsValidEpisodeNumber(int number, int total, int watched);
-std::wstring JoinEpisodeNumbers(const std::vector<int>& input);
-void SplitEpisodeNumbers(const std::wstring& input, std::vector<int>& output);
 int GetLastEpisodeNumber(const Item& item);
 int EstimateEpisodeCount(const Item& item);
 void ChangeEpisode(int anime_id, int value);
@@ -89,11 +81,6 @@ const std::wstring& GetPreferredTitle(const Item& item);
 void GetAllTitles(int anime_id, std::vector<std::wstring>& titles);
 int GetMyRewatchedTimes(const Item& item);
 void GetProgressRatios(const Item& item, float& ratio_aired, float& ratio_watched);
-
-int TranslateResolution(const std::wstring& str);
-std::wstring NormalizeResolution(const std::wstring& resolution);
-
-////////////////////////////////////////////////////////////////////////////////
 
 bool IsValidDate(const Date& date);
 

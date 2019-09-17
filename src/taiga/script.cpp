@@ -32,6 +32,7 @@
 #include "sync/service.h"
 #include "taiga/dummy.h"
 #include "taiga/settings.h"
+#include "track/episode_util.h"
 #include "track/media.h"
 #include "ui/translate.h"
 

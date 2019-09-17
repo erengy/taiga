@@ -37,6 +37,7 @@
 #include "taiga/stats.h"
 #include "taiga/taiga.h"
 #include "taiga/timer.h"
+#include "track/episode_util.h"
 #include "track/media.h"
 #include "track/monitor.h"
 #include "track/feed_aggregator.h"
