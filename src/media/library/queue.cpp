@@ -21,6 +21,7 @@
 #include "base/log.h"
 #include "base/string.h"
 #include "base/xml.h"
+#include "media/library/history.h"
 #include "media/anime_db.h"
 #include "media/anime_util.h"
 #include "sync/sync.h"
@@ -188,9 +189,7 @@ void HistoryQueue::Check(bool automatic) {
   History.queue.updating = true;
   ui::ChangeStatusText(L"Updating list... (" + anime::GetPreferredTitle(*anime_item) + L")");
 
-  AnimeValues* anime_values = static_cast<AnimeValues*>(&items[index]);
-  sync::UpdateLibraryEntry(*anime_values, items[index].anime_id,
-      static_cast<taiga::HttpClientMode>(items[index].mode));
+  sync::UpdateLibraryEntry(items[index]);
 }
 
 void HistoryQueue::Clear(bool save) {

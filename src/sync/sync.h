@@ -19,12 +19,12 @@
 #pragma once
 
 #include "service.h"
-#include "media/library/history.h"
 #include "taiga/http.h"
 
 namespace anime {
 class Season;
 }
+struct QueueItem;
 
 namespace sync {
 
@@ -35,8 +35,7 @@ void GetMetadataById(int id);
 void GetSeason(const anime::Season season, const int offset);
 void SearchTitle(std::wstring title, int id);
 void Synchronize();
-void UpdateLibraryEntry(AnimeValues& anime_values, int id,
-                        taiga::HttpClientMode http_client_mode);
+void UpdateLibraryEntry(const QueueItem& queue_item);
 
 void DownloadImage(int id, const std::wstring& image_url);
 

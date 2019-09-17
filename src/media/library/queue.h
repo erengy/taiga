@@ -39,8 +39,13 @@ enum class QueueSearch {
   Tags,
 };
 
-class AnimeValues {
-public:
+struct QueueItem {
+  bool enabled = true;
+  int anime_id = 0;
+  int mode = 0;
+  std::wstring reason;
+  std::wstring time;
+
   std::optional<int> episode;
   std::optional<int> status;
   std::optional<int> score;
@@ -50,14 +55,6 @@ public:
   std::optional<int> rewatched_times;
   std::optional<std::wstring> tags;
   std::optional<std::wstring> notes;
-};
-
-struct QueueItem : AnimeValues {
-  bool enabled = true;
-  int anime_id = 0;
-  int mode = 0;
-  std::wstring reason;
-  std::wstring time;
 };
 
 class History;

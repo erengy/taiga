@@ -158,34 +158,34 @@ void Synchronize() {
   }
 }
 
-void UpdateLibraryEntry(AnimeValues& anime_values, int id,
-                        taiga::HttpClientMode http_client_mode) {
-  RequestType request_type = ClientModeToRequestType(http_client_mode);
+void UpdateLibraryEntry(const QueueItem& queue_item) {
+  const auto request_type = ClientModeToRequestType(
+      static_cast<taiga::HttpClientMode>(queue_item.mode));
 
   Request request(request_type);
   SetActiveServiceForRequest(request);
   if (!AddAuthenticationToRequest(request))
     return;
-  AddServiceDataToRequest(request, id);
+  AddServiceDataToRequest(request, queue_item.anime_id);
 
-  if (anime_values.episode)
-    request.data[L"episode"] = ToWstr(*anime_values.episode);
-  if (anime_values.status)
-    request.data[L"status"] = ToWstr(*anime_values.status);
-  if (anime_values.score)
-    request.data[L"score"] = ToWstr(*anime_values.score);
-  if (anime_values.date_start)
-    request.data[L"date_start"] = anime_values.date_start->to_string();
-  if (anime_values.date_finish)
-    request.data[L"date_finish"] = anime_values.date_finish->to_string();
-  if (anime_values.enable_rewatching)
-    request.data[L"enable_rewatching"] = ToWstr(*anime_values.enable_rewatching);
-  if (anime_values.rewatched_times)
-    request.data[L"rewatched_times"] = ToWstr(*anime_values.rewatched_times);
-  if (anime_values.tags)
-    request.data[L"tags"] = *anime_values.tags;
-  if (anime_values.notes)
-    request.data[L"notes"] = *anime_values.notes;
+  if (queue_item.episode)
+    request.data[L"episode"] = ToWstr(*queue_item.episode);
+  if (queue_item.status)
+    request.data[L"status"] = ToWstr(*queue_item.status);
+  if (queue_item.score)
+    request.data[L"score"] = ToWstr(*queue_item.score);
+  if (queue_item.date_start)
+    request.data[L"date_start"] = queue_item.date_start->to_string();
+  if (queue_item.date_finish)
+    request.data[L"date_finish"] = queue_item.date_finish->to_string();
+  if (queue_item.enable_rewatching)
+    request.data[L"enable_rewatching"] = ToWstr(*queue_item.enable_rewatching);
+  if (queue_item.rewatched_times)
+    request.data[L"rewatched_times"] = ToWstr(*queue_item.rewatched_times);
+  if (queue_item.tags)
+    request.data[L"tags"] = *queue_item.tags;
+  if (queue_item.notes)
+    request.data[L"notes"] = *queue_item.notes;
 
   ServiceManager.MakeRequest(request);
 }
