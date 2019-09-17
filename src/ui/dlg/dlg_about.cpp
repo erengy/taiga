@@ -72,9 +72,9 @@ static std::wstring GetLibraryVersion(ThirdPartyLibrary library) {
           LIBCURL_VERSION_PATCH).to_string());
     case kPugixml:
       return StrToWstr(semaver::Version(
-          (PUGIXML_VERSION / 100),
-          (PUGIXML_VERSION % 100) / 10,
-          (PUGIXML_VERSION % 100) % 10).to_string());
+          (PUGIXML_VERSION / 1000),
+          (PUGIXML_VERSION % 1000) / 10,
+          (PUGIXML_VERSION % 1000) % 10).to_string());
     case kRandom:
       return L"1.3.0";
     case kRapidJson:
