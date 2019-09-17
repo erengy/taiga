@@ -18,13 +18,8 @@
 
 #pragma once
 
-#include <map>
 #include <string>
 #include <vector>
-
-namespace pugi {
-class xml_node;
-}
 
 namespace track {
 
@@ -143,51 +138,6 @@ public:
   std::wstring description;
   FeedFilter filter;
   bool is_default;
-};
-
-class FeedFilterManager {
-public:
-  FeedFilterManager();
-  ~FeedFilterManager() {}
-
-  void InitializePresets();
-  void InitializeShortcodes();
-
-  void AddPresets();
-  void AddFilter(FeedFilterAction action, FeedFilterMatch match, FeedFilterOption option, bool enabled, const std::wstring& name);
-  void Cleanup();
-  void Filter(Feed& feed, bool preferences);
-  void FilterArchived(Feed& feed);
-  void MarkNewEpisodes(Feed& feed);
-
-  bool Import(const std::wstring& input, std::vector<FeedFilter>& filters);
-  void Import(const pugi::xml_node& node_filter, std::vector<FeedFilter>& filters);
-  void Export(std::wstring& output, const std::vector<FeedFilter>& filters);
-  void Export(pugi::xml_node& node_filter, const std::vector<FeedFilter>& filters);
-
-  std::wstring CreateNameFromConditions(const FeedFilter& filter);
-  std::wstring TranslateCondition(const FeedFilterCondition& condition);
-  std::wstring TranslateConditions(const FeedFilter& filter, size_t index);
-  std::wstring TranslateElement(int element);
-  std::wstring TranslateOperator(int op);
-  std::wstring TranslateValue(const FeedFilterCondition& condition);
-  std::wstring TranslateMatching(int match);
-  std::wstring TranslateAction(int action);
-  std::wstring TranslateOption(int option);
-
-  std::wstring GetShortcodeFromIndex(FeedFilterShortcodeType type, int index);
-  int GetIndexFromShortcode(FeedFilterShortcodeType type, const std::wstring& shortcode);
-
-public:
-  std::vector<FeedFilter> filters;
-  std::vector<FeedFilterPreset> presets;
-
-private:
-  std::map<int, std::wstring> action_shortcodes_;
-  std::map<int, std::wstring> element_shortcodes_;
-  std::map<int, std::wstring> match_shortcodes_;
-  std::map<int, std::wstring> operator_shortcodes_;
-  std::map<int, std::wstring> option_shortcodes_;
 };
 
 }  // namespace track

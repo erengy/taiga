@@ -30,6 +30,7 @@
 #include "taiga/settings.h"
 #include "taiga/stats.h"
 #include "track/feed_aggregator.h"
+#include "track/feed_filter_manager.h"
 #include "track/media.h"
 #include "track/monitor.h"
 #include "ui/dlg/dlg_settings.h"
@@ -340,9 +341,9 @@ void SettingsDialog::OnOK() {
       if (filter) filter->enabled = list.GetCheckState(i) == TRUE;
     }
     list.SetWindowHandle(nullptr);
-    track::aggregator.filter_manager.filters.clear();
+    track::feed_filter_manager.filters.clear();
     for (auto it = feed_filters_.begin(); it != feed_filters_.end(); ++it)
-      track::aggregator.filter_manager.filters.push_back(*it);
+      track::feed_filter_manager.filters.push_back(*it);
   }
 
   // Advanced

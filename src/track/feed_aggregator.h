@@ -48,8 +48,6 @@ public:
   void ClearArchive();
   bool SearchArchive(const std::wstring& file) const;
 
-  FeedFilterManager filter_manager;
-
 private:
   FeedItem* FindFeedItemByLink(Feed& feed, const std::wstring& link);
   void HandleFeedDownloadOpen(FeedItem& feed_item, const std::wstring& file);

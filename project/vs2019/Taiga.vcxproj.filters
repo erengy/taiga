@@ -670,6 +670,9 @@
     <ClCompile Include="..\..\src\media\library\list_util.cpp">
       <Filter>media\library</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\track\feed_filter_manager.cpp">
+      <Filter>track\torrents</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\base\base64.h">
@@ -1214,6 +1217,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\media\library\list_util.h">
       <Filter>media\library</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\track\feed_filter_manager.h">
+      <Filter>track\torrents</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

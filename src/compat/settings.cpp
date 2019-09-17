@@ -26,8 +26,8 @@
 #include "sync/sync.h"
 #include "taiga/settings.h"
 #include "taiga/version.h"
-#include "track/feed_aggregator.h"
 #include "track/feed_filter.h"
+#include "track/feed_filter_manager.h"
 #include "track/media.h"
 
 namespace taiga {
@@ -74,7 +74,7 @@ bool AppSettings::HandleCompatibility() {
     Set(kSync_Service_Kitsu_Password, Base64Encode(password));
 
     // Update torrent filters
-    for (auto& filter : track::aggregator.filter_manager.filters) {
+    for (auto& filter : track::feed_filter_manager.filters) {
       if (filter.name == L"Discard unknown titles") {
         if (filter.conditions.size() == 1) {
           auto& condition = filter.conditions.front();

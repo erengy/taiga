@@ -31,6 +31,7 @@
 #include "taiga/taiga.h"
 #include "track/episode_util.h"
 #include "track/feed_aggregator.h"
+#include "track/feed_filter_manager.h"
 #include "track/recognition.h"
 #include "ui/dlg/dlg_main.h"
 #include "ui/dlg/dlg_settings.h"
@@ -215,10 +216,10 @@ void TorrentDialog::OnContextMenu(HWND hwnd, POINT pt) {
           list_.SetCheckState(i, FALSE);
         }
       }
-      track::aggregator.filter_manager.AddFilter(
+      track::feed_filter_manager.AddFilter(
           track::kFeedFilterActionDiscard, track::kFeedFilterMatchAll, track::kFeedFilterOptionDefault,
           true, L"Discard \"{}\""_format(anime::GetPreferredTitle(*anime_item)));
-      track::aggregator.filter_manager.filters.back().AddCondition(
+      track::feed_filter_manager.filters.back().AddCondition(
           track::kFeedFilterElement_Meta_Id, track::kFeedFilterOperator_Equals,
           ToWstr(anime_item->GetId()));
     }
@@ -238,7 +239,7 @@ void TorrentDialog::OnContextMenu(HWND hwnd, POINT pt) {
           }
         }
       }
-      anime::SetFansubFilter(anime_id, group_name, video_resolution);
+      track::SetFansubFilter(anime_id, group_name, video_resolution);
     }
 
   } else if (answer == L"MoreTorrents") {

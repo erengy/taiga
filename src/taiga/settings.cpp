@@ -43,6 +43,7 @@
 #include "taiga/version.h"
 #include "track/feed.h"
 #include "track/feed_aggregator.h"
+#include "track/feed_filter_manager.h"
 #include "track/media.h"
 #include "track/monitor.h"
 #include "ui/dlg/dlg_anime_list.h"
@@ -335,9 +336,9 @@ bool AppSettings::Load() {
 
   // Torrent filters
   auto node_filter = settings.child(L"rss").child(L"torrent").child(L"filter");
-  track::aggregator.filter_manager.Import(node_filter, track::aggregator.filter_manager.filters);
-  if (track::aggregator.filter_manager.filters.empty())
-    track::aggregator.filter_manager.AddPresets();
+  track::feed_filter_manager.Import(node_filter, track::feed_filter_manager.filters);
+  if (track::feed_filter_manager.filters.empty())
+    track::feed_filter_manager.AddPresets();
   auto& feed = track::aggregator.GetFeed();
   feed.channel.link = GetWstr(kTorrent_Discovery_Source);
   track::aggregator.LoadArchive();
@@ -403,7 +404,7 @@ bool AppSettings::Save() {
 
   // Torrent filters
   auto torrent_filter = settings.child(L"rss").child(L"torrent").child(L"filter");
-  track::aggregator.filter_manager.Export(torrent_filter, track::aggregator.filter_manager.filters);
+  track::feed_filter_manager.Export(torrent_filter, track::feed_filter_manager.filters);
 
   // Write to registry
   win::Registry reg;

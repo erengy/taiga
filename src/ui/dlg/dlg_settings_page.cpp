@@ -40,6 +40,7 @@
 #include "taiga/taiga.h"
 #include "taiga/version.h"
 #include "track/feed_aggregator.h"
+#include "track/feed_filter_manager.h"
 #include "track/media.h"
 #include "ui/dlg/dlg_feed_filter.h"
 #include "ui/dlg/dlg_format.h"
@@ -396,9 +397,9 @@ BOOL SettingsPage::OnInitDialog() {
       list.SetColumnWidth(0, LVSCW_AUTOSIZE_USEHEADER);
       list.InsertGroup(0, L"General filters", true, false);
       list.InsertGroup(1, L"Limited filters", true, false);
-      parent->feed_filters_.resize(track::aggregator.filter_manager.filters.size());
-      std::copy(track::aggregator.filter_manager.filters.begin(),
-                track::aggregator.filter_manager.filters.end(),
+      parent->feed_filters_.resize(track::feed_filter_manager.filters.size());
+      std::copy(track::feed_filter_manager.filters.begin(),
+                track::feed_filter_manager.filters.end(),
                 parent->feed_filters_.begin());
       parent->RefreshTorrentFilterList(list.GetWindowHandle());
       list.SetWindowHandle(nullptr);
@@ -691,7 +692,7 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
           ExecuteAction(L"TorrentAddFilter", TRUE, reinterpret_cast<LPARAM>(parent->GetWindowHandle()));
           if (!DlgFeedFilter.filter.conditions.empty()) {
             if (DlgFeedFilter.filter.name.empty())
-              DlgFeedFilter.filter.name = track::aggregator.filter_manager.CreateNameFromConditions(DlgFeedFilter.filter);
+              DlgFeedFilter.filter.name = track::feed_filter_manager.CreateNameFromConditions(DlgFeedFilter.filter);
             parent->feed_filters_.push_back(DlgFeedFilter.filter);
             win::ListView list = GetDlgItem(IDC_LIST_TORRENT_FILTER);
             parent->RefreshTorrentFilterList(list.GetWindowHandle());
@@ -755,7 +756,7 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
             StringCoder coder;
             bool parsed = coder.Decode(dlg.text, metadata, data);
             if (parsed) {
-              parsed = track::aggregator.filter_manager.Import(data, parent->feed_filters_);
+              parsed = track::feed_filter_manager.Import(data, parent->feed_filters_);
               if (parsed) {
                 parent->RefreshTorrentFilterList(GetDlgItem(IDC_LIST_TORRENT_FILTER));
               }
@@ -774,7 +775,7 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
         // Export filters
         case 107: {
           std::wstring data;
-          track::aggregator.filter_manager.Export(data, parent->feed_filters_);
+          track::feed_filter_manager.Export(data, parent->feed_filters_);
           std::wstring metadata = StrToWstr(taiga::version().to_string());
           InputDialog dlg;
           StringCoder coder;

@@ -24,8 +24,8 @@
 #include "media/anime_util.h"
 #include "taiga/config.h"
 #include "taiga/resource.h"
-#include "track/feed_aggregator.h"
 #include "track/feed_filter.h"
+#include "track/feed_filter_manager.h"
 #include "ui/dlg/dlg_feed_condition.h"
 #include "ui/dlg/dlg_feed_filter.h"
 #include "ui/list.h"
@@ -267,7 +267,7 @@ BOOL FeedFilterDialog::DialogPage0::OnInitDialog() {
   preset_list.SetView(LV_VIEW_TILE);
 
   // Insert presets
-  for (const auto& preset : track::aggregator.filter_manager.presets) {
+  for (const auto& preset : track::feed_filter_manager.presets) {
     if (preset.is_default)
       continue;
     int icon_ = ui::kIcon16_Funnel;
@@ -385,16 +385,16 @@ BOOL FeedFilterDialog::DialogPage1::OnInitDialog() {
 
   // Initialize options
   match_combo.Attach(GetDlgItem(IDC_COMBO_FEED_FILTER_MATCH));
-  match_combo.AddString(track::aggregator.filter_manager.TranslateMatching(track::kFeedFilterMatchAll).c_str());
-  match_combo.AddString(track::aggregator.filter_manager.TranslateMatching(track::kFeedFilterMatchAny).c_str());
+  match_combo.AddString(track::feed_filter_manager.TranslateMatching(track::kFeedFilterMatchAll).c_str());
+  match_combo.AddString(track::feed_filter_manager.TranslateMatching(track::kFeedFilterMatchAny).c_str());
   action_combo.Attach(GetDlgItem(IDC_COMBO_FEED_FILTER_ACTION));
-  action_combo.AddString(track::aggregator.filter_manager.TranslateAction(track::kFeedFilterActionDiscard).c_str());
-  action_combo.AddString(track::aggregator.filter_manager.TranslateAction(track::kFeedFilterActionSelect).c_str());
-  action_combo.AddString(track::aggregator.filter_manager.TranslateAction(track::kFeedFilterActionPrefer).c_str());
+  action_combo.AddString(track::feed_filter_manager.TranslateAction(track::kFeedFilterActionDiscard).c_str());
+  action_combo.AddString(track::feed_filter_manager.TranslateAction(track::kFeedFilterActionSelect).c_str());
+  action_combo.AddString(track::feed_filter_manager.TranslateAction(track::kFeedFilterActionPrefer).c_str());
   option_combo.Attach(GetDlgItem(IDC_COMBO_FEED_FILTER_OPTION));
-  option_combo.AddString(track::aggregator.filter_manager.TranslateOption(track::kFeedFilterOptionDefault).c_str());
-  option_combo.AddString(track::aggregator.filter_manager.TranslateOption(track::kFeedFilterOptionDeactivate).c_str());
-  option_combo.AddString(track::aggregator.filter_manager.TranslateOption(track::kFeedFilterOptionHide).c_str());
+  option_combo.AddString(track::feed_filter_manager.TranslateOption(track::kFeedFilterOptionDefault).c_str());
+  option_combo.AddString(track::feed_filter_manager.TranslateOption(track::kFeedFilterOptionDeactivate).c_str());
+  option_combo.AddString(track::feed_filter_manager.TranslateOption(track::kFeedFilterOptionHide).c_str());
 
   // Display current filter
   name_text.SetText(parent->filter.name);
@@ -552,10 +552,10 @@ void FeedFilterDialog::DialogPage1::AddConditionToList(const track::FeedFilterCo
     index = condition_list.GetItemCount();
 
   condition_list.InsertItem(index, -1, ui::kIcon16_Funnel, 0, nullptr,
-                            track::aggregator.filter_manager.TranslateElement(condition.element).c_str(),
+                            track::feed_filter_manager.TranslateElement(condition.element).c_str(),
                             reinterpret_cast<LPARAM>(&condition));
-  condition_list.SetItem(index, 1, track::aggregator.filter_manager.TranslateOperator(condition.op).c_str());
-  condition_list.SetItem(index, 2, track::aggregator.filter_manager.TranslateValue(condition).c_str());
+  condition_list.SetItem(index, 1, track::feed_filter_manager.TranslateOperator(condition.op).c_str());
+  condition_list.SetItem(index, 2, track::feed_filter_manager.TranslateValue(condition).c_str());
 }
 
 void FeedFilterDialog::DialogPage1::RefreshConditionList() {

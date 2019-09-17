@@ -33,6 +33,7 @@
 #include "taiga/path.h"
 #include "taiga/settings.h"
 #include "track/episode_util.h"
+#include "track/feed_filter_manager.h"
 #include "track/recognition.h"
 #include "ui/dialog.h"
 #include "ui/ui.h"
@@ -118,13 +119,13 @@ void Aggregator::ExamineData(Feed& feed) {
     feed_item.torrent_category = GetTorrentCategory(feed_item);
   }
 
-  filter_manager.MarkNewEpisodes(feed);
+  feed_filter_manager.MarkNewEpisodes(feed);
   // Preferences have lower priority, so we need to handle other filters
   // first in order to avoid discarding items that we actually want.
-  filter_manager.Filter(feed, false);
-  filter_manager.Filter(feed, true);
+  feed_filter_manager.Filter(feed, false);
+  feed_filter_manager.Filter(feed, true);
   // Archived items must be discarded after other filters are processed.
-  filter_manager.FilterArchived(feed);
+  feed_filter_manager.FilterArchived(feed);
 
   // Sort items
   std::stable_sort(feed.items.begin(), feed.items.end());
