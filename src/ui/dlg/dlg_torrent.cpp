@@ -26,7 +26,6 @@
 #include "media/anime_db.h"
 #include "media/anime_util.h"
 #include "taiga/resource.h"
-#include "taiga/script.h"
 #include "taiga/settings.h"
 #include "taiga/taiga.h"
 #include "track/episode_util.h"
@@ -36,6 +35,7 @@
 #include "ui/dlg/dlg_main.h"
 #include "ui/dlg/dlg_settings.h"
 #include "ui/dlg/dlg_torrent.h"
+#include "ui/command.h"
 #include "ui/dialog.h"
 #include "ui/list.h"
 #include "ui/menu.h"
@@ -246,7 +246,7 @@ void TorrentDialog::OnContextMenu(HWND hwnd, POINT pt) {
     Search(Settings[taiga::kTorrent_Discovery_SearchUrl], feed_item->episode_data.anime_title());
 
   } else if (answer == L"SearchService") {
-    ExecuteAction(L"SearchAnime({})"_format(feed_item->episode_data.anime_title()));
+    ExecuteCommand(L"SearchAnime({})"_format(feed_item->episode_data.anime_title()));
   }
 }
 

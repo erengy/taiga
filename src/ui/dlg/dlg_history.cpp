@@ -25,10 +25,10 @@
 #include "media/library/history.h"
 #include "taiga/http.h"
 #include "taiga/resource.h"
-#include "taiga/script.h"
 #include "taiga/taiga.h"
 #include "ui/dlg/dlg_history.h"
 #include "ui/dlg/dlg_main.h"
+#include "ui/command.h"
 #include "ui/dialog.h"
 #include "ui/list.h"
 #include "ui/menu.h"
@@ -79,13 +79,13 @@ void HistoryDialog::OnContextMenu(HWND hwnd, POINT pt) {
       GetPopupMenuPositionForSelectedListItem(list_, pt);
 
     Menus.UpdateHistoryList(list_.GetSelectedCount() > 0);
-    std::wstring action = ui::Menus.Show(DlgMain.GetWindowHandle(), pt.x, pt.y, L"HistoryList");
+    const auto command = ui::Menus.Show(DlgMain.GetWindowHandle(), pt.x, pt.y, L"HistoryList");
 
-    if (action == L"Delete()") {
+    if (command == L"Delete()") {
       RemoveSelectedItems();
     } else {
       int anime_id = GetAnimeIdFromSelectedListItem(list_);
-      ExecuteAction(action, 0, anime_id);
+      ExecuteCommand(command, 0, anime_id);
     }
   }
 }

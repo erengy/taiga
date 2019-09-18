@@ -55,6 +55,7 @@
 #include "ui/dlg/dlg_stats.h"
 #include "ui/dlg/dlg_torrent.h"
 #include "ui/dlg/dlg_update.h"
+#include "ui/command.h"
 #include "ui/menu.h"
 #include "ui/theme.h"
 #include "ui/ui.h"
@@ -408,7 +409,7 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
             switch (search_bar.mode) {
               case SearchMode::Service: {
                 BOOL local_search = GetKeyState(VK_CONTROL) & 0x8000;
-                ExecuteAction(L"SearchAnime(" + text + L")", local_search);
+                ExecuteCommand(L"SearchAnime(" + text + L")", local_search);
                 return TRUE;
               }
               case SearchMode::Feed: {
@@ -717,7 +718,7 @@ void MainDialog::OnTaskbarCallback(UINT uMsg, LPARAM lParam) {
             navigation.SetCurrentPage(kSidebarItemNowPlaying);
             break;
           case TipType::Search:
-            ExecuteAction(L"SearchAnime(" + CurrentEpisode.anime_title() + L")");
+            ExecuteCommand(L"SearchAnime(" + CurrentEpisode.anime_title() + L")");
             break;
           case TipType::Torrent:
             navigation.SetCurrentPage(kSidebarItemFeeds);
@@ -744,7 +745,7 @@ void MainDialog::OnTaskbarCallback(UINT uMsg, LPARAM lParam) {
       case WM_RBUTTONUP: {
         SetForegroundWindow();
         ui::Menus.UpdateAll();
-        ExecuteAction(ui::Menus.Show(GetWindowHandle(), 0, 0, L"Tray"));
+        ExecuteCommand(ui::Menus.Show(GetWindowHandle(), 0, 0, L"Tray"));
         break;
       }
     }

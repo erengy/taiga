@@ -23,10 +23,10 @@
 #include "sync/sync.h"
 #include "taiga/debug.h"
 #include "taiga/resource.h"
-#include "taiga/script.h"
 #include "ui/dlg/dlg_anime_list.h"
 #include "ui/dlg/dlg_main.h"
 #include "ui/dlg/dlg_season.h"
+#include "ui/command.h"
 #include "ui/dialog.h"
 #include "ui/menu.h"
 #include "ui/theme.h"
@@ -343,10 +343,10 @@ void MainDialog::ToolbarWithMenu::ShowMenu() {
 
   // Display menu
   ui::Menus.UpdateAll();
-  std::wstring action;
+  std::wstring command;
   HWND hwnd = DlgMain.GetWindowHandle();
   #define SHOWUIMENU(id, name) \
-    case id: action = ui::Menus.Show(hwnd, pt.x, pt.y, name); break;
+    case id: command = ui::Menus.Show(hwnd, pt.x, pt.y, name); break;
   switch (tbb.idCommand) {
     SHOWUIMENU(100, L"File");
     SHOWUIMENU(101, L"Services");
@@ -368,8 +368,8 @@ void MainDialog::ToolbarWithMenu::ShowMenu() {
   if (button_index > -1)
     toolbar->SetHotItem(-1);
 
-  if (!action.empty())
-    ExecuteAction(action);
+  if (!command.empty())
+    ExecuteCommand(command);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

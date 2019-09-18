@@ -28,7 +28,6 @@
 #include "ui/resource.h"
 #include "sync/sync.h"
 #include "taiga/resource.h"
-#include "taiga/script.h"
 #include "taiga/settings.h"
 #include "taiga/taiga.h"
 #include "track/episode_util.h"
@@ -36,6 +35,7 @@
 #include "ui/dlg/dlg_anime_info.h"
 #include "ui/dlg/dlg_anime_info_page.h"
 #include "ui/dlg/dlg_main.h"
+#include "ui/command.h"
 #include "ui/menu.h"
 #include "ui/theme.h"
 #include "ui/ui.h"
@@ -212,7 +212,7 @@ BOOL AnimeDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
   if (LOWORD(wParam) == IDC_STATIC_ANIME_IMG &&
       HIWORD(wParam) == STN_CLICKED) {
     if (anime::IsValidId(anime_id_)) {
-      ExecuteAction(L"ViewAnimePage", 0, anime_id_);
+      ExecuteCommand(L"ViewAnimePage", 0, anime_id_);
       return TRUE;
     }
   }
@@ -228,17 +228,17 @@ LRESULT AnimeDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
         case NM_CLICK:
         case NM_RETURN: {
           PNMLINK pNMLink = reinterpret_cast<PNMLINK>(pnmh);
-          std::wstring action = pNMLink->item.szUrl;
+          std::wstring command = pNMLink->item.szUrl;
           if (IsEqual(pNMLink->item.szID, L"menu")) {
-            action = ui::Menus.Show(GetWindowHandle(), 0, 0, pNMLink->item.szUrl);
+            command = ui::Menus.Show(GetWindowHandle(), 0, 0, pNMLink->item.szUrl);
           } else if (IsEqual(pNMLink->item.szID, L"search")) {
-            action = L"SearchAnime(" + CurrentEpisode.anime_title() + L")";
+            command = L"SearchAnime(" + CurrentEpisode.anime_title() + L")";
           } else if (IsEqual(pNMLink->item.szUrl, L"score")) {
-            action = L"";
+            command = L"";
             anime::LinkEpisodeToAnime(CurrentEpisode, ToInt(pNMLink->item.szID));
           }
-          if (!action.empty())
-            ExecuteAction(action, 0, GetCurrentId());
+          if (!command.empty())
+            ExecuteCommand(command, 0, GetCurrentId());
           return TRUE;
         }
 

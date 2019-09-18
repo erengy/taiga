@@ -25,13 +25,13 @@
 #include "media/anime_util.h"
 #include "sync/sync.h"
 #include "taiga/resource.h"
-#include "taiga/script.h"
 #include "taiga/settings.h"
 #include "track/recognition.h"
 #include "ui/dlg/dlg_main.h"
 #include "ui/dlg/dlg_search.h"
 #include "ui/dialog.h"
 #include "ui/list.h"
+#include "ui/command.h"
 #include "ui/menu.h"
 #include "ui/theme.h"
 #include "ui/translate.h"
@@ -87,9 +87,9 @@ void SearchDialog::OnContextMenu(HWND hwnd, POINT pt) {
         }
       }
       ui::Menus.UpdateSearchList(!is_in_list);
-      auto action = ui::Menus.Show(DlgMain.GetWindowHandle(), pt.x, pt.y, L"SearchList");
-      ExecuteAction(action, TRUE, StartsWith(action, L"AddToList") ?
-                    reinterpret_cast<LPARAM>(&anime_ids) : anime_id);
+      const auto command = ui::Menus.Show(DlgMain.GetWindowHandle(), pt.x, pt.y, L"SearchList");
+      ExecuteCommand(command, TRUE, StartsWith(command, L"AddToList") ?
+                     reinterpret_cast<LPARAM>(&anime_ids) : anime_id);
     }
   }
 }

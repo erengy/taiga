@@ -24,10 +24,10 @@
 #include "ui/resource.h"
 #include "sync/sync.h"
 #include "taiga/resource.h"
-#include "taiga/script.h"
 #include "taiga/settings.h"
 #include "ui/dlg/dlg_main.h"
 #include "ui/dlg/dlg_season.h"
+#include "ui/command.h"
 #include "ui/dialog.h"
 #include "ui/list.h"
 #include "ui/menu.h"
@@ -154,11 +154,11 @@ void SeasonDialog::OnContextMenu(HWND hwnd, POINT pt) {
         }
       }
       ui::Menus.UpdateSeasonList(!is_in_list);
-      auto action = ui::Menus.Show(DlgMain.GetWindowHandle(), pt.x, pt.y, L"SeasonList");
-      bool multi_id = StartsWith(action, L"AddToList") ||
-                      StartsWith(action, L"Season_RefreshItemData") ||
-                      StartsWith(action, L"ViewAnimePage");
-      ExecuteAction(action, TRUE, multi_id ? reinterpret_cast<LPARAM>(&anime_ids) : anime_id);
+      const auto command = ui::Menus.Show(DlgMain.GetWindowHandle(), pt.x, pt.y, L"SeasonList");
+      bool multi_id = StartsWith(command, L"AddToList") ||
+                      StartsWith(command, L"Season_RefreshItemData") ||
+                      StartsWith(command, L"ViewAnimePage");
+      ExecuteCommand(command, TRUE, multi_id ? reinterpret_cast<LPARAM>(&anime_ids) : anime_id);
       list_.RedrawWindow();
     }
   }
@@ -517,27 +517,27 @@ LRESULT SeasonDialog::OnToolbarNotify(LPARAM lParam) {
                     reinterpret_cast<LPARAM>(&rect));
       MapWindowPoints(nmt->hdr.hwndFrom, HWND_DESKTOP, reinterpret_cast<LPPOINT>(&rect), 2);
       ui::Menus.UpdateSeason();
-      std::wstring action;
+      std::wstring command;
       switch (LOWORD(nmt->iItem)) {
         // Select season
         case 100:
-          action = ui::Menus.Show(GetWindowHandle(), rect.left, rect.bottom, L"SeasonSelect");
+          command = ui::Menus.Show(GetWindowHandle(), rect.left, rect.bottom, L"SeasonSelect");
           break;
         // Group by
         case 103:
-          action = ui::Menus.Show(GetWindowHandle(), rect.left, rect.bottom, L"SeasonGroup");
+          command = ui::Menus.Show(GetWindowHandle(), rect.left, rect.bottom, L"SeasonGroup");
           break;
         // Sort by
         case 104:
-          action = ui::Menus.Show(GetWindowHandle(), rect.left, rect.bottom, L"SeasonSort");
+          command = ui::Menus.Show(GetWindowHandle(), rect.left, rect.bottom, L"SeasonSort");
           break;
         // View as
         case 105:
-          action = ui::Menus.Show(GetWindowHandle(), rect.left, rect.bottom, L"SeasonView");
+          command = ui::Menus.Show(GetWindowHandle(), rect.left, rect.bottom, L"SeasonView");
           break;
       }
-      if (!action.empty()) {
-        ExecuteAction(action);
+      if (!command.empty()) {
+        ExecuteCommand(command);
       }
       break;
     }

@@ -436,9 +436,6 @@
     <ClCompile Include="..\..\src\sync\myanimelist_util.cpp">
       <Filter>sync\myanimelist</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\taiga\action.cpp">
-      <Filter>taiga</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\taiga\announce.cpp">
       <Filter>taiga</Filter>
     </ClCompile>
@@ -672,6 +669,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\track\feed_filter_manager.cpp">
       <Filter>track\torrents</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ui\command.cpp">
+      <Filter>ui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1220,6 +1220,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\track\feed_filter_manager.h">
       <Filter>track\torrents</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ui\command.h">
+      <Filter>ui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

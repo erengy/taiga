@@ -21,15 +21,8 @@
 #include <string>
 #include <windows.h>
 
-namespace anime {
-class Episode;
-}
+namespace ui {
 
-bool IsScriptFunction(const std::wstring& str);
-bool IsScriptVariable(const std::wstring& str);
+void ExecuteCommand(const std::wstring& str, WPARAM wParam = 0, LPARAM lParam = 0);
 
-std::wstring ReplaceVariables(const std::wstring& str,
-                              const anime::Episode& episode,
-                              bool url_encode = false,
-                              bool is_manual = false,
-                              bool is_preview = false);
+}  // namespace ui

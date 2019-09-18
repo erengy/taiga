@@ -32,7 +32,6 @@
 #include "ui/resource.h"
 #include "sync/service.h"
 #include "taiga/resource.h"
-#include "taiga/script.h"
 #include "taiga/settings.h"
 #include "taiga/taiga.h"
 #include "taiga/timer.h"
@@ -40,6 +39,7 @@
 #include "ui/dlg/dlg_anime_list.h"
 #include "ui/dlg/dlg_main.h"
 #include "ui/dlg/dlg_torrent.h"
+#include "ui/command.h"
 #include "ui/dialog.h"
 #include "ui/list.h"
 #include "ui/menu.h"
@@ -182,7 +182,7 @@ INT_PTR AnimeListDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
         if (tab_index > -1) {
           int status = tab.GetItemParam(tab_index);
           if (anime_item->IsInList()) {
-            ExecuteAction(L"EditStatus({})"_format(status), 0,
+            ExecuteCommand(L"EditStatus({})"_format(status), 0,
                           reinterpret_cast<LPARAM>(&anime_ids));
           } else {
             for (const auto& id : anime_ids) {
@@ -209,7 +209,7 @@ INT_PTR AnimeListDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
           int index = DlgMain.treeview.GetItemData(ht.hItem);
           switch (index) {
             case kSidebarItemSearch:
-              ExecuteAction(L"SearchAnime({})"_format(text));
+              ExecuteCommand(L"SearchAnime({})"_format(text));
               break;
             case kSidebarItemFeeds:
               DlgTorrent.Search(Settings[taiga::kTorrent_Discovery_SearchUrl], anime_id);
@@ -323,21 +323,21 @@ void AnimeListDialog::OnContextMenu(HWND hwnd, POINT pt) {
         parameter = reinterpret_cast<LPARAM>(&anime_ids);
       }
       ui::Menus.UpdateAll(GetCurrentItem());
-      auto action = ui::Menus.Show(DlgMain.GetWindowHandle(), pt.x, pt.y, menu_name.c_str());
-      if (action == L"EditDelete()")
+      const auto command = ui::Menus.Show(DlgMain.GetWindowHandle(), pt.x, pt.y, menu_name.c_str());
+      if (command == L"EditDelete()")
         parameter = reinterpret_cast<LPARAM>(&anime_ids);
-      ExecuteAction(action, 0, parameter);
+      ExecuteCommand(command, 0, parameter);
     }
 
   } else if (hwnd == listview.GetHeader()) {
     ui::Menus.UpdateAnimeListHeaders();
-    auto action = ui::Menus.Show(DlgMain.GetWindowHandle(), pt.x, pt.y, L"AnimeListHeaders");
-    if (!action.empty()) {
+    auto command = ui::Menus.Show(DlgMain.GetWindowHandle(), pt.x, pt.y, L"AnimeListHeaders");
+    if (!command.empty()) {
       bool reset = false;
-      if (action == L"ResetAnimeListHeaders()") {
+      if (command == L"ResetAnimeListHeaders()") {
         reset = true;
       } else {
-        auto column_type = listview.TranslateColumnName(action);
+        auto column_type = listview.TranslateColumnName(command);
         auto& column = listview.columns[column_type];
         if (column_type == kColumnAnimeRating && !column.visible &&
             taiga::GetCurrentServiceId() == sync::kMyAnimeList) {
@@ -390,8 +390,8 @@ AnimeListDialog::ListView::ListView()
   button_visible[2] = false;
 }
 
-void AnimeListDialog::ListView::ExecuteAction(AnimeListAction action,
-                                              int anime_id) {
+void AnimeListDialog::ListView::ExecuteCommand(AnimeListAction action,
+                                               int anime_id) {
   switch (action) {
     case kAnimeListActionNothing:
       break;
@@ -399,7 +399,7 @@ void AnimeListDialog::ListView::ExecuteAction(AnimeListAction action,
       ShowDlgAnimeEdit(anime_id);
       break;
     case kAnimeListActionOpenFolder:
-      ::ExecuteAction(L"OpenFolder", 0, anime_id);
+      ui::ExecuteCommand(L"OpenFolder", 0, anime_id);
       break;
     case kAnimeListActionPlayNext:
       track::PlayNextEpisode(anime_id);
@@ -408,7 +408,7 @@ void AnimeListDialog::ListView::ExecuteAction(AnimeListAction action,
       ShowDlgAnimeInfo(anime_id);
       break;
     case kAnimeListActionPage:
-      ::ExecuteAction(L"ViewAnimePage", 0, anime_id);
+      ui::ExecuteCommand(L"ViewAnimePage", 0, anime_id);
       break;
   }
 }
@@ -659,9 +659,9 @@ LRESULT AnimeListDialog::ListView::WindowProc(HWND hwnd, UINT uMsg, WPARAM wPara
       if (item_index > -1) {
         SelectAllItems(false);
         SelectItem(item_index);
-        auto action = static_cast<AnimeListAction>(Settings.GetInt(taiga::kApp_List_MiddleClickAction));
+        const auto command = static_cast<AnimeListAction>(Settings.GetInt(taiga::kApp_List_MiddleClickAction));
         int anime_id = parent->GetCurrentId();
-        ExecuteAction(action, anime_id);
+        ExecuteCommand(command, anime_id);
       }
       break;
     }
@@ -777,8 +777,8 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
           listview.RefreshItem(list_index);
           listview.RedrawItems(list_index, list_index, true);
         } else {
-          auto action = static_cast<AnimeListAction>(Settings.GetInt(taiga::kApp_List_DoubleClickAction));
-          listview.ExecuteAction(action, anime_id);
+          const auto command = static_cast<AnimeListAction>(Settings.GetInt(taiga::kApp_List_DoubleClickAction));
+          listview.ExecuteCommand(command, anime_id);
         }
       }
       break;
@@ -802,8 +802,8 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
             POINT pt = {listview.button_rect[2].left, listview.button_rect[2].bottom};
             ClientToScreen(listview.GetWindowHandle(), &pt);
             ui::Menus.UpdateAnime(GetCurrentItem());
-            ExecuteAction(ui::Menus.Show(GetWindowHandle(), pt.x, pt.y, L"EditScore"), 0,
-                          reinterpret_cast<LPARAM>(&anime_ids));
+            ExecuteCommand(ui::Menus.Show(GetWindowHandle(), pt.x, pt.y, L"EditScore"), 0,
+                           reinterpret_cast<LPARAM>(&anime_ids));
           }
           int list_index = GetListIndex(GetCurrentId());
           listview.RefreshItem(list_index);
@@ -841,15 +841,15 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
         case VK_RETURN: {
           if (!anime::IsValidId(anime_id))
             break;
-          auto action = static_cast<AnimeListAction>(Settings.GetInt(taiga::kApp_List_DoubleClickAction));
-          listview.ExecuteAction(action, anime_id);
+          const auto command = static_cast<AnimeListAction>(Settings.GetInt(taiga::kApp_List_DoubleClickAction));
+          listview.ExecuteCommand(command, anime_id);
           break;
         }
         // Delete item
         case VK_DELETE: {
           if (!anime::IsValidId(anime_id))
             break;
-          ExecuteAction(L"EditDelete()", 0, reinterpret_cast<LPARAM>(&anime_ids));
+          ExecuteCommand(L"EditDelete()", 0, reinterpret_cast<LPARAM>(&anime_ids));
           return TRUE;
         }
         // Various
@@ -873,11 +873,11 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
               return TRUE;
             // Edit score
             } else if (pnkd->wVKey >= '0' && pnkd->wVKey <= '9') {
-              ExecuteAction(L"EditScore({})"_format((pnkd->wVKey - '0') * 10), 0,
+              ExecuteCommand(L"EditScore({})"_format((pnkd->wVKey - '0') * 10), 0,
                             reinterpret_cast<LPARAM>(&anime_ids));
               return TRUE;
             } else if (pnkd->wVKey >= VK_NUMPAD0 && pnkd->wVKey <= VK_NUMPAD9) {
-              ExecuteAction(L"EditScore({})"_format((pnkd->wVKey - VK_NUMPAD0) * 10), 0,
+              ExecuteCommand(L"EditScore({})"_format((pnkd->wVKey - VK_NUMPAD0) * 10), 0,
                             reinterpret_cast<LPARAM>(&anime_ids));
               return TRUE;
             // Copy anime titles to clipboard
@@ -900,7 +900,7 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
               return TRUE;
             // Open folder
             } else if (pnkd->wVKey == 'O') {
-              ExecuteAction(L"OpenFolder", 0, anime_id);
+              ExecuteCommand(L"OpenFolder", 0, anime_id);
               return TRUE;
             // Play next episode
             } else if (pnkd->wVKey == 'N') {

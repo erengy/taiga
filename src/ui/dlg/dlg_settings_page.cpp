@@ -35,7 +35,6 @@
 #include "taiga/announce.h"
 #include "taiga/path.h"
 #include "taiga/resource.h"
-#include "taiga/script.h"
 #include "taiga/settings.h"
 #include "taiga/taiga.h"
 #include "taiga/version.h"
@@ -47,6 +46,7 @@
 #include "ui/dlg/dlg_input.h"
 #include "ui/dlg/dlg_settings.h"
 #include "ui/dlg/dlg_settings_page.h"
+#include "ui/command.h"
 #include "ui/list.h"
 #include "ui/menu.h"
 #include "ui/theme.h"
@@ -689,7 +689,7 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
         // Add global filter
         case 100: {
           DlgFeedFilter.filter.Reset();
-          ExecuteAction(L"TorrentAddFilter", TRUE, reinterpret_cast<LPARAM>(parent->GetWindowHandle()));
+          ExecuteCommand(L"TorrentAddFilter", TRUE, reinterpret_cast<LPARAM>(parent->GetWindowHandle()));
           if (!DlgFeedFilter.filter.conditions.empty()) {
             if (DlgFeedFilter.filter.name.empty())
               DlgFeedFilter.filter.name = track::feed_filter_manager.CreateNameFromConditions(DlgFeedFilter.filter);
@@ -859,7 +859,7 @@ LRESULT SettingsPage::OnNotify(int idCtrl, LPNMHDR pnmh) {
         case IDC_LINK_ACCOUNT_MAL:
         case IDC_LINK_TWITTER: {
           PNMLINK pNMLink = reinterpret_cast<PNMLINK>(pnmh);
-          ExecuteAction(pNMLink->item.szUrl);
+          ExecuteCommand(pNMLink->item.szUrl);
           return TRUE;
         }
       }
