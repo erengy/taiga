@@ -19,14 +19,11 @@
 #pragma once
 
 #include <memory>
-#include <regex>
 #include <string>
 #include <vector>
 
 #include <anisthesia/src/player.h>
 #include <anisthesia/src/win/platform.h>
-
-#include "base/types.h"
 
 namespace track {
 namespace recognition {
@@ -74,37 +71,6 @@ private:
   bool player_running_ = false;
   bool title_changed_ = false;
 };
-
-enum class Stream {
-  Unknown,
-  Animelab,
-  Adn,
-  Ann,
-  Crunchyroll,
-  Funimation,
-  Hidive,
-  Plex,
-  Veoh,
-  Viz,
-  Vrv,
-  Wakanim,
-  Yahoo,
-  Youtube,
-};
-
-struct StreamData {
-  Stream id;
-  enum_t option_id;
-  std::wstring name;
-  std::wstring url;
-  std::regex url_pattern;
-  std::regex title_pattern;
-};
-
-const std::vector<StreamData>& GetStreamData();
-
-bool GetTitleFromStreamingMediaProvider(const std::wstring& url, std::wstring& title);
-void NormalizeWebBrowserTitle(const std::wstring& url, std::wstring& title);
 
 }  // namespace recognition
 

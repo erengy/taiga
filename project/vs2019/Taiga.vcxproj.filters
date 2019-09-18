@@ -1224,6 +1224,9 @@
     <ClInclude Include="..\..\src\ui\command.h">
       <Filter>ui</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\track\media_stream.h">
+      <Filter>track\recognition</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\src\taiga\resource.rc">

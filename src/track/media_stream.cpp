@@ -19,12 +19,13 @@
 #include <regex>
 #include <set>
 
+#include "track/media_stream.h"
+
 #include "base/process.h"
 #include "base/string.h"
 #include "base/url.h"
 #include "track/episode.h"
 #include "taiga/settings.h"
-#include "track/media.h"
 
 namespace track {
 namespace recognition {

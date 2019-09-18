@@ -33,6 +33,7 @@
 #include "taiga/path.h"
 #include "taiga/settings.h"
 #include "taiga/timer.h"
+#include "track/media_stream.h"
 #include "track/recognition.h"
 #include "ui/dlg/dlg_anime_info.h"
 #include "ui/dialog.h"

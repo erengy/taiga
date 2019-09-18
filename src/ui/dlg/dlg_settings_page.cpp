@@ -41,6 +41,7 @@
 #include "track/feed_aggregator.h"
 #include "track/feed_filter_manager.h"
 #include "track/media.h"
+#include "track/media_stream.h"
 #include "ui/dlg/dlg_feed_filter.h"
 #include "ui/dlg/dlg_format.h"
 #include "ui/dlg/dlg_input.h"
