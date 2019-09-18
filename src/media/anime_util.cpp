@@ -268,7 +268,7 @@ void StartWatching(Item& item, Episode& episode) {
     item.AddtoUserList();
 
   // Change status
-  MediaPlayers.play_status = track::recognition::PlayStatus::Playing;
+  track::media_players.play_status = track::recognition::PlayStatus::Playing;
   item.SetPlaying(true);
 
   ui::OnAnimeWatchingStart(item, episode);
@@ -294,7 +294,7 @@ void StartWatching(Item& item, Episode& episode) {
 
 void EndWatching(Item& item, Episode episode) {
   // Change status
-  MediaPlayers.play_status = track::recognition::PlayStatus::Stopped;
+  track::media_players.play_status = track::recognition::PlayStatus::Stopped;
   item.SetPlaying(false);
 
   // Announce

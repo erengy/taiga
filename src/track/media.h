@@ -26,6 +26,8 @@
 #include <anisthesia/src/player.h>
 #include <anisthesia/src/win/platform.h>
 
+#include "base/types.h"
+
 namespace track {
 namespace recognition {
 
@@ -105,11 +107,10 @@ bool GetTitleFromStreamingMediaProvider(const std::wstring& url, std::wstring& t
 void NormalizeWebBrowserTitle(const std::wstring& url, std::wstring& title);
 
 }  // namespace recognition
+
+void ProcessMediaPlayerStatus(const recognition::MediaPlayer* media_player);
+void ProcessMediaPlayerTitle(const recognition::MediaPlayer& media_player);
+
+inline recognition::MediaPlayers media_players;
+
 }  // namespace track
-
-using track::recognition::MediaPlayer;
-
-void ProcessMediaPlayerStatus(const MediaPlayer* media_player);
-void ProcessMediaPlayerTitle(const MediaPlayer& media_player);
-
-extern track::recognition::MediaPlayers MediaPlayers;

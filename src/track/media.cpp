@@ -20,6 +20,8 @@
 
 #include <windows/win/string.h>
 
+#include "track/media.h"
+
 #include "base/file.h"
 #include "base/log.h"
 #include "base/process.h"
@@ -31,13 +33,10 @@
 #include "taiga/path.h"
 #include "taiga/settings.h"
 #include "taiga/timer.h"
-#include "track/media.h"
 #include "track/recognition.h"
 #include "ui/dlg/dlg_anime_info.h"
 #include "ui/dialog.h"
 #include "ui/ui.h"
-
-class track::recognition::MediaPlayers MediaPlayers;
 
 namespace track {
 namespace recognition {
@@ -343,11 +342,10 @@ MediaPlayer* MediaPlayers::GetRunningPlayer() {
 }
 
 }  // namespace recognition
-}  // namespace track
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void ProcessMediaPlayerStatus(const MediaPlayer* media_player) {
+void ProcessMediaPlayerStatus(const recognition::MediaPlayer* media_player) {
   // Media player is running
   if (media_player) {
     ProcessMediaPlayerTitle(*media_player);
@@ -370,17 +368,17 @@ void ProcessMediaPlayerStatus(const MediaPlayer* media_player) {
       taiga::timers.timer(taiga::kTimerMedia)->Reset();
 
     // Media player was running, but the media was not recognized
-    } else if (MediaPlayers.player_running()) {
+    } else if (media_players.player_running()) {
       ui::ClearStatusText();
       CurrentEpisode.Set(anime::ID_UNKNOWN);
-      MediaPlayers.set_player_running(false);
+      media_players.set_player_running(false);
       ui::DlgNowPlaying.SetCurrentId(anime::ID_UNKNOWN);
       taiga::timers.timer(taiga::kTimerMedia)->Reset();
     }
   }
 }
 
-void ProcessMediaPlayerTitle(const MediaPlayer& media_player) {
+void ProcessMediaPlayerTitle(const recognition::MediaPlayer& media_player) {
   auto anime_item = anime::db.Find(CurrentEpisode.anime_id);
 
   if (CurrentEpisode.anime_id == anime::ID_UNKNOWN) {
@@ -391,7 +389,7 @@ void ProcessMediaPlayerTitle(const MediaPlayer& media_player) {
     static track::recognition::ParseOptions parse_options;
     parse_options.parse_path = true;
     parse_options.streaming_media = media_player.type == anisthesia::PlayerType::WebBrowser;
-    if (Meow.Parse(MediaPlayers.current_title(), parse_options, CurrentEpisode)) {
+    if (Meow.Parse(media_players.current_title(), parse_options, CurrentEpisode)) {
       static track::recognition::MatchOptions match_options;
       match_options.allow_sequels = true;
       match_options.check_airing_date = true;
@@ -402,7 +400,7 @@ void ProcessMediaPlayerTitle(const MediaPlayer& media_player) {
       if (anime::IsValidId(anime_id)) {
         // Recognized
         anime_item = anime::db.Find(anime_id);
-        MediaPlayers.set_title_changed(false);
+        media_players.set_title_changed(false);
         CurrentEpisode.Set(anime_item->GetId());
         StartWatching(*anime_item, CurrentEpisode);
         return;
@@ -413,9 +411,9 @@ void ProcessMediaPlayerTitle(const MediaPlayer& media_player) {
     ui::OnRecognitionFail();
 
   } else {
-    if (MediaPlayers.title_changed()) {
+    if (media_players.title_changed()) {
       // Caption changed
-      MediaPlayers.set_title_changed(false);
+      media_players.set_title_changed(false);
       ui::ClearStatusText();
       bool processed = CurrentEpisode.processed;  // TODO: not a good solution...
       CurrentEpisode.Set(anime::ID_UNKNOWN);
@@ -432,3 +430,5 @@ void ProcessMediaPlayerTitle(const MediaPlayer& media_player) {
     }
   }
 }
+
+}  // namespace track

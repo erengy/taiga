@@ -65,7 +65,7 @@ void Timer::OnTimeout() {
       break;
 
     case kTimerDetection:
-      MediaPlayers.CheckRunningPlayers();
+      track::media_players.CheckRunningPlayers();
       break;
 
     case kTimerHistory:
@@ -128,8 +128,8 @@ void TimerManager::UpdateEnabledState() {
   timer_library.set_enabled(!Settings.GetBool(taiga::kLibrary_WatchFolders));
 
   // Media
-  bool media_player_is_running = MediaPlayers.GetRunningPlayer() != nullptr;
-  bool media_player_is_active = MediaPlayers.IsPlayerActive();
+  bool media_player_is_running = track::media_players.GetRunningPlayer() != nullptr;
+  bool media_player_is_active = track::media_players.IsPlayerActive();
   bool episode_processed = CurrentEpisode.processed || timer_media.ticks() == 0;
   timer_media.set_enabled(media_player_is_running && media_player_is_active &&
                           !episode_processed);
@@ -156,7 +156,7 @@ void TimerManager::UpdateIntervalsFromSettings() {
 void TimerManager::UpdateUi() {
   // Media
   ui::DlgMain.UpdateStatusTimer();
-  ProcessMediaPlayerStatus(MediaPlayers.GetRunningPlayer());
+  track::ProcessMediaPlayerStatus(track::media_players.GetRunningPlayer());
 
   // Statistics
   if (ui::DlgStats.IsVisible())

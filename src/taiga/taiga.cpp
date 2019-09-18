@@ -126,8 +126,8 @@ BOOL App::InitInstance() {
 
 void App::Uninitialize() {
   // Announce
-  if (MediaPlayers.play_status == track::recognition::PlayStatus::Playing) {
-    MediaPlayers.play_status = track::recognition::PlayStatus::Stopped;
+  if (track::media_players.play_status == track::recognition::PlayStatus::Playing) {
+    track::media_players.play_status = track::recognition::PlayStatus::Stopped;
     ::Announcer.Do(kAnnounceToHttp);
   }
   ::Announcer.Clear(kAnnounceToDiscord);
@@ -147,7 +147,7 @@ void App::Uninitialize() {
 }
 
 void App::LoadData() {
-  MediaPlayers.Load();
+  track::media_players.Load();
 
   if (Settings.Load())
     if (Settings.HandleCompatibility())

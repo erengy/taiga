@@ -307,7 +307,7 @@ bool AppSettings::Load() {
   for (auto player : node_players.children(L"player")) {
     std::wstring name = player.attribute(L"name").value();
     bool enabled = player.attribute(L"enabled").as_bool();
-    for (auto& media_player : MediaPlayers.items) {
+    for (auto& media_player : track::media_players.items) {
       if (media_player.name == WstrToStr(name)) {
         media_player.enabled = enabled;
         break;
@@ -385,7 +385,7 @@ bool AppSettings::Save() {
 
   // Media players
   auto mediaplayers = settings.child(L"recognition").child(L"mediaplayers");
-  for (const auto& media_player : MediaPlayers.items) {
+  for (const auto& media_player : track::media_players.items) {
     auto player = mediaplayers.append_child(L"player");
     player.append_attribute(L"name") = StrToWstr(media_player.name).c_str();
     player.append_attribute(L"enabled") = media_player.enabled;

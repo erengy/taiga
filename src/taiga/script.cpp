@@ -152,7 +152,7 @@ std::wstring ReplaceVariables(const std::wstring& str,
   fields[L"folder"] = episode_folder;
   fields[L"user"] = taiga::GetCurrentUsername();
 
-  switch (MediaPlayers.play_status) {
+  switch (track::media_players.play_status) {
     case track::recognition::PlayStatus::Stopped:
       fields[L"playstatus"] = L"stopped";
       break;

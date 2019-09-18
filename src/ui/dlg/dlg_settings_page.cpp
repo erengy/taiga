@@ -238,12 +238,12 @@ BOOL SettingsPage::OnInitDialog() {
       Header_SetItem(header.GetWindowHandle(), 0, &hdi);
       header.SetWindowHandle(nullptr);
 
-      for (size_t i = 0; i < MediaPlayers.items.size(); i++) {
-        if (MediaPlayers.items[i].type == anisthesia::PlayerType::WebBrowser)
+      for (size_t i = 0; i < track::media_players.items.size(); i++) {
+        if (track::media_players.items[i].type == anisthesia::PlayerType::WebBrowser)
           continue;
         int j = list.InsertItem(i, 0, ui::kIcon16_AppBlue, 0, nullptr,
-                                StrToWstr(MediaPlayers.items[i].name).c_str(), i);
-        list.SetCheckState(j, MediaPlayers.items[i].enabled);
+                                StrToWstr(track::media_players.items[i].name).c_str(), i);
+        list.SetCheckState(j, track::media_players.items[i].enabled);
       }
       list.SetColumnWidth(0, LVSCW_AUTOSIZE_USEHEADER);
       list.SetWindowHandle(nullptr);

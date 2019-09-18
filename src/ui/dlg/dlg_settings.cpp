@@ -262,7 +262,7 @@ void SettingsDialog::OnOK() {
     Settings.Set(taiga::kRecognition_DetectMediaPlayers, page->IsDlgButtonChecked(IDC_CHECK_DETECT_MEDIA_PLAYER) == TRUE);
     list.SetWindowHandle(page->GetDlgItem(IDC_LIST_MEDIA));
     for (int i = 0; i < list.GetItemCount(); ++i) {
-      MediaPlayers.items[list.GetItemParam(i)].enabled = list.GetCheckState(i);
+      track::media_players.items[list.GetItemParam(i)].enabled = list.GetCheckState(i);
     }
     list.SetWindowHandle(nullptr);
   }

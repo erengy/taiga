@@ -745,7 +745,7 @@ bool OnRecognitionCancelConfirm() {
 
 void OnRecognitionFail() {
   if (!CurrentEpisode.anime_title().empty()) {
-    MediaPlayers.set_title_changed(false);
+    track::media_players.set_title_changed(false);
     DlgNowPlaying.SetScores(Meow.GetScores());
     DlgNowPlaying.SetCurrentId(anime::ID_NOTINLIST);
     ChangeStatusText(L"Watching: {}{} (Not recognized)"_format(
@@ -764,7 +764,7 @@ void OnRecognitionFail() {
 
   } else {
     if (Taiga.options.debug_mode)
-      ChangeStatusText(StrToWstr(MediaPlayers.current_player_name()) +
+      ChangeStatusText(StrToWstr(track::media_players.current_player_name()) +
                        L" is running.");
   }
 }
