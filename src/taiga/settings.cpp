@@ -273,8 +273,6 @@ bool AppSettings::Load() {
     ReadValue(settings, i);
   }
 
-  ReadLegacyValues(settings);
-
   // Services
   ServiceManager.service(sync::kKitsu)->user().rating_system =
       GetWstr(kSync_Service_Kitsu_RatingSystem);

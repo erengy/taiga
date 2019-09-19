@@ -46,14 +46,10 @@ bool Database::LoadDatabase() {
 
   const auto meta_version = XmlReadMetaVersion(document);
 
-  if (!meta_version.empty()) {
-    auto database_node = document.child(L"database");
-    ReadDatabaseNode(database_node);
-    HandleCompatibility(meta_version);
-  } else {
-    LOGW(L"Reading database in compatibility mode");
-    ReadDatabaseInCompatibilityMode(document);
-  }
+  auto database_node = document.child(L"database");
+  ReadDatabaseNode(database_node);
+
+  HandleCompatibility(meta_version);
 
   return true;
 }

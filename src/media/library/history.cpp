@@ -79,17 +79,13 @@ bool History::Load() {
     }
   }
   // Queue events
-  if (version < semaver::Version(1, 1, 4)) {
-    ReadQueueInCompatibilityMode(document);
-  } else {
-    ReadQueue(document);
-    HandleCompatibility(meta_version);
-  }
+  ReadQueue(document);
+  HandleCompatibility(meta_version);
 
   return true;
 }
 
-void History::ReadQueue(const pugi::xml_document& document) {
+void History::ReadQueue(const XmlDocument& document) {
   auto node_queue = document.child(L"history").child(L"queue");
 
   for (auto item : node_queue.children(L"item")) {

@@ -207,7 +207,6 @@
     <ClCompile Include="..\..\src\base\url.cpp" />
     <ClCompile Include="..\..\src\base\xml.cpp" />
     <ClCompile Include="..\..\src\compat\anime_db.cpp" />
-    <ClCompile Include="..\..\src\compat\crypto.cpp" />
     <ClCompile Include="..\..\src\compat\history.cpp" />
     <ClCompile Include="..\..\src\compat\settings.cpp" />
     <ClCompile Include="..\..\src\link\discord.cpp" />
@@ -399,7 +398,6 @@
     <ClInclude Include="..\..\src\base\types.h" />
     <ClInclude Include="..\..\src\base\url.h" />
     <ClInclude Include="..\..\src\base\xml.h" />
-    <ClInclude Include="..\..\src\compat\crypto.h" />
     <ClInclude Include="..\..\src\link\discord.h" />
     <ClInclude Include="..\..\src\link\http.h" />
     <ClInclude Include="..\..\src\link\mirc.h" />

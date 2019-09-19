@@ -206,7 +206,6 @@ public:
 
 private:
   void InitializeMap();
-  void ReadLegacyValues(const pugi::xml_node& settings);
 };
 
 sync::Service* GetCurrentService();

@@ -18,12 +18,9 @@
 
 #include <semaver.hpp>
 
-#include "base/log.h"
-#include "base/string.h"
-#include "base/xml.h"
-#include "media/anime_db.h"
 #include "media/library/history.h"
-#include "sync/sync.h"
+
+#include "base/string.h"
 
 namespace library {
 
@@ -31,73 +28,8 @@ void History::HandleCompatibility(const std::wstring& meta_version) {
   const semaver::Version version(WstrToStr(meta_version));
   bool need_to_save = false;
 
-  // Convert from 10-point scale to 100-point scale
-  if (version < semaver::Version(1, 3, 0, "alpha.2")) {
-    for (auto& item : queue.items) {
-      if (item.score) {
-        const auto score = *item.score;
-        if (0 < score && score <= 10) {
-          item.score = score * 10;
-          need_to_save = true;
-          LOGW(L"Converted score of {} from {} to {}",
-               item.anime_id, score, *item.score);
-        }
-      }
-    }
-  }
-
   if (need_to_save)
     Save();
-}
-
-void History::ReadQueueInCompatibilityMode(const pugi::xml_document& document) {
-  auto node_queue = document.child(L"history").child(L"queue");
-
-  for (auto item : node_queue.children(L"item")) {
-    QueueItem queue_item;
-
-    queue_item.anime_id = item.attribute(L"anime_id").as_int(anime::ID_NOTINLIST);
-    queue_item.mode = item.attribute(L"mode").as_int();
-    queue_item.time = item.attribute(L"time").value();
-
-    #define READ_ATTRIBUTE_INT(x, y) \
-        if (!item.attribute(y).empty()) x = item.attribute(y).as_int();
-    #define READ_ATTRIBUTE_STR(x, y) \
-        if (!item.attribute(y).empty()) x = item.attribute(y).as_string();
-    #define READ_ATTRIBUTE_DATE(x, y) \
-        if (!item.attribute(y).empty()) x = (Date)item.attribute(y).as_string();
-
-    READ_ATTRIBUTE_INT(queue_item.episode, L"episode");
-    READ_ATTRIBUTE_INT(queue_item.score, L"score");
-    READ_ATTRIBUTE_INT(queue_item.status, L"status");
-    READ_ATTRIBUTE_INT(queue_item.enable_rewatching, L"enable_rewatching");
-    READ_ATTRIBUTE_STR(queue_item.tags, L"tags");
-    READ_ATTRIBUTE_DATE(queue_item.date_start, L"date_start");
-    READ_ATTRIBUTE_DATE(queue_item.date_finish, L"date_finish");
-
-    #undef READ_ATTRIBUTE_DATE
-    #undef READ_ATTRIBUTE_STR
-    #undef READ_ATTRIBUTE_INT
-
-    Date date_item(queue_item.time);
-    Date date_limit(L"2014-06-20");  // Release date of v1.1.0
-    if (date_item < date_limit) {
-      if (queue_item.mode == 3) {         // HTTP_MAL_AnimeAdd
-        queue_item.mode = taiga::kHttpServiceAddLibraryEntry;
-      } else if (queue_item.mode == 5) {  // HTTP_MAL_AnimeDelete
-        queue_item.mode = taiga::kHttpServiceDeleteLibraryEntry;
-      } else if (queue_item.mode == 7) {  // HTTP_MAL_AnimeUpdate
-        queue_item.mode = taiga::kHttpServiceUpdateLibraryEntry;
-      }
-    }
-
-    if (anime::db.Find(queue_item.anime_id)) {
-      queue.Add(queue_item, false);
-    } else {
-      LOGW(L"Item does not exist in the database.\n"
-           L"ID: {}", queue_item.anime_id);
-    }
-  }
 }
 
 }  // namespace library

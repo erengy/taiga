@@ -62,11 +62,8 @@ private:
   void ReadDatabaseNode(pugi::xml_node& database_node);
   void WriteDatabaseNode(pugi::xml_node& database_node) const;
 
-  bool CheckOldUserDirectory();
   void HandleCompatibility(const std::wstring& meta_version);
   void HandleListCompatibility(const std::wstring& meta_version);
-  void ReadDatabaseInCompatibilityMode(pugi::xml_document& document);
-  void ReadListInCompatibilityMode(pugi::xml_document& document);
 };
 
 inline Database db;

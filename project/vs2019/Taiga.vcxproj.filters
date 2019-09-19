@@ -178,9 +178,6 @@
     <ClCompile Include="..\..\src\compat\anime_db.cpp">
       <Filter>compat</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\compat\crypto.cpp">
-      <Filter>compat</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\compat\history.cpp">
       <Filter>compat</Filter>
     </ClCompile>
@@ -740,9 +737,6 @@
     </ClInclude>
     <ClInclude Include="..\..\src\base\xml.h">
       <Filter>base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\compat\crypto.h">
-      <Filter>compat</Filter>
     </ClInclude>
     <ClInclude Include="..\..\deps\src\anisthesia\src\media.h">
       <Filter>deps\anisthesia</Filter>

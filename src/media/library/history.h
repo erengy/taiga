@@ -48,8 +48,7 @@ public:
   int limit = 0;  // 0 for unlimited
 
 private:
-  void ReadQueue(const pugi::xml_document& document);
-  void ReadQueueInCompatibilityMode(const pugi::xml_document& document);
+  void ReadQueue(const XmlDocument& document);
 
   int TranslateModeFromString(const std::wstring& mode);
   std::wstring TranslateModeToString(int mode);

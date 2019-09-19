@@ -43,10 +43,7 @@ bool Database::LoadList() {
   const auto parse_result = XmlLoadFileToDocument(document, path);
 
   if (!parse_result) {
-    if (parse_result.status == pugi::status_file_not_found) {
-      if (CheckOldUserDirectory())
-        return LoadList();
-    } else {
+    if (parse_result.status != pugi::status_file_not_found) {
       ui::DisplayErrorMessage(L"Could not read anime list.", path);
     }
     return false;
@@ -54,39 +51,33 @@ bool Database::LoadList() {
 
   const auto meta_version = XmlReadMetaVersion(document);
 
-  if (!meta_version.empty()) {
-    auto node_database = document.child(L"database");
-    ReadDatabaseNode(node_database);
+  auto node_database = document.child(L"database");
+  ReadDatabaseNode(node_database);
 
-    auto node_library = document.child(L"library");
-    for (auto node : node_library.children(L"anime")) {
-      Item anime_item;
-      anime_item.SetId(XmlReadStr(node, L"id"), sync::kTaiga);
-      anime_item.SetSource(sync::kTaiga);
+  auto node_library = document.child(L"library");
+  for (auto node : node_library.children(L"anime")) {
+    Item anime_item;
+    anime_item.SetId(XmlReadStr(node, L"id"), sync::kTaiga);
+    anime_item.SetSource(sync::kTaiga);
 
-      anime_item.AddtoUserList();
-      anime_item.SetMyId(XmlReadStr(node, L"library_id"));
-      anime_item.SetMyLastWatchedEpisode(XmlReadInt(node, L"progress"));
-      anime_item.SetMyDateStart(XmlReadStr(node, L"date_start"));
-      anime_item.SetMyDateEnd(XmlReadStr(node, L"date_end"));
-      anime_item.SetMyScore(XmlReadInt(node, L"score"));
-      anime_item.SetMyStatus(XmlReadInt(node, L"status"));
-      anime_item.SetMyRewatchedTimes(XmlReadInt(node, L"rewatched_times"));
-      anime_item.SetMyRewatching(XmlReadInt(node, L"rewatching"));
-      anime_item.SetMyRewatchingEp(XmlReadInt(node, L"rewatching_ep"));
-      anime_item.SetMyTags(XmlReadStr(node, L"tags"));
-      anime_item.SetMyNotes(XmlReadStr(node, L"notes"));
-      anime_item.SetMyLastUpdated(XmlReadStr(node, L"last_updated"));
+    anime_item.AddtoUserList();
+    anime_item.SetMyId(XmlReadStr(node, L"library_id"));
+    anime_item.SetMyLastWatchedEpisode(XmlReadInt(node, L"progress"));
+    anime_item.SetMyDateStart(XmlReadStr(node, L"date_start"));
+    anime_item.SetMyDateEnd(XmlReadStr(node, L"date_end"));
+    anime_item.SetMyScore(XmlReadInt(node, L"score"));
+    anime_item.SetMyStatus(XmlReadInt(node, L"status"));
+    anime_item.SetMyRewatchedTimes(XmlReadInt(node, L"rewatched_times"));
+    anime_item.SetMyRewatching(XmlReadInt(node, L"rewatching"));
+    anime_item.SetMyRewatchingEp(XmlReadInt(node, L"rewatching_ep"));
+    anime_item.SetMyTags(XmlReadStr(node, L"tags"));
+    anime_item.SetMyNotes(XmlReadStr(node, L"notes"));
+    anime_item.SetMyLastUpdated(XmlReadStr(node, L"last_updated"));
 
-      UpdateItem(anime_item);
-    }
-
-    HandleListCompatibility(meta_version);
-
-  } else {
-    LOGW(L"Reading list in compatibility mode");
-    ReadListInCompatibilityMode(document);
+    UpdateItem(anime_item);
   }
+
+  HandleListCompatibility(meta_version);
 
   return true;
 }

@@ -16,46 +16,13 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/base64.h"
+#include "taiga/settings.h"
+
 #include "base/log.h"
 #include "base/string.h"
-#include "base/xml.h"
-#include "compat/crypto.h"
-#include "media/anime.h"
-#include "sync/manager.h"
-#include "sync/sync.h"
-#include "taiga/settings.h"
 #include "taiga/version.h"
-#include "track/feed_filter.h"
-#include "track/feed_filter_manager.h"
-#include "track/media.h"
 
 namespace taiga {
-
-void AppSettings::ReadLegacyValues(const XmlNode& settings) {
-  // Meta
-  if (GetWstr(kMeta_Version).empty()) {
-    const auto major = ReadValue(settings, L"meta/version/major", true, L"");
-    const auto minor = ReadValue(settings, L"meta/version/minor", true, L"");
-    const auto patch = ReadValue(settings, L"meta/version/revision", true, L"");
-    if (!major.empty() && !minor.empty() && !patch.empty()) {
-      const semaver::Version version(ToInt(major), ToInt(minor), ToInt(patch));
-      Set(kMeta_Version, StrToWstr(version.to_string()));
-    } else {
-      Set(kMeta_Version, StrToWstr(taiga::version().to_string()));
-    }
-  }
-
-  // Services
-  if (GetWstr(kSync_ActiveService) == L"hummingbird") {
-    Set(kSync_Service_Kitsu_Username,
-        ReadValue(settings, L"account/hummingbird/username", true, L""));
-    Set(kSync_Service_Kitsu_Password,
-        ReadValue(settings, L"account/hummingbird/password", true, L""));
-  }
-}
-
-////////////////////////////////////////////////////////////////////////////////
 
 bool AppSettings::HandleCompatibility() {
   const semaver::Version version(WstrToStr(GetWstr(kMeta_Version)));
@@ -65,106 +32,6 @@ bool AppSettings::HandleCompatibility() {
 
   LOGW(L"Upgraded from v{} to v{}", StrToWstr(version.to_string()),
        StrToWstr(taiga::version().to_string()));
-
-  if (version <= semaver::Version(1, 1, 7)) {
-    // Convert old password encoding to base64
-    std::wstring password = compat::SimpleDecrypt(GetWstr(kSync_Service_Mal_Password));
-    Set(kSync_Service_Mal_Password, Base64Encode(password));
-    password = compat::SimpleDecrypt(GetWstr(kSync_Service_Kitsu_Password));
-    Set(kSync_Service_Kitsu_Password, Base64Encode(password));
-
-    // Update torrent filters
-    for (auto& filter : track::feed_filter_manager.filters) {
-      if (filter.name == L"Discard unknown titles") {
-        if (filter.conditions.size() == 1) {
-          auto& condition = filter.conditions.front();
-          if (condition.element == track::kFeedFilterElement_Meta_Id) {
-            filter.name = L"Discard and deactivate not-in-list anime";
-            condition.element = track::kFeedFilterElement_User_Status;
-            condition.value = ToWstr(anime::kNotInList);
-          }
-        }
-        break;
-      }
-    }
-  }
-
-  if (version <= semaver::Version(1, 1, 8)) {
-    auto external_links = GetWstr(kApp_Interface_ExternalLinks);
-    ReplaceString(external_links, L"http://hummingboard.me", L"http://hb.cybrox.eu");
-    Set(kApp_Interface_ExternalLinks, external_links);
-  }
-
-  if (version <= semaver::Version(1, 1, 11)) {
-    bool detect_streaming_media = false;
-    for (auto& media_player : track::media_players.items) {
-      if (media_player.type == anisthesia::PlayerType::WebBrowser) {
-        if (media_player.enabled)
-          detect_streaming_media = true;
-        media_player.enabled = true;
-      }
-    }
-    Set(kRecognition_DetectStreamingMedia, detect_streaming_media);
-  }
-
-  if (version <= semaver::Version(1, 2, 2)) {
-    auto external_links = GetWstr(kApp_Interface_ExternalLinks);
-    ReplaceString(external_links, L"http://mal.oko.im", L"http://graph.anime.plus");
-    std::vector<std::wstring> link_vector;
-    Split(external_links, L"\r\n", link_vector);
-    for (auto it = link_vector.begin(); it != link_vector.end(); ++it) {
-      if (StartsWith(*it, L"Hummingboard")) {
-        *it = L"Hummingbird Tools|https://hb.wopian.me";
-      } else if (StartsWith(*it, L"Mahou Showtime Schedule")) {
-        *it = L"Senpai Anime Charts|http://www.senpai.moe/?mode=calendar";
-        it = link_vector.insert(it, L"Monthly.moe|http://www.monthly.moe/weekly");
-        it = link_vector.insert(it, L"AniChart|http://anichart.net/airing");
-      } else if (StartsWith(*it, L"The Fansub Wiki")) {
-        *it = L"The Fansub Database|http://fansubdb.com";
-        it = link_vector.insert(it, L"Anime Streaming Search Engine|http://because.moe");
-        it = link_vector.insert(it, L"-");
-      }
-    }
-    external_links = Join(link_vector, L"\r\n");
-    Set(kApp_Interface_ExternalLinks, external_links);
-  }
-
-  if (version <= semaver::Version(1, 2, 3)) {
-    if (GetBool(kTorrent_Download_UseAnimeFolder)) {
-      auto app_path = GetWstr(kTorrent_Download_AppPath);
-      if (IsEqual(GetFileName(app_path), L"deluge.exe")) {
-        app_path = GetPathOnly(app_path) + L"deluge-console.exe";
-        Set(kTorrent_Download_AppPath, app_path);
-        LOGW(L"Changed BitTorrent client from deluge.exe to deluge-console.exe");
-      }
-    }
-  }
-
-  if (version <= semaver::Version(1, 2, 5)) {
-    // Change active service to Kitsu
-    if (GetWstr(kSync_ActiveService) == L"hummingbird") {
-      Set(kSync_ActiveService, ServiceManager.GetServiceNameById(sync::kKitsu));
-    }
-
-    // Update mIRC channels
-    auto mirc_channels = GetWstr(kShare_Mirc_Channels);
-    if (ReplaceString(mirc_channels, L"#hummingbird", L"#kitsu")) {
-      Set(kShare_Mirc_Channels, mirc_channels);
-    }
-
-    // Hummingbird Tools -> Hibari
-    auto external_links = GetWstr(kApp_Interface_ExternalLinks);
-    ReplaceString(external_links, L"Hummingbird Tools|", L"Hibari|");
-    Set(kApp_Interface_ExternalLinks, external_links);
-
-    // Change active Nyaa.se feeds to new defaults
-    if (GetWstr(kTorrent_Discovery_Source) == L"nyaa.se") {
-      Set(kTorrent_Discovery_Source, kDefaultTorrentSource);
-    }
-    if (GetWstr(kTorrent_Discovery_SearchUrl) == L"nyaa.se") {
-      Set(kTorrent_Discovery_SearchUrl, kDefaultTorrentSearch);
-    }
-  }
 
   if (version <= semaver::Version(1, 3, 0)) {
     // Set title language preference
