@@ -21,10 +21,7 @@
 #include <string>
 #include <vector>
 
-#include "base/time.h"
 #include "base/xml.h"
-#include "media/library/queue.h"
-#include "track/episode.h"
 
 namespace library {
 

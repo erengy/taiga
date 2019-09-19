@@ -24,7 +24,7 @@
 #include "media/anime.h"
 #include "media/anime_db.h"
 #include "media/anime_util.h"
-#include "media/library/history.h"
+#include "media/library/queue.h"
 #include "ui/resource.h"
 #include "sync/myanimelist_util.h"
 #include "sync/service.h"

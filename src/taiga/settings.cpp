@@ -29,6 +29,7 @@
 #include "media/anime_season.h"
 #include "media/discover.h"
 #include "media/library/history.h"
+#include "media/library/queue.h"
 #include "ui/resource.h"
 #include "sync/manager.h"
 #include "sync/sync.h"

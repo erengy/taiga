@@ -31,7 +31,7 @@
 #include "track/episode.h"
 #include "media/anime_util.h"
 #include "media/discover.h"
-#include "media/library/history.h"
+#include "media/library/queue.h"
 #include "sync/manager.h"
 #include "sync/service.h"
 #include "sync/sync.h"

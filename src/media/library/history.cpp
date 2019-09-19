@@ -16,20 +16,18 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <semaver.hpp>
+
 #include "media/library/history.h"
 
 #include "base/log.h"
 #include "base/string.h"
 #include "base/xml.h"
+#include "media/library/queue.h"
 #include "media/anime_db.h"
-#include "media/anime_util.h"
-#include "sync/sync.h"
-#include "taiga/announce.h"
+#include "taiga/http.h"
 #include "taiga/path.h"
-#include "taiga/settings.h"
 #include "taiga/version.h"
-#include "track/media.h"
-#include "track/scanner.h"
 #include "ui/ui.h"
 
 namespace library {

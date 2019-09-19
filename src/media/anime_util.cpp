@@ -29,7 +29,7 @@
 #include "track/episode.h"
 #include "track/episode_util.h"
 #include "media/anime_util.h"
-#include "media/library/history.h"
+#include "media/library/queue.h"
 #include "sync/sync.h"
 #include "taiga/announce.h"
 #include "taiga/path.h"

@@ -25,7 +25,7 @@
 #include "media/anime.h"
 #include "media/anime_db.h"
 #include "media/anime_util.h"
-#include "media/library/history.h"
+#include "media/library/queue.h"
 #include "taiga/settings.h"
 #include "track/scanner.h"
 #include "ui/ui.h"

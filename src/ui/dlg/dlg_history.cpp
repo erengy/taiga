@@ -23,6 +23,7 @@
 #include "media/anime_db.h"
 #include "media/anime_util.h"
 #include "media/library/history.h"
+#include "media/library/queue.h"
 #include "taiga/http.h"
 #include "taiga/resource.h"
 #include "taiga/taiga.h"

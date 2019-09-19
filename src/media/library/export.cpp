@@ -28,7 +28,7 @@
 #include "media/anime_item.h"
 #include "media/anime_util.h"
 #include "media/library/export.h"
-#include "media/library/history.h"
+#include "media/library/queue.h"
 #include "sync/myanimelist_types.h"
 #include "sync/myanimelist_util.h"
 #include "taiga/settings.h"
