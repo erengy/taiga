@@ -228,8 +228,8 @@ BOOL PageMyInfo::OnCommand(WPARAM wParam, LPARAM lParam) {
       std::wstring default_path, path;
       if (!anime_item->GetFolder().empty()) {
         default_path = anime_item->GetFolder();
-      } else if (!Settings.library_folders.empty()) {
-        default_path = Settings.library_folders.front();
+      } else if (!taiga::settings.library_folders.empty()) {
+        default_path = taiga::settings.library_folders.front();
       }
       if (win::BrowseForFolder(parent->GetWindowHandle(), L"Select Anime Folder",
                                default_path, path)) {
@@ -601,7 +601,7 @@ bool PageMyInfo::Save() {
   anime_item->SetFolder(GetDlgItemText(IDC_EDIT_ANIME_FOLDER));
 
   // Save settings
-  Settings.Save();
+  taiga::settings.Save();
 
   // Add item to queue
   library::queue.Add(queue_item);

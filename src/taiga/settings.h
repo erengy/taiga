@@ -18,14 +18,11 @@
 
 #pragma once
 
+#include <mutex>
 #include <string>
 #include <vector>
 
 #include "base/settings.h"
-
-namespace pugi {
-class xml_node;
-}
 
 namespace sync {
 class Service;
@@ -34,162 +31,415 @@ enum ServiceId;
 
 namespace taiga {
 
-enum AppSettingName {
-  kAppSettingNameFirst = 0,  // used for iteration
-
-  // Meta
-  kMeta_Version = 0,
-
+enum class AppSettingKey {
   // Services
-  kSync_ActiveService,
-  kSync_AutoOnStart,
-  kSync_Service_Mal_Username,
-  kSync_Service_Mal_Password,
-  kSync_Service_Kitsu_DisplayName,
-  kSync_Service_Kitsu_Email,
-  kSync_Service_Kitsu_Username,
-  kSync_Service_Kitsu_Password,
-  kSync_Service_Kitsu_PartialLibrary,
-  kSync_Service_Kitsu_RatingSystem,
-  kSync_Service_AniList_Username,
-  kSync_Service_AniList_RatingSystem,
-  kSync_Service_AniList_Token,
+  SyncActiveService,
+  SyncAutoOnStart,
+  SyncServiceMalUsername,
+  SyncServiceMalPassword,
+  SyncServiceKitsuDisplayName,
+  SyncServiceKitsuEmail,
+  SyncServiceKitsuUsername,
+  SyncServiceKitsuPassword,
+  SyncServiceKitsuPartialLibrary,
+  SyncServiceKitsuRatingSystem,
+  SyncServiceAniListUsername,
+  SyncServiceAniListRatingSystem,
+  SyncServiceAniListToken,
 
   // Library
-  kLibrary_FileSizeThreshold,
-  kLibrary_MediaPlayerPath,
-  kLibrary_WatchFolders,
+  LibraryFileSizeThreshold,
+  LibraryMediaPlayerPath,
+  LibraryWatchFolders,
 
   // Application
-  kApp_List_DoubleClickAction,
-  kApp_List_MiddleClickAction,
-  kApp_List_DisplayEnglishTitles,
-  kApp_List_HighlightNewEpisodes,
-  kApp_List_DisplayHighlightedOnTop,
-  kApp_List_ProgressDisplayAired,
-  kApp_List_ProgressDisplayAvailable,
-  kApp_List_SortColumnPrimary,
-  kApp_List_SortColumnSecondary,
-  kApp_List_SortOrderPrimary,
-  kApp_List_SortOrderSecondary,
-  kApp_List_TitleLanguagePreference,
-  kApp_Behavior_Autostart,
-  kApp_Behavior_StartMinimized,
-  kApp_Behavior_CheckForUpdates,
-  kApp_Behavior_ScanAvailableEpisodes,
-  kApp_Behavior_CloseToTray,
-  kApp_Behavior_MinimizeToTray,
-  kApp_Connection_ProxyHost,
-  kApp_Connection_ProxyUsername,
-  kApp_Connection_ProxyPassword,
-  kApp_Connection_NoRevoke,
-  kApp_Connection_ReuseActive,
-  kApp_Interface_Theme,
-  kApp_Interface_ExternalLinks,
+  AppListDoubleClickAction,
+  AppListMiddleClickAction,
+  AppListDisplayEnglishTitles,
+  AppListHighlightNewEpisodes,
+  AppListDisplayHighlightedOnTop,
+  AppListProgressDisplayAired,
+  AppListProgressDisplayAvailable,
+  AppListSortColumnPrimary,
+  AppListSortColumnSecondary,
+  AppListSortOrderPrimary,
+  AppListSortOrderSecondary,
+  AppListTitleLanguagePreference,
+  AppBehaviorAutostart,
+  AppBehaviorStartMinimized,
+  AppBehaviorCheckForUpdates,
+  AppBehaviorScanAvailableEpisodes,
+  AppBehaviorCloseToTray,
+  AppBehaviorMinimizeToTray,
+  AppConnectionProxyHost,
+  AppConnectionProxyUsername,
+  AppConnectionProxyPassword,
+  AppConnectionNoRevoke,
+  AppConnectionReuseActive,
+  AppInterfaceTheme,
+  AppInterfaceExternalLinks,
 
   // Recognition
-  kRecognition_DetectionInterval,
-  kRecognition_DetectMediaPlayers,
-  kRecognition_DetectStreamingMedia,
-  kRecognition_IgnoredStrings,
-  kRecognition_LookupParentDirectories,
-  kRecognition_RelationsLastModified,
-  kSync_Update_Delay,
-  kSync_Update_AskToConfirm,
-  kSync_Update_CheckPlayer,
-  kSync_Update_OutOfRange,
-  kSync_Update_OutOfRoot,
-  kSync_Update_WaitPlayer,
-  kSync_GoToNowPlaying_Recognized,
-  kSync_GoToNowPlaying_NotRecognized,
-  kSync_Notify_Recognized,
-  kSync_Notify_NotRecognized,
-  kSync_Notify_Format,
-  kStream_Animelab,
-  kStream_Adn,
-  kStream_Ann,
-  kStream_Crunchyroll,
-  kStream_Funimation,
-  kStream_Hidive,
-  kStream_Plex,
-  kStream_Veoh,
-  kStream_Viz,
-  kStream_Vrv,
-  kStream_Wakanim,
-  kStream_Yahoo,
-  kStream_Youtube,
+  RecognitionDetectionInterval,
+  RecognitionDetectMediaPlayers,
+  RecognitionDetectStreamingMedia,
+  RecognitionIgnoredStrings,
+  RecognitionLookupParentDirectories,
+  RecognitionRelationsLastModified,
+  SyncUpdateDelay,
+  SyncUpdateAskToConfirm,
+  SyncUpdateCheckPlayer,
+  SyncUpdateOutOfRange,
+  SyncUpdateOutOfRoot,
+  SyncUpdateWaitPlayer,
+  SyncGoToNowPlayingRecognized,
+  SyncGoToNowPlayingNotRecognized,
+  SyncNotifyRecognized,
+  SyncNotifyNotRecognized,
+  SyncNotifyFormat,
+  StreamAnimelab,
+  StreamAdn,
+  StreamAnn,
+  StreamCrunchyroll,
+  StreamFunimation,
+  StreamHidive,
+  StreamPlex,
+  StreamVeoh,
+  StreamViz,
+  StreamVrv,
+  StreamWakanim,
+  StreamYahoo,
+  StreamYoutube,
 
   // Sharing
-  kShare_Discord_ApplicationId,
-  kShare_Discord_Enabled,
-  kShare_Discord_Format_Details,
-  kShare_Discord_Format_State,
-  kShare_Discord_Username_Enabled,
-  kShare_Http_Enabled,
-  kShare_Http_Format,
-  kShare_Http_Url,
-  kShare_Mirc_Enabled,
-  kShare_Mirc_MultiServer,
-  kShare_Mirc_UseMeAction,
-  kShare_Mirc_Mode,
-  kShare_Mirc_Channels,
-  kShare_Mirc_Format,
-  kShare_Mirc_Service,
-  kShare_Twitter_Enabled,
-  kShare_Twitter_Format,
-  kShare_Twitter_OauthToken,
-  kShare_Twitter_OauthSecret,
-  kShare_Twitter_Username,
+  ShareDiscordApplicationId,
+  ShareDiscordEnabled,
+  ShareDiscordFormatDetails,
+  ShareDiscordFormatState,
+  ShareDiscordUsernameEnabled,
+  ShareHttpEnabled,
+  ShareHttpFormat,
+  ShareHttpUrl,
+  ShareMircEnabled,
+  ShareMircMultiServer,
+  ShareMircUseMeAction,
+  ShareMircMode,
+  ShareMircChannels,
+  ShareMircFormat,
+  ShareMircService,
+  ShareTwitterEnabled,
+  ShareTwitterFormat,
+  ShareTwitterOauthToken,
+  ShareTwitterOauthSecret,
+  ShareTwitterUsername,
 
   // Torrents
-  kTorrent_Discovery_Source,
-  kTorrent_Discovery_SearchUrl,
-  kTorrent_Discovery_AutoCheckEnabled,
-  kTorrent_Discovery_AutoCheckInterval,
-  kTorrent_Discovery_NewAction,
-  kTorrent_Download_AppMode,
-  kTorrent_Download_AppOpen,
-  kTorrent_Download_AppPath,
-  kTorrent_Download_Location,
-  kTorrent_Download_UseAnimeFolder,
-  kTorrent_Download_FallbackOnFolder,
-  kTorrent_Download_CreateSubfolder,
-  kTorrent_Download_SortBy,
-  kTorrent_Download_SortOrder,
-  kTorrent_Download_UseMagnet,
-  kTorrent_Filter_Enabled,
-  kTorrent_Filter_ArchiveMaxCount,
+  TorrentDiscoverySource,
+  TorrentDiscoverySearchUrl,
+  TorrentDiscoveryAutoCheckEnabled,
+  TorrentDiscoveryAutoCheckInterval,
+  TorrentDiscoveryNewAction,
+  TorrentDownloadAppMode,
+  TorrentDownloadAppOpen,
+  TorrentDownloadAppPath,
+  TorrentDownloadLocation,
+  TorrentDownloadUseAnimeFolder,
+  TorrentDownloadFallbackOnFolder,
+  TorrentDownloadCreateSubfolder,
+  TorrentDownloadSortBy,
+  TorrentDownloadSortOrder,
+  TorrentDownloadUseMagnet,
+  TorrentFilterEnabled,
+  TorrentFilterArchiveMaxCount,
 
   // Internal
-  kApp_Position_X,
-  kApp_Position_Y,
-  kApp_Position_W,
-  kApp_Position_H,
-  kApp_Position_Maximized,
-  kApp_Position_Remember,
-  kApp_Option_HideSidebar,
-  kApp_Option_EnableRecognition,
-  kApp_Option_EnableSharing,
-  kApp_Option_EnableSync,
-  kApp_Seasons_LastSeason,
-  kApp_Seasons_GroupBy,
-  kApp_Seasons_SortBy,
-  kApp_Seasons_ViewAs,
-
-  kAppSettingNameLast  // used for iteration
+  AppPositionX,
+  AppPositionY,
+  AppPositionW,
+  AppPositionH,
+  AppPositionMaximized,
+  AppPositionRemember,
+  AppOptionHideSidebar,
+  AppOptionEnableRecognition,
+  AppOptionEnableSharing,
+  AppOptionEnableSync,
+  AppSeasonsLastSeason,
+  AppSeasonsGroupBy,
+  AppSeasonsSortBy,
+  AppSeasonsViewAs,
 };
 
-extern const std::wstring kDefaultTorrentSearch;
-extern const std::wstring kDefaultTorrentSource;
-
-class AppSettings : public base::Settings {
+class AppSettings {
 public:
+  AppSettings() = default;
+  ~AppSettings();
+
   bool Load();
   bool Save();
+
+  void DoAfterLoad();
 
   void ApplyChanges(const AppSettings previous);
   bool HandleCompatibility();
   void RestoreDefaults();
+
+  // Services
+  sync::ServiceId GetSyncActiveService() const;
+  void SetSyncActiveService(const sync::ServiceId service_id);
+  bool GetSyncAutoOnStart() const;
+  void SetSyncAutoOnStart(const bool enabled);
+  std::wstring GetSyncServiceMalUsername() const;
+  void SetSyncServiceMalUsername(const std::wstring& username);
+  std::wstring GetSyncServiceMalPassword() const;
+  void SetSyncServiceMalPassword(const std::wstring& password);
+  std::wstring GetSyncServiceKitsuDisplayName() const;
+  void SetSyncServiceKitsuDisplayName(const std::wstring& name);
+  std::wstring GetSyncServiceKitsuEmail() const;
+  void SetSyncServiceKitsuEmail(const std::wstring& email);
+  std::wstring GetSyncServiceKitsuUsername() const;
+  void SetSyncServiceKitsuUsername(const std::wstring& username);
+  std::wstring GetSyncServiceKitsuPassword() const;
+  void SetSyncServiceKitsuPassword(const std::wstring& password);
+  bool GetSyncServiceKitsuPartialLibrary() const;
+  void SetSyncServiceKitsuPartialLibrary(const bool enabled);
+  std::wstring GetSyncServiceKitsuRatingSystem() const;
+  void SetSyncServiceKitsuRatingSystem(const std::wstring& rating_system);
+  std::wstring GetSyncServiceAniListUsername() const;
+  void SetSyncServiceAniListUsername(const std::wstring& username);
+  std::wstring GetSyncServiceAniListRatingSystem() const;
+  void SetSyncServiceAniListRatingSystem(const std::wstring& rating_system);
+  std::wstring GetSyncServiceAniListToken() const;
+  void SetSyncServiceAniListToken(const std::wstring& token);
+
+  // Library
+  int GetLibraryFileSizeThreshold() const;
+  void SetLibraryFileSizeThreshold(const int bytes);
+  std::wstring GetLibraryMediaPlayerPath() const;
+  void SetLibraryMediaPlayerPath(const std::wstring& path);
+  bool GetLibraryWatchFolders() const;
+  void SetLibraryWatchFolders(const bool enabled);
+
+  // Application
+  int GetAppListDoubleClickAction() const;
+  void SetAppListDoubleClickAction(const int action);
+  int GetAppListMiddleClickAction() const;
+  void SetAppListMiddleClickAction(const int action);
+  bool GetAppListDisplayEnglishTitles() const;
+  void SetAppListDisplayEnglishTitles(const bool enabled);
+  bool GetAppListHighlightNewEpisodes() const;
+  void SetAppListHighlightNewEpisodes(const bool enabled);
+  bool GetAppListDisplayHighlightedOnTop() const;
+  void SetAppListDisplayHighlightedOnTop(const bool enabled);
+  bool GetAppListProgressDisplayAired() const;
+  void SetAppListProgressDisplayAired(const bool enabled);
+  bool GetAppListProgressDisplayAvailable() const;
+  void SetAppListProgressDisplayAvailable(const bool enabled);
+  std::wstring GetAppListSortColumnPrimary() const;
+  void SetAppListSortColumnPrimary(const std::wstring& column);
+  std::wstring GetAppListSortColumnSecondary() const;
+  void SetAppListSortColumnSecondary(const std::wstring& column);
+  int GetAppListSortOrderPrimary() const;
+  void SetAppListSortOrderPrimary(const int order);
+  int GetAppListSortOrderSecondary() const;
+  void SetAppListSortOrderSecondary(const int order);
+  std::wstring GetAppListTitleLanguagePreference() const;
+  void SetAppListTitleLanguagePreference(const std::wstring& language);
+  bool GetAppBehaviorAutostart() const;
+  void SetAppBehaviorAutostart(const bool enabled);
+  bool GetAppBehaviorStartMinimized() const;
+  void SetAppBehaviorStartMinimized(const bool enabled);
+  bool GetAppBehaviorCheckForUpdates() const;
+  void SetAppBehaviorCheckForUpdates(const bool enabled);
+  bool GetAppBehaviorScanAvailableEpisodes() const;
+  void SetAppBehaviorScanAvailableEpisodes(const bool enabled);
+  bool GetAppBehaviorCloseToTray() const;
+  void SetAppBehaviorCloseToTray(const bool enabled);
+  bool GetAppBehaviorMinimizeToTray() const;
+  void SetAppBehaviorMinimizeToTray(const bool enabled);
+  std::wstring GetAppConnectionProxyHost() const;
+  void SetAppConnectionProxyHost(const std::wstring& host);
+  std::wstring GetAppConnectionProxyUsername() const;
+  void SetAppConnectionProxyUsername(const std::wstring& username);
+  std::wstring GetAppConnectionProxyPassword() const;
+  void SetAppConnectionProxyPassword(const std::wstring& password);
+  bool GetAppConnectionNoRevoke() const;
+  void SetAppConnectionNoRevoke(const bool enabled);
+  bool GetAppConnectionReuseActive() const;
+  void SetAppConnectionReuseActive(const bool enabled);
+  std::wstring GetAppInterfaceTheme() const;
+  void SetAppInterfaceTheme(const std::wstring& theme);
+  std::wstring GetAppInterfaceExternalLinks() const;
+  void SetAppInterfaceExternalLinks(const std::wstring& str);
+
+  // Recognition
+  int GetRecognitionDetectionInterval() const;
+  void SetRecognitionDetectionInterval(const int seconds);
+  bool GetRecognitionDetectMediaPlayers() const;
+  void SetRecognitionDetectMediaPlayers(const bool enabled);
+  bool GetRecognitionDetectStreamingMedia() const;
+  void SetRecognitionDetectStreamingMedia(const bool enabled);
+  std::wstring GetRecognitionIgnoredStrings() const;
+  void SetRecognitionIgnoredStrings(const std::wstring& str);
+  bool GetRecognitionLookupParentDirectories() const;
+  void SetRecognitionLookupParentDirectories(const bool enabled);
+  std::wstring GetRecognitionRelationsLastModified() const;
+  void SetRecognitionRelationsLastModified(const std::wstring& last_modified);
+  int GetSyncUpdateDelay() const;
+  void SetSyncUpdateDelay(const int seconds);
+  bool GetSyncUpdateAskToConfirm() const;
+  void SetSyncUpdateAskToConfirm(const bool enabled);
+  bool GetSyncUpdateCheckPlayer() const;
+  void SetSyncUpdateCheckPlayer(const bool enabled);
+  bool GetSyncUpdateOutOfRange() const;
+  void SetSyncUpdateOutOfRange(const bool enabled);
+  bool GetSyncUpdateOutOfRoot() const;
+  void SetSyncUpdateOutOfRoot(const bool enabled);
+  bool GetSyncUpdateWaitPlayer() const;
+  void SetSyncUpdateWaitPlayer(const bool enabled);
+  bool GetSyncGoToNowPlayingRecognized() const;
+  void SetSyncGoToNowPlayingRecognized(const bool enabled);
+  bool GetSyncGoToNowPlayingNotRecognized() const;
+  void SetSyncGoToNowPlayingNotRecognized(const bool enabled);
+  bool GetSyncNotifyRecognized() const;
+  void SetSyncNotifyRecognized(const bool enabled);
+  bool GetSyncNotifyNotRecognized() const;
+  void SetSyncNotifyNotRecognized(const bool enabled);
+  std::wstring GetSyncNotifyFormat() const;
+  void SetSyncNotifyFormat(const std::wstring& format);
+  bool GetStreamAnimelab() const;
+  void SetStreamAnimelab(const bool enabled);
+  bool GetStreamAdn() const;
+  void SetStreamAdn(const bool enabled);
+  bool GetStreamAnn() const;
+  void SetStreamAnn(const bool enabled);
+  bool GetStreamCrunchyroll() const;
+  void SetStreamCrunchyroll(const bool enabled);
+  bool GetStreamFunimation() const;
+  void SetStreamFunimation(const bool enabled);
+  bool GetStreamHidive() const;
+  void SetStreamHidive(const bool enabled);
+  bool GetStreamPlex() const;
+  void SetStreamPlex(const bool enabled);
+  bool GetStreamVeoh() const;
+  void SetStreamVeoh(const bool enabled);
+  bool GetStreamViz() const;
+  void SetStreamViz(const bool enabled);
+  bool GetStreamVrv() const;
+  void SetStreamVrv(const bool enabled);
+  bool GetStreamWakanim() const;
+  void SetStreamWakanim(const bool enabled);
+  bool GetStreamYahoo() const;
+  void SetStreamYahoo(const bool enabled);
+  bool GetStreamYoutube() const;
+  void SetStreamYoutube(const bool enabled);
+
+  // Sharing
+  std::wstring GetShareDiscordApplicationId() const;
+  void SetShareDiscordApplicationId(const std::wstring& application_id);
+  bool GetShareDiscordEnabled() const;
+  void SetShareDiscordEnabled(const bool enabled);
+  std::wstring GetShareDiscordFormatDetails() const;
+  void SetShareDiscordFormatDetails(const std::wstring& format);
+  std::wstring GetShareDiscordFormatState() const;
+  void SetShareDiscordFormatState(const std::wstring& format);
+  bool GetShareDiscordUsernameEnabled() const;
+  void SetShareDiscordUsernameEnabled(const bool enabled);
+  bool GetShareHttpEnabled() const;
+  void SetShareHttpEnabled(const bool enabled);
+  std::wstring GetShareHttpFormat() const;
+  void SetShareHttpFormat(const std::wstring& format);
+  std::wstring GetShareHttpUrl() const;
+  void SetShareHttpUrl(const std::wstring& url);
+  bool GetShareMircEnabled() const;
+  void SetShareMircEnabled(const bool enabled);
+  bool GetShareMircMultiServer() const;
+  void SetShareMircMultiServer(const bool enabled);
+  bool GetShareMircUseMeAction() const;
+  void SetShareMircUseMeAction(const bool enabled);
+  int GetShareMircMode() const;
+  void SetShareMircMode(const int mode);
+  std::wstring GetShareMircChannels() const;
+  void SetShareMircChannels(const std::wstring& channels);
+  std::wstring GetShareMircFormat() const;
+  void SetShareMircFormat(const std::wstring& format);
+  std::wstring GetShareMircService() const;
+  void SetShareMircService(const std::wstring& service);
+  bool GetShareTwitterEnabled() const;
+  void SetShareTwitterEnabled(const bool enabled);
+  std::wstring GetShareTwitterFormat() const;
+  void SetShareTwitterFormat(const std::wstring& format);
+  std::wstring GetShareTwitterOauthToken() const;
+  void SetShareTwitterOauthToken(const std::wstring& oauth_token);
+  std::wstring GetShareTwitterOauthSecret() const;
+  void SetShareTwitterOauthSecret(const std::wstring& oauth_secret);
+  std::wstring GetShareTwitterUsername() const;
+  void SetShareTwitterUsername(const std::wstring& username);
+
+  // Torrents
+  std::wstring GetTorrentDiscoverySource() const;
+  void SetTorrentDiscoverySource(const std::wstring& url);
+  std::wstring GetTorrentDiscoverySearchUrl() const;
+  void SetTorrentDiscoverySearchUrl(const std::wstring& url);
+  bool GetTorrentDiscoveryAutoCheckEnabled() const;
+  void SetTorrentDiscoveryAutoCheckEnabled(const bool enabled);
+  int GetTorrentDiscoveryAutoCheckInterval() const;
+  void SetTorrentDiscoveryAutoCheckInterval(const int minutes);
+  int GetTorrentDiscoveryNewAction() const;
+  void SetTorrentDiscoveryNewAction(const int action);
+  int GetTorrentDownloadAppMode() const;
+  void SetTorrentDownloadAppMode(const int mode);
+  bool GetTorrentDownloadAppOpen() const;
+  void SetTorrentDownloadAppOpen(const bool enabled);
+  std::wstring GetTorrentDownloadAppPath() const;
+  void SetTorrentDownloadAppPath(const std::wstring& path);
+  std::wstring GetTorrentDownloadLocation() const;
+  void SetTorrentDownloadLocation(const std::wstring& path);
+  bool GetTorrentDownloadUseAnimeFolder() const;
+  void SetTorrentDownloadUseAnimeFolder(const bool enabled);
+  bool GetTorrentDownloadFallbackOnFolder() const;
+  void SetTorrentDownloadFallbackOnFolder(const bool enabled);
+  bool GetTorrentDownloadCreateSubfolder() const;
+  void SetTorrentDownloadCreateSubfolder(const bool enabled);
+  std::wstring GetTorrentDownloadSortBy() const;
+  void SetTorrentDownloadSortBy(const std::wstring& sort);
+  std::wstring GetTorrentDownloadSortOrder() const;
+  void SetTorrentDownloadSortOrder(const std::wstring& order);
+  bool GetTorrentDownloadUseMagnet() const;
+  void SetTorrentDownloadUseMagnet(const bool enabled);
+  bool GetTorrentFilterEnabled() const;
+  void SetTorrentFilterEnabled(const bool enabled);
+  int GetTorrentFilterArchiveMaxCount() const;
+  void SetTorrentFilterArchiveMaxCount(const int count);
+
+  // Internal
+  int GetAppPositionX() const;
+  void SetAppPositionX(const int x);
+  int GetAppPositionY() const;
+  void SetAppPositionY(const int y);
+  int GetAppPositionW() const;
+  void SetAppPositionW(const int width);
+  int GetAppPositionH() const;
+  void SetAppPositionH(const int height);
+  bool GetAppPositionMaximized() const;
+  void SetAppPositionMaximized(const bool enabled);
+  bool GetAppPositionRemember() const;
+  void SetAppPositionRemember(const bool enabled);
+  bool GetAppOptionHideSidebar() const;
+  void SetAppOptionHideSidebar(const bool enabled);
+  bool GetAppOptionEnableRecognition() const;
+  void SetAppOptionEnableRecognition(const bool enabled);
+  bool GetAppOptionEnableSharing() const;
+  void SetAppOptionEnableSharing(const bool enabled);
+  bool GetAppOptionEnableSync() const;
+  void SetAppOptionEnableSync(const bool enabled);
+  std::wstring GetAppSeasonsLastSeason() const;
+  void SetAppSeasonsLastSeason(const std::wstring& season);
+  int GetAppSeasonsGroupBy() const;
+  void SetAppSeasonsGroupBy(const int group_by);
+  int GetAppSeasonsSortBy() const;
+  void SetAppSeasonsSortBy(const int sort_by);
+  int GetAppSeasonsViewAs() const;
+  void SetAppSeasonsViewAs(const int view_as);
 
   sync::Service* GetCurrentService() const;
   sync::ServiceId GetCurrentServiceId() const;
@@ -205,7 +455,28 @@ public:
   std::vector<std::wstring> library_folders;
 
 private:
-  void InitializeMap();
+  struct AppSetting {
+    base::Settings::key_t key;
+    base::Settings::value_t default_value;
+  };
+
+  template <typename T>
+  T value(const AppSettingKey key) const;
+
+  template <typename T>
+  void set_value(const AppSettingKey key, T&& value);
+
+  void InitKeyMap() const;
+  const AppSetting& GetSetting(const AppSettingKey key) const;
+
+  bool DeserializeFromXml();
+  bool SerializeToXml() const;
+
+  mutable std::map<AppSettingKey, AppSetting> key_map_;
+  mutable std::mutex mutex_;
+
+  bool modified_ = false;
+  base::Settings settings_;
 };
 
 sync::Service* GetCurrentService();
@@ -215,6 +486,6 @@ std::wstring GetCurrentUserEmail();
 std::wstring GetCurrentUsername();
 std::wstring GetCurrentPassword();
 
-}  // namespace taiga
+inline AppSettings settings;
 
-extern taiga::AppSettings Settings;
+}  // namespace taiga

@@ -63,9 +63,10 @@ static void AccessToken(const std::wstring& key, const std::wstring& secret,
 }
 
 bool SetStatusText(const std::wstring& status_text) {
-  if (Settings[taiga::kShare_Twitter_OauthToken].empty() ||
-      Settings[taiga::kShare_Twitter_OauthSecret].empty())
+  if (taiga::settings.GetShareTwitterOauthToken().empty() ||
+      taiga::settings.GetShareTwitterOauthSecret().empty()) {
     return false;
+  }
 
   if (status_text.empty() || status_text == previous_status_text)
     return false;
@@ -85,8 +86,8 @@ bool SetStatusText(const std::wstring& status_text) {
   http_request.header[L"Authorization"] =
       oauth.BuildAuthorizationHeader(http_request.url.Build(),
                                      L"POST", &post_parameters,
-                                     Settings[taiga::kShare_Twitter_OauthToken],
-                                     Settings[taiga::kShare_Twitter_OauthSecret]);
+                                     taiga::settings.GetShareTwitterOauthToken(),
+                                     taiga::settings.GetShareTwitterOauthSecret());
 
   ConnectionManager.MakeRequest(http_request, taiga::kHttpTwitterPost);
   return true;
@@ -117,9 +118,9 @@ void HandleHttpResponse(const taiga::HttpClientMode mode,
       oauth_parameter_t parameters = oauth.ParseQueryString(response.body);
       if (!parameters[L"oauth_token"].empty() &&
           !parameters[L"oauth_token_secret"].empty()) {
-        Settings.Set(taiga::kShare_Twitter_OauthToken, parameters[L"oauth_token"]);
-        Settings.Set(taiga::kShare_Twitter_OauthSecret, parameters[L"oauth_token_secret"]);
-        Settings.Set(taiga::kShare_Twitter_Username, parameters[L"screen_name"]);
+        taiga::settings.SetShareTwitterOauthToken(parameters[L"oauth_token"]);
+        taiga::settings.SetShareTwitterOauthSecret(parameters[L"oauth_token_secret"]);
+        taiga::settings.SetShareTwitterUsername(parameters[L"screen_name"]);
         success = true;
       }
       ui::OnTwitterAuth(success);

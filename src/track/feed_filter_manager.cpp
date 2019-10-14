@@ -85,7 +85,7 @@ void FeedFilterManager::Cleanup() {
 }
 
 void FeedFilterManager::Filter(Feed& feed, bool preferences) {
-  if (!Settings.GetBool(taiga::kTorrent_Filter_Enabled))
+  if (!taiga::settings.GetTorrentFilterEnabled())
     return;
 
   for (auto& item : feed.items) {

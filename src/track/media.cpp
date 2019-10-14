@@ -85,7 +85,7 @@ bool MediaPlayers::Load() {
 ////////////////////////////////////////////////////////////////////////////////
 
 bool MediaPlayers::IsPlayerActive() const {
-  if (!Settings.GetBool(taiga::kSync_Update_CheckPlayer))
+  if (!taiga::settings.GetSyncUpdateCheckPlayer())
     return true;
 
   return current_result_ &&
@@ -131,11 +131,11 @@ std::vector<anisthesia::Player> GetEnabledPlayers(
     switch (player.type) {
       default:
       case anisthesia::PlayerType::Default:
-        if (!Settings.GetBool(taiga::kRecognition_DetectMediaPlayers))
+        if (!taiga::settings.GetRecognitionDetectMediaPlayers())
           continue;
         break;
       case anisthesia::PlayerType::WebBrowser:
-        if (!Settings.GetBool(taiga::kRecognition_DetectStreamingMedia))
+        if (!taiga::settings.GetRecognitionDetectStreamingMedia())
           continue;
         break;
     }
@@ -150,8 +150,8 @@ bool GetTitleFromDefaultPlayer(const std::vector<anisthesia::Media>& media,
                                std::wstring& title) {
   bool invalid_file = false;
   const bool check_library_folders =
-      Settings.GetBool(taiga::kSync_Update_OutOfRoot) &&
-      !Settings.library_folders.empty();
+      taiga::settings.GetSyncUpdateOutOfRoot() &&
+      !taiga::settings.library_folders.empty();
 
   for (const auto& item : media) {
     for (const auto& information : item.information) {
@@ -360,7 +360,7 @@ void ProcessMediaPlayerStatus(const recognition::MediaPlayer* media_player) {
       bool processed = CurrentEpisode.processed;  // TODO: temporary solution...
       CurrentEpisode.Set(anime::ID_UNKNOWN);
       EndWatching(*anime_item, CurrentEpisode);
-      if (Settings.GetBool(taiga::kSync_Update_WaitPlayer)) {
+      if (taiga::settings.GetSyncUpdateWaitPlayer()) {
         CurrentEpisode.anime_id = anime_item->GetId();
         CurrentEpisode.processed = processed;
         UpdateList(*anime_item, CurrentEpisode);
@@ -383,7 +383,7 @@ void ProcessMediaPlayerTitle(const recognition::MediaPlayer& media_player) {
   auto anime_item = anime::db.Find(CurrentEpisode.anime_id);
 
   if (CurrentEpisode.anime_id == anime::ID_UNKNOWN) {
-    if (!Settings.GetBool(taiga::kApp_Option_EnableRecognition))
+    if (!taiga::settings.GetAppOptionEnableRecognition())
       return;
 
     // Examine title and compare it with list items

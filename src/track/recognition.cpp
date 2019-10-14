@@ -54,7 +54,7 @@ bool Engine::Parse(std::wstring filename, const ParseOptions& parse_options,
   // Set Anitomy options
   if (parse_options.streaming_media)
     anitomy_instance.options().allowed_delimiters = L" ";
-  Split(Settings[taiga::kRecognition_IgnoredStrings], L"|",
+  Split(taiga::settings.GetRecognitionIgnoredStrings(), L"|",
         anitomy_instance.options().ignored_strings);
 
   if (!anitomy_instance.Parse(filename)) {
@@ -128,7 +128,7 @@ int Engine::Identify(anime::Episode& episode, bool give_score,
 
   // Look up parent directories
   if (anime_ids.empty() && !episode.folder.empty() &&
-      Settings.GetBool(taiga::kRecognition_LookupParentDirectories) &&
+      taiga::settings.GetRecognitionLookupParentDirectories() &&
       episode.anime_type().empty()) {
     anime::Episode episode_from_directory(episode);
     episode_from_directory.elements().erase(anitomy::kElementAnimeTitle);
@@ -359,7 +359,7 @@ bool Engine::GetTitleFromPath(anime::Episode& episode) {
 
   std::wstring path = episode.folder;
 
-  for (const auto& library_folder : Settings.library_folders) {
+  for (const auto& library_folder : taiga::settings.library_folders) {
     if (StartsWith(path, library_folder)) {
       path.erase(0, library_folder.size());
       break;

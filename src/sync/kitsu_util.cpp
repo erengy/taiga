@@ -266,12 +266,12 @@ void ViewFeed() {
 
 void ViewLibrary() {
   ExecuteLink(kBaseUrl + L"/users/" +
-              Settings[taiga::kSync_Service_Kitsu_Username] + L"/library");
+              taiga::settings.GetSyncServiceKitsuUsername() + L"/library");
 }
 
 void ViewProfile() {
   ExecuteLink(kBaseUrl + L"/users/" +
-              Settings[taiga::kSync_Service_Kitsu_Username]);
+              taiga::settings.GetSyncServiceKitsuUsername());
 }
 
 }  // namespace kitsu

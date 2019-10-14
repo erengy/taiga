@@ -22,13 +22,10 @@
 #include <string>
 #include <vector>
 
-#include "base/types.h"
-
 namespace track {
 namespace recognition {
 
 enum class Stream {
-  Unknown,
   Animelab,
   Adn,
   Ann,
@@ -46,7 +43,6 @@ enum class Stream {
 
 struct StreamData {
   Stream id;
-  enum_t option_id;
   std::wstring name;
   std::wstring url;
   std::regex url_pattern;
@@ -54,6 +50,9 @@ struct StreamData {
 };
 
 const std::vector<StreamData>& GetStreamData();
+
+bool IsStreamEnabled(const Stream stream);
+void EnableStream(const Stream stream, const bool enabled);
 
 bool GetTitleFromStreamingMediaProvider(const std::wstring& url, std::wstring& title);
 void NormalizeWebBrowserTitle(const std::wstring& url, std::wstring& title);

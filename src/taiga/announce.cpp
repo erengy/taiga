@@ -34,27 +34,27 @@ Announcer::~Announcer() {
 
 void Announcer::Clear(int modes, bool force) {
   if (modes & kAnnounceToDiscord)
-    if (Settings.GetBool(kShare_Discord_Enabled) || force)
+    if (settings.GetShareDiscordEnabled() || force)
       link::discord::ClearPresence();
 
   if (modes & kAnnounceToHttp)
-    if (Settings.GetBool(kShare_Http_Enabled) || force)
-      link::http::Send(Settings[kShare_Http_Url], L"");
+    if (settings.GetShareHttpEnabled() || force)
+      link::http::Send(settings.GetShareHttpUrl(), L"");
 }
 
 void Announcer::Do(int modes, anime::Episode* episode, bool force) {
-  if (!force && !Settings.GetBool(kApp_Option_EnableSharing))
+  if (!force && !settings.GetAppOptionEnableSharing())
     return;
 
   if (!episode)
     episode = &CurrentEpisode;
 
   if (modes & kAnnounceToHttp) {
-    if (Settings.GetBool(kShare_Http_Enabled) || force) {
+    if (settings.GetShareHttpEnabled() || force) {
       LOGD(L"HTTP");
-      const auto data = ReplaceVariables(Settings[kShare_Http_Format],
+      const auto data = ReplaceVariables(settings.GetShareHttpFormat(),
                                          *episode, true, force);
-      link::http::Send(Settings[kShare_Http_Url], data);
+      link::http::Send(settings.GetShareHttpUrl(), data);
     }
   }
 
@@ -62,38 +62,38 @@ void Announcer::Do(int modes, anime::Episode* episode, bool force) {
     return;
 
   if (modes & kAnnounceToDiscord) {
-    if (Settings.GetBool(kShare_Discord_Enabled) || force) {
+    if (settings.GetShareDiscordEnabled() || force) {
       LOGD(L"Discord");
       const std::wstring details = LimitText(ReplaceVariables(
-          Settings[kShare_Discord_Format_Details], *episode, false, force), 64);
+          settings.GetShareDiscordFormatDetails(), *episode, false, force), 64);
       const std::wstring state = LimitText(ReplaceVariables(
-          Settings[kShare_Discord_Format_State], *episode, false, force), 64);
+          settings.GetShareDiscordFormatState(), *episode, false, force), 64);
       auto timestamp = std::time(nullptr);
       if (!force)
-        timestamp -= Settings.GetInt(taiga::kSync_Update_Delay);
+        timestamp -= settings.GetSyncUpdateDelay();
       link::discord::UpdatePresence(WstrToStr(details), WstrToStr(state), timestamp);
     }
   }
 
   if (modes & kAnnounceToMirc) {
-    if (Settings.GetBool(kShare_Mirc_Enabled) || force) {
+    if (settings.GetShareMircEnabled() || force) {
       LOGD(L"mIRC");
-      const auto data = ReplaceVariables(Settings[kShare_Mirc_Format],
+      const auto data = ReplaceVariables(settings.GetShareMircFormat(),
                                          *episode, false, force);
-      if (!link::mirc::Send(Settings[kShare_Mirc_Service],
-                            Settings[kShare_Mirc_Channels],
-                            data, Settings.GetInt(kShare_Mirc_Mode),
-                            Settings.GetBool(kShare_Mirc_UseMeAction),
-                            Settings.GetBool(kShare_Mirc_MultiServer))) {
+      if (!link::mirc::Send(settings.GetShareMircService(),
+                            settings.GetShareMircChannels(),
+                            data, settings.GetShareMircMode(),
+                            settings.GetShareMircUseMeAction(),
+                            settings.GetShareMircMultiServer())) {
         ui::OnMircDdeConnectionFail();
       }
     }
   }
 
   if (modes & kAnnounceToTwitter) {
-    if (Settings.GetBool(kShare_Twitter_Enabled) || force) {
+    if (settings.GetShareTwitterEnabled() || force) {
       LOGD(L"Twitter");
-      const auto status_text = ReplaceVariables(Settings[kShare_Twitter_Format],
+      const auto status_text = ReplaceVariables(settings.GetShareTwitterFormat(),
                                                 *episode, false, force);
       link::twitter::SetStatusText(status_text);
     }

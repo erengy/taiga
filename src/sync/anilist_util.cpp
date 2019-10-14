@@ -305,12 +305,12 @@ void ViewAnimePage(int anime_id) {
 
 void ViewProfile() {
   ExecuteLink(L"{}/user/{}"_format(kBaseUrl,
-              Settings[taiga::kSync_Service_AniList_Username]));
+              taiga::settings.GetSyncServiceAniListUsername()));
 }
 
 void ViewStats() {
   ExecuteLink(L"{}/user/{}/stats"_format(kBaseUrl,
-              Settings[taiga::kSync_Service_AniList_Username]));
+              taiga::settings.GetSyncServiceAniListUsername()));
 }
 
 }  // namespace anilist

@@ -219,13 +219,13 @@ void Manager::HandleResponse(Response& response, HttpResponse& http_response) {
       // Update settings with the returned value for the correct letter case
       switch (response.service_id) {
         case kMyAnimeList:
-          Settings.Set(taiga::kSync_Service_Mal_Username, username);
+          taiga::settings.SetSyncServiceMalUsername(username);
           break;
         case kKitsu:
-          Settings.Set(taiga::kSync_Service_Kitsu_Username, username);
+          taiga::settings.SetSyncServiceKitsuUsername(username);
           break;
         case kAniList:
-          Settings.Set(taiga::kSync_Service_AniList_Username, username);
+          taiga::settings.SetSyncServiceAniListUsername(username);
           break;
       }
     }

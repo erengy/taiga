@@ -112,10 +112,10 @@ BOOL App::InitInstance() {
   InitializeDummies();
 
   // Initialize Discord
-  if (Settings.GetBool(kShare_Discord_Enabled))
+  if (settings.GetShareDiscordEnabled())
     link::discord::Initialize();
 
-  if (Settings.GetBool(kApp_Behavior_CheckForUpdates)) {
+  if (settings.GetAppBehaviorCheckForUpdates()) {
     ui::ShowDialog(ui::Dialog::Update);
   } else {
     ui::ShowDialog(ui::Dialog::Main);
@@ -138,7 +138,7 @@ void App::Uninitialize() {
   ui::taskbar_list.Release();
 
   // Save
-  Settings.Save();
+  settings.Save();
   anime::db.SaveDatabase();
   track::aggregator.SaveArchive();
 
@@ -149,9 +149,11 @@ void App::Uninitialize() {
 void App::LoadData() {
   track::media_players.Load();
 
-  if (Settings.Load())
-    if (Settings.HandleCompatibility())
-      Settings.Save();
+  if (settings.Load()) {
+    settings.DoAfterLoad();
+    if (settings.HandleCompatibility())
+      settings.Save();
+  }
 
   ui::Theme.Load();
   ui::Menus.Load();
@@ -161,6 +163,7 @@ void App::LoadData() {
   anime::db.ClearInvalidItems();
 
   library::history.Load();
+  track::aggregator.LoadArchive();
 }
 
 }  // namespace taiga

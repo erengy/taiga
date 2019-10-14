@@ -74,7 +74,7 @@ bool PlayEpisode(int anime_id, int number) {
     return false;
   }
 
-  const auto player_path = Settings[taiga::kLibrary_MediaPlayerPath];
+  const auto player_path = taiga::settings.GetLibraryMediaPlayerPath();
   if (player_path.empty()) {
     return Execute(file_path);
   } else {

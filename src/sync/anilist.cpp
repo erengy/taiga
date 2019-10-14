@@ -574,7 +574,7 @@ void Service::ParseUserObject(const Json& json) {
   user_.rating_system =
       StrToWstr(JsonReadStr(json["mediaListOptions"], "scoreFormat"));
 
-  Settings.Set(taiga::kSync_Service_AniList_RatingSystem, user_.rating_system);
+  taiga::settings.SetSyncServiceAniListRatingSystem(user_.rating_system);
 }
 
 bool Service::ParseResponseBody(const std::wstring& body,

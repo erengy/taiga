@@ -24,7 +24,11 @@
 
 namespace taiga {
 
+// @TODO
 bool AppSettings::HandleCompatibility() {
+  return false;
+
+  /*
   const semaver::Version version(WstrToStr(GetWstr(kMeta_Version)));
 
   if (version == taiga::version())
@@ -43,6 +47,7 @@ bool AppSettings::HandleCompatibility() {
       }
     }
   }
+  */
 
   return true;
 }

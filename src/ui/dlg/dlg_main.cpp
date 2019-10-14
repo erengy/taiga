@@ -99,10 +99,10 @@ BOOL MainDialog::OnInitDialog() {
   ui::Menus.UpdateAll();
 
   // Apply startup settings
-  if (Settings.GetBool(taiga::kSync_AutoOnStart)) {
+  if (taiga::settings.GetSyncAutoOnStart()) {
     sync::Synchronize();
   }
-  if (Settings.GetBool(taiga::kApp_Behavior_ScanAvailableEpisodes)) {
+  if (taiga::settings.GetAppBehaviorScanAvailableEpisodes()) {
     ScanAvailableEpisodesQuick();
   }
 
@@ -122,7 +122,7 @@ BOOL MainDialog::OnInitDialog() {
     if (dlg.GetSelectedButtonID() == IDYES)
       ShowDlgSettings(kSettingsSectionServices, kSettingsPageServicesMain);
   }
-  if (Settings.GetBool(taiga::kLibrary_WatchFolders)) {
+  if (taiga::settings.GetLibraryWatchFolders()) {
     track::monitor.SetWindowHandle(GetWindowHandle());
     track::monitor.Enable();
   }
@@ -174,7 +174,7 @@ void MainDialog::CreateDialogControls() {
   treeview.SetImageList(ui::Theme.GetImageList16().GetHandle());
   treeview.SetItemHeight(ScaleY(20));
   treeview.SetTheme();
-  if (Settings.GetBool(taiga::kApp_Option_HideSidebar)) {
+  if (taiga::settings.GetAppOptionHideSidebar()) {
     treeview.Hide();
   }
   // Create status bar
@@ -247,10 +247,10 @@ void MainDialog::CreateDialogControls() {
 
 void MainDialog::InitWindowPosition() {
   win::Rect rcWindow(
-      Settings.GetInt(taiga::kApp_Position_X),
-      Settings.GetInt(taiga::kApp_Position_Y),
-      Settings.GetInt(taiga::kApp_Position_X) + Settings.GetInt(taiga::kApp_Position_W),
-      Settings.GetInt(taiga::kApp_Position_Y) + Settings.GetInt(taiga::kApp_Position_H));
+      taiga::settings.GetAppPositionX(),
+      taiga::settings.GetAppPositionY(),
+      taiga::settings.GetAppPositionX() + taiga::settings.GetAppPositionW(),
+      taiga::settings.GetAppPositionY() + taiga::settings.GetAppPositionH());
 
   bool first_time = rcWindow.left == -1 && rcWindow.top == -1;
   bool center_owner = first_time;
@@ -259,9 +259,9 @@ void MainDialog::InitWindowPosition() {
   wp.length = sizeof(WINDOWPLACEMENT);
   wp.showCmd = SW_SHOWNORMAL;
 
-  if (Settings.GetBool(taiga::kApp_Position_Remember)) {
+  if (taiga::settings.GetAppPositionRemember()) {
     CopyRect(&wp.rcNormalPosition, &rcWindow);
-    if (Settings.GetBool(taiga::kApp_Position_Maximized)) {
+    if (taiga::settings.GetAppPositionMaximized()) {
       wp.flags = WPF_RESTORETOMAXIMIZED;
       wp.showCmd = SW_SHOWMAXIMIZED;
     }
@@ -270,7 +270,7 @@ void MainDialog::InitWindowPosition() {
     center_owner = true;
   }
 
-  if (Settings.GetBool(taiga::kApp_Behavior_StartMinimized)) {
+  if (taiga::settings.GetAppBehaviorStartMinimized()) {
     wp.showCmd = SW_SHOWMINIMIZED;
   }
 
@@ -279,8 +279,8 @@ void MainDialog::InitWindowPosition() {
   if (center_owner)
     CenterOwner();
 
-  if (Settings.GetBool(taiga::kApp_Behavior_StartMinimized) &&
-      Settings.GetBool(taiga::kApp_Behavior_MinimizeToTray)) {
+  if (taiga::settings.GetAppBehaviorStartMinimized() &&
+      taiga::settings.GetAppBehaviorMinimizeToTray()) {
     Show(SW_HIDE);
   }
 }
@@ -413,7 +413,7 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
                 return TRUE;
               }
               case SearchMode::Feed: {
-                DlgTorrent.Search(Settings[taiga::kTorrent_Discovery_SearchUrl], text);
+                DlgTorrent.Search(taiga::settings.GetTorrentDiscoverySearchUrl(), text);
                 return TRUE;
               }
             }
@@ -491,7 +491,7 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
             case kSidebarItemFeeds: {
               // Check new torrents
               edit.SetText(L"");
-              track::aggregator.CheckFeed(Settings[taiga::kTorrent_Discovery_Source]);
+              track::aggregator.CheckFeed(taiga::settings.GetTorrentDiscoverySource());
               return TRUE;
             }
           }
@@ -505,8 +505,8 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
       if (IsNumericChar(pMsg->wParam)) {
         int index = (pMsg->wParam - '0') - 1;
         if (index >= 0 &&
-            index < static_cast<int>(Settings.library_folders.size())) {
-          Execute(Settings.library_folders.at(index));
+            index < static_cast<int>(taiga::settings.library_folders.size())) {
+          Execute(taiga::settings.library_folders.at(index));
           return TRUE;
         }
       } else if (handle_menu_accelerator()) {
@@ -589,7 +589,7 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
 ////////////////////////////////////////////////////////////////////////////////
 
 BOOL MainDialog::OnClose() {
-  if (Settings.GetBool(taiga::kApp_Behavior_CloseToTray)) {
+  if (taiga::settings.GetAppBehaviorCloseToTray()) {
     Hide();
     return TRUE;
   }
@@ -598,19 +598,19 @@ BOOL MainDialog::OnClose() {
 }
 
 BOOL MainDialog::OnDestroy() {
-  if (Settings.GetBool(taiga::kApp_Position_Remember)) {
+  if (taiga::settings.GetAppPositionRemember()) {
     WINDOWPLACEMENT wp = {0};
     wp.length = sizeof(WINDOWPLACEMENT);
     if (GetPlacement(wp)) {
       bool maximized = wp.showCmd == SW_SHOWMAXIMIZED;
       bool restore_to_maximized = (wp.showCmd == SW_SHOWMINIMIZED) &&
                                   (wp.flags & WPF_RESTORETOMAXIMIZED);
-      Settings.Set(taiga::kApp_Position_Maximized, maximized || restore_to_maximized);
+      taiga::settings.SetAppPositionMaximized(maximized || restore_to_maximized);
       win::Rect rcWindow(wp.rcNormalPosition);
-      Settings.Set(taiga::kApp_Position_X, rcWindow.left);
-      Settings.Set(taiga::kApp_Position_Y, rcWindow.top);
-      Settings.Set(taiga::kApp_Position_W, rcWindow.Width());
-      Settings.Set(taiga::kApp_Position_H, rcWindow.Height());
+      taiga::settings.SetAppPositionX(rcWindow.left);
+      taiga::settings.SetAppPositionY(rcWindow.top);
+      taiga::settings.SetAppPositionW(rcWindow.Width());
+      taiga::settings.SetAppPositionH(rcWindow.Height());
     }
   }
 
@@ -631,7 +631,7 @@ void MainDialog::OnDropFiles(HDROP hDropInfo) {
     anime::Episode episode;
     track::recognition::ParseOptions parse_options;
     Meow.Parse(buffer, parse_options, episode);
-    MessageBox(ReplaceVariables(Settings[taiga::kSync_Notify_Format], episode).c_str(), TAIGA_APP_NAME, MB_OK);
+    MessageBox(ReplaceVariables(taiga::settings.GetSyncNotifyFormat(), episode).c_str(), TAIGA_APP_NAME, MB_OK);
   }
 #endif
 }
@@ -679,7 +679,7 @@ void MainDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
   switch (uMsg) {
     case WM_SIZE: {
       if (nType == SIZE_MINIMIZED) {
-        if (Settings.GetBool(taiga::kApp_Behavior_MinimizeToTray))
+        if (taiga::settings.GetAppBehaviorMinimizeToTray())
           Hide();
         return;
       }
@@ -827,7 +827,7 @@ void MainDialog::UpdateStatusTimer() {
     auto timer = taiga::timers.timer(taiga::kTimerMedia);
     int seconds = timer ? timer->ticks() : 0;
     bool waiting_for_media_player = seconds == 0 &&
-        Settings.GetBool(taiga::kSync_Update_WaitPlayer);
+        taiga::settings.GetSyncUpdateWaitPlayer();
 
     std::wstring str = L"List update in " + ToTimeString(seconds);
     if (waiting_for_media_player)
@@ -887,7 +887,7 @@ void MainDialog::UpdateTitle() {
   if (anime_item) {
     title += L" \u2013 " + anime::GetPreferredTitle(*anime_item) +
              PushString(L" #", anime::GetEpisodeRange(CurrentEpisode));
-    if (Settings.GetBool(taiga::kSync_Update_OutOfRange) &&
+    if (taiga::settings.GetSyncUpdateOutOfRange() &&
         anime::GetEpisodeLow(CurrentEpisode) > anime_item->GetMyLastWatchedEpisode() + 1) {
       title += L" (out of range)";
     }

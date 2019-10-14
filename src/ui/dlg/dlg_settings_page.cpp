@@ -102,32 +102,31 @@ BOOL SettingsPage::OnInitDialog() {
     case kSettingsPageServicesMain: {
       win::ComboBox combo(GetDlgItem(IDC_COMBO_SERVICE));
       for (int i = sync::kFirstService; i <= sync::kLastService; i++) {
-        auto service = ServiceManager.service(static_cast<sync::ServiceId>(i));
+        const auto service = ServiceManager.service(static_cast<sync::ServiceId>(i));
         combo.AddItem(service->name().c_str(), service->id());
-        auto active_service = ServiceManager.service(Settings[taiga::kSync_ActiveService]);
-        if (service->id() == active_service->id())
+        if (service->id() == taiga::settings.GetSyncActiveService())
           combo.SetCurSel(combo.GetCount() - 1);
       }
       combo.SetWindowHandle(nullptr);
-      CheckDlgButton(IDC_CHECK_START_LOGIN, Settings.GetBool(taiga::kSync_AutoOnStart));
+      CheckDlgButton(IDC_CHECK_START_LOGIN, taiga::settings.GetSyncAutoOnStart());
       break;
     }
     // Services > MyAnimeList
     case kSettingsPageServicesMal: {
-      SetDlgItemText(IDC_EDIT_USER_MAL, Settings[taiga::kSync_Service_Mal_Username].c_str());
-      SetDlgItemText(IDC_EDIT_PASS_MAL, Base64Decode(Settings[taiga::kSync_Service_Mal_Password]).c_str());
+      SetDlgItemText(IDC_EDIT_USER_MAL, taiga::settings.GetSyncServiceMalUsername().c_str());
+      SetDlgItemText(IDC_EDIT_PASS_MAL, Base64Decode(taiga::settings.GetSyncServiceMalPassword()).c_str());
       break;
     }
     // Services > Kitsu
     case kSettingsPageServicesKitsu: {
-      SetDlgItemText(IDC_EDIT_USER_KITSU, Settings[taiga::kSync_Service_Kitsu_Email].c_str());
-      SetDlgItemText(IDC_EDIT_PASS_KITSU, Base64Decode(Settings[taiga::kSync_Service_Kitsu_Password]).c_str());
+      SetDlgItemText(IDC_EDIT_USER_KITSU, taiga::settings.GetSyncServiceKitsuEmail().c_str());
+      SetDlgItemText(IDC_EDIT_PASS_KITSU, Base64Decode(taiga::settings.GetSyncServiceKitsuPassword()).c_str());
       break;
     }
     // Services > AniList
     case kSettingsPageServicesAniList: {
-      SetDlgItemText(IDC_EDIT_USER_ANILIST, Settings[taiga::kSync_Service_AniList_Username].c_str());
-      if (Settings[taiga::kSync_Service_AniList_Token].empty()) {
+      SetDlgItemText(IDC_EDIT_USER_ANILIST, taiga::settings.GetSyncServiceAniListUsername().c_str());
+      if (taiga::settings.GetSyncServiceAniListToken().empty()) {
         SetDlgItemText(IDC_BUTTON_ANILIST_AUTH, L"Authorize...");
       } else {
         SetDlgItemText(IDC_BUTTON_ANILIST_AUTH, L"Re-authorize...");
@@ -145,10 +144,10 @@ BOOL SettingsPage::OnInitDialog() {
       list.SetExtendedStyle(LVS_EX_DOUBLEBUFFER);
       list.SetImageList(ui::Theme.GetImageList16().GetHandle());
       list.SetTheme();
-      for (size_t i = 0; i < Settings.library_folders.size(); i++)
-        list.InsertItem(i, -1, ui::kIcon16_Folder, 0, nullptr, Settings.library_folders[i].c_str(), 0);
+      for (size_t i = 0; i < taiga::settings.library_folders.size(); i++)
+        list.InsertItem(i, -1, ui::kIcon16_Folder, 0, nullptr, taiga::settings.library_folders[i].c_str(), 0);
       list.SetWindowHandle(nullptr);
-      CheckDlgButton(IDC_CHECK_FOLDERS_WATCH, Settings.GetBool(taiga::kLibrary_WatchFolders));
+      CheckDlgButton(IDC_CHECK_FOLDERS_WATCH, taiga::settings.GetLibraryWatchFolders());
       break;
     }
     // Library > Cache
@@ -161,13 +160,13 @@ BOOL SettingsPage::OnInitDialog() {
 
     // Application > General
     case kSettingsPageAppGeneral: {
-      CheckDlgButton(IDC_CHECK_AUTOSTART, Settings.GetBool(taiga::kApp_Behavior_Autostart));
-      CheckDlgButton(IDC_CHECK_GENERAL_CLOSE, Settings.GetBool(taiga::kApp_Behavior_CloseToTray));
-      CheckDlgButton(IDC_CHECK_GENERAL_MINIMIZE, Settings.GetBool(taiga::kApp_Behavior_MinimizeToTray));
-      CheckDlgButton(IDC_CHECK_START_VERSION, Settings.GetBool(taiga::kApp_Behavior_CheckForUpdates));
-      CheckDlgButton(IDC_CHECK_START_CHECKEPS, Settings.GetBool(taiga::kApp_Behavior_ScanAvailableEpisodes));
-      CheckDlgButton(IDC_CHECK_START_MINIMIZE, Settings.GetBool(taiga::kApp_Behavior_StartMinimized));
-      SetDlgItemText(IDC_EDIT_EXTERNALLINKS, Settings[taiga::kApp_Interface_ExternalLinks].c_str());
+      CheckDlgButton(IDC_CHECK_AUTOSTART, taiga::settings.GetAppBehaviorAutostart());
+      CheckDlgButton(IDC_CHECK_GENERAL_CLOSE, taiga::settings.GetAppBehaviorCloseToTray());
+      CheckDlgButton(IDC_CHECK_GENERAL_MINIMIZE, taiga::settings.GetAppBehaviorMinimizeToTray());
+      CheckDlgButton(IDC_CHECK_START_VERSION, taiga::settings.GetAppBehaviorCheckForUpdates());
+      CheckDlgButton(IDC_CHECK_START_CHECKEPS, taiga::settings.GetAppBehaviorScanAvailableEpisodes());
+      CheckDlgButton(IDC_CHECK_START_MINIMIZE, taiga::settings.GetAppBehaviorStartMinimized());
+      SetDlgItemText(IDC_EDIT_EXTERNALLINKS, taiga::settings.GetAppInterfaceExternalLinks().c_str());
       break;
     }
     // Application > List
@@ -178,25 +177,25 @@ BOOL SettingsPage::OnInitDialog() {
       AddComboString(IDC_COMBO_DBLCLICK, L"Play next episode");
       AddComboString(IDC_COMBO_DBLCLICK, L"View anime info");
       AddComboString(IDC_COMBO_DBLCLICK, L"View anime page");
-      SetComboSelection(IDC_COMBO_DBLCLICK, Settings.GetInt(taiga::kApp_List_DoubleClickAction));
+      SetComboSelection(IDC_COMBO_DBLCLICK, taiga::settings.GetAppListDoubleClickAction());
       AddComboString(IDC_COMBO_MDLCLICK, L"Do nothing");
       AddComboString(IDC_COMBO_MDLCLICK, L"Edit details");
       AddComboString(IDC_COMBO_MDLCLICK, L"Open folder");
       AddComboString(IDC_COMBO_MDLCLICK, L"Play next episode");
       AddComboString(IDC_COMBO_MDLCLICK, L"View anime info");
       AddComboString(IDC_COMBO_MDLCLICK, L"View anime page");
-      SetComboSelection(IDC_COMBO_MDLCLICK, Settings.GetInt(taiga::kApp_List_MiddleClickAction));
+      SetComboSelection(IDC_COMBO_MDLCLICK, taiga::settings.GetAppListMiddleClickAction());
       AddComboString(IDC_COMBO_TITLELANG, L"Romaji");
       AddComboString(IDC_COMBO_TITLELANG, L"English");
       AddComboString(IDC_COMBO_TITLELANG, L"Native");
       SetComboSelection(IDC_COMBO_TITLELANG, anime::GetTitleLanguagePreferenceIndex(
-          Settings[taiga::kApp_List_TitleLanguagePreference]));
-      bool enabled = Settings.GetBool(taiga::kApp_List_HighlightNewEpisodes);
+          taiga::settings.GetAppListTitleLanguagePreference()));
+      bool enabled = taiga::settings.GetAppListHighlightNewEpisodes();
       CheckDlgButton(IDC_CHECK_HIGHLIGHT, enabled);
-      CheckDlgButton(IDC_CHECK_HIGHLIGHT_ONTOP, Settings.GetBool(taiga::kApp_List_DisplayHighlightedOnTop));
+      CheckDlgButton(IDC_CHECK_HIGHLIGHT_ONTOP, taiga::settings.GetAppListDisplayHighlightedOnTop());
       EnableDlgItem(IDC_CHECK_HIGHLIGHT_ONTOP, enabled);
-      CheckDlgButton(IDC_CHECK_LIST_PROGRESS_AIRED, Settings.GetBool(taiga::kApp_List_ProgressDisplayAired));
-      CheckDlgButton(IDC_CHECK_LIST_PROGRESS_AVAILABLE, Settings.GetBool(taiga::kApp_List_ProgressDisplayAvailable));
+      CheckDlgButton(IDC_CHECK_LIST_PROGRESS_AIRED, taiga::settings.GetAppListProgressDisplayAired());
+      CheckDlgButton(IDC_CHECK_LIST_PROGRESS_AVAILABLE, taiga::settings.GetAppListProgressDisplayAvailable());
       break;
     }
 
@@ -204,22 +203,22 @@ BOOL SettingsPage::OnInitDialog() {
 
     // Recognition > General
     case kSettingsPageRecognitionGeneral: {
-      CheckDlgButton(IDC_CHECK_UPDATE_CONFIRM, Settings.GetBool(taiga::kSync_Update_AskToConfirm));
-      CheckDlgButton(IDC_CHECK_UPDATE_CHECKMP, Settings.GetBool(taiga::kSync_Update_CheckPlayer));
-      CheckDlgButton(IDC_CHECK_UPDATE_RANGE, Settings.GetBool(taiga::kSync_Update_OutOfRange));
-      CheckDlgButton(IDC_CHECK_UPDATE_ROOT, Settings.GetBool(taiga::kSync_Update_OutOfRoot));
-      CheckDlgButton(IDC_CHECK_UPDATE_WAITMP, Settings.GetBool(taiga::kSync_Update_WaitPlayer));
+      CheckDlgButton(IDC_CHECK_UPDATE_CONFIRM, taiga::settings.GetSyncUpdateAskToConfirm());
+      CheckDlgButton(IDC_CHECK_UPDATE_CHECKMP, taiga::settings.GetSyncUpdateCheckPlayer());
+      CheckDlgButton(IDC_CHECK_UPDATE_RANGE, taiga::settings.GetSyncUpdateOutOfRange());
+      CheckDlgButton(IDC_CHECK_UPDATE_ROOT, taiga::settings.GetSyncUpdateOutOfRoot());
+      CheckDlgButton(IDC_CHECK_UPDATE_WAITMP, taiga::settings.GetSyncUpdateWaitPlayer());
       SendDlgItemMessage(IDC_SPIN_DELAY, UDM_SETRANGE32, 10, 3600);
-      SendDlgItemMessage(IDC_SPIN_DELAY, UDM_SETPOS32, 0, Settings.GetInt(taiga::kSync_Update_Delay));
-      CheckDlgButton(IDC_CHECK_NOTIFY_RECOGNIZED, Settings.GetBool(taiga::kSync_Notify_Recognized));
-      CheckDlgButton(IDC_CHECK_NOTIFY_NOTRECOGNIZED, Settings.GetBool(taiga::kSync_Notify_NotRecognized));
-      CheckDlgButton(IDC_CHECK_GOTO_RECOGNIZED, Settings.GetBool(taiga::kSync_GoToNowPlaying_Recognized));
-      CheckDlgButton(IDC_CHECK_GOTO_NOTRECOGNIZED, Settings.GetBool(taiga::kSync_GoToNowPlaying_NotRecognized));
+      SendDlgItemMessage(IDC_SPIN_DELAY, UDM_SETPOS32, 0, taiga::settings.GetSyncUpdateDelay());
+      CheckDlgButton(IDC_CHECK_NOTIFY_RECOGNIZED, taiga::settings.GetSyncNotifyRecognized());
+      CheckDlgButton(IDC_CHECK_NOTIFY_NOTRECOGNIZED, taiga::settings.GetSyncNotifyNotRecognized());
+      CheckDlgButton(IDC_CHECK_GOTO_RECOGNIZED, taiga::settings.GetSyncGoToNowPlayingRecognized());
+      CheckDlgButton(IDC_CHECK_GOTO_NOTRECOGNIZED, taiga::settings.GetSyncGoToNowPlayingNotRecognized());
       break;
     }
     // Recognition > Media players
     case kSettingsPageRecognitionMedia: {
-      bool enabled = Settings.GetBool(taiga::kRecognition_DetectMediaPlayers);
+      bool enabled = taiga::settings.GetRecognitionDetectMediaPlayers();
       CheckDlgButton(IDC_CHECK_DETECT_MEDIA_PLAYER, enabled);
       win::ListView list = GetDlgItem(IDC_LIST_MEDIA);
       list.Enable(enabled);
@@ -252,7 +251,7 @@ BOOL SettingsPage::OnInitDialog() {
     }
     // Recognition > Streaming media
     case kSettingsPageRecognitionStream: {
-      bool enabled = Settings.GetBool(taiga::kRecognition_DetectStreamingMedia);
+      bool enabled = taiga::settings.GetRecognitionDetectStreamingMedia();
       CheckDlgButton(IDC_CHECK_DETECT_STREAMING_MEDIA, enabled);
       win::ListView list = GetDlgItem(IDC_LIST_STREAM_PROVIDER);
       list.Enable(enabled);
@@ -276,8 +275,8 @@ BOOL SettingsPage::OnInitDialog() {
       for (int i = 0; i < static_cast<int>(stream_data.size()); i++) {
         const auto& item = stream_data.at(i);
         list.InsertItem(i, 0, ui::kIcon16_AppBlue, 0, nullptr,
-                        item.name.c_str(), item.option_id);
-        if (Settings.GetBool(item.option_id))
+                        item.name.c_str(), static_cast<LPARAM>(item.id));
+        if (track::recognition::IsStreamEnabled(item.id))
           list.SetCheckState(i, TRUE);
       }
       list.SetColumnWidth(0, LVSCW_AUTOSIZE_USEHEADER);
@@ -289,31 +288,31 @@ BOOL SettingsPage::OnInitDialog() {
 
     // Sharing > Discord
     case kSettingsPageSharingDiscord: {
-      CheckDlgButton(IDC_CHECK_DISCORD, Settings.GetBool(taiga::kShare_Discord_Enabled));
-      CheckDlgButton(IDC_CHECK_DISCORD_USERNAME, Settings.GetBool(taiga::kShare_Discord_Username_Enabled));
+      CheckDlgButton(IDC_CHECK_DISCORD, taiga::settings.GetShareDiscordEnabled());
+      CheckDlgButton(IDC_CHECK_DISCORD_USERNAME, taiga::settings.GetShareDiscordUsernameEnabled());
       break;
     }
     // Sharing > HTTP
     case kSettingsPageSharingHttp: {
-      CheckDlgButton(IDC_CHECK_HTTP, Settings.GetBool(taiga::kShare_Http_Enabled));
-      SetDlgItemText(IDC_EDIT_HTTP_URL, Settings[taiga::kShare_Http_Url].c_str());
+      CheckDlgButton(IDC_CHECK_HTTP, taiga::settings.GetShareHttpEnabled());
+      SetDlgItemText(IDC_EDIT_HTTP_URL, taiga::settings.GetShareHttpUrl().c_str());
       break;
     }
     // Sharing > mIRC
     case kSettingsPageSharingMirc: {
-      CheckDlgButton(IDC_CHECK_MIRC, Settings.GetBool(taiga::kShare_Mirc_Enabled));
-      CheckDlgButton(IDC_CHECK_MIRC_MULTISERVER, Settings.GetBool(taiga::kShare_Mirc_MultiServer));
-      CheckDlgButton(IDC_CHECK_MIRC_ACTION, Settings.GetBool(taiga::kShare_Mirc_UseMeAction));
-      SetDlgItemText(IDC_EDIT_MIRC_SERVICE, Settings[taiga::kShare_Mirc_Service].c_str());
+      CheckDlgButton(IDC_CHECK_MIRC, taiga::settings.GetShareMircEnabled());
+      CheckDlgButton(IDC_CHECK_MIRC_MULTISERVER, taiga::settings.GetShareMircMultiServer());
+      CheckDlgButton(IDC_CHECK_MIRC_ACTION, taiga::settings.GetShareMircUseMeAction());
+      SetDlgItemText(IDC_EDIT_MIRC_SERVICE, taiga::settings.GetShareMircService().c_str());
       CheckRadioButton(IDC_RADIO_MIRC_CHANNEL1, IDC_RADIO_MIRC_CHANNEL3,
-                       IDC_RADIO_MIRC_CHANNEL1 + Settings.GetInt(taiga::kShare_Mirc_Mode) - 1);
-      SetDlgItemText(IDC_EDIT_MIRC_CHANNELS, Settings[taiga::kShare_Mirc_Channels].c_str());
-      EnableDlgItem(IDC_EDIT_MIRC_CHANNELS, Settings.GetInt(taiga::kShare_Mirc_Mode) == 3);
+                       IDC_RADIO_MIRC_CHANNEL1 + taiga::settings.GetShareMircMode() - 1);
+      SetDlgItemText(IDC_EDIT_MIRC_CHANNELS, taiga::settings.GetShareMircChannels().c_str());
+      EnableDlgItem(IDC_EDIT_MIRC_CHANNELS, taiga::settings.GetShareMircMode() == 3);
       break;
     }
     // Sharing > Twitter
     case kSettingsPageSharingTwitter: {
-      CheckDlgButton(IDC_CHECK_TWITTER, Settings.GetBool(taiga::kShare_Twitter_Enabled));
+      CheckDlgButton(IDC_CHECK_TWITTER, taiga::settings.GetShareTwitterEnabled());
       parent->RefreshTwitterLink();
       break;
     }
@@ -329,20 +328,20 @@ BOOL SettingsPage::OnInitDialog() {
       AddComboString(IDC_COMBO_TORRENT_SOURCE, L"http://tracker.minglong.org/rss.xml");
       AddComboString(IDC_COMBO_TORRENT_SOURCE, L"https://www.shanaproject.com/feeds/site/");
       AddComboString(IDC_COMBO_TORRENT_SOURCE, L"https://www.tokyotosho.info/rss.php?filter=1,11&zwnj=0");
-      SetDlgItemText(IDC_COMBO_TORRENT_SOURCE, Settings[taiga::kTorrent_Discovery_Source].c_str());
+      SetDlgItemText(IDC_COMBO_TORRENT_SOURCE, taiga::settings.GetTorrentDiscoverySource().c_str());
       AddComboString(IDC_COMBO_TORRENT_SEARCH, L"https://anidex.info/rss/?cat=1&lang_id=1&q=%title%");
       AddComboString(IDC_COMBO_TORRENT_SEARCH, L"https://nyaa.pantsu.cat/feed?c=3_5&s=0&q=%title%");
       AddComboString(IDC_COMBO_TORRENT_SEARCH, L"https://nyaa.si/?page=rss&c=1_2&f=0&q=%title%");
-      SetDlgItemText(IDC_COMBO_TORRENT_SEARCH, Settings[taiga::kTorrent_Discovery_SearchUrl].c_str());
-      CheckDlgButton(IDC_CHECK_TORRENT_AUTOCHECK, Settings.GetBool(taiga::kTorrent_Discovery_AutoCheckEnabled));
+      SetDlgItemText(IDC_COMBO_TORRENT_SEARCH, taiga::settings.GetTorrentDiscoverySearchUrl().c_str());
+      CheckDlgButton(IDC_CHECK_TORRENT_AUTOCHECK, taiga::settings.GetTorrentDiscoveryAutoCheckEnabled());
       SendDlgItemMessage(IDC_SPIN_TORRENT_INTERVAL, UDM_SETRANGE32, 10, 3600);
-      SendDlgItemMessage(IDC_SPIN_TORRENT_INTERVAL, UDM_SETPOS32, 0, Settings.GetInt(taiga::kTorrent_Discovery_AutoCheckInterval));
-      EnableDlgItem(IDC_EDIT_TORRENT_INTERVAL, Settings.GetBool(taiga::kTorrent_Discovery_AutoCheckEnabled));
-      EnableDlgItem(IDC_SPIN_TORRENT_INTERVAL, Settings.GetBool(taiga::kTorrent_Discovery_AutoCheckEnabled));
+      SendDlgItemMessage(IDC_SPIN_TORRENT_INTERVAL, UDM_SETPOS32, 0, taiga::settings.GetTorrentDiscoveryAutoCheckInterval());
+      EnableDlgItem(IDC_EDIT_TORRENT_INTERVAL, taiga::settings.GetTorrentDiscoveryAutoCheckEnabled());
+      EnableDlgItem(IDC_SPIN_TORRENT_INTERVAL, taiga::settings.GetTorrentDiscoveryAutoCheckEnabled());
       CheckRadioButton(IDC_RADIO_TORRENT_NEW1, IDC_RADIO_TORRENT_NEW2,
-                       IDC_RADIO_TORRENT_NEW1 + Settings.GetInt(taiga::kTorrent_Discovery_NewAction) - 1);
-      EnableDlgItem(IDC_RADIO_TORRENT_NEW1, Settings.GetBool(taiga::kTorrent_Discovery_AutoCheckEnabled));
-      EnableDlgItem(IDC_RADIO_TORRENT_NEW2, Settings.GetBool(taiga::kTorrent_Discovery_AutoCheckEnabled));
+                       IDC_RADIO_TORRENT_NEW1 + taiga::settings.GetTorrentDiscoveryNewAction() - 1);
+      EnableDlgItem(IDC_RADIO_TORRENT_NEW1, taiga::settings.GetTorrentDiscoveryAutoCheckEnabled());
+      EnableDlgItem(IDC_RADIO_TORRENT_NEW2, taiga::settings.GetTorrentDiscoveryAutoCheckEnabled());
       break;
     }
     // Torrents > Downloads
@@ -352,40 +351,40 @@ BOOL SettingsPage::OnInitDialog() {
       AddComboString(IDC_COMBO_TORRENTS_QUEUE_SORTBY, L"Sort by episode number");
       AddComboString(IDC_COMBO_TORRENTS_QUEUE_SORTBY, L"Sort by release date");
       SetComboSelection(IDC_COMBO_TORRENTS_QUEUE_SORTBY,
-                        Settings[taiga::kTorrent_Download_SortBy] == L"episode_number" ? 0 : 1);
+                        taiga::settings.GetTorrentDownloadSortBy() == L"episode_number" ? 0 : 1);
       AddComboString(IDC_COMBO_TORRENTS_QUEUE_SORTORDER, L"In ascending order");
       AddComboString(IDC_COMBO_TORRENTS_QUEUE_SORTORDER, L"In descending order");
       SetComboSelection(IDC_COMBO_TORRENTS_QUEUE_SORTORDER,
-                        Settings[taiga::kTorrent_Download_SortOrder] == L"ascending" ? 0 : 1);
+                        taiga::settings.GetTorrentDownloadSortOrder() == L"ascending" ? 0 : 1);
       // Location
-      CheckDlgButton(IDC_CHECK_TORRENT_AUTOSETFOLDER, Settings.GetBool(taiga::kTorrent_Download_UseAnimeFolder));
-      CheckDlgButton(IDC_CHECK_TORRENT_AUTOUSEFOLDER, Settings.GetBool(taiga::kTorrent_Download_FallbackOnFolder));
-      CheckDlgButton(IDC_CHECK_TORRENT_AUTOCREATEFOLDER, Settings.GetBool(taiga::kTorrent_Download_CreateSubfolder));
-      for (size_t i = 0; i < Settings.library_folders.size(); i++)
-        AddComboString(IDC_COMBO_TORRENT_FOLDER, Settings.library_folders[i].c_str());
-      SetDlgItemText(IDC_COMBO_TORRENT_FOLDER, Settings[taiga::kTorrent_Download_Location].c_str());
-      EnableDlgItem(IDC_CHECK_TORRENT_AUTOUSEFOLDER, Settings.GetBool(taiga::kTorrent_Download_UseAnimeFolder));
-      enabled = Settings.GetBool(taiga::kTorrent_Download_UseAnimeFolder) &&
-                Settings.GetBool(taiga::kTorrent_Download_FallbackOnFolder);
+      CheckDlgButton(IDC_CHECK_TORRENT_AUTOSETFOLDER, taiga::settings.GetTorrentDownloadUseAnimeFolder());
+      CheckDlgButton(IDC_CHECK_TORRENT_AUTOUSEFOLDER, taiga::settings.GetTorrentDownloadFallbackOnFolder());
+      CheckDlgButton(IDC_CHECK_TORRENT_AUTOCREATEFOLDER, taiga::settings.GetTorrentDownloadCreateSubfolder());
+      for (size_t i = 0; i < taiga::settings.library_folders.size(); i++)
+        AddComboString(IDC_COMBO_TORRENT_FOLDER, taiga::settings.library_folders[i].c_str());
+      SetDlgItemText(IDC_COMBO_TORRENT_FOLDER, taiga::settings.GetTorrentDownloadLocation().c_str());
+      EnableDlgItem(IDC_CHECK_TORRENT_AUTOUSEFOLDER, taiga::settings.GetTorrentDownloadUseAnimeFolder());
+      enabled = taiga::settings.GetTorrentDownloadUseAnimeFolder() &&
+                taiga::settings.GetTorrentDownloadFallbackOnFolder();
       EnableDlgItem(IDC_COMBO_TORRENT_FOLDER, enabled);
       EnableDlgItem(IDC_BUTTON_TORRENT_BROWSE_FOLDER, enabled);
       EnableDlgItem(IDC_CHECK_TORRENT_AUTOCREATEFOLDER, enabled);
       // Application
-      CheckDlgButton(IDC_CHECK_TORRENT_APP_OPEN, Settings.GetBool(taiga::kTorrent_Download_AppOpen));
+      CheckDlgButton(IDC_CHECK_TORRENT_APP_OPEN, taiga::settings.GetTorrentDownloadAppOpen());
       CheckRadioButton(IDC_RADIO_TORRENT_APP1, IDC_RADIO_TORRENT_APP2,
-                       IDC_RADIO_TORRENT_APP1 + Settings.GetInt(taiga::kTorrent_Download_AppMode) - 1);
-      EnableDlgItem(IDC_RADIO_TORRENT_APP1, Settings.GetBool(taiga::kTorrent_Download_AppOpen));
-      EnableDlgItem(IDC_RADIO_TORRENT_APP2, Settings.GetBool(taiga::kTorrent_Download_AppOpen));
-      SetDlgItemText(IDC_EDIT_TORRENT_APP, Settings[taiga::kTorrent_Download_AppPath].c_str());
-      enabled = Settings.GetBool(taiga::kTorrent_Download_AppOpen) &&
-                Settings.GetInt(taiga::kTorrent_Download_AppMode) > 1;
+                       IDC_RADIO_TORRENT_APP1 + taiga::settings.GetTorrentDownloadAppMode() - 1);
+      EnableDlgItem(IDC_RADIO_TORRENT_APP1, taiga::settings.GetTorrentDownloadAppOpen());
+      EnableDlgItem(IDC_RADIO_TORRENT_APP2, taiga::settings.GetTorrentDownloadAppOpen());
+      SetDlgItemText(IDC_EDIT_TORRENT_APP, taiga::settings.GetTorrentDownloadAppPath().c_str());
+      enabled = taiga::settings.GetTorrentDownloadAppOpen() &&
+                taiga::settings.GetTorrentDownloadAppMode() > 1;
       EnableDlgItem(IDC_EDIT_TORRENT_APP, enabled);
       EnableDlgItem(IDC_BUTTON_TORRENT_BROWSE_APP, enabled);
       break;
     }
     // Torrents > Filters
     case kSettingsPageTorrentsFilters: {
-      BOOL enable = Settings.GetBool(taiga::kTorrent_Filter_Enabled);
+      BOOL enable = taiga::settings.GetTorrentFilterEnabled();
       CheckDlgButton(IDC_CHECK_TORRENT_FILTER, enable);
       EnableDlgItem(IDC_LIST_TORRENT_FILTER, enable);
       EnableDlgItem(IDC_TOOLBAR_FEED_FILTER, enable);
@@ -429,23 +428,23 @@ BOOL SettingsPage::OnInitDialog() {
     case kSettingsPageAdvanced: {
       parent->advanced_settings_.clear();
       parent->advanced_settings_.insert({
-        {taiga::kApp_Connection_NoRevoke, {L"", L"Application / Disable certificate revocation checks"}},
-        {taiga::kSync_Notify_Format, {L"", L"Application / Episode notification format"}},
-        {taiga::kApp_Connection_ProxyHost, {L"", L"Application / Proxy host"}},
-        {taiga::kApp_Connection_ProxyPassword, {L"", L"Application / Proxy password"}},
-        {taiga::kApp_Connection_ProxyUsername, {L"", L"Application / Proxy username"}},
-        {taiga::kApp_Position_Remember, {L"", L"Application / Remember main window position and size"}},
-        {taiga::kApp_Connection_ReuseActive, {L"", L"Application / Reuse active connections"}},
-        {taiga::kApp_Interface_Theme, {L"", L"Application / UI theme"}},
-        {taiga::kLibrary_FileSizeThreshold, {L"", L"Library / File size threshold"}},
-        {taiga::kLibrary_MediaPlayerPath, {L"", L"Library / Media player path"}},
-        {taiga::kRecognition_IgnoredStrings, {L"", L"Recognition / Ignored strings"}},
-        {taiga::kRecognition_LookupParentDirectories, {L"", L"Recognition / Look up parent directories"}},
-        {taiga::kRecognition_DetectionInterval, {L"", L"Recognition / Media detection interval"}},
-        {taiga::kSync_Service_Kitsu_PartialLibrary, {L"", L"Services / Kitsu / Download partial library"}},
-        {taiga::kShare_Discord_ApplicationId, {L"", L"Sharing / Discord / Application ID"}},
-        {taiga::kTorrent_Filter_ArchiveMaxCount, {L"", L"Torrents / Archive limit"}},
-        {taiga::kTorrent_Download_UseMagnet, {L"", L"Torrents / Use magnet links if available"}},
+        {static_cast<int>(taiga::AppSettingKey::AppConnectionNoRevoke), {L"", L"Application / Disable certificate revocation checks"}},
+        {static_cast<int>(taiga::AppSettingKey::SyncNotifyFormat), {L"", L"Application / Episode notification format"}},
+        {static_cast<int>(taiga::AppSettingKey::AppConnectionProxyHost), {L"", L"Application / Proxy host"}},
+        {static_cast<int>(taiga::AppSettingKey::AppConnectionProxyPassword), {L"", L"Application / Proxy password"}},
+        {static_cast<int>(taiga::AppSettingKey::AppConnectionProxyUsername), {L"", L"Application / Proxy username"}},
+        {static_cast<int>(taiga::AppSettingKey::AppPositionRemember), {L"", L"Application / Remember main window position and size"}},
+        {static_cast<int>(taiga::AppSettingKey::AppConnectionReuseActive), {L"", L"Application / Reuse active connections"}},
+        {static_cast<int>(taiga::AppSettingKey::AppInterfaceTheme), {L"", L"Application / UI theme"}},
+        {static_cast<int>(taiga::AppSettingKey::LibraryFileSizeThreshold), {L"", L"Library / File size threshold"}},
+        {static_cast<int>(taiga::AppSettingKey::LibraryMediaPlayerPath), {L"", L"Library / Media player path"}},
+        {static_cast<int>(taiga::AppSettingKey::RecognitionIgnoredStrings), {L"", L"Recognition / Ignored strings"}},
+        {static_cast<int>(taiga::AppSettingKey::RecognitionLookupParentDirectories), {L"", L"Recognition / Look up parent directories"}},
+        {static_cast<int>(taiga::AppSettingKey::RecognitionDetectionInterval), {L"", L"Recognition / Media detection interval"}},
+        {static_cast<int>(taiga::AppSettingKey::SyncServiceKitsuPartialLibrary), {L"", L"Services / Kitsu / Download partial library"}},
+        {static_cast<int>(taiga::AppSettingKey::ShareDiscordApplicationId), {L"", L"Sharing / Discord / Application ID"}},
+        {static_cast<int>(taiga::AppSettingKey::TorrentFilterArchiveMaxCount), {L"", L"Torrents / Archive limit"}},
+        {static_cast<int>(taiga::AppSettingKey::TorrentDownloadUseMagnet), {L"", L"Torrents / Use magnet links if available"}},
       });
       win::ListView list = GetDlgItem(IDC_LIST_ADVANCED_SETTINGS);
       list.SetExtendedStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_LABELTIP);
@@ -453,12 +452,14 @@ BOOL SettingsPage::OnInitDialog() {
       list.InsertColumn(0, ScaleX(350), 0, LVS_ALIGNLEFT, L"Name");
       list.InsertColumn(1, ScaleX(100), 0, LVS_ALIGNLEFT, L"Value");
       int list_index = 0;
-      for (auto& it : parent->advanced_settings_) {
-        list.InsertItem(list_index, -1, -1, 0, nullptr, it.second.second.c_str(), it.first);
-        it.second.first = Settings.GetWstr(it.first);
-        bool is_password = it.first == taiga::kApp_Connection_ProxyPassword;
-        auto value = is_password ? std::wstring(it.second.first.size(), L'\u25cf') : it.second.first;
-        list.SetItem(list_index, 1, value.c_str());
+      for (auto& [setting_key, pair] : parent->advanced_settings_) {
+        auto& [value, name] = pair;
+        // @TODO
+        //value = taiga::settings.GetWstr(setting_key);
+        list.InsertItem(list_index, -1, -1, 0, nullptr, name.c_str(), setting_key);
+        bool is_password = setting_key == static_cast<int>(taiga::AppSettingKey::AppConnectionProxyPassword);
+        auto text = is_password ? std::wstring(value.size(), L'\u25cf') : value;
+        list.SetItem(list_index, 1, text.c_str());
         ++list_index;
       }
       list.Sort(0, 1, 0, ui::ListViewCompareProc);
@@ -587,7 +588,7 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
           sync::anilist::RequestToken();
           std::wstring auth_pin;
           if (ui::EnterAuthorizationPin(L"AniList", auth_pin)) {
-            Settings.Set(taiga::kSync_Service_AniList_Token, auth_pin);
+            taiga::settings.SetSyncServiceAniListToken(auth_pin);
             ServiceManager.service(sync::kAniList)->user().access_token = auth_pin;
           }
           return TRUE;
@@ -989,19 +990,19 @@ LRESULT SettingsPage::OnNotify(int idCtrl, LPNMHDR pnmh) {
       // Advanced settings
       } else if (lpnmitem->hdr.hwndFrom == GetDlgItem(IDC_LIST_ADVANCED_SETTINGS)) {
         win::ListView list = lpnmitem->hdr.hwndFrom;
-        auto param = list.GetItemParam(lpnmitem->iItem);
-        auto& it = parent->advanced_settings_[param];
-        if (param == taiga::kSync_Notify_Format) {
+        const auto param = list.GetItemParam(lpnmitem->iItem);
+        auto& [value, name] = parent->advanced_settings_[param];
+        if (param == static_cast<int>(taiga::AppSettingKey::SyncNotifyFormat)) {
           DlgFormat.mode = FormatDialogMode::Balloon;
           if (DlgFormat.Create(IDD_FORMAT, parent->GetWindowHandle(), true) == IDOK) {
-            it.first = Settings.GetWstr(taiga::kSync_Notify_Format);
-            list.SetItem(lpnmitem->iItem, 1, it.first.c_str());
+            value = taiga::settings.GetSyncNotifyFormat();
+            list.SetItem(lpnmitem->iItem, 1, value.c_str());
           }
         } else {
-          bool is_password = param == taiga::kApp_Connection_ProxyPassword;
-          if (OnSettingsEditAdvanced(it.second, is_password, it.first)) {
-            auto value = is_password ? std::wstring(it.first.size(), L'\u25cf') : it.first;
-            list.SetItem(lpnmitem->iItem, 1, value.c_str());
+          bool is_password = param == static_cast<int>(taiga::AppSettingKey::AppConnectionProxyPassword);
+          if (OnSettingsEditAdvanced(name, is_password, value)) {
+            auto text = is_password ? std::wstring(value.size(), L'\u25cf') : value;
+            list.SetItem(lpnmitem->iItem, 1, text.c_str());
           }
         }
         list.SetWindowHandle(nullptr);

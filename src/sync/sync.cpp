@@ -217,7 +217,7 @@ bool AddAuthenticationToRequest(Request& request) {
   switch (service->id()) {
     case sync::kKitsu:
       request.data[service->canonical_name() + L"-email"] =
-          Settings[taiga::kSync_Service_Kitsu_Email];
+          taiga::settings.GetSyncServiceKitsuEmail();
       break;
   }
 
@@ -274,39 +274,31 @@ void InvalidateUserAuthentication() {
 }
 
 bool IsUserAccountAvailable() {
-  constexpr auto not_empty = [](taiga::AppSettingName name) {
-    return !Settings[name].empty();
-  };
-
   switch (taiga::GetCurrentServiceId()) {
     case sync::kMyAnimeList:
-      return not_empty(taiga::kSync_Service_Mal_Username);
+      return !taiga::settings.GetSyncServiceMalUsername().empty();
     case sync::kKitsu:
-      return not_empty(taiga::kSync_Service_Kitsu_Email) ||
-             not_empty(taiga::kSync_Service_Kitsu_Username);
+      return !taiga::settings.GetSyncServiceKitsuEmail().empty() ||
+             !taiga::settings.GetSyncServiceKitsuUsername().empty();
     case sync::kAniList:
-      return not_empty(taiga::kSync_Service_AniList_Username);
+      return !taiga::settings.GetSyncServiceAniListUsername().empty();
   }
 
   return false;
 }
 
 bool IsUserAuthenticationAvailable() {
-  constexpr auto not_empty = [](taiga::AppSettingName name) {
-    return !Settings[name].empty();
-  };
-
   switch (taiga::GetCurrentServiceId()) {
     case sync::kMyAnimeList:
-      return not_empty(taiga::kSync_Service_Mal_Username) &&
-             not_empty(taiga::kSync_Service_Mal_Password);
+      return !taiga::settings.GetSyncServiceMalUsername().empty() &&
+             !taiga::settings.GetSyncServiceMalPassword().empty();
     case sync::kKitsu:
-      return (not_empty(taiga::kSync_Service_Kitsu_Email) ||
-              not_empty(taiga::kSync_Service_Kitsu_Username)) &&
-             not_empty(taiga::kSync_Service_Kitsu_Password);
+      return (!taiga::settings.GetSyncServiceKitsuEmail().empty() ||
+              !taiga::settings.GetSyncServiceKitsuUsername().empty()) &&
+             !taiga::settings.GetSyncServiceKitsuPassword().empty();
     case sync::kAniList:
-      return not_empty(taiga::kSync_Service_AniList_Username) &&
-             not_empty(taiga::kSync_Service_AniList_Token);
+      return !taiga::settings.GetSyncServiceAniListUsername().empty() &&
+             !taiga::settings.GetSyncServiceAniListToken().empty();
   }
 
   return false;

@@ -233,7 +233,7 @@ void MenuList::UpdateExternalLinks() {
     menu->items.clear();
 
     std::vector<std::wstring> lines;
-    Split(Settings[taiga::kApp_Interface_ExternalLinks], L"\r\n", lines);
+    Split(taiga::settings.GetAppInterfaceExternalLinks(), L"\r\n", lines);
     for (const auto& line : lines) {
       if (IsEqual(line, L"-")) {
         menu->CreateItem();  // separator
@@ -253,10 +253,10 @@ void MenuList::UpdateFolders() {
   if (menu) {
     menu->items.clear();
 
-    if (!Settings.library_folders.empty()) {
+    if (!taiga::settings.library_folders.empty()) {
       // Add folders
-      for (size_t i = 0; i < Settings.library_folders.size(); ++i) {
-        const auto& library_folder = Settings.library_folders.at(i);
+      for (size_t i = 0; i < taiga::settings.library_folders.size(); ++i) {
+        const auto& library_folder = taiga::settings.library_folders.at(i);
         auto name = library_folder;
         if (i <= 9)
           name += L"\tAlt+" + ToWstr(i + 1);
@@ -448,7 +448,7 @@ void MenuList::UpdateSeason() {
     for (auto& item : menu->items) {
       item.checked = false;
     }
-    int item_index = Settings.GetInt(taiga::kApp_Seasons_GroupBy);
+    const int item_index = taiga::settings.GetAppSeasonsGroupBy();
     if (item_index < static_cast<int>(menu->items.size())) {
       menu->items[item_index].checked = true;
     }
@@ -460,7 +460,7 @@ void MenuList::UpdateSeason() {
     for (auto& item : menu->items) {
       item.checked = false;
     }
-    int item_index = Settings.GetInt(taiga::kApp_Seasons_SortBy);
+    const int item_index = taiga::settings.GetAppSeasonsSortBy();
     if (item_index < static_cast<int>(menu->items.size())) {
       menu->items[item_index].checked = true;
     }
@@ -472,7 +472,7 @@ void MenuList::UpdateSeason() {
     for (auto& item : menu->items) {
       item.checked = false;
     }
-    int item_index = Settings.GetInt(taiga::kApp_Seasons_ViewAs);
+    const int item_index = taiga::settings.GetAppSeasonsViewAs();
     if (item_index < static_cast<int>(menu->items.size())) {
       menu->items[item_index].checked = true;
     }
@@ -497,13 +497,13 @@ void MenuList::UpdateTools() {
     for (auto& item : menu->items) {
       // Tools > Enable anime recognition
       if (item.action == L"ToggleRecognition()")
-        item.checked = Settings.GetBool(taiga::kApp_Option_EnableRecognition);
+        item.checked = taiga::settings.GetAppOptionEnableRecognition();
       // Tools > Enable auto sharing
       if (item.action == L"ToggleSharing()")
-        item.checked = Settings.GetBool(taiga::kApp_Option_EnableSharing);
+        item.checked = taiga::settings.GetAppOptionEnableSharing();
       // Tools > Enable auto synchronization
       if (item.action == L"ToggleSynchronization()")
-        item.checked = Settings.GetBool(taiga::kApp_Option_EnableSync);
+        item.checked = taiga::settings.GetAppOptionEnableSync();
     }
   }
 }
@@ -514,7 +514,7 @@ void MenuList::UpdateTray() {
     // Tray > Enable recognition
     for (auto& item : menu->items) {
       if (item.action == L"ToggleRecognition()") {
-        item.checked = Settings.GetBool(taiga::kApp_Option_EnableRecognition);
+        item.checked = taiga::settings.GetAppOptionEnableRecognition();
         break;
       }
     }
@@ -534,7 +534,7 @@ void MenuList::UpdateView() {
         break;
       }
     }
-    menu->items.back().checked = !Settings.GetBool(taiga::kApp_Option_HideSidebar);
+    menu->items.back().checked = !taiga::settings.GetAppOptionHideSidebar();
   }
 }
 

@@ -178,7 +178,7 @@ void Queue::Check(bool automatic) {
     return;
   }
 
-  if (automatic && !Settings.GetBool(taiga::kApp_Option_EnableSync)) {
+  if (automatic && !taiga::settings.GetAppOptionEnableSync()) {
     items[index].reason = L"Automatic synchronization is disabled";
     LOGD(items[index].reason);
     return;

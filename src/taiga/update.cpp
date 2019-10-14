@@ -119,7 +119,7 @@ bool UpdateHelper::IsAnimeRelationsAvailable() const {
   if (current_item_->taiga_anime_relations_location.empty())
     return false;
 
-  Date local_modified(Settings[kRecognition_RelationsLastModified]);
+  Date local_modified(settings.GetRecognitionRelationsLastModified());
   if (local_modified) {
     Date current_modified(current_item_->taiga_anime_relations_modified);
     if (!current_modified || current_modified <= local_modified)

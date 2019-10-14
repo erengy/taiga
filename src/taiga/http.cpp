@@ -54,14 +54,14 @@ HttpClient::HttpClient(const HttpRequest& request)
     : base::http::Client(request),
       mode_(kHttpSilent) {
   // Reuse existing connections
-  set_allow_reuse(Settings.GetBool(kApp_Connection_ReuseActive));
+  set_allow_reuse(settings.GetAppConnectionReuseActive());
 
   // Enable debug mode to log requests and responses
   set_debug_mode(Taiga.options.debug_mode);
 
   // Disabling certificate revocation checks seems to work for those who get
   // "SSL connect error". See issue #312 for more information.
-  set_no_revoke(Settings.GetBool(kApp_Connection_NoRevoke));
+  set_no_revoke(settings.GetAppConnectionNoRevoke());
 
   // The default header (e.g. "User-Agent: Taiga/1.0") will be used, unless
   // another value is specified in the request header
@@ -69,9 +69,9 @@ HttpClient::HttpClient(const HttpRequest& request)
       TAIGA_APP_NAME, TAIGA_VERSION_MAJOR, TAIGA_VERSION_MINOR));
 
   // Make sure all new clients use the proxy settings
-  set_proxy(Settings[kApp_Connection_ProxyHost],
-            Settings[kApp_Connection_ProxyUsername],
-            Settings[kApp_Connection_ProxyPassword]);
+  set_proxy(settings.GetAppConnectionProxyHost(),
+            settings.GetAppConnectionProxyUsername(),
+            settings.GetAppConnectionProxyPassword());
 }
 
 HttpClientMode HttpClient::mode() const {
@@ -350,9 +350,9 @@ HttpClient& HttpManager::GetClient(const HttpRequest& request) {
         LOGD(L"Reusing client with the ID: {}\nClient's new ID: {}",
              client.request().uid, request.uid);
         // Proxy settings might have changed since then
-        client.set_proxy(Settings[kApp_Connection_ProxyHost],
-                         Settings[kApp_Connection_ProxyUsername],
-                         Settings[kApp_Connection_ProxyPassword]);
+        client.set_proxy(settings.GetAppConnectionProxyHost(),
+                         settings.GetAppConnectionProxyUsername(),
+                         settings.GetAppConnectionProxyPassword());
         return client;
       }
     }

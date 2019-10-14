@@ -254,7 +254,7 @@ bool LinkEpisodeToAnime(Episode& episode, int anime_id) {
   synonyms.push_back(CurrentEpisode.anime_title());
   anime_item->SetUserSynonyms(synonyms);
   Meow.UpdateTitles(*anime_item);
-  Settings.Save();
+  taiga::settings.Save();
 
   StartWatching(*anime_item, episode);
   ui::ClearStatusText();
@@ -278,7 +278,7 @@ void StartWatching(Item& item, Episode& episode) {
     if (IsInsideLibraryFolders(episode.folder)) {
       // Set the folder if only it is under a library folder
       item.SetFolder(episode.folder);
-      Settings.Save();
+      taiga::settings.Save();
     }
   }
 
@@ -287,8 +287,8 @@ void StartWatching(Item& item, Episode& episode) {
     sync::GetMetadataById(item.GetId());
 
   // Update list
-  if (Settings.GetInt(taiga::kSync_Update_Delay) == 0 &&
-      !Settings.GetBool(taiga::kSync_Update_WaitPlayer))
+  if (taiga::settings.GetSyncUpdateDelay() == 0 &&
+      !taiga::settings.GetSyncUpdateWaitPlayer())
     UpdateList(item, episode);
 }
 
@@ -323,8 +323,8 @@ bool IsUpdateAllowed(const Item& item, const Episode& episode, bool ignore_updat
     return false;
 
   if (!ignore_update_time) {
-    auto delay = Settings.GetInt(taiga::kSync_Update_Delay);
-    auto ticks = taiga::timers.timer(taiga::kTimerMedia)->ticks();
+    const auto delay = taiga::settings.GetSyncUpdateDelay();
+    const auto ticks = taiga::timers.timer(taiga::kTimerMedia)->ticks();
     if (delay > 0 && ticks > 0)
       return false;
   }
@@ -336,7 +336,7 @@ bool IsUpdateAllowed(const Item& item, const Episode& episode, bool ignore_updat
   int number_low = GetEpisodeLow(episode);
   int last_watched = item.GetMyLastWatchedEpisode();
 
-  if (Settings.GetBool(taiga::kSync_Update_OutOfRange))
+  if (taiga::settings.GetSyncUpdateOutOfRange())
     if (number_low > last_watched + 1 || number < last_watched + 1)
       return false;
 
@@ -352,7 +352,7 @@ void UpdateList(const Item& item, Episode& episode) {
 
   episode.processed = true;
 
-  if (Settings.GetBool(taiga::kSync_Update_AskToConfirm)) {
+  if (taiga::settings.GetSyncUpdateAskToConfirm()) {
     library::confirmation_queue.Add(episode);
     library::confirmation_queue.Process();
   } else {
@@ -436,7 +436,7 @@ void GetUpcomingTitles(std::vector<int>& anime_ids) {
 ////////////////////////////////////////////////////////////////////////////////
 
 bool IsInsideLibraryFolders(const std::wstring& path) {
-  for (auto library_folder : Settings.library_folders) {
+  for (auto library_folder : taiga::settings.library_folders) {
     library_folder = GetNormalizedPath(GetFinalPath(library_folder));
     if (StartsWith(path, library_folder))
       return true;
@@ -575,7 +575,7 @@ std::wstring GetTitleLanguagePreferenceStr(const int index) {
 
 const std::wstring& GetPreferredTitle(const Item& item) {
   switch (GetTitleLanguagePreferenceIndex(
-      Settings[taiga::kApp_List_TitleLanguagePreference])) {
+      taiga::settings.GetAppListTitleLanguagePreference())) {
     default:
       return item.GetTitle();
     case 1:
