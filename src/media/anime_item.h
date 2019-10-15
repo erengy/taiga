@@ -136,6 +136,7 @@ public:
   const std::wstring& GetFolder() const;
   int GetLastAiredEpisodeNumber() const;
   const std::wstring& GetNextEpisodePath() const;
+  const std::wstring& GetEpisodePath(int number) const;
   time_t GetNextEpisodeTime() const;
   bool GetPlaying() const;
   bool GetUseAlternative() const;

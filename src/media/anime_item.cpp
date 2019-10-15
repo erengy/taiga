@@ -163,8 +163,10 @@ void Item::SetEpisodeCount(int number) {
 
   // TODO: Call it separately
   if (number >= 0)
-    if (static_cast<size_t>(number) > local_info_.available_episodes.size())
+    if (static_cast<size_t>(number) > local_info_.available_episodes.size()) {
       local_info_.available_episodes.resize(number);
+      local_info_.episode_paths.resize(number);
+    }
 }
 
 void Item::SetEpisodeLength(int number) {
@@ -492,6 +494,10 @@ const std::wstring& Item::GetNextEpisodePath() const {
   return local_info_.next_episode_path;
 }
 
+const std::wstring& Item::GetEpisodePath(int number) const {
+  return local_info_.episode_paths.at(number - 1);
+}
+
 time_t Item::GetNextEpisodeTime() const {
   return local_info_.next_episode_time;
 }
@@ -518,8 +524,10 @@ bool Item::SetEpisodeAvailability(int number, bool available,
   if (number <= GetEpisodeCount() || !IsValidEpisodeCount(GetEpisodeCount())) {
     if (static_cast<size_t>(number) > local_info_.available_episodes.size()) {
       local_info_.available_episodes.resize(number);
+      local_info_.episode_paths.resize(number);
     }
     local_info_.available_episodes.at(number - 1) = available;
+    local_info_.episode_paths.at(number - 1) = path;
     if (number == GetMyLastWatchedEpisode() + 1) {
       SetNextEpisodePath(path);
     }

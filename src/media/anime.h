@@ -133,6 +133,7 @@ struct LocalInformation {
   int last_aired_episode = 0;
   std::vector<bool> available_episodes;
   std::wstring next_episode_path;
+  std::vector<std::wstring> episode_paths;
   time_t next_episode_time = 0;
   std::wstring folder;
   std::vector<std::wstring> synonyms;
