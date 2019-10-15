@@ -32,6 +32,9 @@ enum ServiceId;
 namespace taiga {
 
 enum class AppSettingKey {
+  // Meta
+  MetaVersion,
+
   // Services
   SyncActiveService,
   SyncAutoOnStart,

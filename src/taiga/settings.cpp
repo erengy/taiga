@@ -173,6 +173,9 @@ void AppSettings::set_value(const AppSettingKey key, T&& value) {
 void AppSettings::InitKeyMap() const {
   if (key_map_.empty()) {
     key_map_ = {
+      // Meta
+      {AppSettingKey::MetaVersion, {"meta/version", std::wstring{}}},
+
       // Services
       {AppSettingKey::SyncActiveService, {"account/update/activeservice", std::wstring{L"anilist"}}},
       {AppSettingKey::SyncAutoOnStart, {"account/myanimelist/login", false}},
@@ -341,8 +344,6 @@ bool AppSettings::DeserializeFromXml() {
 
   const auto settings = document.child(L"settings");
 
-  // @TODO: Read meta version
-
   InitKeyMap();
   for (const auto& [key, app_setting] : key_map_) {
     if (const auto attr = attr_from_path(settings, app_setting.key)) {
@@ -434,8 +435,6 @@ bool AppSettings::SerializeToXml() const {
     return XmlAttr(node, attr_name.c_str());
   };
 
-  // @TODO: Write meta version
-
   InitKeyMap();
   for (const auto& [key, app_setting] : key_map_) {
     auto attr = attr_from_path(settings, app_setting.key);
@@ -453,6 +452,10 @@ bool AppSettings::SerializeToXml() const {
         break;
     }
   }
+
+  // Meta
+  auto meta = XmlChild(settings, L"meta");
+  XmlAttr(meta, L"version").set_value(StrToWstr(taiga::version().to_string()).c_str());
 
   // Library folders
   auto folders = settings.child(L"anime").child(L"folders");
