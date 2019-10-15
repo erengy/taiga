@@ -56,7 +56,7 @@
 
 namespace taiga {
 
-const std::wstring kDefaultExternalLinks =
+constexpr auto kDefaultExternalLinks =
     L"Hibari|https://hb.wopian.me\r\n"
     L"MALgraph|http://graph.anime.plus\r\n"
     L"-\r\n"
@@ -66,12 +66,12 @@ const std::wstring kDefaultExternalLinks =
     L"-\r\n"
     L"Anime Streaming Search Engine|http://because.moe\r\n"
     L"The Fansub Database|https://fansubdb.com";
-const std::wstring kDefaultFormatDiscordDetails =
+constexpr auto kDefaultFormatDiscordDetails =
     L"%title%";
-const std::wstring kDefaultFormatDiscordState =
+constexpr auto kDefaultFormatDiscordState =
     L"$if(%episode%,Episode %episode%$if(%total%,/%total%) )"
     L"$if(%group%,by %group%)";
-const std::wstring kDefaultFormatHttp =
+constexpr auto kDefaultFormatHttp =
     L"user=%user%"
     L"&name=%title%"
     L"&ep=%episode%"
@@ -79,29 +79,29 @@ const std::wstring kDefaultFormatHttp =
     L"&score=%score%"
     L"&picurl=%image%"
     L"&playstatus=%playstatus%";
-const std::wstring kDefaultFormatMirc =
+constexpr auto kDefaultFormatMirc =
     L"\00304$if($greater(%episode%,%watched%),Watching,Rewatching):\003 %title%"
     L"$if(%episode%, \00303%episode%$if(%total%,/%total%))\003 "
     L"$if(%score%,\00314[Score: %score%]\003) "
     L"\00312%animeurl%";
-const std::wstring kDefaultFormatTwitter =
+constexpr auto kDefaultFormatTwitter =
     L"$ifequal(%episode%,%total%,Just completed: %title%"
     L"$if(%score%, (Score: %score%)) %animeurl%,"
     L"$ifequal(%episode%,1,Started watching: %title% %animeurl%))";
-const std::wstring kDefaultFormatBalloon =
+constexpr auto kDefaultFormatBalloon =
     L"$if(%title%,%title%)\\n"
     L"$if(%episode%,Episode %episode%$if(%total%,/%total%) )"
     L"$if(%group%,by %group%)\\n"
     L"$if(%name%,%name%)";
-const std::wstring kDefaultTorrentAppPath =
+constexpr auto kDefaultTorrentAppPath =
     L"C:\\Program Files\\uTorrent\\uTorrent.exe";
-const std::wstring kDefaultTorrentSearch =
+constexpr auto kDefaultTorrentSearch =
     L"https://nyaa.si/?page=rss&c=1_2&f=0&q=%title%";
-const std::wstring kDefaultTorrentSource =
+constexpr auto kDefaultTorrentSource =
     L"https://www.tokyotosho.info/rss.php?filter=1,11&zwnj=0";
 
 // Here we assume that anything less than 10 MiB can't be a valid episode.
-const ULONGLONG kDefaultFileSizeThreshold = 1024 * 1024 * 10;
+constexpr int kDefaultFileSizeThreshold = 1024 * 1024 * 10;
 
 ////////////////////////////////////////////////////////////////////////////////
 
