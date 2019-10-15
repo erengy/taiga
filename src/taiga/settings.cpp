@@ -645,6 +645,13 @@ void AppSettings::RestoreDefaults() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+// Meta
+
+semaver::Version AppSettings::GetMetaVersion() const {
+  const std::wstring version = value<std::wstring>(AppSettingKey::MetaVersion);
+  return semaver::Version(WstrToStr(version));
+}
+
 // Services
 
 sync::ServiceId AppSettings::GetSyncActiveService() const {

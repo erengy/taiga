@@ -22,6 +22,8 @@
 #include <string>
 #include <vector>
 
+#include <semaver.hpp>
+
 #include "base/settings.h"
 
 namespace sync {
@@ -185,6 +187,9 @@ public:
   void ApplyChanges(const AppSettings previous);
   bool HandleCompatibility();
   void RestoreDefaults();
+
+  // Meta
+  semaver::Version GetMetaVersion() const;
 
   // Services
   sync::ServiceId GetSyncActiveService() const;
