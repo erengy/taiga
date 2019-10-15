@@ -81,6 +81,7 @@ void SettingsDialog::SetCurrentSection(SettingsSections section) {
     case kSettingsSectionLibrary:
       tab_.InsertItem(0, L"Folders", kSettingsPageLibraryFolders);
       tab_.InsertItem(1, L"Cache", kSettingsPageLibraryCache);
+      tab_.InsertItem(2, L"Episode management", kSettingsPageLibraryManagement);
       break;
     case kSettingsSectionApplication:
       tab_.InsertItem(0, L"Anime list", kSettingsPageAppList);
@@ -216,6 +217,16 @@ void SettingsDialog::OnOK() {
     }
     Settings.Set(taiga::kLibrary_WatchFolders, page->IsDlgButtonChecked(IDC_CHECK_FOLDERS_WATCH));
     list.SetWindowHandle(nullptr);
+  }
+
+  // Library > Episode management
+  page = &pages[kSettingsPageLibraryManagement];
+  if (page->IsWindow()) {
+    Settings.Set(taiga::kLibrary_Management_DeleteAfterWatch, page->IsDlgButtonChecked(IDC_DELETE_WATCHING));
+    Settings.Set(taiga::kLibrary_Management_DeleteAfterCompletion, page->IsDlgButtonChecked(IDC_DELETE_COMPLETED));
+    Settings.Set(taiga::kLibrary_Management_PromptDelete, page->IsDlgButtonChecked(IDC_DELETE_PROMPT));
+    Settings.Set(taiga::kLibrary_Management_DeletePermanently, page->IsDlgButtonChecked(IDC_DELETE_PERMANENT));
+    Settings.Set(taiga::kLibrary_Management_KeepNum, static_cast<int>(page->GetDlgItemInt(IDC_DELETE_KEEPNUM)));
   }
 
   // Application > General

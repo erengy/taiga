@@ -72,6 +72,7 @@ void SettingsPage::Create() {
     SETRESOURCEID(kSettingsPageAppList, IDD_SETTINGS_APP_LIST);
     SETRESOURCEID(kSettingsPageLibraryFolders, IDD_SETTINGS_LIBRARY_FOLDERS);
     SETRESOURCEID(kSettingsPageLibraryCache, IDD_SETTINGS_LIBRARY_CACHE);
+    SETRESOURCEID(kSettingsPageLibraryManagement, IDD_SETTINGS_LIBRARY_MANAGE);
     SETRESOURCEID(kSettingsPageRecognitionGeneral, IDD_SETTINGS_RECOGNITION_GENERAL);
     SETRESOURCEID(kSettingsPageRecognitionMedia, IDD_SETTINGS_RECOGNITION_MEDIA);
     SETRESOURCEID(kSettingsPageRecognitionStream, IDD_SETTINGS_RECOGNITION_STREAM);
@@ -154,6 +155,16 @@ BOOL SettingsPage::OnInitDialog() {
     // Library > Cache
     case kSettingsPageLibraryCache: {
       parent->RefreshCache();
+      break;
+    }
+    // Library > Episode management
+    case kSettingsPageLibraryManagement: {
+      CheckDlgButton(IDC_DELETE_WATCHING, Settings.GetBool(taiga::kLibrary_Management_DeleteAfterWatch));
+      CheckDlgButton(IDC_DELETE_COMPLETED, Settings.GetBool(taiga::kLibrary_Management_DeleteAfterCompletion));
+      CheckDlgButton(IDC_DELETE_PROMPT, Settings.GetBool(taiga::kLibrary_Management_PromptDelete));
+      CheckDlgButton(IDC_DELETE_PERMANENT, Settings.GetBool(taiga::kLibrary_Management_DeletePermanently));
+      SendDlgItemMessage(IDC_SPIN_KEEPNUM, UDM_SETRANGE32, 0, 1000); // Hardcoded upper limit maybe bad/too small?
+      SendDlgItemMessage(IDC_SPIN_KEEPNUM, UDM_SETPOS32, 0, Settings.GetInt(taiga::kLibrary_Management_KeepNum));
       break;
     }
 

@@ -60,6 +60,13 @@ enum AppSettingName {
   kLibrary_MediaPlayerPath,
   kLibrary_WatchFolders,
 
+  // Episode management
+  kLibrary_Management_DeleteAfterWatch,
+  kLibrary_Management_DeleteAfterCompletion,
+  kLibrary_Management_PromptDelete,
+  kLibrary_Management_DeletePermanently,
+  kLibrary_Management_KeepNum,
+
   // Application
   kApp_List_DoubleClickAction,
   kApp_List_MiddleClickAction,

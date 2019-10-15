@@ -28,6 +28,7 @@ enum SettingsPages {
   kSettingsPageAppList,
   kSettingsPageLibraryCache,
   kSettingsPageLibraryFolders,
+  kSettingsPageLibraryManagement,
   kSettingsPageRecognitionGeneral,
   kSettingsPageRecognitionMedia,
   kSettingsPageRecognitionStream,

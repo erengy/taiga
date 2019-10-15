@@ -135,6 +135,13 @@ void AppSettings::InitializeMap() {
   INITKEY(kLibrary_MediaPlayerPath, nullptr, L"recognition/mediaplayers/launchpath");
   INITKEY(kLibrary_WatchFolders, L"true", L"anime/folders/watch/enabled");
 
+  // Episode management
+  INITKEY(kLibrary_Management_DeleteAfterWatch, L"false", L"anime/management/delete/afterwatch");
+  INITKEY(kLibrary_Management_DeleteAfterCompletion, L"false", L"anime/management/delete/aftercomplete");
+  INITKEY(kLibrary_Management_PromptDelete, L"true", L"anime/management/delete/prompt");
+  INITKEY(kLibrary_Management_DeletePermanently, L"false", L"anime/management/delete/permanent");
+  INITKEY(kLibrary_Management_KeepNum, L"1", L"anime/management/delete/keepnum");
+
   // Application
   INITKEY(kApp_List_DoubleClickAction, L"4", L"program/list/action/doubleclick");
   INITKEY(kApp_List_MiddleClickAction, L"3", L"program/list/action/middleclick");

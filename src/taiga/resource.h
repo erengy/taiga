@@ -43,6 +43,7 @@
 #define IDD_TORRENT                             148
 #define IDD_UPDATE                              149
 #define IDD_UPDATE_NEW                          150
+#define IDD_SETTINGS_LIBRARY_MANAGE             152
 #define IDC_BUTTON_ADDFOLDER                    1000
 #define IDC_BUTTON_ANILIST_AUTH                 1001
 #define IDC_BUTTON_BROWSE                       1002
@@ -217,3 +218,11 @@
 #define IDC_TOOLBAR_TORRENT                     1173
 #define IDC_TREE_MAIN                           1174
 #define IDC_TREE_SECTIONS                       1175
+#define IDC_DELETE_WATCHING                     40000
+#define IDC_DELETE_COMPLETED                    40001
+#define IDC_DELETE_PROMPT                       40002
+#define IDC_DELETE_PERMANENT                    40003
+#define IDC_STATIC_DELETE1                      40004
+#define IDC_STATIC_DELETE2                      40005
+#define IDC_SPIN_KEEPNUM                        40007
+#define IDC_DELETE_KEEPNUM                      40008
