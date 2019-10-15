@@ -532,8 +532,6 @@ void AppSettings::DoAfterLoad() {
   feed.channel.link = GetTorrentDiscoverySource();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-
 void AppSettings::ApplyChanges() {
   if (changed_account_or_service_) {
     anime::db.LoadList();
@@ -551,23 +549,6 @@ void AppSettings::ApplyChanges() {
   ui::Menus.UpdateFolders();
 
   timers.UpdateIntervalsFromSettings();
-}
-
-// @TODO
-void AppSettings::RestoreDefaults() {
-  // Take a backup
-  std::wstring file = taiga::GetPath(taiga::Path::Settings);
-  std::wstring backup = file + L".bak";
-  DWORD flags = MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH;
-  MoveFileEx(file.c_str(), backup.c_str(), flags);
-
-  // Reload settings
-  //const AppSettings previous_settings = *this;
-  //Load();
-  //ApplyChanges(previous_settings);
-
-  // Reload settings dialog
-  ui::OnSettingsRestoreDefaults();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

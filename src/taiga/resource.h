@@ -144,7 +144,6 @@
 #define IDC_LINK_ACCOUNT_KITSU                  1100
 #define IDC_LINK_ACCOUNT_MAL                    1101
 #define IDC_LINK_ANIME_FANSUB                   1102
-#define IDC_LINK_DEFAULTS                       1103
 #define IDC_LINK_NOWPLAYING                     1104
 #define IDC_LINK_TWITTER                        1105
 #define IDC_LIST_ADVANCED_SETTINGS              1106

@@ -186,7 +186,6 @@ public:
 
   void ApplyChanges();
   bool HandleCompatibility();
-  void RestoreDefaults();
 
   // Meta
   semaver::Version GetMetaVersion() const;

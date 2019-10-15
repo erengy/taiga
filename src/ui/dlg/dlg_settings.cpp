@@ -427,27 +427,6 @@ LRESULT SettingsDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
       }
       break;
     }
-
-    case IDC_LINK_DEFAULTS: {
-      switch (pnmh->code) {
-        // Restore default settings
-        case NM_CLICK:
-        case NM_RETURN: {
-          win::TaskDialog dlg;
-          dlg.SetWindowTitle(TAIGA_APP_NAME);
-          dlg.SetMainIcon(TD_ICON_WARNING);
-          dlg.SetMainInstruction(L"Are you sure you want to restore default settings?");
-          dlg.SetContent(L"All your current settings will be lost.");
-          dlg.AddButton(L"Yes", IDYES);
-          dlg.AddButton(L"No", IDNO);
-          dlg.Show(GetWindowHandle());
-          if (dlg.GetSelectedButtonID() == IDYES)
-            taiga::settings.RestoreDefaults();
-          return TRUE;
-        }
-      }
-      break;
-    }
   }
 
   return 0;
