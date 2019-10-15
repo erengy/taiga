@@ -504,22 +504,6 @@ bool AppSettings::SerializeToXml() const {
   auto torrent_filter = settings.child(L"rss").child(L"torrent").child(L"filter");
   track::feed_filter_manager.Export(torrent_filter, track::feed_filter_manager.filters);
 
-  // Write to registry
-  win::Registry reg;
-  reg.OpenKey(HKEY_CURRENT_USER,
-              L"Software\\Microsoft\\Windows\\CurrentVersion\\Run",
-              0, KEY_SET_VALUE);
-  // @TODO
-  /*
-  if (GetAppBehaviorAutostart()) {
-    std::wstring app_path = Taiga.GetModulePath();
-    reg.SetValue(TAIGA_APP_NAME, app_path.c_str());
-  } else {
-    reg.DeleteValue(TAIGA_APP_NAME);
-  }
-  */
-  reg.CloseKey();
-
   const auto path = taiga::GetPath(taiga::Path::Settings) + L".test.xml";  // @TEMP
   return XmlSaveDocumentToFile(document, path);
 }
@@ -899,6 +883,16 @@ bool AppSettings::GetAppBehaviorAutostart() const {
 
 void AppSettings::SetAppBehaviorAutostart(const bool enabled) {
   set_value(AppSettingKey::AppBehaviorAutostart, enabled);
+
+  win::Registry registry;
+  registry.OpenKey(HKEY_CURRENT_USER,
+                   L"Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+                   0, KEY_SET_VALUE);
+  if (enabled) {
+    registry.SetValue(TAIGA_APP_NAME, Taiga.GetModulePath());
+  } else {
+    registry.DeleteValue(TAIGA_APP_NAME);
+  }
 }
 
 bool AppSettings::GetAppBehaviorStartMinimized() const {
