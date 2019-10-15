@@ -184,7 +184,7 @@ public:
 
   void DoAfterLoad();
 
-  void ApplyChanges(const AppSettings previous);
+  void ApplyChanges();
   bool HandleCompatibility();
   void RestoreDefaults();
 
@@ -472,7 +472,7 @@ private:
   T value(const AppSettingKey key) const;
 
   template <typename T>
-  void set_value(const AppSettingKey key, T&& value);
+  bool set_value(const AppSettingKey key, T&& value);
 
   void InitKeyMap() const;
   const AppSetting& GetSetting(const AppSettingKey key) const;
@@ -483,7 +483,9 @@ private:
   mutable std::map<AppSettingKey, AppSetting> key_map_;
   mutable std::mutex mutex_;
 
+  bool changed_account_or_service_ = false;
   bool modified_ = false;
+
   base::Settings settings_;
 };
 

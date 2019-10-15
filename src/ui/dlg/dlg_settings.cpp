@@ -175,8 +175,6 @@ BOOL SettingsDialog::OnInitDialog() {
 void SettingsDialog::OnOK() {
   win::ListView list;
   SettingsPage* page = nullptr;
-  // @TODO
-  //const taiga::AppSettings previous_settings = taiga::settings;
 
   // Services > Main
   page = &pages[kSettingsPageServicesMain];
@@ -358,10 +356,7 @@ void SettingsDialog::OnOK() {
 
   // Save settings
   taiga::settings.Save();
-
-  // Apply changes
-  // @TODO
-  //taiga::settings.ApplyChanges(previous_settings);
+  taiga::settings.ApplyChanges();
 
   // End dialog
   EndDialog(IDOK);

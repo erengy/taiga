@@ -162,11 +162,14 @@ T AppSettings::value(const AppSettingKey key) const {
 }
 
 template <typename T>
-void AppSettings::set_value(const AppSettingKey key, T&& value) {
+bool AppSettings::set_value(const AppSettingKey key, T&& value) {
   std::lock_guard lock{mutex_};
 
   if (settings_.set_value(GetSetting(key).key, std::move(value))) {
     modified_ = true;
+    return true;
+  } else {
+    return false;
   }
 }
 
@@ -531,67 +534,8 @@ void AppSettings::DoAfterLoad() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// @TODO
-void AppSettings::ApplyChanges(const AppSettings previous) {
-  /*
-  const auto previous_service = previous[kSync_ActiveService];
-  bool changed_service = GetWstr(kSync_ActiveService) != previous_service;
-  if (changed_service) {
-    if (library::queue.GetItemCount() > 0) {
-      ui::OnSettingsServiceChangeFailed();
-      Set(kSync_ActiveService, previous_service);
-      changed_service = false;
-    } else if (!anime::db.items.empty()) {
-      if (ui::OnSettingsServiceChangeConfirm(previous_service,
-                                             GetWstr(kSync_ActiveService))) {
-        std::wstring current_service = GetWstr(kSync_ActiveService);
-        Set(kSync_ActiveService, previous_service);
-        anime::db.SaveList(true);
-        Set(kSync_ActiveService, current_service);
-        anime::db.items.clear();
-        anime::db.SaveDatabase();
-        ui::image_db.Clear();
-        SeasonDatabase.Reset();
-      } else {
-        Set(kSync_ActiveService, previous_service);
-        changed_service = false;
-      }
-    }
-  }
-
-  const auto previous_theme = previous[kApp_Interface_Theme];
-  bool changed_theme = GetWstr(kApp_Interface_Theme) != previous_theme;
-  if (changed_theme) {
-    if (ui::Theme.Load()) {
-      ui::OnSettingsThemeChange();
-    } else {
-      Set(kApp_Interface_Theme, previous_theme);
-    }
-  }
-
-  const bool changed_account = [&]() {
-    const auto equal_settings = [&](AppSettingName name) {
-      return previous[name] == GetWstr(name);
-    };
-    switch (GetCurrentServiceId()) {
-      case sync::kMyAnimeList:
-        return !equal_settings(kSync_Service_Mal_Username);
-      case sync::kKitsu:
-        return !equal_settings(kSync_Service_Kitsu_Email);
-      case sync::kAniList:
-        return !equal_settings(kSync_Service_AniList_Username);
-    }
-    return false;
-  }();
-  if (changed_account) {
-    switch (GetCurrentServiceId()) {
-      case sync::kKitsu:
-        Set(kSync_Service_Kitsu_DisplayName, std::wstring{});
-        Set(kSync_Service_Kitsu_Username, std::wstring{});
-        break;
-    }
-  }
-  if (changed_account || changed_service) {
+void AppSettings::ApplyChanges() {
+  if (changed_account_or_service_) {
     anime::db.LoadList();
     library::history.Load();
     CurrentEpisode.Set(anime::ID_UNKNOWN);
@@ -599,34 +543,18 @@ void AppSettings::ApplyChanges(const AppSettings previous) {
     sync::InvalidateUserAuthentication();
     ui::OnSettingsUserChange();
     ui::OnSettingsServiceChange();
+    changed_account_or_service_ = false;
   } else {
     ui::OnSettingsChange();
   }
 
-  bool enable_monitor = GetBool(kLibrary_WatchFolders);
-  track::monitor.Enable(enable_monitor);
-
-  bool toggled_discord = GetBool(kShare_Discord_Enabled) !=
-      previous.GetBool(kShare_Discord_Enabled);
-  if (toggled_discord) {
-    if (GetBool(kShare_Discord_Enabled)) {
-      link::discord::Initialize();
-      ::Announcer.Do(kAnnounceToDiscord);
-    } else {
-      link::discord::Shutdown();
-    }
-  }
-
-  ui::Menus.UpdateExternalLinks();
   ui::Menus.UpdateFolders();
 
   timers.UpdateIntervalsFromSettings();
-  */
 }
 
 // @TODO
 void AppSettings::RestoreDefaults() {
-  /*
   // Take a backup
   std::wstring file = taiga::GetPath(taiga::Path::Settings);
   std::wstring backup = file + L".bak";
@@ -634,13 +562,12 @@ void AppSettings::RestoreDefaults() {
   MoveFileEx(file.c_str(), backup.c_str(), flags);
 
   // Reload settings
-  const AppSettings previous_settings = *this;
-  Load();
-  ApplyChanges(previous_settings);
+  //const AppSettings previous_settings = *this;
+  //Load();
+  //ApplyChanges(previous_settings);
 
   // Reload settings dialog
   ui::OnSettingsRestoreDefaults();
-  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -660,8 +587,31 @@ sync::ServiceId AppSettings::GetSyncActiveService() const {
 }
 
 void AppSettings::SetSyncActiveService(const sync::ServiceId service_id) {
+  const auto previous_service_id = GetSyncActiveService();
+
+  if (service_id != previous_service_id) {
+    if (library::queue.GetItemCount() > 0) {
+      ui::OnSettingsServiceChangeFailed();
+      return;
+    }
+
+    if (!anime::db.items.empty()) {
+      if (ui::OnSettingsServiceChangeConfirm(service_id, previous_service_id)) {
+        anime::db.SaveList(true);
+        anime::db.items.clear();
+        anime::db.SaveDatabase();
+        ui::image_db.Clear();
+        SeasonDatabase.Reset();
+      } else {
+        return;
+      }
+    }
+  }
+
   const std::wstring name = ServiceManager.GetServiceNameById(service_id);
-  set_value(AppSettingKey::SyncActiveService, name);
+  if (set_value(AppSettingKey::SyncActiveService, name)) {
+    changed_account_or_service_ = true;
+  }
 }
 
 bool AppSettings::GetSyncAutoOnStart() const {
@@ -677,7 +627,11 @@ std::wstring AppSettings::GetSyncServiceMalUsername() const {
 }
 
 void AppSettings::SetSyncServiceMalUsername(const std::wstring& username) {
-  set_value(AppSettingKey::SyncServiceMalUsername, username);
+  if (set_value(AppSettingKey::SyncServiceMalUsername, username)) {
+    if (GetCurrentServiceId() == sync::kMyAnimeList) {
+      changed_account_or_service_ = true;
+    }
+  }
 }
 
 std::wstring AppSettings::GetSyncServiceMalPassword() const {
@@ -701,7 +655,14 @@ std::wstring AppSettings::GetSyncServiceKitsuEmail() const {
 }
 
 void AppSettings::SetSyncServiceKitsuEmail(const std::wstring& email) {
-  set_value(AppSettingKey::SyncServiceKitsuEmail, email);
+  if (set_value(AppSettingKey::SyncServiceKitsuEmail, email)) {
+    set_value(AppSettingKey::SyncServiceKitsuDisplayName, std::wstring{});
+    set_value(AppSettingKey::SyncServiceKitsuUsername, std::wstring{});
+
+    if (GetCurrentServiceId() == sync::kKitsu) {
+      changed_account_or_service_ = true;
+    }
+  }
 }
 
 std::wstring AppSettings::GetSyncServiceKitsuUsername() const {
@@ -741,7 +702,11 @@ std::wstring AppSettings::GetSyncServiceAniListUsername() const {
 }
 
 void AppSettings::SetSyncServiceAniListUsername(const std::wstring& username) {
-  set_value(AppSettingKey::SyncServiceAniListUsername, username);
+  if (set_value(AppSettingKey::SyncServiceAniListUsername, username)) {
+    if (GetCurrentServiceId() == sync::kAniList) {
+      changed_account_or_service_ = true;
+    }
+  }
 }
 
 std::wstring AppSettings::GetSyncServiceAniListRatingSystem() const {
@@ -784,6 +749,7 @@ bool AppSettings::GetLibraryWatchFolders() const {
 
 void AppSettings::SetLibraryWatchFolders(const bool enabled) {
   set_value(AppSettingKey::LibraryWatchFolders, enabled);
+  track::monitor.Enable(enabled);
 }
 
 // Application
@@ -987,7 +953,14 @@ std::wstring AppSettings::GetAppInterfaceTheme() const {
 }
 
 void AppSettings::SetAppInterfaceTheme(const std::wstring& theme) {
-  set_value(AppSettingKey::AppInterfaceTheme, theme);
+  const auto previous_theme = GetAppInterfaceTheme();
+  if (set_value(AppSettingKey::AppInterfaceTheme, theme)) {
+    if (ui::Theme.Load()) {
+      ui::OnSettingsThemeChange();
+    } else {
+      set_value(AppSettingKey::AppInterfaceTheme, previous_theme);
+    }
+  }
 }
 
 std::wstring AppSettings::GetAppInterfaceExternalLinks() const {
@@ -995,7 +968,9 @@ std::wstring AppSettings::GetAppInterfaceExternalLinks() const {
 }
 
 void AppSettings::SetAppInterfaceExternalLinks(const std::wstring& str) {
-  set_value(AppSettingKey::AppInterfaceExternalLinks, str);
+  if (set_value(AppSettingKey::AppInterfaceExternalLinks, str)) {
+    ui::Menus.UpdateExternalLinks();
+  }
 }
 
 // Recognition
@@ -1255,7 +1230,14 @@ bool AppSettings::GetShareDiscordEnabled() const {
 }
 
 void AppSettings::SetShareDiscordEnabled(const bool enabled) {
-  set_value(AppSettingKey::ShareDiscordEnabled, enabled);
+  if (set_value(AppSettingKey::ShareDiscordEnabled, enabled)) {
+    if (enabled) {
+      link::discord::Initialize();
+      ::Announcer.Do(kAnnounceToDiscord);
+    } else {
+      link::discord::Shutdown();
+    }
+  }
 }
 
 std::wstring AppSettings::GetShareDiscordFormatDetails() const {

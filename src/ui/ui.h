@@ -30,6 +30,9 @@ class Item;
 namespace library {
 struct QueueItem;
 }
+namespace sync {
+enum ServiceId;
+}
 namespace taiga {
 class HttpClient;
 }
@@ -116,7 +119,7 @@ void OnSettingsChange();
 void OnSettingsLibraryFoldersEmpty();
 void OnSettingsRestoreDefaults();
 void OnSettingsServiceChange();
-bool OnSettingsServiceChangeConfirm(const std::wstring& current_service, const std::wstring& new_service);
+bool OnSettingsServiceChangeConfirm(const sync::ServiceId current_service, const sync::ServiceId new_service);
 void OnSettingsServiceChangeFailed();
 void OnSettingsThemeChange();
 void OnSettingsUserChange();

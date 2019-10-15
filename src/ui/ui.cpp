@@ -879,8 +879,8 @@ void OnSettingsServiceChange() {
   DlgMain.toolbar_main.SetButtonTooltip(0, tooltip.c_str());
 }
 
-bool OnSettingsServiceChangeConfirm(const std::wstring& current_service,
-                                    const std::wstring& new_service) {
+bool OnSettingsServiceChangeConfirm(const sync::ServiceId current_service,
+                                    const sync::ServiceId new_service) {
   win::TaskDialog dlg(TAIGA_APP_NAME, TD_ICON_WARNING);
   std::wstring instruction =
       L"Do you want to change the active service from {} to {}?"_format(
