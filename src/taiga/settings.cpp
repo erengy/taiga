@@ -16,6 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <filesystem>
+
 #include <windows/win/registry.h>
 #include <windows/win/task_dialog.h>
 
@@ -113,15 +115,22 @@ bool AppSettings::Load() {
   std::lock_guard lock{mutex_};
 
   if (modified_) {
-    // @TODO: What to do in this case?
+    LOGE(L"Cannot load modified settings.");
     return false;
   }
 
-  // @TODO: If `<filename>.new` exists
-  // - Delete `<filename>`
-  // - Rename `<filename>.new` to `<filename>`
+  const auto path = taiga::GetPath(taiga::Path::Settings);
+  const auto old_path = path + L".old";
+  const auto new_path = path + L".new";
 
-  return DeserializeFromXml();
+  std::error_code error;
+  if (std::filesystem::exists(new_path, error)) {
+    LOGW(L"Found new settings.");
+    std::filesystem::rename(path, old_path, error);
+    std::filesystem::rename(new_path, path, error);
+  }
+
+  return DeserializeFromXml(path);
 }
 
 bool AppSettings::Save() {
@@ -131,14 +140,20 @@ bool AppSettings::Save() {
     return false;
   }
 
-  if (!SerializeToXml()) {
+  const auto path = taiga::GetPath(taiga::Path::Settings);
+  const auto new_path = path + L".new";
+
+  if (!SerializeToXml(new_path)) {
+    LOGE(L"Could not save application settings.\nPath: {}", new_path);
     return false;
   }
 
-  // @TODO:
-  // - Save as `<filename>.new`
-  // - Delete `<filename>`
-  // - Rename `<filename>.new` to `<filename>`
+  std::error_code error;
+  std::filesystem::rename(new_path, path, error);
+  if (error) {
+    LOGE(StrToWstr(error.message()));
+    return false;
+  }
 
   modified_ = false;
 
@@ -323,9 +338,8 @@ const AppSettings::AppSetting& AppSettings::GetSetting(const AppSettingKey key) 
   return key_map_[key];
 }
 
-bool AppSettings::DeserializeFromXml() {
+bool AppSettings::DeserializeFromXml(const std::wstring& path) {
   XmlDocument document;
-  const auto path = taiga::GetPath(taiga::Path::Settings);
   const auto parse_result = XmlLoadFileToDocument(document, path);
 
   if (!parse_result) {
@@ -422,7 +436,7 @@ bool AppSettings::DeserializeFromXml() {
   return true;
 }
 
-bool AppSettings::SerializeToXml() const {
+bool AppSettings::SerializeToXml(const std::wstring& path) const {
   XmlDocument document;
 
   auto settings = document.append_child(L"settings");
@@ -507,7 +521,6 @@ bool AppSettings::SerializeToXml() const {
   auto torrent_filter = settings.child(L"rss").child(L"torrent").child(L"filter");
   track::feed_filter_manager.Export(torrent_filter, track::feed_filter_manager.filters);
 
-  const auto path = taiga::GetPath(taiga::Path::Settings) + L".test.xml";  // @TEMP
   return XmlSaveDocumentToFile(document, path);
 }
 

@@ -476,8 +476,8 @@ private:
   void InitKeyMap() const;
   const AppSetting& GetSetting(const AppSettingKey key) const;
 
-  bool DeserializeFromXml();
-  bool SerializeToXml() const;
+  bool DeserializeFromXml(const std::wstring& path);
+  bool SerializeToXml(const std::wstring& path) const;
 
   mutable std::map<AppSettingKey, AppSetting> key_map_;
   mutable std::mutex mutex_;
