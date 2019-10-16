@@ -76,7 +76,7 @@ public:
 
   size_t index = 0;
   std::vector<QueueItem> items;
-  History* history = nullptr;
+  History* history;
   bool updating = false;
 };
 
