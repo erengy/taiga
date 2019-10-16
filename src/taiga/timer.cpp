@@ -24,6 +24,7 @@
 #include "media/anime_db.h"
 #include "media/anime_util.h"
 #include "media/library/queue.h"
+#include "media/library/localmanagement.h"
 #include "ui/resource.h"
 #include "taiga/announce.h"
 #include "taiga/http.h"
@@ -47,6 +48,7 @@ static Timer timer_media(kTimerMedia, 2 * 60, false);  //  2 minutes
 static Timer timer_memory(kTimerMemory, 10 * 60);      // 10 minutes
 static Timer timer_stats(kTimerStats, 10);             // 10 seconds
 static Timer timer_torrents(kTimerTorrents, 60 * 60);  // 60 minutes
+static Timer timer_management(kTimerManagement, 1);    //  1 second
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -75,6 +77,10 @@ void Timer::OnTimeout() {
 
     case kTimerLibrary:
       ScanAvailableEpisodesQuick();
+      break;
+
+    case kTimerManagement:
+      library::ProcessPurges();
       break;
 
     case kTimerMedia:
@@ -117,6 +123,7 @@ void TimerManager::Initialize() {
   InsertTimer(&timer_detection);
   InsertTimer(&timer_history);
   InsertTimer(&timer_library);
+  InsertTimer(&timer_management);
   InsertTimer(&timer_media);
   InsertTimer(&timer_memory);
   InsertTimer(&timer_stats);

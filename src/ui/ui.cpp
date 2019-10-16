@@ -722,6 +722,35 @@ void OnAnimeWatchingEnd(const anime::Item& anime_item,
 
 ////////////////////////////////////////////////////////////////////////////////
 
+bool OnEpisodePurge(anime::Item& anime_item, std::vector<std::wstring> episode_files) {
+  /* Prompts the user if purge of given episode files are wanted or not*/
+  win::TaskDialog dlg;
+  std::wstring title = L"Anime title: " + anime::GetPreferredTitle(anime_item);
+  dlg.SetWindowTitle(TAIGA_APP_NAME);
+  dlg.SetMainIcon(TD_ICON_INFORMATION);
+  // Compile list of episodes to prompt
+  std::wstring prompt_string = L"Do you want to remove the following watched episode files?\n\n";
+  for (std::wstring file_name : episode_files) {
+    prompt_string += file_name + L"\n";
+  }
+  dlg.SetMainInstruction(prompt_string.c_str());
+  dlg.SetContent(title.c_str());
+  dlg.SetVerificationText(L"Don't ask again, remove automatically");
+  dlg.UseCommandLinks(true);
+
+  std::wstring button = L"Remove files";
+  dlg.AddButton(button.c_str(), IDYES);
+  dlg.AddButton(L"Cancel\n"
+    L"Keep files", IDNO);
+
+  dlg.Show(DlgMain.GetWindowHandle());
+  if (dlg.GetVerificationCheck())
+    Settings.Set(taiga::kLibrary_Management_PromptDelete, false);
+  return dlg.GetSelectedButtonID() == IDYES;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 bool OnRecognitionCancelConfirm() {
   auto anime_item = anime::db.Find(CurrentEpisode.anime_id);
 

@@ -30,6 +30,7 @@
 #include "track/episode_util.h"
 #include "media/anime_util.h"
 #include "media/library/queue.h"
+#include "media/library/localmanagement.h"
 #include "sync/sync.h"
 #include "taiga/announce.h"
 #include "taiga/path.h"
@@ -305,6 +306,9 @@ void EndWatching(Item& item, Episode episode) {
   episode.anime_id = anime::ID_UNKNOWN;
 
   ui::OnAnimeWatchingEnd(item, episode);
+
+  if (Settings.GetBool(taiga::kLibrary_Management_DeleteAfterWatch))
+    library::SchedulePurge(item.GetId());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -404,6 +408,9 @@ void AddToQueue(const Item& item, const Episode& episode, bool change_status) {
 
   // Add to queue
   library::queue.Add(queue_item);
+
+  if (change_status && (*queue_item.status) == kCompleted && Settings.GetBool(taiga::kLibrary_Management_DeleteAfterCompletion) && !track::media_players.player_running())
+    library::SchedulePurge(item.GetId());
 }
 
 void SetMyLastUpdateToNow(Item& item) {

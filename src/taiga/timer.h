@@ -27,6 +27,7 @@ enum TimerId {
   kTimerDetection,
   kTimerHistory,
   kTimerLibrary,
+  kTimerManagement,
   kTimerMedia,
   kTimerMemory,
   kTimerStats,
