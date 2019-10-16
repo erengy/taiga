@@ -670,6 +670,9 @@
     <ClCompile Include="..\..\src\ui\command.cpp">
       <Filter>ui</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\ui\dlg\dlg_settings_advanced.cpp">
+      <Filter>ui\dlg</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\base\base64.h">
@@ -1220,6 +1223,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\track\media_stream.h">
       <Filter>track\recognition</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ui\dlg\dlg_settings_advanced.h">
+      <Filter>ui\dlg</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

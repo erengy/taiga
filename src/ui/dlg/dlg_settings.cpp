@@ -348,9 +348,8 @@ void SettingsDialog::OnOK() {
   // Advanced
   page = &pages[kSettingsPageAdvanced];
   if (page->IsWindow()) {
-    for (const auto& it : advanced_settings_) {
-      // @TODO
-      //taiga::settings.Set(it.first, it.second.first);
+    for (const auto& [key, value] : advanced_settings_) {
+      SetAdvancedSetting(key, value);
     }
   }
 

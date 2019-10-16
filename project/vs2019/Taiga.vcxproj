@@ -281,6 +281,7 @@
     <ClCompile Include="..\..\src\ui\dlg\dlg_search.cpp" />
     <ClCompile Include="..\..\src\ui\dlg\dlg_season.cpp" />
     <ClCompile Include="..\..\src\ui\dlg\dlg_settings.cpp" />
+    <ClCompile Include="..\..\src\ui\dlg\dlg_settings_advanced.cpp" />
     <ClCompile Include="..\..\src\ui\dlg\dlg_settings_page.cpp" />
     <ClCompile Include="..\..\src\ui\dlg\dlg_stats.cpp" />
     <ClCompile Include="..\..\src\ui\dlg\dlg_torrent.cpp" />
@@ -468,6 +469,7 @@
     <ClInclude Include="..\..\src\ui\dlg\dlg_search.h" />
     <ClInclude Include="..\..\src\ui\dlg\dlg_season.h" />
     <ClInclude Include="..\..\src\ui\dlg\dlg_settings.h" />
+    <ClInclude Include="..\..\src\ui\dlg\dlg_settings_advanced.h" />
     <ClInclude Include="..\..\src\ui\dlg\dlg_settings_page.h" />
     <ClInclude Include="..\..\src\ui\dlg\dlg_stats.h" />
     <ClInclude Include="..\..\src\ui\dlg\dlg_torrent.h" />

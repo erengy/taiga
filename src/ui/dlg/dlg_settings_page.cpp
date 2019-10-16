@@ -426,39 +426,20 @@ BOOL SettingsPage::OnInitDialog() {
 
     // Advanced
     case kSettingsPageAdvanced: {
-      parent->advanced_settings_.clear();
-      parent->advanced_settings_.insert({
-        {static_cast<int>(taiga::AppSettingKey::AppConnectionNoRevoke), {L"", L"Application / Disable certificate revocation checks"}},
-        {static_cast<int>(taiga::AppSettingKey::SyncNotifyFormat), {L"", L"Application / Episode notification format"}},
-        {static_cast<int>(taiga::AppSettingKey::AppConnectionProxyHost), {L"", L"Application / Proxy host"}},
-        {static_cast<int>(taiga::AppSettingKey::AppConnectionProxyPassword), {L"", L"Application / Proxy password"}},
-        {static_cast<int>(taiga::AppSettingKey::AppConnectionProxyUsername), {L"", L"Application / Proxy username"}},
-        {static_cast<int>(taiga::AppSettingKey::AppPositionRemember), {L"", L"Application / Remember main window position and size"}},
-        {static_cast<int>(taiga::AppSettingKey::AppConnectionReuseActive), {L"", L"Application / Reuse active connections"}},
-        {static_cast<int>(taiga::AppSettingKey::AppInterfaceTheme), {L"", L"Application / UI theme"}},
-        {static_cast<int>(taiga::AppSettingKey::LibraryFileSizeThreshold), {L"", L"Library / File size threshold"}},
-        {static_cast<int>(taiga::AppSettingKey::LibraryMediaPlayerPath), {L"", L"Library / Media player path"}},
-        {static_cast<int>(taiga::AppSettingKey::RecognitionIgnoredStrings), {L"", L"Recognition / Ignored strings"}},
-        {static_cast<int>(taiga::AppSettingKey::RecognitionLookupParentDirectories), {L"", L"Recognition / Look up parent directories"}},
-        {static_cast<int>(taiga::AppSettingKey::RecognitionDetectionInterval), {L"", L"Recognition / Media detection interval"}},
-        {static_cast<int>(taiga::AppSettingKey::SyncServiceKitsuPartialLibrary), {L"", L"Services / Kitsu / Download partial library"}},
-        {static_cast<int>(taiga::AppSettingKey::ShareDiscordApplicationId), {L"", L"Sharing / Discord / Application ID"}},
-        {static_cast<int>(taiga::AppSettingKey::TorrentFilterArchiveMaxCount), {L"", L"Torrents / Archive limit"}},
-        {static_cast<int>(taiga::AppSettingKey::TorrentDownloadUseMagnet), {L"", L"Torrents / Use magnet links if available"}},
-      });
+      for (const auto key : GetAdvancedSettingKeys()) {
+        parent->advanced_settings_[key] = GetAdvancedSettingValue(key);
+      }
       win::ListView list = GetDlgItem(IDC_LIST_ADVANCED_SETTINGS);
       list.SetExtendedStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_LABELTIP);
       list.SetTheme();
       list.InsertColumn(0, ScaleX(350), 0, LVS_ALIGNLEFT, L"Name");
       list.InsertColumn(1, ScaleX(100), 0, LVS_ALIGNLEFT, L"Value");
       int list_index = 0;
-      for (auto& [setting_key, pair] : parent->advanced_settings_) {
-        auto& [value, name] = pair;
-        // @TODO
-        //value = taiga::settings.GetWstr(setting_key);
-        list.InsertItem(list_index, -1, -1, 0, nullptr, name.c_str(), setting_key);
-        bool is_password = setting_key == static_cast<int>(taiga::AppSettingKey::AppConnectionProxyPassword);
-        auto text = is_password ? std::wstring(value.size(), L'\u25cf') : value;
+      for (const auto& [key, value] : parent->advanced_settings_) {
+        const auto description = GetAdvancedSettingDescription(key);
+        list.InsertItem(list_index, -1, -1, 0, nullptr, description.c_str(), static_cast<LPARAM>(key));
+        const bool is_password = key == AdvancedSetting::AppConnectionProxyPassword;
+        const auto text = is_password ? std::wstring(value.size(), L'\u25cf') : value;
         list.SetItem(list_index, 1, text.c_str());
         ++list_index;
       }
@@ -990,18 +971,18 @@ LRESULT SettingsPage::OnNotify(int idCtrl, LPNMHDR pnmh) {
       // Advanced settings
       } else if (lpnmitem->hdr.hwndFrom == GetDlgItem(IDC_LIST_ADVANCED_SETTINGS)) {
         win::ListView list = lpnmitem->hdr.hwndFrom;
-        const auto param = list.GetItemParam(lpnmitem->iItem);
-        auto& [value, name] = parent->advanced_settings_[param];
-        if (param == static_cast<int>(taiga::AppSettingKey::SyncNotifyFormat)) {
+        const auto key = static_cast<AdvancedSetting>(list.GetItemParam(lpnmitem->iItem));
+        auto& value = parent->advanced_settings_[key];
+        if (key == taiga::AppSettingKey::SyncNotifyFormat) {
           DlgFormat.mode = FormatDialogMode::Balloon;
           if (DlgFormat.Create(IDD_FORMAT, parent->GetWindowHandle(), true) == IDOK) {
             value = taiga::settings.GetSyncNotifyFormat();
             list.SetItem(lpnmitem->iItem, 1, value.c_str());
           }
         } else {
-          bool is_password = param == static_cast<int>(taiga::AppSettingKey::AppConnectionProxyPassword);
-          if (OnSettingsEditAdvanced(name, is_password, value)) {
-            auto text = is_password ? std::wstring(value.size(), L'\u25cf') : value;
+          const bool is_password = key == taiga::AppSettingKey::AppConnectionProxyPassword;
+          if (OnSettingsEditAdvanced(GetAdvancedSettingDescription(key), is_password, value)) {
+            const auto text = is_password ? std::wstring(value.size(), L'\u25cf') : value;
             list.SetItem(lpnmitem->iItem, 1, text.c_str());
           }
         }
