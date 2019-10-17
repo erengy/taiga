@@ -32,6 +32,7 @@
 #include "media/library/history.h"
 #include "media/library/list_util.h"
 #include "media/library/queue.h"
+#include "media/library/localmanagement.h"
 #include "sync/anilist_util.h"
 #include "sync/kitsu_util.h"
 #include "sync/myanimelist_util.h"
@@ -510,6 +511,14 @@ void ExecuteCommand(const std::wstring& str, WPARAM wParam, LPARAM lParam) {
         library::queue.Add(queue_item);
       }
     }
+
+  // DeleteWatchedEpisodes()
+  //   Removes watched episodes of selected anime.
+  //   lParam is a pointer to a vector of anime IDs.
+  } else if (command == L"DeleteWatchedEpisodes") {
+    const auto& anime_ids = *reinterpret_cast<std::vector<int>*>(lParam);
+    for (int id : anime_ids)
+      library::PurgeWatchedEpisodes(id);
 
   // EditEpisode()
   //   Changes watched episode value of an anime.

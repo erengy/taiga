@@ -9,7 +9,7 @@
 		<item name="View" sub="View"/>
 		<item name="Help" sub="Help"/>
 	</menu>
-	
+
 	<!-- File -->
 	<menu name="File">
 		<item name="Library folders" sub="Folders"/>
@@ -96,7 +96,7 @@
 		<item type="separator"/>
 		<item name="Check for updates" action="CheckUpdates()"/>
 	</menu>
-	
+
 	<!-- Search list -->
 	<menu name="SearchList">
 		<item name="Information" action="Info()" default="1"/>
@@ -110,7 +110,7 @@
 		<item name="Dropped"            action="AddToList(4)"/>
 		<item name="Plan to watch"      action="AddToList(5)"/>
 	</menu>
-	
+
 	<!-- Right click -->
 	<menu name="RightClick">
 		<item name="Information" action="Info()"/>
@@ -118,6 +118,8 @@
 		<item type="separator"/>
 		<item name="Edit" action="EditAll()"/>
 		<item name="&amp;Delete from list...&#9;Del" action="EditDelete()"/>
+		<item type="separator"/>
+		<item name="Delete watched episodes" action="DeleteWatchedEpisodes()"/>
 		<item type="separator"/>
 		<item name="Open folder&#9;Ctrl+O" action="OpenFolder()"/>
 		<item name="Scan available episodes&#9;F5" action="ScanEpisodes()"/>
@@ -139,6 +141,8 @@
 		<item name="Set &amp;tags..."     action="EditTags"/> <!-- Note: Overwritten -->
 		<item type="separator"/>
 		<item name="Delete from &amp;list...&#9;Del" action="EditDelete()"/>
+		<item type="separator"/>
+		<item name="Delete watched episodes" action="DeleteWatchedEpisodes()"/>
 	</menu>
 	<!-- Date started -->
 	<menu name="EditDateStarted">
@@ -207,7 +211,7 @@
 		<item type="separator"/>
 		<item name="Reset to defaults" action="ResetAnimeListHeaders()"/>
 	</menu>
-	
+
 	<!-- Tray -->
 	<menu name="Tray">
 		<item name="Open Taiga" action="MainDialog()" default="1"/>
@@ -220,7 +224,7 @@
 		<item type="separator"/>
 		<item name="Exit" action="Exit()"/>
 	</menu>
-	
+
 	<!-- History list menu -->
 	<menu name="HistoryList">
 		<item name="Information" action="Info()" default="1"/>
@@ -229,7 +233,7 @@
 		<item name="Clear history..." action="ClearHistory()"/>
 		<item name="Clear queue..." action="ClearQueue()"/>
 	</menu>
-	
+
 	<!-- Season browser -->
 	<menu name="SeasonSelect">
 		<!-- Note: Overwritten -->
@@ -250,7 +254,7 @@
 		<item name="Images"  action="Season_ViewAs(0)" radio="1"/>
 		<item name="Details" action="Season_ViewAs(1)" radio="1"/>
 	</menu>
-	
+
 	<!-- Season list -->
 	<menu name="SeasonList">
 		<item name="Information" action="Info()" default="1"/>
@@ -260,7 +264,7 @@
 		<item type="separator"/>
 		<item name="Add to list" sub="AddToList" disabled="1"/>
 	</menu>
-	
+
 	<!-- Torrent list right click -->
 	<menu name="TorrentListRightClick">
 		<item name="Download torrent" action="DownloadTorrent" default="1"/>
@@ -277,7 +281,7 @@
 		<item name="Discard all torrents for this anime" action="DiscardTorrents"/>
 		<item name="Select this fansub group for this anime" action="SelectFansub"/>
 	</menu>
-	
+
 	<!-- Script functions and variables -->
 	<menu name="ScriptAdd">
 		<item name="Character" sub="ScriptAddCharacter"/>

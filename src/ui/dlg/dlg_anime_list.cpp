@@ -324,7 +324,7 @@ void AnimeListDialog::OnContextMenu(HWND hwnd, POINT pt) {
       }
       ui::Menus.UpdateAll(GetCurrentItem());
       const auto command = ui::Menus.Show(DlgMain.GetWindowHandle(), pt.x, pt.y, menu_name.c_str());
-      if (command == L"EditDelete()")
+      if (command == L"EditDelete()" || command == L"DeleteWatchedEpisodes()")
         parameter = reinterpret_cast<LPARAM>(&anime_ids);
       ExecuteCommand(command, 0, parameter);
     }
