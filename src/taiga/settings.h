@@ -34,10 +34,10 @@ enum ServiceId;
 
 namespace taiga {
 
-class AppSettings {
+class Settings {
 public:
-  AppSettings() = default;
-  ~AppSettings();
+  Settings() = default;
+  ~Settings();
 
   bool Load();
   bool Save();
@@ -334,7 +334,6 @@ private:
   bool set_value(const AppSettingKey key, T&& value);
 
   void InitKeyMap() const;
-  const AppSetting& GetSetting(const AppSettingKey key) const;
 
   bool DeserializeFromXml(const std::wstring& path);
   bool SerializeToXml(const std::wstring& path) const;
@@ -355,6 +354,6 @@ std::wstring GetCurrentUserEmail();
 std::wstring GetCurrentUsername();
 std::wstring GetCurrentPassword();
 
-inline AppSettings settings;
+inline Settings settings;
 
 }  // namespace taiga

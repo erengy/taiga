@@ -88,7 +88,7 @@ constexpr int kDefaultFileSizeThreshold = 1024 * 1024 * 10;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void AppSettings::InitKeyMap() const {
+void Settings::InitKeyMap() const {
   if (key_map_.empty()) {
     key_map_ = {
       // Meta
@@ -236,10 +236,11 @@ void AppSettings::InitKeyMap() const {
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-T AppSettings::value(const AppSettingKey key) const {
+T Settings::value(const AppSettingKey key) const {
   std::lock_guard lock{mutex_};
 
-  const auto& app_setting = GetSetting(key);
+  InitKeyMap();
+  const auto& app_setting = key_map_[key];
   const auto value = settings_.value(app_setting.key);
 
   if (std::holds_alternative<T>(value)) {
@@ -252,10 +253,13 @@ T AppSettings::value(const AppSettingKey key) const {
 }
 
 template <typename T>
-bool AppSettings::set_value(const AppSettingKey key, T&& value) {
+bool Settings::set_value(const AppSettingKey key, T&& value) {
   std::lock_guard lock{mutex_};
 
-  if (settings_.set_value(GetSetting(key).key, std::move(value))) {
+  InitKeyMap();
+  const auto& app_setting = key_map_[key];
+
+  if (settings_.set_value(app_setting.key, std::move(value))) {
     modified_ = true;
     return true;
   } else {
@@ -267,19 +271,19 @@ bool AppSettings::set_value(const AppSettingKey key, T&& value) {
 
 // Meta
 
-semaver::Version AppSettings::GetMetaVersion() const {
+semaver::Version Settings::GetMetaVersion() const {
   const std::wstring version = value<std::wstring>(AppSettingKey::MetaVersion);
   return semaver::Version(WstrToStr(version));
 }
 
 // Services
 
-sync::ServiceId AppSettings::GetSyncActiveService() const {
+sync::ServiceId Settings::GetSyncActiveService() const {
   const std::wstring name = value<std::wstring>(AppSettingKey::SyncActiveService);
   return ServiceManager.GetServiceIdByName(name);
 }
 
-void AppSettings::SetSyncActiveService(const sync::ServiceId service_id) {
+void Settings::SetSyncActiveService(const sync::ServiceId service_id) {
   const auto previous_service_id = GetSyncActiveService();
 
   if (service_id != previous_service_id) {
@@ -307,19 +311,19 @@ void AppSettings::SetSyncActiveService(const sync::ServiceId service_id) {
   }
 }
 
-bool AppSettings::GetSyncAutoOnStart() const {
+bool Settings::GetSyncAutoOnStart() const {
   return value<bool>(AppSettingKey::SyncAutoOnStart);
 }
 
-void AppSettings::SetSyncAutoOnStart(const bool enabled) {
+void Settings::SetSyncAutoOnStart(const bool enabled) {
   set_value(AppSettingKey::SyncAutoOnStart, enabled);
 }
 
-std::wstring AppSettings::GetSyncServiceMalUsername() const {
+std::wstring Settings::GetSyncServiceMalUsername() const {
   return value<std::wstring>(AppSettingKey::SyncServiceMalUsername);
 }
 
-void AppSettings::SetSyncServiceMalUsername(const std::wstring& username) {
+void Settings::SetSyncServiceMalUsername(const std::wstring& username) {
   if (set_value(AppSettingKey::SyncServiceMalUsername, username)) {
     if (GetCurrentServiceId() == sync::kMyAnimeList) {
       changed_account_or_service_ = true;
@@ -327,27 +331,27 @@ void AppSettings::SetSyncServiceMalUsername(const std::wstring& username) {
   }
 }
 
-std::wstring AppSettings::GetSyncServiceMalPassword() const {
+std::wstring Settings::GetSyncServiceMalPassword() const {
   return value<std::wstring>(AppSettingKey::SyncServiceMalPassword);
 }
 
-void AppSettings::SetSyncServiceMalPassword(const std::wstring& password) {
+void Settings::SetSyncServiceMalPassword(const std::wstring& password) {
   set_value(AppSettingKey::SyncServiceMalPassword, password);
 }
 
-std::wstring AppSettings::GetSyncServiceKitsuDisplayName() const {
+std::wstring Settings::GetSyncServiceKitsuDisplayName() const {
   return value<std::wstring>(AppSettingKey::SyncServiceKitsuDisplayName);
 }
 
-void AppSettings::SetSyncServiceKitsuDisplayName(const std::wstring& name) {
+void Settings::SetSyncServiceKitsuDisplayName(const std::wstring& name) {
   set_value(AppSettingKey::SyncServiceKitsuDisplayName, name);
 }
 
-std::wstring AppSettings::GetSyncServiceKitsuEmail() const {
+std::wstring Settings::GetSyncServiceKitsuEmail() const {
   return value<std::wstring>(AppSettingKey::SyncServiceKitsuEmail);
 }
 
-void AppSettings::SetSyncServiceKitsuEmail(const std::wstring& email) {
+void Settings::SetSyncServiceKitsuEmail(const std::wstring& email) {
   if (set_value(AppSettingKey::SyncServiceKitsuEmail, email)) {
     set_value(AppSettingKey::SyncServiceKitsuDisplayName, std::wstring{});
     set_value(AppSettingKey::SyncServiceKitsuUsername, std::wstring{});
@@ -358,43 +362,43 @@ void AppSettings::SetSyncServiceKitsuEmail(const std::wstring& email) {
   }
 }
 
-std::wstring AppSettings::GetSyncServiceKitsuUsername() const {
+std::wstring Settings::GetSyncServiceKitsuUsername() const {
   return value<std::wstring>(AppSettingKey::SyncServiceKitsuUsername);
 }
 
-void AppSettings::SetSyncServiceKitsuUsername(const std::wstring& username) {
+void Settings::SetSyncServiceKitsuUsername(const std::wstring& username) {
   set_value(AppSettingKey::SyncServiceKitsuUsername, username);
 }
 
-std::wstring AppSettings::GetSyncServiceKitsuPassword() const {
+std::wstring Settings::GetSyncServiceKitsuPassword() const {
   return value<std::wstring>(AppSettingKey::SyncServiceKitsuPassword);
 }
 
-void AppSettings::SetSyncServiceKitsuPassword(const std::wstring& password) {
+void Settings::SetSyncServiceKitsuPassword(const std::wstring& password) {
   set_value(AppSettingKey::SyncServiceKitsuPassword, password);
 }
 
-bool AppSettings::GetSyncServiceKitsuPartialLibrary() const {
+bool Settings::GetSyncServiceKitsuPartialLibrary() const {
   return value<bool>(AppSettingKey::SyncServiceKitsuPartialLibrary);
 }
 
-void AppSettings::SetSyncServiceKitsuPartialLibrary(const bool enabled) {
+void Settings::SetSyncServiceKitsuPartialLibrary(const bool enabled) {
   set_value(AppSettingKey::SyncServiceKitsuPartialLibrary, enabled);
 }
 
-std::wstring AppSettings::GetSyncServiceKitsuRatingSystem() const {
+std::wstring Settings::GetSyncServiceKitsuRatingSystem() const {
   return value<std::wstring>(AppSettingKey::SyncServiceKitsuRatingSystem);
 }
 
-void AppSettings::SetSyncServiceKitsuRatingSystem(const std::wstring& rating_system) {
+void Settings::SetSyncServiceKitsuRatingSystem(const std::wstring& rating_system) {
   set_value(AppSettingKey::SyncServiceKitsuRatingSystem, rating_system);
 }
 
-std::wstring AppSettings::GetSyncServiceAniListUsername() const {
+std::wstring Settings::GetSyncServiceAniListUsername() const {
   return value<std::wstring>(AppSettingKey::SyncServiceAniListUsername);
 }
 
-void AppSettings::SetSyncServiceAniListUsername(const std::wstring& username) {
+void Settings::SetSyncServiceAniListUsername(const std::wstring& username) {
   if (set_value(AppSettingKey::SyncServiceAniListUsername, username)) {
     if (GetCurrentServiceId() == sync::kAniList) {
       changed_account_or_service_ = true;
@@ -402,152 +406,152 @@ void AppSettings::SetSyncServiceAniListUsername(const std::wstring& username) {
   }
 }
 
-std::wstring AppSettings::GetSyncServiceAniListRatingSystem() const {
+std::wstring Settings::GetSyncServiceAniListRatingSystem() const {
   return value<std::wstring>(AppSettingKey::SyncServiceAniListRatingSystem);
 }
 
-void AppSettings::SetSyncServiceAniListRatingSystem(const std::wstring& rating_system) {
+void Settings::SetSyncServiceAniListRatingSystem(const std::wstring& rating_system) {
   set_value(AppSettingKey::SyncServiceAniListRatingSystem, rating_system);
 }
 
-std::wstring AppSettings::GetSyncServiceAniListToken() const {
+std::wstring Settings::GetSyncServiceAniListToken() const {
   return value<std::wstring>(AppSettingKey::SyncServiceAniListToken);
 }
 
-void AppSettings::SetSyncServiceAniListToken(const std::wstring& token) {
+void Settings::SetSyncServiceAniListToken(const std::wstring& token) {
   set_value(AppSettingKey::SyncServiceAniListToken, token);
 }
 
 // Library
 
-int AppSettings::GetLibraryFileSizeThreshold() const {
+int Settings::GetLibraryFileSizeThreshold() const {
   return value<int>(AppSettingKey::LibraryFileSizeThreshold);
 }
 
-void AppSettings::SetLibraryFileSizeThreshold(const int bytes) {
+void Settings::SetLibraryFileSizeThreshold(const int bytes) {
   set_value(AppSettingKey::LibraryFileSizeThreshold, bytes);
 }
 
-std::wstring AppSettings::GetLibraryMediaPlayerPath() const {
+std::wstring Settings::GetLibraryMediaPlayerPath() const {
   return value<std::wstring>(AppSettingKey::LibraryMediaPlayerPath);
 }
 
-void AppSettings::SetLibraryMediaPlayerPath(const std::wstring& path) {
+void Settings::SetLibraryMediaPlayerPath(const std::wstring& path) {
   set_value(AppSettingKey::LibraryMediaPlayerPath, path);
 }
 
-bool AppSettings::GetLibraryWatchFolders() const {
+bool Settings::GetLibraryWatchFolders() const {
   return value<bool>(AppSettingKey::LibraryWatchFolders);
 }
 
-void AppSettings::SetLibraryWatchFolders(const bool enabled) {
+void Settings::SetLibraryWatchFolders(const bool enabled) {
   set_value(AppSettingKey::LibraryWatchFolders, enabled);
   track::monitor.Enable(enabled);
 }
 
 // Application
 
-int AppSettings::GetAppListDoubleClickAction() const {
+int Settings::GetAppListDoubleClickAction() const {
   return value<int>(AppSettingKey::AppListDoubleClickAction);
 }
 
-void AppSettings::SetAppListDoubleClickAction(const int action) {
+void Settings::SetAppListDoubleClickAction(const int action) {
   set_value(AppSettingKey::AppListDoubleClickAction, action);
 }
 
-int AppSettings::GetAppListMiddleClickAction() const {
+int Settings::GetAppListMiddleClickAction() const {
   return value<int>(AppSettingKey::AppListMiddleClickAction);
 }
 
-void AppSettings::SetAppListMiddleClickAction(const int action) {
+void Settings::SetAppListMiddleClickAction(const int action) {
   set_value(AppSettingKey::AppListMiddleClickAction, action);
 }
 
-bool AppSettings::GetAppListDisplayEnglishTitles() const {
+bool Settings::GetAppListDisplayEnglishTitles() const {
   return value<bool>(AppSettingKey::AppListDisplayEnglishTitles);
 }
 
-void AppSettings::SetAppListDisplayEnglishTitles(const bool enabled) {
+void Settings::SetAppListDisplayEnglishTitles(const bool enabled) {
   set_value(AppSettingKey::AppListDisplayEnglishTitles, enabled);
 }
 
-bool AppSettings::GetAppListHighlightNewEpisodes() const {
+bool Settings::GetAppListHighlightNewEpisodes() const {
   return value<bool>(AppSettingKey::AppListHighlightNewEpisodes);
 }
 
-void AppSettings::SetAppListHighlightNewEpisodes(const bool enabled) {
+void Settings::SetAppListHighlightNewEpisodes(const bool enabled) {
   set_value(AppSettingKey::AppListHighlightNewEpisodes, enabled);
 }
 
-bool AppSettings::GetAppListDisplayHighlightedOnTop() const {
+bool Settings::GetAppListDisplayHighlightedOnTop() const {
   return value<bool>(AppSettingKey::AppListDisplayHighlightedOnTop);
 }
 
-void AppSettings::SetAppListDisplayHighlightedOnTop(const bool enabled) {
+void Settings::SetAppListDisplayHighlightedOnTop(const bool enabled) {
   set_value(AppSettingKey::AppListDisplayHighlightedOnTop, enabled);
 }
 
-bool AppSettings::GetAppListProgressDisplayAired() const {
+bool Settings::GetAppListProgressDisplayAired() const {
   return value<bool>(AppSettingKey::AppListProgressDisplayAired);
 }
 
-void AppSettings::SetAppListProgressDisplayAired(const bool enabled) {
+void Settings::SetAppListProgressDisplayAired(const bool enabled) {
   set_value(AppSettingKey::AppListProgressDisplayAired, enabled);
 }
 
-bool AppSettings::GetAppListProgressDisplayAvailable() const {
+bool Settings::GetAppListProgressDisplayAvailable() const {
   return value<bool>(AppSettingKey::AppListProgressDisplayAvailable);
 }
 
-void AppSettings::SetAppListProgressDisplayAvailable(const bool enabled) {
+void Settings::SetAppListProgressDisplayAvailable(const bool enabled) {
   set_value(AppSettingKey::AppListProgressDisplayAvailable, enabled);
 }
 
-std::wstring AppSettings::GetAppListSortColumnPrimary() const {
+std::wstring Settings::GetAppListSortColumnPrimary() const {
   return value<std::wstring>(AppSettingKey::AppListSortColumnPrimary);
 }
 
-void AppSettings::SetAppListSortColumnPrimary(const std::wstring& column) {
+void Settings::SetAppListSortColumnPrimary(const std::wstring& column) {
   set_value(AppSettingKey::AppListSortColumnPrimary, column);
 }
 
-std::wstring AppSettings::GetAppListSortColumnSecondary() const {
+std::wstring Settings::GetAppListSortColumnSecondary() const {
   return value<std::wstring>(AppSettingKey::AppListSortColumnSecondary);
 }
 
-void AppSettings::SetAppListSortColumnSecondary(const std::wstring& column) {
+void Settings::SetAppListSortColumnSecondary(const std::wstring& column) {
   set_value(AppSettingKey::AppListSortColumnSecondary, column);
 }
 
-int AppSettings::GetAppListSortOrderPrimary() const {
+int Settings::GetAppListSortOrderPrimary() const {
   return value<int>(AppSettingKey::AppListSortOrderPrimary);
 }
 
-void AppSettings::SetAppListSortOrderPrimary(const int order) {
+void Settings::SetAppListSortOrderPrimary(const int order) {
   set_value(AppSettingKey::AppListSortOrderPrimary, order);
 }
 
-int AppSettings::GetAppListSortOrderSecondary() const {
+int Settings::GetAppListSortOrderSecondary() const {
   return value<int>(AppSettingKey::AppListSortOrderSecondary);
 }
 
-void AppSettings::SetAppListSortOrderSecondary(const int order) {
+void Settings::SetAppListSortOrderSecondary(const int order) {
   set_value(AppSettingKey::AppListSortOrderSecondary, order);
 }
 
-std::wstring AppSettings::GetAppListTitleLanguagePreference() const {
+std::wstring Settings::GetAppListTitleLanguagePreference() const {
   return value<std::wstring>(AppSettingKey::AppListTitleLanguagePreference);
 }
 
-void AppSettings::SetAppListTitleLanguagePreference(const std::wstring& language) {
+void Settings::SetAppListTitleLanguagePreference(const std::wstring& language) {
   set_value(AppSettingKey::AppListTitleLanguagePreference, language);
 }
 
-bool AppSettings::GetAppBehaviorAutostart() const {
+bool Settings::GetAppBehaviorAutostart() const {
   return value<bool>(AppSettingKey::AppBehaviorAutostart);
 }
 
-void AppSettings::SetAppBehaviorAutostart(const bool enabled) {
+void Settings::SetAppBehaviorAutostart(const bool enabled) {
   set_value(AppSettingKey::AppBehaviorAutostart, enabled);
 
   win::Registry registry;
@@ -561,91 +565,91 @@ void AppSettings::SetAppBehaviorAutostart(const bool enabled) {
   }
 }
 
-bool AppSettings::GetAppBehaviorStartMinimized() const {
+bool Settings::GetAppBehaviorStartMinimized() const {
   return value<bool>(AppSettingKey::AppBehaviorStartMinimized);
 }
 
-void AppSettings::SetAppBehaviorStartMinimized(const bool enabled) {
+void Settings::SetAppBehaviorStartMinimized(const bool enabled) {
   set_value(AppSettingKey::AppBehaviorStartMinimized, enabled);
 }
 
-bool AppSettings::GetAppBehaviorCheckForUpdates() const {
+bool Settings::GetAppBehaviorCheckForUpdates() const {
   return value<bool>(AppSettingKey::AppBehaviorCheckForUpdates);
 }
 
-void AppSettings::SetAppBehaviorCheckForUpdates(const bool enabled) {
+void Settings::SetAppBehaviorCheckForUpdates(const bool enabled) {
   set_value(AppSettingKey::AppBehaviorCheckForUpdates, enabled);
 }
 
-bool AppSettings::GetAppBehaviorScanAvailableEpisodes() const {
+bool Settings::GetAppBehaviorScanAvailableEpisodes() const {
   return value<bool>(AppSettingKey::AppBehaviorScanAvailableEpisodes);
 }
 
-void AppSettings::SetAppBehaviorScanAvailableEpisodes(const bool enabled) {
+void Settings::SetAppBehaviorScanAvailableEpisodes(const bool enabled) {
   set_value(AppSettingKey::AppBehaviorScanAvailableEpisodes, enabled);
 }
 
-bool AppSettings::GetAppBehaviorCloseToTray() const {
+bool Settings::GetAppBehaviorCloseToTray() const {
   return value<bool>(AppSettingKey::AppBehaviorCloseToTray);
 }
 
-void AppSettings::SetAppBehaviorCloseToTray(const bool enabled) {
+void Settings::SetAppBehaviorCloseToTray(const bool enabled) {
   set_value(AppSettingKey::AppBehaviorCloseToTray, enabled);
 }
 
-bool AppSettings::GetAppBehaviorMinimizeToTray() const {
+bool Settings::GetAppBehaviorMinimizeToTray() const {
   return value<bool>(AppSettingKey::AppBehaviorMinimizeToTray);
 }
 
-void AppSettings::SetAppBehaviorMinimizeToTray(const bool enabled) {
+void Settings::SetAppBehaviorMinimizeToTray(const bool enabled) {
   set_value(AppSettingKey::AppBehaviorMinimizeToTray, enabled);
 }
 
-std::wstring AppSettings::GetAppConnectionProxyHost() const {
+std::wstring Settings::GetAppConnectionProxyHost() const {
   return value<std::wstring>(AppSettingKey::AppConnectionProxyHost);
 }
 
-void AppSettings::SetAppConnectionProxyHost(const std::wstring& host) {
+void Settings::SetAppConnectionProxyHost(const std::wstring& host) {
   set_value(AppSettingKey::AppConnectionProxyHost, host);
 }
 
-std::wstring AppSettings::GetAppConnectionProxyUsername() const {
+std::wstring Settings::GetAppConnectionProxyUsername() const {
   return value<std::wstring>(AppSettingKey::AppConnectionProxyUsername);
 }
 
-void AppSettings::SetAppConnectionProxyUsername(const std::wstring& username) {
+void Settings::SetAppConnectionProxyUsername(const std::wstring& username) {
   set_value(AppSettingKey::AppConnectionProxyUsername, username);
 }
 
-std::wstring AppSettings::GetAppConnectionProxyPassword() const {
+std::wstring Settings::GetAppConnectionProxyPassword() const {
   return value<std::wstring>(AppSettingKey::AppConnectionProxyPassword);
 }
 
-void AppSettings::SetAppConnectionProxyPassword(const std::wstring& password) {
+void Settings::SetAppConnectionProxyPassword(const std::wstring& password) {
   set_value(AppSettingKey::AppConnectionProxyPassword, password);
 }
 
-bool AppSettings::GetAppConnectionNoRevoke() const {
+bool Settings::GetAppConnectionNoRevoke() const {
   return value<bool>(AppSettingKey::AppConnectionNoRevoke);
 }
 
-void AppSettings::SetAppConnectionNoRevoke(const bool enabled) {
+void Settings::SetAppConnectionNoRevoke(const bool enabled) {
   set_value(AppSettingKey::AppConnectionNoRevoke, enabled);
 }
 
-bool AppSettings::GetAppConnectionReuseActive() const {
+bool Settings::GetAppConnectionReuseActive() const {
   return value<bool>(AppSettingKey::AppConnectionReuseActive);
 }
 
-void AppSettings::SetAppConnectionReuseActive(const bool enabled) {
+void Settings::SetAppConnectionReuseActive(const bool enabled) {
   set_value(AppSettingKey::AppConnectionReuseActive, enabled);
 }
 
-std::wstring AppSettings::GetAppInterfaceTheme() const {
+std::wstring Settings::GetAppInterfaceTheme() const {
   return value<std::wstring>(AppSettingKey::AppInterfaceTheme);
 }
 
-void AppSettings::SetAppInterfaceTheme(const std::wstring& theme) {
+void Settings::SetAppInterfaceTheme(const std::wstring& theme) {
   const auto previous_theme = GetAppInterfaceTheme();
   if (set_value(AppSettingKey::AppInterfaceTheme, theme)) {
     if (ui::Theme.Load()) {
@@ -656,11 +660,11 @@ void AppSettings::SetAppInterfaceTheme(const std::wstring& theme) {
   }
 }
 
-std::wstring AppSettings::GetAppInterfaceExternalLinks() const {
+std::wstring Settings::GetAppInterfaceExternalLinks() const {
   return value<std::wstring>(AppSettingKey::AppInterfaceExternalLinks);
 }
 
-void AppSettings::SetAppInterfaceExternalLinks(const std::wstring& str) {
+void Settings::SetAppInterfaceExternalLinks(const std::wstring& str) {
   if (set_value(AppSettingKey::AppInterfaceExternalLinks, str)) {
     ui::Menus.UpdateExternalLinks();
   }
@@ -668,261 +672,261 @@ void AppSettings::SetAppInterfaceExternalLinks(const std::wstring& str) {
 
 // Recognition
 
-int AppSettings::GetRecognitionDetectionInterval() const {
+int Settings::GetRecognitionDetectionInterval() const {
   return value<int>(AppSettingKey::RecognitionDetectionInterval);
 }
 
-void AppSettings::SetRecognitionDetectionInterval(const int seconds) {
+void Settings::SetRecognitionDetectionInterval(const int seconds) {
   set_value(AppSettingKey::RecognitionDetectionInterval, seconds);
 }
 
-bool AppSettings::GetRecognitionDetectMediaPlayers() const {
+bool Settings::GetRecognitionDetectMediaPlayers() const {
   return value<bool>(AppSettingKey::RecognitionDetectMediaPlayers);
 }
 
-void AppSettings::SetRecognitionDetectMediaPlayers(const bool enabled) {
+void Settings::SetRecognitionDetectMediaPlayers(const bool enabled) {
   set_value(AppSettingKey::RecognitionDetectMediaPlayers, enabled);
 }
 
-bool AppSettings::GetRecognitionDetectStreamingMedia() const {
+bool Settings::GetRecognitionDetectStreamingMedia() const {
   return value<bool>(AppSettingKey::RecognitionDetectStreamingMedia);
 }
 
-void AppSettings::SetRecognitionDetectStreamingMedia(const bool enabled) {
+void Settings::SetRecognitionDetectStreamingMedia(const bool enabled) {
   set_value(AppSettingKey::RecognitionDetectStreamingMedia, enabled);
 }
 
-std::wstring AppSettings::GetRecognitionIgnoredStrings() const {
+std::wstring Settings::GetRecognitionIgnoredStrings() const {
   return value<std::wstring>(AppSettingKey::RecognitionIgnoredStrings);
 }
 
-void AppSettings::SetRecognitionIgnoredStrings(const std::wstring& str) {
+void Settings::SetRecognitionIgnoredStrings(const std::wstring& str) {
   set_value(AppSettingKey::RecognitionIgnoredStrings, str);
 }
 
-bool AppSettings::GetRecognitionLookupParentDirectories() const {
+bool Settings::GetRecognitionLookupParentDirectories() const {
   return value<bool>(AppSettingKey::RecognitionLookupParentDirectories);
 }
 
-void AppSettings::SetRecognitionLookupParentDirectories(const bool enabled) {
+void Settings::SetRecognitionLookupParentDirectories(const bool enabled) {
   set_value(AppSettingKey::RecognitionLookupParentDirectories, enabled);
 }
 
-std::wstring AppSettings::GetRecognitionRelationsLastModified() const {
+std::wstring Settings::GetRecognitionRelationsLastModified() const {
   return value<std::wstring>(AppSettingKey::RecognitionRelationsLastModified);
 }
 
-void AppSettings::SetRecognitionRelationsLastModified(const std::wstring& last_modified) {
+void Settings::SetRecognitionRelationsLastModified(const std::wstring& last_modified) {
   set_value(AppSettingKey::RecognitionRelationsLastModified, last_modified);
 }
 
-int AppSettings::GetSyncUpdateDelay() const {
+int Settings::GetSyncUpdateDelay() const {
   return value<int>(AppSettingKey::SyncUpdateDelay);
 }
 
-void AppSettings::SetSyncUpdateDelay(const int seconds) {
+void Settings::SetSyncUpdateDelay(const int seconds) {
   set_value(AppSettingKey::SyncUpdateDelay, seconds);
 }
 
-bool AppSettings::GetSyncUpdateAskToConfirm() const {
+bool Settings::GetSyncUpdateAskToConfirm() const {
   return value<bool>(AppSettingKey::SyncUpdateAskToConfirm);
 }
 
-void AppSettings::SetSyncUpdateAskToConfirm(const bool enabled) {
+void Settings::SetSyncUpdateAskToConfirm(const bool enabled) {
   set_value(AppSettingKey::SyncUpdateAskToConfirm, enabled);
 }
 
-bool AppSettings::GetSyncUpdateCheckPlayer() const {
+bool Settings::GetSyncUpdateCheckPlayer() const {
   return value<bool>(AppSettingKey::SyncUpdateCheckPlayer);
 }
 
-void AppSettings::SetSyncUpdateCheckPlayer(const bool enabled) {
+void Settings::SetSyncUpdateCheckPlayer(const bool enabled) {
   set_value(AppSettingKey::SyncUpdateCheckPlayer, enabled);
 }
 
-bool AppSettings::GetSyncUpdateOutOfRange() const {
+bool Settings::GetSyncUpdateOutOfRange() const {
   return value<bool>(AppSettingKey::SyncUpdateOutOfRange);
 }
 
-void AppSettings::SetSyncUpdateOutOfRange(const bool enabled) {
+void Settings::SetSyncUpdateOutOfRange(const bool enabled) {
   set_value(AppSettingKey::SyncUpdateOutOfRange, enabled);
 }
 
-bool AppSettings::GetSyncUpdateOutOfRoot() const {
+bool Settings::GetSyncUpdateOutOfRoot() const {
   return value<bool>(AppSettingKey::SyncUpdateOutOfRoot);
 }
 
-void AppSettings::SetSyncUpdateOutOfRoot(const bool enabled) {
+void Settings::SetSyncUpdateOutOfRoot(const bool enabled) {
   set_value(AppSettingKey::SyncUpdateOutOfRoot, enabled);
 }
 
-bool AppSettings::GetSyncUpdateWaitPlayer() const {
+bool Settings::GetSyncUpdateWaitPlayer() const {
   return value<bool>(AppSettingKey::SyncUpdateWaitPlayer);
 }
 
-void AppSettings::SetSyncUpdateWaitPlayer(const bool enabled) {
+void Settings::SetSyncUpdateWaitPlayer(const bool enabled) {
   set_value(AppSettingKey::SyncUpdateWaitPlayer, enabled);
 }
 
-bool AppSettings::GetSyncGoToNowPlayingRecognized() const {
+bool Settings::GetSyncGoToNowPlayingRecognized() const {
   return value<bool>(AppSettingKey::SyncGoToNowPlayingRecognized);
 }
 
-void AppSettings::SetSyncGoToNowPlayingRecognized(const bool enabled) {
+void Settings::SetSyncGoToNowPlayingRecognized(const bool enabled) {
   set_value(AppSettingKey::SyncGoToNowPlayingRecognized, enabled);
 }
 
-bool AppSettings::GetSyncGoToNowPlayingNotRecognized() const {
+bool Settings::GetSyncGoToNowPlayingNotRecognized() const {
   return value<bool>(AppSettingKey::SyncGoToNowPlayingNotRecognized);
 }
 
-void AppSettings::SetSyncGoToNowPlayingNotRecognized(const bool enabled) {
+void Settings::SetSyncGoToNowPlayingNotRecognized(const bool enabled) {
   set_value(AppSettingKey::SyncGoToNowPlayingNotRecognized, enabled);
 }
 
-bool AppSettings::GetSyncNotifyRecognized() const {
+bool Settings::GetSyncNotifyRecognized() const {
   return value<bool>(AppSettingKey::SyncNotifyRecognized);
 }
 
-void AppSettings::SetSyncNotifyRecognized(const bool enabled) {
+void Settings::SetSyncNotifyRecognized(const bool enabled) {
   set_value(AppSettingKey::SyncNotifyRecognized, enabled);
 }
 
-bool AppSettings::GetSyncNotifyNotRecognized() const {
+bool Settings::GetSyncNotifyNotRecognized() const {
   return value<bool>(AppSettingKey::SyncNotifyNotRecognized);
 }
 
-void AppSettings::SetSyncNotifyNotRecognized(const bool enabled) {
+void Settings::SetSyncNotifyNotRecognized(const bool enabled) {
   set_value(AppSettingKey::SyncNotifyNotRecognized, enabled);
 }
 
-std::wstring AppSettings::GetSyncNotifyFormat() const {
+std::wstring Settings::GetSyncNotifyFormat() const {
   return value<std::wstring>(AppSettingKey::SyncNotifyFormat);
 }
 
-void AppSettings::SetSyncNotifyFormat(const std::wstring& format) {
+void Settings::SetSyncNotifyFormat(const std::wstring& format) {
   set_value(AppSettingKey::SyncNotifyFormat, format);
 }
 
-bool AppSettings::GetStreamAnimelab() const {
+bool Settings::GetStreamAnimelab() const {
   return value<bool>(AppSettingKey::StreamAnimelab);
 }
 
-void AppSettings::SetStreamAnimelab(const bool enabled) {
+void Settings::SetStreamAnimelab(const bool enabled) {
   set_value(AppSettingKey::StreamAnimelab, enabled);
 }
 
-bool AppSettings::GetStreamAdn() const {
+bool Settings::GetStreamAdn() const {
   return value<bool>(AppSettingKey::StreamAdn);
 }
 
-void AppSettings::SetStreamAdn(const bool enabled) {
+void Settings::SetStreamAdn(const bool enabled) {
   set_value(AppSettingKey::StreamAdn, enabled);
 }
 
-bool AppSettings::GetStreamAnn() const {
+bool Settings::GetStreamAnn() const {
   return value<bool>(AppSettingKey::StreamAnn);
 }
 
-void AppSettings::SetStreamAnn(const bool enabled) {
+void Settings::SetStreamAnn(const bool enabled) {
   set_value(AppSettingKey::StreamAnn, enabled);
 }
 
-bool AppSettings::GetStreamCrunchyroll() const {
+bool Settings::GetStreamCrunchyroll() const {
   return value<bool>(AppSettingKey::StreamCrunchyroll);
 }
 
-void AppSettings::SetStreamCrunchyroll(const bool enabled) {
+void Settings::SetStreamCrunchyroll(const bool enabled) {
   set_value(AppSettingKey::StreamCrunchyroll, enabled);
 }
 
-bool AppSettings::GetStreamFunimation() const {
+bool Settings::GetStreamFunimation() const {
   return value<bool>(AppSettingKey::StreamFunimation);
 }
 
-void AppSettings::SetStreamFunimation(const bool enabled) {
+void Settings::SetStreamFunimation(const bool enabled) {
   set_value(AppSettingKey::StreamFunimation, enabled);
 }
 
-bool AppSettings::GetStreamHidive() const {
+bool Settings::GetStreamHidive() const {
   return value<bool>(AppSettingKey::StreamHidive);
 }
 
-void AppSettings::SetStreamHidive(const bool enabled) {
+void Settings::SetStreamHidive(const bool enabled) {
   set_value(AppSettingKey::StreamHidive, enabled);
 }
 
-bool AppSettings::GetStreamPlex() const {
+bool Settings::GetStreamPlex() const {
   return value<bool>(AppSettingKey::StreamPlex);
 }
 
-void AppSettings::SetStreamPlex(const bool enabled) {
+void Settings::SetStreamPlex(const bool enabled) {
   set_value(AppSettingKey::StreamPlex, enabled);
 }
 
-bool AppSettings::GetStreamVeoh() const {
+bool Settings::GetStreamVeoh() const {
   return value<bool>(AppSettingKey::StreamVeoh);
 }
 
-void AppSettings::SetStreamVeoh(const bool enabled) {
+void Settings::SetStreamVeoh(const bool enabled) {
   set_value(AppSettingKey::StreamVeoh, enabled);
 }
 
-bool AppSettings::GetStreamViz() const {
+bool Settings::GetStreamViz() const {
   return value<bool>(AppSettingKey::StreamViz);
 }
 
-void AppSettings::SetStreamViz(const bool enabled) {
+void Settings::SetStreamViz(const bool enabled) {
   set_value(AppSettingKey::StreamViz, enabled);
 }
 
-bool AppSettings::GetStreamVrv() const {
+bool Settings::GetStreamVrv() const {
   return value<bool>(AppSettingKey::StreamVrv);
 }
 
-void AppSettings::SetStreamVrv(const bool enabled) {
+void Settings::SetStreamVrv(const bool enabled) {
   set_value(AppSettingKey::StreamVrv, enabled);
 }
 
-bool AppSettings::GetStreamWakanim() const {
+bool Settings::GetStreamWakanim() const {
   return value<bool>(AppSettingKey::StreamWakanim);
 }
 
-void AppSettings::SetStreamWakanim(const bool enabled) {
+void Settings::SetStreamWakanim(const bool enabled) {
   set_value(AppSettingKey::StreamWakanim, enabled);
 }
 
-bool AppSettings::GetStreamYahoo() const {
+bool Settings::GetStreamYahoo() const {
   return value<bool>(AppSettingKey::StreamYahoo);
 }
 
-void AppSettings::SetStreamYahoo(const bool enabled) {
+void Settings::SetStreamYahoo(const bool enabled) {
   set_value(AppSettingKey::StreamYahoo, enabled);
 }
 
-bool AppSettings::GetStreamYoutube() const {
+bool Settings::GetStreamYoutube() const {
   return value<bool>(AppSettingKey::StreamYoutube);
 }
 
-void AppSettings::SetStreamYoutube(const bool enabled) {
+void Settings::SetStreamYoutube(const bool enabled) {
   set_value(AppSettingKey::StreamYoutube, enabled);
 }
 
 // Sharing
 
-std::wstring AppSettings::GetShareDiscordApplicationId() const {
+std::wstring Settings::GetShareDiscordApplicationId() const {
   return value<std::wstring>(AppSettingKey::ShareDiscordApplicationId);
 }
 
-void AppSettings::SetShareDiscordApplicationId(const std::wstring& application_id) {
+void Settings::SetShareDiscordApplicationId(const std::wstring& application_id) {
   set_value(AppSettingKey::ShareDiscordApplicationId, application_id);
 }
 
-bool AppSettings::GetShareDiscordEnabled() const {
+bool Settings::GetShareDiscordEnabled() const {
   return value<bool>(AppSettingKey::ShareDiscordEnabled);
 }
 
-void AppSettings::SetShareDiscordEnabled(const bool enabled) {
+void Settings::SetShareDiscordEnabled(const bool enabled) {
   if (set_value(AppSettingKey::ShareDiscordEnabled, enabled)) {
     if (enabled) {
       link::discord::Initialize();
@@ -933,399 +937,399 @@ void AppSettings::SetShareDiscordEnabled(const bool enabled) {
   }
 }
 
-std::wstring AppSettings::GetShareDiscordFormatDetails() const {
+std::wstring Settings::GetShareDiscordFormatDetails() const {
   return value<std::wstring>(AppSettingKey::ShareDiscordFormatDetails);
 }
 
-void AppSettings::SetShareDiscordFormatDetails(const std::wstring& format) {
+void Settings::SetShareDiscordFormatDetails(const std::wstring& format) {
   set_value(AppSettingKey::ShareDiscordFormatDetails, format);
 }
 
-std::wstring AppSettings::GetShareDiscordFormatState() const {
+std::wstring Settings::GetShareDiscordFormatState() const {
   return value<std::wstring>(AppSettingKey::ShareDiscordFormatState);
 }
 
-void AppSettings::SetShareDiscordFormatState(const std::wstring& format) {
+void Settings::SetShareDiscordFormatState(const std::wstring& format) {
   set_value(AppSettingKey::ShareDiscordFormatState, format);
 }
 
-bool AppSettings::GetShareDiscordUsernameEnabled() const {
+bool Settings::GetShareDiscordUsernameEnabled() const {
   return value<bool>(AppSettingKey::ShareDiscordUsernameEnabled);
 }
 
-void AppSettings::SetShareDiscordUsernameEnabled(const bool enabled) {
+void Settings::SetShareDiscordUsernameEnabled(const bool enabled) {
   set_value(AppSettingKey::ShareDiscordUsernameEnabled, enabled);
 }
 
-bool AppSettings::GetShareHttpEnabled() const {
+bool Settings::GetShareHttpEnabled() const {
   return value<bool>(AppSettingKey::ShareHttpEnabled);
 }
 
-void AppSettings::SetShareHttpEnabled(const bool enabled) {
+void Settings::SetShareHttpEnabled(const bool enabled) {
   set_value(AppSettingKey::ShareHttpEnabled, enabled);
 }
 
-std::wstring AppSettings::GetShareHttpFormat() const {
+std::wstring Settings::GetShareHttpFormat() const {
   return value<std::wstring>(AppSettingKey::ShareHttpFormat);
 }
 
-void AppSettings::SetShareHttpFormat(const std::wstring& format) {
+void Settings::SetShareHttpFormat(const std::wstring& format) {
   set_value(AppSettingKey::ShareHttpFormat, format);
 }
 
-std::wstring AppSettings::GetShareHttpUrl() const {
+std::wstring Settings::GetShareHttpUrl() const {
   return value<std::wstring>(AppSettingKey::ShareHttpUrl);
 }
 
-void AppSettings::SetShareHttpUrl(const std::wstring& url) {
+void Settings::SetShareHttpUrl(const std::wstring& url) {
   set_value(AppSettingKey::ShareHttpUrl, url);
 }
 
-bool AppSettings::GetShareMircEnabled() const {
+bool Settings::GetShareMircEnabled() const {
   return value<bool>(AppSettingKey::ShareMircEnabled);
 }
 
-void AppSettings::SetShareMircEnabled(const bool enabled) {
+void Settings::SetShareMircEnabled(const bool enabled) {
   set_value(AppSettingKey::ShareMircEnabled, enabled);
 }
 
-bool AppSettings::GetShareMircMultiServer() const {
+bool Settings::GetShareMircMultiServer() const {
   return value<bool>(AppSettingKey::ShareMircMultiServer);
 }
 
-void AppSettings::SetShareMircMultiServer(const bool enabled) {
+void Settings::SetShareMircMultiServer(const bool enabled) {
   set_value(AppSettingKey::ShareMircMultiServer, enabled);
 }
 
-bool AppSettings::GetShareMircUseMeAction() const {
+bool Settings::GetShareMircUseMeAction() const {
   return value<bool>(AppSettingKey::ShareMircUseMeAction);
 }
 
-void AppSettings::SetShareMircUseMeAction(const bool enabled) {
+void Settings::SetShareMircUseMeAction(const bool enabled) {
   set_value(AppSettingKey::ShareMircUseMeAction, enabled);
 }
 
-int AppSettings::GetShareMircMode() const {
+int Settings::GetShareMircMode() const {
   return value<int>(AppSettingKey::ShareMircMode);
 }
 
-void AppSettings::SetShareMircMode(const int mode) {
+void Settings::SetShareMircMode(const int mode) {
   set_value(AppSettingKey::ShareMircMode, mode);
 }
 
-std::wstring AppSettings::GetShareMircChannels() const {
+std::wstring Settings::GetShareMircChannels() const {
   return value<std::wstring>(AppSettingKey::ShareMircChannels);
 }
 
-void AppSettings::SetShareMircChannels(const std::wstring& channels) {
+void Settings::SetShareMircChannels(const std::wstring& channels) {
   set_value(AppSettingKey::ShareMircChannels, channels);
 }
 
-std::wstring AppSettings::GetShareMircFormat() const {
+std::wstring Settings::GetShareMircFormat() const {
   return value<std::wstring>(AppSettingKey::ShareMircFormat);
 }
 
-void AppSettings::SetShareMircFormat(const std::wstring& format) {
+void Settings::SetShareMircFormat(const std::wstring& format) {
   set_value(AppSettingKey::ShareMircFormat, format);
 }
 
-std::wstring AppSettings::GetShareMircService() const {
+std::wstring Settings::GetShareMircService() const {
   return value<std::wstring>(AppSettingKey::ShareMircService);
 }
 
-void AppSettings::SetShareMircService(const std::wstring& service) {
+void Settings::SetShareMircService(const std::wstring& service) {
   set_value(AppSettingKey::ShareMircService, service);
 }
 
-bool AppSettings::GetShareTwitterEnabled() const {
+bool Settings::GetShareTwitterEnabled() const {
   return value<bool>(AppSettingKey::ShareTwitterEnabled);
 }
 
-void AppSettings::SetShareTwitterEnabled(const bool enabled) {
+void Settings::SetShareTwitterEnabled(const bool enabled) {
   set_value(AppSettingKey::ShareTwitterEnabled, enabled);
 }
 
-std::wstring AppSettings::GetShareTwitterFormat() const {
+std::wstring Settings::GetShareTwitterFormat() const {
   return value<std::wstring>(AppSettingKey::ShareTwitterFormat);
 }
 
-void AppSettings::SetShareTwitterFormat(const std::wstring& format) {
+void Settings::SetShareTwitterFormat(const std::wstring& format) {
   set_value(AppSettingKey::ShareTwitterFormat, format);
 }
 
-std::wstring AppSettings::GetShareTwitterOauthToken() const {
+std::wstring Settings::GetShareTwitterOauthToken() const {
   return value<std::wstring>(AppSettingKey::ShareTwitterOauthToken);
 }
 
-void AppSettings::SetShareTwitterOauthToken(const std::wstring& oauth_token) {
+void Settings::SetShareTwitterOauthToken(const std::wstring& oauth_token) {
   set_value(AppSettingKey::ShareTwitterOauthToken, oauth_token);
 }
 
-std::wstring AppSettings::GetShareTwitterOauthSecret() const {
+std::wstring Settings::GetShareTwitterOauthSecret() const {
   return value<std::wstring>(AppSettingKey::ShareTwitterOauthSecret);
 }
 
-void AppSettings::SetShareTwitterOauthSecret(const std::wstring& oauth_secret) {
+void Settings::SetShareTwitterOauthSecret(const std::wstring& oauth_secret) {
   set_value(AppSettingKey::ShareTwitterOauthSecret, oauth_secret);
 }
 
-std::wstring AppSettings::GetShareTwitterUsername() const {
+std::wstring Settings::GetShareTwitterUsername() const {
   return value<std::wstring>(AppSettingKey::ShareTwitterUsername);
 }
 
-void AppSettings::SetShareTwitterUsername(const std::wstring& username) {
+void Settings::SetShareTwitterUsername(const std::wstring& username) {
   set_value(AppSettingKey::ShareTwitterUsername, username);
 }
 
 // Torrents
 
-std::wstring AppSettings::GetTorrentDiscoverySource() const {
+std::wstring Settings::GetTorrentDiscoverySource() const {
   return value<std::wstring>(AppSettingKey::TorrentDiscoverySource);
 }
 
-void AppSettings::SetTorrentDiscoverySource(const std::wstring& url) {
+void Settings::SetTorrentDiscoverySource(const std::wstring& url) {
   set_value(AppSettingKey::TorrentDiscoverySource, url);
 }
 
-std::wstring AppSettings::GetTorrentDiscoverySearchUrl() const {
+std::wstring Settings::GetTorrentDiscoverySearchUrl() const {
   return value<std::wstring>(AppSettingKey::TorrentDiscoverySearchUrl);
 }
 
-void AppSettings::SetTorrentDiscoverySearchUrl(const std::wstring& url) {
+void Settings::SetTorrentDiscoverySearchUrl(const std::wstring& url) {
   set_value(AppSettingKey::TorrentDiscoverySearchUrl, url);
 }
 
-bool AppSettings::GetTorrentDiscoveryAutoCheckEnabled() const {
+bool Settings::GetTorrentDiscoveryAutoCheckEnabled() const {
   return value<bool>(AppSettingKey::TorrentDiscoveryAutoCheckEnabled);
 }
 
-void AppSettings::SetTorrentDiscoveryAutoCheckEnabled(const bool enabled) {
+void Settings::SetTorrentDiscoveryAutoCheckEnabled(const bool enabled) {
   set_value(AppSettingKey::TorrentDiscoveryAutoCheckEnabled, enabled);
 }
 
-int AppSettings::GetTorrentDiscoveryAutoCheckInterval() const {
+int Settings::GetTorrentDiscoveryAutoCheckInterval() const {
   return value<int>(AppSettingKey::TorrentDiscoveryAutoCheckInterval);
 }
 
-void AppSettings::SetTorrentDiscoveryAutoCheckInterval(const int minutes) {
+void Settings::SetTorrentDiscoveryAutoCheckInterval(const int minutes) {
   set_value(AppSettingKey::TorrentDiscoveryAutoCheckInterval, minutes);
 }
 
-int AppSettings::GetTorrentDiscoveryNewAction() const {
+int Settings::GetTorrentDiscoveryNewAction() const {
   return value<int>(AppSettingKey::TorrentDiscoveryNewAction);
 }
 
-void AppSettings::SetTorrentDiscoveryNewAction(const int action) {
+void Settings::SetTorrentDiscoveryNewAction(const int action) {
   set_value(AppSettingKey::TorrentDiscoveryNewAction, action);
 }
 
-int AppSettings::GetTorrentDownloadAppMode() const {
+int Settings::GetTorrentDownloadAppMode() const {
   return value<int>(AppSettingKey::TorrentDownloadAppMode);
 }
 
-void AppSettings::SetTorrentDownloadAppMode(const int mode) {
+void Settings::SetTorrentDownloadAppMode(const int mode) {
   set_value(AppSettingKey::TorrentDownloadAppMode, mode);
 }
 
-bool AppSettings::GetTorrentDownloadAppOpen() const {
+bool Settings::GetTorrentDownloadAppOpen() const {
   return value<bool>(AppSettingKey::TorrentDownloadAppOpen);
 }
 
-void AppSettings::SetTorrentDownloadAppOpen(const bool enabled) {
+void Settings::SetTorrentDownloadAppOpen(const bool enabled) {
   set_value(AppSettingKey::TorrentDownloadAppOpen, enabled);
 }
 
-std::wstring AppSettings::GetTorrentDownloadAppPath() const {
+std::wstring Settings::GetTorrentDownloadAppPath() const {
   return value<std::wstring>(AppSettingKey::TorrentDownloadAppPath);
 }
 
-void AppSettings::SetTorrentDownloadAppPath(const std::wstring& path) {
+void Settings::SetTorrentDownloadAppPath(const std::wstring& path) {
   set_value(AppSettingKey::TorrentDownloadAppPath, path);
 }
 
-std::wstring AppSettings::GetTorrentDownloadLocation() const {
+std::wstring Settings::GetTorrentDownloadLocation() const {
   return value<std::wstring>(AppSettingKey::TorrentDownloadLocation);
 }
 
-void AppSettings::SetTorrentDownloadLocation(const std::wstring& path) {
+void Settings::SetTorrentDownloadLocation(const std::wstring& path) {
   set_value(AppSettingKey::TorrentDownloadLocation, path);
 }
 
-bool AppSettings::GetTorrentDownloadUseAnimeFolder() const {
+bool Settings::GetTorrentDownloadUseAnimeFolder() const {
   return value<bool>(AppSettingKey::TorrentDownloadUseAnimeFolder);
 }
 
-void AppSettings::SetTorrentDownloadUseAnimeFolder(const bool enabled) {
+void Settings::SetTorrentDownloadUseAnimeFolder(const bool enabled) {
   set_value(AppSettingKey::TorrentDownloadUseAnimeFolder, enabled);
 }
 
-bool AppSettings::GetTorrentDownloadFallbackOnFolder() const {
+bool Settings::GetTorrentDownloadFallbackOnFolder() const {
   return value<bool>(AppSettingKey::TorrentDownloadFallbackOnFolder);
 }
 
-void AppSettings::SetTorrentDownloadFallbackOnFolder(const bool enabled) {
+void Settings::SetTorrentDownloadFallbackOnFolder(const bool enabled) {
   set_value(AppSettingKey::TorrentDownloadFallbackOnFolder, enabled);
 }
 
-bool AppSettings::GetTorrentDownloadCreateSubfolder() const {
+bool Settings::GetTorrentDownloadCreateSubfolder() const {
   return value<bool>(AppSettingKey::TorrentDownloadCreateSubfolder);
 }
 
-void AppSettings::SetTorrentDownloadCreateSubfolder(const bool enabled) {
+void Settings::SetTorrentDownloadCreateSubfolder(const bool enabled) {
   set_value(AppSettingKey::TorrentDownloadCreateSubfolder, enabled);
 }
 
-std::wstring AppSettings::GetTorrentDownloadSortBy() const {
+std::wstring Settings::GetTorrentDownloadSortBy() const {
   return value<std::wstring>(AppSettingKey::TorrentDownloadSortBy);
 }
 
-void AppSettings::SetTorrentDownloadSortBy(const std::wstring& sort) {
+void Settings::SetTorrentDownloadSortBy(const std::wstring& sort) {
   set_value(AppSettingKey::TorrentDownloadSortBy, sort);
 }
 
-std::wstring AppSettings::GetTorrentDownloadSortOrder() const {
+std::wstring Settings::GetTorrentDownloadSortOrder() const {
   return value<std::wstring>(AppSettingKey::TorrentDownloadSortOrder);
 }
 
-void AppSettings::SetTorrentDownloadSortOrder(const std::wstring& order) {
+void Settings::SetTorrentDownloadSortOrder(const std::wstring& order) {
   set_value(AppSettingKey::TorrentDownloadSortOrder, order);
 }
 
-bool AppSettings::GetTorrentDownloadUseMagnet() const {
+bool Settings::GetTorrentDownloadUseMagnet() const {
   return value<bool>(AppSettingKey::TorrentDownloadUseMagnet);
 }
 
-void AppSettings::SetTorrentDownloadUseMagnet(const bool enabled) {
+void Settings::SetTorrentDownloadUseMagnet(const bool enabled) {
   set_value(AppSettingKey::TorrentDownloadUseMagnet, enabled);
 }
 
-bool AppSettings::GetTorrentFilterEnabled() const {
+bool Settings::GetTorrentFilterEnabled() const {
   return value<bool>(AppSettingKey::TorrentFilterEnabled);
 }
 
-void AppSettings::SetTorrentFilterEnabled(const bool enabled) {
+void Settings::SetTorrentFilterEnabled(const bool enabled) {
   set_value(AppSettingKey::TorrentFilterEnabled, enabled);
 }
 
-int AppSettings::GetTorrentFilterArchiveMaxCount() const {
+int Settings::GetTorrentFilterArchiveMaxCount() const {
   return value<int>(AppSettingKey::TorrentFilterArchiveMaxCount);
 }
 
-void AppSettings::SetTorrentFilterArchiveMaxCount(const int count) {
+void Settings::SetTorrentFilterArchiveMaxCount(const int count) {
   set_value(AppSettingKey::TorrentFilterArchiveMaxCount, count);
 }
 
 // Internal
 
-int AppSettings::GetAppPositionX() const {
+int Settings::GetAppPositionX() const {
   return value<int>(AppSettingKey::AppPositionX);
 }
 
-void AppSettings::SetAppPositionX(const int x) {
+void Settings::SetAppPositionX(const int x) {
   set_value(AppSettingKey::AppPositionX, x);
 }
 
-int AppSettings::GetAppPositionY() const {
+int Settings::GetAppPositionY() const {
   return value<int>(AppSettingKey::AppPositionY);
 }
 
-void AppSettings::SetAppPositionY(const int y) {
+void Settings::SetAppPositionY(const int y) {
   set_value(AppSettingKey::AppPositionY, y);
 }
 
-int AppSettings::GetAppPositionW() const {
+int Settings::GetAppPositionW() const {
   return value<int>(AppSettingKey::AppPositionW);
 }
 
-void AppSettings::SetAppPositionW(const int width) {
+void Settings::SetAppPositionW(const int width) {
   set_value(AppSettingKey::AppPositionW, width);
 }
 
-int AppSettings::GetAppPositionH() const {
+int Settings::GetAppPositionH() const {
   return value<int>(AppSettingKey::AppPositionH);
 }
 
-void AppSettings::SetAppPositionH(const int height) {
+void Settings::SetAppPositionH(const int height) {
   set_value(AppSettingKey::AppPositionH, height);
 }
 
-bool AppSettings::GetAppPositionMaximized() const {
+bool Settings::GetAppPositionMaximized() const {
   return value<bool>(AppSettingKey::AppPositionMaximized);
 }
 
-void AppSettings::SetAppPositionMaximized(const bool enabled) {
+void Settings::SetAppPositionMaximized(const bool enabled) {
   set_value(AppSettingKey::AppPositionMaximized, enabled);
 }
 
-bool AppSettings::GetAppPositionRemember() const {
+bool Settings::GetAppPositionRemember() const {
   return value<bool>(AppSettingKey::AppPositionRemember);
 }
 
-void AppSettings::SetAppPositionRemember(const bool enabled) {
+void Settings::SetAppPositionRemember(const bool enabled) {
   set_value(AppSettingKey::AppPositionRemember, enabled);
 }
 
-bool AppSettings::GetAppOptionHideSidebar() const {
+bool Settings::GetAppOptionHideSidebar() const {
   return value<bool>(AppSettingKey::AppOptionHideSidebar);
 }
 
-void AppSettings::SetAppOptionHideSidebar(const bool enabled) {
+void Settings::SetAppOptionHideSidebar(const bool enabled) {
   set_value(AppSettingKey::AppOptionHideSidebar, enabled);
 }
 
-bool AppSettings::GetAppOptionEnableRecognition() const {
+bool Settings::GetAppOptionEnableRecognition() const {
   return value<bool>(AppSettingKey::AppOptionEnableRecognition);
 }
 
-void AppSettings::SetAppOptionEnableRecognition(const bool enabled) {
+void Settings::SetAppOptionEnableRecognition(const bool enabled) {
   set_value(AppSettingKey::AppOptionEnableRecognition, enabled);
 }
 
-bool AppSettings::GetAppOptionEnableSharing() const {
+bool Settings::GetAppOptionEnableSharing() const {
   return value<bool>(AppSettingKey::AppOptionEnableSharing);
 }
 
-void AppSettings::SetAppOptionEnableSharing(const bool enabled) {
+void Settings::SetAppOptionEnableSharing(const bool enabled) {
   set_value(AppSettingKey::AppOptionEnableSharing, enabled);
 }
 
-bool AppSettings::GetAppOptionEnableSync() const {
+bool Settings::GetAppOptionEnableSync() const {
   return value<bool>(AppSettingKey::AppOptionEnableSync);
 }
 
-void AppSettings::SetAppOptionEnableSync(const bool enabled) {
+void Settings::SetAppOptionEnableSync(const bool enabled) {
   set_value(AppSettingKey::AppOptionEnableSync, enabled);
 }
 
-std::wstring AppSettings::GetAppSeasonsLastSeason() const {
+std::wstring Settings::GetAppSeasonsLastSeason() const {
   return value<std::wstring>(AppSettingKey::AppSeasonsLastSeason);
 }
 
-void AppSettings::SetAppSeasonsLastSeason(const std::wstring& season) {
+void Settings::SetAppSeasonsLastSeason(const std::wstring& season) {
   set_value(AppSettingKey::AppSeasonsLastSeason, season);
 }
 
-int AppSettings::GetAppSeasonsGroupBy() const {
+int Settings::GetAppSeasonsGroupBy() const {
   return value<int>(AppSettingKey::AppSeasonsGroupBy);
 }
 
-void AppSettings::SetAppSeasonsGroupBy(const int group_by) {
+void Settings::SetAppSeasonsGroupBy(const int group_by) {
   set_value(AppSettingKey::AppSeasonsGroupBy, group_by);
 }
 
-int AppSettings::GetAppSeasonsSortBy() const {
+int Settings::GetAppSeasonsSortBy() const {
   return value<int>(AppSettingKey::AppSeasonsSortBy);
 }
 
-void AppSettings::SetAppSeasonsSortBy(const int sort_by) {
+void Settings::SetAppSeasonsSortBy(const int sort_by) {
   set_value(AppSettingKey::AppSeasonsSortBy, sort_by);
 }
 
-int AppSettings::GetAppSeasonsViewAs() const {
+int Settings::GetAppSeasonsViewAs() const {
   return value<int>(AppSettingKey::AppSeasonsViewAs);
 }
 
-void AppSettings::SetAppSeasonsViewAs(const int view_as) {
+void Settings::SetAppSeasonsViewAs(const int view_as) {
   set_value(AppSettingKey::AppSeasonsViewAs, view_as);
 }
 

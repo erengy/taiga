@@ -41,11 +41,11 @@
 
 namespace taiga {
 
-AppSettings::~AppSettings() {
+Settings::~Settings() {
   Save();
 }
 
-bool AppSettings::Load() {
+bool Settings::Load() {
   std::lock_guard lock{mutex_};
 
   if (modified_) {
@@ -67,7 +67,7 @@ bool AppSettings::Load() {
   return DeserializeFromXml(path);
 }
 
-bool AppSettings::Save() {
+bool Settings::Save() {
   std::lock_guard lock{mutex_};
 
   if (!modified_) {
@@ -94,12 +94,7 @@ bool AppSettings::Save() {
   return true;
 }
 
-const AppSettings::AppSetting& AppSettings::GetSetting(const AppSettingKey key) const {
-  InitKeyMap();
-  return key_map_[key];
-}
-
-bool AppSettings::DeserializeFromXml(const std::wstring& path) {
+bool Settings::DeserializeFromXml(const std::wstring& path) {
   XmlDocument document;
   const auto parse_result = XmlLoadFileToDocument(document, path);
 
@@ -197,7 +192,7 @@ bool AppSettings::DeserializeFromXml(const std::wstring& path) {
   return true;
 }
 
-bool AppSettings::SerializeToXml(const std::wstring& path) const {
+bool Settings::SerializeToXml(const std::wstring& path) const {
   XmlDocument document;
 
   auto settings = document.append_child(L"settings");
@@ -288,7 +283,7 @@ bool AppSettings::SerializeToXml(const std::wstring& path) const {
 ////////////////////////////////////////////////////////////////////////////////
 
 // @TODO: Remove
-void AppSettings::DoAfterLoad() {
+void Settings::DoAfterLoad() {
   // Services
   ServiceManager.service(sync::kKitsu)->user().rating_system =
       GetSyncServiceKitsuRatingSystem();
@@ -302,7 +297,7 @@ void AppSettings::DoAfterLoad() {
   feed.channel.link = GetTorrentDiscoverySource();
 }
 
-void AppSettings::ApplyChanges() {
+void Settings::ApplyChanges() {
   if (changed_account_or_service_) {
     anime::db.LoadList();
     library::history.Load();
@@ -323,11 +318,11 @@ void AppSettings::ApplyChanges() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-sync::Service* AppSettings::GetCurrentService() const {
+sync::Service* Settings::GetCurrentService() const {
   return ServiceManager.service(GetSyncActiveService());
 }
 
-sync::ServiceId AppSettings::GetCurrentServiceId() const {
+sync::ServiceId Settings::GetCurrentServiceId() const {
   const auto service = GetCurrentService();
 
   if (service)
@@ -336,7 +331,7 @@ sync::ServiceId AppSettings::GetCurrentServiceId() const {
   return sync::kMyAnimeList;
 }
 
-std::wstring AppSettings::GetUserDisplayName(sync::ServiceId service_id) const {
+std::wstring Settings::GetUserDisplayName(sync::ServiceId service_id) const {
   switch (service_id) {
     case sync::kKitsu: {
       const auto display_name = GetSyncServiceKitsuDisplayName();
@@ -349,7 +344,7 @@ std::wstring AppSettings::GetUserDisplayName(sync::ServiceId service_id) const {
   return GetUsername(service_id);
 }
 
-std::wstring AppSettings::GetUserEmail(sync::ServiceId service_id) const {
+std::wstring Settings::GetUserEmail(sync::ServiceId service_id) const {
   switch (service_id) {
     case sync::kKitsu:
       return GetSyncServiceKitsuEmail();
@@ -358,7 +353,7 @@ std::wstring AppSettings::GetUserEmail(sync::ServiceId service_id) const {
   }
 }
 
-std::wstring AppSettings::GetUsername(sync::ServiceId service_id) const {
+std::wstring Settings::GetUsername(sync::ServiceId service_id) const {
   switch (service_id) {
     case sync::kMyAnimeList:
       return GetSyncServiceMalUsername();
@@ -371,7 +366,7 @@ std::wstring AppSettings::GetUsername(sync::ServiceId service_id) const {
   }
 }
 
-std::wstring AppSettings::GetPassword(sync::ServiceId service_id) const {
+std::wstring Settings::GetPassword(sync::ServiceId service_id) const {
   switch (service_id) {
     case sync::kMyAnimeList:
       return Base64Decode(GetSyncServiceMalPassword());
@@ -384,19 +379,19 @@ std::wstring AppSettings::GetPassword(sync::ServiceId service_id) const {
   }
 }
 
-std::wstring AppSettings::GetCurrentUserDisplayName() const {
+std::wstring Settings::GetCurrentUserDisplayName() const {
   return GetUserDisplayName(GetCurrentServiceId());
 }
 
-std::wstring AppSettings::GetCurrentUserEmail() const {
+std::wstring Settings::GetCurrentUserEmail() const {
   return GetUserEmail(GetCurrentServiceId());
 }
 
-std::wstring AppSettings::GetCurrentUsername() const {
+std::wstring Settings::GetCurrentUsername() const {
   return GetUsername(GetCurrentServiceId());
 }
 
-std::wstring AppSettings::GetCurrentPassword() const {
+std::wstring Settings::GetCurrentPassword() const {
   return GetPassword(GetCurrentServiceId());
 }
 

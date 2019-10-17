@@ -24,7 +24,7 @@
 
 namespace taiga {
 
-bool AppSettings::HandleCompatibility() {
+bool Settings::HandleCompatibility() {
   const semaver::Version version = GetMetaVersion();
 
   if (version == taiga::version())
