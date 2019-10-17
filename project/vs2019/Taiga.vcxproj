@@ -243,6 +243,7 @@
     <ClCompile Include="..\..\src\taiga\path.cpp" />
     <ClCompile Include="..\..\src\taiga\script.cpp" />
     <ClCompile Include="..\..\src\taiga\settings.cpp" />
+    <ClCompile Include="..\..\src\taiga\settings_keys.cpp" />
     <ClCompile Include="..\..\src\taiga\stats.cpp" />
     <ClCompile Include="..\..\src\taiga\taiga.cpp" />
     <ClCompile Include="..\..\src\taiga\timer.cpp" />
@@ -436,6 +437,7 @@
     <ClInclude Include="..\..\src\taiga\resource.h" />
     <ClInclude Include="..\..\src\taiga\script.h" />
     <ClInclude Include="..\..\src\taiga\settings.h" />
+    <ClInclude Include="..\..\src\taiga\settings_keys.h" />
     <ClInclude Include="..\..\src\taiga\stats.h" />
     <ClInclude Include="..\..\src\taiga\taiga.h" />
     <ClInclude Include="..\..\src\taiga\timer.h" />
