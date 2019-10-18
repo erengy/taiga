@@ -26,8 +26,8 @@
 #include "base/process.h"
 #include "base/string.h"
 #include "media/anime_db.h"
+#include "media/anime_season_db.h"
 #include "media/anime_util.h"
-#include "media/discover.h"
 #include "media/library/export.h"
 #include "media/library/history.h"
 #include "media/library/list_util.h"
@@ -708,13 +708,12 @@ void ExecuteCommand(const std::wstring& str, WPARAM wParam, LPARAM lParam) {
         break;
       case sync::kKitsu:
       case sync::kAniList:
-        if (SeasonDatabase.Load(anime::Season(body))) {
-          taiga::settings.SetAppSeasonsLastSeason(
-              ui::TranslateSeason(SeasonDatabase.current_season));
-          ui::OnSeasonLoad(false);
-          if (SeasonDatabase.items.empty()) {
-            ui::DlgSeason.GetData();
-          }
+        anime::season_db.Set(anime::Season(body));
+        taiga::settings.SetAppSeasonsLastSeason(
+            ui::TranslateSeason(anime::season_db.current_season));
+        ui::OnSeasonLoad(false);
+        if (anime::season_db.items.empty()) {
+          ui::DlgSeason.GetData();
         }
         break;
     }

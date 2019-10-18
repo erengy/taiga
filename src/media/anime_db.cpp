@@ -21,8 +21,8 @@
 #include "base/log.h"
 #include "base/string.h"
 #include "base/xml.h"
+#include "media/anime_season_db.h"
 #include "media/anime_util.h"
-#include "media/discover.h"
 #include "media/library/queue.h"
 #include "sync/manager.h"
 #include "sync/service.h"
@@ -247,7 +247,7 @@ bool Database::DeleteItem(int id) {
     //delete_history_items(id, History.items);
     delete_history_items(id, library::queue.items);
 
-    auto& items = SeasonDatabase.items;
+    auto& items = anime::season_db.items;
     items.erase(std::remove(items.begin(), items.end(), id), items.end());
 
     if (CurrentEpisode.anime_id == id)

@@ -27,8 +27,8 @@
 #include "track/episode.h"
 #include "media/library/history.h"
 #include "media/library/queue.h"
+#include "media/anime_season_db.h"
 #include "media/anime_util.h"
-#include "media/discover.h"
 #include "sync/anilist_util.h"
 #include "sync/kitsu_util.h"
 #include "sync/myanimelist_util.h"
@@ -382,7 +382,7 @@ void MenuList::UpdateSeason() {
     auto create_item = [](win::Menu& menu, const anime::Season& season) {
       const auto season_str = ui::TranslateSeason(season);
       menu.CreateItem(L"Season_Load(" + season_str + L")", season_str, L"",
-                      season == SeasonDatabase.current_season,
+                      season == anime::season_db.current_season,
                       false, true, false, true);
     };
 

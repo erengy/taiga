@@ -219,8 +219,8 @@
     <ClCompile Include="..\..\src\media\anime_filter.cpp" />
     <ClCompile Include="..\..\src\media\anime_item.cpp" />
     <ClCompile Include="..\..\src\media\anime_season.cpp" />
+    <ClCompile Include="..\..\src\media\anime_season_db.cpp" />
     <ClCompile Include="..\..\src\media\anime_util.cpp" />
-    <ClCompile Include="..\..\src\media\discover.cpp" />
     <ClCompile Include="..\..\src\media\library\export.cpp" />
     <ClCompile Include="..\..\src\media\library\history.cpp" />
     <ClCompile Include="..\..\src\media\library\list.cpp" />
@@ -409,8 +409,8 @@
     <ClInclude Include="..\..\src\media\anime_filter.h" />
     <ClInclude Include="..\..\src\media\anime_item.h" />
     <ClInclude Include="..\..\src\media\anime_season.h" />
+    <ClInclude Include="..\..\src\media\anime_season_db.h" />
     <ClInclude Include="..\..\src\media\anime_util.h" />
-    <ClInclude Include="..\..\src\media\discover.h" />
     <ClInclude Include="..\..\src\media\library\export.h" />
     <ClInclude Include="..\..\src\media\library\history.h" />
     <ClInclude Include="..\..\src\media\library\list_util.h" />

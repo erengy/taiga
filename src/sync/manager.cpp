@@ -19,7 +19,7 @@
 #include "base/string.h"
 #include "media/anime_db.h"
 #include "media/anime_season.h"
-#include "media/discover.h"
+#include "media/anime_season_db.h"
 #include "media/library/queue.h"
 #include "ui/resource.h"
 #include "sync/anilist.h"
@@ -272,13 +272,13 @@ void Manager::HandleResponse(Response& response, HttpResponse& http_response) {
       const auto next_page = ToInt(response.data[L"next_page_offset"]);
 
       if (current_page == 0)  // first page
-        SeasonDatabase.items.clear();
+        anime::season_db.items.clear();
 
       std::vector<std::wstring> ids;
       Split(response.data[L"ids"], L",", ids);
       for (const auto& id_str : ids) {
         const int id = ToInt(id_str);
-        SeasonDatabase.items.push_back(id);
+        anime::season_db.items.push_back(id);
         ui::OnLibraryEntryChange(id);
       }
 
@@ -286,10 +286,10 @@ void Manager::HandleResponse(Response& response, HttpResponse& http_response) {
         GetSeason(anime::Season(request.data[L"season"] + L" " +
                                 request.data[L"year"]), next_page);
       } else {
-        SeasonDatabase.Review();
+        anime::season_db.Review();
         ui::ClearStatusText();
         ui::OnLibraryGetSeason();
-        for (const auto& id : SeasonDatabase.items) {
+        for (const auto& id : anime::season_db.items) {
           ui::image_db.Load(id, true, true);
         }
       }

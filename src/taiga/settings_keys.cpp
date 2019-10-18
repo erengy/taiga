@@ -25,8 +25,8 @@
 #include "base/string.h"
 #include "link/mirc.h"
 #include "media/library/queue.h"
+#include "media/anime_season_db.h"
 #include "media/anime_db.h"
-#include "media/discover.h"
 #include "sync/manager.h"
 #include "taiga/announce.h"
 #include "taiga/config.h"
@@ -301,7 +301,7 @@ void Settings::SetSyncActiveService(const sync::ServiceId service_id) {
         anime::db.items.clear();
         anime::db.SaveDatabase();
         ui::image_db.Clear();
-        SeasonDatabase.Reset();
+        anime::season_db.Reset();
       } else {
         return;
       }

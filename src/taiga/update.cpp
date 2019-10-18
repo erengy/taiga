@@ -23,7 +23,7 @@
 #include "base/time.h"
 #include "base/url.h"
 #include "base/xml.h"
-#include "media/discover.h"
+#include "media/anime_season_db.h"
 #include "sync/service.h"
 #include "taiga/http.h"
 #include "taiga/settings.h"

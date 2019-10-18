@@ -18,20 +18,19 @@
 
 #pragma once
 
-#include <string>
+#include <vector>
 
 #include "media/anime_season.h"
 
-namespace library {
+namespace anime {
 
 class SeasonDatabase {
 public:
-  bool Load(const anime::Season& season);
-
   // Checkes if a significant portion of season data is empty and requires
   // refreshing.
-  bool IsRefreshRequired();
+  bool IsRefreshRequired() const;
 
+  void Set(const Season& season);
   void Reset();
 
   // Improves season data by excluding invalid items (i.e. postpones series) and
@@ -42,9 +41,9 @@ public:
   std::vector<int> items;
 
   // Current season (e.g. "Spring 2012")
-  anime::Season current_season;
+  Season current_season;
 };
 
-}  // namespace library
+inline SeasonDatabase season_db;
 
-extern library::SeasonDatabase SeasonDatabase;
+}  // namespace anime

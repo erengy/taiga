@@ -29,8 +29,8 @@
 #include "base/string.h"
 #include "media/anime_db.h"
 #include "track/episode.h"
+#include "media/anime_season_db.h"
 #include "media/anime_util.h"
-#include "media/discover.h"
 #include "media/library/queue.h"
 #include "sync/manager.h"
 #include "sync/service.h"
@@ -799,7 +799,7 @@ void OnSeasonLoadFail() {
 
 bool OnSeasonRefreshRequired() {
   win::TaskDialog dlg;
-  std::wstring title = L"Season - " + ui::TranslateSeason(SeasonDatabase.current_season);
+  std::wstring title = L"Season - " + ui::TranslateSeason(anime::season_db.current_season);
   dlg.SetWindowTitle(title.c_str());
   dlg.SetMainIcon(TD_ICON_INFORMATION);
   dlg.SetMainInstruction(L"Would you like to refresh this season's data?");

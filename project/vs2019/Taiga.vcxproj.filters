@@ -592,9 +592,6 @@
     <ClCompile Include="..\..\src\media\library\list.cpp">
       <Filter>media\library</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\media\discover.cpp">
-      <Filter>media</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\media\anime.cpp">
       <Filter>media\anime</Filter>
     </ClCompile>
@@ -675,6 +672,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\taiga\settings_keys.cpp">
       <Filter>taiga</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\media\anime_season_db.cpp">
+      <Filter>media\anime</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1155,9 +1155,6 @@
     <ClInclude Include="..\..\src\media\library\history.h">
       <Filter>media\library</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\media\discover.h">
-      <Filter>media</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\media\anime.h">
       <Filter>media\anime</Filter>
     </ClInclude>
@@ -1232,6 +1229,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\taiga\settings_keys.h">
       <Filter>taiga</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\media\anime_season_db.h">
+      <Filter>media\anime</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
