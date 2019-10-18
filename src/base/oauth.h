@@ -19,44 +19,56 @@
 #pragma once
 
 #include <map>
+#include <optional>
 #include <string>
 
 #include "url.h"
 
-using oauth_parameter_t = std::map<std::wstring, std::wstring>;
+namespace oauth {
 
-class OAuth {
-public:
-  OAuth() {}
-  ~OAuth() {}
-
-  std::wstring BuildAuthorizationHeader(
-      const std::wstring& url,
-      const std::wstring& http_method,
-      const oauth_parameter_t* post_parameters = nullptr,
-      const std::wstring& oauth_token = L"",
-      const std::wstring& oauth_token_secret = L"",
-      const std::wstring& pin = L"");
-  oauth_parameter_t ParseQueryString(const std::wstring& url);
-
-  std::wstring consumer_key;
-  std::wstring consumer_secret;
-
-private:
-  oauth_parameter_t BuildSignedParameters(
-      const oauth_parameter_t& get_parameters,
-      const std::wstring& url,
-      const std::wstring& http_method,
-      const oauth_parameter_t* post_parameters,
-      const std::wstring& oauth_token,
-      const std::wstring& oauth_token_secret,
-      const std::wstring& pin);
-
-  std::wstring CreateNonce();
-  std::wstring CreateSignature(const std::wstring& signature_base, const std::wstring& oauth_token_secret);
-  std::wstring CreateTimestamp();
-
-  std::wstring NormalizeUrl(const std::wstring& url);
-  oauth_parameter_t ParseQuery(const query_t& query);
-  std::wstring SortParameters(const oauth_parameter_t& parameters);
+struct Access {
+  std::wstring token;
+  std::wstring secret;
+  std::wstring pin;
 };
+
+struct Consumer {
+  std::wstring key;
+  std::wstring secret;
+};
+
+using Parameters = std::map<std::wstring, std::wstring>;
+
+std::wstring BuildAuthorizationHeader(
+    const std::wstring& url,
+    const std::wstring& http_method,
+    const Consumer& consumer,
+    const Access& access = {},
+    const std::optional<Parameters>& post_parameters = std::nullopt);
+
+Parameters ParseQueryString(const std::wstring& url);
+
+namespace detail {
+
+Parameters BuildSignedParameters(
+    const std::wstring& url,
+    const std::wstring& http_method,
+    const Consumer& consumer,
+    const Access& access,
+    const Parameters& get_parameters,
+    const std::optional<Parameters>& post_parameters);
+
+std::wstring CreateNonce();
+std::wstring CreateSignature(
+    const std::wstring& consumer_secret,
+    const std::wstring& signature_base,
+    const std::wstring& access_token_secret);
+std::wstring CreateTimestamp();
+
+std::wstring NormalizeUrl(const std::wstring& url);
+Parameters ParseQuery(const query_t& query);
+std::wstring SortParameters(const Parameters& parameters);
+
+}  // namespace detail
+
+}  // namespace oauth

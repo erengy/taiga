@@ -27,37 +27,33 @@
 
 namespace link::twitter {
 
-static OAuth oauth;
-
-static void InitializeOauth() {
-  oauth.consumer_key = L"9GZsCbqzjOrsPWlIlysvg";
-  oauth.consumer_secret = L"ebjXyymbuLtjDvoxle9Ldj8YYIMoleORapIOoqBrjRw";
+static oauth::Consumer GetOauthConsumer() {
+  return {
+    L"9GZsCbqzjOrsPWlIlysvg",
+    L"ebjXyymbuLtjDvoxle9Ldj8YYIMoleORapIOoqBrjRw"
+  };
 }
 
 void RequestToken() {
-  InitializeOauth();
-
   HttpRequest http_request;
   http_request.url.protocol = base::http::Protocol::Https;
   http_request.url.host = L"api.twitter.com";
   http_request.url.path = L"/oauth/request_token";
-  http_request.header[L"Authorization"] =
-      oauth.BuildAuthorizationHeader(http_request.url.Build(), L"GET");
+  http_request.header[L"Authorization"] = oauth::BuildAuthorizationHeader(
+      http_request.url.Build(), L"GET", GetOauthConsumer());
 
   ConnectionManager.MakeRequest(http_request, taiga::kHttpTwitterRequest);
 }
 
 static void AccessToken(const std::wstring& key, const std::wstring& secret,
                         const std::wstring& pin) {
-  InitializeOauth();
-
   HttpRequest http_request;
   http_request.url.protocol = base::http::Protocol::Https;
   http_request.url.host = L"api.twitter.com";
   http_request.url.path = L"/oauth/access_token";
-  http_request.header[L"Authorization"] =
-      oauth.BuildAuthorizationHeader(http_request.url.Build(),
-                                     L"POST", nullptr, key, secret, pin);
+  http_request.header[L"Authorization"] = oauth::BuildAuthorizationHeader(
+      http_request.url.Build(), L"POST", GetOauthConsumer(),
+      oauth::Access{key, secret, pin});
 
   ConnectionManager.MakeRequest(http_request, taiga::kHttpTwitterAuth);
 }
@@ -73,9 +69,7 @@ bool SetStatusText(const std::wstring& status_text) {
     return false;
   previous_status_text = status_text;
 
-  InitializeOauth();
-
-  oauth_parameter_t post_parameters;
+  oauth::Parameters post_parameters;
   post_parameters[L"status"] = EncodeUrl(status_text);
 
   HttpRequest http_request;
@@ -84,11 +78,11 @@ bool SetStatusText(const std::wstring& status_text) {
   http_request.url.host = L"api.twitter.com";
   http_request.url.path = L"/1.1/statuses/update.json";
   http_request.body = L"status=" + post_parameters[L"status"];
-  http_request.header[L"Authorization"] =
-      oauth.BuildAuthorizationHeader(http_request.url.Build(),
-                                     L"POST", &post_parameters,
-                                     taiga::settings.GetShareTwitterOauthToken(),
-                                     taiga::settings.GetShareTwitterOauthSecret());
+  http_request.header[L"Authorization"] = oauth::BuildAuthorizationHeader(
+      http_request.url.Build(), L"POST", GetOauthConsumer(),
+      oauth::Access{taiga::settings.GetShareTwitterOauthToken(),
+                    taiga::settings.GetShareTwitterOauthSecret(), {}},
+      post_parameters);
 
   ConnectionManager.MakeRequest(http_request, taiga::kHttpTwitterPost);
   return true;
@@ -99,7 +93,7 @@ void HandleHttpResponse(const taiga::HttpClientMode mode,
   switch (mode) {
     case taiga::kHttpTwitterRequest: {
       bool success = false;
-      oauth_parameter_t parameters = oauth.ParseQueryString(response.body);
+      auto parameters = oauth::ParseQueryString(response.body);
       if (!parameters[L"oauth_token"].empty()) {
         ExecuteLink(L"https://api.twitter.com/oauth/authorize?oauth_token=" +
                     parameters[L"oauth_token"]);
@@ -116,7 +110,7 @@ void HandleHttpResponse(const taiga::HttpClientMode mode,
 
     case taiga::kHttpTwitterAuth: {
       bool success = false;
-      oauth_parameter_t parameters = oauth.ParseQueryString(response.body);
+      auto parameters = oauth::ParseQueryString(response.body);
       if (!parameters[L"oauth_token"].empty() &&
           !parameters[L"oauth_token_secret"].empty()) {
         taiga::settings.SetShareTwitterOauthToken(parameters[L"oauth_token"]);
