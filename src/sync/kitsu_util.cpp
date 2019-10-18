@@ -19,6 +19,7 @@
 #include <map>
 
 #include "base/file.h"
+#include "base/format.h"
 #include "base/log.h"
 #include "base/string.h"
 #include "base/time.h"
@@ -247,31 +248,27 @@ RatingSystem TranslateRatingSystemFrom(const std::string& value) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static const std::wstring kBaseUrl = L"https://kitsu.io";
-
 std::wstring GetAnimePage(const anime::Item& anime_item) {
-  return kBaseUrl + L"/anime/" + anime_item.GetSlug();
+  return L"https://kitsu.io/anime/{}"_format(anime_item.GetSlug());
 }
 
 void ViewAnimePage(int anime_id) {
-  auto anime_item = anime::db.Find(anime_id);
-
-  if (anime_item)
+  if (const auto anime_item = anime::db.Find(anime_id))
     ExecuteLink(GetAnimePage(*anime_item));
 }
 
 void ViewFeed() {
-  ExecuteLink(kBaseUrl);
+  ExecuteLink(L"https://kitsu.io");
 }
 
 void ViewLibrary() {
-  ExecuteLink(kBaseUrl + L"/users/" +
-              taiga::settings.GetSyncServiceKitsuUsername() + L"/library");
+  ExecuteLink(L"https://kitsu.io/users/{}/library"_format(
+      taiga::settings.GetSyncServiceKitsuUsername()));
 }
 
 void ViewProfile() {
-  ExecuteLink(kBaseUrl + L"/users/" +
-              taiga::settings.GetSyncServiceKitsuUsername());
+  ExecuteLink(L"https://kitsu.io/users/{}"_format(
+      taiga::settings.GetSyncServiceKitsuUsername()));
 }
 
 }  // namespace kitsu

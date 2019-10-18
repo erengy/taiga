@@ -175,7 +175,7 @@ std::wstring DecodeUrl(const std::wstring& input) {
         i + 2 < input.length() &&
         IsHexadecimalChar(input[i + 1]) && IsHexadecimalChar(input[i + 2])) {
       char c = 0;
-      static const wchar_t* digits = L"0123456789ABCDEF";
+      constexpr auto digits = L"0123456789ABCDEF";
       for (char j = 0; j < 16; j++) {
         if (input[i + 1] == digits[j])
           c += j << 4;
@@ -207,7 +207,7 @@ std::wstring EncodeUrl(const std::wstring& input, bool encode_unreserved) {
           str[i] == '_' || str[i] == '~'))) {
       output.append(1, static_cast<wchar_t>(str[i]));
     } else {
-      static const wchar_t* digits = L"0123456789ABCDEF";
+      constexpr auto digits = L"0123456789ABCDEF";
       output.append(L"%");
       output.append(&digits[(str[i] >> 4) & 0x0F], 1);
       output.append(&digits[str[i] & 0x0F], 1);

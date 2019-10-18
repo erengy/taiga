@@ -127,7 +127,7 @@ oauth_parameter_t OAuth::BuildSignedParameters(
 ////////////////////////////////////////////////////////////////////////////////
 
 std::wstring OAuth::CreateNonce() {
-  static const wchar_t alphanumeric[] =
+  constexpr auto alphanumeric =
       L"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
   std::wstring nonce;
 

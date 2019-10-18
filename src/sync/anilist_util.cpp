@@ -284,10 +284,8 @@ RatingSystem TranslateRatingSystemFrom(const std::string& value) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static const std::wstring kBaseUrl = L"https://anilist.co";
-
 std::wstring GetAnimePage(const anime::Item& anime_item) {
-  return L"{}/anime/{}"_format(kBaseUrl, anime_item.GetId());
+  return L"https://anilist.co/anime/{}"_format(anime_item.GetId());
 }
 
 void RequestToken() {
@@ -297,20 +295,18 @@ void RequestToken() {
 }
 
 void ViewAnimePage(int anime_id) {
-  auto anime_item = anime::db.Find(anime_id);
-
-  if (anime_item)
+  if (const auto anime_item = anime::db.Find(anime_id))
     ExecuteLink(GetAnimePage(*anime_item));
 }
 
 void ViewProfile() {
-  ExecuteLink(L"{}/user/{}"_format(kBaseUrl,
-              taiga::settings.GetSyncServiceAniListUsername()));
+  ExecuteLink(L"https://anilist.co/user/{}"_format(
+      taiga::settings.GetSyncServiceAniListUsername()));
 }
 
 void ViewStats() {
-  ExecuteLink(L"{}/user/{}/stats"_format(kBaseUrl,
-              taiga::settings.GetSyncServiceAniListUsername()));
+  ExecuteLink(L"https://anilist.co/user/{}/stats"_format(
+      taiga::settings.GetSyncServiceAniListUsername()));
 }
 
 }  // namespace anilist

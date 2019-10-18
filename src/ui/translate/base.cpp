@@ -53,7 +53,7 @@ std::wstring TranslateDateRange(const std::pair<Date, Date>& range) {
 }
 
 std::wstring TranslateMonth(const int month) {
-  static const std::array<wchar_t*, 12> months{
+  constexpr std::array<wchar_t*, 12> months{
         L"Jan", L"Feb", L"Mar", L"Apr", L"May", L"Jun",
         L"Jul", L"Aug", L"Sep", L"Oct", L"Nov", L"Dec"
     };

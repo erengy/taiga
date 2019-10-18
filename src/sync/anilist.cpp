@@ -86,7 +86,7 @@ void Service::HandleResponse(Response& response, HttpResponse& http_response) {
 // Request builders
 
 void Service::AuthenticateUser(Request& request, HttpRequest& http_request) {
-  static const auto query{R"(
+  constexpr auto query{R"(
 {
   Viewer {
     id
@@ -102,7 +102,7 @@ void Service::AuthenticateUser(Request& request, HttpRequest& http_request) {
 }
 
 void Service::GetLibraryEntries(Request& request, HttpRequest& http_request) {
-  static const auto query{R"(
+  constexpr auto query{R"(
 query ($userName: String!) {
   MediaListCollection (userName: $userName, type: ANIME) {
     lists {
@@ -133,7 +133,7 @@ fragment mediaFragment on Media {
 }
 
 void Service::GetMetadataById(Request& request, HttpRequest& http_request) {
-  static const auto query{R"(
+  constexpr auto query{R"(
 query ($id: Int!) {
   Media (id: $id, type: ANIME) {
     {mediaFields}
@@ -149,7 +149,7 @@ query ($id: Int!) {
 }
 
 void Service::GetSeason(Request& request, HttpRequest& http_request) {
-  static const auto query{R"(
+  constexpr auto query{R"(
 query ($season: MediaSeason!, $seasonYear: Int!, $page: Int) {
   Page(page: $page) {
     media(season: $season, seasonYear: $seasonYear, type: ANIME, sort: START_DATE) {
@@ -179,7 +179,7 @@ query ($season: MediaSeason!, $seasonYear: Int!, $page: Int) {
 }
 
 void Service::SearchTitle(Request& request, HttpRequest& http_request) {
-  static const auto query{R"(
+  constexpr auto query{R"(
 query ($query: String!) {
   Page {
     media(search: $query, type: ANIME) {
@@ -201,7 +201,7 @@ void Service::AddLibraryEntry(Request& request, HttpRequest& http_request) {
 }
 
 void Service::DeleteLibraryEntry(Request& request, HttpRequest& http_request) {
-  static const auto query{R"(
+  constexpr auto query{R"(
 mutation ($id: Int!) {
   DeleteMediaListEntry (id: $id) {
     deleted
@@ -359,7 +359,7 @@ bool Service::RequestSucceeded(Response& response,
 ////////////////////////////////////////////////////////////////////////////////
 
 std::wstring Service::BuildLibraryObject(Request& request) const {
-  static const auto query{R"(
+  constexpr auto query{R"(
 mutation (
     $id: Int,
     $mediaId: Int,
