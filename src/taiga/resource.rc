@@ -409,7 +409,7 @@ FONT 9, "Segoe UI", 400, 0, 0
 {
     LTEXT           "Keep up to ", IDC_STATIC_DELETE1, 175, 17, 35, 9, SS_LEFT, WS_EX_LEFT
     LTEXT           "watched episodes", IDC_STATIC_DELETE2, 244, 17, 55, 9, SS_LEFT, WS_EX_LEFT
-    GROUPBOX        "Episode removal", IDC_STATIC, 7, 7, 301, 59, 0, WS_EX_LEFT
+    GROUPBOX        "Automatic file removal", IDC_STATIC, 7, 7, 301, 59, 0, WS_EX_LEFT
     AUTOCHECKBOX    "Delete local episodes after watching", IDC_DELETE_WATCHING, 12, 18, 124, 8, 0, WS_EX_LEFT
     AUTOCHECKBOX    "Delete local episodes after series completion", IDC_DELETE_COMPLETED, 12, 29, 149, 8, 0, WS_EX_LEFT
     AUTOCHECKBOX    "Prompt before deletion", IDC_DELETE_PROMPT, 12, 40, 86, 8, 0, WS_EX_LEFT

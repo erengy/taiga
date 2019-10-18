@@ -13,17 +13,17 @@
 
 namespace library {
 
-  std::deque<int> purge_queue;
+  std::deque<std::pair<int, RemoveSettings>> purge_queue;
   // Lock variable for queue multi-thread handling
   win::CriticalSection removal_queue_section;
 
   // Methods for file purging
-  void PurgeWatchedEpisodes(int anime_id) {
-    int episode_num_max;
-    int last_to_remove;
+  void PurgeWatchedEpisodes(int anime_id, RemoveSettings remove_params, bool silent) {
     anime::Item item;
 
-    ui::ChangeStatusText(L"Identifying anime...");
+    if (!silent)
+      ui::ChangeStatusText(L"Identifying anime...");
+
     // Retrieve anime item
     auto item_ptr = anime::db.Find(anime_id);
     if (!item_ptr) { return; }
@@ -39,92 +39,127 @@ namespace library {
       }
     }
 
-    ui::ChangeStatusText(L"Updating local info...");
-    // Identify watched episode files
-    ScanAvailableEpisodesQuick(anime_id);
+    PurgeWatchedEpisodes(item, remove_params, silent);
+  }
 
-    std::vector<std::pair<int, std::wstring>> eps_to_remove;
-    episode_num_max = item.GetAvailableEpisodeCount();
-    last_to_remove = item.GetMyLastWatchedEpisode(true) - Settings.GetInt(taiga::kLibrary_Management_KeepNum);
-    if (Settings.GetBool(taiga::kLibrary_Management_DeleteAfterCompletion)
-      && item.GetMyStatus(false) == anime::kCompleted) {
+  void PurgeWatchedEpisodes(anime::Item item, RemoveSettings remove_params, bool silent) {
+    // read settings
+    int eps_to_keep;
+    bool after_completion;
+    bool prompt;
+    bool permanent_removal;
+    eps_to_keep = remove_params.eps_to_keep.value_or(Settings.GetInt(taiga::kLibrary_Management_KeepNum));
+    after_completion = remove_params.remove_all_if_complete.value_or(Settings.GetBool(taiga::kLibrary_Management_DeleteAfterCompletion));
+    prompt = remove_params.prompt_remove.value_or(Settings.GetBool(taiga::kLibrary_Management_PromptDelete));
+    permanent_removal = remove_params.remove_permanent.value_or(Settings.GetBool(taiga::kLibrary_Management_DeletePermanently));
+
+    bool series_completed = item.GetMyStatus(false) == anime::kCompleted;
+
+    std::vector<std::wstring> eps_to_remove;
+    int episode_num_max = item.GetAvailableEpisodeCount();
+    int last_to_remove = item.GetMyLastWatchedEpisode(true) - eps_to_keep;
+    if (after_completion && series_completed) {
       last_to_remove = episode_num_max;
     }
+    episode_num_max = std::min(episode_num_max, last_to_remove);
 
-
-    ui::ChangeStatusText(L"Searching local files...");
-    for (int i = 1; i <= episode_num_max && i <= last_to_remove; i++) {
-      if (item.IsEpisodeAvailable(i)) {
-        std::wstring path_to_ep = item.GetEpisodePath(i);
-        eps_to_remove.push_back(std::pair<int, std::wstring>(i, path_to_ep));
-      }
-    }
-
-    if (eps_to_remove.size() <= 0)
+    eps_to_remove = ReadEpisodePaths(item, episode_num_max, true, silent);
+    if (eps_to_remove.size() == 0)
       return;
 
     bool okay_to_delete = true;
     // prompt before deletion
-    if (Settings.GetBool(taiga::kLibrary_Management_PromptDelete) && eps_to_remove.size() > 0) {
-      ui::ChangeStatusText(L"Asking for purge permission...");
-      std::vector<std::wstring> ep_file_names(eps_to_remove.size());
-      std::wstring path, base_name;
-      for (int i = 0; i < eps_to_remove.size(); i++) {
-        path = eps_to_remove[i].second;
-        base_name = path.substr(path.find_last_of(L"/\\") + 1);
-        ep_file_names[i] = base_name;
-      }
-      okay_to_delete = ui::OnEpisodePurge(item, ep_file_names);
-    }
+    if (prompt && eps_to_remove.size() > 0 && !silent)
+      okay_to_delete = PromptDeletion(item, eps_to_remove, false);
 
     // delete
-    if (okay_to_delete) {
-      std::wstring ep_path;
-      ui::ChangeStatusText(L"Purging files...");
-      SHFILEOPSTRUCT delete_info;
-      ZeroMemory(&delete_info, sizeof(delete_info));
-      delete_info.wFunc = FO_DELETE;
-      // Make deletion into recycle bin silent and only prompt user in case of error
-      delete_info.fFlags = FOF_FILESONLY | FOF_NOCONFIRMATION | FOF_SILENT | FOF_NORECURSION;
-      if (!Settings.GetBool(taiga::kLibrary_Management_DeletePermanently))
-        delete_info.fFlags |= FOF_ALLOWUNDO; // Try to remove to recycle bin
-      int removal_num = 0;
-      for (auto ep_pair : eps_to_remove) {
-        if (Settings.GetBool(taiga::kLibrary_Management_PromptDelete)) {
-          // Check if file still exists after waiting for approval
-          if (GetFileAttributes(ep_pair.second.c_str()) == INVALID_FILE_ATTRIBUTES)
-            continue;
-        }
-        ep_path += ep_pair.second;
-        // make path doubly nul terminated. Required by SHFILEOPERATION
-        ep_path += L'\0';
-        removal_num++;
-      }
-      if (removal_num > 0) {
-        delete_info.pFrom = ep_path.c_str();
-        SHFileOperation(&delete_info);
-      }
-    }
+    if (okay_to_delete)
+      DeleteEpisodes(eps_to_remove, permanent_removal);
+
     ui::ChangeStatusText(L"");
   }
 
-  void SchedulePurge(int anime_id) {
+  void DeleteEpisodes(std::vector<std::wstring> paths, bool permanent) {
+    std::wstring ep_path;
+    ui::ChangeStatusText(L"Purging files...");
+    SHFILEOPSTRUCT delete_info;
+    ZeroMemory(&delete_info, sizeof(delete_info));
+    delete_info.wFunc = FO_DELETE;
+    // Make deletion into recycle bin silent and only prompt user in case of error
+    delete_info.fFlags = FOF_FILESONLY | FOF_NOCONFIRMATION | FOF_SILENT | FOF_NORECURSION;
+    if (!permanent)
+      delete_info.fFlags |= FOF_ALLOWUNDO; // Try to remove to recycle bin
+    int removal_num = 0;
+    for (auto path : paths) {
+      // Check if file exists
+      if (GetFileAttributes(path.c_str()) == INVALID_FILE_ATTRIBUTES)
+          continue;
+      ep_path += path;
+      // make path doubly nul terminated. Required by SHFILEOPERATION
+      ep_path += L'\0';
+      removal_num++;
+    }
+    if (removal_num > 0) {
+      delete_info.pFrom = ep_path.c_str();
+      SHFileOperation(&delete_info);
+    }
+  }
+
+  bool PromptDeletion(anime::Item item, std::vector<std::wstring> episode_paths, bool silent) {
+    if (!silent)
+      ui::ChangeStatusText(L"Asking for purge permission...");
+    std::vector<std::wstring> ep_file_names(episode_paths.size());
+    std::wstring path, base_name;
+    for (int i = 0; i < episode_paths.size(); i++) {
+      path = episode_paths[i];
+      base_name = path.substr(path.find_last_of(L"/\\") + 1);
+      ep_file_names[i] = base_name;
+    }
+    return ui::OnEpisodePurge(item, ep_file_names);
+  }
+
+  std::vector<std::wstring> ReadEpisodePaths(anime::Item item, int episode_num_max, bool scan, bool silent) {
+    if (!silent)
+      ui::ChangeStatusText(L"Scanning local files...");
+    // Identify watched episode files
+    if (scan)
+      ScanAvailableEpisodesQuick(item.GetId());
+
+    if (!silent)
+      ui::ChangeStatusText(L"Reading file info...");
+
+    std::vector<std::wstring> episode_paths;
+    for (int i = 1; i <= episode_num_max; i++) {
+      if (item.IsEpisodeAvailable(i)) {
+        std::wstring path_to_ep = item.GetEpisodePath(i);
+        episode_paths.push_back(path_to_ep);
+      }
+    }
+    return episode_paths;
+  }
+
+  void SchedulePurge(int anime_id, RemoveSettings settings) {
     win::Lock lock(removal_queue_section);
 
-    for (int i : purge_queue) {
-      if (i == anime_id)
+    for (std::pair<int, RemoveSettings> entry : purge_queue) {
+      if (entry.first == anime_id)
         return;
     }
-    purge_queue.push_front(anime_id);
+    purge_queue.push_front(std::pair<int, RemoveSettings>(anime_id, settings));
+  }
+
+  void SchedulePurge(int anime_id) {
+    RemoveSettings nullsettings;
+    SchedulePurge(anime_id, nullsettings);
   }
 
   void ProcessPurges() {
     win::Lock lock(removal_queue_section);
 
     while (purge_queue.size() > 0) {
-      int anime_to_purge = purge_queue.back();
+      std::pair<int,RemoveSettings> entry_to_purge = purge_queue.back();
       purge_queue.pop_back();
-      PurgeWatchedEpisodes(anime_to_purge);
+      PurgeWatchedEpisodes(entry_to_purge.first, entry_to_purge.second, false);
     }
 
     purge_queue.clear();

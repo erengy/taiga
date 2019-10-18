@@ -24,8 +24,23 @@
 
 namespace library {
 
-  void PurgeWatchedEpisodes(int anime_id);
+  struct RemoveSettings {
+  public:
+    std::optional<int> eps_to_keep;
+    std::optional<bool> remove_all_if_complete;
+    std::optional<bool> prompt_remove;
+    std::optional<bool> remove_permanent;
+  };
+
+  void PurgeWatchedEpisodes(int anime_id, RemoveSettings settings, bool silent);
+  void PurgeWatchedEpisodes(anime::Item item, RemoveSettings settings, bool silent);
+
+  void DeleteEpisodes(std::vector<std::wstring> paths, bool permanent);
+  bool PromptDeletion(anime::Item item, std::vector<std::wstring> episode_paths, bool silent);
+  std::vector<std::wstring> ReadEpisodePaths(anime::Item item, int episode_num_max, bool scan, bool silent);
+
   void ProcessPurges();
+  void SchedulePurge(int anime_id, RemoveSettings);
   void SchedulePurge(int anime_id);
  
 }  // namespace library

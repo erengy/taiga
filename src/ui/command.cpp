@@ -517,8 +517,11 @@ void ExecuteCommand(const std::wstring& str, WPARAM wParam, LPARAM lParam) {
   //   lParam is a pointer to a vector of anime IDs.
   } else if (command == L"DeleteWatchedEpisodes") {
     const auto& anime_ids = *reinterpret_cast<std::vector<int>*>(lParam);
+    library::RemoveSettings remove_params;
+    remove_params.eps_to_keep = 0;
+    remove_params.prompt_remove = false;
     for (int id : anime_ids)
-      library::PurgeWatchedEpisodes(id);
+      library::SchedulePurge(id, remove_params);
 
   // EditEpisode()
   //   Changes watched episode value of an anime.
