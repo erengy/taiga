@@ -26,6 +26,7 @@ enum class AnimePageType {
   None,
   SeriesInfo,
   MyInfo,
+  ManagementSettings,
   NotRecognized,
 };
 
@@ -69,6 +70,17 @@ private:
 
   bool start_date_changed_;
   bool finish_date_changed_;
+};
+
+class PageMyManagement : public PageBaseInfo {
+public:
+  BOOL OnCommand(WPARAM wParam, LPARAM lParam);
+  bool Save();
+
+  void Refresh(int anime_id);
+
+private:
+  void SetEnabledStatus(bool enable);
 };
 
 }  // namespace ui

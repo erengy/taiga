@@ -625,6 +625,69 @@ void Item::RemoveFromUserList() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+bool Item::GetUseGlobalRemovalSetting() const {
+  return remove_settings_.use_global_settings;
+}
+
+int Item::GetEpisodesToKeep() const {
+  return remove_settings_.keep_num;
+}
+
+bool Item::IsEpisodeRemovedAfterWatching() const {
+  return remove_settings_.remove_after_watching;
+}
+
+bool Item::IsEpisodeRemovedWhenCompleted() const {
+  return remove_settings_.remove_after_completion;
+}
+
+bool Item::IsPromptedAtEpisodeDelete() const {
+  return remove_settings_.prompt_delete;
+}
+
+bool Item::IsEpisodesDeletedPermanently() const {
+  return remove_settings_.delete_permanent;
+}
+
+bool Item::IsRemovalDefault() const {
+  return remove_settings_.use_global_settings == true &&
+    remove_settings_.keep_num == 1 &&
+    remove_settings_.remove_after_watching == true &&
+    remove_settings_.remove_after_completion == true &&
+    remove_settings_.prompt_delete == true &&
+    remove_settings_.delete_permanent == false;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void Item::SetUseGlobalRemovalSetting(bool use_global_setting) {
+  remove_settings_.use_global_settings = use_global_setting;
+}
+
+void Item::SetEpisodesToKeep(int keep_num) {
+  remove_settings_.keep_num = keep_num;
+}
+
+void Item::SetRemovedAfterWatching(bool remove_after_watch) {
+  remove_settings_.remove_after_watching = remove_after_watch;
+}
+
+void Item::SetRemovedWhenCompleted(bool remove_when_complete) {
+  remove_settings_.remove_after_completion = remove_when_complete;
+}
+
+void Item::SetPromptAtEpisodeDelete(bool prompt_at_delete) {
+  remove_settings_.prompt_delete = prompt_at_delete;
+}
+
+void Item::SetEpisodesDeletedPermanently(bool delete_permanent) {
+  remove_settings_.delete_permanent = delete_permanent;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 library::QueueItem* Item::SearchQueue(library::QueueSearch search_mode) const {
   return library::queue.FindItem(GetId(), search_mode);

@@ -623,4 +623,75 @@ bool PageMyInfo::IsAdvancedScoreInput() const {
   return false;
 }
 
+/////////////////////////////////////////////////////////////////////////
+
+BOOL PageMyManagement::OnCommand(WPARAM wParam, LPARAM lParam) {
+  auto anime_item = anime::db.Find(anime_id_);
+
+  if (!anime_item)
+    return FALSE;
+
+  switch (LOWORD(wParam)) {
+  case IDC_USE_GLOBAL:
+    SetEnabledStatus(!IsDlgButtonChecked(IDC_USE_GLOBAL));
+    break;
+  };
+
+  return TRUE;
+}
+
+bool PageMyManagement::Save() {
+  auto anime_item = anime::db.Find(anime_id_);
+
+  if (!anime_item)
+    return false;
+
+  anime_item->SetUseGlobalRemovalSetting(IsDlgButtonChecked(IDC_USE_GLOBAL));
+
+  anime_item->SetEpisodesToKeep(GetDlgItemInt(IDC_LOCAL_DELETE_KEEPNUM));
+  anime_item->SetRemovedAfterWatching(IsDlgButtonChecked(IDC_LOCAL_DELETE_WATCHING));
+  anime_item->SetRemovedWhenCompleted(IsDlgButtonChecked(IDC_LOCAL_DELETE_COMPLETED));
+  anime_item->SetPromptAtEpisodeDelete(IsDlgButtonChecked(IDC_LOCAL_DELETE_PROMPT));
+  anime_item->SetEpisodesDeletedPermanently(IsDlgButtonChecked(IDC_LOCAL_DELETE_PERMANENT));
+
+  Settings.Save();
+  return true;
+}
+
+void PageMyManagement::Refresh(int anime_id) {
+  if (!anime::IsValidId(anime_id))
+    return;
+
+  anime_id_ = anime_id;
+  auto anime_item = anime::db.Find(anime_id_);
+
+  if (!anime_item || !anime_item->IsInList())
+    return;
+
+  // Episodes watched
+  win::Spin spin = GetDlgItem(IDC_LOCAL_SPIN_KEEPNUM);
+  spin.SetRange32(0, anime_item->GetEpisodeCount() > 0 ? anime_item->GetEpisodeCount() : 1000);
+  spin.SetPos32(anime_item->GetEpisodesToKeep());
+  spin.SetWindowHandle(nullptr);
+
+  CheckDlgButton(IDC_LOCAL_DELETE_WATCHING, anime_item->IsEpisodeRemovedAfterWatching());
+  CheckDlgButton(IDC_LOCAL_DELETE_COMPLETED, anime_item->IsEpisodeRemovedWhenCompleted());
+  CheckDlgButton(IDC_LOCAL_DELETE_PROMPT, anime_item->IsPromptedAtEpisodeDelete());
+  CheckDlgButton(IDC_LOCAL_DELETE_PERMANENT, anime_item->IsEpisodesDeletedPermanently());
+
+  bool use_global_setting = anime_item->GetUseGlobalRemovalSetting();
+  CheckDlgButton(IDC_USE_GLOBAL, use_global_setting);
+
+  SetEnabledStatus(!use_global_setting);
+}
+
+void PageMyManagement::SetEnabledStatus(bool enable) {
+  EnableDlgItem(IDC_LOCAL_DELETE_KEEPNUM, enable);
+  EnableDlgItem(IDC_LOCAL_SPIN_KEEPNUM, enable);
+  EnableDlgItem(IDC_LOCAL_DELETE_WATCHING, enable);
+  EnableDlgItem(IDC_LOCAL_DELETE_COMPLETED, enable);
+  EnableDlgItem(IDC_LOCAL_DELETE_PROMPT, enable);
+  EnableDlgItem(IDC_LOCAL_DELETE_PERMANENT, enable);
+}
+
 }  // namespace ui

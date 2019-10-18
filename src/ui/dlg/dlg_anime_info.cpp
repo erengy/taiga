@@ -84,6 +84,7 @@ BOOL AnimeDialog::OnInitDialog() {
     case AnimeDialogMode::AnimeInformation:
       tab_.InsertItem(0, L"Main information", 0);
       tab_.InsertItem(1, L"My list and settings", 0);
+      tab_.InsertItem(2, L"Management settings", 0);
       break;
     case AnimeDialogMode::NowPlaying:
       tab_.Hide();
@@ -93,12 +94,15 @@ BOOL AnimeDialog::OnInitDialog() {
   // Initialize pages
   page_series_info.parent = this;
   page_my_info.parent = this;
+  page_my_management.parent = this;
   page_series_info.Create(IDD_ANIME_INFO_PAGE01, GetWindowHandle(), false);
   switch (mode_) {
     case AnimeDialogMode::AnimeInformation:
       page_my_info.Create(IDD_ANIME_INFO_PAGE02, GetWindowHandle(), false);
+      page_my_management.Create(IDD_ANIME_INFO_PAGE03, GetWindowHandle(), false);
       EnableThemeDialogTexture(page_series_info.GetWindowHandle(), ETDT_ENABLETAB);
       EnableThemeDialogTexture(page_my_info.GetWindowHandle(), ETDT_ENABLETAB);
+      EnableThemeDialogTexture(page_my_management.GetWindowHandle(), ETDT_ENABLETAB);
       break;
     case AnimeDialogMode::NowPlaying:
       break;
@@ -119,8 +123,10 @@ void AnimeDialog::OnCancel() {
 void AnimeDialog::OnOK() {
   auto anime_item = anime::db.Find(anime_id_);
 
+  bool save_success = true;
   if (anime_item && anime_item->IsInList())
-    if (!page_my_info.Save())
+    save_success = page_my_info.Save() && page_my_management.Save(); // Perhaps different logic here?
+    if (!save_success)
       return;
 
   EndDialog(IDOK);
@@ -302,6 +308,7 @@ BOOL AnimeDialog::PreTranslateMessage(MSG* pMsg) {
         break;
       // Refresh
       case VK_F5:
+        page_my_management.Refresh(anime_id_);
         page_my_info.Refresh(anime_id_);
         page_series_info.Refresh(anime_id_, false);
         if (anime::IsValidId(anime_id_)) {
@@ -452,24 +459,35 @@ void AnimeDialog::SetCurrentPage(AnimePageType index) {
       image_label_.Hide();
       page_my_info.Hide();
       page_series_info.Hide();
+      page_my_management.Hide();
       sys_link_.Show();
       break;
     case AnimePageType::SeriesInfo:
       image_label_.Show();
       page_my_info.Hide();
       page_series_info.Show();
+      page_my_management.Hide();
       sys_link_.Show(mode_ == AnimeDialogMode::NowPlaying || !anime_in_list);
       break;
     case AnimePageType::MyInfo:
       image_label_.Show();
       page_series_info.Hide();
       page_my_info.Show();
+      page_my_management.Hide();
+      sys_link_.Hide();
+      break;
+    case AnimePageType::ManagementSettings:
+      image_label_.Show();
+      page_series_info.Hide();
+      page_my_info.Hide();
+      page_my_management.Show();
       sys_link_.Hide();
       break;
     case AnimePageType::NotRecognized:
       image_label_.Show();
       page_my_info.Hide();
       page_series_info.Hide();
+      page_my_management.Hide();
       sys_link_.Show();
       break;
   }
@@ -486,6 +504,9 @@ void AnimeDialog::SetCurrentPage(AnimePageType index) {
           break;
         case AnimePageType::MyInfo:
           page_my_info.SetFocus();
+          break;
+        case AnimePageType::ManagementSettings:
+          page_my_management.SetFocus();
           break;
         case AnimePageType::NotRecognized:
           sys_link_.SetFocus();
@@ -508,7 +529,7 @@ void AnimeDialog::SetScores(const sorted_scores_t& scores) {
   scores_ = scores;
 }
 
-void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool connect) {
+void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool my_management, bool connect) {
   if (!IsWindow())
     return;
 
@@ -734,6 +755,8 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
     page_series_info.Refresh(anime_id_, connect);
   if (my_info)
     page_my_info.Refresh(anime_id_);
+  if (my_management)
+    page_my_management.Refresh(anime_id_);
   SetCurrentPage(current_page_);
 
   // Update controls
@@ -811,6 +834,7 @@ void AnimeDialog::UpdateControlPositions(const SIZE* size) {
   }
   page_series_info.SetPosition(nullptr, rect_page);
   page_my_info.SetPosition(nullptr, rect_page);
+  page_my_management.SetPosition(nullptr, rect_page);
 }
 
 void AnimeDialog::UpdateTitle(bool refreshing) {

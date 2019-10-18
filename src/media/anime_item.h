@@ -142,6 +142,15 @@ public:
   bool GetUseAlternative() const;
   const std::vector<std::wstring>& GetUserSynonyms() const;
 
+  // removal settings
+  bool GetUseGlobalRemovalSetting() const;
+  int GetEpisodesToKeep() const;
+  bool IsEpisodeRemovedAfterWatching() const;
+  bool IsEpisodeRemovedWhenCompleted() const;
+  bool IsPromptedAtEpisodeDelete() const;
+  bool IsEpisodesDeletedPermanently() const;
+  bool IsRemovalDefault() const;
+
   bool SetEpisodeAvailability(int number, bool available, const std::wstring& path);
   void SetFolder(const std::wstring& folder);
   void SetLastAiredEpisodeNumber(int number);
@@ -155,6 +164,14 @@ public:
   bool IsEpisodeAvailable(int number) const;
   bool IsNextEpisodeAvailable() const;
   bool UserSynonymsAvailable() const;
+
+  // removal settings
+  void SetUseGlobalRemovalSetting(bool use_global_setting);
+  void SetEpisodesToKeep(int keep_num);
+  void SetRemovedAfterWatching(bool remove_after_watch);
+  void SetRemovedWhenCompleted(bool remove_when_complete);
+  void SetPromptAtEpisodeDelete(bool prompt_at_delete);
+  void SetEpisodesDeletedPermanently(bool delete_permanent);
 
   //////////////////////////////////////////////////////////////////////////////
 
@@ -176,6 +193,8 @@ private:
 
   // Local information, stored temporarily
   LocalInformation local_info_;
+
+  MyRemovalSettings remove_settings_;
 };
 
 }  // namespace anime

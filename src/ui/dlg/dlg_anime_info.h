@@ -59,6 +59,7 @@ public:
   void Refresh(bool image = true,
                bool series_info = true,
                bool my_info = true,
+               bool my_management = true,
                bool connect = true);
   void UpdateControlPositions(const SIZE* size = nullptr);
   void UpdateTitle(bool refreshing = false);
@@ -66,6 +67,7 @@ public:
 public:
   PageSeriesInfo page_series_info;
   PageMyInfo page_my_info;
+  PageMyManagement page_my_management;
 
 protected:
   int anime_id_;

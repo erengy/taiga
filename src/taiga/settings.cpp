@@ -306,6 +306,14 @@ bool AppSettings::Load() {
     anime_item->SetFolder(item.attribute(L"folder").value());
     anime_item->SetUserSynonyms(item.attribute(L"titles").value());
     anime_item->SetUseAlternative(item.attribute(L"use_alternative").as_bool());
+
+    // removal settings
+    anime_item->SetUseGlobalRemovalSetting(item.attribute(L"use_global_removal_settings").as_bool());
+    anime_item->SetEpisodesToKeep(item.attribute(L"keep_num").as_int());
+    anime_item->SetRemovedAfterWatching(item.attribute(L"remove_after_watching").as_bool());
+    anime_item->SetRemovedWhenCompleted(item.attribute(L"remove_after_completion").as_bool());
+    anime_item->SetPromptAtEpisodeDelete(item.attribute(L"prompt_removal").as_bool());
+    anime_item->SetEpisodesDeletedPermanently(item.attribute(L"remove_permanent").as_bool());
   }
 
   // Media players
@@ -377,7 +385,8 @@ bool AppSettings::Save() {
   for (const auto& [id, anime_item] : anime::db.items) {
     if (anime_item.GetFolder().empty() &&
         !anime_item.UserSynonymsAvailable() &&
-        !anime_item.GetUseAlternative())
+        !anime_item.GetUseAlternative() &&
+        anime_item.IsRemovalDefault())
       continue;
     auto item = items.append_child(L"item");
     item.append_attribute(L"id") = anime_item.GetId();
@@ -387,6 +396,14 @@ bool AppSettings::Save() {
       item.append_attribute(L"titles") = Join(anime_item.GetUserSynonyms(), L"; ").c_str();
     if (anime_item.GetUseAlternative())
       item.append_attribute(L"use_alternative") = anime_item.GetUseAlternative();
+
+    // removal settings
+    item.append_attribute(L"use_global_removal_settings") = anime_item.GetUseGlobalRemovalSetting();
+    item.append_attribute(L"keep_num") = anime_item.GetEpisodesToKeep();
+    item.append_attribute(L"remove_after_watching") = anime_item.IsEpisodeRemovedAfterWatching();
+    item.append_attribute(L"remove_after_completion") = anime_item.IsEpisodeRemovedWhenCompleted();
+    item.append_attribute(L"prompt_removal") = anime_item.IsPromptedAtEpisodeDelete();
+    item.append_attribute(L"remove_permanent") = anime_item.IsEpisodesDeletedPermanently();
   }
 
   // Media players

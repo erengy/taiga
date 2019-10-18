@@ -89,6 +89,7 @@ namespace library {
     delete_info.fFlags = FOF_FILESONLY | FOF_NOCONFIRMATION | FOF_SILENT | FOF_NORECURSION;
     if (!permanent)
       delete_info.fFlags |= FOF_ALLOWUNDO; // Try to remove to recycle bin
+
     int removal_num = 0;
     for (auto path : paths) {
       // Check if file exists

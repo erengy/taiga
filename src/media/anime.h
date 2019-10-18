@@ -141,4 +141,14 @@ struct LocalInformation {
   bool use_alternative = false;
 };
 
+// Local settings for automatic episode removal
+struct MyRemovalSettings {
+  bool use_global_settings = true;
+  int keep_num = 1;
+  bool remove_after_watching = true;
+  bool remove_after_completion = true;
+  bool prompt_delete = true;
+  bool delete_permanent = false;
+};
+
 }  // namespace anime
