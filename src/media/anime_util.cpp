@@ -50,17 +50,6 @@ bool IsValidId(int anime_id) {
   return anime_id > ID_UNKNOWN;
 }
 
-// @TODO: Remove
-bool ListHasMissingIds() {
-  for (const auto& [id, item] : anime::db.items) {
-    if (item.GetMyStatus(false) != kNotInList && item.GetMyId().empty()) {
-      return true;
-    }
-  }
-
-  return false;
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 
 SeriesStatus GetAiringStatus(const Item& item) {

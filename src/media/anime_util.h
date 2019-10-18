@@ -32,7 +32,6 @@ class Item;
 class Season;
 
 bool IsValidId(int anime_id);
-bool ListHasMissingIds();
 
 SeriesStatus GetAiringStatus(const Item& item);
 bool IsAiredYet(const Item& item);
