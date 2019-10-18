@@ -25,6 +25,7 @@
 #include "media/anime.h"
 #include "media/anime_db.h"
 #include "media/anime_util.h"
+#include "media/library/history.h"
 #include "media/library/queue.h"
 #include "taiga/settings.h"
 #include "track/scanner.h"
@@ -107,27 +108,26 @@ bool PlayNextEpisode(int anime_id) {
 }
 
 bool PlayNextEpisodeOfLastWatchedAnime() {
-  int anime_id = anime::ID_UNKNOWN;
-
-  auto get_id_from_history_items = [](const std::vector<library::QueueItem>& items) {
-    for (auto it = items.rbegin(); it != items.rend(); ++it) {
-      const auto& item = *it;
-      if (item.episode) {
-        auto anime_item = anime::db.Find(item.anime_id);
-        if (anime_item && anime_item->GetMyStatus() != anime::kCompleted)
-          return item.anime_id;
-      }
-    }
-    return static_cast<int>(anime::ID_UNKNOWN);
+  const auto check_item = [](const int anime_id) {
+    const auto anime_item = anime::db.Find(anime_id);
+    return anime_item && anime_item->GetMyStatus() != anime::kCompleted;
   };
 
-  if (!anime::IsValidId(anime_id))
-    anime_id = get_id_from_history_items(library::queue.items);
-  // @TODO
-  //if (!anime::IsValidId(anime_id))
-  //  anime_id = get_id_from_history_items(History.items);
+  const auto& queue_items = library::queue.items;
+  for (auto it = queue_items.rbegin(); it != queue_items.rend(); ++it) {
+    if (it->episode && check_item(it->anime_id)) {
+      return PlayNextEpisode(it->anime_id);
+    }
+  }
 
-  return PlayNextEpisode(anime_id);
+  const auto& history_items = library::history.items;
+  for (auto it = history_items.rbegin(); it != history_items.rend(); ++it) {
+    if (it->episode && check_item(it->anime_id)) {
+      return PlayNextEpisode(it->anime_id);
+    }
+  }
+
+  return false;
 }
 
 bool PlayRandomAnime() {
