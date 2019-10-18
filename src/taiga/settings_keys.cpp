@@ -16,12 +16,14 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <semaver.hpp>
 #include <windows/win/registry.h>
 
 #include "taiga/settings_keys.h"
 
 #include "base/file.h"
 #include "base/string.h"
+#include "link/mirc.h"
 #include "media/library/queue.h"
 #include "media/anime_db.h"
 #include "media/discover.h"
@@ -31,6 +33,7 @@
 #include "taiga/settings.h"
 #include "taiga/taiga.h"
 #include "track/monitor.h"
+#include "ui/dlg/dlg_anime_list.h"
 #include "ui/dlg/dlg_season.h"
 #include "ui/menu.h"
 #include "ui/resource.h"
@@ -115,8 +118,8 @@ void Settings::InitKeyMap() const {
       {AppSettingKey::LibraryWatchFolders, {"anime/folders/watch/enabled", true}},
 
       // Application
-      {AppSettingKey::AppListDoubleClickAction, {"program/list/action/doubleclick", 4}},
-      {AppSettingKey::AppListMiddleClickAction, {"program/list/action/middleclick", 3}},
+      {AppSettingKey::AppListDoubleClickAction, {"program/list/action/doubleclick", ui::kAnimeListActionInfo}},
+      {AppSettingKey::AppListMiddleClickAction, {"program/list/action/middleclick", ui::kAnimeListActionPlayNext}},
       {AppSettingKey::AppListDisplayEnglishTitles, {"program/list/action/englishtitles", false}},
       {AppSettingKey::AppListHighlightNewEpisodes, {"program/list/filter/episodes/highlight", true}},
       {AppSettingKey::AppListDisplayHighlightedOnTop, {"program/list/filter/episodes/highlightedontop", false}},
@@ -185,7 +188,7 @@ void Settings::InitKeyMap() const {
       {AppSettingKey::ShareMircEnabled, {"announce/mirc/enabled", false}},
       {AppSettingKey::ShareMircMultiServer, {"announce/mirc/multiserver", false}},
       {AppSettingKey::ShareMircUseMeAction, {"announce/mirc/useaction", true}},
-      {AppSettingKey::ShareMircMode, {"announce/mirc/mode", 1}},
+      {AppSettingKey::ShareMircMode, {"announce/mirc/mode", link::mirc::kChannelModeActive}},
       {AppSettingKey::ShareMircChannels, {"announce/mirc/channels", std::wstring{L"#kitsu, #myanimelist, #taiga"}}},
       {AppSettingKey::ShareMircFormat, {"announce/mirc/format", std::wstring{kDefaultFormatMirc}}},
       {AppSettingKey::ShareMircService, {"announce/mirc/service", std::wstring{L"mIRC"}}},

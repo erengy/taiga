@@ -25,6 +25,7 @@
 #include "base/string.h"
 #include "base/xml.h"
 #include "media/anime_db.h"
+#include "media/anime_util.h"
 #include "media/library/history.h"
 #include "sync/manager.h"
 #include "sync/sync.h"
@@ -49,7 +50,7 @@ bool Settings::Load() {
   std::lock_guard lock{mutex_};
 
   if (modified_) {
-    LOGE(L"Cannot load modified settings.");
+    LOGE(L"Cannot load settings when current values are modified.");
     return false;
   }
 
@@ -59,9 +60,12 @@ bool Settings::Load() {
 
   std::error_code error;
   if (std::filesystem::exists(new_path, error)) {
-    LOGW(L"Found new settings.");
-    std::filesystem::rename(path, old_path, error);
-    std::filesystem::rename(new_path, path, error);
+    if (DeserializeFromXml(new_path)) {
+      LOGW(L"Found new settings.");
+      std::filesystem::rename(path, old_path, error);
+      std::filesystem::rename(new_path, path, error);
+      return true;
+    }
   }
 
   return DeserializeFromXml(path);
@@ -148,22 +152,21 @@ bool Settings::DeserializeFromXml(const std::wstring& path) {
   const auto node_items = settings.child(L"anime").child(L"items");
   for (const auto item : node_items.children(L"item")) {
     const int anime_id = item.attribute(L"id").as_int();
-    auto anime_item = anime::db.Find(anime_id, false);
-    if (!anime_item)
-      anime_item = &anime::db.items[anime_id];
-    anime_item->SetFolder(item.attribute(L"folder").value());
-    anime_item->SetUserSynonyms(item.attribute(L"titles").value());
-    anime_item->SetUseAlternative(item.attribute(L"use_alternative").as_bool());
+    if (anime::IsValidId(anime_id)) {
+      auto& anime_item = anime::db.items[anime_id];
+      anime_item.SetFolder(item.attribute(L"folder").value());
+      anime_item.SetUserSynonyms(item.attribute(L"titles").value());
+      anime_item.SetUseAlternative(item.attribute(L"use_alternative").as_bool());
+    }
   }
 
   // Media players
   const auto node_players = settings.child(L"recognition").child(L"mediaplayers");
   for (const auto player : node_players.children(L"player")) {
-    const std::wstring name = player.attribute(L"name").value();
-    const bool enabled = player.attribute(L"enabled").as_bool();
+    const auto name = WstrToStr(player.attribute(L"name").value());
     for (auto& media_player : track::media_players.items) {
-      if (media_player.name == WstrToStr(name)) {
-        media_player.enabled = enabled;
+      if (media_player.name == name) {
+        media_player.enabled = player.attribute(L"enabled").as_bool();
         break;
       }
     }
@@ -318,105 +321,60 @@ void Settings::ApplyChanges() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-sync::Service* Settings::GetCurrentService() const {
-  return ServiceManager.service(GetSyncActiveService());
+sync::Service* GetCurrentService() {
+  return ServiceManager.service(settings.GetSyncActiveService());
 }
 
-sync::ServiceId Settings::GetCurrentServiceId() const {
-  const auto service = GetCurrentService();
-
-  if (service)
-    return static_cast<sync::ServiceId>(service->id());
-
-  return sync::kMyAnimeList;
+sync::ServiceId GetCurrentServiceId() {
+  return settings.GetSyncActiveService();
 }
 
-std::wstring Settings::GetUserDisplayName(sync::ServiceId service_id) const {
-  switch (service_id) {
+std::wstring GetCurrentUserDisplayName() {
+  switch (GetCurrentServiceId()) {
     case sync::kKitsu: {
-      const auto display_name = GetSyncServiceKitsuDisplayName();
+      const auto display_name = settings.GetSyncServiceKitsuDisplayName();
       if (!display_name.empty())
         return display_name;
       break;
     }
   }
 
-  return GetUsername(service_id);
-}
-
-std::wstring Settings::GetUserEmail(sync::ServiceId service_id) const {
-  switch (service_id) {
-    case sync::kKitsu:
-      return GetSyncServiceKitsuEmail();
-    default:
-      return {};
-  }
-}
-
-std::wstring Settings::GetUsername(sync::ServiceId service_id) const {
-  switch (service_id) {
-    case sync::kMyAnimeList:
-      return GetSyncServiceMalUsername();
-    case sync::kKitsu:
-      return GetSyncServiceKitsuUsername();
-    case sync::kAniList:
-      return GetSyncServiceAniListUsername();
-    default:
-      return {};
-  }
-}
-
-std::wstring Settings::GetPassword(sync::ServiceId service_id) const {
-  switch (service_id) {
-    case sync::kMyAnimeList:
-      return Base64Decode(GetSyncServiceMalPassword());
-    case sync::kKitsu:
-      return Base64Decode(GetSyncServiceKitsuPassword());
-    case sync::kAniList:
-      return GetSyncServiceAniListToken();
-    default:
-      return {};
-  }
-}
-
-std::wstring Settings::GetCurrentUserDisplayName() const {
-  return GetUserDisplayName(GetCurrentServiceId());
-}
-
-std::wstring Settings::GetCurrentUserEmail() const {
-  return GetUserEmail(GetCurrentServiceId());
-}
-
-std::wstring Settings::GetCurrentUsername() const {
-  return GetUsername(GetCurrentServiceId());
-}
-
-std::wstring Settings::GetCurrentPassword() const {
-  return GetPassword(GetCurrentServiceId());
-}
-
-sync::Service* GetCurrentService() {
-  return settings.GetCurrentService();
-}
-
-sync::ServiceId GetCurrentServiceId() {
-  return settings.GetCurrentServiceId();
-}
-
-std::wstring GetCurrentUserDisplayName() {
-  return settings.GetCurrentUserDisplayName();
+  return GetCurrentUsername();
 }
 
 std::wstring GetCurrentUserEmail() {
-  return settings.GetCurrentUserEmail();
+  switch (GetCurrentServiceId()) {
+    case sync::kKitsu:
+      return settings.GetSyncServiceKitsuEmail();
+    default:
+      return {};
+  }
 }
 
 std::wstring GetCurrentUsername() {
-  return settings.GetCurrentUsername();
+  switch (GetCurrentServiceId()) {
+    case sync::kMyAnimeList:
+      return settings.GetSyncServiceMalUsername();
+    case sync::kKitsu:
+      return settings.GetSyncServiceKitsuUsername();
+    case sync::kAniList:
+      return settings.GetSyncServiceAniListUsername();
+    default:
+      return {};
+  }
 }
 
 std::wstring GetCurrentPassword() {
-  return settings.GetCurrentPassword();
+  switch (GetCurrentServiceId()) {
+    case sync::kMyAnimeList:
+      return Base64Decode(settings.GetSyncServiceMalPassword());
+    case sync::kKitsu:
+      return Base64Decode(settings.GetSyncServiceKitsuPassword());
+    case sync::kAniList:
+      return settings.GetSyncServiceAniListToken();
+    default:
+      return {};
+  }
 }
 
 }  // namespace taiga

@@ -23,6 +23,12 @@
 
 namespace link::mirc {
 
+enum ChannelMode {
+  kChannelModeActive = 1,
+  kChannelModeAll,
+  kChannelModeCustom,
+};
+
 bool IsRunning();
 bool GetChannels(const std::wstring& service, std::vector<std::wstring>& channels);
 bool Send(const std::wstring& service, std::wstring channels, const std::wstring& data, int mode, bool use_action, bool multi_server);

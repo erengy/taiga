@@ -22,11 +22,12 @@
 #include <string>
 #include <vector>
 
-#include <semaver.hpp>
-
 #include "base/settings.h"
 #include "taiga/settings_keys.h"
 
+namespace semaver {
+class Version;
+}
 namespace sync {
 class Service;
 enum ServiceId;
@@ -307,17 +308,6 @@ public:
   void SetAppSeasonsSortBy(const int sort_by);
   int GetAppSeasonsViewAs() const;
   void SetAppSeasonsViewAs(const int view_as);
-
-  sync::Service* GetCurrentService() const;
-  sync::ServiceId GetCurrentServiceId() const;
-  std::wstring GetUserDisplayName(sync::ServiceId service_id) const;
-  std::wstring GetUserEmail(sync::ServiceId service_id) const;
-  std::wstring GetUsername(sync::ServiceId service_id) const;
-  std::wstring GetPassword(sync::ServiceId service_id) const;
-  std::wstring GetCurrentUserDisplayName() const;
-  std::wstring GetCurrentUserEmail() const;
-  std::wstring GetCurrentUsername() const;
-  std::wstring GetCurrentPassword() const;
 
   std::vector<std::wstring> library_folders;
 

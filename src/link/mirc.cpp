@@ -25,12 +25,6 @@
 
 namespace link::mirc {
 
-enum ChannelMode {
-  kChannelModeActive = 1,
-  kChannelModeAll,
-  kChannelModeCustom,
-};
-
 bool IsRunning() {
   return ::FindWindow(L"mIRC", nullptr) != nullptr;
 }
