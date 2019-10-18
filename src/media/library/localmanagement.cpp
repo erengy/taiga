@@ -48,10 +48,19 @@ namespace library {
     bool after_completion;
     bool prompt;
     bool permanent_removal;
-    eps_to_keep = remove_params.eps_to_keep.value_or(Settings.GetInt(taiga::kLibrary_Management_KeepNum));
-    after_completion = remove_params.remove_all_if_complete.value_or(Settings.GetBool(taiga::kLibrary_Management_DeleteAfterCompletion));
-    prompt = remove_params.prompt_remove.value_or(Settings.GetBool(taiga::kLibrary_Management_PromptDelete));
-    permanent_removal = remove_params.remove_permanent.value_or(Settings.GetBool(taiga::kLibrary_Management_DeletePermanently));
+
+    if (item.GetUseGlobalRemovalSetting()) {
+      eps_to_keep = remove_params.eps_to_keep.value_or(Settings.GetInt(taiga::kLibrary_Management_KeepNum));
+      after_completion = remove_params.remove_all_if_complete.value_or(Settings.GetBool(taiga::kLibrary_Management_DeleteAfterCompletion));
+      prompt = remove_params.prompt_remove.value_or(Settings.GetBool(taiga::kLibrary_Management_PromptDelete));
+      permanent_removal = remove_params.remove_permanent.value_or(Settings.GetBool(taiga::kLibrary_Management_DeletePermanently));
+    }
+    else {
+      eps_to_keep = remove_params.eps_to_keep.value_or(item.GetEpisodesToKeep());
+      after_completion = remove_params.remove_all_if_complete.value_or(item.IsEpisodeRemovedWhenCompleted());
+      prompt = remove_params.prompt_remove.value_or(item.IsPromptedAtEpisodeDelete());
+      permanent_removal = remove_params.remove_permanent.value_or(item.IsEpisodesDeletedPermanently());
+    }
 
     bool series_completed = item.GetMyStatus(false) == anime::kCompleted;
 

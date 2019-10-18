@@ -307,7 +307,8 @@ void EndWatching(Item& item, Episode episode) {
 
   ui::OnAnimeWatchingEnd(item, episode);
 
-  if (Settings.GetBool(taiga::kLibrary_Management_DeleteAfterWatch))
+  bool purge_episodes = item.GetUseGlobalRemovalSetting() ? Settings.GetBool(taiga::kLibrary_Management_DeleteAfterWatch) : item.IsEpisodeRemovedAfterWatching();
+  if (purge_episodes)
     library::SchedulePurge(item.GetId());
 }
 
@@ -409,7 +410,8 @@ void AddToQueue(const Item& item, const Episode& episode, bool change_status) {
   // Add to queue
   library::queue.Add(queue_item);
 
-  if (change_status && (*queue_item.status) == kCompleted && Settings.GetBool(taiga::kLibrary_Management_DeleteAfterCompletion) && !track::media_players.player_running())
+  bool purge_at_complete = item.GetUseGlobalRemovalSetting() ? Settings.GetBool(taiga::kLibrary_Management_DeleteAfterCompletion) : item.IsEpisodeRemovedWhenCompleted();
+  if (change_status && (*queue_item.status) == kCompleted && purge_at_complete && !track::media_players.player_running())
     library::SchedulePurge(item.GetId());
 }
 
