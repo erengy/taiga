@@ -143,7 +143,7 @@ void Queue::Add(QueueItem& item, bool save) {
       episode.anime_id = anime_item->GetId();
       episode.set_episode_number(*item.episode);
       track::media_players.play_status = track::recognition::PlayStatus::Updated;
-      Announcer.Do(taiga::kAnnounceToHttp | taiga::kAnnounceToTwitter, &episode);
+      taiga::announcer.Do(taiga::kAnnounceToHttp | taiga::kAnnounceToTwitter, &episode);
     }
 
     // Check new episode

@@ -46,7 +46,7 @@ using multidictionary_t = std::map<std::wstring, std::vector<std::wstring>>;
 
 // HTTP request and response
 using HttpRequest = base::http::Request;
-using HttpResponse = base::http::Response ;
+using HttpResponse = base::http::Response;
 
 // 64-bit integral data type (quadword)
 using QWORD = unsigned __int64;

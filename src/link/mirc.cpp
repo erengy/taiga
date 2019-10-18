@@ -30,12 +30,10 @@ bool IsRunning() {
 }
 
 bool GetChannels(const std::wstring& service,
-    std::vector<std::wstring>& channels) {
+                 std::vector<std::wstring>& channels) {
   win::DynamicDataExchange dde;
 
-  if (!dde.Initialize())
-    return false;
-  if (!dde.Connect(service, L"CHANNELS"))
+  if (!dde.Initialize() || !dde.Connect(service, L"CHANNELS"))
     return false;
 
   std::wstring data;
@@ -49,24 +47,19 @@ static bool SendCommands(const std::wstring& service,
                          const std::vector<std::wstring>& commands) {
   win::DynamicDataExchange dde;
 
-  if (!dde.Initialize())
-    return false;
-  if (!dde.Connect(service, L"COMMAND"))
+  if (!dde.Initialize() || !dde.Connect(service, L"COMMAND"))
     return false;
 
-  bool success = true;
-  for (const auto& command : commands)
-    if (success)
-      success = dde.ClientTransaction(L" ", command, nullptr, XTYP_POKE) != FALSE;
+  for (const auto& command : commands) {
+    if (dde.ClientTransaction(L" ", command, nullptr, XTYP_POKE) == FALSE)
+      return false;
+  }
 
-  return success;
+  return true;
 }
 
-bool Send(const std::wstring& service,
-          std::wstring channels,
-          const std::wstring& data,
-          int mode,
-          bool use_action,
+bool Send(const std::wstring& service, std::wstring channels,
+          const std::wstring& data, int mode, bool use_action,
           bool multi_server) {
   if (!IsRunning())
     return false;
@@ -83,7 +76,6 @@ bool Send(const std::wstring& service,
   // List channels
   std::vector<std::wstring> channel_list;
   std::wstring active_channel;
-
   switch (mode) {
     case kChannelModeActive:
     case kChannelModeAll:
@@ -93,7 +85,6 @@ bool Send(const std::wstring& service,
       Tokenize(channels, L" ,;", channel_list);
       break;
   }
-
   for (auto& channel : channel_list) {
     Trim(channel);
     if (channel.empty())  // ?

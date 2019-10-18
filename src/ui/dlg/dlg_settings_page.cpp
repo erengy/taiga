@@ -26,6 +26,8 @@
 #include "base/file.h"
 #include "base/log.h"
 #include "base/string.h"
+#include "link/mirc.h"
+#include "link/twitter.h"
 #include "media/anime_db.h"
 #include "media/anime_util.h"
 #include "media/library/history.h"

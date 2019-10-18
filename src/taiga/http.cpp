@@ -21,6 +21,7 @@
 #include "base/log.h"
 #include "base/string.h"
 #include "base/url.h"
+#include "link/twitter.h"
 #include "media/anime_db.h"
 #include "media/anime_season_db.h"
 #include "media/anime_util.h"

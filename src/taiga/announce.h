@@ -18,11 +18,6 @@
 
 #pragma once
 
-#include "link/discord.h"
-#include "link/http.h"
-#include "link/mirc.h"
-#include "link/twitter.h"
-
 namespace anime {
 class Episode;
 }
@@ -44,6 +39,6 @@ public:
   void Do(int modes, anime::Episode* episode = nullptr, bool force = false);
 };
 
-}  // namespace taiga
+inline Announcer announcer;
 
-inline taiga::Announcer Announcer;
+}  // namespace taiga

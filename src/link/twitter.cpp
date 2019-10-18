@@ -19,15 +19,15 @@
 #include "link/twitter.h"
 
 #include "base/file.h"
-#include "base/string.h"
 #include "base/oauth.h"
+#include "base/string.h"
+#include "taiga/http.h"
 #include "taiga/settings.h"
 #include "ui/ui.h"
 
 namespace link::twitter {
 
 static OAuth oauth;
-static std::wstring previous_status_text;
 
 static void InitializeOauth() {
   oauth.consumer_key = L"9GZsCbqzjOrsPWlIlysvg";
@@ -68,6 +68,7 @@ bool SetStatusText(const std::wstring& status_text) {
     return false;
   }
 
+  static std::wstring previous_status_text;
   if (status_text.empty() || status_text == previous_status_text)
     return false;
   previous_status_text = status_text;

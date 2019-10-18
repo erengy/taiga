@@ -23,6 +23,7 @@
 
 #include "base/file.h"
 #include "base/string.h"
+#include "link/discord.h"
 #include "link/mirc.h"
 #include "media/library/queue.h"
 #include "media/anime_season_db.h"
@@ -933,7 +934,7 @@ void Settings::SetShareDiscordEnabled(const bool enabled) {
   if (set_value(AppSettingKey::ShareDiscordEnabled, enabled)) {
     if (enabled) {
       link::discord::Initialize();
-      ::Announcer.Do(kAnnounceToDiscord);
+      taiga::announcer.Do(kAnnounceToDiscord);
     } else {
       link::discord::Shutdown();
     }

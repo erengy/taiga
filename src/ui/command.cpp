@@ -407,22 +407,22 @@ void ExecuteCommand(const std::wstring& str, WPARAM wParam, LPARAM lParam) {
   // AnnounceToDiscord(force)
   //   Updates rich presence.
   } else if (command == L"AnnounceToDiscord") {
-    Announcer.Do(taiga::kAnnounceToDiscord, nullptr, body == L"true");
+    taiga::announcer.Do(taiga::kAnnounceToDiscord, nullptr, body == L"true");
 
   // AnnounceToHTTP(force)
   //   Sends an HTTP request.
   } else if (command == L"AnnounceToHTTP") {
-    Announcer.Do(taiga::kAnnounceToHttp, nullptr, body == L"true");
+    taiga::announcer.Do(taiga::kAnnounceToHttp, nullptr, body == L"true");
 
   // AnnounceToMIRC(force)
   //   Sends message to specified channels in mIRC.
   } else if (command == L"AnnounceToMIRC") {
-    Announcer.Do(taiga::kAnnounceToMirc, nullptr, body == L"true");
+    taiga::announcer.Do(taiga::kAnnounceToMirc, nullptr, body == L"true");
 
   // AnnounceToTwitter(force)
   //   Changes Twitter status.
   } else if (command == L"AnnounceToTwitter") {
-    Announcer.Do(taiga::kAnnounceToTwitter, nullptr, body == L"true");
+    taiga::announcer.Do(taiga::kAnnounceToTwitter, nullptr, body == L"true");
 
   //////////////////////////////////////////////////////////////////////////////
 
