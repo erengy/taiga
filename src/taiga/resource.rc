@@ -506,12 +506,11 @@ STYLE DS_3DLOOK | DS_CONTROL | DS_SHELLFONT | WS_CHILDWINDOW
 EXSTYLE WS_EX_CONTROLPARENT
 FONT 9, "Segoe UI", 400, 0, 0
 {
-    GROUPBOX        "Account", IDC_STATIC, 7, 7, 301, 63, 0, WS_EX_LEFT
+    GROUPBOX        "Account", IDC_STATIC, 7, 7, 301, 55, 0, WS_EX_LEFT
     LTEXT           "Username: (not your email address)", IDC_STATIC, 12, 18, 141, 8, SS_LEFT, WS_EX_LEFT
     EDITTEXT        IDC_EDIT_USER_MAL, 12, 28, 141, 12, ES_AUTOHSCROLL, WS_EX_LEFT
-    LTEXT           "Password:", IDC_STATIC, 160, 18, 141, 8, SS_LEFT, WS_EX_LEFT
-    EDITTEXT        IDC_EDIT_PASS_MAL, 160, 28, 141, 12, ES_AUTOHSCROLL | ES_PASSWORD, WS_EX_LEFT
-    CONTROL         "Warning: MyAnimeList has <a href=""URL(https://github.com/erengy/taiga/issues/588)"">disabled their API</a> on May 24, 2018. Taiga will not be able to communicate with MyAnimeList until they restore their API.", IDC_LINK_ACCOUNT_MAL, "SysLink", 0x50010004, 12, 47, 288, 16, 0x00000000
+    PUSHBUTTON      "Authorize...", IDC_BUTTON_MAL_AUTH, 160, 27, 85, 14, 0, WS_EX_LEFT
+    CONTROL         "<a href=""URL(https://myanimelist.net/register.php)"">Create a new MyAnimeList account</a>", IDC_LINK_ACCOUNT_MAL, "SysLink", 0x50010004, 12, 47, 141, 8, 0x00000000
 }
 
 

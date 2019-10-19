@@ -77,6 +77,7 @@ struct User {
   std::wstring rating_system;
 
   std::wstring access_token;
+  std::wstring refresh_token;
   bool authenticated = false;
   time_t last_synchronized = 0;
 };

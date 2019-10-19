@@ -283,7 +283,8 @@ bool IsUserAuthenticationAvailable() {
   switch (taiga::GetCurrentServiceId()) {
     case sync::kMyAnimeList:
       return !taiga::settings.GetSyncServiceMalUsername().empty() &&
-             !taiga::settings.GetSyncServiceMalPassword().empty();
+             !taiga::settings.GetSyncServiceMalAccessToken().empty() &&
+             !taiga::settings.GetSyncServiceMalRefreshToken().empty();
     case sync::kKitsu:
       return (!taiga::settings.GetSyncServiceKitsuEmail().empty() ||
               !taiga::settings.GetSyncServiceKitsuUsername().empty()) &&

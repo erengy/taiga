@@ -116,7 +116,11 @@ BOOL SettingsPage::OnInitDialog() {
     // Services > MyAnimeList
     case kSettingsPageServicesMal: {
       SetDlgItemText(IDC_EDIT_USER_MAL, taiga::settings.GetSyncServiceMalUsername().c_str());
-      SetDlgItemText(IDC_EDIT_PASS_MAL, Base64Decode(taiga::settings.GetSyncServiceMalPassword()).c_str());
+      if (taiga::settings.GetSyncServiceMalAccessToken().empty()) {
+        SetDlgItemText(IDC_BUTTON_MAL_AUTH, L"Authorize...");
+      } else {
+        SetDlgItemText(IDC_BUTTON_MAL_AUTH, L"Re-authorize...");
+      }
       break;
     }
     // Services > Kitsu
@@ -574,6 +578,12 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
             taiga::settings.SetSyncServiceAniListToken(auth_pin);
             ServiceManager.service(sync::kAniList)->user().access_token = auth_pin;
           }
+          return TRUE;
+        }
+
+        // Authorize MyAnimeList
+        case IDC_BUTTON_MAL_AUTH: {
+          // @TODO
           return TRUE;
         }
 

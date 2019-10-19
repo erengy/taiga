@@ -58,8 +58,10 @@ public:
   void SetSyncAutoOnStart(const bool enabled);
   std::wstring GetSyncServiceMalUsername() const;
   void SetSyncServiceMalUsername(const std::wstring& username);
-  std::wstring GetSyncServiceMalPassword() const;
-  void SetSyncServiceMalPassword(const std::wstring& password);
+  std::wstring GetSyncServiceMalAccessToken() const;
+  void SetSyncServiceMalAccessToken(const std::wstring& token);
+  std::wstring GetSyncServiceMalRefreshToken() const;
+  void SetSyncServiceMalRefreshToken(const std::wstring& token);
   std::wstring GetSyncServiceKitsuDisplayName() const;
   void SetSyncServiceKitsuDisplayName(const std::wstring& name);
   std::wstring GetSyncServiceKitsuEmail() const;

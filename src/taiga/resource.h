@@ -132,7 +132,6 @@
 #define IDC_EDIT_MIRC_CHANNELS                  1088
 #define IDC_EDIT_MIRC_SERVICE                   1089
 #define IDC_EDIT_PASS_KITSU                     1090
-#define IDC_EDIT_PASS_MAL                       1091
 #define IDC_EDIT_PREVIEW                        1092
 #define IDC_EDIT_SEARCH                         1093
 #define IDC_EDIT_TORRENT_APP                    1094
@@ -216,3 +215,4 @@
 #define IDC_TOOLBAR_TORRENT                     1173
 #define IDC_TREE_MAIN                           1174
 #define IDC_TREE_SECTIONS                       1175
+#define IDC_BUTTON_MAL_AUTH                     1176

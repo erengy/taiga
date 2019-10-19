@@ -288,6 +288,10 @@ bool Settings::SerializeToXml(const std::wstring& path) const {
 // @TODO: Remove
 void Settings::DoAfterLoad() {
   // Services
+  ServiceManager.service(sync::kMyAnimeList)->user().access_token =
+      GetSyncServiceMalAccessToken();
+  ServiceManager.service(sync::kMyAnimeList)->user().refresh_token =
+      GetSyncServiceMalRefreshToken();
   ServiceManager.service(sync::kKitsu)->user().rating_system =
       GetSyncServiceKitsuRatingSystem();
   ServiceManager.service(sync::kAniList)->user().rating_system =
@@ -367,7 +371,7 @@ std::wstring GetCurrentUsername() {
 std::wstring GetCurrentPassword() {
   switch (GetCurrentServiceId()) {
     case sync::kMyAnimeList:
-      return Base64Decode(settings.GetSyncServiceMalPassword());
+      return settings.GetSyncServiceMalAccessToken();
     case sync::kKitsu:
       return Base64Decode(settings.GetSyncServiceKitsuPassword());
     case sync::kAniList:

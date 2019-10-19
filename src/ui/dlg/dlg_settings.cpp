@@ -189,7 +189,6 @@ void SettingsDialog::OnOK() {
   page = &pages[kSettingsPageServicesMal];
   if (page->IsWindow()) {
     taiga::settings.SetSyncServiceMalUsername(page->GetDlgItemText(IDC_EDIT_USER_MAL));
-    taiga::settings.SetSyncServiceMalPassword(Base64Encode(page->GetDlgItemText(IDC_EDIT_PASS_MAL)));
   }
   // Services > Kitsu
   page = &pages[kSettingsPageServicesKitsu];

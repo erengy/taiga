@@ -215,6 +215,11 @@ void Manager::HandleResponse(Response& response, HttpResponse& http_response) {
       switch (response.service_id) {
         case kMyAnimeList:
           taiga::settings.SetSyncServiceMalUsername(username);
+          if (!service.user().access_token.empty())
+            taiga::settings.SetSyncServiceMalAccessToken(service.user().access_token);
+          if (!service.user().refresh_token.empty())
+            taiga::settings.SetSyncServiceMalRefreshToken(service.user().refresh_token);
+          break;
           break;
         case kKitsu:
           taiga::settings.SetSyncServiceKitsuUsername(username);

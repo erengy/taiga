@@ -102,7 +102,8 @@ void Settings::InitKeyMap() const {
       {AppSettingKey::SyncActiveService, {"account/update/activeservice", std::wstring{L"anilist"}}},
       {AppSettingKey::SyncAutoOnStart, {"account/myanimelist/login", false}},
       {AppSettingKey::SyncServiceMalUsername, {"account/myanimelist/username", std::wstring{}}},
-      {AppSettingKey::SyncServiceMalPassword, {"account/myanimelist/password", std::wstring{}}},
+      {AppSettingKey::SyncServiceMalAccessToken, {"account/myanimelist/accesstoken", std::wstring{}}},
+      {AppSettingKey::SyncServiceMalRefreshToken, {"account/myanimelist/refreshtoken", std::wstring{}}},
       {AppSettingKey::SyncServiceKitsuDisplayName, {"account/kitsu/displayname", std::wstring{}}},
       {AppSettingKey::SyncServiceKitsuEmail, {"account/kitsu/email", std::wstring{}}},
       {AppSettingKey::SyncServiceKitsuUsername, {"account/kitsu/username", std::wstring{}}},
@@ -335,12 +336,20 @@ void Settings::SetSyncServiceMalUsername(const std::wstring& username) {
   }
 }
 
-std::wstring Settings::GetSyncServiceMalPassword() const {
-  return value<std::wstring>(AppSettingKey::SyncServiceMalPassword);
+std::wstring Settings::GetSyncServiceMalAccessToken() const {
+  return value<std::wstring>(AppSettingKey::SyncServiceMalAccessToken);
 }
 
-void Settings::SetSyncServiceMalPassword(const std::wstring& password) {
-  set_value(AppSettingKey::SyncServiceMalPassword, password);
+void Settings::SetSyncServiceMalAccessToken(const std::wstring& token) {
+  set_value(AppSettingKey::SyncServiceMalAccessToken, token);
+}
+
+std::wstring Settings::GetSyncServiceMalRefreshToken() const {
+  return value<std::wstring>(AppSettingKey::SyncServiceMalRefreshToken);
+}
+
+void Settings::SetSyncServiceMalRefreshToken(const std::wstring& token) {
+  set_value(AppSettingKey::SyncServiceMalRefreshToken, token);
 }
 
 std::wstring Settings::GetSyncServiceKitsuDisplayName() const {
