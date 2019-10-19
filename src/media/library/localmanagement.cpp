@@ -19,60 +19,57 @@ namespace library {
 
   // Methods for file purging
   void PurgeWatchedEpisodes(int anime_id, RemoveSettings remove_params, bool silent) {
-    anime::Item item;
-
     if (!silent)
       ui::ChangeStatusText(L"Identifying anime...");
 
     // Retrieve anime item
-    auto item_ptr = anime::db.Find(anime_id);
-    if (!item_ptr) { return; }
+    anime::Item* item = anime::db.Find(anime_id);
+    if (!item) { return; }
     else {
-      item = *item_ptr;
       if (library::queue.GetItemCount() > 0) {
         auto episode_update_item = library::queue.FindItem(anime_id, QueueSearch::Episode);
         auto status_update_item = library::queue.FindItem(anime_id, QueueSearch::Status);
         if (episode_update_item)
-          item.SetMyLastWatchedEpisode(*episode_update_item->episode);
+          item->SetMyLastWatchedEpisode(*episode_update_item->episode);
         if (status_update_item)
-          item.SetMyStatus(*status_update_item->status);
+          item->SetMyStatus(*status_update_item->status);
       }
     }
 
     PurgeWatchedEpisodes(item, remove_params, silent);
   }
 
-  void PurgeWatchedEpisodes(anime::Item item, RemoveSettings remove_params, bool silent) {
+  void PurgeWatchedEpisodes(anime::Item* item, RemoveSettings remove_params, bool silent) {
     // read settings
     int eps_to_keep;
     bool after_completion;
     bool prompt;
     bool permanent_removal;
 
-    if (item.GetUseGlobalRemovalSetting()) {
+    if (item->GetUseGlobalRemovalSetting()) {
       eps_to_keep = remove_params.eps_to_keep.value_or(Settings.GetInt(taiga::kLibrary_Management_KeepNum));
       after_completion = remove_params.remove_all_if_complete.value_or(Settings.GetBool(taiga::kLibrary_Management_DeleteAfterCompletion));
       prompt = remove_params.prompt_remove.value_or(Settings.GetBool(taiga::kLibrary_Management_PromptDelete));
       permanent_removal = remove_params.remove_permanent.value_or(Settings.GetBool(taiga::kLibrary_Management_DeletePermanently));
     }
     else {
-      eps_to_keep = remove_params.eps_to_keep.value_or(item.GetEpisodesToKeep());
-      after_completion = remove_params.remove_all_if_complete.value_or(item.IsEpisodeRemovedWhenCompleted());
-      prompt = remove_params.prompt_remove.value_or(item.IsPromptedAtEpisodeDelete());
-      permanent_removal = remove_params.remove_permanent.value_or(item.IsEpisodesDeletedPermanently());
+      eps_to_keep = remove_params.eps_to_keep.value_or(item->GetEpisodesToKeep());
+      after_completion = remove_params.remove_all_if_complete.value_or(item->IsEpisodeRemovedWhenCompleted());
+      prompt = remove_params.prompt_remove.value_or(item->IsPromptedAtEpisodeDelete());
+      permanent_removal = remove_params.remove_permanent.value_or(item->IsEpisodesDeletedPermanently());
     }
 
-    bool series_completed = item.GetMyStatus(false) == anime::kCompleted;
+    bool series_completed = item->GetMyStatus(false) == anime::kCompleted;
 
     std::vector<std::wstring> eps_to_remove;
-    int episode_num_max = item.GetAvailableEpisodeCount();
-    int last_to_remove = item.GetMyLastWatchedEpisode(true) - eps_to_keep;
+    int episode_num_max = item->GetAvailableEpisodeCount();
+    int last_to_remove = item->GetMyLastWatchedEpisode(true) - eps_to_keep;
     if (after_completion && series_completed) {
       last_to_remove = episode_num_max;
     }
     episode_num_max = std::min(episode_num_max, last_to_remove);
 
-    eps_to_remove = ReadEpisodePaths(item, episode_num_max, true, silent);
+    eps_to_remove = ReadEpisodePaths(*item, episode_num_max, true, silent);
     if (eps_to_remove.size() == 0)
       return;
 
@@ -115,7 +112,7 @@ namespace library {
     }
   }
 
-  bool PromptDeletion(anime::Item item, std::vector<std::wstring> episode_paths, bool silent) {
+  bool PromptDeletion(anime::Item* item, std::vector<std::wstring> episode_paths, bool silent) {
     if (!silent)
       ui::ChangeStatusText(L"Asking for purge permission...");
     std::vector<std::wstring> ep_file_names(episode_paths.size());

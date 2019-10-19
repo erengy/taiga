@@ -33,10 +33,10 @@ namespace library {
   };
 
   void PurgeWatchedEpisodes(int anime_id, RemoveSettings settings, bool silent);
-  void PurgeWatchedEpisodes(anime::Item item, RemoveSettings settings, bool silent);
+  void PurgeWatchedEpisodes(anime::Item* item, RemoveSettings settings, bool silent);
 
   void DeleteEpisodes(std::vector<std::wstring> paths, bool permanent);
-  bool PromptDeletion(anime::Item item, std::vector<std::wstring> episode_paths, bool silent);
+  bool PromptDeletion(anime::Item* item, std::vector<std::wstring> episode_paths, bool silent);
   std::vector<std::wstring> ReadEpisodePaths(anime::Item item, int episode_num_max, bool scan, bool silent);
 
   void ProcessPurges();

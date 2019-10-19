@@ -722,10 +722,10 @@ void OnAnimeWatchingEnd(const anime::Item& anime_item,
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool OnEpisodePurge(anime::Item& anime_item, std::vector<std::wstring> episode_files) {
+bool OnEpisodePurge(anime::Item* anime_item, std::vector<std::wstring> episode_files) {
   /* Prompts the user if purge of given episode files are wanted or not*/
   win::TaskDialog dlg;
-  std::wstring title = L"Anime title: " + anime::GetPreferredTitle(anime_item);
+  std::wstring title = L"Anime title: " + anime::GetPreferredTitle(*anime_item);
   dlg.SetWindowTitle(TAIGA_APP_NAME);
   dlg.SetMainIcon(TD_ICON_INFORMATION);
   // Compile list of episodes to prompt
@@ -744,8 +744,13 @@ bool OnEpisodePurge(anime::Item& anime_item, std::vector<std::wstring> episode_f
     L"Keep files", IDNO);
 
   dlg.Show(DlgMain.GetWindowHandle());
-  if (dlg.GetVerificationCheck())
-    Settings.Set(taiga::kLibrary_Management_PromptDelete, false);
+  if (dlg.GetVerificationCheck()) {
+    if (anime_item->GetUseGlobalRemovalSetting()) {
+      Settings.Set(taiga::kLibrary_Management_PromptDelete, false);
+    } else {
+      anime_item->SetPromptAtEpisodeDelete(false);
+    }
+  }
   return dlg.GetSelectedButtonID() == IDYES;
 }
 

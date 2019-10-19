@@ -101,7 +101,7 @@ bool OnAnimeFolderNotFound();
 void OnAnimeWatchingStart(const anime::Item& anime_item, const anime::Episode& episode);
 void OnAnimeWatchingEnd(const anime::Item& anime_item, const anime::Episode& episode);
 
-bool OnEpisodePurge(anime::Item& anime_item, std::vector<std::wstring> episode_files);
+bool OnEpisodePurge(anime::Item* anime_item, std::vector<std::wstring> episode_files);
 
 bool OnRecognitionCancelConfirm();
 void OnRecognitionFail();
