@@ -984,9 +984,6 @@
     <ClInclude Include="..\..\src\sync\myanimelist.h">
       <Filter>sync\myanimelist</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\sync\myanimelist_types.h">
-      <Filter>sync\myanimelist</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\taiga\announce.h">
       <Filter>taiga</Filter>
     </ClInclude>

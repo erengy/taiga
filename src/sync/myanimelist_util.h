@@ -30,22 +30,20 @@ class Item;
 namespace sync {
 namespace myanimelist {
 
-std::wstring DecodeText(std::wstring text);
-std::wstring EraseBbcode(std::wstring& str);
+std::wstring DecodeSynopsis(std::string text);
 
 std::vector<Rating> GetMyRatings();
 
-int TranslateSeriesStatusFrom(int value);
+int TranslateAgeRatingFrom(const std::wstring& value);
+int TranslateEpisodeLengthFrom(int value);
 int TranslateSeriesStatusFrom(const std::wstring& value);
-int TranslateSeriesTypeFrom(int value);
 int TranslateSeriesTypeFrom(const std::wstring& value);
-int TranslateSeriesTypeTo(int value);
-std::wstring TranslateMyDateTo(const std::wstring& value);
+std::wstring TranslateMyLastUpdatedFrom(const std::string& value);
 std::wstring TranslateMyRating(int value, bool full);
 int TranslateMyRatingFrom(int value);
 int TranslateMyRatingTo(int value);
-int TranslateMyStatusFrom(int value);
-int TranslateMyStatusTo(int value);
+int TranslateMyStatusFrom(const std::wstring& value);
+std::wstring TranslateMyStatusTo(int value);
 std::wstring TranslateKeyTo(const std::wstring& key);
 
 std::wstring GetAnimePage(const anime::Item& anime_item);

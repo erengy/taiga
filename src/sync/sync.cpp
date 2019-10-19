@@ -217,12 +217,7 @@ bool AddAuthenticationToRequest(Request& request) {
 }
 
 void AddPageOffsetToRequest(const int offset, Request& request) {
-  switch (taiga::GetCurrentServiceId()) {
-    case sync::kKitsu:
-    case sync::kAniList:
-      request.data[L"page_offset"] = ToWstr(offset);
-      break;
-  }
+  request.data[L"page_offset"] = ToWstr(offset);
 }
 
 bool AddServiceDataToRequest(Request& request, int id) {

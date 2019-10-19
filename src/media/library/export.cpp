@@ -29,7 +29,6 @@
 #include "media/anime_util.h"
 #include "media/library/export.h"
 #include "media/library/queue.h"
-#include "sync/myanimelist_types.h"
 #include "sync/myanimelist_util.h"
 #include "taiga/settings.h"
 #include "taiga/version.h"
@@ -49,26 +48,26 @@ bool ExportAsMalXml(const std::wstring& path) {
   };
 
   constexpr auto tr_series_type = [](int type) {
-    switch (sync::myanimelist::TranslateSeriesTypeTo(type)) {
+    switch (type) {
       default:
-      case sync::myanimelist::kUnknownType: return L"Unknown";
-      case sync::myanimelist::kTv: return L"TV";
-      case sync::myanimelist::kOva: return L"OVA";
-      case sync::myanimelist::kMovie: return L"Movie";
-      case sync::myanimelist::kSpecial: return L"Special";
-      case sync::myanimelist::kOna: return L"ONA";
-      case sync::myanimelist::kMusic: return L"Music";
+      case anime::kUnknownType: return L"Unknown";
+      case anime::kTv: return L"TV";
+      case anime::kOva: return L"OVA";
+      case anime::kMovie: return L"Movie";
+      case anime::kSpecial: return L"Special";
+      case anime::kOna: return L"ONA";
+      case anime::kMusic: return L"Music";
     }
   };
 
   constexpr auto tr_my_status = [](int status) {
-    switch (sync::myanimelist::TranslateMyStatusTo(status)) {
+    switch (status) {
       default:
-      case sync::myanimelist::kWatching: return L"Watching";
-      case sync::myanimelist::kCompleted: return L"Completed";
-      case sync::myanimelist::kOnHold: return L"On-Hold";
-      case sync::myanimelist::kDropped: return L"Dropped";
-      case sync::myanimelist::kPlanToWatch: return L"Plan to Watch";
+      case anime::kWatching: return L"Watching";
+      case anime::kCompleted: return L"Completed";
+      case anime::kOnHold: return L"On-Hold";
+      case anime::kDropped: return L"Dropped";
+      case anime::kPlanToWatch: return L"Plan to Watch";
     }
   };
 

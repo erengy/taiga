@@ -16,24 +16,30 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <set>
+#include "sync/myanimelist.h"
 
-#include "base/base64.h"
-#include "base/html.h"
+#include "base/format.h"
 #include "base/http.h"
+#include "base/log.h"
 #include "base/string.h"
-#include "base/xml.h"
 #include "media/anime_db.h"
 #include "media/anime_item.h"
 #include "media/anime_util.h"
-#include "sync/myanimelist.h"
 #include "sync/myanimelist_util.h"
 
 namespace sync {
 namespace myanimelist {
 
+constexpr auto kClientId = L"f6e398095cf7525360276786ec4407bc";
+
+constexpr auto kRedirectUrl = L"https://taiga.moe/api/myanimelist/auth";
+
+constexpr auto kLibraryPageLimit = 1000;
+constexpr auto kSearchPageLimit = 100;
+constexpr auto kSeasonPageLimit = 500;
+
 Service::Service() {
-  host_ = L"myanimelist.net";
+  host_ = L"api.myanimelist.net";
 
   id_ = kMyAnimeList;
   canonical_name_ = L"myanimelist";
@@ -46,34 +52,23 @@ void Service::BuildRequest(Request& request, HttpRequest& http_request) {
   http_request.url.host = host_;
   http_request.url.protocol = base::http::Protocol::Https;
 
-  // This doesn't quite help; MAL returns whatever it pleases
-  http_request.header[L"Accept"] = L"text/xml, text/*";
+  http_request.header[L"Accept"] = L"application/json";
   http_request.header[L"Accept-Charset"] = L"utf-8";
   http_request.header[L"Accept-Encoding"] = L"gzip";
 
-  // Since October 2013, third-party applications need to identify themselves
-  // with a unique user-agent string that is whitelisted by MAL. Using a generic
-  // value (e.g. "Mozilla/5.0") or an arbitrary one (e.g. "Taiga/1.0") will
-  // result in invalid text/html responses, courtesy of Incapsula.
-  // To get your own whitelisted user-agent string, follow the registration link
-  // at the official MAL API club page. If, for any reason, you'd like to use
-  // Taiga's instead, I will appreciate it if you ask beforehand.
-  http_request.header[L"User-Agent"] =
-      L"api-taiga-32864c09ef538453b4d8110734ee355b";
-
-  if (RequestNeedsAuthentication(request.type)) {
-    // TODO: Make sure username and password are available
-    http_request.header[L"Authorization"] = L"Basic " +
-        Base64Encode(request.data[canonical_name_ + L"-username"] + L":" +
-                     request.data[canonical_name_ + L"-password"]);
+  if (RequestNeedsAuthentication(request.type) &&
+      request.type != kAuthenticateUser) {
+    http_request.header[L"Authorization"] = L"Bearer " + user().access_token;
   }
 
   switch (request.type) {
     BUILD_HTTP_REQUEST(kAddLibraryEntry, AddLibraryEntry);
     BUILD_HTTP_REQUEST(kAuthenticateUser, AuthenticateUser);
+    BUILD_HTTP_REQUEST(kGetUser, GetUser);
     BUILD_HTTP_REQUEST(kDeleteLibraryEntry, DeleteLibraryEntry);
     BUILD_HTTP_REQUEST(kGetLibraryEntries, GetLibraryEntries);
     BUILD_HTTP_REQUEST(kGetMetadataById, GetMetadataById);
+    BUILD_HTTP_REQUEST(kGetSeason, GetSeason);
     BUILD_HTTP_REQUEST(kSearchTitle, SearchTitle);
     BUILD_HTTP_REQUEST(kUpdateLibraryEntry, UpdateLibraryEntry);
   }
@@ -84,9 +79,11 @@ void Service::HandleResponse(Response& response, HttpResponse& http_response) {
     switch (response.type) {
       HANDLE_HTTP_RESPONSE(kAddLibraryEntry, AddLibraryEntry);
       HANDLE_HTTP_RESPONSE(kAuthenticateUser, AuthenticateUser);
+      HANDLE_HTTP_RESPONSE(kGetUser, GetUser);
       HANDLE_HTTP_RESPONSE(kDeleteLibraryEntry, DeleteLibraryEntry);
       HANDLE_HTTP_RESPONSE(kGetLibraryEntries, GetLibraryEntries);
       HANDLE_HTTP_RESPONSE(kGetMetadataById, GetMetadataById);
+      HANDLE_HTTP_RESPONSE(kGetSeason, GetSeason);
       HANDLE_HTTP_RESPONSE(kSearchTitle, SearchTitle);
       HANDLE_HTTP_RESPONSE(kUpdateLibraryEntry, UpdateLibraryEntry);
     }
@@ -97,318 +94,185 @@ void Service::HandleResponse(Response& response, HttpResponse& http_response) {
 // Request builders
 
 void Service::AuthenticateUser(Request& request, HttpRequest& http_request) {
-  http_request.url.path = L"/api/account/verify_credentials.xml";
+  http_request.url.host = L"myanimelist.net";
+  http_request.url.path = L"/v1/oauth2/token";
+
+  http_request.method = L"POST";
+  http_request.header[L"Content-Type"] = L"application/x-www-form-urlencoded";
+
+  http_request.data[L"client_id"] = kClientId;
+  http_request.data[L"grant_type"] = L"refresh_token";
+  http_request.data[L"refresh_token"] = user().refresh_token;
+}
+
+void Service::GetUser(Request& request, HttpRequest& http_request) {
+  const auto username = user().authenticated ?
+      L"@me" : request.data[canonical_name_ + L"-username"];
+  http_request.url.path = L"/v2/users/{}"_format(username);
 }
 
 void Service::GetLibraryEntries(Request& request, HttpRequest& http_request) {
-  // malappinfo.php is an undocumented feature of MAL. While it's not a part
-  // of their official API, it's the easiest way to get user lists.
-  http_request.url.path = L"/malappinfo.php";
-  http_request.url.query[L"u"] = request.data[canonical_name_ + L"-username"];
-  // Changing the status parameter to some other value such as "1" or "watching"
-  // doesn't seem to make any difference.
-  http_request.url.query[L"status"] = L"all";
+  const auto username = request.data[canonical_name_ + L"-username"];
+  http_request.url.path = L"/v2/users/{}/animelist"_format(username);
+  http_request.url.query[L"limit"] = ToWstr(kLibraryPageLimit);
+  http_request.url.query[L"offset"] = request.data[L"page_offset"];
+  http_request.url.query[L"nsfw"] = L"true";
+  http_request.url.query[L"fields"] =
+      L"{},list_status{{{}}}"_format(GetAnimeFields(), GetListStatusFields());
 }
 
 void Service::GetMetadataById(Request& request, HttpRequest& http_request) {
-  // As MAL API doesn't have a method to get information by ID, we're using an
-  // undocumented call that is normally used to display information bubbles
-  // when hovering over anime/manga titles at the website. The downside is,
-  // it doesn't provide all the information we need.
-  http_request.url.path = L"/includes/ajax.inc.php";
-  http_request.url.query[L"t"] = L"64";
-  http_request.url.query[L"id"] = request.data[canonical_name_ + L"-id"];
+  const auto id = request.data[canonical_name_ + L"-id"];
+  http_request.url.path = L"/v2/anime/{}"_format(id);
+  http_request.url.query[L"fields"] = GetAnimeFields();
+}
+
+void Service::GetSeason(Request& request, HttpRequest& http_request) {
+  const auto year = request.data[L"year"];
+  const auto season = request.data[L"season"];
+  http_request.url.path = L"/v2/anime/season/{}/{}"_format(year, season);
+  http_request.url.query[L"limit"] = ToWstr(kSeasonPageLimit);
+  http_request.url.query[L"offset"] = request.data[L"page_offset"];
+  http_request.url.query[L"nsfw"] = L"true";
+  http_request.url.query[L"fields"] = GetAnimeFields();
 }
 
 void Service::SearchTitle(Request& request, HttpRequest& http_request) {
-  // MAL's search method is far from perfect. Missing a punctuation mark
-  // (e.g. "A B" instead of "A: B") or searching for a title that is too short
-  // (e.g. "C", "K") can return irrelevant or no results.
-  http_request.url.path = L"/api/anime/search.xml";
-  // TODO: We might have to do some encoding on the title here
+  http_request.url.path = L"/v2/anime";
   http_request.url.query[L"q"] = request.data[L"title"];
+  http_request.url.query[L"limit"] = ToWstr(kSearchPageLimit);
+  http_request.url.query[L"nsfw"] = L"true";
+  http_request.url.query[L"fields"] = GetAnimeFields();
 }
 
 void Service::AddLibraryEntry(Request& request, HttpRequest& http_request) {
-  request.data[L"action"] = L"add";
   UpdateLibraryEntry(request, http_request);
 }
 
 void Service::DeleteLibraryEntry(Request& request, HttpRequest& http_request) {
-  request.data[L"action"] = L"delete";
-  UpdateLibraryEntry(request, http_request);
+  const auto id = request.data[canonical_name_ + L"-id"];
+  http_request.url.path = L"/v2/anime/{}/my_list_status"_format(id);
+  http_request.method = L"DELETE";
 }
 
 void Service::UpdateLibraryEntry(Request& request, HttpRequest& http_request) {
-  http_request.method = L"POST";
+  const auto id = request.data[canonical_name_ + L"-id"];
+  http_request.url.path = L"/v2/anime/{}/my_list_status"_format(id);
+  http_request.url.query[L"fields"] = GetListStatusFields();
+
+  http_request.method = L"PATCH";
   http_request.header[L"Content-Type"] = L"application/x-www-form-urlencoded";
 
-  if (!request.data.count(L"action"))
-    request.data[L"action"] = L"update";
+  query_t query;
 
-  http_request.url.path = L"/api/animelist/" + request.data[L"action"] + L"/" +
-                          request.data[canonical_name_ + L"-id"] + L".xml";
-
-  // Delete method doesn't require us to provide additional data
-  if (request.data[L"action"] == L"delete")
-    return;
-
-  XmlDocument document;
-  auto node_declaration = document.append_child(pugi::node_declaration);
-  node_declaration.append_attribute(L"version") = L"1.0";
-  node_declaration.append_attribute(L"encoding") = L"UTF-8";
-  auto node_entry = document.append_child(L"entry");
-
-  // MAL allows setting a new value to "times_rewatched" and others, but
-  // there's no way to get the current value. So we avoid them altogether.
-  const std::set<std::wstring> valid_tags{
-      L"episode",
-      L"status",
-      L"score",
-//    L"downloaded_episodes",
-//    L"storage_type",
-//    L"storage_value",
-//    L"times_rewatched",
-//    L"rewatch_value",
-      L"date_start",
-      L"date_finish",
-//    L"priority",
-//    L"enable_discussion",
-      L"enable_rewatching",
-//    L"comments",
-//    L"fansub_group",
-      L"tags"
-  };
   for (const auto& pair : request.data) {
-    auto tag = valid_tags.find(TranslateKeyTo(pair.first));
-    if (tag != valid_tags.end()) {
+    const auto name = TranslateKeyTo(pair.first);
+    if (!name.empty()) {
       std::wstring value = pair.second;
-      if (*tag == L"score") {
+      if (name == L"score") {
         value = ToWstr(TranslateMyRatingTo(ToInt(value)));
-      } else if (*tag == L"status") {
-        value = ToWstr(TranslateMyStatusTo(ToInt(value)));
-      } else if (StartsWith(*tag, L"date")) {
-        value = TranslateMyDateTo(value);
+      } else if (name == L"status") {
+        value = TranslateMyStatusTo(ToInt(value));
       }
-      XmlWriteStr(node_entry, *tag, value);
+      query.emplace(name, value);
     }
   }
 
-  http_request.data[L"data"] = XmlDump(document);
+  http_request.body = BuildUrlParameters(query);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Response handlers
 
 void Service::AuthenticateUser(Response& response, HttpResponse& http_response) {
-  user_.id = InStr(http_response.body, L"<id>", L"</id>");
-  user_.username = InStr(http_response.body, L"<username>", L"</username>");
+  Json root;
+
+  if (!ParseResponseBody(http_response.body, response, root))
+    return;
+
+  user().access_token = StrToWstr(JsonReadStr(root, "access_token"));
+  user().refresh_token = StrToWstr(JsonReadStr(root, "refresh_token"));
+}
+
+void Service::GetUser(Response& response, HttpResponse& http_response) {
+  Json root;
+
+  if (!ParseResponseBody(http_response.body, response, root))
+    return;
+
+  user_.id = StrToWstr(JsonReadStr(root, "id"));
+  user_.username = StrToWstr(JsonReadStr(root, "name"));
 }
 
 void Service::GetLibraryEntries(Response& response, HttpResponse& http_response) {
-  XmlDocument document;
-  const auto parse_result = document.load_string(http_response.body.c_str());
+  Json root;
 
-  if (!parse_result) {
-    response.data[L"error"] = L"Could not parse the list";
+  if (!ParseResponseBody(http_response.body, response, root))
     return;
+
+  ParseLinks(root, response);
+
+  if (response.data[L"previous_page_offset"].empty()) {  // first page
+    anime::db.ClearUserData();
   }
 
-  auto node_myanimelist = document.child(L"myanimelist");
-
-  // Available tags:
-  // - user_id
-  // - user_name
-  // - user_watching
-  // - user_completed
-  // - user_onhold
-  // - user_dropped
-  // - user_plantowatch
-  // - user_days_spent_watching
-  auto node_myinfo = node_myanimelist.child(L"myinfo");
-  user_.id = XmlReadStr(node_myinfo, L"user_id");
-  user_.username = XmlReadStr(node_myinfo, L"user_name");
-  // We ignore the remaining tags, because MAL can be very slow at updating
-  // their values, and we can easily calculate them ourselves anyway.
-
-  anime::db.ClearUserData();
-
-  // Available tags:
-  // - series_animedb_id
-  // - series_title
-  // - series_synonyms (separated by "; ")
-  // - series_type
-  // - series_episodes
-  // - series_status
-  // - series_start
-  // - series_end
-  // - series_image
-  // - my_id (deprecated)
-  // - my_watched_episodes
-  // - my_start_date
-  // - my_finish_date
-  // - my_score
-  // - my_status
-  // - my_rewatching
-  // - my_rewatching_ep
-  // - my_last_updated
-  // - my_tags
-  for (auto node : node_myanimelist.children(L"anime")) {
-    ::anime::Item anime_item;
-    anime_item.SetSource(this->id());
-    anime_item.SetId(XmlReadStr(node, L"series_animedb_id"), this->id());
-    anime_item.SetLastModified(time(nullptr));  // current time
-
-    anime_item.SetTitle(XmlReadStr(node, L"series_title"));
-    anime_item.SetSynonyms(XmlReadStr(node, L"series_synonyms"));
-    anime_item.SetType(TranslateSeriesTypeFrom(XmlReadInt(node, L"series_type")));
-    anime_item.SetEpisodeCount(XmlReadInt(node, L"series_episodes"));
-    anime_item.SetAiringStatus(TranslateSeriesStatusFrom(XmlReadInt(node, L"series_status")));
-    anime_item.SetDateStart(XmlReadStr(node, L"series_start"));
-    anime_item.SetDateEnd(XmlReadStr(node, L"series_end"));
-    anime_item.SetImageUrl(XmlReadStr(node, L"series_image"));
-
-    anime_item.AddtoUserList();
-    anime_item.SetMyLastWatchedEpisode(XmlReadInt(node, L"my_watched_episodes"));
-    anime_item.SetMyDateStart(XmlReadStr(node, L"my_start_date"));
-    anime_item.SetMyDateEnd(XmlReadStr(node, L"my_finish_date"));
-    anime_item.SetMyScore(TranslateMyRatingFrom(XmlReadInt(node, L"my_score")));
-    anime_item.SetMyStatus(TranslateMyStatusFrom(XmlReadInt(node, L"my_status")));
-    anime_item.SetMyRewatching(XmlReadInt(node, L"my_rewatching"));
-    anime_item.SetMyRewatchingEp(XmlReadInt(node, L"my_rewatching_ep"));
-    anime_item.SetMyLastUpdated(XmlReadStr(node, L"my_last_updated"));
-    anime_item.SetMyTags(XmlReadStr(node, L"my_tags"));
-
-    anime::db.UpdateItem(anime_item);
+  for (const auto& value : root["data"]) {
+    const auto anime_id = ParseAnimeObject(value["node"]);
+    ParseLibraryObject(value["list_status"], anime_id);
   }
 }
 
 void Service::GetMetadataById(Response& response, HttpResponse& http_response) {
-  // Available data:
-  // - ID
-  // - Title (truncated, followed by year aired)
-  // - Synopsis (limited to 200 characters)
-  // - Genres
-  // - Status (in string form)
-  // - Type (in string form)
-  // - Episodes
-  // - Score
-  // - Rank
-  // - Popularity
-  // - Members
-  std::wstring id = InStr(http_response.body,
-      L"/anime/", L"/");
-  std::wstring title = InStr(http_response.body,
-      L"class=\"hovertitle\">", L"</a>");
-  std::wstring genres = InStr(http_response.body,
-      L"Genres:</span> ", L"<br />");
-  std::wstring status = InStr(http_response.body,
-      L"Status:</span> ", L"<br />");
-  std::wstring type = InStr(http_response.body,
-      L"Type:</span> ", L"<br />");
-  std::wstring episodes = InStr(http_response.body,
-      L"Episodes:</span> ", L"<br />");
-  std::wstring score = InStr(http_response.body,
-      L"Score:</span> ", L"<br />");
-  std::wstring popularity = InStr(http_response.body,
-      L"Popularity:</span> ", L"<br />");
+  Json root;
 
-  bool title_is_truncated = false;
+  if (!ParseResponseBody(http_response.body, response, root))
+    return;
 
-  title = DecodeText(title);
-  if (EndsWith(title, L")") && title.length() > 7)
-    title = title.substr(0, title.length() - 7);
-  if (EndsWith(title, L"...") && title.length() > 3) {
-    title = title.substr(0, title.length() - 3);
-    title_is_truncated = true;
+  ParseAnimeObject(root);
+}
+
+void Service::GetSeason(Response& response, HttpResponse& http_response) {
+  Json root;
+
+  if (!ParseResponseBody(http_response.body, response, root))
+    return;
+
+  ParseLinks(root, response);
+
+  for (const auto& value : root["data"]) {
+    const auto anime_id = ParseAnimeObject(value["node"]);
+    AppendString(response.data[L"ids"], ToWstr(anime_id), L",");
   }
-
-  std::vector<std::wstring> genres_vector;
-  Split(genres, L", ", genres_vector);
-
-  StripHtmlTags(score);
-  int pos = InStr(score, L" (", 0);
-  if (pos > -1)
-    score.resize(pos);
-
-  TrimLeft(popularity, L"#");
-
-  ::anime::Item anime_item;
-  anime_item.SetSource(this->id());
-  anime_item.SetId(id, this->id());
-  if (!title_is_truncated)
-    anime_item.SetTitle(title);
-  anime_item.SetAiringStatus(TranslateSeriesStatusFrom(status));
-  anime_item.SetType(TranslateSeriesTypeFrom(type));
-  anime_item.SetEpisodeCount(ToInt(episodes));
-  anime_item.SetGenres(genres_vector);
-  anime_item.SetPopularity(ToInt(popularity));
-  anime_item.SetScore(ToDouble(score));
-  anime_item.SetLastModified(time(nullptr));  // current time
-
-  anime::db.UpdateItem(anime_item);
 }
 
 void Service::SearchTitle(Response& response, HttpResponse& http_response) {
-  XmlDocument document;
-  const auto parse_result = document.load_string(http_response.body.c_str());
+  Json root;
 
-  if (!parse_result) {
-    response.data[L"error"] = L"Could not parse search results";
+  if (!ParseResponseBody(http_response.body, response, root))
     return;
-  }
 
-  auto node_anime = document.child(L"anime");
-
-  // Available tags:
-  // - id
-  // - title (must be decoded)
-  // - english (must be decoded)
-  // - synonyms (must be decoded)
-  // - episodes
-  // - score
-  // - type
-  // - status
-  // - start_date
-  // - end_date
-  // - synopsis (must be decoded)
-  // - image
-  for (auto node : node_anime.children(L"entry")) {
-    ::anime::Item anime_item;
-    anime_item.SetSource(this->id());
-    anime_item.SetId(XmlReadStr(node, L"id"), this->id());
-    anime_item.SetTitle(DecodeText(XmlReadStr(node, L"title")));
-    anime_item.SetEnglishTitle(DecodeText(XmlReadStr(node, L"english")));
-    anime_item.SetSynonyms(DecodeText(XmlReadStr(node, L"synonyms")));
-    anime_item.SetEpisodeCount(XmlReadInt(node, L"episodes"));
-    anime_item.SetScore(ToDouble(XmlReadStr(node, L"score")));
-    anime_item.SetType(TranslateSeriesTypeFrom(XmlReadStr(node, L"type")));
-    anime_item.SetAiringStatus(TranslateSeriesStatusFrom(XmlReadStr(node, L"status")));
-    anime_item.SetDateStart(XmlReadStr(node, L"start_date"));
-    anime_item.SetDateEnd(XmlReadStr(node, L"end_date"));
-    std::wstring synopsis = EraseBbcode(DecodeText(XmlReadStr(node, L"synopsis")));
-    if (!StartsWith(synopsis, L"No synopsis has been added for this series yet"))
-      anime_item.SetSynopsis(synopsis);
-    anime_item.SetImageUrl(XmlReadStr(node, L"image"));
-    anime_item.SetLastModified(time(nullptr));  // current time
-
-    int anime_id = anime::db.UpdateItem(anime_item);
-
-    // We return a list of IDs so that we can display the results afterwards
+  for (const auto& value : root["data"]) {
+    const auto anime_id = ParseAnimeObject(value["node"]);
     AppendString(response.data[L"ids"], ToWstr(anime_id), L",");
   }
 }
 
 void Service::AddLibraryEntry(Response& response, HttpResponse& http_response) {
-  // Nothing to do here
+  UpdateLibraryEntry(response, http_response);
 }
 
 void Service::DeleteLibraryEntry(Response& response, HttpResponse& http_response) {
-  // Nothing to do here
+  // Returns either "200 OK" or "404 Not Found"
 }
 
 void Service::UpdateLibraryEntry(Response& response, HttpResponse& http_response) {
-  // Nothing to do here
+  Json root;
+
+  if (!ParseResponseBody(http_response.body, response, root))
+    return;
+
+  const int anime_id = ToInt(response.data[L"taiga-id"]);
+  ParseLibraryObject(root["data"], anime_id);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -416,8 +280,11 @@ void Service::UpdateLibraryEntry(Response& response, HttpResponse& http_response
 bool Service::RequestNeedsAuthentication(RequestType request_type) const {
   switch (request_type) {
     case kAddLibraryEntry:
-    case kAuthenticateUser:
     case kDeleteLibraryEntry:
+    case kGetLibraryEntries:
+    case kGetMetadataById:
+    case kGetSeason:
+    case kGetUser:
     case kSearchTitle:
     case kUpdateLibraryEntry:
       return true;
@@ -428,123 +295,201 @@ bool Service::RequestNeedsAuthentication(RequestType request_type) const {
 
 bool Service::RequestSucceeded(Response& response,
                                const HttpResponse& http_response) {
-  // No content
-  if (http_response.code == 204 || http_response.body.empty()) {
-    response.data[L"error"] = name() + L" returned an empty response";
-    return false;
-  }
-
-  // Unauthorized
-  if (http_response.code == 401) {
-    // MAL doesn't return a meaningful explanation, so we'll just assume that
-    // either the username or the password is wrong
-    response.data[L"error"] =
-        L"Authorization failed (invalid username or password)";
-    return false;
-  }
-
-  // Website login required
-  if (http_response.code == 403) {
-    // Users that haven't logged in to MAL in the past 90 days are required to
-    // do so and clear the captcha first.
-    if (InStr(http_response.body, L"Website login required") > -1) {
-      response.data[L"error"] = http_response.body;
-      response.data[L"website_login_required"] = L"true";
-      HandleError(http_response, response);
-      return false;
-    }
-  }
-
-  // Not approved
-  // TODO: Remove when MAL fixes its API
-  if (http_response.code == 400) {
-    if (InStr(http_response.body, L"This anime has not been approved yet") > -1) {
-      response.data[L"error"] = http_response.body;
-      response.data[L"not_approved"] = L"true";
-      return false;
-    }
-  }
-
-  // API is down
-  // See: https://github.com/erengy/taiga/issues/588
-  if (http_response.code == 404) {
-    if (InStr(http_response.body, L"<title>404 Not Found</title>") > -1) {
-      response.data[L"error"] =
-          L"API is unavailable. Please contact MyAnimeList's customer service.";
-      HandleError(http_response, response);
-      return false;
-    }
-  }
+  if (http_response.GetStatusCategory() == 200)
+    return true;
 
   switch (response.type) {
-    case kAddLibraryEntry:
-      if (StartsWith(http_response.body, L"Created"))
-        return true;
-      // According to a previous documentation, this method was supposed to
-      // "return the unique ID of the row generated by the insert"...
-      if (IsNumericString(http_response.body))
-        return true;
-      // ...but it returned some HTML code instead. We're keeping these lines in
-      // case MAL suddenly reverts to the old behavior.
-      if (InStr(http_response.body, L"<title>201 Created</title>") > -1)
-        return true;
-      // If we try to add an anime that is already in user's list, MyAnimeList
-      // returns a "400 Bad Request" response with "The anime (id: 12345) is
-      // already in the list." error message. Here we ignore this error and
-      // assume that our request succeeded.
-      if (InStr(http_response.body, L"is already in the list") > -1)
-        return true;
-      break;
-    case kAuthenticateUser:
-      if (InStr(http_response.body, L"<username>") > -1)
-        return true;
-      break;
-    case kDeleteLibraryEntry:
-      if (StartsWith(http_response.body, L"Deleted"))
-        return true;
-      break;
-    case kGetLibraryEntries:
-      if (InStr(http_response.body, L"<myanimelist>", 0, true) > -1 &&
-          InStr(http_response.body, L"<myinfo>", 0, true) > -1)
-        return true;
-      break;
     case kGetMetadataById:
-      if (!InStr(http_response.body, L"/anime/", L"/").empty())
-        return true;
-      if (InStr(http_response.body, L"No such series found") > -1 ||
-          InStr(http_response.body, L"/anime//") > -1) {
-        response.data[L"error"] = L"Invalid anime ID";
+      // Invalid anime ID
+      if (http_response.code == 404)
         response.data[L"invalid_id"] = L"true";
-        return false;
-      }
       break;
-    case kSearchTitle:
-      return true;
-    case kUpdateLibraryEntry:
-      if (StartsWith(http_response.body, L"Updated"))
+    case kDeleteLibraryEntry:
+      // Anime does not exist in user's list
+      if (http_response.code == 404)
         return true;
       break;
   }
 
-  // Set the error message on failure
-  switch (response.type) {
-    case kAuthenticateUser:
-      response.data[L"error"] = http_response.body;
-      break;
-    case kAddLibraryEntry:
-    case kDeleteLibraryEntry:
-    case kUpdateLibraryEntry: {
-      std::wstring error_message = http_response.body;
-      ReplaceString(error_message, L"</div><div>", L"\r\n");
-      StripHtmlTags(error_message);
-      response.data[L"error"] = error_message;
-      break;
+  if (http_response.code == 401) {
+    user().authenticated = false;
+    // @TODO
+    // WWW-Authenticate: Bearer error="invalid_token",error_description="The access token expired"
+    response.data[L"error"] = L"401 Unauthorized";
+  }
+
+  Json root;
+  std::wstring error_description;
+  if (response.data[L"error"].empty() &&
+      JsonParseString(http_response.body, root)) {
+    error_description = StrToWstr(JsonReadStr(root, "message"));
+    if (const auto hint = JsonReadStr(root, "hint"); !hint.empty()) {
+      error_description += L" ({})"_format(StrToWstr(hint));
     }
   }
+  response.data[L"error"] = error_description;
 
   HandleError(http_response, response);
+  return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+int Service::ParseAnimeObject(const Json& json) const {
+  const auto anime_id = JsonReadInt(json, "id");
+
+  if (!anime_id) {
+    LOGW(L"Could not parse anime object:\n{}", StrToWstr(json.dump()));
+    return anime::ID_UNKNOWN;
+  }
+
+  anime::Item anime_item;
+  anime_item.SetSource(this->id());
+  anime_item.SetId(ToWstr(anime_id), this->id());
+  anime_item.SetLastModified(time(nullptr));  // current time
+
+  anime_item.SetTitle(StrToWstr(JsonReadStr(json, "title")));
+  anime_item.SetDateStart(StrToWstr(JsonReadStr(json, "start_date")));
+  anime_item.SetDateEnd(StrToWstr(JsonReadStr(json, "end_date")));
+  anime_item.SetSynopsis(DecodeSynopsis(JsonReadStr(json, "synopsis")));
+  anime_item.SetScore(JsonReadDouble(json, "mean"));
+  anime_item.SetPopularity(JsonReadInt(json, "popularity"));
+  anime_item.SetType(TranslateSeriesTypeFrom(StrToWstr(JsonReadStr(json, "media_type"))));
+  anime_item.SetAiringStatus(TranslateSeriesStatusFrom(StrToWstr(JsonReadStr(json, "status"))));
+  anime_item.SetEpisodeCount(JsonReadInt(json, "num_episodes"));
+  anime_item.SetEpisodeLength(TranslateEpisodeLengthFrom(JsonReadInt(json, "average_episode_duration")));
+  anime_item.SetAgeRating(TranslateAgeRatingFrom(StrToWstr(JsonReadStr(json, "rating"))));
+
+  if (json.contains("main_picture")) {
+    anime_item.SetImageUrl(StrToWstr(JsonReadStr(json["main_picture"], "medium")));
+  }
+
+  if (json.contains("alternative_titles")) {
+    const auto& alternative_titles = json["alternative_titles"];
+    if (alternative_titles.contains("synonyms")) {
+      for (const auto& title : alternative_titles["synonyms"]) {
+        if (title.is_string())
+          anime_item.InsertSynonym(StrToWstr(title));
+      }
+    }
+    anime_item.SetEnglishTitle(StrToWstr(JsonReadStr(alternative_titles, "en")));
+    anime_item.SetJapaneseTitle(StrToWstr(JsonReadStr(alternative_titles, "ja")));
+  }
+
+  const auto get_names = [](const Json& json, const std::string& key) {
+    std::vector<std::wstring> names;
+    if (json.contains(key) && json[key].is_array()) {
+      for (const auto& genre : json[key]) {
+        const auto name = JsonReadStr(genre, "name");
+        if (!name.empty()) {
+          names.push_back(StrToWstr(name));
+        }
+      }
+    }
+    return names;
+  };
+  anime_item.SetGenres(get_names(json, "genres"));
+  anime_item.SetProducers(get_names(json, "studios"));
+
+  return anime::db.UpdateItem(anime_item);
+}
+
+int Service::ParseLibraryObject(const Json& json, int anime_id) const {
+  if (!anime_id) {
+    LOGW(L"Could not parse anime list entry #{}", anime_id);
+    return anime::ID_UNKNOWN;
+  }
+
+  anime::Item anime_item;
+  anime_item.SetSource(this->id());
+  anime_item.SetId(ToWstr(anime_id), this->id());
+  anime_item.AddtoUserList();
+
+  anime_item.SetMyStatus(TranslateMyStatusFrom(StrToWstr(JsonReadStr(json, "status"))));
+  anime_item.SetMyScore(TranslateMyRatingFrom(JsonReadInt(json, "score")));
+  anime_item.SetMyLastWatchedEpisode(JsonReadInt(json, "num_episodes_watched"));
+  anime_item.SetMyRewatching(JsonReadBool(json, "is_rewatching"));
+  anime_item.SetMyDateStart(StrToWstr(JsonReadStr(json, "start_date")));
+  anime_item.SetMyDateEnd(StrToWstr(JsonReadStr(json, "finish_date")));
+  anime_item.SetMyRewatchedTimes(JsonReadInt(json, "num_times_rewatched"));
+  anime_item.SetMyTags(StrToWstr(JsonReadStr(json, "tags")));
+  anime_item.SetMyNotes(StrToWstr(JsonReadStr(json, "comments")));
+  anime_item.SetMyLastUpdated(TranslateMyLastUpdatedFrom(JsonReadStr(json, "updated_at")));
+
+  return anime::db.UpdateItem(anime_item);
+}
+
+void Service::ParseLinks(const Json& json, Response& response) const {
+  const auto parse_link = [&](const std::string& name) {
+    const auto link = JsonReadStr(json["paging"], name);
+    if (!link.empty()) {
+      Url url = StrToWstr(link);
+      response.data[StrToWstr(name) + L"_page_offset"] = url.query[L"offset"];
+    }
+  };
+
+  parse_link("previous");
+  parse_link("next");
+}
+
+bool Service::ParseResponseBody(const std::wstring& body,
+                                Response& response, Json& json) {
+  if (JsonParseString(body, json))
+    return true;
+
+  switch (response.type) {
+    case kGetLibraryEntries:
+      response.data[L"error"] = L"Could not parse anime list";
+      break;
+    case kGetMetadataById:
+      response.data[L"error"] = L"Could not parse anime object";
+      break;
+    case kGetSeason:
+      response.data[L"error"] = L"Could not parse season data";
+      break;
+    case kSearchTitle:
+      response.data[L"error"] = L"Could not parse search results";
+      break;
+    case kUpdateLibraryEntry:
+      response.data[L"error"] = L"Could not parse anime list entry";
+      break;
+  }
 
   return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+std::wstring Service::GetAnimeFields() const {
+  return L"alternative_titles,"
+         L"average_episode_duration,"
+         L"end_date,"
+         L"genres,"
+         L"id,"
+         L"main_picture,"
+         L"mean,"
+         L"media_type,"
+         L"num_episodes,"
+         L"popularity,"
+         L"rating,"
+         L"start_date,"
+         L"status,"
+         L"studios,"
+         L"synopsis,"
+         L"title";
+}
+
+std::wstring Service::GetListStatusFields() const {
+  return L"comments,"
+         L"finish_date,"
+         L"is_rewatching,"
+         L"num_times_rewatched,"
+         L"num_watched_episodes,"
+         L"score,"
+         L"start_date,"
+         L"status,"
+         L"tags,"
+         L"updated_at";
 }
 
 }  // namespace myanimelist

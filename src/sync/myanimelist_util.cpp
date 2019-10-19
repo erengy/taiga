@@ -16,6 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <chrono>
 #include <regex>
 
 #include "base/file.h"
@@ -26,30 +27,16 @@
 #include "media/anime.h"
 #include "media/anime_db.h"
 #include "sync/myanimelist_util.h"
-#include "sync/myanimelist_types.h"
 #include "sync/service.h"
 #include "taiga/settings.h"
 
 namespace sync {
 namespace myanimelist {
 
-std::wstring DecodeText(std::wstring text) {
-  ReplaceString(text, L"<br />", L"\r");
-  ReplaceString(text, L"\n\n", L"\r\n\r\n");
-
-  StripHtmlTags(text);
-  DecodeHtmlEntities(text);
-  Trim(text, L" \t\r\n");
-
-  return text;
-}
-
-std::wstring EraseBbcode(std::wstring& str) {
-  using namespace std::regex_constants;
-  const std::wregex pattern(
-      L"\\[/?(b|i|quote|u|(color(=[#\\w]+)?)|(size(=[0-9]+)?)|(url(=[^\\]]*)?))\\]",
-      nosubs | optimize);
-  return std::regex_replace(str, pattern, L"");
+std::wstring DecodeSynopsis(std::string text) {
+  auto str = StrToWstr(text);
+  ReplaceString(str, L"\n\n", L"\r\n\r\n");
+  return str;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -74,24 +61,37 @@ std::vector<Rating> GetMyRatings() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-int TranslateSeriesStatusFrom(int value) {
-  switch (value) {
-    case kUnknownStatus: return anime::kUnknownStatus;
-    case kAiring: return anime::kAiring;
-    case kFinishedAiring: return anime::kFinishedAiring;
-    case kNotYetAired: return anime::kNotYetAired;
-  }
+int TranslateAgeRatingFrom(const std::wstring& value) {
+  static const std::map<std::wstring, anime::AgeRating> table{
+    {L"g", anime::kAgeRatingG},
+    {L"pg", anime::kAgeRatingPG},
+    {L"pg_13", anime::kAgeRatingPG13},
+    {L"r", anime::kAgeRatingR17},
+    {L"r+", anime::kAgeRatingR17},
+    {L"rx", anime::kAgeRatingR18},
+  };
 
-  LOGW(L"Invalid value: {}", value);
-  return anime::kUnknownStatus;
+  const auto it = table.find(value);
+  if (it != table.end())
+    return it->second;
+
+  if (!value.empty())
+    LOGD(L"Invalid value: {}", value);
+
+  return anime::kUnknownAgeRating;
+}
+
+int TranslateEpisodeLengthFrom(int value) {
+  const auto seconds = std::chrono::seconds{value};
+  return std::chrono::duration_cast<std::chrono::minutes>(seconds).count();
 }
 
 int TranslateSeriesStatusFrom(const std::wstring& value) {
-  if (IsEqual(value, L"Currently airing")) {
+  if (IsEqual(value, L"currently_airing")) {
     return anime::kAiring;
-  } else if (IsEqual(value, L"Finished airing")) {
+  } else if (IsEqual(value, L"finished_airing")) {
     return anime::kFinishedAiring;
-  } else if (IsEqual(value, L"Not yet aired")) {
+  } else if (IsEqual(value, L"not_yet_aired")) {
     return anime::kNotYetAired;
   }
 
@@ -99,48 +99,20 @@ int TranslateSeriesStatusFrom(const std::wstring& value) {
   return anime::kUnknownStatus;
 }
 
-int TranslateSeriesTypeFrom(int value) {
-  switch (value) {
-    case kUnknownType: return anime::kUnknownType;
-    case kTv: return anime::kTv;
-    case kOva: return anime::kOva;
-    case kMovie: return anime::kMovie;
-    case kSpecial: return anime::kSpecial;
-    case kOna: return anime::kOna;
-    case kMusic: return anime::kMusic;
-  }
-
-  LOGW(L"Invalid value: {}", value);
-  return anime::kUnknownType;
-}
-
-int TranslateSeriesTypeTo(int value) {
-  switch (value) {
-    case anime::kUnknownType: return kUnknownType;
-    case anime::kTv: return kTv;
-    case anime::kOva: return kOva;
-    case anime::kMovie: return kMovie;
-    case anime::kSpecial: return kSpecial;
-    case anime::kOna: return kOna;
-    case anime::kMusic: return kMusic;
-  }
-
-  LOGW(L"Invalid value: {}", value);
-  return anime::kUnknownType;
-}
-
 int TranslateSeriesTypeFrom(const std::wstring& value) {
-  if (IsEqual(value, L"TV")) {
+  if (IsEqual(value, L"unknown")) {
+    return anime::kUnknownType;
+  } else if (IsEqual(value, L"tv")) {
     return anime::kTv;
-  } else if (IsEqual(value, L"OVA")) {
+  } else if (IsEqual(value, L"ova")) {
     return anime::kOva;
-  } else if (IsEqual(value, L"Movie")) {
+  } else if (IsEqual(value, L"movie")) {
     return anime::kMovie;
-  } else if (IsEqual(value, L"Special")) {
+  } else if (IsEqual(value, L"special")) {
     return anime::kSpecial;
-  } else if (IsEqual(value, L"ONA")) {
+  } else if (IsEqual(value, L"ona")) {
     return anime::kOna;
-  } else if (IsEqual(value, L"Music")) {
+  } else if (IsEqual(value, L"music")) {
     return anime::kMusic;
   }
 
@@ -150,13 +122,10 @@ int TranslateSeriesTypeFrom(const std::wstring& value) {
   return anime::kUnknownType;
 }
 
-std::wstring TranslateMyDateTo(const std::wstring& value) {
-  Date date(value);
-
-  // Convert YYYY-MM-DD to MMDDYYYY
-  return PadChar(ToWstr(date.month()), '0', 2) +
-         PadChar(ToWstr(date.day()), '0', 2) +
-         PadChar(ToWstr(date.year()), '0', 4);
+std::wstring TranslateMyLastUpdatedFrom(const std::string& value) {
+  // Get Unix time from ISO 8601
+  const auto result = ConvertIso8601(StrToWstr(value));
+  return result != -1 ? ToWstr(result) : std::wstring();
 }
 
 std::wstring TranslateMyRating(int value, bool full) {
@@ -189,47 +158,55 @@ int TranslateMyRatingTo(int value) {
   return (value * 10) / anime::kUserScoreMax;
 }
 
-int TranslateMyStatusFrom(int value) {
-  switch (value) {
-    case kWatching: return anime::kWatching;
-    case kCompleted: return anime::kCompleted;
-    case kOnHold: return anime::kOnHold;
-    case kDropped: return anime::kDropped;
-    case kPlanToWatch: return anime::kPlanToWatch;
+int TranslateMyStatusFrom(const std::wstring& value) {
+  if (IsEqual(value, L"watching")) {
+    return anime::kWatching;
+  } else if (IsEqual(value, L"completed")) {
+    return anime::kCompleted;
+  } else if (IsEqual(value, L"on_hold")) {
+    return anime::kOnHold;
+  } else if (IsEqual(value, L"dropped")) {
+    return anime::kDropped;
+  } else if (IsEqual(value, L"plan_to_watch")) {
+    return anime::kPlanToWatch;
   }
 
   LOGW(L"Invalid value: {}", value);
   return anime::kNotInList;
 }
 
-int TranslateMyStatusTo(int value) {
+std::wstring TranslateMyStatusTo(int value) {
   switch (value) {
-    case anime::kWatching: return kWatching;
-    case anime::kCompleted: return kCompleted;
-    case anime::kOnHold: return kOnHold;
-    case anime::kDropped: return kDropped;
-    case anime::kPlanToWatch: return kPlanToWatch;
+    case anime::kWatching: return L"watching";
+    case anime::kCompleted: return L"completed";
+    case anime::kOnHold: return L"on_hold";
+    case anime::kDropped: return L"dropped";
+    case anime::kPlanToWatch: return L"plan_to_watch";
   }
 
   LOGW(L"Invalid value: {}", value);
-  return kWatching;
+  return L"watching";
 }
 
 std::wstring TranslateKeyTo(const std::wstring& key) {
   if (IsEqual(key, L"episode")) {
-    return key;
+    return L"num_watched_episodes";
   } else if (IsEqual(key, L"status")) {
     return key;
   } else if (IsEqual(key, L"score")) {
     return key;
   } else if (IsEqual(key, L"date_start")) {
-    return key;
+    return L"start_date";
   } else if (IsEqual(key, L"date_finish")) {
-    return key;
+    return L"finish_date";
   } else if (IsEqual(key, L"enable_rewatching")) {
-    return key;
+    return L"is_rewatching";
+  } else if (IsEqual(key, L"rewatched_times")) {
+    return L"num_times_rewatched";
   } else if (IsEqual(key, L"tags")) {
     return key;
+  } else if (IsEqual(key, L"notes")) {
+    return L"comments";
   }
 
   return std::wstring();

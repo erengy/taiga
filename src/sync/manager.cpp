@@ -191,6 +191,11 @@ void Manager::HandleError(Response& response, HttpResponse& http_response) {
 }
 
 void Manager::HandleResponse(Response& response, HttpResponse& http_response) {
+  Request& request = requests_[http_response.uid];
+
+  if (request.data.count(L"taiga-id"))
+    response.data[L"taiga-id"] = request.data[L"taiga-id"];
+
   // Let the service do its thing
   Service& service = *services_[response.service_id].get();
   service.HandleResponse(response, http_response);
@@ -200,8 +205,6 @@ void Manager::HandleResponse(Response& response, HttpResponse& http_response) {
     HandleError(response, http_response);
     return;
   }
-
-  Request& request = requests_[http_response.uid];
 
   int anime_id = ::anime::ID_UNKNOWN;
   if (request.data.count(L"taiga-id"))

@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include "base/json.h"
 #include "base/types.h"
 #include "sync/service.h"
 
@@ -39,13 +40,24 @@ public:
 private:
   REQUEST_AND_RESPONSE(AddLibraryEntry);
   REQUEST_AND_RESPONSE(AuthenticateUser);
+  REQUEST_AND_RESPONSE(GetUser);
   REQUEST_AND_RESPONSE(DeleteLibraryEntry);
   REQUEST_AND_RESPONSE(GetLibraryEntries);
   REQUEST_AND_RESPONSE(GetMetadataById);
+  REQUEST_AND_RESPONSE(GetSeason);
   REQUEST_AND_RESPONSE(SearchTitle);
   REQUEST_AND_RESPONSE(UpdateLibraryEntry);
 
   bool RequestSucceeded(Response& response, const HttpResponse& http_response);
+
+  int ParseAnimeObject(const Json& json) const;
+  int ParseLibraryObject(const Json& json, int anime_id) const;
+  void ParseLinks(const Json& json, Response& response) const;
+
+  bool ParseResponseBody(const std::wstring& body, Response& response, Json& json);
+
+  std::wstring Service::GetAnimeFields() const;
+  std::wstring Service::GetListStatusFields() const;
 };
 
 }  // namespace myanimelist

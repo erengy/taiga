@@ -423,7 +423,6 @@
     <ClInclude Include="..\..\src\sync\kitsu_util.h" />
     <ClInclude Include="..\..\src\sync\manager.h" />
     <ClInclude Include="..\..\src\sync\myanimelist.h" />
-    <ClInclude Include="..\..\src\sync\myanimelist_types.h" />
     <ClInclude Include="..\..\src\sync\myanimelist_util.h" />
     <ClInclude Include="..\..\src\sync\service.h" />
     <ClInclude Include="..\..\src\sync\sync.h" />
