@@ -105,7 +105,6 @@ bool Settings::DeserializeFromXml(const std::wstring& path) {
   if (!parse_result) {
     LOGE(L"Could not read application settings.\nPath: {}\nReason: {}",
          path, StrToWstr(parse_result.description()));
-    return false;
   }
 
   const auto attr_from_path = [](XmlNode node, const std::string& path) {
@@ -123,21 +122,20 @@ bool Settings::DeserializeFromXml(const std::wstring& path) {
 
   InitKeyMap();
   for (const auto& [key, app_setting] : key_map_) {
-    if (const auto attr = attr_from_path(settings, app_setting.key)) {
-      switch (base::GetSettingValueType(app_setting.default_value)) {
-        case base::SettingValueType::Bool:
-          settings_.set_value(app_setting.key, attr.as_bool(
-              std::get<bool>(app_setting.default_value)));
-          break;
-        case base::SettingValueType::Int:
-          settings_.set_value(app_setting.key, attr.as_int(
-              std::get<int>(app_setting.default_value)));
-          break;
-        case base::SettingValueType::Wstring:
-          settings_.set_value(app_setting.key, std::wstring{attr.as_string(
-              std::get<std::wstring>(app_setting.default_value).c_str())});
-          break;
-      }
+    const auto attr = attr_from_path(settings, app_setting.key);
+    switch (base::GetSettingValueType(app_setting.default_value)) {
+      case base::SettingValueType::Bool:
+        settings_.set_value(app_setting.key, attr.as_bool(
+            std::get<bool>(app_setting.default_value)));
+        break;
+      case base::SettingValueType::Int:
+        settings_.set_value(app_setting.key, attr.as_int(
+            std::get<int>(app_setting.default_value)));
+        break;
+      case base::SettingValueType::Wstring:
+        settings_.set_value(app_setting.key, std::wstring{attr.as_string(
+            std::get<std::wstring>(app_setting.default_value).c_str())});
+        break;
     }
   }
 
@@ -192,7 +190,7 @@ bool Settings::DeserializeFromXml(const std::wstring& path) {
   if (track::feed_filter_manager.filters.empty())
     track::feed_filter_manager.AddPresets();
 
-  return true;
+  return parse_result;
 }
 
 bool Settings::SerializeToXml(const std::wstring& path) const {
