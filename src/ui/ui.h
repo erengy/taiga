@@ -107,8 +107,6 @@ void OnAnimeWatchingEnd(const anime::Item& anime_item, const anime::Episode& epi
 bool OnRecognitionCancelConfirm();
 void OnRecognitionFail();
 
-void OnAnimeListHeaderRatingWarning();
-
 void OnSeasonLoad(bool refresh);
 void OnSeasonLoadFail();
 bool OnSeasonRefreshRequired();

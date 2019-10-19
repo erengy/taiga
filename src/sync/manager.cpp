@@ -167,11 +167,6 @@ void Manager::HandleError(Response& response, HttpResponse& http_response) {
           if (in_list)
             anime::db.SaveList();
         }
-      } else {
-        // Try making the other request, even though this one failed
-        if (response.service_id == kMyAnimeList && anime_item) {
-          SearchTitle(anime_item->GetTitle(), anime_id);
-        }
       }
       break;
     case kGetSeason:
@@ -258,12 +253,6 @@ void Manager::HandleResponse(Response& response, HttpResponse& http_response) {
 
     case kGetMetadataById: {
       ui::OnLibraryEntryChange(anime_id);
-      // We need to make another request, because MyAnimeList doesn't have
-      // a proper method in its API for metadata retrieval, and the one we use
-      // doesn't provide us enough information.
-      if (response.service_id == kMyAnimeList && anime_item) {
-        SearchTitle(anime_item->GetTitle(), anime_id);
-      }
       break;
     }
 

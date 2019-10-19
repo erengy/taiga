@@ -72,7 +72,6 @@ int GetTitleLanguagePreferenceIndex(const std::wstring& str);
 std::wstring GetTitleLanguagePreferenceStr(const int index);
 const std::wstring& GetPreferredTitle(const Item& item);
 void GetAllTitles(int anime_id, std::vector<std::wstring>& titles);
-int GetMyRewatchedTimes(const Item& item);
 void GetProgressRatios(const Item& item, float& ratio_aired, float& ratio_watched);
 
 bool IsValidDate(const Date& date);

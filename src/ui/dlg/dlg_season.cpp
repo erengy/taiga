@@ -86,15 +86,7 @@ BOOL SeasonDialog::OnInitDialog() {
   // Load the last selected season
   const auto last_season = taiga::settings.GetAppSeasonsLastSeason();
   if (!last_season.empty()) {
-    switch (taiga::GetCurrentServiceId()) {
-      case sync::kMyAnimeList:
-        // @TODO
-        break;
-      case sync::kKitsu:
-      case sync::kAniList:
-        anime::season_db.Set(anime::Season(last_season));
-        break;
-    }
+    anime::season_db.Set(anime::Season(last_season));
   }
 
   // Refresh
@@ -123,15 +115,7 @@ BOOL SeasonDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
   switch (LOWORD(wParam)) {
     // Refresh data
     case 101:
-      switch (taiga::GetCurrentServiceId()) {
-        case sync::kMyAnimeList:
-          RefreshData();
-          break;
-        case sync::kKitsu:
-        case sync::kAniList:
-          GetData();
-          break;
-      }
+      GetData();
       return TRUE;
   }
 

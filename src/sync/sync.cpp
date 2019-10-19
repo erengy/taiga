@@ -309,17 +309,11 @@ bool ServiceSupportsRequestType(RequestType request_type) {
         default:
           return false;
       }
-    case kGetSeason:
-      switch (service_id) {
-        case sync::kKitsu:
-        case sync::kAniList:
-          return true;
-        default:
-          return false;
-      }
     default:
-      return true;
+      break;
   }
+
+  return true;
 }
 
 RequestType ClientModeToRequestType(taiga::HttpClientMode client_mode) {

@@ -702,20 +702,12 @@ void ExecuteCommand(const std::wstring& str, WPARAM wParam, LPARAM lParam) {
   // Season_Load(file)
   //   Loads season data.
   } else if (command == L"Season_Load") {
-    switch (taiga::GetCurrentServiceId()) {
-      case sync::kMyAnimeList:
-        // @TODO
-        break;
-      case sync::kKitsu:
-      case sync::kAniList:
-        anime::season_db.Set(anime::Season(body));
-        taiga::settings.SetAppSeasonsLastSeason(
-            ui::TranslateSeason(anime::season_db.current_season));
-        ui::OnSeasonLoad(false);
-        if (anime::season_db.items.empty()) {
-          ui::DlgSeason.GetData();
-        }
-        break;
+    anime::season_db.Set(anime::Season(body));
+    taiga::settings.SetAppSeasonsLastSeason(
+        ui::TranslateSeason(anime::season_db.current_season));
+    ui::OnSeasonLoad(false);
+    if (anime::season_db.items.empty()) {
+      ui::DlgSeason.GetData();
     }
 
   // Season_GroupBy(group)

@@ -424,21 +424,15 @@ void MenuList::UpdateSeason() {
 
     // Add available seasons
     create_available_seasons(*menu, season_min, season_max);
-    switch (taiga::GetCurrentServiceId()) {
-      case sync::kKitsu:
-      case sync::kAniList: {
-        menu->CreateItem();  // separator
-        for (int decade = 2000; decade >= 1960; decade -= 10) {
-          std::wstring submenu_name = L"SeasonDecade" + ToWstr(decade);
-          auto submenu = create_submenu(submenu_name);
-          submenu->items.clear();
-          menu->CreateItem(L"", ToWstr(decade) + L"s", submenu_name);
-          create_available_seasons(*submenu,
-              anime::Season(anime::Season::Name::kWinter, decade),
-              anime::Season(anime::Season::Name::kFall, decade + 9));
-        }
-        break;
-      }
+    menu->CreateItem();  // separator
+    for (int decade = 2000; decade >= 1960; decade -= 10) {
+      std::wstring submenu_name = L"SeasonDecade" + ToWstr(decade);
+      auto submenu = create_submenu(submenu_name);
+      submenu->items.clear();
+      menu->CreateItem(L"", ToWstr(decade) + L"s", submenu_name);
+      create_available_seasons(*submenu,
+          anime::Season(anime::Season::Name::kWinter, decade),
+          anime::Season(anime::Season::Name::kFall, decade + 9));
     }
   }
 

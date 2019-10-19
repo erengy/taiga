@@ -594,17 +594,6 @@ void GetAllTitles(int anime_id, std::vector<std::wstring>& titles) {
     insert_title(synonym);
 }
 
-// @TODO: We may get rid of this function once MAL fixes their API
-int GetMyRewatchedTimes(const Item& item) {
-  const int rewatched_times = item.GetMyRewatchedTimes();
-
-  if (item.GetMyRewatching()) {
-    return std::max(rewatched_times, 1);  // because MAL doesn't tell us the actual value
-  } else {
-    return rewatched_times;
-  }
-}
-
 void GetProgressRatios(const Item& item, float& ratio_aired, float& ratio_watched) {
   ratio_aired = 0.0f;
   ratio_watched = 0.0f;

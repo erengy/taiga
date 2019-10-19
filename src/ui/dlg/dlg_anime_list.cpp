@@ -337,12 +337,8 @@ void AnimeListDialog::OnContextMenu(HWND hwnd, POINT pt) {
       if (command == L"ResetAnimeListHeaders()") {
         reset = true;
       } else {
-        auto column_type = listview.TranslateColumnName(command);
+        const auto column_type = listview.TranslateColumnName(command);
         auto& column = listview.columns[column_type];
-        if (column_type == kColumnAnimeRating && !column.visible &&
-            taiga::GetCurrentServiceId() == sync::kMyAnimeList) {
-          OnAnimeListHeaderRatingWarning();
-        }
         column.visible = !column.visible;
       }
       listview.RefreshColumns(reset);
