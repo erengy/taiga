@@ -135,7 +135,7 @@ void Queue::Add(QueueItem& item, bool save) {
 
   if (anime_item && save) {
     // Save
-    history->Save();
+    history.Save();
 
     // Announce
     if (item.episode) {
@@ -202,7 +202,7 @@ void Queue::Clear(bool save) {
   ui::OnHistoryChange();
 
   if (save)
-    history->Save();
+    history.Save();
 }
 
 void Queue::Merge(bool save) {
@@ -214,7 +214,7 @@ void Queue::Merge(bool save) {
   ui::OnHistoryChange();
 
   if (save) {
-    history->Save();
+    history.Save();
     anime::db.SaveList();
   }
 }
@@ -314,10 +314,10 @@ void Queue::Remove(int index, bool save, bool refresh, bool to_history) {
       history_item.anime_id = queue_item.anime_id;
       history_item.episode = *queue_item.episode;
       history_item.time = queue_item.time;
-      history->items.push_back(history_item);
-      if (history->limit > 0 &&
-          static_cast<int>(history->items.size()) > history->limit) {
-        history->items.erase(history->items.begin());
+      history.items.push_back(history_item);
+      if (history.limit > 0 &&
+          static_cast<int>(history.items.size()) > history.limit) {
+        history.items.erase(history.items.begin());
       }
     }
 
@@ -337,7 +337,7 @@ void Queue::Remove(int index, bool save, bool refresh, bool to_history) {
   }
 
   if (save)
-    history->Save();
+    history.Save();
 }
 
 void Queue::RemoveDisabled(bool save, bool refresh) {
@@ -355,7 +355,7 @@ void Queue::RemoveDisabled(bool save, bool refresh) {
     ui::OnHistoryChange();
 
   if (save)
-    history->Save();
+    history.Save();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

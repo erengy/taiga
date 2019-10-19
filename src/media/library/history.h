@@ -33,8 +33,6 @@ struct HistoryItem {
 
 class History {
 public:
-  History();
-
   void Clear(bool save = true);
   bool Load();
   bool Save();

@@ -29,8 +29,6 @@
 
 namespace library {
 
-class History;
-
 enum class QueueSearch {
   DateStart,
   DateEnd,
@@ -76,7 +74,6 @@ public:
 
   size_t index = 0;
   std::vector<QueueItem> items;
-  History* history = nullptr;
   bool updating = false;
 };
 

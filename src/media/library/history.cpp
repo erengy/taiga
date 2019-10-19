@@ -32,10 +32,6 @@
 
 namespace library {
 
-History::History() {  
-  queue.history = this;
-}
-
 void History::Clear(bool save) {
   items.clear();
 
