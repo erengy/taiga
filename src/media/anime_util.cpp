@@ -411,8 +411,11 @@ void AddToQueue(const Item& item, const Episode& episode, bool change_status) {
   library::queue.Add(queue_item);
 
   bool purge_at_complete = item.GetUseGlobalRemovalSetting() ? Settings.GetBool(taiga::kLibrary_Management_DeleteAfterCompletion) : item.IsEpisodeRemovedWhenCompleted();
-  if (change_status && (*queue_item.status) == kCompleted && purge_at_complete && !track::media_players.player_running())
-    library::SchedulePurge(item.GetId());
+  if (change_status && (*queue_item.status) == kCompleted && purge_at_complete) {
+    library::RemoveSettings remove_params;
+    remove_params.wait_for_player = true;
+    library::SchedulePurge(item.GetId(), remove_params);
+  }
 }
 
 void SetMyLastUpdateToNow(Item& item) {

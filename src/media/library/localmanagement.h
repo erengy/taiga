@@ -30,6 +30,16 @@ namespace library {
     std::optional<bool> remove_all_if_complete;
     std::optional<bool> prompt_remove;
     std::optional<bool> remove_permanent;
+
+    std::optional<bool> wait_for_player;
+
+    // Comparison operator maybe needed for future more advanced scheduling
+    bool operator== (RemoveSettings other_sett) {
+      return eps_to_keep == other_sett.eps_to_keep &&
+        remove_all_if_complete == other_sett.remove_all_if_complete &&
+        prompt_remove == other_sett.prompt_remove &&
+        remove_permanent == other_sett.remove_permanent;
+    }
   };
 
   void PurgeWatchedEpisodes(int anime_id, RemoveSettings settings, bool silent);

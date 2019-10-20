@@ -5,7 +5,12 @@
 #include "media/library/history.h"
 #include "media/library/queue.h"
 #include "track/scanner.h"
+#include "track/media.h"
+#include "track/play.h"
+#include "track/episode.h"
 #include "taiga/settings.h"
+#include "track/recognition.h"
+#include "base/log.h"
 #include "ui/ui.h"
 
 #include "localmanagement.h"
@@ -149,7 +154,7 @@ namespace library {
     win::Lock lock(removal_queue_section);
 
     for (std::pair<int, RemoveSettings> entry : purge_queue) {
-      if (entry.first == anime_id)
+      if (entry.first == anime_id && entry.second == settings) // only one scheduled purge per anime and setting
         return;
     }
     purge_queue.push_front(std::pair<int, RemoveSettings>(anime_id, settings));
@@ -163,12 +168,25 @@ namespace library {
   void ProcessPurges() {
     win::Lock lock(removal_queue_section);
 
-    while (purge_queue.size() > 0) {
+    bool start_purge = false;
+    int bound = purge_queue.size();
+    for (int i = 0; i < bound; i++) {
       std::pair<int,RemoveSettings> entry_to_purge = purge_queue.back();
       purge_queue.pop_back();
-      PurgeWatchedEpisodes(entry_to_purge.first, entry_to_purge.second, false);
-    }
 
-    purge_queue.clear();
+      // process settings
+      start_purge = true;
+      if (entry_to_purge.second.wait_for_player) {
+        start_purge = !track::media_players.player_running();
+        if (!start_purge) {
+          start_purge = entry_to_purge.first != CurrentEpisode.anime_id;
+        }
+      }
+
+      if (start_purge)
+        PurgeWatchedEpisodes(entry_to_purge.first, entry_to_purge.second, false);
+      else
+        purge_queue.push_front(entry_to_purge);
+    }
   }
 }
