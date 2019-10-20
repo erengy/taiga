@@ -232,7 +232,7 @@ void SettingsDialog::OnOK() {
   if (page->IsWindow()) {
     taiga::settings.SetAppListDoubleClickAction(page->GetComboSelection(IDC_COMBO_DBLCLICK));
     taiga::settings.SetAppListMiddleClickAction(page->GetComboSelection(IDC_COMBO_MDLCLICK));
-    taiga::settings.SetAppListTitleLanguagePreference(anime::GetTitleLanguagePreferenceStr(
+    taiga::settings.SetAppListTitleLanguagePreference(static_cast<anime::TitleLanguage>(
         page->GetComboSelection(IDC_COMBO_TITLELANG)));
     taiga::settings.SetAppListHighlightNewEpisodes(page->IsDlgButtonChecked(IDC_CHECK_HIGHLIGHT));
     taiga::settings.SetAppListDisplayHighlightedOnTop(page->IsDlgButtonChecked(IDC_CHECK_HIGHLIGHT_ONTOP));
@@ -310,7 +310,8 @@ void SettingsDialog::OnOK() {
     taiga::settings.SetTorrentDiscoverySearchUrl(page->GetDlgItemText(IDC_COMBO_TORRENT_SEARCH));
     taiga::settings.SetTorrentDiscoveryAutoCheckEnabled(page->IsDlgButtonChecked(IDC_CHECK_TORRENT_AUTOCHECK));
     taiga::settings.SetTorrentDiscoveryAutoCheckInterval(static_cast<int>(page->GetDlgItemInt(IDC_EDIT_TORRENT_INTERVAL)));
-    taiga::settings.SetTorrentDiscoveryNewAction(page->GetCheckedRadioButton(IDC_RADIO_TORRENT_NEW1, IDC_RADIO_TORRENT_NEW2) + 1);
+    taiga::settings.SetTorrentDiscoveryNewAction(static_cast<track::TorrentAction>(
+        page->GetCheckedRadioButton(IDC_RADIO_TORRENT_NEW1, IDC_RADIO_TORRENT_NEW2) + 1));
   }
   // Torrents > Downloads
   page = &pages[kSettingsPageTorrentsDownloads];
@@ -326,7 +327,8 @@ void SettingsDialog::OnOK() {
     taiga::settings.SetTorrentDownloadLocation(page->GetDlgItemText(IDC_COMBO_TORRENT_FOLDER));
     taiga::settings.SetTorrentDownloadCreateSubfolder(page->IsDlgButtonChecked(IDC_CHECK_TORRENT_AUTOCREATEFOLDER));
     taiga::settings.SetTorrentDownloadAppOpen(page->IsDlgButtonChecked(IDC_CHECK_TORRENT_APP_OPEN));
-    taiga::settings.SetTorrentDownloadAppMode(page->GetCheckedRadioButton(IDC_RADIO_TORRENT_APP1, IDC_RADIO_TORRENT_APP2) + 1);
+    taiga::settings.SetTorrentDownloadAppMode(static_cast<track::TorrentApp>(
+        page->GetCheckedRadioButton(IDC_RADIO_TORRENT_APP1, IDC_RADIO_TORRENT_APP2) + 1));
     taiga::settings.SetTorrentDownloadAppPath(page->GetDlgItemText(IDC_EDIT_TORRENT_APP));
   }
   // Torrents > Filters

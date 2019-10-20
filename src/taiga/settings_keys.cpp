@@ -33,9 +33,11 @@
 #include "taiga/config.h"
 #include "taiga/settings.h"
 #include "taiga/taiga.h"
+#include "track/feed_aggregator.h"
 #include "track/monitor.h"
 #include "ui/dlg/dlg_anime_list.h"
 #include "ui/dlg/dlg_season.h"
+#include "ui/list.h"
 #include "ui/menu.h"
 #include "ui/resource.h"
 #include "ui/theme.h"
@@ -129,9 +131,9 @@ void Settings::InitKeyMap() const {
       {AppSettingKey::AppListProgressDisplayAvailable, {"program/list/progress/showavailable", true}},
       {AppSettingKey::AppListSortColumnPrimary, {"program/list/sort/column", std::wstring{L"anime_title"}}},
       {AppSettingKey::AppListSortColumnSecondary, {"program/list/sort/column2", std::wstring{L"anime_title"}}},
-      {AppSettingKey::AppListSortOrderPrimary, {"program/list/sort/order", 1}},
-      {AppSettingKey::AppListSortOrderSecondary, {"program/list/sort/order2", 1}},
-      {AppSettingKey::AppListTitleLanguagePreference, {"program/list/action/titlelang", std::wstring{}}},
+      {AppSettingKey::AppListSortOrderPrimary, {"program/list/sort/order", ui::kListSortAscending}},
+      {AppSettingKey::AppListSortOrderSecondary, {"program/list/sort/order2", ui::kListSortAscending}},
+      {AppSettingKey::AppListTitleLanguagePreference, {"program/list/action/titlelang", std::wstring{L"romaji"}}},
       {AppSettingKey::AppBehaviorAutostart, {"program/general/autostart", false}},
       {AppSettingKey::AppBehaviorStartMinimized, {"program/startup/minimize", false}},
       {AppSettingKey::AppBehaviorCheckForUpdates, {"program/startup/checkversion", true}},
@@ -205,8 +207,8 @@ void Settings::InitKeyMap() const {
       {AppSettingKey::TorrentDiscoverySearchUrl, {"rss/torrent/search/address", std::wstring{kDefaultTorrentSearch}}},
       {AppSettingKey::TorrentDiscoveryAutoCheckEnabled, {"rss/torrent/options/autocheck", true}},
       {AppSettingKey::TorrentDiscoveryAutoCheckInterval, {"rss/torrent/options/checkinterval", 60}},
-      {AppSettingKey::TorrentDiscoveryNewAction, {"rss/torrent/options/newaction", 1}},
-      {AppSettingKey::TorrentDownloadAppMode, {"rss/torrent/application/mode", 1}},
+      {AppSettingKey::TorrentDiscoveryNewAction, {"rss/torrent/options/newaction", track::kTorrentActionNotify}},
+      {AppSettingKey::TorrentDownloadAppMode, {"rss/torrent/application/mode", track::kTorrentAppDefault}},
       {AppSettingKey::TorrentDownloadAppOpen, {"rss/torrent/application/open", true}},
       {AppSettingKey::TorrentDownloadAppPath, {"rss/torrent/application/path", std::wstring{GetDefaultAppPath(L".torrent", kDefaultTorrentAppPath)}}},
       {AppSettingKey::TorrentDownloadLocation, {"rss/torrent/options/downloadpath", std::wstring{}}},
@@ -552,12 +554,23 @@ void Settings::SetAppListSortOrderSecondary(const int order) {
   set_value(AppSettingKey::AppListSortOrderSecondary, order);
 }
 
-std::wstring Settings::GetAppListTitleLanguagePreference() const {
-  return value<std::wstring>(AppSettingKey::AppListTitleLanguagePreference);
+anime::TitleLanguage Settings::GetAppListTitleLanguagePreference() const {
+  const auto slug = value<std::wstring>(AppSettingKey::AppListTitleLanguagePreference);
+  if (slug == L"english") return anime::kTitleLanguageEnglish;
+  if (slug == L"native") return anime::kTitleLanguageNative;
+  return anime::kTitleLanguageRomaji;
 }
 
-void Settings::SetAppListTitleLanguagePreference(const std::wstring& language) {
-  set_value(AppSettingKey::AppListTitleLanguagePreference, language);
+void Settings::SetAppListTitleLanguagePreference(const anime::TitleLanguage language) {
+  const std::wstring slug = [&language]() {
+    switch (language) {
+      default:
+      case anime::kTitleLanguageRomaji: return L"romaji";
+      case anime::kTitleLanguageEnglish: return L"english";
+      case anime::kTitleLanguageNative: return L"native";
+    }
+  }();
+  set_value(AppSettingKey::AppListTitleLanguagePreference, slug);
 }
 
 bool Settings::GetAppBehaviorAutostart() const {
@@ -1128,19 +1141,19 @@ void Settings::SetTorrentDiscoveryAutoCheckInterval(const int minutes) {
   set_value(AppSettingKey::TorrentDiscoveryAutoCheckInterval, minutes);
 }
 
-int Settings::GetTorrentDiscoveryNewAction() const {
-  return value<int>(AppSettingKey::TorrentDiscoveryNewAction);
+track::TorrentAction Settings::GetTorrentDiscoveryNewAction() const {
+  return static_cast<track::TorrentAction>(value<int>(AppSettingKey::TorrentDiscoveryNewAction));
 }
 
-void Settings::SetTorrentDiscoveryNewAction(const int action) {
+void Settings::SetTorrentDiscoveryNewAction(const track::TorrentAction action) {
   set_value(AppSettingKey::TorrentDiscoveryNewAction, action);
 }
 
-int Settings::GetTorrentDownloadAppMode() const {
-  return value<int>(AppSettingKey::TorrentDownloadAppMode);
+track::TorrentApp Settings::GetTorrentDownloadAppMode() const {
+  return static_cast<track::TorrentApp>(value<int>(AppSettingKey::TorrentDownloadAppMode));
 }
 
-void Settings::SetTorrentDownloadAppMode(const int mode) {
+void Settings::SetTorrentDownloadAppMode(const track::TorrentApp mode) {
   set_value(AppSettingKey::TorrentDownloadAppMode, mode);
 }
 

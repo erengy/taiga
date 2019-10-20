@@ -68,8 +68,6 @@ bool IsValidEpisodeNumber(int number, int total, int watched);
 int GetLastEpisodeNumber(const Item& item);
 int EstimateEpisodeCount(const Item& item);
 
-int GetTitleLanguagePreferenceIndex(const std::wstring& str);
-std::wstring GetTitleLanguagePreferenceStr(const int index);
 const std::wstring& GetPreferredTitle(const Item& item);
 void GetAllTitles(int anime_id, std::vector<std::wstring>& titles);
 void GetProgressRatios(const Item& item, float& ratio_aired, float& ratio_watched);

@@ -20,6 +20,7 @@
 
 #include "base/log.h"
 #include "base/string.h"
+#include "media/anime.h"
 #include "taiga/version.h"
 
 namespace taiga {
@@ -35,12 +36,10 @@ bool Settings::HandleCompatibility() {
 
   if (version <= semaver::Version(1, 3, 0)) {
     // Set title language preference
-    if (GetAppListTitleLanguagePreference().empty()) {
-      if (GetAppListDisplayEnglishTitles()) {
-        SetAppListTitleLanguagePreference(std::wstring{L"english"});
-      } else {
-        SetAppListTitleLanguagePreference(std::wstring{L"romaji"});
-      }
+    if (GetAppListDisplayEnglishTitles()) {
+      SetAppListTitleLanguagePreference(anime::kTitleLanguageEnglish);
+    } else {
+      SetAppListTitleLanguagePreference(anime::kTitleLanguageRomaji);
     }
   }
 

@@ -25,12 +25,19 @@
 #include "base/settings.h"
 #include "taiga/settings_keys.h"
 
+namespace anime {
+enum TitleLanguage;
+}
 namespace semaver {
 class Version;
 }
 namespace sync {
 class Service;
 enum ServiceId;
+}
+namespace track {
+enum TorrentAction;
+enum TorrentApp;
 }
 
 namespace taiga {
@@ -112,8 +119,8 @@ public:
   void SetAppListSortOrderPrimary(const int order);
   int GetAppListSortOrderSecondary() const;
   void SetAppListSortOrderSecondary(const int order);
-  std::wstring GetAppListTitleLanguagePreference() const;
-  void SetAppListTitleLanguagePreference(const std::wstring& language);
+  anime::TitleLanguage GetAppListTitleLanguagePreference() const;
+  void SetAppListTitleLanguagePreference(const anime::TitleLanguage language);
   bool GetAppBehaviorAutostart() const;
   void SetAppBehaviorAutostart(const bool enabled);
   bool GetAppBehaviorStartMinimized() const;
@@ -254,10 +261,10 @@ public:
   void SetTorrentDiscoveryAutoCheckEnabled(const bool enabled);
   int GetTorrentDiscoveryAutoCheckInterval() const;
   void SetTorrentDiscoveryAutoCheckInterval(const int minutes);
-  int GetTorrentDiscoveryNewAction() const;
-  void SetTorrentDiscoveryNewAction(const int action);
-  int GetTorrentDownloadAppMode() const;
-  void SetTorrentDownloadAppMode(const int mode);
+  track::TorrentAction GetTorrentDiscoveryNewAction() const;
+  void SetTorrentDiscoveryNewAction(const track::TorrentAction action);
+  track::TorrentApp GetTorrentDownloadAppMode() const;
+  void SetTorrentDownloadAppMode(const track::TorrentApp mode);
   bool GetTorrentDownloadAppOpen() const;
   void SetTorrentDownloadAppOpen(const bool enabled);
   std::wstring GetTorrentDownloadAppPath() const;

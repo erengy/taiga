@@ -549,28 +549,14 @@ int EstimateEpisodeCount(const Item& item) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-int GetTitleLanguagePreferenceIndex(const std::wstring& str) {
-  if (str == L"english") return 1;
-  if (str == L"native") return 2;
-  return 0;  // romaji
-}
-
-std::wstring GetTitleLanguagePreferenceStr(const int index) {
-  switch (index) {
-    default: return L"romaji";
-    case 1: return L"english";
-    case 2: return L"native";
-  }
-}
-
 const std::wstring& GetPreferredTitle(const Item& item) {
-  switch (GetTitleLanguagePreferenceIndex(
-      taiga::settings.GetAppListTitleLanguagePreference())) {
+  switch (taiga::settings.GetAppListTitleLanguagePreference()) {
     default:
+    case anime::kTitleLanguageRomaji:
       return item.GetTitle();
-    case 1:
+    case anime::kTitleLanguageEnglish:
       return item.GetEnglishTitle(true);
-    case 2: {
+    case anime::kTitleLanguageNative: {
       const auto& native_title = item.GetJapaneseTitle();
       return !native_title.empty() ? native_title : item.GetTitle();
     }

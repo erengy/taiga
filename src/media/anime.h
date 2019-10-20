@@ -83,6 +83,12 @@ enum AgeRating {
   kAgeRatingR18
 };
 
+enum TitleLanguage {
+  kTitleLanguageRomaji,
+  kTitleLanguageEnglish,
+  kTitleLanguageNative,
+};
+
 struct Titles {
   std::wstring romaji;
   std::wstring english;

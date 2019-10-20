@@ -235,10 +235,10 @@ void Aggregator::HandleFeedCheck(Feed& feed, const std::string& data,
 
   if (automatic) {
     switch (taiga::settings.GetTorrentDiscoveryNewAction()) {
-      case 1:  // Notify
+      case kTorrentActionNotify:
         ui::OnFeedNotify(feed);
         break;
-      case 2:  // Download
+      case kTorrentActionDownload:
         Download(nullptr);
         break;
     }
@@ -297,9 +297,9 @@ void Aggregator::HandleFeedDownloadError(Feed& feed) {
 
 std::wstring GetTorrentApplicationPath() {
   switch (taiga::settings.GetTorrentDownloadAppMode()) {
-    case 1:  // Default application
+    case track::kTorrentAppDefault:
       return GetDefaultAppPath(L".torrent");
-    case 2:  // Custom application
+    case track::kTorrentAppCustom:
       return taiga::settings.GetTorrentDownloadAppPath();
     default:
       return {};

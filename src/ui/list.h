@@ -27,6 +27,11 @@ class ListView;
 
 namespace ui {
 
+enum ListSortOrder {
+  kListSortAscending = 1,
+  kListSortDescending = -1,
+};
+
 enum ListSortType {
   kListSortDefault,
   kListSortFileSize,

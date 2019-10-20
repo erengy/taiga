@@ -194,9 +194,8 @@ BOOL SettingsPage::OnInitDialog() {
       AddComboString(IDC_COMBO_TITLELANG, L"Romaji");
       AddComboString(IDC_COMBO_TITLELANG, L"English");
       AddComboString(IDC_COMBO_TITLELANG, L"Native");
-      SetComboSelection(IDC_COMBO_TITLELANG, anime::GetTitleLanguagePreferenceIndex(
-          taiga::settings.GetAppListTitleLanguagePreference()));
-      bool enabled = taiga::settings.GetAppListHighlightNewEpisodes();
+      SetComboSelection(IDC_COMBO_TITLELANG, taiga::settings.GetAppListTitleLanguagePreference());
+      const bool enabled = taiga::settings.GetAppListHighlightNewEpisodes();
       CheckDlgButton(IDC_CHECK_HIGHLIGHT, enabled);
       CheckDlgButton(IDC_CHECK_HIGHLIGHT_ONTOP, taiga::settings.GetAppListDisplayHighlightedOnTop());
       EnableDlgItem(IDC_CHECK_HIGHLIGHT_ONTOP, enabled);

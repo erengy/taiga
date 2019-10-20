@@ -27,6 +27,16 @@
 
 namespace track {
 
+enum TorrentAction {
+  kTorrentActionNotify = 1,
+  kTorrentActionDownload,
+};
+
+enum TorrentApp {
+  kTorrentAppDefault = 1,
+  kTorrentAppCustom,
+};
+
 class Aggregator {
 public:
   Feed& GetFeed();
