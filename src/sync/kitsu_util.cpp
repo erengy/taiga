@@ -34,14 +34,6 @@
 namespace sync {
 namespace kitsu {
 
-std::wstring DecodeSynopsis(std::string text) {
-  auto str = StrToWstr(text);
-  ReplaceString(str, L"\n\n", L"\r\n\r\n");
-  return str;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
 RatingSystem GetRatingSystem() {
   const auto& service = *ServiceManager.service(sync::kKitsu);
   return TranslateRatingSystemFrom(WstrToStr(service.user().rating_system));

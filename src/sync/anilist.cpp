@@ -447,7 +447,7 @@ int Service::ParseMediaObject(const Json& json) const {
 
   anime_item.SetTitle(StrToWstr(JsonReadStr(json["title"], "userPreferred")));
   anime_item.SetType(TranslateSeriesTypeFrom(JsonReadStr(json, "format")));
-  anime_item.SetSynopsis(DecodeDescription(JsonReadStr(json, "description")));
+  anime_item.SetSynopsis(anime::NormalizeSynopsis(StrToWstr(JsonReadStr(json, "description"))));
   anime_item.SetDateStart(TranslateFuzzyDateFrom(json["startDate"]));
   anime_item.SetDateEnd(TranslateFuzzyDateFrom(json["endDate"]));
   anime_item.SetEpisodeCount(JsonReadInt(json, "episodes"));

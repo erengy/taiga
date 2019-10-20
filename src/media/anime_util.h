@@ -76,4 +76,6 @@ void GetProgressRatios(const Item& item, float& ratio_aired, float& ratio_watche
 
 bool IsValidDate(const Date& date);
 
+std::wstring NormalizeSynopsis(std::wstring str);
+
 }  // namespace anime

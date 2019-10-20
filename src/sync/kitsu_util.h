@@ -31,8 +31,6 @@ class Item;
 namespace sync {
 namespace kitsu {
 
-std::wstring DecodeSynopsis(std::string text);
-
 RatingSystem GetRatingSystem();
 std::vector<Rating> GetMyRatings(RatingSystem rating_system);
 

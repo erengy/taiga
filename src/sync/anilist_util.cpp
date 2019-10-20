@@ -20,7 +20,6 @@
 
 #include "base/file.h"
 #include "base/format.h"
-#include "base/html.h"
 #include "base/json.h"
 #include "base/log.h"
 #include "base/string.h"
@@ -34,21 +33,6 @@
 
 namespace sync {
 namespace anilist {
-
-std::wstring DecodeDescription(std::string text) {
-  auto str = StrToWstr(text);
-
-  ReplaceString(str, L"\r\n", L"\n");
-  ReplaceString(str, L"<br>", L"\n");
-  while (ReplaceString(str, L"\n\n\n", L"\n\n"));
-  ReplaceString(str, L"\n", L"\r\n");
-
-  StripHtmlTags(str);
-
-  return str;
-}
-
-////////////////////////////////////////////////////////////////////////////////
 
 RatingSystem GetRatingSystem() {
   const auto& service = *ServiceManager.service(sync::kAniList);

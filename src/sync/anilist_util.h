@@ -32,8 +32,6 @@ class Item;
 namespace sync {
 namespace anilist {
 
-std::wstring DecodeDescription(std::string text);
-
 RatingSystem GetRatingSystem();
 std::vector<Rating> GetMyRatings(RatingSystem rating_system);
 

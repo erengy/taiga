@@ -30,8 +30,6 @@ class Item;
 namespace sync {
 namespace myanimelist {
 
-std::wstring DecodeSynopsis(std::string text);
-
 std::vector<Rating> GetMyRatings();
 
 int TranslateAgeRatingFrom(const std::wstring& value);

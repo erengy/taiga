@@ -20,6 +20,7 @@
 
 #include "base/file.h"
 #include "base/format.h"
+#include "base/html.h"
 #include "base/log.h"
 #include "base/process.h"
 #include "base/string.h"
@@ -625,6 +626,19 @@ void GetProgressRatios(const Item& item, float& ratio_aired, float& ratio_watche
 
 bool IsValidDate(const Date& date) {
   return date.year() > 0;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+std::wstring NormalizeSynopsis(std::wstring str) {
+  while (ReplaceString(str, L"\r\n", L"\n"));
+  ReplaceString(str, L"<br>", L"\n");
+  while (ReplaceString(str, L"\n\n\n", L"\n\n"));
+  ReplaceString(str, L"\n", L"\r\n");
+
+  StripHtmlTags(str);
+
+  return str;
 }
 
 }  // namespace anime
