@@ -45,6 +45,9 @@ std::wstring TranslateMyStatusTo(int value);
 std::wstring TranslateKeyTo(const std::wstring& key);
 
 std::wstring GetAnimePage(const anime::Item& anime_item);
+void RequestAuthorizationCode(std::wstring& code_verifier);
+void RequestAccessToken(const std::wstring& authorization_code,
+                        const std::wstring& code_verifier);
 void ViewAnimePage(int anime_id);
 void ViewAnimeSearch(const std::wstring& title);
 void ViewHistory();

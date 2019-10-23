@@ -168,6 +168,7 @@ void OnHttpHeadersAvailable(const taiga::HttpClient& http_client) {
     case taiga::kHttpSilent:
     case taiga::kHttpServiceGetMetadataById:
     case taiga::kHttpServiceSearchTitle:
+    case taiga::kHttpMalRequestAccessToken:
     case taiga::kHttpGetLibraryEntryImage:
     case taiga::kHttpTaigaUpdateRelations:
       return;
@@ -199,6 +200,7 @@ void OnHttpProgress(const taiga::HttpClient& http_client) {
     case taiga::kHttpSilent:
     case taiga::kHttpServiceGetMetadataById:
     case taiga::kHttpServiceSearchTitle:
+    case taiga::kHttpMalRequestAccessToken:
     case taiga::kHttpGetLibraryEntryImage:
     case taiga::kHttpTaigaUpdateRelations:
       return;
@@ -1036,6 +1038,20 @@ void OnMircDdeConnectionSuccess(const std::vector<std::wstring>& channels,
   dlg.SetContent(content.c_str());
   dlg.AddButton(L"OK", IDOK);
   dlg.Show(testing ? DlgSettings.GetWindowHandle() : DlgMain.GetWindowHandle());
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void OnMalRequestAccessToken(bool success) {
+  win::TaskDialog dlg(TAIGA_APP_NAME,
+                      success ? TD_ICON_INFORMATION : TD_ICON_ERROR);
+  if (success) {
+    dlg.SetMainInstruction(L"MyAnimeList token request succeeded.");
+  } else {
+    dlg.SetMainInstruction(L"MyAnimeList token request failed.");
+  }
+  dlg.AddButton(L"OK", IDOK);
+  dlg.Show(DlgSettings.GetWindowHandle());
 }
 
 ////////////////////////////////////////////////////////////////////////////////

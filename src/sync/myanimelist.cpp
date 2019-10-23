@@ -30,10 +30,6 @@
 namespace sync {
 namespace myanimelist {
 
-constexpr auto kClientId = L"f6e398095cf7525360276786ec4407bc";
-
-constexpr auto kRedirectUrl = L"https://taiga.moe/api/myanimelist/auth";
-
 constexpr auto kLibraryPageLimit = 1000;
 constexpr auto kSearchPageLimit = 100;
 constexpr auto kSeasonPageLimit = 500;

@@ -33,6 +33,7 @@
 #include "media/library/history.h"
 #include "ui/resource.h"
 #include "sync/anilist_util.h"
+#include "sync/myanimelist_util.h"
 #include "sync/manager.h"
 #include "taiga/announce.h"
 #include "taiga/path.h"
@@ -582,7 +583,12 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
 
         // Authorize MyAnimeList
         case IDC_BUTTON_MAL_AUTH: {
-          // @TODO
+          std::wstring code_verifier;
+          sync::myanimelist::RequestAuthorizationCode(code_verifier);
+          std::wstring authorization_code;
+          if (ui::EnterAuthorizationPin(L"MyAnimeList", authorization_code)) {
+            sync::myanimelist::RequestAccessToken(authorization_code, code_verifier);
+          }
           return TRUE;
         }
 

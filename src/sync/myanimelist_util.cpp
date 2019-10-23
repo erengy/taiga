@@ -16,18 +16,23 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <algorithm>
 #include <chrono>
 #include <regex>
 
 #include "base/file.h"
+#include "base/format.h"
 #include "base/html.h"
 #include "base/log.h"
+#include "base/random.h"
 #include "base/string.h"
 #include "base/time.h"
 #include "media/anime.h"
 #include "media/anime_db.h"
+#include "sync/myanimelist.h"
 #include "sync/myanimelist_util.h"
 #include "sync/service.h"
+#include "taiga/http.h"
 #include "taiga/settings.h"
 
 namespace sync {
@@ -209,6 +214,48 @@ std::wstring TranslateKeyTo(const std::wstring& key) {
 std::wstring GetAnimePage(const anime::Item& anime_item) {
   return L"https://myanimelist.net/anime/" +
          anime_item.GetId(sync::kMyAnimeList) + L"/";
+}
+
+void RequestAuthorizationCode(std::wstring& code_verifier) {
+  code_verifier.assign(64, '\0');
+  std::generate(code_verifier.begin(), code_verifier.end(), []() {
+    static const std::wstring unreserved =
+        L"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        L"abcdefghijklmnopqrstvuwxyz"
+        L"0123456789-._~";
+    return *Random::get(unreserved.begin(), unreserved.end());
+  });
+
+  ExecuteLink(L"https://myanimelist.net/v1/oauth2/authorize"
+      L"?response_type=code"
+      L"&client_id={}"
+      L"&redirect_uri={}"
+      L"&code_challenge={}"
+      L"&code_challenge_method=plain"_format(
+          kClientId, kRedirectUrl, code_verifier));
+}
+
+void RequestAccessToken(const std::wstring& authorization_code,
+                        const std::wstring& code_verifier) {
+  HttpRequest http_request;
+  http_request.url.protocol = base::http::Protocol::Https;
+  http_request.url.host = L"myanimelist.net";
+  http_request.url.path = L"/v1/oauth2/token";
+
+  http_request.header = {{
+      {L"Content-Type", L"application/x-www-form-urlencoded"},
+    }};
+
+  http_request.data = {{
+      {L"client_id", kClientId},
+      {L"grant_type", L"authorization_code"},
+      {L"code", authorization_code},
+      {L"redirect_uri", kRedirectUrl},
+      {L"code_verifier", code_verifier},
+    }};
+
+  ConnectionManager.MakeRequest(http_request,
+                                taiga::kHttpMalRequestAccessToken);
 }
 
 void ViewAnimePage(int anime_id) {

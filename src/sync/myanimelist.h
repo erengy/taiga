@@ -28,6 +28,9 @@ namespace myanimelist {
 // API documentation:
 // https://myanimelist.net/modules.php?go=api
 
+constexpr auto kClientId = L"f6e398095cf7525360276786ec4407bc";
+constexpr auto kRedirectUrl = L"https://taiga.moe/api/myanimelist/auth";
+
 class Service : public sync::Service {
 public:
   Service();
