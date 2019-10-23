@@ -307,22 +307,36 @@ bool Service::RequestSucceeded(Response& response,
       break;
   }
 
+  std::wstring error_description;
+
   if (http_response.code == 401) {
     user().authenticated = false;
-    // @TODO
-    // WWW-Authenticate: Bearer error="invalid_token",error_description="The access token expired"
-    response.data[L"error"] = L"401 Unauthorized";
-  }
 
-  Json root;
-  std::wstring error_description;
-  if (response.data[L"error"].empty() &&
-      JsonParseString(http_response.body, root)) {
-    error_description = StrToWstr(JsonReadStr(root, "message"));
-    if (const auto hint = JsonReadStr(root, "hint"); !hint.empty()) {
-      error_description += L" ({})"_format(StrToWstr(hint));
+    // WWW-Authenticate:
+    // Bearer error="invalid_token",error_description="The access token expired"
+    const auto it = http_response.header.find(L"WWW-Authenticate");
+    if (it != http_response.header.end()) {
+      const auto error = InStr(it->second, L"error=\"", L"\"");
+      if (error == L"invalid_token") {
+        response.data[L"access_token_expired"] = L"true";
+      }
+      error_description = InStr(it->second, L"error_description=\"", L"\"");
     }
   }
+
+  if (error_description.empty()) {
+    if (Json root; JsonParseString(http_response.body, root)) {
+      const auto error = StrToWstr(JsonReadStr(root, "error"));
+      if (error == L"invalid_request") {
+        response.data[L"refresh_token_expired"] = L"true";
+      }
+      error_description = StrToWstr(JsonReadStr(root, "message"));
+      if (const auto hint = JsonReadStr(root, "hint"); !hint.empty()) {
+        error_description += L" ({})"_format(StrToWstr(hint));
+      }
+    }
+  }
+
   response.data[L"error"] = error_description;
 
   HandleError(http_response, response);
