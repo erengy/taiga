@@ -1,0 +1,9 @@
+# Clang-Format Style Options:
+# https://clang.llvm.org/docs/ClangFormatStyleOptions.html
+---
+Language: Cpp
+BasedOnStyle: Google
+
+AccessModifierOffset: -2
+AllowShortIfStatementsOnASingleLine: false
+DerivePointerAlignment: false
