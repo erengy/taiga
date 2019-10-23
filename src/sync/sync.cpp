@@ -132,14 +132,21 @@ void Synchronize() {
 
   if (!authenticated) {
     authenticated = AuthenticateUser();
+
     // Special case where we allow downloading lists without authentication
-    if (!authenticated && !taiga::GetCurrentUsername().empty()) {
-      if (ServiceSupportsRequestType(kGetUser)) {
-        GetUser();
-      } else {
-        GetLibraryEntries();
-      }
+    switch (taiga::GetCurrentServiceId()) {
+      case sync::kKitsu:
+      case sync::kAniList:
+        if (!authenticated && !taiga::GetCurrentUsername().empty()) {
+          if (ServiceSupportsRequestType(kGetUser)) {
+            GetUser();
+          } else {
+            GetLibraryEntries();
+          }
+        }
+        break;
     }
+
     return;
   }
 

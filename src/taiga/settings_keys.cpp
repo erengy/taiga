@@ -343,7 +343,9 @@ std::wstring Settings::GetSyncServiceMalAccessToken() const {
 }
 
 void Settings::SetSyncServiceMalAccessToken(const std::wstring& token) {
-  set_value(AppSettingKey::SyncServiceMalAccessToken, token);
+  if (set_value(AppSettingKey::SyncServiceMalAccessToken, token)) {
+    ServiceManager.service(sync::kMyAnimeList)->user().access_token = token;
+  }
 }
 
 std::wstring Settings::GetSyncServiceMalRefreshToken() const {
@@ -351,7 +353,9 @@ std::wstring Settings::GetSyncServiceMalRefreshToken() const {
 }
 
 void Settings::SetSyncServiceMalRefreshToken(const std::wstring& token) {
-  set_value(AppSettingKey::SyncServiceMalRefreshToken, token);
+  if (set_value(AppSettingKey::SyncServiceMalRefreshToken, token)) {
+    ServiceManager.service(sync::kMyAnimeList)->user().refresh_token = token;
+  }
 }
 
 std::wstring Settings::GetSyncServiceKitsuDisplayName() const {

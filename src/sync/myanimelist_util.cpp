@@ -238,6 +238,7 @@ void RequestAuthorizationCode(std::wstring& code_verifier) {
 void RequestAccessToken(const std::wstring& authorization_code,
                         const std::wstring& code_verifier) {
   HttpRequest http_request;
+  http_request.method = L"POST";
   http_request.url.protocol = base::http::Protocol::Https;
   http_request.url.host = L"myanimelist.net";
   http_request.url.path = L"/v1/oauth2/token";
