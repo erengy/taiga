@@ -142,7 +142,7 @@ void App::Uninitialize() {
   // Save
   settings.Save();
   anime::db.SaveDatabase();
-  track::aggregator.SaveArchive();
+  track::aggregator.archive.Save();
 
   // Exit
   PostQuitMessage();
@@ -165,7 +165,7 @@ void App::LoadData() {
   anime::db.ClearInvalidItems();
 
   library::history.Load();
-  track::aggregator.LoadArchive();
+  track::aggregator.archive.Load();
 }
 
 }  // namespace taiga

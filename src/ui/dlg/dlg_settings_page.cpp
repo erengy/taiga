@@ -538,8 +538,8 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
             CheckDlgButton(IDC_CHECK_CACHE3, FALSE);
           }
           if (IsDlgButtonChecked(IDC_CHECK_CACHE4)) {
-            track::aggregator.ClearArchive();
-            track::aggregator.SaveArchive();
+            track::aggregator.archive.Clear();
+            track::aggregator.archive.Save();
             CheckDlgButton(IDC_CHECK_CACHE4, FALSE);
           }
           parent->RefreshCache();

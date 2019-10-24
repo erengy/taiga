@@ -157,13 +157,13 @@ BOOL TorrentDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
           if (feed_item) {
             feed_item->state = track::FeedItemState::DiscardedNormal;
             list_.SetCheckState(i, FALSE);
-            track::aggregator.AddToArchive(feed_item->title);
+            track::aggregator.archive.Add(feed_item->title);
             save_archive = true;
           }
         }
       }
       if (save_archive)
-        track::aggregator.SaveArchive();
+        track::aggregator.archive.Save();
       return TRUE;
     }
     // Settings
@@ -203,8 +203,8 @@ void TorrentDialog::OnContextMenu(HWND hwnd, POINT pt) {
   } else if (answer == L"DiscardTorrent") {
     feed_item->state = track::FeedItemState::DiscardedNormal;
     list_.SetCheckState(item_index, FALSE);
-    track::aggregator.AddToArchive(feed_item->title);
-    track::aggregator.SaveArchive();
+    track::aggregator.archive.Add(feed_item->title);
+    track::aggregator.archive.Save();
 
   } else if (answer == L"DiscardTorrents") {
     auto anime_item = anime::db.Find(feed_item->episode_data.anime_id);

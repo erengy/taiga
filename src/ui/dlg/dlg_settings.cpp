@@ -483,7 +483,7 @@ void SettingsDialog::RefreshCache() {
   page.SetDlgItemText(IDC_STATIC_CACHE3, text.c_str());
 
   // Torrent history
-  text = ToWstr(track::aggregator.GetArchiveSize()) + L" item(s)";
+  text = ToWstr(track::aggregator.archive.Size()) + L" item(s)";
   page.SetDlgItemText(IDC_STATIC_CACHE4, text.c_str());
 }
 

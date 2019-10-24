@@ -279,8 +279,8 @@ void Aggregator::HandleFeedDownload(Feed& feed, const std::string& data) {
   }
 
   feed_item->state = FeedItemState::DiscardedNormal;
-  AddToArchive(feed_item->title);
-  SaveArchive();
+  archive.Add(feed_item->title);
+  archive.Save();
   ui::OnFeedDownloadSuccess(is_magnet_link);
 
   HandleFeedDownloadOpen(*feed_item, file);
@@ -454,11 +454,7 @@ bool Aggregator::ValidateFeedDownload(const HttpRequest& http_request,
 
 ////////////////////////////////////////////////////////////////////////////////
 
-size_t Aggregator::GetArchiveSize() const {
-  return file_archive_.size();
-}
-
-bool Aggregator::LoadArchive() {
+bool TorrentArchive::Load() {
   XmlDocument document;
   const auto path = taiga::GetPath(taiga::Path::FeedHistory);
   const auto parse_result = XmlLoadFileToDocument(document, path);
@@ -467,29 +463,29 @@ bool Aggregator::LoadArchive() {
     return false;
 
   // Read discarded
-  file_archive_.clear();
+  files_.clear();
   auto archive_node = document.child(L"archive");
   for (auto node : archive_node.children(L"item")) {
-    file_archive_.push_back(node.attribute(L"title").value());
+    files_.push_back(node.attribute(L"title").value());
   }
 
   return true;
 }
 
-bool Aggregator::SaveArchive() const {
+bool TorrentArchive::Save() const {
   XmlDocument document;
   auto archive_node = document.append_child(L"archive");
 
   size_t max_count = taiga::settings.GetTorrentFilterArchiveMaxCount();
 
   if (max_count > 0) {
-    size_t length = file_archive_.size();
+    size_t length = files_.size();
     size_t i = 0;
     if (length > max_count)
       i = length - max_count;
-    for ( ; i < file_archive_.size(); i++) {
+    for ( ; i < files_.size(); i++) {
       auto xml_item = archive_node.append_child(L"item");
-      xml_item.append_attribute(L"title") = file_archive_[i].c_str();
+      xml_item.append_attribute(L"title") = files_[i].c_str();
     }
   }
 
@@ -497,18 +493,22 @@ bool Aggregator::SaveArchive() const {
   return XmlSaveDocumentToFile(document, path);
 }
 
-void Aggregator::AddToArchive(const std::wstring& file) {
-  if (!SearchArchive(file))
-    file_archive_.push_back(file);
+bool TorrentArchive::Contains(const std::wstring& file) const {
+  const auto it = std::find(files_.begin(), files_.end(), file);
+  return it != files_.end();
 }
 
-void Aggregator::ClearArchive() {
-  file_archive_.clear();
+size_t TorrentArchive::Size() const {
+  return files_.size();
 }
 
-bool Aggregator::SearchArchive(const std::wstring& file) const {
-  auto it = std::find(file_archive_.begin(), file_archive_.end(), file);
-  return it != file_archive_.end();
+void TorrentArchive::Add(const std::wstring& file) {
+  if (!Contains(file))
+    files_.push_back(file);
+}
+
+void TorrentArchive::Clear() {
+  files_.clear();
 }
 
 }  // namespace track

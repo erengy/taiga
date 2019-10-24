@@ -100,8 +100,7 @@ void FeedFilterManager::Filter(Feed& feed, bool preferences) {
 void FeedFilterManager::FilterArchived(Feed& feed) {
   for (auto& item : feed.items) {
     if (!item.IsDiscarded()) {
-      bool found = aggregator.SearchArchive(item.title);
-      if (found) {
+      if (aggregator.archive.Contains(item.title)) {
         item.state = FeedItemState::DiscardedNormal;
         if (Taiga.options.debug_mode) {
           std::wstring filter_text = L"!FILTER :: Archived";

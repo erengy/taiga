@@ -37,6 +37,21 @@ enum TorrentApp {
   kTorrentAppCustom,
 };
 
+class TorrentArchive {
+public:
+  bool Load();
+  bool Save() const;
+
+  bool Contains(const std::wstring& file) const;
+  size_t Size() const;
+
+  void Add(const std::wstring& file);
+  void Clear();
+
+private:
+  std::vector<std::wstring> files_;
+};
+
 class Aggregator {
 public:
   Feed& GetFeed();
@@ -51,12 +66,7 @@ public:
 
   void ExamineData(Feed& feed);
 
-  size_t GetArchiveSize() const;
-  bool LoadArchive();
-  bool SaveArchive() const;
-  void AddToArchive(const std::wstring& file);
-  void ClearArchive();
-  bool SearchArchive(const std::wstring& file) const;
+  TorrentArchive archive;
 
 private:
   FeedItem* FindFeedItemByLink(Feed& feed, const std::wstring& link);
@@ -65,7 +75,6 @@ private:
 
   std::vector<std::wstring> download_queue_;
   Feed feed_;
-  std::vector<std::wstring> file_archive_;
 };
 
 inline track::Aggregator aggregator;
