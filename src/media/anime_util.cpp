@@ -410,10 +410,11 @@ void AddToQueue(const Item& item, const Episode& episode, bool change_status) {
   // Add to queue
   library::queue.Add(queue_item);
 
+  // if new status is "complete", then remove episodes if such is specified in settings
   bool purge_at_complete = item.GetUseGlobalRemovalSetting() ? Settings.GetBool(taiga::kLibrary_Management_DeleteAfterCompletion) : item.IsEpisodeRemovedWhenCompleted();
   if (change_status && (*queue_item.status) == kCompleted && purge_at_complete) {
     library::RemoveSettings remove_params;
-    remove_params.wait_for_player = true;
+    remove_params.wait_for_player = true; // only remove once not watching the anime
     library::SchedulePurge(item.GetId(), remove_params);
   }
 }
