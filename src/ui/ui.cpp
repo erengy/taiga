@@ -131,8 +131,6 @@ void OnHttpError(const taiga::HttpClient& http_client, const std::wstring& error
       ChangeStatusText(error);
       DlgMain.EnableInput(true);
       break;
-    case taiga::kHttpFeedCheck:
-    case taiga::kHttpFeedCheckAuto:
     case taiga::kHttpFeedDownload:
       ChangeStatusText(error);
       DlgTorrent.EnableInput();
@@ -212,11 +210,6 @@ void OnHttpProgress(const taiga::HttpClient& http_client) {
     case taiga::kHttpServiceDeleteLibraryEntry:
     case taiga::kHttpServiceUpdateLibraryEntry:
       status = L"Updating list...";
-      break;
-    case taiga::kHttpFeedCheck:
-    case taiga::kHttpFeedCheckAuto:
-      status = L"Checking new torrents via {}..."_format(
-               http_client.request().url.host);
       break;
     case taiga::kHttpFeedDownload:
       status = L"Downloading torrent file...";

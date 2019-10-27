@@ -244,15 +244,6 @@ void HttpManager::HandleResponse(HttpResponse& response) {
       break;
     }
 
-    case kHttpFeedCheck:
-    case kHttpFeedCheckAuto: {
-      const auto feed = reinterpret_cast<track::Feed*>(response.parameter);
-      if (feed) {
-        bool automatic = client.mode() == kHttpFeedCheckAuto;
-        track::aggregator.HandleFeedCheck(*feed, client.write_buffer_, automatic);
-      }
-      break;
-    }
     case kHttpFeedDownload: {
       const auto feed = reinterpret_cast<track::Feed*>(response.parameter);
       if (feed) {

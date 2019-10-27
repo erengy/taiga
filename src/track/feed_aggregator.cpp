@@ -30,6 +30,7 @@
 #include "media/anime_db.h"
 #include "media/anime_util.h"
 #include "taiga/http.h"
+#include "taiga/http_new.h"
 #include "taiga/path.h"
 #include "taiga/settings.h"
 #include "track/episode_util.h"
@@ -48,26 +49,41 @@ bool Aggregator::CheckFeed(const std::wstring& source, bool automatic) {
   if (source.empty())
     return false;
 
-  Feed& feed = GetFeed();
+  auto& feed = GetFeed();
 
   feed.channel.link = source;
 
-  HttpRequest http_request;
-  http_request.url = feed.channel.link;
-  http_request.parameter = reinterpret_cast<LPARAM>(&feed);
-  http_request.header[L"Accept"] = L"application/rss+xml, */*";
-  http_request.header[L"Accept-Encoding"] = L"gzip";
+  taiga::http::Request request;
+  request.set_target(WstrToStr(feed.channel.link));
+  request.set_headers({
+      {"Accept", "application/rss+xml, */*"},
+      {"Accept-Encoding", "gzip"}});
+
+  const auto host = StrToWstr(request.target().uri.authority->host);
 
   if (!automatic) {
-    ui::ChangeStatusText(
-      L"Checking new torrents via {}..."_format(http_request.url.host));
+    ui::ChangeStatusText(L"Checking new torrents via {}..."_format(host));
   }
   ui::EnableDialogInput(ui::Dialog::Torrents, false);
 
-  auto client_mode = automatic ?
-      taiga::kHttpFeedCheckAuto : taiga::kHttpFeedCheck;
+  const auto on_transfer = [host](const taiga::http::Transfer& transfer) {
+    ui::ChangeStatusText(L"Checking new torrents via {}... ({})"_format(
+        host, taiga::http::util::to_string(transfer)));
+    return true;
+  };
 
-  ConnectionManager.MakeRequest(http_request, client_mode);
+  const auto on_response = [automatic, &feed, host,
+                            this](const taiga::http::Response& response) {
+    if (response.error()) {
+      ui::ChangeStatusText(
+          taiga::http::util::to_string(response.error(), host));
+      ui::EnableDialogInput(ui::Dialog::Torrents, true);
+      return;
+    }
+    HandleFeedCheck(feed, response.body(), automatic);
+  };
+
+  taiga::http::Send(request, on_transfer, on_response);
 
   return true;
 }

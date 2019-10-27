@@ -42,8 +42,6 @@ enum HttpClientMode {
   kHttpServiceUpdateLibraryEntry,
   kHttpMalRequestAccessToken,
   // Feed
-  kHttpFeedCheck,
-  kHttpFeedCheckAuto,
   kHttpFeedDownload,
   // Twitter
   kHttpTwitterRequest,
