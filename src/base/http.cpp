@@ -182,8 +182,6 @@ void Client::set_user_agent(const std::wstring& user_agent) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-CurlGlobal Client::curl_global_;
-
 CurlGlobal::CurlGlobal()
     : initialized_(false) {
   if (curl_global_init(CURL_GLOBAL_ALL) == 0)

@@ -161,7 +161,6 @@ private:
   bool GetResponseHeader(const std::wstring& header);
   bool ParseResponseHeader();
 
-  static CurlGlobal curl_global_;
   CURL* curl_handle_;
 
   bool busy_;

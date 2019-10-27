@@ -30,6 +30,7 @@
 #include "taiga/config.h"
 #include "taiga/dummy.h"
 #include "taiga/http.h"
+#include "taiga/http_new.h"
 #include "taiga/resource.h"
 #include "taiga/settings.h"
 #include "taiga/taiga.h"
@@ -105,6 +106,7 @@ BOOL App::InitInstance() {
   }
 
   // Initialize
+  http::Init();
   InitCommonControls(ICC_STANDARD_CLASSES);
   OleInitialize(nullptr);
 

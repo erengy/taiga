@@ -55,9 +55,6 @@ bool Client::MakeRequest(const Request& request) {
 ////////////////////////////////////////////////////////////////////////////////
 
 bool Client::Initialize() {
-  if (!curl_global_.initialized())
-    return false;
-
   if (!curl_handle_)
     curl_handle_ = curl_easy_init();
 
