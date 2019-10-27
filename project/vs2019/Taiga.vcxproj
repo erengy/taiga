@@ -239,6 +239,7 @@
     <ClCompile Include="..\..\src\taiga\debug.cpp" />
     <ClCompile Include="..\..\src\taiga\dummy.cpp" />
     <ClCompile Include="..\..\src\taiga\http.cpp" />
+    <ClCompile Include="..\..\src\taiga\http_new.cpp" />
     <ClCompile Include="..\..\src\taiga\orange.cpp" />
     <ClCompile Include="..\..\src\taiga\path.cpp" />
     <ClCompile Include="..\..\src\taiga\script.cpp" />
@@ -431,6 +432,7 @@
     <ClInclude Include="..\..\src\taiga\debug.h" />
     <ClInclude Include="..\..\src\taiga\dummy.h" />
     <ClInclude Include="..\..\src\taiga\http.h" />
+    <ClInclude Include="..\..\src\taiga\http_new.h" />
     <ClInclude Include="..\..\src\taiga\orange.h" />
     <ClInclude Include="..\..\src\taiga\path.h" />
     <ClInclude Include="..\..\src\taiga\resource.h" />
