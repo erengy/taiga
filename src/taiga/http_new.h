@@ -37,4 +37,12 @@ void Send(const Request& request,
           const TransferCallback& on_transfer,
           const ResponseCallback& on_response);
 
+namespace util {
+
+std::wstring GetUrlHost(const std::string_view url);
+std::wstring to_string(const hypr::Error& error, const std::wstring& host);
+std::wstring to_string(const Transfer& transfer);
+
+}  // namespace util
+
 }  // namespace taiga::http

@@ -23,6 +23,7 @@
 
 #include "taiga/http_new.h"
 
+#include "base/file.h"
 #include "base/format.h"
 #include "base/gzip.h"
 #include "base/log.h"
@@ -107,18 +108,7 @@ static void HandleError(const Response& response) {
   if (!response.error()) {
     return;
   }
-
-  std::wstring message = L"{} ({})"_format(
-      StrToWstr(response.error().str()), response.error().code);
-  switch (response.error().code) {
-    case CURLE_COULDNT_RESOLVE_HOST:
-    case CURLE_COULDNT_CONNECT:
-      message += L" ({})"_format(StrToWstr(std::string{response.url()}));
-      break;
-  }
-  TrimRight(message, L" \r\n");
-
-  LOGE(message);
+  LOGE(util::to_string(response.error(), util::GetUrlHost(response.url())));
 }
 
 static void SendRequest(Request request,
@@ -355,6 +345,45 @@ private:
 };
 
 }  // namespace detail
+
+namespace util {
+
+std::wstring GetUrlHost(const std::string_view url) {
+  hypp::Parser parser{url};
+  if (const auto expected = hypp::ParseUri(parser)) {
+    if (expected.value().authority.has_value()) {
+      return StrToWstr(expected.value().authority->host);
+    }
+  }
+  return {};
+}
+
+std::wstring to_string(const hypr::Error& error, const std::wstring& host) {
+  std::wstring message = StrToWstr(error.str());
+  TrimRight(message, L" \r\n");
+  message = L"{} ({})"_format(message, error.code);
+  if (!host.empty()) {
+    switch (error.code) {
+      case CURLE_COULDNT_RESOLVE_HOST:
+      case CURLE_COULDNT_CONNECT:
+        message += L" ({})"_format(host);
+        break;
+    }
+  }
+  return message;
+}
+
+std::wstring to_string(const Transfer& transfer) {
+  if (transfer.total > 0) {
+    const auto percentage = static_cast<float>(transfer.current) /
+                            static_cast<float>(transfer.total);
+    return L"{}%"_format(percentage);
+  } else {
+    return ToSizeString(transfer.current);
+  }
+}
+
+}  // namespace util
 
 void Init() {
   hypr::init();
