@@ -17,6 +17,7 @@
 */
 
 #include "base/crypto.h"
+#include "base/file.h"
 #include "base/string.h"
 #include "base/url.h"
 #include "media/anime_db.h"
@@ -26,9 +27,11 @@
 #include "sync/manager.h"
 #include "sync/sync.h"
 #include "taiga/http.h"
+#include "taiga/http_new.h"
 #include "taiga/settings.h"
 #include "taiga/taiga.h"
 #include "ui/dialog.h"
+#include "ui/resource.h"
 #include "ui/translate.h"
 #include "ui/ui.h"
 
@@ -189,15 +192,25 @@ void UpdateLibraryEntry(const library::QueueItem& queue_item) {
   ServiceManager.MakeRequest(request);
 }
 
-void DownloadImage(int id, const std::wstring& image_url) {
+void DownloadImage(int anime_id, const std::wstring& image_url) {
   if (image_url.empty())
     return;
 
-  HttpRequest http_request;
-  http_request.url = image_url;
-  http_request.parameter = id;
+  taiga::http::Request request;
+  request.set_target(WstrToStr(image_url));
 
-  ConnectionManager.MakeRequest(http_request, taiga::kHttpGetLibraryEntryImage);
+  const auto on_response = [anime_id](const taiga::http::Response& response) {
+    if (hypp::status::to_class(response.status_code()) == 200) {
+      SaveToFile(response.body(), anime::GetImagePath(anime_id));
+      if (ui::image_db.Reload(anime_id))
+        ui::OnLibraryEntryImageChange(anime_id);
+    } else if (response.status_code() == 404) {
+      if (const auto anime_item = anime::db.Find(anime_id))
+        anime_item->SetImageUrl({});
+    }
+  };
+
+  taiga::http::Send(request, nullptr, on_response);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

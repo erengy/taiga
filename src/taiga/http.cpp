@@ -26,7 +26,6 @@
 #include "media/anime_db.h"
 #include "media/anime_season_db.h"
 #include "media/anime_util.h"
-#include "ui/resource.h"
 #include "sync/manager.h"
 #include "taiga/announce.h"
 #include "taiga/config.h"
@@ -242,20 +241,6 @@ void HttpManager::HandleResponse(HttpResponse& response) {
         }
       }
       ui::OnMalRequestAccessToken(success);
-      break;
-    }
-
-    case kHttpGetLibraryEntryImage: {
-      const int anime_id = static_cast<int>(response.parameter);
-      if (response.GetStatusCategory() == 200) {
-        SaveToFile(client.write_buffer_, anime::GetImagePath(anime_id));
-        if (ui::image_db.Reload(anime_id))
-          ui::OnLibraryEntryImageChange(anime_id);
-      } else if (response.code == 404) {
-        const auto anime_item = anime::db.Find(anime_id);
-        if (anime_item)
-          anime_item->SetImageUrl({});
-      }
       break;
     }
 

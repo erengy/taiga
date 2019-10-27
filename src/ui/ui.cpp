@@ -120,7 +120,6 @@ void OnHttpError(const taiga::HttpClient& http_client, const std::wstring& error
     case taiga::kHttpSilent:
     case taiga::kHttpServiceGetMetadataById:
     case taiga::kHttpServiceSearchTitle:
-    case taiga::kHttpGetLibraryEntryImage:
     case taiga::kHttpTaigaUpdateRelations:
       return;
     case taiga::kHttpServiceAuthenticateUser:
@@ -169,7 +168,6 @@ void OnHttpHeadersAvailable(const taiga::HttpClient& http_client) {
     case taiga::kHttpServiceGetMetadataById:
     case taiga::kHttpServiceSearchTitle:
     case taiga::kHttpMalRequestAccessToken:
-    case taiga::kHttpGetLibraryEntryImage:
     case taiga::kHttpTaigaUpdateRelations:
       return;
     case taiga::kHttpTaigaUpdateCheck:
@@ -201,7 +199,6 @@ void OnHttpProgress(const taiga::HttpClient& http_client) {
     case taiga::kHttpServiceGetMetadataById:
     case taiga::kHttpServiceSearchTitle:
     case taiga::kHttpMalRequestAccessToken:
-    case taiga::kHttpGetLibraryEntryImage:
     case taiga::kHttpTaigaUpdateRelations:
       return;
     case taiga::kHttpServiceAuthenticateUser:

@@ -39,7 +39,7 @@ void SearchTitle(std::wstring title, int id);
 void Synchronize();
 void UpdateLibraryEntry(const library::QueueItem& queue_item);
 
-void DownloadImage(int id, const std::wstring& image_url);
+void DownloadImage(int anime_id, const std::wstring& image_url);
 
 bool AddAuthenticationToRequest(Request& request);
 void AddPageOffsetToRequest(const int offset, Request& request);

@@ -41,8 +41,6 @@ enum HttpClientMode {
   kHttpServiceGetLibraryEntries,
   kHttpServiceUpdateLibraryEntry,
   kHttpMalRequestAccessToken,
-  // Library
-  kHttpGetLibraryEntryImage,
   // Feed
   kHttpFeedCheck,
   kHttpFeedCheckAuto,
