@@ -18,10 +18,9 @@
 
 #pragma once
 
-#include <windows/win/gdi.h>
-#include <windows/win/gdi_plus.h>
+#include <string>
 
-extern class win::GdiPlus GdiPlus;
+#include <windows/win/gdi.h>
 
 namespace base {
 
@@ -38,6 +37,8 @@ public:
 };
 
 }  // namespace base
+
+HBITMAP LoadImage(const std::wstring& file, UINT width, UINT height);
 
 HFONT ChangeDCFont(HDC hdc, LPCWSTR lpFaceName, INT iSize, BOOL bBold, BOOL bItalic, BOOL bUnderline);
 int GetTextHeight(HDC hdc);

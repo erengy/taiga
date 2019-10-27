@@ -17,12 +17,11 @@
 */
 
 #include <algorithm>
+#include <memory>
 
 #include <windows/win/gdi_plus.h>
 
 #include "gfx.h"
-
-win::GdiPlus GdiPlus;
 
 namespace base {
 
@@ -56,7 +55,19 @@ bool Image::Load(const std::wstring& path) {
   return true;
 }
 
+static win::GdiPlus* GdiPlus() {
+  static const auto gdi_plus = std::make_unique<win::GdiPlus>();
+  return gdi_plus.get();
+}
+
 }  // namespace base
+
+////////////////////////////////////////////////////////////////////////////////
+
+HBITMAP LoadImage(const std::wstring& file, UINT width, UINT height) {
+  const auto gdi_plus = base::GdiPlus();
+  return gdi_plus ? gdi_plus->LoadImage(file, width, height) : nullptr;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
