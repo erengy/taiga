@@ -26,6 +26,14 @@
 	path = deps/src/fmt
 	url = https://github.com/fmtlib/fmt.git
 
+[submodule "hypp"]
+	path = deps/src/hypp
+	url = https://github.com/erengy/hypp.git
+
+[submodule "hypr"]
+	path = deps/src/hypr
+	url = https://github.com/erengy/hypr.git
+
 [submodule "json"]
 	path = deps/src/json
 	url = https://github.com/nlohmann/json.git
