@@ -18,7 +18,8 @@
 
 #include "link/http.h"
 
-#include "taiga/http.h"
+#include "base/string.h"
+#include "taiga/http_new.h"
 
 namespace link::http {
 
@@ -26,11 +27,13 @@ bool Send(const std::wstring& url, const std::wstring& data) {
   if (url.empty() || data.empty())
     return false;
 
-  HttpRequest http_request;
-  http_request.method = L"POST";
-  http_request.url = url;
-  http_request.body = data;
-  ConnectionManager.MakeRequest(http_request, taiga::kHttpSilent);
+  taiga::http::Request request;
+  request.set_method("POST");
+  request.set_target(WstrToStr(url));
+  request.set_header("Content-Type", "application/x-www-form-urlencoded");
+  request.set_body(hypr::Body{WstrToStr(data)});
+
+  taiga::http::Send(request, nullptr, nullptr);
 
   return true;
 }
