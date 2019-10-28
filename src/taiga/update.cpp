@@ -19,53 +19,123 @@
 #include <cmath>
 
 #include "base/file.h"
+#include "base/log.h"
 #include "base/string.h"
 #include "base/time.h"
 #include "base/url.h"
 #include "base/xml.h"
 #include "media/anime_season_db.h"
 #include "sync/service.h"
-#include "taiga/http.h"
+#include "taiga/http_new.h"
+#include "taiga/path.h"
+#include "taiga/resource.h"
 #include "taiga/settings.h"
 #include "taiga/taiga.h"
 #include "taiga/version.h"
 #include "taiga/update.h"
+#include "track/recognition.h"
 #include "ui/dlg/dlg_main.h"
+#include "ui/dlg/dlg_update.h"
 #include "ui/translate.h"
 #include "ui/ui.h"
 
 namespace taiga::detail {
 
 void UpdateHelper::Cancel() {
-  ConnectionManager.CancelRequest(client_uid_);
+  transfer_cancelled_ = true;
 }
 
 void UpdateHelper::Check() {
-  const std::wstring channel = taiga::version().prerelease.empty() ?
-      L"stable" : StrToWstr(taiga::version().prerelease);
-  const std::wstring method = ui::DlgMain.IsWindow() ? L"manual" : L"auto";
+  const std::string channel = taiga::version().prerelease.empty() ?
+      "stable" : taiga::version().prerelease;
+  const std::string method = ui::DlgMain.IsWindow() ? "manual" : "auto";
 
-  HttpRequest http_request;
-  http_request.url.protocol = base::http::Protocol::Https;
-  http_request.url.host = L"taiga.moe";
-  http_request.url.path = L"/update.php";
-  http_request.url.query[L"channel"] = channel;
-  http_request.url.query[L"check"] = method;
-  http_request.url.query[L"version"] = StrToWstr(taiga::version().to_string());
-  http_request.url.query[L"service"] = GetCurrentService()->canonical_name();
-  http_request.url.query[L"username"] = GetCurrentUsername();
+  taiga::http::Request request;
+  request.set_target("https://taiga.moe/update.php");
+  request.set_query({
+      {"channel", channel},
+      {"check", method},
+      {"version", taiga::version().to_string()},
+      {"service", WstrToStr(GetCurrentService()->canonical_name())},
+      {"username", WstrToStr(GetCurrentUsername())}});
 
-  client_uid_ = http_request.uid;
+  ui::DlgUpdate.progressbar.SetPosition(0);
 
-  ConnectionManager.MakeRequest(http_request, taiga::kHttpTaigaUpdateCheck);
+  const auto on_transfer = [this](const taiga::http::Transfer& transfer) {
+    return OnTransfer(transfer);
+  };
+
+  const auto on_response = [this](const taiga::http::Response& response) {
+    if (transfer_cancelled_) {
+      transfer_cancelled_ = false;
+      return;
+    }
+    if (response.error()) {
+      if (ui::DlgMain.IsWindow()) {
+        MessageBox(ui::DlgUpdate.GetWindowHandle(),
+                   StrToWstr(response.error().str()).c_str(), L"Update Error",
+                   MB_ICONERROR | MB_OK);
+      }
+      ui::OnUpdateFinished();
+      return;
+    }
+
+    if (!ParseData(StrToWstr(response.body()))) {
+      if (ui::DlgMain.IsWindow()) {
+        MessageBox(ui::DlgUpdate.GetWindowHandle(),
+                   L"Could not parse update data.", L"Update Error",
+                   MB_ICONERROR | MB_OK);
+      }
+      ui::OnUpdateFinished();
+      return;
+    }
+
+    if (update_available_) {
+      ui::OnUpdateAvailable();
+      return;
+    }
+    if (IsAnimeRelationsAvailable()) {
+      CheckAnimeRelations();
+      return;
+    }
+    ui::OnUpdateNotAvailable(false);
+    ui::OnUpdateFinished();
+  };
+
+  taiga::http::Send(request, on_transfer, on_response);
 }
 
 void UpdateHelper::CheckAnimeRelations() {
-  HttpRequest http_request;
-  http_request.url = current_item_->taiga_anime_relations_location;
+  taiga::http::Request request;
+  request.set_target(WstrToStr(current_item_->taiga_anime_relations_location));
 
-  ConnectionManager.MakeRequest(http_request,
-                                taiga::kHttpTaigaUpdateRelations);
+  ui::DlgUpdate.progressbar.SetPosition(0);
+  ui::DlgUpdate.SetDlgItemText(IDC_STATIC_UPDATE_PROGRESS,
+                               L"Checking latest anime relations...");
+
+  const auto on_transfer = [this](const taiga::http::Transfer& transfer) {
+    return OnTransfer(transfer);
+  };
+
+  const auto on_response = [](const taiga::http::Response& response) {
+    if (response.error()) {
+      ui::OnUpdateFinished();
+      return;
+    }
+
+    if (Meow.ReadRelations(response.body()) &&
+        SaveToFile(response.body(), GetPath(Path::DatabaseAnimeRelations))) {
+      LOGD(L"Updated anime relation data.");
+      ui::OnUpdateNotAvailable(true);
+    } else {
+      Meow.ReadRelations();
+      LOGD(L"Anime relation data update failed.");
+      ui::OnUpdateNotAvailable(false);
+    }
+    ui::OnUpdateFinished();
+  };
+
+  taiga::http::Send(request, on_transfer, on_response);
 }
 
 bool UpdateHelper::ParseData(std::wstring data) {
@@ -90,11 +160,13 @@ bool UpdateHelper::ParseData(std::wstring data) {
     items.back().link = XmlReadStr(item, L"link");
     items.back().description = XmlReadStr(item, L"description");
     items.back().pub_date = XmlReadStr(item, L"pubDate");
-    items.back().taiga_anime_relations_location = XmlReadStr(item, L"taiga:animeRelationsLocation");
-    items.back().taiga_anime_relations_modified = XmlReadStr(item, L"taiga:animeRelationsModified");
+    items.back().taiga_anime_relations_location =
+        XmlReadStr(item, L"taiga:animeRelationsLocation");
+    items.back().taiga_anime_relations_modified =
+        XmlReadStr(item, L"taiga:animeRelationsModified");
   }
 
-  auto current_version = taiga::version();
+  const auto current_version = taiga::version();
   auto latest_version = current_version;
   for (const auto& item : items) {
     semaver::Version item_version(WstrToStr(item.guid.value));
@@ -119,9 +191,9 @@ bool UpdateHelper::IsAnimeRelationsAvailable() const {
   if (current_item_->taiga_anime_relations_location.empty())
     return false;
 
-  Date local_modified(settings.GetRecognitionRelationsLastModified());
+  const Date local_modified(settings.GetRecognitionRelationsLastModified());
   if (local_modified) {
-    Date current_modified(current_item_->taiga_anime_relations_modified);
+    const Date current_modified(current_item_->taiga_anime_relations_modified);
     if (!current_modified || current_modified <= local_modified)
       return false;
   }
@@ -133,10 +205,6 @@ bool UpdateHelper::IsRestartRequired() const {
   return restart_required_;
 }
 
-bool UpdateHelper::IsUpdateAvailable() const {
-  return update_available_;
-}
-
 bool UpdateHelper::Download() {
   if (!latest_item_)
     return false;
@@ -144,13 +212,44 @@ bool UpdateHelper::Download() {
   download_path_ = AddTrailingSlash(GetPathOnly(Taiga.GetModulePath()));
   download_path_ += GetFileName(latest_item_->link);
 
-  HttpRequest http_request;
-  http_request.url = latest_item_->link;
+  taiga::http::Request request;
+  request.set_target(WstrToStr(latest_item_->link));
 
-  client_uid_ = http_request.uid;
+  ui::DlgUpdate.progressbar.SetPosition(0);
+  ui::DlgUpdate.SetDlgItemText(IDC_STATIC_UPDATE_PROGRESS,
+                               L"Downloading latest update...");
 
-  ConnectionManager.MakeRequest(http_request, taiga::kHttpTaigaUpdateDownload);
+  const auto on_transfer = [this](const taiga::http::Transfer& transfer) {
+    return OnTransfer(transfer);
+  };
 
+  const auto on_response = [this](const taiga::http::Response& response) {
+    if (transfer_cancelled_) {
+      transfer_cancelled_ = false;
+      return;
+    }
+    if (response.error()) {
+      MessageBox(ui::DlgUpdate.GetWindowHandle(),
+                  StrToWstr(response.error().str()).c_str(), L"Download Error",
+                  MB_ICONERROR | MB_OK);
+      ui::OnUpdateFinished();
+      return;
+    }
+
+    const auto path = GetPathOnly(download_path_);
+    const auto file = GetFileName(StrToWstr(std::string{response.url()}));
+    download_path_ = path + file;
+
+    if (hypp::status::to_class(response.status_code()) == 200 &&
+        SaveToFile(response.body(), download_path_)) {
+      RunInstaller();
+    } else {
+      ui::OnUpdateFailed();
+    }
+    ui::OnUpdateFinished();
+  };
+
+  taiga::http::Send(request, on_transfer, on_response);
   return true;
 }
 
@@ -173,12 +272,26 @@ std::wstring UpdateHelper::GetCurrentAnimeRelationsModified() const {
                          std::wstring();
 }
 
-std::wstring UpdateHelper::GetDownloadPath() const {
-  return download_path_;
-}
+bool UpdateHelper::OnTransfer(const taiga::http::Transfer& transfer) {
+  if (transfer_cancelled_) {
+    transfer_cancelled_ = false;
+    return false;
+  }
 
-void UpdateHelper::SetDownloadPath(const std::wstring& path) {
-  download_path_ = path;
+  if (!ui::DlgUpdate.progressbar.GetPosition()) {
+    if (transfer.total > 0) {
+      ui::DlgUpdate.progressbar.SetMarquee(false);
+      ui::DlgUpdate.progressbar.SetRange(0, static_cast<UINT>(transfer.total));
+    } else {
+      ui::DlgUpdate.progressbar.SetMarquee(true);
+    }
+  }
+
+  if (transfer.total > 0) {
+    ui::DlgUpdate.progressbar.SetPosition(static_cast<UINT>(transfer.current));
+  }
+
+  return true;
 }
 
 }  // namespace taiga::detail

@@ -113,15 +113,6 @@ bool HttpClient::OnHeadersAvailable() {
 bool HttpClient::OnRedirect(const std::wstring& address, bool refresh) {
   LOGD(L"Location: {}", address);
 
-  switch (mode()) {
-    case kHttpTaigaUpdateDownload: {
-      std::wstring path = GetPathOnly(taiga::updater.GetDownloadPath());
-      std::wstring file = GetFileName(address);
-      taiga::updater.SetDownloadPath(path + file);
-      break;
-    }
-  }
-
   auto check_cloudflare = [](const base::http::Response& response) {
     if (response.code >= 500) {
       auto it = response.header.find(L"Server");
@@ -241,44 +232,6 @@ void HttpManager::HandleResponse(HttpResponse& response) {
         }
       }
       ui::OnMalRequestAccessToken(success);
-      break;
-    }
-
-    case kHttpTaigaUpdateCheck: {
-      if (taiga::updater.ParseData(response.body)) {
-        if (taiga::updater.IsUpdateAvailable()) {
-          ui::OnUpdateAvailable();
-          break;
-        }
-        if (taiga::updater.IsAnimeRelationsAvailable()) {
-          taiga::updater.CheckAnimeRelations();
-          break;
-        }
-        ui::OnUpdateNotAvailable(false);
-      }
-      ui::OnUpdateFinished();
-      break;
-    }
-    case kHttpTaigaUpdateDownload:
-      if (response.GetStatusCategory() == 200 &&
-          SaveToFile(client.write_buffer_, taiga::updater.GetDownloadPath())) {
-        taiga::updater.RunInstaller();
-      } else {
-        ui::OnUpdateFailed();
-      }
-      ui::OnUpdateFinished();
-      break;
-    case kHttpTaigaUpdateRelations: {
-      if (Meow.ReadRelations(client.write_buffer_) &&
-          SaveToFile(client.write_buffer_, GetPath(Path::DatabaseAnimeRelations))) {
-        LOGD(L"Updated anime relation data.");
-        ui::OnUpdateNotAvailable(true);
-      } else {
-        Meow.ReadRelations();
-        LOGD(L"Anime relation data update failed.");
-        ui::OnUpdateNotAvailable(false);
-      }
-      ui::OnUpdateFinished();
       break;
     }
   }

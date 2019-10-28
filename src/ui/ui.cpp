@@ -120,7 +120,6 @@ void OnHttpError(const taiga::HttpClient& http_client, const std::wstring& error
     case taiga::kHttpSilent:
     case taiga::kHttpServiceGetMetadataById:
     case taiga::kHttpServiceSearchTitle:
-    case taiga::kHttpTaigaUpdateRelations:
       return;
     case taiga::kHttpServiceAuthenticateUser:
     case taiga::kHttpServiceGetUser:
@@ -135,17 +134,6 @@ void OnHttpError(const taiga::HttpClient& http_client, const std::wstring& error
       ChangeStatusText(error);
       DlgSeason.EnableInput();
       break;
-    case taiga::kHttpTaigaUpdateCheck:
-      if (DlgMain.IsWindow())  // Don't display error message on automatic checks
-        MessageBox(DlgUpdate.GetWindowHandle(), error.c_str(), L"Update Error",
-                   MB_ICONERROR | MB_OK);
-      DlgUpdate.PostMessage(WM_CLOSE);
-      return;
-    case taiga::kHttpTaigaUpdateDownload:
-      MessageBox(DlgUpdate.GetWindowHandle(), error.c_str(), L"Download Error",
-                 MB_ICONERROR | MB_OK);
-      DlgUpdate.PostMessage(WM_CLOSE);
-      return;
   }
 
   taskbar_list.SetProgressState(TBPF_NOPROGRESS);
@@ -157,22 +145,7 @@ void OnHttpHeadersAvailable(const taiga::HttpClient& http_client) {
     case taiga::kHttpServiceGetMetadataById:
     case taiga::kHttpServiceSearchTitle:
     case taiga::kHttpMalRequestAccessToken:
-    case taiga::kHttpTaigaUpdateRelations:
       return;
-    case taiga::kHttpTaigaUpdateCheck:
-    case taiga::kHttpTaigaUpdateDownload:
-      if (http_client.content_length() > 0) {
-        DlgUpdate.progressbar.SetMarquee(false);
-        DlgUpdate.progressbar.SetRange(0,
-            static_cast<UINT>(http_client.content_length()));
-      } else {
-        DlgUpdate.progressbar.SetMarquee(true);
-      }
-      if (http_client.mode() == taiga::kHttpTaigaUpdateDownload) {
-        DlgUpdate.SetDlgItemText(IDC_STATIC_UPDATE_PROGRESS,
-                                 L"Downloading latest update...");
-      }
-      break;
     default:
       taskbar_list.SetProgressState(http_client.content_length() > 0 ?
                                     TBPF_NORMAL : TBPF_INDETERMINATE);
@@ -188,7 +161,6 @@ void OnHttpProgress(const taiga::HttpClient& http_client) {
     case taiga::kHttpServiceGetMetadataById:
     case taiga::kHttpServiceSearchTitle:
     case taiga::kHttpMalRequestAccessToken:
-    case taiga::kHttpTaigaUpdateRelations:
       return;
     case taiga::kHttpServiceAuthenticateUser:
     case taiga::kHttpServiceGetUser:
@@ -205,12 +177,6 @@ void OnHttpProgress(const taiga::HttpClient& http_client) {
     case taiga::kHttpServiceGetSeason:
       status = L"Downloading anime season data...";
       break;
-    case taiga::kHttpTaigaUpdateCheck:
-    case taiga::kHttpTaigaUpdateDownload:
-      if (http_client.content_length() > 0)
-        DlgUpdate.progressbar.SetPosition(
-            static_cast<UINT>(http_client.current_length()));
-      return;
   }
 
   if (http_client.content_length() > 0) {

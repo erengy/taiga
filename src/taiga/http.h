@@ -41,10 +41,6 @@ enum HttpClientMode {
   kHttpServiceGetLibraryEntries,
   kHttpServiceUpdateLibraryEntry,
   kHttpMalRequestAccessToken,
-  // Taiga
-  kHttpTaigaUpdateCheck,
-  kHttpTaigaUpdateDownload,
-  kHttpTaigaUpdateRelations,
 };
 
 class HttpClient : public base::http::Client {

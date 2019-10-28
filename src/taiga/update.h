@@ -18,11 +18,16 @@
 
 #pragma once
 
+#include <atomic>
 #include <memory>
 #include <string>
 #include <vector>
 
 #include "base/rss.h"
+
+namespace hypr::detail {
+struct Transfer;
+}
 
 namespace taiga {
 
@@ -32,17 +37,10 @@ class UpdateHelper {
 public:
   void Cancel();
   void Check();
-  void CheckAnimeRelations();
   bool Download();
-  bool IsAnimeRelationsAvailable() const;
   bool IsRestartRequired() const;
-  bool IsUpdateAvailable() const;
-  bool ParseData(std::wstring data);
-  bool RunInstaller();
 
   std::wstring GetCurrentAnimeRelationsModified() const;
-  std::wstring GetDownloadPath() const;
-  void SetDownloadPath(const std::wstring& path);
 
   class Item : public rss::Item {
   public:
@@ -52,9 +50,16 @@ public:
   std::vector<Item> items;
 
 private:
+  void CheckAnimeRelations();
+  bool IsAnimeRelationsAvailable() const;
+  bool ParseData(std::wstring data);
+  bool RunInstaller();
+  bool OnTransfer(const hypr::detail::Transfer& transfer);
+
   std::wstring download_path_;
   std::unique_ptr<Item> current_item_;
   std::unique_ptr<Item> latest_item_;
+  std::atomic_bool transfer_cancelled_ = false;
   bool restart_required_ = false;
   bool update_available_ = false;
   std::wstring client_uid_;
