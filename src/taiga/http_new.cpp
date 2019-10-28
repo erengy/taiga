@@ -32,6 +32,7 @@
 #include "taiga/settings.h"
 #include "taiga/stats.h"
 #include "taiga/taiga.h"
+#include "ui/ui.h"
 
 namespace taiga::http {
 
@@ -152,6 +153,7 @@ static void SendRequest(Request request,
   } else {
     taiga::stats.connections_succeeded++;
   }
+  ui::OnHttpReadComplete();
 
   if (on_response) {
     on_response(response);

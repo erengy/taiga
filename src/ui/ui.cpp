@@ -193,7 +193,7 @@ void OnHttpProgress(const taiga::HttpClient& http_client) {
   ChangeStatusText(status);
 }
 
-void OnHttpReadComplete(const taiga::HttpClient& http_client) {
+void OnHttpReadComplete() {
   taskbar_list.SetProgressState(TBPF_NOPROGRESS);
 }
 

@@ -152,7 +152,7 @@ bool HttpClient::OnProgress() {
 }
 
 void HttpClient::OnReadComplete() {
-  ui::OnHttpReadComplete(*this);
+  ui::OnHttpReadComplete();
 
   taiga::stats.connections_succeeded++;
 
