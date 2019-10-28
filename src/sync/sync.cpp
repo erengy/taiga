@@ -249,9 +249,9 @@ bool AddServiceDataToRequest(Request& request, int id) {
     return false;
 
   auto add_data = [&](sync::ServiceId service_id) {
-    const auto canonical_name = ServiceManager.service(service_id)->canonical_name();
-    request.data[canonical_name + L"-id"] = anime_item->GetId(service_id);
-    request.data[canonical_name + L"-library-id"] = anime_item->GetMyId();
+    const auto slug = GetServiceSlugById(service_id);
+    request.data[slug + L"-id"] = anime_item->GetId(service_id);
+    request.data[slug + L"-library-id"] = anime_item->GetMyId();
   };
 
   add_data(kMyAnimeList);

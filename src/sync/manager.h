@@ -45,9 +45,6 @@ public:
   Service* service(ServiceId service_id) const;
   Service* service(const std::wstring& canonical_name) const;
 
-  ServiceId GetServiceIdByName(const std::wstring& canonical_name) const;
-  std::wstring GetServiceNameById(ServiceId service_id) const;
-
 private:
   void HandleError(Response& response, HttpResponse& http_response);
   void HandleResponse(Response& response, HttpResponse& http_response);
@@ -57,6 +54,10 @@ private:
   std::map<ServiceId, std::unique_ptr<Service>> services_;
 };
 
+ServiceId GetServiceIdBySlug(const std::wstring& slug);
+std::wstring GetServiceNameById(const ServiceId service_id);
+std::wstring GetServiceSlugById(const ServiceId service_id);
+
 }  // namespace sync
 
-extern sync::Manager ServiceManager;
+inline sync::Manager ServiceManager;

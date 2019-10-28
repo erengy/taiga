@@ -60,27 +60,16 @@ void Database::ReadDatabaseNode(XmlNode& database_node) {
     std::map<enum_t, std::wstring> id_map;
 
     for (auto id_node : node.children(L"id")) {
-      const std::wstring name = id_node.attribute(L"name").as_string();
-      if (name == L"hummingbird") {
-        id_map[sync::kKitsu] = id_node.child_value();
-      } else {
-        enum_t service_id = ServiceManager.GetServiceIdByName(name);
-        id_map[service_id] = id_node.child_value();
-      }
+      const std::wstring slug = id_node.attribute(L"name").as_string();
+      const enum_t service_id = sync::GetServiceIdBySlug(slug);
+      id_map[service_id] = id_node.child_value();
     }
 
-    enum_t source = sync::kTaiga;
     const std::wstring source_name = XmlReadStr(node, L"source");
-    if (source_name == L"hummingbird") {
-      source = sync::kKitsu;
-    } else {
-      auto service = ServiceManager.service(source_name);
-      if (service)
-        source = service->id();
-    }
+    enum_t source = sync::GetServiceIdBySlug(source_name);
 
     if (source == sync::kTaiga) {
-      auto current_service_id = taiga::GetCurrentServiceId();
+      const auto current_service_id = taiga::GetCurrentServiceId();
       if (id_map.find(current_service_id) != id_map.end()) {
         source = current_service_id;
         LOGW(L"Fixed source for ID: {}", id_map[source]);
@@ -140,13 +129,13 @@ void Database::WriteDatabaseNode(XmlNode& database_node) const {
       std::wstring id = item.GetId(i);
       if (!id.empty()) {
         auto child = anime_node.append_child(L"id");
-        std::wstring name = ServiceManager.GetServiceNameById(static_cast<sync::ServiceId>(i));
-        child.append_attribute(L"name") = name.c_str();
+        std::wstring slug = sync::GetServiceSlugById(static_cast<sync::ServiceId>(i));
+        child.append_attribute(L"name") = slug.c_str();
         child.append_child(pugi::node_pcdata).set_value(id.c_str());
       }
     }
 
-    std::wstring source = ServiceManager.GetServiceNameById(
+    const std::wstring source = sync::GetServiceSlugById(
         static_cast<sync::ServiceId>(item.GetSource()));
 
     #define XML_WC(n, v, t) \

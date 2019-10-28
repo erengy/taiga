@@ -16,6 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "sync/manager.h"
+
 #include "base/string.h"
 #include "media/anime_db.h"
 #include "media/anime_season.h"
@@ -24,15 +26,12 @@
 #include "ui/resource.h"
 #include "sync/anilist.h"
 #include "sync/kitsu.h"
-#include "sync/manager.h"
 #include "sync/myanimelist.h"
 #include "sync/sync.h"
 #include "taiga/http.h"
 #include "taiga/settings.h"
 #include "taiga/taiga.h"
 #include "ui/ui.h"
-
-sync::Manager ServiceManager;
 
 namespace sync {
 
@@ -65,22 +64,33 @@ Service* Manager::service(const std::wstring& canonical_name) const {
   return nullptr;
 }
 
-ServiceId Manager::GetServiceIdByName(const std::wstring& canonical_name) const {
-  auto found_service = service(canonical_name);
+ServiceId GetServiceIdBySlug(const std::wstring& slug) {
+  static const std::map<std::wstring, ServiceId> services{
+    {L"myanimelist", kMyAnimeList},
+    {L"kitsu", kKitsu},
+    {L"anilist", kAniList},
+  };
 
-  if (found_service)
-    return static_cast<ServiceId>(found_service->id());
-
-  return kTaiga;
+  const auto it = services.find(slug);
+  return it != services.end() ? it->second : kTaiga;
 }
 
-std::wstring Manager::GetServiceNameById(ServiceId service_id) const {
-  auto found_service = service(service_id);
+std::wstring GetServiceNameById(const ServiceId service_id) {
+  switch (service_id) {
+    case kMyAnimeList: return L"MyAnimeList";
+    case kKitsu: return L"Kitsu";
+    case kAniList: return L"AniList";
+    default: return L"Taiga";
+  }
+}
 
-  if (found_service)
-    return found_service->canonical_name();
-
-  return L"taiga";
+std::wstring GetServiceSlugById(const ServiceId service_id) {
+  switch (service_id) {
+    case kMyAnimeList: return L"myanimelist";
+    case kKitsu: return L"kitsu";
+    case kAniList: return L"anilist";
+    default: return L"taiga";
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

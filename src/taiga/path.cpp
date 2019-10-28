@@ -45,8 +45,7 @@ std::wstring GetDataPath() {
 }
 
 std::wstring GetUserDirectoryName(const sync::ServiceId service_id) {
-  return GetCurrentUsername() + L"@" +
-         ServiceManager.service(service_id)->canonical_name();
+  return GetCurrentUsername() + L"@" + sync::GetServiceSlugById(service_id);
 }
 
 std::wstring GetUserDirectoryName() {

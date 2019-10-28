@@ -279,15 +279,15 @@ bool Settings::set_value(const AppSettingKey key, T&& value) {
 // Meta
 
 semaver::Version Settings::GetMetaVersion() const {
-  const std::wstring version = value<std::wstring>(AppSettingKey::MetaVersion);
+  const auto version = value<std::wstring>(AppSettingKey::MetaVersion);
   return semaver::Version(WstrToStr(version));
 }
 
 // Services
 
 sync::ServiceId Settings::GetSyncActiveService() const {
-  const std::wstring name = value<std::wstring>(AppSettingKey::SyncActiveService);
-  return ServiceManager.GetServiceIdByName(name);
+  const auto slug = value<std::wstring>(AppSettingKey::SyncActiveService);
+  return sync::GetServiceIdBySlug(slug);
 }
 
 void Settings::SetSyncActiveService(const sync::ServiceId service_id) {
@@ -312,8 +312,8 @@ void Settings::SetSyncActiveService(const sync::ServiceId service_id) {
     }
   }
 
-  const std::wstring name = ServiceManager.GetServiceNameById(service_id);
-  if (set_value(AppSettingKey::SyncActiveService, name)) {
+  const auto slug = sync::GetServiceSlugById(service_id);
+  if (set_value(AppSettingKey::SyncActiveService, slug)) {
     changed_account_or_service_ = true;
   }
 }

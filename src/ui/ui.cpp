@@ -810,8 +810,8 @@ bool OnSettingsServiceChangeConfirm(const sync::ServiceId current_service,
   win::TaskDialog dlg(TAIGA_APP_NAME, TD_ICON_WARNING);
   std::wstring instruction =
       L"Do you want to change the active service from {} to {}?"_format(
-      ServiceManager.service(current_service)->name(),
-      ServiceManager.service(new_service)->name());
+      sync::GetServiceNameById(current_service),
+      sync::GetServiceNameById(new_service));
   dlg.SetMainInstruction(instruction.c_str());
   dlg.SetContent(L"Note that:\n"
                  L"- Taiga cannot move your list from one service to another. "
