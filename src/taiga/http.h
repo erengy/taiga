@@ -41,10 +41,6 @@ enum HttpClientMode {
   kHttpServiceGetLibraryEntries,
   kHttpServiceUpdateLibraryEntry,
   kHttpMalRequestAccessToken,
-  // Twitter
-  kHttpTwitterRequest,
-  kHttpTwitterAuth,
-  kHttpTwitterPost,
   // Taiga
   kHttpTaigaUpdateCheck,
   kHttpTaigaUpdateDownload,

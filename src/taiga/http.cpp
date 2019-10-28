@@ -244,12 +244,6 @@ void HttpManager::HandleResponse(HttpResponse& response) {
       break;
     }
 
-    case kHttpTwitterRequest:
-    case kHttpTwitterAuth:
-    case kHttpTwitterPost:
-      link::twitter::HandleHttpResponse(client.mode(), response);
-      break;
-
     case kHttpTaigaUpdateCheck: {
       if (taiga::updater.ParseData(response.body)) {
         if (taiga::updater.IsUpdateAvailable()) {

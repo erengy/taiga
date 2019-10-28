@@ -19,13 +19,19 @@
 #include "link/twitter.h"
 
 #include "base/file.h"
+#include "base/format.h"
+#include "base/json.h"
 #include "base/oauth.h"
 #include "base/string.h"
-#include "taiga/http.h"
+#include "taiga/http_new.h"
 #include "taiga/settings.h"
+#include "ui/dlg/dlg_settings.h"
 #include "ui/ui.h"
 
 namespace link::twitter {
+
+static void AccessToken(const std::wstring& key, const std::wstring& secret,
+                        const std::wstring& pin);
 
 static oauth::Consumer GetOauthConsumer() {
   return {
@@ -35,27 +41,93 @@ static oauth::Consumer GetOauthConsumer() {
 }
 
 void RequestToken() {
-  HttpRequest http_request;
-  http_request.url.protocol = base::http::Protocol::Https;
-  http_request.url.host = L"api.twitter.com";
-  http_request.url.path = L"/oauth/request_token";
-  http_request.header[L"Authorization"] = oauth::BuildAuthorizationHeader(
-      http_request.url.Build(), L"GET", GetOauthConsumer());
+  constexpr auto kTarget = "https://api.twitter.com/oauth/request_token";
 
-  ConnectionManager.MakeRequest(http_request, taiga::kHttpTwitterRequest);
+  const auto authorization = WstrToStr(oauth::BuildAuthorizationHeader(
+      StrToWstr(kTarget), L"GET", GetOauthConsumer()));
+
+  taiga::http::Request request;
+  request.set_target(kTarget);
+  request.set_header("Authorization", authorization);
+
+  const auto on_transfer = [](const taiga::http::Transfer& transfer) {
+    ui::ChangeStatusText(L"Obtaining request token from Twitter... ({})"_format(
+        taiga::http::util::to_string(transfer)));
+    return true;
+  };
+
+  const auto on_response = [](const taiga::http::Response& response) {
+    if (response.error()) {
+      ui::ChangeStatusText(L"Could not get request token from Twitter. ({})"_format(
+          taiga::http::util::to_string(response.error(), {})));
+      return;
+    }
+
+    auto parameters = oauth::ParseQueryString(StrToWstr(response.body()));
+    if (parameters[L"oauth_token"].empty()) {
+      ui::ChangeStatusText(L"Could not get request token from Twitter.");
+      return;
+    }
+
+    ui::ClearStatusText();
+    ExecuteLink(
+        L"https://api.twitter.com/oauth/authorize?oauth_token={}"_format(
+            parameters[L"oauth_token"]));
+    if (std::wstring auth_pin; ui::OnTwitterTokenEntry(auth_pin)) {
+      AccessToken(parameters[L"oauth_token"],
+                  parameters[L"oauth_token_secret"],
+                  auth_pin);
+    }
+  };
+
+  taiga::http::Send(request, on_transfer, on_response);
 }
 
 static void AccessToken(const std::wstring& key, const std::wstring& secret,
                         const std::wstring& pin) {
-  HttpRequest http_request;
-  http_request.url.protocol = base::http::Protocol::Https;
-  http_request.url.host = L"api.twitter.com";
-  http_request.url.path = L"/oauth/access_token";
-  http_request.header[L"Authorization"] = oauth::BuildAuthorizationHeader(
-      http_request.url.Build(), L"POST", GetOauthConsumer(),
-      oauth::Access{key, secret, pin});
+  constexpr auto kTarget = "https://api.twitter.com/oauth/access_token";
 
-  ConnectionManager.MakeRequest(http_request, taiga::kHttpTwitterAuth);
+  const auto authorization = WstrToStr(oauth::BuildAuthorizationHeader(
+      StrToWstr(kTarget), L"POST", GetOauthConsumer(),
+      oauth::Access{key, secret, pin}));
+
+  taiga::http::Request request;
+  request.set_target(kTarget);
+  request.set_header("Authorization", authorization);
+
+  const auto on_transfer = [](const taiga::http::Transfer& transfer) {
+    ui::ChangeStatusText(L"Obtaining access token from Twitter... ({})"_format(
+        taiga::http::util::to_string(transfer)));
+    return true;
+  };
+
+  const auto on_response = [](const taiga::http::Response& response) {
+    if (response.error()) {
+      ui::ChangeStatusText(L"Could not get access token from Twitter. ({})"_format(
+          taiga::http::util::to_string(response.error(), {})));
+      return;
+    }
+
+    auto parameters = oauth::ParseQueryString(StrToWstr(response.body()));
+    if (parameters[L"oauth_token"].empty() ||
+        parameters[L"oauth_token_secret"].empty()) {
+      ui::ChangeStatusText(L"Could not get access token from Twitter.");
+      ui::DlgSettings.RefreshTwitterLink();
+      return;
+    }
+
+    taiga::settings.SetShareTwitterOauthToken(parameters[L"oauth_token"]);
+    taiga::settings.SetShareTwitterOauthSecret(
+        parameters[L"oauth_token_secret"]);
+    taiga::settings.SetShareTwitterUsername(parameters[L"screen_name"]);
+
+    ui::ChangeStatusText(
+        L"Taiga is now authorized to post to this Twitter account: " +
+        taiga::settings.GetShareTwitterUsername());
+    ui::DlgSettings.RefreshTwitterLink();
+  };
+
+  taiga::http::Send(request, on_transfer, on_response);
 }
 
 bool SetStatusText(const std::wstring& status_text) {
@@ -72,72 +144,52 @@ bool SetStatusText(const std::wstring& status_text) {
   oauth::Parameters post_parameters;
   post_parameters[L"status"] = EncodeUrl(status_text);
 
-  HttpRequest http_request;
-  http_request.method = L"POST";
-  http_request.url.protocol = base::http::Protocol::Https;
-  http_request.url.host = L"api.twitter.com";
-  http_request.url.path = L"/1.1/statuses/update.json";
-  http_request.body = L"status=" + post_parameters[L"status"];
-  http_request.header[L"Authorization"] = oauth::BuildAuthorizationHeader(
-      http_request.url.Build(), L"POST", GetOauthConsumer(),
+  constexpr auto kTarget = "https://api.twitter.com/1.1/statuses/update.json";
+
+  const auto authorization = WstrToStr(oauth::BuildAuthorizationHeader(
+      StrToWstr(kTarget), L"POST", GetOauthConsumer(),
       oauth::Access{taiga::settings.GetShareTwitterOauthToken(),
-                    taiga::settings.GetShareTwitterOauthSecret(), {}},
-      post_parameters);
+                    taiga::settings.GetShareTwitterOauthSecret(),
+                    {}},
+      post_parameters));
 
-  ConnectionManager.MakeRequest(http_request, taiga::kHttpTwitterPost);
-  return true;
-}
+  taiga::http::Request request;
+  request.set_method("POST");
+  request.set_target(kTarget);
+  request.set_header("Authorization", authorization);
+  request.set_body({{"status", WstrToStr(status_text)}});
 
-void HandleHttpResponse(const taiga::HttpClientMode mode,
-                        const HttpResponse& response) {
-  switch (mode) {
-    case taiga::kHttpTwitterRequest: {
-      bool success = false;
-      auto parameters = oauth::ParseQueryString(response.body);
-      if (!parameters[L"oauth_token"].empty()) {
-        ExecuteLink(L"https://api.twitter.com/oauth/authorize?oauth_token=" +
-                    parameters[L"oauth_token"]);
-        std::wstring auth_pin;
-        if (ui::OnTwitterTokenEntry(auth_pin))
-          AccessToken(parameters[L"oauth_token"],
-                      parameters[L"oauth_token_secret"],
-                      auth_pin);
-        success = true;
-      }
-      ui::OnTwitterTokenRequest(success);
-      break;
+  const auto on_transfer = [](const taiga::http::Transfer& transfer) {
+    ui::ChangeStatusText(L"Updating Twitter status... ({})"_format(
+        taiga::http::util::to_string(transfer)));
+    return true;
+  };
+
+  const auto on_response = [](const taiga::http::Response& response) {
+    if (response.error()) {
+      ui::ChangeStatusText(L"Could not update Twitter status. ({})"_format(
+          taiga::http::util::to_string(response.error(), {})));
+      return;
     }
 
-    case taiga::kHttpTwitterAuth: {
-      bool success = false;
-      auto parameters = oauth::ParseQueryString(response.body);
-      if (!parameters[L"oauth_token"].empty() &&
-          !parameters[L"oauth_token_secret"].empty()) {
-        taiga::settings.SetShareTwitterOauthToken(parameters[L"oauth_token"]);
-        taiga::settings.SetShareTwitterOauthSecret(parameters[L"oauth_token_secret"]);
-        taiga::settings.SetShareTwitterUsername(parameters[L"screen_name"]);
-        success = true;
-      }
-      ui::OnTwitterAuth(success);
-      break;
-    }
-
-    case taiga::kHttpTwitterPost: {
-      if (InStr(response.body, L"\"errors\"", 0) == -1) {
-        ui::OnTwitterPost(true, L"");
-      } else {
-        std::wstring error;
-        int index_begin = InStr(response.body, L"\"message\":\"", 0);
-        int index_end = InStr(response.body, L"\",\"", index_begin);
-        if (index_begin > -1 && index_end > -1) {
-          index_begin += 11;
-          error = response.body.substr(index_begin, index_end - index_begin);
+    Json json;
+    JsonParseString(response.body(), json);
+    if (json.contains("errors")) {
+      for (const auto error : json["errors"]) {
+        const auto message = StrToWstr(JsonReadStr(error, "message"));
+        if (!message.empty()) {
+          ui::ChangeStatusText(
+              L"Could not update Twitter status. ({})"_format(message));
+          return;
         }
-        ui::OnTwitterPost(false, error);
       }
-      break;
     }
-  }
+
+    ui::ChangeStatusText(L"Twitter status updated.");
+  };
+
+  taiga::http::Send(request, on_transfer, on_response);
+  return true;
 }
 
 }  // namespace link::twitter

@@ -137,10 +137,7 @@ void OnMircDdeConnectionSuccess(const std::vector<std::wstring>& channels, bool 
 
 void OnMalRequestAccessToken(bool success);
 
-void OnTwitterTokenRequest(bool success);
 bool OnTwitterTokenEntry(std::wstring& auth_pin);
-void OnTwitterAuth(bool success);
-void OnTwitterPost(bool success, const std::wstring& error);
 
 void OnLogin();
 void OnLogout(bool website_login_required = false);

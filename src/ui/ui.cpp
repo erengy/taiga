@@ -135,11 +135,6 @@ void OnHttpError(const taiga::HttpClient& http_client, const std::wstring& error
       ChangeStatusText(error);
       DlgSeason.EnableInput();
       break;
-    case taiga::kHttpTwitterRequest:
-    case taiga::kHttpTwitterAuth:
-    case taiga::kHttpTwitterPost:
-      ChangeStatusText(error);
-      break;
     case taiga::kHttpTaigaUpdateCheck:
       if (DlgMain.IsWindow())  // Don't display error message on automatic checks
         MessageBox(DlgUpdate.GetWindowHandle(), error.c_str(), L"Update Error",
@@ -209,15 +204,6 @@ void OnHttpProgress(const taiga::HttpClient& http_client) {
       break;
     case taiga::kHttpServiceGetSeason:
       status = L"Downloading anime season data...";
-      break;
-    case taiga::kHttpTwitterRequest:
-      status = L"Connecting to Twitter...";
-      break;
-    case taiga::kHttpTwitterAuth:
-      status = L"Authorizing Twitter...";
-      break;
-    case taiga::kHttpTwitterPost:
-      status = L"Updating Twitter status...";
       break;
     case taiga::kHttpTaigaUpdateCheck:
     case taiga::kHttpTaigaUpdateDownload:
@@ -1039,32 +1025,9 @@ void OnMalRequestAccessToken(bool success) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void OnTwitterTokenRequest(bool success) {
-  if (success) {
-    ClearStatusText();
-  } else {
-    ChangeStatusText(L"Twitter token request failed.");
-  }
-}
-
 bool OnTwitterTokenEntry(std::wstring& auth_pin) {
   ClearStatusText();
   return EnterAuthorizationPin(L"Twitter", auth_pin);
-}
-
-void OnTwitterAuth(bool success) {
-  ChangeStatusText(success ?
-      L"Taiga is now authorized to post to this Twitter account: " +
-      taiga::settings.GetShareTwitterUsername() :
-      L"Twitter authorization failed.");
-
-  DlgSettings.RefreshTwitterLink();
-}
-
-void OnTwitterPost(bool success, const std::wstring& error) {
-  ChangeStatusText(success ?
-      L"Twitter status updated." :
-      L"Twitter status update failed. (" + error + L")");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
