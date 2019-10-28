@@ -20,51 +20,31 @@
 
 #include <map>
 #include <string>
-
-#include "types.h"
-
-namespace pugi {
-class xml_node;
-}
+#include <variant>
 
 namespace base {
 
-class Setting {
-public:
-  Setting() {}
-  Setting(bool attribute, const std::wstring& path);
-  Setting(bool attribute, const std::wstring& default_value, const std::wstring& path);
-  ~Setting() {}
-
-  bool attribute;
-  std::wstring default_value;
-  std::wstring path;
-  std::wstring value;
+enum class SettingValueType : size_t {
+  Bool,
+  Int,
+  Wstring,
+  None = std::variant_npos
 };
+
+using SettingVariant = std::variant<bool, int, std::wstring>;
+
+SettingValueType GetSettingValueType(const SettingVariant& variant);
 
 class Settings {
 public:
-  const std::wstring& operator[](enum_t name) const;
+  using key_t = std::string;
+  using value_t = SettingVariant;
 
-  bool GetBool(enum_t name) const;
-  int GetInt(enum_t name) const;
-  const std::wstring& GetWstr(enum_t name) const;
+  value_t value(const key_t& key) const;
+  bool set_value(const key_t& key, value_t&& value);
 
-  void Set(enum_t name, bool value);
-  void Set(enum_t name, int value);
-  void Set(enum_t name, const std::wstring& value);
-  bool Toggle(enum_t name);
-
-protected:
-  void InitializeKey(enum_t name, const wchar_t* default_value, const std::wstring& path);
-  std::wstring ReadValue(const pugi::xml_node& node_parent, const std::wstring& path,
-                         const bool attribute, const std::wstring& default_value);
-  void ReadValue(const pugi::xml_node& node_parent, enum_t name);
-  void WriteValue(const pugi::xml_node& node_parent, enum_t name);
-
-  virtual void InitializeMap() = 0;
-
-  std::map<enum_t, Setting> map_;
+private:
+  std::map<key_t, value_t> map_;
 };
 
 }  // namespace base

@@ -43,19 +43,19 @@ BOOL FormatDialog::OnInitDialog() {
   switch (mode) {
     case FormatDialogMode::Http:
       SetText(L"Edit Format - HTTP Request");
-      rich_edit_.SetText(Settings[taiga::kShare_Http_Format].c_str());
+      rich_edit_.SetText(taiga::settings.GetShareHttpFormat().c_str());
       break;
     case FormatDialogMode::Mirc:
       SetText(L"Edit Format - mIRC");
-      rich_edit_.SetText(Settings[taiga::kShare_Mirc_Format].c_str());
+      rich_edit_.SetText(taiga::settings.GetShareMircFormat().c_str());
       break;
     case FormatDialogMode::Twitter:
       SetText(L"Edit Format - Twitter");
-      rich_edit_.SetText(Settings[taiga::kShare_Twitter_Format].c_str());
+      rich_edit_.SetText(taiga::settings.GetShareTwitterFormat().c_str());
       break;
     case FormatDialogMode::Balloon:
       SetText(L"Edit Format - Episode Notifications");
-      rich_edit_.SetText(Settings[taiga::kSync_Notify_Format].c_str());
+      rich_edit_.SetText(taiga::settings.GetSyncNotifyFormat().c_str());
       break;
   }
 
@@ -65,16 +65,16 @@ BOOL FormatDialog::OnInitDialog() {
 void FormatDialog::OnOK() {
   switch (mode) {
     case FormatDialogMode::Http:
-      Settings.Set(taiga::kShare_Http_Format, rich_edit_.GetText());
+      taiga::settings.SetShareHttpFormat(rich_edit_.GetText());
       break;
     case FormatDialogMode::Mirc:
-      Settings.Set(taiga::kShare_Mirc_Format, rich_edit_.GetText());
+      taiga::settings.SetShareMircFormat(rich_edit_.GetText());
       break;
     case FormatDialogMode::Twitter:
-      Settings.Set(taiga::kShare_Twitter_Format, rich_edit_.GetText());
+      taiga::settings.SetShareTwitterFormat(rich_edit_.GetText());
       break;
     case FormatDialogMode::Balloon:
-      Settings.Set(taiga::kSync_Notify_Format, rich_edit_.GetText());
+      taiga::settings.SetSyncNotifyFormat(rich_edit_.GetText());
       break;
   }
 

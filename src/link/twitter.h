@@ -20,13 +20,19 @@
 
 #include <string>
 
-#include "taiga/http.h"
+namespace base::http {
+class Response;
+}
+
+namespace taiga {
+enum HttpClientMode;
+}
 
 namespace link::twitter {
 
 void RequestToken();
 bool SetStatusText(const std::wstring& status_text);
 
-void HandleHttpResponse(const taiga::HttpClientMode mode, const HttpResponse& response);
+void HandleHttpResponse(const taiga::HttpClientMode mode, const base::http::Response& response);
 
 }  // namespace link::twitter

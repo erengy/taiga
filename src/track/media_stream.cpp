@@ -34,7 +34,6 @@ static const std::vector<StreamData> stream_data{
   // AnimeLab
   {
     Stream::Animelab,
-    taiga::kStream_Animelab,
     L"AnimeLab",
     L"https://www.animelab.com",
     std::regex("animelab\\.com/player/"),
@@ -43,7 +42,6 @@ static const std::vector<StreamData> stream_data{
   // Anime Digital Network
   {
     Stream::Adn,
-    taiga::kStream_Adn,
     L"Anime Digital Network",
     L"https://animedigitalnetwork.fr/video/",
     std::regex("animedigitalnetwork.fr/video/[^/]+/[0-9]+"),
@@ -52,7 +50,6 @@ static const std::vector<StreamData> stream_data{
   // Anime News Network
   {
     Stream::Ann,
-    taiga::kStream_Ann,
     L"Anime News Network",
     L"https://www.animenewsnetwork.com/video/",
     std::regex("animenewsnetwork\\.(?:com|cc)/video/[0-9]+"),
@@ -61,7 +58,6 @@ static const std::vector<StreamData> stream_data{
   // Crunchyroll
   {
     Stream::Crunchyroll,
-    taiga::kStream_Crunchyroll,
     L"Crunchyroll",
     L"http://www.crunchyroll.com",
     std::regex(
@@ -75,7 +71,6 @@ static const std::vector<StreamData> stream_data{
   // Funimation
   {
     Stream::Funimation,
-    taiga::kStream_Funimation,
     L"Funimation",
     L"https://www.funimation.com",
     std::regex("funimation\\.com/shows/[^/]+/[^/]+/"),
@@ -84,7 +79,6 @@ static const std::vector<StreamData> stream_data{
   // HIDIVE
   {
     Stream::Hidive,
-    taiga::kStream_Hidive,
     L"HIDIVE",
     L"https://www.hidive.com",
     std::regex("hidive\\.com/stream/"),
@@ -93,7 +87,6 @@ static const std::vector<StreamData> stream_data{
   // Plex Web App
   {
     Stream::Plex,
-    taiga::kStream_Plex,
     L"Plex Web App",
     L"https://www.plex.tv",
     std::regex(
@@ -109,7 +102,6 @@ static const std::vector<StreamData> stream_data{
   // Veoh
   {
     Stream::Veoh,
-    taiga::kStream_Veoh,
     L"Veoh",
     L"http://www.veoh.com",
     std::regex("veoh\\.com/watch/"),
@@ -118,7 +110,6 @@ static const std::vector<StreamData> stream_data{
   // VIZ
   {
     Stream::Viz,
-    taiga::kStream_Viz,
     L"VIZ",
     L"https://www.viz.com/watch",
     std::regex("viz\\.com/watch/streaming/[^/]+-(?:episode-[0-9]+|movie)/"),
@@ -127,7 +118,6 @@ static const std::vector<StreamData> stream_data{
   // VRV
   {
     Stream::Vrv,
-    taiga::kStream_Vrv,
     L"VRV",
     L"https://vrv.co",
     std::regex("vrv\\.co/watch/"),
@@ -136,7 +126,6 @@ static const std::vector<StreamData> stream_data{
   // Wakanim
   {
     Stream::Wakanim,
-    taiga::kStream_Wakanim,
     L"Wakanim",
     L"https://www.wakanim.tv",
     std::regex("wakanim\\.tv/[^/]+/v2/catalogue/episode/[^/]+/"),
@@ -145,7 +134,6 @@ static const std::vector<StreamData> stream_data{
   // Yahoo View
   {
     Stream::Yahoo,
-    taiga::kStream_Yahoo,
     L"Yahoo View",
     L"https://view.yahoo.com",
     std::regex("view.yahoo.com/show/[^/]+/episode/[^/]+/"),
@@ -154,7 +142,6 @@ static const std::vector<StreamData> stream_data{
   // YouTube
   {
     Stream::Youtube,
-    taiga::kStream_Youtube,
     L"YouTube",
     L"https://www.youtube.com",
     std::regex("youtube\\.com/watch"),
@@ -164,6 +151,82 @@ static const std::vector<StreamData> stream_data{
 
 const std::vector<StreamData>& GetStreamData() {
   return stream_data;
+}
+
+bool IsStreamEnabled(const Stream stream) {
+  switch (stream) {
+    case Stream::Animelab:
+      return taiga::settings.GetStreamAnimelab();
+    case Stream::Adn:
+      return taiga::settings.GetStreamAdn();
+    case Stream::Ann:
+      return taiga::settings.GetStreamAnn();
+    case Stream::Crunchyroll:
+      return taiga::settings.GetStreamCrunchyroll();
+    case Stream::Funimation:
+      return taiga::settings.GetStreamFunimation();
+    case Stream::Hidive:
+      return taiga::settings.GetStreamHidive();
+    case Stream::Plex:
+      return taiga::settings.GetStreamPlex();
+    case Stream::Veoh:
+      return taiga::settings.GetStreamVeoh();
+    case Stream::Viz:
+      return taiga::settings.GetStreamViz();
+    case Stream::Vrv:
+      return taiga::settings.GetStreamVrv();
+    case Stream::Wakanim:
+      return taiga::settings.GetStreamWakanim();
+    case Stream::Yahoo:
+      return taiga::settings.GetStreamYahoo();
+    case Stream::Youtube:
+      return taiga::settings.GetStreamYoutube();
+  }
+  return false;
+}
+
+void EnableStream(const Stream stream, const bool enabled) {
+  switch (stream) {
+    case Stream::Animelab:
+      taiga::settings.SetStreamAnimelab(enabled);
+      break;
+    case Stream::Adn:
+      taiga::settings.SetStreamAdn(enabled);
+      break;
+    case Stream::Ann:
+      taiga::settings.SetStreamAnn(enabled);
+      break;
+    case Stream::Crunchyroll:
+      taiga::settings.SetStreamCrunchyroll(enabled);
+      break;
+    case Stream::Funimation:
+      taiga::settings.SetStreamFunimation(enabled);
+      break;
+    case Stream::Hidive:
+      taiga::settings.SetStreamHidive(enabled);
+      break;
+    case Stream::Plex:
+      taiga::settings.SetStreamPlex(enabled);
+      break;
+    case Stream::Veoh:
+      taiga::settings.SetStreamVeoh(enabled);
+      break;
+    case Stream::Viz:
+      taiga::settings.SetStreamViz(enabled);
+      break;
+    case Stream::Vrv:
+      taiga::settings.SetStreamVrv(enabled);
+      break;
+    case Stream::Wakanim:
+      taiga::settings.SetStreamWakanim(enabled);
+      break;
+    case Stream::Yahoo:
+      taiga::settings.SetStreamYahoo(enabled);
+      break;
+    case Stream::Youtube:
+      taiga::settings.SetStreamYoutube(enabled);
+      break;
+  }
 }
 
 const StreamData* FindStreamFromUrl(std::wstring url) {
@@ -176,9 +239,8 @@ const StreamData* FindStreamFromUrl(std::wstring url) {
   const std::string str = WstrToStr(url);
 
   for (const auto& item : stream_data) {
-    if (std::regex_search(str, item.url_pattern)) {
-      const bool enabled = Settings.GetBool(item.option_id);
-      return enabled ? &item : nullptr;
+    if (std::regex_search(str, item.url_pattern)) {;
+      return IsStreamEnabled(item.id) ? &item : nullptr;
     }
   }
 

@@ -171,7 +171,7 @@ void ScanAvailableEpisodes(bool silent, int anime_id, int episode_number) {
   using track::scanner;
 
   // Check if any library folder is available
-  if (!silent && Settings.library_folders.empty()) {
+  if (!silent && taiga::settings.library_folders.empty()) {
     ui::OnSettingsLibraryFoldersEmpty();
     return;
   }
@@ -187,7 +187,7 @@ void ScanAvailableEpisodes(bool silent, int anime_id, int episode_number) {
   // Casting file size threshold to int shouldn't be a problem, as the value
   // is never supposed to exceed INT_MAX (i.e. ~2GB).
   scanner.options.min_file_size =
-      Settings.GetInt(taiga::kLibrary_FileSizeThreshold);
+      taiga::settings.GetLibraryFileSizeThreshold();
   scanner.set_path_found(L"");
 
   auto anime_item = anime::db.Find(anime_id);
@@ -219,7 +219,7 @@ void ScanAvailableEpisodes(bool silent, int anime_id, int episode_number) {
 
   if (!found) {
     // Search library folders for available episodes
-    for (const auto& folder : Settings.library_folders) {
+    for (const auto& folder : taiga::settings.library_folders) {
       if (!FolderExists(folder))
         continue;  // Might be a disconnected external drive
       bool skip_directories = false;
@@ -265,7 +265,7 @@ void ScanAvailableEpisodesQuick(int anime_id) {
     scanner.set_anime_id(anime_item.GetId());
     scanner.set_episode_number(0);
     scanner.options.min_file_size =
-        Settings.GetInt(taiga::kLibrary_FileSizeThreshold);
+        taiga::settings.GetLibraryFileSizeThreshold();
     scanner.options.skip_directories = true;
     scanner.options.skip_files = false;
     scanner.options.skip_subdirectories = false;

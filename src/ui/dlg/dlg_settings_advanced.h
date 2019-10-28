@@ -19,32 +19,17 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
-#include "media/anime_season.h"
+#include "taiga/settings.h"
 
-namespace library {
+namespace ui {
 
-class SeasonDatabase {
-public:
-  bool Load(const anime::Season& season);
+using AdvancedSetting = taiga::AppSettingKey;
 
-  // Checkes if a significant portion of season data is empty and requires
-  // refreshing.
-  bool IsRefreshRequired();
+std::vector<AdvancedSetting> GetAdvancedSettingKeys();
+std::wstring GetAdvancedSettingDescription(const AdvancedSetting key);
+std::wstring GetAdvancedSettingValue(const AdvancedSetting key);
+void SetAdvancedSetting(const AdvancedSetting key, const std::wstring& value);
 
-  void Reset();
-
-  // Improves season data by excluding invalid items (i.e. postpones series) and
-  // adding missing ones from the anime database.
-  void Review(bool hide_nsfw = true);
-
-  // Only IDs are stored here, actual info is kept in anime::Database.
-  std::vector<int> items;
-
-  // Current season (e.g. "Spring 2012")
-  anime::Season current_season;
-};
-
-}  // namespace library
-
-extern library::SeasonDatabase SeasonDatabase;
+}  // namespace ui

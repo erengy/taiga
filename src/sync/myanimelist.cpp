@@ -28,7 +28,6 @@
 #include "media/anime_util.h"
 #include "sync/myanimelist.h"
 #include "sync/myanimelist_util.h"
-#include "taiga/settings.h"
 
 namespace sync {
 namespace myanimelist {

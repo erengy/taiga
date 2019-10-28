@@ -26,12 +26,6 @@
 
 class Date;
 
-namespace anime {
-class Database;
-class Episode;
-class Item;
-}
-
 namespace library {
 enum class QueueSearch;
 struct QueueItem;

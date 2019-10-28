@@ -23,11 +23,13 @@
 #include "base/log.h"
 #include "base/process.h"
 #include "base/string.h"
+#include "link/discord.h"
 #include "media/anime_db.h"
 #include "media/library/history.h"
 #include "taiga/announce.h"
 #include "taiga/config.h"
 #include "taiga/dummy.h"
+#include "taiga/http.h"
 #include "taiga/resource.h"
 #include "taiga/settings.h"
 #include "taiga/taiga.h"
@@ -112,10 +114,10 @@ BOOL App::InitInstance() {
   InitializeDummies();
 
   // Initialize Discord
-  if (Settings.GetBool(kShare_Discord_Enabled))
+  if (settings.GetShareDiscordEnabled())
     link::discord::Initialize();
 
-  if (Settings.GetBool(kApp_Behavior_CheckForUpdates)) {
+  if (settings.GetAppBehaviorCheckForUpdates()) {
     ui::ShowDialog(ui::Dialog::Update);
   } else {
     ui::ShowDialog(ui::Dialog::Main);
@@ -128,9 +130,9 @@ void App::Uninitialize() {
   // Announce
   if (track::media_players.play_status == track::recognition::PlayStatus::Playing) {
     track::media_players.play_status = track::recognition::PlayStatus::Stopped;
-    ::Announcer.Do(kAnnounceToHttp);
+    announcer.Do(kAnnounceToHttp);
   }
-  ::Announcer.Clear(kAnnounceToDiscord);
+  announcer.Clear(kAnnounceToDiscord);
 
   // Cleanup
   ConnectionManager.Shutdown();
@@ -138,7 +140,7 @@ void App::Uninitialize() {
   ui::taskbar_list.Release();
 
   // Save
-  Settings.Save();
+  settings.Save();
   anime::db.SaveDatabase();
   track::aggregator.SaveArchive();
 
@@ -149,9 +151,11 @@ void App::Uninitialize() {
 void App::LoadData() {
   track::media_players.Load();
 
-  if (Settings.Load())
-    if (Settings.HandleCompatibility())
-      Settings.Save();
+  if (settings.Load()) {
+    settings.DoAfterLoad();
+    if (settings.HandleCompatibility())
+      settings.Save();
+  }
 
   ui::Theme.Load();
   ui::Menus.Load();
@@ -161,6 +165,7 @@ void App::LoadData() {
   anime::db.ClearInvalidItems();
 
   library::history.Load();
+  track::aggregator.LoadArchive();
 }
 
 }  // namespace taiga

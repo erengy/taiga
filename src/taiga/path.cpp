@@ -83,7 +83,7 @@ std::wstring GetPath(Path path) {
     case Path::Theme:
       return data_path + L"theme\\";
     case Path::ThemeCurrent:
-      return data_path + L"theme\\" + Settings[kApp_Interface_Theme] + L"\\theme.xml";
+      return data_path + L"theme\\" + settings.GetAppInterfaceTheme() + L"\\theme.xml";
     case Path::User:
       return data_path + L"user\\";
     case Path::UserHistory:

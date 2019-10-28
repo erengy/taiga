@@ -25,6 +25,7 @@
 #include <windows/win/dialog.h>
 
 #include "track/feed_filter.h"
+#include "ui/dlg/dlg_settings_advanced.h"
 #include "ui/dlg/dlg_settings_page.h"
 
 namespace ui {
@@ -69,7 +70,7 @@ private:
   win::Tab tab_;
 
 private:
-  std::map<int, std::pair<std::wstring, std::wstring>> advanced_settings_;
+  std::map<AdvancedSetting, std::wstring> advanced_settings_;
   SettingsSections current_section_;
   SettingsPages current_page_;
   std::vector<track::FeedFilter> feed_filters_;

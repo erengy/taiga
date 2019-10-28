@@ -127,7 +127,7 @@ void Engine::Transliterate(std::wstring& str) const {
 }
 
 void Engine::NormalizeUnicode(std::wstring& str) const {
-  static const int options =
+  constexpr int options =
       // NFKC normalization according to Unicode Standard Annex #15
       UTF8PROC_COMPAT | UTF8PROC_COMPOSE | UTF8PROC_STABLE |
       // Strip "default ignorable" characters, control characters, character

@@ -84,10 +84,10 @@ void Timer::OnTimeout() {
       break;
 
     case kTimerMedia:
-      ::Announcer.Do(taiga::kAnnounceToDiscord |
-                     taiga::kAnnounceToHttp |
-                     taiga::kAnnounceToMirc);
-      if (!Settings.GetBool(taiga::kSync_Update_WaitPlayer)) {
+      announcer.Do(taiga::kAnnounceToDiscord |
+                   taiga::kAnnounceToHttp |
+                   taiga::kAnnounceToMirc);
+      if (!settings.GetSyncUpdateWaitPlayer()) {
         auto anime_item = anime::db.Find(CurrentEpisode.anime_id);
         if (anime_item)
           anime::UpdateList(*anime_item, CurrentEpisode);
@@ -104,7 +104,7 @@ void Timer::OnTimeout() {
       break;
 
     case kTimerTorrents:
-      track::aggregator.CheckFeed(Settings[taiga::kTorrent_Discovery_Source], true);
+      track::aggregator.CheckFeed(settings.GetTorrentDiscoverySource(), true);
       break;
   }
 }
@@ -132,7 +132,7 @@ void TimerManager::Initialize() {
 
 void TimerManager::UpdateEnabledState() {
   // Library
-  timer_library.set_enabled(!Settings.GetBool(taiga::kLibrary_WatchFolders));
+  timer_library.set_enabled(!settings.GetLibraryWatchFolders());
 
   // Media
   bool media_player_is_running = track::media_players.GetRunningPlayer() != nullptr;
@@ -146,18 +146,18 @@ void TimerManager::UpdateEnabledState() {
 
   // Torrents
   timer_torrents.set_enabled(
-      Settings.GetBool(taiga::kTorrent_Discovery_AutoCheckEnabled));
+      settings.GetTorrentDiscoveryAutoCheckEnabled());
 }
 
 void TimerManager::UpdateIntervalsFromSettings() {
   timer_detection.set_interval(
-      std::max(1, Settings.GetInt(taiga::kRecognition_DetectionInterval)));
+      std::max(1, settings.GetRecognitionDetectionInterval()));
 
   timer_media.set_interval(
-      Settings.GetInt(taiga::kSync_Update_Delay));
+      settings.GetSyncUpdateDelay());
 
   timer_torrents.set_interval(
-      Settings.GetInt(taiga::kTorrent_Discovery_AutoCheckInterval) * 60);
+      settings.GetTorrentDiscoveryAutoCheckInterval() * 60);
 }
 
 void TimerManager::UpdateUi() {

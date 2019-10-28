@@ -21,8 +21,9 @@
 #include "base/log.h"
 #include "base/string.h"
 #include "base/xml.h"
+#include "media/anime_season_db.h"
 #include "media/anime_util.h"
-#include "media/discover.h"
+#include "media/library/history.h"
 #include "media/library/queue.h"
 #include "sync/manager.h"
 #include "sync/service.h"
@@ -236,18 +237,23 @@ bool Database::DeleteItem(int id) {
   if (items.erase(id) > 0) {
     LOGW(L"ID: {} | Title: {}", id, title);
 
-    auto delete_history_items = [](int id, std::vector<library::QueueItem>& items) {
-      items.erase(std::remove_if(items.begin(), items.end(),
-          [&id](const library::QueueItem& item) {
-            return item.anime_id == id;
-          }), items.end());
-    };
+    library::history.items.erase(
+        std::remove_if(library::history.items.begin(),
+                       library::history.items.end(),
+                       [&id](const library::HistoryItem& item) {
+                         return item.anime_id == id;
+                       }),
+        library::history.items.end());
 
-    // @TODO
-    //delete_history_items(id, History.items);
-    delete_history_items(id, library::queue.items);
+    library::queue.items.erase(
+        std::remove_if(library::queue.items.begin(),
+                       library::queue.items.end(),
+                       [&id](const library::QueueItem& item) {
+                         return item.anime_id == id;
+                       }),
+        library::queue.items.end());
 
-    auto& items = SeasonDatabase.items;
+    auto& items = anime::season_db.items;
     items.erase(std::remove(items.begin(), items.end(), id), items.end());
 
     if (CurrentEpisode.anime_id == id)

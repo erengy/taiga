@@ -29,8 +29,8 @@
 #include "base/string.h"
 #include "media/anime_db.h"
 #include "track/episode.h"
+#include "media/anime_season_db.h"
 #include "media/anime_util.h"
-#include "media/discover.h"
 #include "media/library/queue.h"
 #include "sync/manager.h"
 #include "sync/service.h"
@@ -498,7 +498,7 @@ static bool AnimeListNeedsRefresh(const library::QueueItem& queue_item) {
 
 static bool AnimeListNeedsResort() {
   auto sort_column = DlgAnimeList.listview.TranslateColumnName(
-      Settings[taiga::kApp_List_SortColumnPrimary]);
+      taiga::settings.GetAppListSortColumnPrimary());
   switch (sort_column) {
     case kColumnUserLastUpdated:
     case kColumnUserProgress:
@@ -619,7 +619,7 @@ int OnHistoryProcessConfirmationQueue(anime::Episode& episode) {
 
   dlg.Show(DlgMain.GetWindowHandle());
   if (dlg.GetVerificationCheck())
-    Settings.Set(taiga::kSync_Update_AskToConfirm, false);
+    taiga::settings.SetSyncUpdateAskToConfirm(false);
   return dlg.GetSelectedButtonID();
 }
 
@@ -693,13 +693,13 @@ void OnAnimeWatchingStart(const anime::Item& anime_item,
 
   DlgMain.UpdateTip();
   DlgMain.UpdateTitle();
-  if (Settings.GetBool(taiga::kSync_GoToNowPlaying_Recognized))
+  if (taiga::settings.GetSyncGoToNowPlayingRecognized())
     DlgMain.navigation.SetCurrentPage(kSidebarItemNowPlaying);
 
-  if (Settings.GetBool(taiga::kSync_Notify_Recognized)) {
+  if (taiga::settings.GetSyncNotifyRecognized()) {
     taskbar.tip_type = TipType::NowPlaying;
     std::wstring tip_text =
-        ReplaceVariables(Settings[taiga::kSync_Notify_Format], episode);
+        ReplaceVariables(taiga::settings.GetSyncNotifyFormat(), episode);
     taskbar.Tip(L"", L"", 0);
     taskbar.Tip(tip_text.c_str(), L"Now Playing", NIIF_INFO | NIIF_NOSOUND);
   }
@@ -746,7 +746,7 @@ bool OnEpisodePurge(anime::Item* anime_item, std::vector<std::wstring> episode_f
   dlg.Show(DlgMain.GetWindowHandle());
   if (dlg.GetVerificationCheck()) {
     if (anime_item->GetUseGlobalRemovalSetting()) {
-      Settings.Set(taiga::kLibrary_Management_PromptDelete, false);
+      taiga::settings.SetManagementPromptDeletion(false);
     } else {
       anime_item->SetPromptAtEpisodeDelete(false);
     }
@@ -785,11 +785,11 @@ void OnRecognitionFail() {
     ChangeStatusText(L"Watching: {}{} (Not recognized)"_format(
                      CurrentEpisode.anime_title(),
                      PushString(L" #", anime::GetEpisodeRange(CurrentEpisode))));
-    if (Settings.GetBool(taiga::kSync_GoToNowPlaying_NotRecognized))
+    if (taiga::settings.GetSyncGoToNowPlayingNotRecognized())
       DlgMain.navigation.SetCurrentPage(kSidebarItemNowPlaying);
-    if (Settings.GetBool(taiga::kSync_Notify_NotRecognized)) {
+    if (taiga::settings.GetSyncNotifyNotRecognized()) {
       std::wstring tip_text =
-          ReplaceVariables(Settings[taiga::kSync_Notify_Format], CurrentEpisode) +
+          ReplaceVariables(taiga::settings.GetSyncNotifyFormat(), CurrentEpisode) +
           L"\nClick here to view similar titles for this anime.";
       taskbar.tip_type = TipType::NowPlaying;
       taskbar.Tip(L"", L"", 0);
@@ -833,7 +833,7 @@ void OnSeasonLoadFail() {
 
 bool OnSeasonRefreshRequired() {
   win::TaskDialog dlg;
-  std::wstring title = L"Season - " + ui::TranslateSeason(SeasonDatabase.current_season);
+  std::wstring title = L"Season - " + ui::TranslateSeason(anime::season_db.current_season);
   dlg.SetWindowTitle(title.c_str());
   dlg.SetMainIcon(TD_ICON_INFORMATION);
   dlg.SetMainInstruction(L"Would you like to refresh this season's data?");
@@ -913,8 +913,8 @@ void OnSettingsServiceChange() {
   DlgMain.toolbar_main.SetButtonTooltip(0, tooltip.c_str());
 }
 
-bool OnSettingsServiceChangeConfirm(const std::wstring& current_service,
-                                    const std::wstring& new_service) {
+bool OnSettingsServiceChangeConfirm(const sync::ServiceId current_service,
+                                    const sync::ServiceId new_service) {
   win::TaskDialog dlg(TAIGA_APP_NAME, TD_ICON_WARNING);
   std::wstring instruction =
       L"Do you want to change the active service from {} to {}?"_format(
@@ -1101,7 +1101,7 @@ bool OnTwitterTokenEntry(std::wstring& auth_pin) {
 void OnTwitterAuth(bool success) {
   ChangeStatusText(success ?
       L"Taiga is now authorized to post to this Twitter account: " +
-      Settings[taiga::kShare_Twitter_Username] :
+      taiga::settings.GetShareTwitterUsername() :
       L"Twitter authorization failed.");
 
   DlgSettings.RefreshTwitterLink();

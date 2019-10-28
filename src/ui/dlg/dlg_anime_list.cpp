@@ -212,7 +212,7 @@ INT_PTR AnimeListDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
               ExecuteCommand(L"SearchAnime({})"_format(text));
               break;
             case kSidebarItemFeeds:
-              DlgTorrent.Search(Settings[taiga::kTorrent_Discovery_SearchUrl], anime_id);
+              DlgTorrent.Search(taiga::settings.GetTorrentDiscoverySearchUrl(), anime_id);
               break;
           }
         }
@@ -467,10 +467,10 @@ void AnimeListDialog::ListView::SortFromSettings() {
     SetSortOptions(sort_options, secondary);
   };
 
-  set_options(TranslateColumnName(Settings[taiga::kApp_List_SortColumnPrimary]),
-              Settings.GetInt(taiga::kApp_List_SortOrderPrimary), false);
-  set_options(TranslateColumnName(Settings[taiga::kApp_List_SortColumnSecondary]),
-              Settings.GetInt(taiga::kApp_List_SortOrderSecondary), true);
+  set_options(TranslateColumnName(taiga::settings.GetAppListSortColumnPrimary()),
+              taiga::settings.GetAppListSortOrderPrimary(), false);
+  set_options(TranslateColumnName(taiga::settings.GetAppListSortColumnSecondary()),
+              taiga::settings.GetAppListSortOrderSecondary(), true);
 
   win::ListView::Sort(ui::AnimeListCompareProc);
 
@@ -659,7 +659,7 @@ LRESULT AnimeListDialog::ListView::WindowProc(HWND hwnd, UINT uMsg, WPARAM wPara
       if (item_index > -1) {
         SelectAllItems(false);
         SelectItem(item_index);
-        const auto command = static_cast<AnimeListAction>(Settings.GetInt(taiga::kApp_List_MiddleClickAction));
+        const auto command = static_cast<AnimeListAction>(taiga::settings.GetAppListMiddleClickAction());
         int anime_id = parent->GetCurrentId();
         ExecuteCommand(command, anime_id);
       }
@@ -733,11 +733,11 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
       listview.Sort(lplv->iSubItem, order, listview.GetSortType(column_type), ui::AnimeListCompareProc);
       RebuildIdCache();
       if (!same_column) {
-        Settings.Set(taiga::kApp_List_SortColumnSecondary, Settings[taiga::kApp_List_SortColumnPrimary]);
-        Settings.Set(taiga::kApp_List_SortOrderSecondary, Settings[taiga::kApp_List_SortOrderPrimary]);
+        taiga::settings.SetAppListSortColumnSecondary(taiga::settings.GetAppListSortColumnPrimary());
+        taiga::settings.SetAppListSortOrderSecondary(taiga::settings.GetAppListSortOrderPrimary());
       }
-      Settings.Set(taiga::kApp_List_SortColumnPrimary, listview.columns[column_type].key);
-      Settings.Set(taiga::kApp_List_SortOrderPrimary, order);
+      taiga::settings.SetAppListSortColumnPrimary(listview.columns[column_type].key);
+      taiga::settings.SetAppListSortOrderPrimary(order);
       break;
     }
 
@@ -777,7 +777,7 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
           listview.RefreshItem(list_index);
           listview.RedrawItems(list_index, list_index, true);
         } else {
-          const auto command = static_cast<AnimeListAction>(Settings.GetInt(taiga::kApp_List_DoubleClickAction));
+          const auto command = static_cast<AnimeListAction>(taiga::settings.GetAppListDoubleClickAction());
           listview.ExecuteCommand(command, anime_id);
         }
       }
@@ -841,7 +841,7 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
         case VK_RETURN: {
           if (!anime::IsValidId(anime_id))
             break;
-          const auto command = static_cast<AnimeListAction>(Settings.GetInt(taiga::kApp_List_DoubleClickAction));
+          const auto command = static_cast<AnimeListAction>(taiga::settings.GetAppListDoubleClickAction());
           listview.ExecuteCommand(command, anime_id);
           break;
         }
@@ -995,7 +995,7 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, int index,
       rcWatched.left;
 
   // Draw aired episodes
-  if (Settings.GetBool(taiga::kApp_List_ProgressDisplayAired) && rcAired.Width()) {
+  if (taiga::settings.GetAppListProgressDisplayAired() && rcAired.Width()) {
     rcAired.top = rcAired.bottom - ScaleY(3);
     ui::Theme.DrawListProgress(dc.Get(), &rcAired, ui::kListProgressAired);
   }
@@ -1029,7 +1029,7 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, int index,
   }
 
   // Draw episode availability
-  if (Settings.GetBool(taiga::kApp_List_ProgressDisplayAvailable)) {
+  if (taiga::settings.GetAppListProgressDisplayAvailable()) {
     const int eps_total = anime::EstimateEpisodeCount(anime_item);
     const int eps_aired = anime::GetLastEpisodeNumber(anime_item);
     const int eps_available = std::max(eps_total, eps_aired);
@@ -1211,7 +1211,7 @@ LRESULT AnimeListDialog::OnListCustomDraw(LPARAM lParam) {
           break;
         case kColumnAnimeTitle:
           if (anime_item->IsNextEpisodeAvailable() &&
-              Settings.GetBool(taiga::kApp_List_HighlightNewEpisodes))
+              taiga::settings.GetAppListHighlightNewEpisodes())
             pCD->clrText = GetSysColor(COLOR_HIGHLIGHT);
           break;
         case kColumnUserRating:

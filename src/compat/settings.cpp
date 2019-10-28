@@ -24,8 +24,8 @@
 
 namespace taiga {
 
-bool AppSettings::HandleCompatibility() {
-  const semaver::Version version(WstrToStr(GetWstr(kMeta_Version)));
+bool Settings::HandleCompatibility() {
+  const semaver::Version version = GetMetaVersion();
 
   if (version == taiga::version())
     return false;
@@ -35,11 +35,11 @@ bool AppSettings::HandleCompatibility() {
 
   if (version <= semaver::Version(1, 3, 0)) {
     // Set title language preference
-    if (GetWstr(kApp_List_TitleLanguagePreference).empty()) {
-      if (GetBool(kApp_List_DisplayEnglishTitles)) {
-        Set(kApp_List_TitleLanguagePreference, L"english");
+    if (GetAppListTitleLanguagePreference().empty()) {
+      if (GetAppListDisplayEnglishTitles()) {
+        SetAppListTitleLanguagePreference(std::wstring{L"english"});
       } else {
-        Set(kApp_List_TitleLanguagePreference, L"romaji");
+        SetAppListTitleLanguagePreference(std::wstring{L"romaji"});
       }
     }
   }

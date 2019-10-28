@@ -20,6 +20,7 @@
 
 #include "link/discord.h"
 
+#include "base/format.h"
 #include "base/log.h"
 #include "base/string.h"
 #include "sync/service.h"
@@ -58,7 +59,7 @@ void Initialize() {
   handlers.errored = OnError;
 
   const auto application_id =
-      WstrToStr(Settings[taiga::kShare_Discord_ApplicationId]);
+      WstrToStr(taiga::settings.GetShareDiscordApplicationId());
 
   Discord_Initialize(application_id.c_str(), &handlers, FALSE, nullptr);
 }
@@ -79,12 +80,11 @@ void UpdatePresence(const std::string& details,
   const std::string small_image_key =
       WstrToStr(taiga::GetCurrentService()->canonical_name());
 
-  std::string small_image_text =
+  const std::string small_image_text =
+      taiga::settings.GetShareDiscordUsernameEnabled() ?
+      WstrToStr(L"{} at {}"_format(taiga::GetCurrentUserDisplayName(),
+                                   taiga::GetCurrentService()->name())) :
       WstrToStr(taiga::GetCurrentService()->name());
-  if (Settings.GetBool(taiga::kShare_Discord_Username_Enabled)) {
-    small_image_text = WstrToStr(taiga::GetCurrentUserDisplayName() + L" at ") +
-                       small_image_text;
-  }
 
   DiscordRichPresence presence = {0};
   presence.state = state.c_str();

@@ -26,8 +26,8 @@
 #include "base/process.h"
 #include "base/string.h"
 #include "media/anime_db.h"
+#include "media/anime_season_db.h"
 #include "media/anime_util.h"
-#include "media/discover.h"
 #include "media/library/export.h"
 #include "media/library/history.h"
 #include "media/library/list_util.h"
@@ -270,12 +270,13 @@ void ExecuteCommand(const std::wstring& str, WPARAM wParam, LPARAM lParam) {
   } else if (command == L"SearchTorrents") {
     int anime_id = static_cast<int>(lParam);
     if (body.empty())
-      body = Settings[taiga::kTorrent_Discovery_SearchUrl];
+      body = taiga::settings.GetTorrentDiscoverySearchUrl();
     ui::DlgTorrent.Search(body, anime_id);
 
   // ToggleSidebar()
   } else if (command == L"ToggleSidebar") {
-    bool hide_sidebar = Settings.Toggle(taiga::kApp_Option_HideSidebar);
+    const bool hide_sidebar = !taiga::settings.GetAppOptionHideSidebar();
+    taiga::settings.SetAppOptionHideSidebar(hide_sidebar);
     ui::DlgMain.treeview.Show(!hide_sidebar);
     ui::DlgMain.UpdateControlPositions();
     ui::Menus.UpdateView();
@@ -344,8 +345,8 @@ void ExecuteCommand(const std::wstring& str, WPARAM wParam, LPARAM lParam) {
     std::wstring path;
     if (win::BrowseForFolder(ui::GetWindowHandle(ui::Dialog::Main),
                              L"Add a Library Folder", L"", path)) {
-      Settings.library_folders.push_back(path);
-      if (Settings.GetBool(taiga::kLibrary_WatchFolders))
+      taiga::settings.library_folders.push_back(path);
+      if (taiga::settings.GetLibraryWatchFolders())
         track::monitor.Enable();
       ui::ShowDlgSettings(ui::kSettingsSectionLibrary, ui::kSettingsPageLibraryFolders);
     }
@@ -364,7 +365,8 @@ void ExecuteCommand(const std::wstring& str, WPARAM wParam, LPARAM lParam) {
   // ToggleRecognition()
   //   Enables or disables anime recognition.
   } else if (command == L"ToggleRecognition") {
-    bool enable_recognition = Settings.Toggle(taiga::kApp_Option_EnableRecognition);
+    const bool enable_recognition = !taiga::settings.GetAppOptionEnableRecognition();
+    taiga::settings.SetAppOptionEnableRecognition(enable_recognition);
     if (enable_recognition) {
       ui::ChangeStatusText(L"Automatic anime recognition is now enabled.");
       CurrentEpisode.Set(anime::ID_UNKNOWN);
@@ -379,7 +381,8 @@ void ExecuteCommand(const std::wstring& str, WPARAM wParam, LPARAM lParam) {
   // ToggleSharing()
   //   Enables or disables automatic sharing.
   } else if (command == L"ToggleSharing") {
-    bool enable_sharing = Settings.Toggle(taiga::kApp_Option_EnableSharing);
+    const bool enable_sharing = !taiga::settings.GetAppOptionEnableSharing();
+    taiga::settings.SetAppOptionEnableSharing(enable_sharing);
     ui::Menus.UpdateTools();
     if (enable_sharing) {
       ui::ChangeStatusText(L"Automatic sharing is now enabled.");
@@ -390,7 +393,8 @@ void ExecuteCommand(const std::wstring& str, WPARAM wParam, LPARAM lParam) {
   // ToggleSynchronization()
   //   Enables or disables automatic list synchronization.
   } else if (command == L"ToggleSynchronization") {
-    bool enable_sync = Settings.Toggle(taiga::kApp_Option_EnableSync);
+    const bool enable_sync = !taiga::settings.GetAppOptionEnableSync();
+    taiga::settings.SetAppOptionEnableSync(enable_sync);
     ui::Menus.UpdateTools();
     if (enable_sync) {
       ui::ChangeStatusText(L"Automatic synchronization is now enabled.");
@@ -404,22 +408,22 @@ void ExecuteCommand(const std::wstring& str, WPARAM wParam, LPARAM lParam) {
   // AnnounceToDiscord(force)
   //   Updates rich presence.
   } else if (command == L"AnnounceToDiscord") {
-    Announcer.Do(taiga::kAnnounceToDiscord, nullptr, body == L"true");
+    taiga::announcer.Do(taiga::kAnnounceToDiscord, nullptr, body == L"true");
 
   // AnnounceToHTTP(force)
   //   Sends an HTTP request.
   } else if (command == L"AnnounceToHTTP") {
-    Announcer.Do(taiga::kAnnounceToHttp, nullptr, body == L"true");
+    taiga::announcer.Do(taiga::kAnnounceToHttp, nullptr, body == L"true");
 
   // AnnounceToMIRC(force)
   //   Sends message to specified channels in mIRC.
   } else if (command == L"AnnounceToMIRC") {
-    Announcer.Do(taiga::kAnnounceToMirc, nullptr, body == L"true");
+    taiga::announcer.Do(taiga::kAnnounceToMirc, nullptr, body == L"true");
 
   // AnnounceToTwitter(force)
   //   Changes Twitter status.
   } else if (command == L"AnnounceToTwitter") {
-    Announcer.Do(taiga::kAnnounceToTwitter, nullptr, body == L"true");
+    taiga::announcer.Do(taiga::kAnnounceToTwitter, nullptr, body == L"true");
 
   //////////////////////////////////////////////////////////////////////////////
 
@@ -637,13 +641,13 @@ void ExecuteCommand(const std::wstring& str, WPARAM wParam, LPARAM lParam) {
     if (anime_item->GetFolder().empty()) {
       if (ui::OnAnimeFolderNotFound()) {
         std::wstring default_path, path;
-        if (!Settings.library_folders.empty())
-          default_path = Settings.library_folders.front();
+        if (!taiga::settings.library_folders.empty())
+          default_path = taiga::settings.library_folders.front();
         if (win::BrowseForFolder(ui::GetWindowHandle(ui::Dialog::Main),
                                  L"Select Anime Folder",
                                  default_path, path)) {
           anime_item->SetFolder(path);
-          Settings.Save();
+          taiga::settings.Save();
         }
       }
     }
@@ -716,13 +720,12 @@ void ExecuteCommand(const std::wstring& str, WPARAM wParam, LPARAM lParam) {
         break;
       case sync::kKitsu:
       case sync::kAniList:
-        if (SeasonDatabase.Load(anime::Season(body))) {
-          Settings.Set(taiga::kApp_Seasons_LastSeason,
-                       ui::TranslateSeason(SeasonDatabase.current_season));
-          ui::OnSeasonLoad(false);
-          if (SeasonDatabase.items.empty()) {
-            ui::DlgSeason.GetData();
-          }
+        anime::season_db.Set(anime::Season(body));
+        taiga::settings.SetAppSeasonsLastSeason(
+            ui::TranslateSeason(anime::season_db.current_season));
+        ui::OnSeasonLoad(false);
+        if (anime::season_db.items.empty()) {
+          ui::DlgSeason.GetData();
         }
         break;
     }
@@ -730,14 +733,14 @@ void ExecuteCommand(const std::wstring& str, WPARAM wParam, LPARAM lParam) {
   // Season_GroupBy(group)
   //   Groups season data.
   } else if (command == L"Season_GroupBy") {
-    Settings.Set(taiga::kApp_Seasons_GroupBy, ToInt(body));
+    taiga::settings.SetAppSeasonsGroupBy(ToInt(body));
     ui::DlgSeason.RefreshList();
     ui::DlgSeason.RefreshToolbar();
 
   // Season_SortBy(sort)
   //   Sorts season data.
   } else if (command == L"Season_SortBy") {
-    Settings.Set(taiga::kApp_Seasons_SortBy, ToInt(body));
+    taiga::settings.SetAppSeasonsSortBy(ToInt(body));
     ui::DlgSeason.RefreshList();
     ui::DlgSeason.RefreshToolbar();
 

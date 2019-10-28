@@ -19,8 +19,8 @@
 #include "base/file.h"
 #include "media/anime.h"
 #include "media/anime_db.h"
+#include "media/anime_season_db.h"
 #include "media/anime_util.h"
-#include "media/discover.h"
 #include "ui/resource.h"
 #include "sync/sync.h"
 #include "taiga/path.h"
@@ -92,9 +92,9 @@ void ImageDatabase::FreeMemory() {
         ui::DlgNowPlaying.GetCurrentId() == anime_id)
       erase = false;
 
-    if (!SeasonDatabase.items.empty())
-      if (std::find(SeasonDatabase.items.begin(), SeasonDatabase.items.end(),
-                    anime_id) != SeasonDatabase.items.end())
+    if (!anime::season_db.items.empty())
+      if (std::find(anime::season_db.items.begin(), anime::season_db.items.end(),
+                    anime_id) != anime::season_db.items.end())
         if (ui::DlgSeason.IsVisible())
           erase = false;
 

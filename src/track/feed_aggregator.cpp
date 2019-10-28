@@ -147,8 +147,8 @@ bool Aggregator::Download(const FeedItem* feed_item) {
         [&](const FeedItem* item1, const FeedItem* item2) {
           if (item1->episode_data.anime_id != item2->episode_data.anime_id)
             return item1->episode_data.anime_id < item2->episode_data.anime_id;
-          auto sort_by = Settings[taiga::kTorrent_Download_SortBy];
-          auto sort_order = Settings[taiga::kTorrent_Download_SortOrder];
+          auto sort_by = taiga::settings.GetTorrentDownloadSortBy();
+          auto sort_order = taiga::settings.GetTorrentDownloadSortOrder();
           if (sort_by == L"episode_number") {
             if (sort_order == L"descending") {
               return item2->episode_data.episode_number() <
@@ -234,7 +234,7 @@ void Aggregator::HandleFeedCheck(Feed& feed, const std::string& data,
   ui::OnFeedCheck(success);
 
   if (automatic) {
-    switch (Settings.GetInt(taiga::kTorrent_Discovery_NewAction)) {
+    switch (taiga::settings.GetTorrentDiscoveryNewAction()) {
       case 1:  // Notify
         ui::OnFeedNotify(feed);
         break;
@@ -296,11 +296,11 @@ void Aggregator::HandleFeedDownloadError(Feed& feed) {
 }
 
 std::wstring GetTorrentApplicationPath() {
-  switch (Settings.GetInt(taiga::kTorrent_Download_AppMode)) {
+  switch (taiga::settings.GetTorrentDownloadAppMode()) {
     case 1:  // Default application
       return GetDefaultAppPath(L".torrent");
     case 2:  // Custom application
-      return Settings[taiga::kTorrent_Download_AppPath];
+      return taiga::settings.GetTorrentDownloadAppPath();
     default:
       return {};
   }
@@ -319,12 +319,12 @@ std::wstring GetTorrentDownloadPath(const FeedItem::EpisodeData& episode_data) {
 
   // If no anime folder is set, use an alternative folder
   if (path.empty() &&
-      Settings.GetBool(taiga::kTorrent_Download_FallbackOnFolder)) {
-    path = Settings[taiga::kTorrent_Download_Location];
+      taiga::settings.GetTorrentDownloadFallbackOnFolder()) {
+    path = taiga::settings.GetTorrentDownloadLocation();
 
     // Create a subfolder using the anime title as its name
     if (!path.empty() &&
-        Settings.GetBool(taiga::kTorrent_Download_CreateSubfolder)) {
+        taiga::settings.GetTorrentDownloadCreateSubfolder()) {
       auto subfolder =
           anime_item ? anime_item->GetTitle() : episode_data.anime_title();
       ValidateFileName(subfolder);
@@ -332,7 +332,7 @@ std::wstring GetTorrentDownloadPath(const FeedItem::EpisodeData& episode_data) {
       path += subfolder;
       if (CreateFolder(path) && anime_item) {
         anime_item->SetFolder(path);
-        Settings.Save();
+        taiga::settings.Save();
       }
     }
   }
@@ -344,7 +344,7 @@ std::wstring GetTorrentDownloadPath(const FeedItem::EpisodeData& episode_data) {
 
 void Aggregator::HandleFeedDownloadOpen(FeedItem& feed_item,
                                         const std::wstring& file) {
-  if (!Settings.GetBool(taiga::kTorrent_Download_AppOpen))
+  if (!taiga::settings.GetTorrentDownloadAppOpen())
     return;
 
   const auto app_path = GetTorrentApplicationPath();
@@ -358,7 +358,7 @@ void Aggregator::HandleFeedDownloadOpen(FeedItem& feed_item,
   std::wstring parameters = LR"("{}")"_format(file);
   int show_command = SW_SHOWNORMAL;
 
-  if (Settings.GetBool(taiga::kTorrent_Download_UseAnimeFolder)) {
+  if (taiga::settings.GetTorrentDownloadUseAnimeFolder()) {
     const auto download_path = GetTorrentDownloadPath(feed_item.episode_data);
     if (!download_path.empty()) {
       const auto app_filename = GetFileName(app_path);
@@ -387,7 +387,7 @@ void Aggregator::HandleFeedDownloadOpen(FeedItem& feed_item,
 }
 
 bool Aggregator::IsMagnetLink(const FeedItem& feed_item) const {
-  if (Settings.GetBool(taiga::kTorrent_Download_UseMagnet) &&
+  if (taiga::settings.GetTorrentDownloadUseMagnet() &&
       !feed_item.magnet_link.empty())
     return true;
 
@@ -480,7 +480,7 @@ bool Aggregator::SaveArchive() const {
   XmlDocument document;
   auto archive_node = document.append_child(L"archive");
 
-  size_t max_count = Settings.GetInt(taiga::kTorrent_Filter_ArchiveMaxCount);
+  size_t max_count = taiga::settings.GetTorrentFilterArchiveMaxCount();
 
   if (max_count > 0) {
     size_t length = file_archive_.size();

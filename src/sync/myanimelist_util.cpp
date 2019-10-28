@@ -255,7 +255,7 @@ void ViewAnimeSearch(const std::wstring& title) {
 
 void ViewHistory() {
   ExecuteLink(L"https://myanimelist.net/history/" +
-              Settings[taiga::kSync_Service_Mal_Username]);
+              taiga::settings.GetSyncServiceMalUsername());
 }
 
 void ViewLogin() {
@@ -268,7 +268,7 @@ void ViewPanel() {
 
 void ViewProfile() {
   ExecuteLink(L"https://myanimelist.net/profile/" +
-              Settings[taiga::kSync_Service_Mal_Username]);
+              taiga::settings.GetSyncServiceMalUsername());
 }
 
 void ViewUpcomingAnime() {

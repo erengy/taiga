@@ -290,9 +290,9 @@ void Service::GetUser(Response& response, HttpResponse& http_response) {
   const auto display_name = StrToWstr(JsonReadStr(user["attributes"], "name"));
   const auto email = StrToWstr(JsonReadStr(user["attributes"], "email"));
 
-  Settings.Set(taiga::kSync_Service_Kitsu_DisplayName, display_name);
-  Settings.Set(taiga::kSync_Service_Kitsu_Email, email);
-  Settings.Set(taiga::kSync_Service_Kitsu_RatingSystem, user_.rating_system);
+  taiga::settings.SetSyncServiceKitsuDisplayName(display_name);
+  taiga::settings.SetSyncServiceKitsuEmail(email);
+  taiga::settings.SetSyncServiceKitsuRatingSystem(user_.rating_system);
 }
 
 void Service::GetLibraryEntries(Response& response, HttpResponse& http_response) {
@@ -794,7 +794,7 @@ bool Service::ParseResponseBody(const std::wstring& body,
 
 bool Service::IsPartialLibraryRequest() const {
   return user_.last_synchronized &&
-         Settings.GetBool(taiga::kSync_Service_Kitsu_PartialLibrary);
+         taiga::settings.GetSyncServiceKitsuPartialLibrary();
 }
 
 }  // namespace kitsu

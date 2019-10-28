@@ -299,8 +299,8 @@ int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2,
 
 int CALLBACK AnimeListCompareProc(LPARAM lParam1, LPARAM lParam2,
                                   LPARAM lParamSort) {
-  if (Settings.GetBool(taiga::kApp_List_HighlightNewEpisodes) &&
-      Settings.GetBool(taiga::kApp_List_DisplayHighlightedOnTop)) {
+  if (taiga::settings.GetAppListHighlightNewEpisodes() &&
+      taiga::settings.GetAppListDisplayHighlightedOnTop()) {
     const auto list = reinterpret_cast<win::ListView*>(lParamSort);
     const auto item1 = anime::db.Find(list->GetItemParam(lParam1));
     const auto item2 = anime::db.Find(list->GetItemParam(lParam2));

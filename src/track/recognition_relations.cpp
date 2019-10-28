@@ -144,7 +144,7 @@ bool Engine::ReadRelations() {
 
   if (!ReadFromFile(path, document)) {
     LOGW(L"Could not read anime relations data.");
-    Settings.Set(taiga::kRecognition_RelationsLastModified, std::wstring());
+    taiga::settings.SetRecognitionRelationsLastModified(std::wstring{});
     return false;
   }
 
@@ -197,7 +197,7 @@ bool Engine::ReadRelations(const std::string& document) {
             if (version > taiga::version())
               LOGD(L"Anime relations version is larger than application version.");
           } else if (name == L"last_modified") {
-            Settings.Set(taiga::kRecognition_RelationsLastModified, value);
+            taiga::settings.SetRecognitionRelationsLastModified(value);
           }
         }
         break;

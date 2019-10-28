@@ -1,6 +1,10 @@
 @echo off
 
 set vc=%1
+if "%vc%"=="16" (
+  set vcvarsall="%ProgramFiles(x86)%\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars32.bat"
+  goto :initialize_environment
+)
 if "%vc%"=="15" (
   set vcvarsall="%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars32.bat"
   goto :initialize_environment
@@ -22,8 +26,8 @@ if exist %vswhere% (
 )
 
 echo Error in script usage. The correct usage is: %~nx0 [version]
-echo [version] can be "15" ^(VS2017^) or "14" ^(VS2015^)
-echo Example: %~nx0 15
+echo [version] can be "16" ^(VS2019^), "15" ^(VS2017^) or "14" ^(VS2015^)
+echo Example: %~nx0 16
 exit /B 1
 
 :initialize_environment

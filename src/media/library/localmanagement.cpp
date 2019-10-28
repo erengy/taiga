@@ -66,10 +66,10 @@ namespace library {
 
     // read settings
     if (item->GetUseGlobalRemovalSetting()) { // use application-wide settings as default
-      eps_to_keep = remove_params.eps_to_keep.value_or(Settings.GetInt(taiga::kLibrary_Management_KeepNum));
-      after_completion = remove_params.remove_all_if_complete.value_or(Settings.GetBool(taiga::kLibrary_Management_DeleteAfterCompletion));
-      prompt = remove_params.prompt_remove.value_or(Settings.GetBool(taiga::kLibrary_Management_PromptDelete));
-      permanent_removal = remove_params.remove_permanent.value_or(Settings.GetBool(taiga::kLibrary_Management_DeletePermanently));
+      eps_to_keep = remove_params.eps_to_keep.value_or(taiga::settings.GetManagementKeepNum());
+      after_completion = remove_params.remove_all_if_complete.value_or(taiga::settings.GetManagementDeleteAfterCompletion());
+      prompt = remove_params.prompt_remove.value_or(taiga::settings.GetManagementPromptDeletion());
+      permanent_removal = remove_params.remove_permanent.value_or(taiga::settings.GetManagementDeletePermanently());
     }
     else { // use settings for specified anime as default
       eps_to_keep = remove_params.eps_to_keep.value_or(item->GetEpisodesToKeep());

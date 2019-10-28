@@ -18,35 +18,32 @@
 
 #pragma once
 
-#include <cstdint>
-#include <map>
-#include <string>
 #include <vector>
 
-namespace base {
-namespace http {
-class Request;
-class Response;
-}
-}
+#include "media/anime_season.h"
 
-namespace base {
+namespace anime {
 
-// Unique ID type
-using uid_t = std::wstring;
+class SeasonDatabase {
+public:
+  // Checkes if a significant portion of season data is empty and requires
+  // refreshing.
+  bool IsRefreshRequired() const;
 
-}  // namespace base
+  void Set(const Season& season);
+  void Reset();
 
-// Default enumeration type
-using enum_t = unsigned char;
+  // Improves season data by excluding invalid items (i.e. postpones series) and
+  // adding missing ones from the anime database.
+  void Review(bool hide_nsfw = true);
 
-// Dictionary types
-using dictionary_t = std::map<std::wstring, std::wstring>;
-using multidictionary_t = std::map<std::wstring, std::vector<std::wstring>>;
+  // Only IDs are stored here, actual info is kept in anime::Database.
+  std::vector<int> items;
 
-// HTTP request and response
-using HttpRequest = base::http::Request;
-using HttpResponse = base::http::Response;
+  // Current season (e.g. "Spring 2012")
+  Season current_season;
+};
 
-// 64-bit integral data type (quadword)
-using QWORD = unsigned __int64;
+inline SeasonDatabase season_db;
+
+}  // namespace anime

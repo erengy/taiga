@@ -139,7 +139,7 @@ BOOL TorrentDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
         track::aggregator.ExamineData(feed);
         RefreshList();
       } else {
-        track::aggregator.CheckFeed(Settings[taiga::kTorrent_Discovery_Source]);
+        track::aggregator.CheckFeed(taiga::settings.GetTorrentDiscoverySource());
       }
       return TRUE;
     }
@@ -243,7 +243,7 @@ void TorrentDialog::OnContextMenu(HWND hwnd, POINT pt) {
     }
 
   } else if (answer == L"MoreTorrents") {
-    Search(Settings[taiga::kTorrent_Discovery_SearchUrl], feed_item->episode_data.anime_title());
+    Search(taiga::settings.GetTorrentDiscoverySearchUrl(), feed_item->episode_data.anime_title());
 
   } else if (answer == L"SearchService") {
     ExecuteCommand(L"SearchAnime({})"_format(feed_item->episode_data.anime_title()));
@@ -537,8 +537,8 @@ void TorrentDialog::SetTimer(int ticks) {
 
   std::wstring text = L"Check new torrents";
 
-  if (Settings.GetBool(taiga::kTorrent_Discovery_AutoCheckEnabled) &&
-      Settings.GetInt(taiga::kTorrent_Discovery_AutoCheckInterval) > 0) {
+  if (taiga::settings.GetTorrentDiscoveryAutoCheckEnabled() &&
+      taiga::settings.GetTorrentDiscoveryAutoCheckInterval() > 0) {
     text += L" [{}]"_format(ToTimeString(ticks));
   }
 

@@ -19,8 +19,8 @@
 #include "base/gfx.h"
 #include "base/string.h"
 #include "media/anime_db.h"
+#include "media/anime_season_db.h"
 #include "media/anime_util.h"
-#include "media/discover.h"
 #include "ui/resource.h"
 #include "sync/sync.h"
 #include "taiga/resource.h"
@@ -50,7 +50,7 @@ BOOL SeasonDialog::OnInitDialog() {
   list_.SetExtendedStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT);
   list_.SetTheme();
   list_.SetView(LV_VIEW_TILE);
-  SetViewMode(Settings.GetInt(taiga::kApp_Seasons_ViewAs));
+  SetViewMode(taiga::settings.GetAppSeasonsViewAs());
 
   // Create list tooltips
   tooltips_.Create(list_.GetWindowHandle());
@@ -84,7 +84,7 @@ BOOL SeasonDialog::OnInitDialog() {
                     HIWORD(toolbar_.GetButtonSize()) + (HIWORD(toolbar_.GetPadding()) / 2), fMask, fStyle);
 
   // Load the last selected season
-  const auto last_season = Settings[taiga::kApp_Seasons_LastSeason];
+  const auto last_season = taiga::settings.GetAppSeasonsLastSeason();
   if (!last_season.empty()) {
     switch (taiga::GetCurrentServiceId()) {
       case sync::kMyAnimeList:
@@ -92,7 +92,7 @@ BOOL SeasonDialog::OnInitDialog() {
         break;
       case sync::kKitsu:
       case sync::kAniList:
-        SeasonDatabase.Load(anime::Season(last_season));
+        anime::season_db.Set(anime::Season(last_season));
         break;
     }
   }
@@ -218,7 +218,7 @@ LRESULT SeasonDialog::OnListNotify(LPARAM lParam) {
     // Item hover
     case LVN_HOTTRACK: {
       auto lplv = reinterpret_cast<LPNMLISTVIEW>(lParam);
-      if (Settings.GetInt(taiga::kApp_Seasons_ViewAs) != kSeasonViewAsImages) {
+      if (taiga::settings.GetAppSeasonsViewAs() != kSeasonViewAsImages) {
         tooltips_.NewToolRect(0, nullptr);
         break;
       }
@@ -286,7 +286,7 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       // markup text when the control has no items.
       if (list_.GetItemCount() == 0) {
         std::wstring text;
-        if (SeasonDatabase.items.empty()) {
+        if (anime::season_db.items.empty()) {
           text = L"No season selected. Please choose one from above.";
         } else {
           text = L"No matching items for \"" + DlgMain.search_bar.filters.text[kSidebarItemSeasons] + L"\".";
@@ -372,7 +372,7 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
           break;
       }
 
-      auto view_as = Settings.GetInt(taiga::kApp_Seasons_ViewAs);
+      auto view_as = taiga::settings.GetAppSeasonsViewAs();
 
       if (view_as == kSeasonViewAsImages) {
         rect_title.Copy(rect);
@@ -392,7 +392,7 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       // Set title
       std::wstring text = anime::GetPreferredTitle(*anime_item);
       if (view_as == kSeasonViewAsImages) {
-        switch (Settings.GetInt(taiga::kApp_Seasons_SortBy)) {
+        switch (taiga::settings.GetAppSeasonsSortBy()) {
           case kSeasonSortByAiringDate:
             text = ui::TranslateDate(anime_item->GetDateStart());
             break;
@@ -566,15 +566,15 @@ void SeasonDialog::EnableInput(bool enable) {
 void SeasonDialog::GetData() {
   EnableInput(false);
   ui::ChangeStatusText(L"Retrieving latest data for " +
-      ui::TranslateSeason(SeasonDatabase.current_season) + L" anime season...");
+      ui::TranslateSeason(anime::season_db.current_season) + L" anime season...");
 
-  sync::GetSeason(SeasonDatabase.current_season, 0);
+  sync::GetSeason(anime::season_db.current_season, 0);
 }
 
 void SeasonDialog::RefreshData(int anime_id) {
   ui::SetSharedCursor(IDC_WAIT);
 
-  for (const auto& id : SeasonDatabase.items) {
+  for (const auto& id : anime::season_db.items) {
     if (anime_id > 0 && anime_id != id)
       continue;
 
@@ -612,7 +612,7 @@ void SeasonDialog::RefreshList(bool redraw_only) {
   // Insert list groups
   list_.RemoveAllGroups();
   list_.EnableGroupView(true);  // Required for XP
-  switch (Settings.GetInt(taiga::kApp_Seasons_GroupBy)) {
+  switch (taiga::settings.GetAppSeasonsGroupBy()) {
     case kSeasonGroupByAiringStatus:
       for (int i = anime::kFinishedAiring; i <= anime::kNotYetAired; i++) {
         list_.InsertGroup(i, ui::TranslateStatus(i).c_str(), true, false);
@@ -638,7 +638,7 @@ void SeasonDialog::RefreshList(bool redraw_only) {
 
   // Add items
   list_.DeleteAllItems();
-  for (auto i = SeasonDatabase.items.begin(); i != SeasonDatabase.items.end(); ++i) {
+  for (auto i = anime::season_db.items.begin(); i != anime::season_db.items.end(); ++i) {
     auto anime_item = anime::db.Find(*i);
     if (!anime_item)
       continue;
@@ -656,7 +656,7 @@ void SeasonDialog::RefreshList(bool redraw_only) {
     if (!passed_filters)
       continue;
     int group = -1;
-    switch (Settings.GetInt(taiga::kApp_Seasons_GroupBy)) {
+    switch (taiga::settings.GetAppSeasonsGroupBy()) {
       case kSeasonGroupByAiringStatus:
         group = anime_item->GetAiringStatus();
         break;
@@ -669,13 +669,13 @@ void SeasonDialog::RefreshList(bool redraw_only) {
         group = anime_item->GetType();
         break;
     }
-    list_.InsertItem(i - SeasonDatabase.items.begin(),
+    list_.InsertItem(i - anime::season_db.items.begin(),
                      group, -1, 0, nullptr, LPSTR_TEXTCALLBACK,
                      static_cast<LPARAM>(anime_item->GetId()));
   }
 
   // Sort items
-  switch (Settings.GetInt(taiga::kApp_Seasons_SortBy)) {
+  switch (taiga::settings.GetAppSeasonsSortBy()) {
     case kSeasonSortByAiringDate:
       list_.Sort(0, 1, ui::kListSortDateStart, ui::ListViewCompareProc);
       break;
@@ -708,24 +708,24 @@ void SeasonDialog::RefreshList(bool redraw_only) {
 }
 
 void SeasonDialog::RefreshStatus() {
-  if (!SeasonDatabase.current_season)
+  if (!anime::season_db.current_season)
     return;
 
-  std::wstring text = ui::TranslateSeason(SeasonDatabase.current_season) + L", from " +
-                      ui::TranslateSeasonToMonths(SeasonDatabase.current_season);
+  std::wstring text = ui::TranslateSeason(anime::season_db.current_season) + L", from " +
+                      ui::TranslateSeasonToMonths(anime::season_db.current_season);
 
   ui::ChangeStatusText(text);
 }
 
 void SeasonDialog::RefreshToolbar() {
-  toolbar_.SetButtonText(0, SeasonDatabase.current_season ?
-      ui::TranslateSeason(SeasonDatabase.current_season).c_str() :
+  toolbar_.SetButtonText(0, anime::season_db.current_season ?
+      ui::TranslateSeason(anime::season_db.current_season).c_str() :
       L"Select season");
 
-  toolbar_.EnableButton(101, SeasonDatabase.current_season);
+  toolbar_.EnableButton(101, anime::season_db.current_season);
 
   std::wstring text = L"Group by: ";
-  switch (Settings.GetInt(taiga::kApp_Seasons_GroupBy)) {
+  switch (taiga::settings.GetAppSeasonsGroupBy()) {
     case kSeasonGroupByAiringStatus:
       text += L"Airing status";
       break;
@@ -740,7 +740,7 @@ void SeasonDialog::RefreshToolbar() {
   toolbar_.SetButtonText(3, text.c_str());
 
   text = L"Sort by: ";
-  switch (Settings.GetInt(taiga::kApp_Seasons_SortBy)) {
+  switch (taiga::settings.GetAppSeasonsSortBy()) {
     case kSeasonSortByAiringDate:
       text += L"Airing date";
       break;
@@ -761,7 +761,7 @@ void SeasonDialog::RefreshToolbar() {
   toolbar_.SetButtonText(4, text.c_str());
 
   text = L"View: ";
-  switch (Settings.GetInt(taiga::kApp_Seasons_ViewAs)) {
+  switch (taiga::settings.GetAppSeasonsViewAs()) {
     case kSeasonViewAsImages:
       text += L"Images";
       break;
@@ -800,7 +800,7 @@ void SeasonDialog::SetViewMode(int mode) {
       static_cast<int>(size.cy * 2.5);
   list_.SetTileViewInfo(0, LVTVIF_FIXEDSIZE, nullptr, &size);
 
-  Settings.Set(taiga::kApp_Seasons_ViewAs, mode);
+  taiga::settings.SetAppSeasonsViewAs(mode);
 }
 
 int SeasonDialog::GetLineCount() const {

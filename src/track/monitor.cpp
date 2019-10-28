@@ -32,7 +32,7 @@ namespace track {
 static void ChangeAnimeFolder(anime::Item& anime_item,
                               const std::wstring& path) {
   anime_item.SetFolder(path);
-  Settings.Save();
+  taiga::settings.Save();
 
   LOGD(L"Anime folder changed: {}\nPath: {}",
        anime_item.GetTitle(), anime_item.GetFolder());
@@ -97,7 +97,7 @@ void Monitor::Enable(bool enabled) {
   Clear();
 
   if (enabled) {
-    for (const auto& folder : Settings.library_folders) {
+    for (const auto& folder : taiga::settings.library_folders) {
       Add(folder);
     }
     Start();
