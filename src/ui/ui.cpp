@@ -131,10 +131,6 @@ void OnHttpError(const taiga::HttpClient& http_client, const std::wstring& error
       ChangeStatusText(error);
       DlgMain.EnableInput(true);
       break;
-    case taiga::kHttpFeedDownload:
-      ChangeStatusText(error);
-      DlgTorrent.EnableInput();
-      break;
     case taiga::kHttpServiceGetSeason:
       ChangeStatusText(error);
       DlgSeason.EnableInput();
@@ -210,9 +206,6 @@ void OnHttpProgress(const taiga::HttpClient& http_client) {
     case taiga::kHttpServiceDeleteLibraryEntry:
     case taiga::kHttpServiceUpdateLibraryEntry:
       status = L"Updating list...";
-      break;
-    case taiga::kHttpFeedDownload:
-      status = L"Downloading torrent file...";
       break;
     case taiga::kHttpServiceGetSeason:
       status = L"Downloading anime season data...";

@@ -348,6 +348,13 @@ private:
 
 namespace util {
 
+std::wstring GetUrlHost(const hypp::Uri& uri) {
+  if (uri.authority.has_value()) {
+    return StrToWstr(uri.authority->host);
+  }
+  return {};
+}
+
 std::wstring GetUrlHost(const std::string_view url) {
   hypp::Parser parser{url};
   if (const auto expected = hypp::ParseUri(parser)) {

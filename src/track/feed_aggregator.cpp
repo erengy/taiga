@@ -18,6 +18,7 @@
 
 #include <algorithm>
 #include <regex>
+#include <set>
 
 #include "track/feed_aggregator.h"
 
@@ -205,15 +206,37 @@ bool Aggregator::Download(const FeedItem* feed_item) {
     HandleFeedDownload(feed, empty_data);
 
   } else {
-    ui::ChangeStatusText(L"Downloading \"" + feed_item->title + L"\"...");
+    const auto title = feed_item->title;
+    ui::ChangeStatusText(L"Downloading \"{}\"..."_format(title));
     ui::EnableDialogInput(ui::Dialog::Torrents, false);
 
-    HttpRequest http_request;
-    http_request.header[L"Accept"] = L"application/x-bittorrent, */*";
-    http_request.url = feed_item->link;
-    http_request.parameter = reinterpret_cast<LPARAM>(&feed);
+    taiga::http::Request request;
+    request.set_target(WstrToStr(feed_item->link));
+    request.set_header("Accept", "application/x-bittorrent, */*");
 
-    ConnectionManager.MakeRequest(http_request, taiga::kHttpFeedDownload);
+    const auto host = taiga::http::util::GetUrlHost(request.target().uri);
+
+    const auto on_transfer = [title](const taiga::http::Transfer& transfer) {
+      ui::ChangeStatusText(L"Downloading \"{}\"... ({})"_format(
+          title, taiga::http::util::to_string(transfer)));
+      return true;
+    };
+
+    const auto on_response = [&feed, host, this](const taiga::http::Response& response) {
+      if (response.error()) {
+        ui::ChangeStatusText(
+            taiga::http::util::to_string(response.error(), host));
+        ui::EnableDialogInput(ui::Dialog::Torrents, true);
+        return;
+      }
+      if (ValidateFeedDownload(response)) {
+        HandleFeedDownload(feed, response.body());
+      } else {
+        HandleFeedDownloadError(feed);
+      }
+    };
+
+    taiga::http::Send(request, on_transfer, on_response);
   }
 
   return true;
@@ -413,29 +436,28 @@ bool Aggregator::IsMagnetLink(const FeedItem& feed_item) const {
   return false;
 }
 
-bool Aggregator::ValidateFeedDownload(const HttpRequest& http_request,
-                                      HttpResponse& http_response) {
+bool Aggregator::ValidateFeedDownload(const taiga::http::Response& response) {
   // Check response code
-  if (http_response.code >= 400) {
-    if (http_response.code == 404) {
-      const auto location = http_request.url.Build();
-      ui::OnFeedDownloadError(L"File not found at " + location);
+  if (response.status_code() >= 400) {
+    if (response.status_code() == 404) {
+      ui::OnFeedDownloadError(
+          L"File not found at " + StrToWstr(std::string{response.url()}));
     } else {
-      const auto code = ToWstr(http_response.code);
-      ui::OnFeedDownloadError(L"Invalid HTTP response (" + code + L")");
+      ui::OnFeedDownloadError(
+          L"Invalid HTTP response ({})"_format(response.status_code()));
     }
     return false;
   }
 
   // Check response body
-  if (StartsWith(http_response.body, L"<!DOCTYPE html>")) {
-    const auto location = http_request.url.Build();
-    ui::OnFeedDownloadError(L"Invalid torrent file: " + location);
+  if (StartsWith(StrToWstr(response.body()), L"<!DOCTYPE html>")) {
+    ui::OnFeedDownloadError(
+        L"Invalid torrent file: " + StrToWstr(std::string{response.url()}));
     return false;
   }
 
-  auto verify_content_type = [&]() {
-    static const std::vector<std::wstring> allowed_types{
+  const auto verify_content_type = [&]() {
+    static const std::set<std::wstring> allowed_types{
       L"application/x-bittorrent",
       // The following MIME types are invalid for .torrent files, but we allow
       // them to handle misconfigured servers.
@@ -444,23 +466,23 @@ bool Aggregator::ValidateFeedDownload(const HttpRequest& http_request,
       L"application/torrent",
       L"application/x-torrent",
     };
-    auto it = http_response.header.find(L"Content-Type");
-    if (it == http_response.header.end())
+    const auto content_type = response.header("content-type");
+    if (content_type.empty())
       return true;  // We can't check the header if it doesn't exist
-    const auto& content_type = it->second;
-    return std::find(allowed_types.begin(), allowed_types.end(),
-                     ToLower_Copy(content_type)) != allowed_types.end();
+
+    return allowed_types.count(
+               ToLower_Copy(StrToWstr(std::string{content_type}))) > 0;
   };
 
   auto has_content_disposition = [&]() {
-    return http_response.header.count(L"Content-Disposition") > 0;
+    return !response.header("content-disposition").empty();
   };
 
   if (!verify_content_type()) {
     // Allow invalid MIME types when Content-Disposition field is present
     if (!has_content_disposition()) {
       ui::OnFeedDownloadError(L"Invalid content type: " +
-                              http_response.header[L"Content-Type"]);
+          StrToWstr(std::string{response.header("content-type")}));
       return false;
     }
   }

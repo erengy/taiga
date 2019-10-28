@@ -25,6 +25,10 @@
 #include "track/feed.h"
 #include "track/feed_filter.h"
 
+namespace hypr {
+class Response;
+}
+
 namespace track {
 
 enum TorrentAction {
@@ -62,7 +66,7 @@ public:
   void HandleFeedCheck(Feed& feed, const std::string& data, bool automatic);
   void HandleFeedDownload(Feed& feed, const std::string& data);
   void HandleFeedDownloadError(Feed& feed);
-  bool ValidateFeedDownload(const HttpRequest& http_request, HttpResponse& http_response);
+  bool ValidateFeedDownload(const hypr::Response& http_response);
 
   void ExamineData(Feed& feed);
 

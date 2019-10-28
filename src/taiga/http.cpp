@@ -244,18 +244,6 @@ void HttpManager::HandleResponse(HttpResponse& response) {
       break;
     }
 
-    case kHttpFeedDownload: {
-      const auto feed = reinterpret_cast<track::Feed*>(response.parameter);
-      if (feed) {
-        if (track::aggregator.ValidateFeedDownload(client.request(), response)) {
-          track::aggregator.HandleFeedDownload(*feed, client.write_buffer_);
-        } else {
-          track::aggregator.HandleFeedDownloadError(*feed);
-        }
-      }
-      break;
-    }
-
     case kHttpTwitterRequest:
     case kHttpTwitterAuth:
     case kHttpTwitterPost:

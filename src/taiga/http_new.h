@@ -39,6 +39,7 @@ void Send(const Request& request,
 
 namespace util {
 
+std::wstring GetUrlHost(const hypp::Uri& uri);
 std::wstring GetUrlHost(const std::string_view url);
 std::wstring to_string(const hypr::Error& error, const std::wstring& host);
 std::wstring to_string(const Transfer& transfer);
