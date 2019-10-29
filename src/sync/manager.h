@@ -58,6 +58,10 @@ ServiceId GetServiceIdBySlug(const std::wstring& slug);
 std::wstring GetServiceNameById(const ServiceId service_id);
 std::wstring GetServiceSlugById(const ServiceId service_id);
 
+void AfterGetLibrary();
+void AfterGetSeason();
+void AfterLibraryUpdate();
+
 }  // namespace sync
 
 inline sync::Manager ServiceManager;

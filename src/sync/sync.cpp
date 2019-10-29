@@ -16,6 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "sync/sync.h"
+
 #include "base/crypto.h"
 #include "base/file.h"
 #include "base/string.h"
@@ -25,7 +27,7 @@
 #include "media/anime_util.h"
 #include "media/library/queue.h"
 #include "sync/manager.h"
-#include "sync/sync.h"
+#include "sync/myanimelist.h"
 #include "taiga/http.h"
 #include "taiga/http_new.h"
 #include "taiga/settings.h"
@@ -53,7 +55,15 @@ bool AuthenticateUser() {
   if (!AddAuthenticationToRequest(request))
     return false;
 
-  ServiceManager.MakeRequest(request);
+  switch (taiga::GetCurrentServiceId()) {
+    case kMyAnimeList:
+      myanimelist::AuthenticateUser();
+      break;
+    default:
+      ServiceManager.MakeRequest(request);
+      break;
+  }
+
   return true;
 }
 
@@ -73,7 +83,14 @@ void GetUser() {
   if (!AddAuthenticationToRequest(request))
     return;
 
-  ServiceManager.MakeRequest(request);
+  switch (taiga::GetCurrentServiceId()) {
+    case kMyAnimeList:
+      myanimelist::GetUser();
+      break;
+    default:
+      ServiceManager.MakeRequest(request);
+      break;
+  }
 }
 
 void GetLibraryEntries(const int offset) {
@@ -96,7 +113,15 @@ void GetLibraryEntries(const int offset) {
   if (!AddAuthenticationToRequest(request))
     return;
   AddPageOffsetToRequest(offset, request);
-  ServiceManager.MakeRequest(request);
+
+  switch (taiga::GetCurrentServiceId()) {
+    case kMyAnimeList:
+      myanimelist::GetLibraryEntries();
+      break;
+    default:
+      ServiceManager.MakeRequest(request);
+      break;
+  }
 }
 
 void GetMetadataById(int id) {
@@ -105,7 +130,15 @@ void GetMetadataById(int id) {
   if (!AddAuthenticationToRequest(request))
     return;
   AddServiceDataToRequest(request, id);
-  ServiceManager.MakeRequest(request);
+
+  switch (taiga::GetCurrentServiceId()) {
+    case kMyAnimeList:
+      myanimelist::GetMetadataById(id);
+      break;
+    default:
+      ServiceManager.MakeRequest(request);
+      break;
+  }
 }
 
 void GetSeason(const anime::Season season, const int offset) {
@@ -116,7 +149,15 @@ void GetSeason(const anime::Season season, const int offset) {
   AddPageOffsetToRequest(offset, request);
   request.data[L"year"] = ToWstr(season.year);
   request.data[L"season"] = ToLower_Copy(ui::TranslateSeasonName(season.name));
-  ServiceManager.MakeRequest(request);
+
+  switch (taiga::GetCurrentServiceId()) {
+    case kMyAnimeList:
+      myanimelist::GetSeason(season);
+      break;
+    default:
+      ServiceManager.MakeRequest(request);
+      break;
+  }
 }
 
 void SearchTitle(std::wstring title, int id) {
@@ -127,7 +168,15 @@ void SearchTitle(std::wstring title, int id) {
   if (id != anime::ID_UNKNOWN)
     AddServiceDataToRequest(request, id);
   request.data[L"title"] = title;
-  ServiceManager.MakeRequest(request);
+
+  switch (taiga::GetCurrentServiceId()) {
+    case kMyAnimeList:
+      myanimelist::SearchTitle(title);
+      break;
+    default:
+      ServiceManager.MakeRequest(request);
+      break;
+  }
 }
 
 void Synchronize() {
@@ -189,7 +238,14 @@ void UpdateLibraryEntry(const library::QueueItem& queue_item) {
   if (queue_item.notes)
     request.data[L"notes"] = *queue_item.notes;
 
-  ServiceManager.MakeRequest(request);
+  switch (taiga::GetCurrentServiceId()) {
+    case kMyAnimeList:
+      myanimelist::UpdateLibraryEntry(queue_item);
+      break;
+    default:
+      ServiceManager.MakeRequest(request);
+      break;
+  }
 }
 
 void DownloadImage(int anime_id, const std::wstring& image_url) {
@@ -271,8 +327,16 @@ void SetActiveServiceForRequest(Request& request) {
 }
 
 bool UserAuthenticated() {
-  auto service = taiga::GetCurrentService();
-  return service->user().authenticated;
+  switch (taiga::GetCurrentServiceId()) {
+    case kMyAnimeList:
+      return myanimelist::IsUserAuthenticated();
+      break;
+    default: {
+      const auto service = taiga::GetCurrentService();
+      return service->user().authenticated;
+      break;
+    }
+  }
 }
 
 void InvalidateUserAuthentication() {

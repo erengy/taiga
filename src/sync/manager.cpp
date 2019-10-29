@@ -300,12 +300,7 @@ void Manager::HandleResponse(Response& response, HttpResponse& http_response) {
         GetSeason(anime::Season(request.data[L"season"] + L" " +
                                 request.data[L"year"]), next_page);
       } else {
-        anime::season_db.Review();
-        ui::ClearStatusText();
-        ui::OnLibraryGetSeason();
-        for (const auto& id : anime::season_db.items) {
-          ui::image_db.Load(id, true, true);
-        }
+        AfterGetSeason();
       }
       break;
     }
@@ -322,10 +317,7 @@ void Manager::HandleResponse(Response& response, HttpResponse& http_response) {
       if (next_page > 0) {
         GetLibraryEntries(next_page);
       } else {
-        anime::db.SaveDatabase();
-        anime::db.SaveList();
-        ui::ChangeStatusText(L"Successfully downloaded the list.");
-        ui::OnLibraryChange();
+        AfterGetLibrary();
       }
       break;
     }
@@ -333,19 +325,40 @@ void Manager::HandleResponse(Response& response, HttpResponse& http_response) {
     case kAddLibraryEntry:
     case kDeleteLibraryEntry:
     case kUpdateLibraryEntry: {
-      library::queue.updating = false;
-      ui::ClearStatusText();
-
-      const auto queue_item = library::queue.GetCurrentItem();
-      if (queue_item) {
-        anime::db.UpdateItem(*queue_item);
-        anime::db.SaveList();
-        library::queue.Remove();
-        library::queue.Check(false);
-      }
-
+      AfterLibraryUpdate();
       break;
     }
+  }
+}
+
+void AfterGetLibrary() {
+  anime::db.SaveDatabase();
+  anime::db.SaveList();
+
+  ui::ChangeStatusText(L"Successfully downloaded the list.");
+  ui::OnLibraryChange();
+}
+
+void AfterGetSeason() {
+  anime::season_db.Review();
+
+  ui::ClearStatusText();
+  ui::OnLibraryGetSeason();
+
+  for (const auto& anime_id : anime::season_db.items) {
+    ui::image_db.Load(anime_id, true, true);
+  }
+}
+
+void AfterLibraryUpdate() {
+  library::queue.updating = false;
+  ui::ClearStatusText();
+
+  if (const auto queue_item = library::queue.GetCurrentItem()) {
+    anime::db.UpdateItem(*queue_item);
+    anime::db.SaveList();
+    library::queue.Remove();
+    library::queue.Check(false);
   }
 }
 

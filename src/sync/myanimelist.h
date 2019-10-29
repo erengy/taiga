@@ -22,11 +22,17 @@
 #include "base/types.h"
 #include "sync/service.h"
 
-namespace sync {
-namespace myanimelist {
+namespace anime {
+class Season;
+}
+namespace library {
+struct QueueItem;
+}
 
-// API documentation:
-// https://myanimelist.net/modules.php?go=api
+namespace sync::myanimelist {
+
+constexpr auto kServiceName = L"MyAnimeList";
+constexpr auto kServiceSlug = L"myanimelist";
 
 constexpr auto kClientId = L"f6e398095cf7525360276786ec4407bc";
 constexpr auto kRedirectUrl = L"https://taiga.moe/api/myanimelist/auth";
@@ -36,32 +42,21 @@ public:
   Service();
   ~Service() {}
 
-  void BuildRequest(Request& request, HttpRequest& http_request);
-  void HandleResponse(Response& response, HttpResponse& http_response);
+  void BuildRequest(Request& request, HttpRequest& http_request) {}
+  void HandleResponse(Response& response, HttpResponse& http_response) {}
   bool RequestNeedsAuthentication(RequestType request_type) const;
-
-private:
-  REQUEST_AND_RESPONSE(AddLibraryEntry);
-  REQUEST_AND_RESPONSE(AuthenticateUser);
-  REQUEST_AND_RESPONSE(GetUser);
-  REQUEST_AND_RESPONSE(DeleteLibraryEntry);
-  REQUEST_AND_RESPONSE(GetLibraryEntries);
-  REQUEST_AND_RESPONSE(GetMetadataById);
-  REQUEST_AND_RESPONSE(GetSeason);
-  REQUEST_AND_RESPONSE(SearchTitle);
-  REQUEST_AND_RESPONSE(UpdateLibraryEntry);
-
-  bool RequestSucceeded(Response& response, const HttpResponse& http_response);
-
-  int ParseAnimeObject(const Json& json) const;
-  int ParseLibraryObject(const Json& json, int anime_id) const;
-  void ParseLinks(const Json& json, Response& response) const;
-
-  bool ParseResponseBody(const std::wstring& body, Response& response, Json& json);
-
-  std::wstring Service::GetAnimeFields() const;
-  std::wstring Service::GetListStatusFields() const;
 };
 
-}  // namespace myanimelist
-}  // namespace sync
+void AuthenticateUser();
+void GetUser();
+void GetLibraryEntries(const int page_offset = 0);
+void GetMetadataById(const int id);
+void GetSeason(const anime::Season season, const int page_offset = 0);
+void SearchTitle(const std::wstring& title);
+void AddLibraryEntry(const library::QueueItem& queue_item);
+void DeleteLibraryEntry(const int id);
+void UpdateLibraryEntry(const library::QueueItem& queue_item);
+
+bool IsUserAuthenticated();
+
+}  // namespace sync::myanimelist
