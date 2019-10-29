@@ -25,6 +25,8 @@
 #include "media/anime_db.h"
 #include "media/anime_item.h"
 #include "media/anime_util.h"
+#include "sync/service.h"
+#include "taiga/settings.h"
 
 namespace anime {
 
@@ -57,6 +59,10 @@ void SeasonDatabase::Reset() {
 }
 
 void SeasonDatabase::Review(bool hide_nsfw) {
+  if (taiga::GetCurrentServiceId() == sync::kMyAnimeList) {
+    return;
+  }
+
   Date date_start, date_end;
   current_season.GetInterval(date_start, date_end);
 
