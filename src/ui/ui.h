@@ -49,7 +49,6 @@ enum class TipType {
   Torrent,
   UpdateFailed,
   NotApproved,
-  WebsiteLoginRequired,
 };
 
 class Taskbar : public win::Taskbar {
@@ -84,7 +83,7 @@ void OnLibraryEntryDelete(int id);
 void OnLibraryEntryImageChange(int id);
 void OnLibraryGetSeason();
 void OnLibrarySearchTitle(int id, const std::wstring& results);
-void OnLibraryEntryChangeFailure(int id, const std::wstring& reason);
+void OnLibraryEntryChangeFailure(int id);
 void OnLibraryUpdateFailure(int id, const std::wstring& reason, bool not_approved);
 
 bool OnLibraryEntriesEditDelete(const std::vector<int> ids);
@@ -140,7 +139,7 @@ void OnMalRequestAccessToken(bool success);
 bool OnTwitterTokenEntry(std::wstring& auth_pin);
 
 void OnLogin();
-void OnLogout(bool website_login_required = false);
+void OnLogout();
 
 void OnUpdateAvailable();
 void OnUpdateNotAvailable(bool relations = false);

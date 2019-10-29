@@ -165,11 +165,11 @@ void Manager::HandleError(Response& response, HttpResponse& http_response) {
     case kAuthenticateUser:
     case kGetUser:
       service.user().authenticated = false;
-      ui::OnLogout(response.data.count(L"website_login_required"));
+      ui::OnLogout();
       ui::ChangeStatusText(response.data[L"error"]);
       break;
     case kGetMetadataById:
-      ui::OnLibraryEntryChangeFailure(anime_id, response.data[L"error"]);
+      ui::OnLibraryEntryChangeFailure(anime_id);
       if (response.data.count(L"invalid_id")) {
         const bool in_list = anime_item && anime_item->IsInList();
         if (anime::db.DeleteItem(anime_id)) {

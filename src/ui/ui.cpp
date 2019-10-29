@@ -293,7 +293,7 @@ void OnLibrarySearchTitle(int id, const std::wstring& results) {
     DlgSearch.ParseResults(ids);
 }
 
-void OnLibraryEntryChangeFailure(int id, const std::wstring& reason) {
+void OnLibraryEntryChangeFailure(int id) {
   if (DlgAnime.GetCurrentId() == id)
     DlgAnime.UpdateTitle(false);
 }
@@ -1008,17 +1008,7 @@ void OnLogin() {
   DlgMain.EnableInput(true);
 }
 
-void OnLogout(bool website_login_required) {
-  if (website_login_required) {
-    const std::wstring tip_text =
-        L"Due to restrictions of MyAnimeList API, users are required to have "
-        L"logged in via the website within the past 90 days.\n\n"
-        L"Click to go to MAL website.";
-    taskbar.tip_type = TipType::WebsiteLoginRequired;
-    taskbar.Tip(L"", L"", 0);
-    taskbar.Tip(tip_text.c_str(), L"Website login required", NIIF_ERROR);
-  }
-
+void OnLogout() {
   DlgMain.EnableInput(true);
 }
 

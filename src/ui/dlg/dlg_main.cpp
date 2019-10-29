@@ -729,9 +729,6 @@ void MainDialog::OnTaskbarCallback(UINT uMsg, LPARAM lParam) {
           case TipType::NotApproved:
             navigation.SetCurrentPage(kSidebarItemHistory);
             break;
-          case TipType::WebsiteLoginRequired:
-            sync::myanimelist::ViewLogin();
-            break;
         }
         ActivateWindow(GetWindowHandle());
         taskbar.tip_type = TipType::Default;

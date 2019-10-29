@@ -275,10 +275,6 @@ void ViewHistory() {
               taiga::settings.GetSyncServiceMalUsername());
 }
 
-void ViewLogin() {
-  ExecuteLink(L"https://myanimelist.net/login.php");
-}
-
 void ViewPanel() {
   ExecuteLink(L"https://myanimelist.net/panel.php");
 }

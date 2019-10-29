@@ -51,7 +51,6 @@ void RequestAccessToken(const std::wstring& authorization_code,
 void ViewAnimePage(int anime_id);
 void ViewAnimeSearch(const std::wstring& title);
 void ViewHistory();
-void ViewLogin();
 void ViewPanel();
 void ViewProfile();
 void ViewUpcomingAnime();
