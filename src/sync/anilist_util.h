@@ -22,18 +22,15 @@
 
 #include "base/json.h"
 #include "base/time.h"
-#include "sync/anilist_types.h"
 #include "sync/service.h"
 
 namespace anime {
 class Item;
 }
 
-namespace sync {
-namespace anilist {
+namespace sync::anilist {
 
-RatingSystem GetRatingSystem();
-std::vector<Rating> GetMyRatings(RatingSystem rating_system);
+enum class RatingSystem;
 
 Date TranslateFuzzyDateFrom(const Json& json);
 Json TranslateFuzzyDateTo(const Date& date);
@@ -52,5 +49,4 @@ void ViewAnimePage(int anime_id);
 void ViewProfile();
 void ViewStats();
 
-}  // namespace anilist
-}  // namespace sync
+}  // namespace sync::anilist

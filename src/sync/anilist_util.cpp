@@ -18,6 +18,8 @@
 
 #include <map>
 
+#include "sync/anilist_util.h"
+
 #include "base/file.h"
 #include "base/format.h"
 #include "base/json.h"
@@ -26,107 +28,11 @@
 #include "media/anime.h"
 #include "media/anime_db.h"
 #include "sync/anilist.h"
-#include "sync/anilist_types.h"
-#include "sync/anilist_util.h"
+#include "sync/anilist_ratings.h"
 #include "sync/manager.h"
 #include "taiga/settings.h"
 
-namespace sync {
-namespace anilist {
-
-RatingSystem GetRatingSystem() {
-  const auto& service = *ServiceManager.service(sync::kAniList);
-  return TranslateRatingSystemFrom(WstrToStr(service.user().rating_system));
-}
-
-std::vector<Rating> GetMyRatings(RatingSystem rating_system) {
-  constexpr int k = anime::kUserScoreMax / 100;
-
-  switch (rating_system) {
-    case RatingSystem::Point_100:
-      return {
-        {  0,       L"0"},
-        { 10 * k,  L"10"},
-        { 15 * k,  L"15"},
-        { 20 * k,  L"20"},
-        { 25 * k,  L"25"},
-        { 30 * k,  L"30"},
-        { 35 * k,  L"35"},
-        { 40 * k,  L"40"},
-        { 45 * k,  L"45"},
-        { 50 * k,  L"50"},
-        { 55 * k,  L"55"},
-        { 60 * k,  L"60"},
-        { 65 * k,  L"65"},
-        { 70 * k,  L"70"},
-        { 75 * k,  L"75"},
-        { 80 * k,  L"80"},
-        { 85 * k,  L"85"},
-        { 90 * k,  L"90"},
-        { 95 * k,  L"95"},
-        {100 * k, L"100"},
-      };
-      break;
-    case RatingSystem::Point_10_Decimal:
-      return {
-        {  0,       L"0"},
-        { 10 * k, L"1.0"},
-        { 15 * k, L"1.5"},
-        { 20 * k, L"2.0"},
-        { 25 * k, L"2.5"},
-        { 30 * k, L"3.0"},
-        { 35 * k, L"3.5"},
-        { 40 * k, L"4.0"},
-        { 45 * k, L"4.5"},
-        { 50 * k, L"5.0"},
-        { 55 * k, L"5.5"},
-        { 60 * k, L"6.0"},
-        { 65 * k, L"6.5"},
-        { 70 * k, L"7.0"},
-        { 75 * k, L"7.5"},
-        { 80 * k, L"8.0"},
-        { 85 * k, L"8.5"},
-        { 90 * k, L"9.0"},
-        { 95 * k, L"9.5"},
-        {100 * k,  L"10"},
-      };
-      break;
-    case RatingSystem::Point_10:
-      return {
-        {  0,      L"0"},
-        { 10 * k,  L"1"},
-        { 20 * k,  L"2"},
-        { 30 * k,  L"3"},
-        { 40 * k,  L"4"},
-        { 50 * k,  L"5"},
-        { 60 * k,  L"6"},
-        { 70 * k,  L"7"},
-        { 80 * k,  L"8"},
-        { 90 * k,  L"9"},
-        {100 * k, L"10"},
-      };
-    case RatingSystem::Point_5:
-      return {
-        { 0,     L"\u2606\u2606\u2606\u2606\u2606"},
-        {10 * k, L"\u2605\u2606\u2606\u2606\u2606"},
-        {30 * k, L"\u2605\u2605\u2606\u2606\u2606"},
-        {50 * k, L"\u2605\u2605\u2605\u2606\u2606"},
-        {70 * k, L"\u2605\u2605\u2605\u2605\u2606"},
-        {90 * k, L"\u2605\u2605\u2605\u2605\u2605"},
-      };
-    case RatingSystem::Point_3:
-      return {
-        { 0,     L"No Score"},
-        {35 * k, L":("},
-        {60 * k, L":|"},
-        {85 * k, L":)"},
-      };
-  }
-
-  return {};
-}
-
-////////////////////////////////////////////////////////////////////////////////
+namespace sync::anilist {
 
 Date TranslateFuzzyDateFrom(const Json& json) {
   return Date{
@@ -293,5 +199,4 @@ void ViewStats() {
       taiga::settings.GetSyncServiceAniListUsername()));
 }
 
-}  // namespace anilist
-}  // namespace sync
+}  // namespace sync::anilist

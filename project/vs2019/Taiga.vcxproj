@@ -227,6 +227,7 @@
     <ClCompile Include="..\..\src\media\library\list_util.cpp" />
     <ClCompile Include="..\..\src\media\library\queue.cpp" />
     <ClCompile Include="..\..\src\sync\anilist.cpp" />
+    <ClCompile Include="..\..\src\sync\anilist_ratings.cpp" />
     <ClCompile Include="..\..\src\sync\anilist_util.cpp" />
     <ClCompile Include="..\..\src\sync\kitsu.cpp" />
     <ClCompile Include="..\..\src\sync\kitsu_util.cpp" />
@@ -417,7 +418,7 @@
     <ClInclude Include="..\..\src\media\library\list_util.h" />
     <ClInclude Include="..\..\src\media\library\queue.h" />
     <ClInclude Include="..\..\src\sync\anilist.h" />
-    <ClInclude Include="..\..\src\sync\anilist_types.h" />
+    <ClInclude Include="..\..\src\sync\anilist_ratings.h" />
     <ClInclude Include="..\..\src\sync\anilist_util.h" />
     <ClInclude Include="..\..\src\sync\kitsu.h" />
     <ClInclude Include="..\..\src\sync\kitsu_types.h" />

@@ -23,6 +23,7 @@
 #include "media/anime_db.h"
 #include "media/anime_util.h"
 #include "media/library/queue.h"
+#include "sync/anilist_ratings.h"
 #include "sync/anilist_util.h"
 #include "sync/kitsu_util.h"
 #include "sync/myanimelist_util.h"

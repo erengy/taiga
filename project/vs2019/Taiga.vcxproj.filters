@@ -679,6 +679,9 @@
     <ClCompile Include="..\..\src\taiga\http_new.cpp">
       <Filter>taiga</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\sync\anilist_ratings.cpp">
+      <Filter>sync\anilist</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\base\base64.h">
@@ -966,9 +969,6 @@
     <ClInclude Include="..\..\src\sync\anilist.h">
       <Filter>sync\anilist</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\sync\anilist_types.h">
-      <Filter>sync\anilist</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\sync\anilist_util.h">
       <Filter>sync\anilist</Filter>
     </ClInclude>
@@ -1235,6 +1235,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\taiga\http_new.h">
       <Filter>taiga</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\sync\anilist_ratings.h">
+      <Filter>sync\anilist</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

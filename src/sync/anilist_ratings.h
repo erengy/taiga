@@ -18,8 +18,13 @@
 
 #pragma once
 
+#include <vector>
+
 namespace sync {
-namespace anilist {
+struct Rating;
+}
+
+namespace sync::anilist {
 
 enum class RatingSystem {
   Point_100,
@@ -31,5 +36,7 @@ enum class RatingSystem {
 
 constexpr auto kDefaultRatingSystem = RatingSystem::Point_10;
 
-}  // namespace anilist
-}  // namespace sync
+RatingSystem GetRatingSystem();
+std::vector<sync::Rating> GetMyRatings(const RatingSystem rating_system);
+
+}  // namespace sync::anilist
