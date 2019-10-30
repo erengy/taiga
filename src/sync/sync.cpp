@@ -26,6 +26,7 @@
 #include "media/anime_season.h"
 #include "media/anime_util.h"
 #include "media/library/queue.h"
+#include "sync/anilist.h"
 #include "sync/manager.h"
 #include "sync/myanimelist.h"
 #include "taiga/http.h"
@@ -59,6 +60,9 @@ bool AuthenticateUser() {
     case kMyAnimeList:
       myanimelist::AuthenticateUser();
       break;
+    case kAniList:
+      anilist::AuthenticateUser();
+      break;
     default:
       ServiceManager.MakeRequest(request);
       break;
@@ -86,6 +90,8 @@ void GetUser() {
   switch (taiga::GetCurrentServiceId()) {
     case kMyAnimeList:
       myanimelist::GetUser();
+      break;
+    case kAniList:
       break;
     default:
       ServiceManager.MakeRequest(request);
@@ -118,6 +124,9 @@ void GetLibraryEntries(const int offset) {
     case kMyAnimeList:
       myanimelist::GetLibraryEntries();
       break;
+    case kAniList:
+      anilist::GetLibraryEntries();
+      break;
     default:
       ServiceManager.MakeRequest(request);
       break;
@@ -134,6 +143,9 @@ void GetMetadataById(int id) {
   switch (taiga::GetCurrentServiceId()) {
     case kMyAnimeList:
       myanimelist::GetMetadataById(id);
+      break;
+    case kAniList:
+      anilist::GetMetadataById(id);
       break;
     default:
       ServiceManager.MakeRequest(request);
@@ -154,6 +166,9 @@ void GetSeason(const anime::Season season, const int offset) {
     case kMyAnimeList:
       myanimelist::GetSeason(season);
       break;
+    case kAniList:
+      anilist::GetSeason(season);
+      break;
     default:
       ServiceManager.MakeRequest(request);
       break;
@@ -172,6 +187,9 @@ void SearchTitle(std::wstring title, int id) {
   switch (taiga::GetCurrentServiceId()) {
     case kMyAnimeList:
       myanimelist::SearchTitle(title);
+      break;
+    case kAniList:
+      anilist::SearchTitle(title);
       break;
     default:
       ServiceManager.MakeRequest(request);
@@ -241,6 +259,9 @@ void UpdateLibraryEntry(const library::QueueItem& queue_item) {
   switch (taiga::GetCurrentServiceId()) {
     case kMyAnimeList:
       myanimelist::UpdateLibraryEntry(queue_item);
+      break;
+    case kAniList:
+      anilist::UpdateLibraryEntry(queue_item);
       break;
     default:
       ServiceManager.MakeRequest(request);
@@ -330,6 +351,9 @@ bool UserAuthenticated() {
   switch (taiga::GetCurrentServiceId()) {
     case kMyAnimeList:
       return myanimelist::IsUserAuthenticated();
+      break;
+    case kAniList:
+      return anilist::IsUserAuthenticated();
       break;
     default: {
       const auto service = taiga::GetCurrentService();

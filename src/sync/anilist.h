@@ -23,51 +23,33 @@
 #include "sync/service.h"
 
 namespace anime {
-class Item;
+class Season;
+}
+namespace library {
+struct QueueItem;
 }
 
-namespace sync {
-namespace anilist {
-
-// API documentation:
-// https://anilist.gitbooks.io/anilist-apiv2-docs/
-// https://anilist.github.io/ApiV2-GraphQL-Docs/
+namespace sync::anilist {
 
 class Service : public sync::Service {
 public:
   Service();
   ~Service() {}
 
-  void BuildRequest(Request& request, HttpRequest& http_request);
-  void HandleResponse(Response& response, HttpResponse& http_response);
+  void BuildRequest(Request& request, HttpRequest& http_request) {}
+  void HandleResponse(Response& response, HttpResponse& http_response) {}
   bool RequestNeedsAuthentication(RequestType request_type) const;
-
-private:
-  REQUEST_AND_RESPONSE(AddLibraryEntry);
-  REQUEST_AND_RESPONSE(AuthenticateUser);
-  REQUEST_AND_RESPONSE(DeleteLibraryEntry);
-  REQUEST_AND_RESPONSE(GetLibraryEntries);
-  REQUEST_AND_RESPONSE(GetMetadataById);
-  REQUEST_AND_RESPONSE(GetSeason);
-  REQUEST_AND_RESPONSE(SearchTitle);
-  REQUEST_AND_RESPONSE(UpdateLibraryEntry);
-
-  bool RequestSucceeded(Response& response, const HttpResponse& http_response);
-
-  std::wstring BuildLibraryObject(Request& request) const;
-  std::wstring BuildRequestBody(const std::string& query, const Json& variables) const;
-
-  int ParseMediaObject(const Json& json) const;
-  int ParseMediaListObject(const Json& json) const;
-  void ParseMediaTitleObject(const Json& json, anime::Item& anime_item) const;
-  void ParseUserObject(const Json& json);
-
-  bool ParseResponseBody(const std::wstring& body, Response& response, Json& json);
-
-  std::string ExpandQuery(const std::string& query) const;
-  std::wstring GetMediaFields() const;
-  std::wstring GetMediaListFields() const;
 };
 
-}  // namespace anilist
-}  // namespace sync
+void AuthenticateUser();
+void GetLibraryEntries();
+void GetMetadataById(const int id);
+void GetSeason(const anime::Season season, const int page = 1);
+void SearchTitle(const std::wstring& title);
+void AddLibraryEntry(const library::QueueItem& queue_item);
+void DeleteLibraryEntry(const int id);
+void UpdateLibraryEntry(const library::QueueItem& queue_item);
+
+bool IsUserAuthenticated();
+
+}  // namespace sync::anilist
