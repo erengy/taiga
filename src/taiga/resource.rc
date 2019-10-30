@@ -15,6 +15,18 @@ IDR_MENU           DATA           "..\\..\\res\\menu.xml"
 
 
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
+IDR_ANILIST_DELETEMEDIALISTENTRY           DATA           "..\\sync\\anilist\\DeleteMediaListEntry.gql"
+IDR_ANILIST_MEDIA                          DATA           "..\\sync\\anilist\\Media.gql"
+IDR_ANILIST_MEDIAFIELDS                    DATA           "..\\sync\\anilist\\MediaFields.gql"
+IDR_ANILIST_MEDIALISTCOLLECTION            DATA           "..\\sync\\anilist\\MediaListCollection.gql"
+IDR_ANILIST_MEDIALISTFIELDS                DATA           "..\\sync\\anilist\\MediaListFields.gql"
+IDR_ANILIST_MEDIASEARCH                    DATA           "..\\sync\\anilist\\MediaSearch.gql"
+IDR_ANILIST_MEDIASEASON                    DATA           "..\\sync\\anilist\\MediaSeason.gql"
+IDR_ANILIST_SAVEMEDIALISTENTRY             DATA           "..\\sync\\anilist\\SaveMediaListEntry.gql"
+IDR_ANILIST_VIEWER                         DATA           "..\\sync\\anilist\\Viewer.gql"
+
+
+LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 IDR_PLAYERS        DATA           "..\\..\\deps\\src\\anisthesia\\data\\players.anisthesia"
 
 

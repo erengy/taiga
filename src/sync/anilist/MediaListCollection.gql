@@ -1,0 +1,20 @@
+query ($userName: String!) {
+  MediaListCollection (userName: $userName, type: ANIME) {
+    lists {
+      entries {
+        ...mediaListFragment
+      }
+    }
+  }
+}
+
+fragment mediaListFragment on MediaList {
+  {mediaListFields}
+  media {
+    ...mediaFragment
+  }
+}
+
+fragment mediaFragment on Media {
+  {mediaFields}
+}

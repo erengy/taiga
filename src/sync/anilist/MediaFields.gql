@@ -1,0 +1,22 @@
+id
+title {
+  romaji(stylised: true)
+  english(stylised: true)
+  native(stylised: true)
+  userPreferred
+}
+format
+description
+startDate { year month day }
+endDate { year month day }
+episodes
+duration
+countryOfOrigin
+updatedAt
+coverImage { large }
+genres
+synonyms
+averageScore
+popularity
+studios { edges { node { name } } }
+nextAiringEpisode { airingAt episode }

@@ -1,0 +1,9 @@
+id
+status
+score(format: POINT_100)
+progress
+repeat
+notes
+startedAt { year month day }
+completedAt { year month day }
+updatedAt
