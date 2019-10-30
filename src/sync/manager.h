@@ -27,6 +27,7 @@
 #include "service.h"
 #include "base/types.h"
 #include "taiga/http.h"
+#include "taiga/http_new.h"
 
 namespace sync {
 
@@ -61,6 +62,9 @@ std::wstring GetServiceSlugById(const ServiceId service_id);
 void AfterGetLibrary();
 void AfterGetSeason();
 void AfterLibraryUpdate();
+
+bool OnTransfer(const taiga::http::Transfer& transfer,
+                const std::wstring& status);
 
 }  // namespace sync
 

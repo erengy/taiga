@@ -305,9 +305,7 @@ void AuthenticateUser() {
       {"refresh_token", refresh_token}});
 
   const auto on_transfer = [](const taiga::http::Transfer& transfer) {
-    ui::ChangeStatusText(L"MyAnimeList: Authenticating user... ({})"_format(
-        taiga::http::util::to_string(transfer)));
-    return true;
+    return OnTransfer(transfer, L"MyAnimeList: Authenticating user...");
   };
 
   const auto on_response = [](const taiga::http::Response& response) {
@@ -342,10 +340,7 @@ void GetUser() {
   request.set_target("{}/users/{}"_format(kBaseUrl, username));
 
   const auto on_transfer = [](const taiga::http::Transfer& transfer) {
-    ui::ChangeStatusText(
-        L"MyAnimeList: Retrieving user information... ({})"_format(
-            taiga::http::util::to_string(transfer)));
-    return true;
+    return OnTransfer(transfer, L"MyAnimeList: Retrieving user information...");
   };
 
   const auto on_response = [](const taiga::http::Response& response) {
@@ -377,9 +372,7 @@ void GetLibraryEntries(const int page_offset) {
           WstrToStr(GetAnimeFields()), WstrToStr(GetListStatusFields()))}});
 
   const auto on_transfer = [](const taiga::http::Transfer& transfer) {
-    ui::ChangeStatusText(L"MyAnimeList: Retrieving anime list... ({})"_format(
-        taiga::http::util::to_string(transfer)));
-    return true;
+    return OnTransfer(transfer, L"MyAnimeList: Retrieving anime list...");
   };
 
   const auto on_response = [](const taiga::http::Response& response) {
@@ -424,10 +417,7 @@ void GetMetadataById(const int id) {
   request.set_query({{"fields", WstrToStr(GetAnimeFields())}});
 
   const auto on_transfer = [](const taiga::http::Transfer& transfer) {
-    ui::ChangeStatusText(
-        L"MyAnimeList: Retrieving anime information... ({})"_format(
-            taiga::http::util::to_string(transfer)));
-    return true;
+    return OnTransfer(transfer, L"MyAnimeList: Retrieving anime information...");
   };
 
   const auto on_response = [id](const taiga::http::Response& response) {
@@ -474,11 +464,9 @@ void GetSeason(const anime::Season season, const int page_offset) {
       {"fields", WstrToStr(GetAnimeFields())}});
 
   const auto on_transfer = [season](const taiga::http::Transfer& transfer) {
-    ui::ChangeStatusText(
+    return OnTransfer(transfer,
         L"MyAnimeList: Retrieving {} anime season... ({})"_format(
-            ui::TranslateSeason(season),
-            taiga::http::util::to_string(transfer)));
-    return true;
+            ui::TranslateSeason(season)));
   };
 
   const auto on_response = [season](const taiga::http::Response& response) {
@@ -526,9 +514,8 @@ void SearchTitle(const std::wstring& title) {
       {"fields", WstrToStr(GetAnimeFields())}});
 
   const auto on_transfer = [title](const taiga::http::Transfer& transfer) {
-    ui::ChangeStatusText(L"MyAnimeList: Searching for \"{}\"... ({})"_format(
-        title, taiga::http::util::to_string(transfer)));
-    return true;
+    return OnTransfer(transfer,
+        L"MyAnimeList: Searching for \"{}\"... ({})"_format(title));
   };
 
   const auto on_response = [](const taiga::http::Response& response) {
@@ -563,10 +550,7 @@ void DeleteLibraryEntry(const int id) {
   request.set_target("{}/anime/{}/my_list_status"_format(kBaseUrl, id));
 
   const auto on_transfer = [](const taiga::http::Transfer& transfer) {
-    ui::ChangeStatusText(
-        L"MyAnimeList: Deleting anime from list... ({})"_format(
-            taiga::http::util::to_string(transfer)));
-    return true;
+    return OnTransfer(transfer, L"MyAnimeList: Deleting anime from list...");
   };
 
   const auto on_response = [](const taiga::http::Response& response) {
@@ -613,10 +597,7 @@ void UpdateLibraryEntry(const library::QueueItem& queue_item) {
   request.set_body(hypr::Body{WstrToStr(BuildUrlParameters(fields))});
 
   const auto on_transfer = [](const taiga::http::Transfer& transfer) {
-    ui::ChangeStatusText(
-        L"MyAnimeList: Updating anime list... ({})"_format(
-            taiga::http::util::to_string(transfer)));
-    return true;
+    return OnTransfer(transfer, L"MyAnimeList: Updating anime list...");
   };
 
   const auto on_response = [id](const taiga::http::Response& response) {

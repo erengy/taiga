@@ -18,6 +18,7 @@
 
 #include "sync/manager.h"
 
+#include "base/format.h"
 #include "base/string.h"
 #include "media/anime_db.h"
 #include "media/anime_season.h"
@@ -360,6 +361,13 @@ void AfterLibraryUpdate() {
     library::queue.Remove();
     library::queue.Check(false);
   }
+}
+
+bool OnTransfer(const taiga::http::Transfer& transfer,
+                const std::wstring& status) {
+  ui::ChangeStatusText(
+      L"{} ({})"_format(status, taiga::http::util::to_string(transfer)));
+  return true;
 }
 
 }  // namespace sync
