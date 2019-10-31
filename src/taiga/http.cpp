@@ -42,8 +42,6 @@
 #include "ui/translate.h"
 #include "ui/ui.h"
 
-taiga::HttpManager ConnectionManager;
-
 namespace taiga {
 
 // These are the values commonly used by today's web browsers.
@@ -101,8 +99,6 @@ void HttpClient::OnError(CURLcode error_code) {
   ui::OnHttpError(*this, error_text);
 
   taiga::stats.connections_failed++;
-
-  ConnectionManager.HandleError(response_, error_text);
 }
 
 bool HttpClient::OnHeadersAvailable() {
@@ -134,14 +130,14 @@ bool HttpClient::OnRedirect(const std::wstring& address, bool refresh) {
       HttpRequest http_request = request_;
       http_request.uid = base::http::GenerateRequestId();
       http_request.url = address;
-      ConnectionManager.MakeRequest(http_request, mode());
+      //ConnectionManager.MakeRequest(http_request, mode());
     }
     Cancel();
     return true;
 
   } else {
     Url url(address);
-    ConnectionManager.HandleRedirect(request_.url.host, url.host);
+    //ConnectionManager.HandleRedirect(request_.url.host, url.host);
     return false;
   }
 }
@@ -155,199 +151,6 @@ void HttpClient::OnReadComplete() {
   ui::OnHttpReadComplete();
 
   taiga::stats.connections_succeeded++;
-
-  ConnectionManager.HandleResponse(response_);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-HttpManager::HttpManager()
-    : shutdown_(false) {
-}
-
-void HttpManager::CancelRequest(base::uid_t uid) {
-  auto client = FindClient(uid);
-
-  if (client && client->busy())
-    client->Cancel();
-}
-
-void HttpManager::MakeRequest(HttpRequest& request, HttpClientMode mode) {
-  AddToQueue(request, mode);
-  ProcessQueue();
-}
-
-void HttpManager::HandleError(HttpResponse& response, const std::wstring& error) {
-  HttpClient& client = *FindClient(response.uid);
-
-  switch (client.mode()) {
-    case kHttpServiceAuthenticateUser:
-    case kHttpServiceGetUser:
-    case kHttpServiceGetMetadataById:
-    case kHttpServiceGetSeason:
-    case kHttpServiceSearchTitle:
-    case kHttpServiceAddLibraryEntry:
-    case kHttpServiceDeleteLibraryEntry:
-    case kHttpServiceGetLibraryEntries:
-    case kHttpServiceUpdateLibraryEntry:
-      ServiceManager.HandleHttpError(client.response_, error);
-      break;
-  }
-
-  FreeConnection(client.request_.url.host);
-  ProcessQueue();
-}
-
-void HttpManager::HandleRedirect(const std::wstring& current_host,
-                                 const std::wstring& next_host) {
-  FreeConnection(current_host);
-  AddConnection(next_host);
-}
-
-void HttpManager::HandleResponse(HttpResponse& response) {
-  HttpClient& client = *FindClient(response.uid);
-
-  switch (client.mode()) {
-    case kHttpServiceAuthenticateUser:
-    case kHttpServiceGetUser:
-    case kHttpServiceGetMetadataById:
-    case kHttpServiceGetSeason:
-    case kHttpServiceSearchTitle:
-    case kHttpServiceAddLibraryEntry:
-    case kHttpServiceDeleteLibraryEntry:
-    case kHttpServiceGetLibraryEntries:
-    case kHttpServiceUpdateLibraryEntry:
-      ServiceManager.HandleHttpResponse(response);
-      break;
-
-    case kHttpMalRequestAccessToken: {
-      break;
-    }
-  }
-
-  FreeConnection(client.request_.url.host);
-  ProcessQueue();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-void HttpManager::FreeMemory() {
-  for (auto it = clients_.cbegin(); it != clients_.cend(); ) {
-    if (!it->busy()) {
-      clients_.erase(it++);
-    } else {
-      ++it;
-    }
-  }
-}
-
-void HttpManager::Shutdown() {
-  shutdown_ = true;
-
-  for (auto& client : clients_) {
-    if (client.busy())
-      client.Cancel();
-  }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-HttpClient* HttpManager::FindClient(base::uid_t uid) {
-  for (auto& client : clients_)
-    if (client.request().uid == uid)
-      return &client;
-
-  return nullptr;
-}
-
-HttpClient& HttpManager::GetClient(const HttpRequest& request) {
-  for (auto& client : clients_) {
-    if (client.allow_reuse() && !client.busy()) {
-      if (IsEqual(client.request().url.host, request.url.host)) {
-        LOGD(L"Reusing client with the ID: {}\nClient's new ID: {}",
-             client.request().uid, request.uid);
-        // Proxy settings might have changed since then
-        client.set_proxy(settings.GetAppConnectionProxyHost(),
-                         settings.GetAppConnectionProxyUsername(),
-                         settings.GetAppConnectionProxyPassword());
-        return client;
-      }
-    }
-  }
-
-  clients_.push_back(HttpClient(request));
-  LOGD(L"Created a new client. Total number of clients is now {}",
-        clients_.size());
-  return clients_.back();
-}
-
-void HttpManager::AddToQueue(HttpRequest& request, HttpClientMode mode) {
-  win::Lock lock(critical_section_);
-
-  LOGD(L"ID: {}", request.uid);
-
-  requests_.push_back(std::make_pair(request, mode));
-}
-
-void HttpManager::ProcessQueue() {
-  win::Lock lock(critical_section_);
-
-  unsigned int connections = 0;
-  for (const auto& pair : connections_) {
-    connections += pair.second;
-  }
-
-  for (size_t i = 0; i < requests_.size(); i++) {
-    if (shutdown_) {
-      LOGD(L"Shutting down");
-      return;
-    }
-
-    if (connections == kMaxSimultaneousConnections) {
-      LOGD(L"Reached max connections");
-      return;
-    }
-
-    const HttpRequest& request = requests_.at(i).first;
-    HttpClientMode mode = requests_.at(i).second;
-
-    if (connections_[request.url.host] == kMaxSimultaneousConnectionsPerHostname) {
-      LOGD(L"Reached max connections for hostname: {}", request.url.host);
-      continue;
-    } else {
-      connections++;
-      connections_[request.url.host]++;
-      LOGD(L"Connections for hostname is now {}: {}",
-           connections_[request.url.host], request.url.host);
-
-      HttpClient& client = GetClient(request);
-      client.set_mode(mode);
-      client.MakeRequest(request);
-
-      requests_.erase(requests_.begin() + i);
-      i--;
-    }
-  }
-}
-
-void HttpManager::AddConnection(const std::wstring& hostname) {
-  win::Lock lock(critical_section_);
-
-  connections_[hostname]++;
-  LOGD(L"Connections for hostname is now {}: {}",
-       connections_[hostname], hostname);
-}
-
-void HttpManager::FreeConnection(const std::wstring& hostname) {
-  win::Lock lock(critical_section_);
-
-  if (connections_[hostname] > 0) {
-    connections_[hostname]--;
-    LOGD(L"Connections for hostname is now {}: {}",
-         connections_[hostname], hostname);
-  } else {
-    LOGE(L"Connections for hostname was already zero: {}", hostname);
-  }
 }
 
 }  // namespace taiga

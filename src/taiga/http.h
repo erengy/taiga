@@ -64,36 +64,4 @@ private:
   HttpClientMode mode_;
 };
 
-class HttpManager {
-public:
-  HttpManager();
-
-  void CancelRequest(base::uid_t uid);
-  void MakeRequest(HttpRequest& request, HttpClientMode mode);
-
-  void HandleError(HttpResponse& response, const std::wstring& error);
-  void HandleRedirect(const std::wstring& current_host, const std::wstring& next_host);
-  void HandleResponse(HttpResponse& response);
-
-  void FreeMemory();
-  void Shutdown();
-
-private:
-  HttpClient* FindClient(base::uid_t uid);
-  HttpClient& GetClient(const HttpRequest& request);
-
-  void AddToQueue(HttpRequest& request, HttpClientMode mode);
-  void ProcessQueue();
-  void AddConnection(const std::wstring& hostname);
-  void FreeConnection(const std::wstring& hostname);
-
-  std::list<HttpClient> clients_;
-  std::map<std::wstring, unsigned int> connections_;
-  win::CriticalSection critical_section_;
-  std::vector<std::pair<HttpRequest, HttpClientMode>> requests_;
-  bool shutdown_;
-};
-
 }  // namespace taiga
-
-extern taiga::HttpManager ConnectionManager;

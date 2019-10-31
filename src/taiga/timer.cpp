@@ -89,7 +89,6 @@ void Timer::OnTimeout() {
       break;
 
     case kTimerMemory:
-      ConnectionManager.FreeMemory();
       ui::image_db.FreeMemory();
       break;
 
