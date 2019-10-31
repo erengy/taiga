@@ -221,17 +221,6 @@ void HttpManager::HandleResponse(HttpResponse& response) {
       break;
 
     case kHttpMalRequestAccessToken: {
-      bool success = false;
-      if (Json json; JsonParseString(response.body, json)) {
-        const auto access_token = JsonReadStr(json, "access_token");
-        const auto refresh_token = JsonReadStr(json, "refresh_token");
-        if (!access_token.empty() && !refresh_token.empty()) {
-          settings.SetSyncServiceMalAccessToken(StrToWstr(access_token));
-          settings.SetSyncServiceMalRefreshToken(StrToWstr(refresh_token));
-          success = true;
-        }
-      }
-      ui::OnMalRequestAccessToken(success);
       break;
     }
   }

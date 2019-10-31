@@ -288,6 +288,46 @@ void ParseLibraryObject(const Json& json, const int anime_id) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+void RequestAccessToken(const std::wstring& authorization_code,
+                        const std::wstring& code_verifier) {
+  taiga::http::Request request;
+  request.set_method("POST");
+  request.set_target("https://myanimelist.net/v1/oauth2/token");
+  request.set_header("Content-Type", "application/x-www-form-urlencoded");
+  request.set_body({
+      {"client_id", kClientId},
+      {"grant_type", "authorization_code"},
+      {"code", WstrToStr(authorization_code)},
+      {"redirect_uri", kRedirectUrl},
+      {"code_verifier", WstrToStr(code_verifier)}});
+
+  const auto on_transfer = [](const taiga::http::Transfer& transfer) {
+    return OnTransfer(transfer, L"MyAnimeList: Requesting access token...");
+  };
+
+  const auto on_response = [](const taiga::http::Response& response) {
+    if (HasError(response)) {
+      return;
+    }
+
+    Json json;
+    if (!JsonParseString(response.body(), json)) {
+      ui::OnMalRequestAccessToken(false);
+      return;
+    }
+
+    const auto access_token = JsonReadStr(json, "access_token");
+    const auto refresh_token = JsonReadStr(json, "refresh_token");
+    if (!access_token.empty() && !refresh_token.empty()) {
+      Account::set_access_token(access_token);
+      Account::set_refresh_token(refresh_token);
+      ui::OnMalRequestAccessToken(true);
+    }
+  };
+
+  taiga::http::Send(request, on_transfer, on_response);
+}
+
 void AuthenticateUser() {
   const auto refresh_token = Account::refresh_token();
   if (refresh_token.empty()) {
@@ -300,7 +340,7 @@ void AuthenticateUser() {
   request.set_target("https://myanimelist.net/v1/oauth2/token");
   request.set_header("Content-Type", "application/x-www-form-urlencoded");
   request.set_body({
-      {"client_id", WstrToStr(kClientId)},
+      {"client_id", kClientId},
       {"grant_type", "refresh_token"},
       {"refresh_token", refresh_token}});
 

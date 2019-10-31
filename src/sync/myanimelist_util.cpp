@@ -232,31 +232,7 @@ void RequestAuthorizationCode(std::wstring& code_verifier) {
       L"&redirect_uri={}"
       L"&code_challenge={}"
       L"&code_challenge_method=plain"_format(
-          kClientId, kRedirectUrl, code_verifier));
-}
-
-void RequestAccessToken(const std::wstring& authorization_code,
-                        const std::wstring& code_verifier) {
-  HttpRequest http_request;
-  http_request.method = L"POST";
-  http_request.url.protocol = base::http::Protocol::Https;
-  http_request.url.host = L"myanimelist.net";
-  http_request.url.path = L"/v1/oauth2/token";
-
-  http_request.header = {{
-      {L"Content-Type", L"application/x-www-form-urlencoded"},
-    }};
-
-  http_request.data = {{
-      {L"client_id", kClientId},
-      {L"grant_type", L"authorization_code"},
-      {L"code", authorization_code},
-      {L"redirect_uri", kRedirectUrl},
-      {L"code_verifier", code_verifier},
-    }};
-
-  ConnectionManager.MakeRequest(http_request,
-                                taiga::kHttpMalRequestAccessToken);
+          StrToWstr(kClientId), StrToWstr(kRedirectUrl), code_verifier));
 }
 
 void ViewAnimePage(int anime_id) {

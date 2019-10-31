@@ -33,6 +33,7 @@
 #include "media/library/history.h"
 #include "ui/resource.h"
 #include "sync/anilist_util.h"
+#include "sync/myanimelist.h"
 #include "sync/myanimelist_util.h"
 #include "sync/manager.h"
 #include "taiga/announce.h"

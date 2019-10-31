@@ -34,8 +34,8 @@ namespace sync::myanimelist {
 constexpr auto kServiceName = L"MyAnimeList";
 constexpr auto kServiceSlug = L"myanimelist";
 
-constexpr auto kClientId = L"f6e398095cf7525360276786ec4407bc";
-constexpr auto kRedirectUrl = L"https://taiga.moe/api/myanimelist/auth";
+constexpr auto kClientId = "f6e398095cf7525360276786ec4407bc";
+constexpr auto kRedirectUrl = "https://taiga.moe/api/myanimelist/auth";
 
 class Service : public sync::Service {
 public:
@@ -47,6 +47,8 @@ public:
   bool RequestNeedsAuthentication(RequestType request_type) const;
 };
 
+void RequestAccessToken(const std::wstring& authorization_code,
+                        const std::wstring& code_verifier);
 void AuthenticateUser();
 void GetUser();
 void GetLibraryEntries(const int page_offset = 0);
