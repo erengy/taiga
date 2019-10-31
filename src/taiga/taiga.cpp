@@ -137,7 +137,7 @@ void App::Uninitialize() {
   announcer.Clear(kAnnounceToDiscord);
 
   // Cleanup
-  // @TODO: http::Shutdown();
+  http::Shutdown();
   ui::taskbar.Destroy();
   ui::taskbar_list.Release();
 

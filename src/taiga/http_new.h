@@ -33,6 +33,8 @@ using ResponseCallback = std::function<void(const Response&)>;
 using TransferCallback = std::function<bool(const Transfer&)>;
 
 void Init();
+void Shutdown();
+
 void Send(const Request& request,
           const TransferCallback& on_transfer,
           const ResponseCallback& on_response);

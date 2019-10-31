@@ -394,14 +394,19 @@ std::wstring to_string(const Transfer& transfer) {
 
 }  // namespace util
 
+static detail::Pool pool;
+
 void Init() {
   hypr::init();
+}
+
+void Shutdown() {
+  pool.Shutdown();
 }
 
 void Send(const Request& request,
           const TransferCallback& on_transfer,
           const ResponseCallback& on_response) {
-  static detail::Pool pool;
   pool.AddToQueue({request, on_transfer, on_response});
   pool.ProcessQueue();
 }
