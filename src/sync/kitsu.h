@@ -22,50 +22,35 @@
 #include "base/types.h"
 #include "sync/service.h"
 
-namespace sync {
-namespace kitsu {
+namespace anime {
+class Season;
+}
+namespace library {
+struct QueueItem;
+}
 
-// API documentation:
-// https://kitsu.docs.apiary.io
+namespace sync::kitsu {
 
 class Service : public sync::Service {
 public:
   Service();
   ~Service() {}
 
-  void BuildRequest(Request& request, HttpRequest& http_request);
-  void HandleResponse(Response& response, HttpResponse& http_response);
+  void BuildRequest(Request& request, HttpRequest& http_request) {}
+  void HandleResponse(Response& response, HttpResponse& http_response) {}
   bool RequestNeedsAuthentication(RequestType request_type) const;
-
-private:
-  REQUEST_AND_RESPONSE(AddLibraryEntry);
-  REQUEST_AND_RESPONSE(AuthenticateUser);
-  REQUEST_AND_RESPONSE(GetUser);
-  REQUEST_AND_RESPONSE(DeleteLibraryEntry);
-  REQUEST_AND_RESPONSE(GetLibraryEntries);
-  REQUEST_AND_RESPONSE(GetMetadataById);
-  REQUEST_AND_RESPONSE(GetSeason);
-  REQUEST_AND_RESPONSE(SearchTitle);
-  REQUEST_AND_RESPONSE(UpdateLibraryEntry);
-
-  bool RequestSucceeded(Response& response, const HttpResponse& http_response);
-
-  std::wstring BuildLibraryObject(Request& request) const;
-  void UseSparseFieldsetsForAnime(HttpRequest& http_request, bool minimal = false) const;
-  void UseSparseFieldsetsForLibraryEntries(HttpRequest& http_request) const;
-  void UseSparseFieldsetsForUser(HttpRequest& http_request) const;
-
-  void ParseObject(const Json& json) const;
-  int ParseAnimeObject(const Json& json) const;
-  void ParseCategories(const Json& json, const int anime_id) const;
-  void ParseProducers(const Json& json, const int anime_id) const;
-  int ParseLibraryObject(const Json& json) const;
-  void ParseLinks(const Json& json, Response& response) const;
-
-  bool ParseResponseBody(const std::wstring& body, Response& response, Json& json);
-
-  bool IsPartialLibraryRequest() const;
 };
 
-}  // namespace kitsu
-}  // namespace sync
+void AuthenticateUser();
+void GetUser();
+void GetLibraryEntries(const int page = 0);
+void GetMetadataById(const int id);
+void GetSeason(const anime::Season season, const int page = 0);
+void SearchTitle(const std::wstring& title);
+void AddLibraryEntry(const library::QueueItem& queue_item);
+void DeleteLibraryEntry(const int id);
+void UpdateLibraryEntry(const library::QueueItem& queue_item);
+
+bool IsUserAuthenticated();
+
+}  // namespace sync::kitsu

@@ -18,22 +18,34 @@
 
 #include <map>
 
-#include "base/http.h"
+#include "sync/kitsu.h"
+
+#include "base/format.h"
 #include "base/log.h"
 #include "base/string.h"
 #include "media/anime_db.h"
 #include "media/anime_item.h"
+#include "media/anime_season.h"
+#include "media/anime_season_db.h"
 #include "media/anime_util.h"
-#include "sync/kitsu.h"
+#include "media/library/queue.h"
 #include "sync/kitsu_types.h"
 #include "sync/kitsu_util.h"
+#include "sync/manager.h"
+#include "taiga/http_new.h"
 #include "taiga/settings.h"
+#include "ui/translate.h"
+#include "ui/ui.h"
 
-namespace sync {
-namespace kitsu {
+namespace sync::kitsu {
+
+// API documentation:
+// https://kitsu.docs.apiary.io
+
+constexpr auto kBaseUrl = "https://kitsu.io/api/edge";
 
 // Kitsu requires use of the JSON API media type: http://jsonapi.org/format/
-constexpr auto kJsonApiMediaType = L"application/vnd.api+json";
+constexpr auto kJsonApiMediaType = "application/vnd.api+json";
 
 // Kitsu's configuration sets JSON API's maximum_page_size to 20. Asking for
 // more results will return an error: "Limit exceeds maximum page size of 20."
@@ -44,420 +56,116 @@ constexpr auto kJsonApiMaximumPageSize = 20;
 // Library requests are limited to 500 entries per page.
 constexpr auto kLibraryMaximumPageSize = 500;
 
-Service::Service() {
-  host_ = L"kitsu.io/api";
+// Application registration has not yet been implemented, so all requests are
+// made with the following client ID and secret.
+constexpr auto kClientId =
+    "dd031b32d2f56c990b1425efe6c42ad847e7fe3ab46bf1299f05ecd856bdb7dd";
+constexpr auto kClientSecret =
+    "54d7307928f63414defd96399fc31ba847961ceaecef3a5fd93144e960c0e151";
 
-  id_ = kKitsu;
-  canonical_name_ = L"kitsu";
-  name_ = L"Kitsu";
+////////////////////////////////////////////////////////////////////////////////
+
+class Account {
+public:
+  static std::string username() {
+    return WstrToStr(taiga::settings.GetSyncServiceKitsuUsername());
+  }
+  static void set_username(const std::string& username) {
+    return taiga::settings.SetSyncServiceKitsuUsername(StrToWstr(username));
+  }
+
+  static std::string display_name() {
+    return WstrToStr(taiga::settings.GetSyncServiceKitsuDisplayName());
+  }
+  static void set_display_name(const std::string& name) {
+    return taiga::settings.SetSyncServiceKitsuDisplayName(StrToWstr(name));
+  }
+
+  static std::string email() {
+    return WstrToStr(taiga::settings.GetSyncServiceKitsuEmail());
+  }
+  static void set_email(const std::string& email) {
+    return taiga::settings.SetSyncServiceKitsuEmail(StrToWstr(email));
+  }
+
+  static std::string password() {
+    return WstrToStr(taiga::settings.GetSyncServiceKitsuPassword());
+  }
+  static void set_password(const std::string& password) {
+    taiga::settings.SetSyncServiceKitsuPassword(StrToWstr(password));
+  }
+
+  static std::string rating_system() {
+    return WstrToStr(taiga::settings.GetSyncServiceKitsuRatingSystem());
+  }
+  static void set_rating_system(const std::string& rating_system) {
+    taiga::settings.SetSyncServiceKitsuRatingSystem(StrToWstr(rating_system));
+  }
+
+  bool authenticated() const {
+    return authenticated_;
+  }
+  void set_authenticated(const bool authenticated) {
+    authenticated_ = authenticated;
+  }
+
+  time_t last_synchronized() const {
+    return last_synchronized_;
+  }
+  void set_last_synchronized(const time_t last_synchronized) {
+    last_synchronized_ = last_synchronized;
+  }
+
+  std::string access_token() const {
+    return access_token_;
+  }
+  void set_access_token(const std::string& token) {
+    access_token_ = token;
+  }
+
+  std::string id() const {
+    return id_;
+  }
+  void set_id(const std::string& id) {
+    id_ = id;
+  }
+
+private:
+  bool authenticated_ = false;
+  time_t last_synchronized_ = 0;
+  std::string access_token_;
+  std::string id_;
+};
+
+static Account account;
+
+bool IsUserAuthenticated() {
+  return account.authenticated();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void Service::BuildRequest(Request& request, HttpRequest& http_request) {
-  http_request.url.host = host_;
-  http_request.url.protocol = base::http::Protocol::Https;
+taiga::http::Request BuildRequest() {
+  taiga::http::Request request;
 
-  http_request.header[L"Accept"] = kJsonApiMediaType;
-  http_request.header[L"Accept-Charset"] = L"utf-8";
-  http_request.header[L"Accept-Encoding"] = L"gzip";
+  request.set_headers({
+      {"Accept", kJsonApiMediaType},
+      {"Accept-Charset", "utf-8"},
+      {"Accept-Encoding", "gzip"}});
 
-  // kAuthenticateUser method returns an access token, which is to be used on
-  // all methods that require authentication. Some methods don't require the
-  // token, but behave differently (e.g. private library entries are included)
-  // when it's provided.
-  if (RequestNeedsAuthentication(request.type))
-    http_request.header[L"Authorization"] = L"Bearer " + user().access_token;
-
-  switch (request.type) {
-    BUILD_HTTP_REQUEST(kAddLibraryEntry, AddLibraryEntry);
-    BUILD_HTTP_REQUEST(kAuthenticateUser, AuthenticateUser);
-    BUILD_HTTP_REQUEST(kGetUser, GetUser);
-    BUILD_HTTP_REQUEST(kDeleteLibraryEntry, DeleteLibraryEntry);
-    BUILD_HTTP_REQUEST(kGetLibraryEntries, GetLibraryEntries);
-    BUILD_HTTP_REQUEST(kGetMetadataById, GetMetadataById);
-    BUILD_HTTP_REQUEST(kGetSeason, GetSeason);
-    BUILD_HTTP_REQUEST(kSearchTitle, SearchTitle);
-    BUILD_HTTP_REQUEST(kUpdateLibraryEntry, UpdateLibraryEntry);
-  }
-}
-
-void Service::HandleResponse(Response& response, HttpResponse& http_response) {
-  if (RequestSucceeded(response, http_response)) {
-    switch (response.type) {
-      HANDLE_HTTP_RESPONSE(kAddLibraryEntry, AddLibraryEntry);
-      HANDLE_HTTP_RESPONSE(kAuthenticateUser, AuthenticateUser);
-      HANDLE_HTTP_RESPONSE(kGetUser, GetUser);
-      HANDLE_HTTP_RESPONSE(kDeleteLibraryEntry, DeleteLibraryEntry);
-      HANDLE_HTTP_RESPONSE(kGetLibraryEntries, GetLibraryEntries);
-      HANDLE_HTTP_RESPONSE(kGetMetadataById, GetMetadataById);
-      HANDLE_HTTP_RESPONSE(kGetSeason, GetSeason);
-      HANDLE_HTTP_RESPONSE(kSearchTitle, SearchTitle);
-      HANDLE_HTTP_RESPONSE(kUpdateLibraryEntry, UpdateLibraryEntry);
-    }
-  }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Request builders
-
-void Service::AuthenticateUser(Request& request, HttpRequest& http_request) {
-  http_request.url.path = L"/oauth/token";
-
-  // We will transmit the credentials in the request body rather than as query
-  // parameters to avoid accidental logging.
-  http_request.method = L"POST";
-  http_request.header[L"Content-Type"] = L"application/x-www-form-urlencoded";
-
-  // TODO: Register Taiga as a client and get a new ID
-  http_request.data[L"client_id"] =
-      L"dd031b32d2f56c990b1425efe6c42ad847e7fe3ab46bf1299f05ecd856bdb7dd";
-  http_request.data[L"client_secret"] =
-      L"54d7307928f63414defd96399fc31ba847961ceaecef3a5fd93144e960c0e151";
-
-  auto username = request.data[canonical_name_ + L"-email"];
-  if (username.empty())
-    username = request.data[canonical_name_ + L"-username"];
-
-  // Resource Owner Password Credentials Grant
-  // https://tools.ietf.org/html/rfc6749#section-4.3
-  http_request.data[L"grant_type"] = L"password";
-  http_request.data[L"username"] = username;
-  http_request.data[L"password"] = request.data[canonical_name_ + L"-password"];
-}
-
-void Service::GetUser(Request& request, HttpRequest& http_request) {
-  http_request.url.path = L"/edge/users";
-
-  if (user().authenticated) {
-    http_request.url.query[L"filter[self]"] = L"true";
-  } else {
-    const auto username = request.data[canonical_name_ + L"-username"];
-    http_request.url.query[L"filter[slug]"] = username;
+  // AuthenticateUser method returns an access token, which is to be used on all
+  // methods that require authentication. Some methods don't require the token,
+  // but behave differently (e.g. private library entries are included) when
+  // it's provided.
+  const auto access_token = account.access_token();
+  if (!access_token.empty()) {
+    request.set_header("Authorization", "Bearer {}"_format(access_token));
   }
 
-  UseSparseFieldsetsForUser(http_request);
+  return request;
 }
 
-void Service::GetLibraryEntries(Request& request, HttpRequest& http_request) {
-  http_request.url.path = L"/edge/library-entries";
-
-  http_request.url.query[L"filter[user_id]"] = user_.id;
-  http_request.url.query[L"filter[kind]"] = L"anime";
-
-  // We don't need to download the entire library; we just need to know about
-  // the entries that have changed since the last download. `filter[since]` is
-  // quite useful in this manner, but note that the following scenario results
-  // in an undesirable behavior:
-  //
-  // 1. Get library entries via client
-  // 2. Go to website and delete entry from library
-  // 3. Get library entries via client, using `filter[since]={...}`
-  // 4. Client doesn't know entry was deleted
-  //
-  // Our "solution" to this is to allow Taiga to download the entire library
-  // after each restart (i.e. last_synchronized is not saved on exit).
-  if (IsPartialLibraryRequest()) {
-    const auto date = GetDate(user_.last_synchronized - (60 * 60 * 24));  // 1 day before, to be safe
-    http_request.url.query[L"filter[since]"] = date.to_string();
-  }
-
-  http_request.url.query[L"include"] = L"anime";
-
-  // We would prefer retrieving the entire library in a single request. However,
-  // Kitsu's server fails to respond in time for large libraries.
-  http_request.url.query[L"page[offset]"] = request.data[L"page_offset"];
-  http_request.url.query[L"page[limit]"] = ToWstr(kLibraryMaximumPageSize);
-
-  UseSparseFieldsetsForAnime(http_request, true);
-  UseSparseFieldsetsForLibraryEntries(http_request);
-}
-
-void Service::GetMetadataById(Request& request, HttpRequest& http_request) {
-  http_request.url.path = L"/edge/anime/" +
-                          request.data[canonical_name_ + L"-id"];
-
-  http_request.url.query[L"include"] =
-      L"categories,"
-      L"animeProductions,"
-      L"animeProductions.producer";
-
-  UseSparseFieldsetsForAnime(http_request);
-}
-
-void Service::GetSeason(Request& request, HttpRequest& http_request) {
-  http_request.url.path = L"/edge/anime";
-
-  http_request.url.query[L"filter[season]"] = request.data[L"season"];
-  http_request.url.query[L"filter[season_year]"] = request.data[L"year"];
-
-  http_request.url.query[L"page[offset]"] = request.data[L"page_offset"];
-  http_request.url.query[L"page[limit]"] = ToWstr(kJsonApiMaximumPageSize);
-
-  // We don't actually need the results to be sorted. But without this
-  // parameter, we get inconsistent ordering and duplicate objects.
-  http_request.url.query[L"sort"] = L"-user_count";
-
-  UseSparseFieldsetsForAnime(http_request);
-}
-
-void Service::SearchTitle(Request& request, HttpRequest& http_request) {
-  http_request.url.path = L"/edge/anime";
-
-  http_request.url.query[L"filter[text]"] = request.data[L"title"];
-
-  http_request.url.query[L"page[offset]"] = L"0";
-  http_request.url.query[L"page[limit]"] = ToWstr(kJsonApiMaximumPageSize);
-
-  UseSparseFieldsetsForAnime(http_request);
-}
-
-void Service::AddLibraryEntry(Request& request, HttpRequest& http_request) {
-  http_request.url.path = L"/edge/library-entries";
-
-  http_request.method = L"POST";
-  http_request.header[L"Content-Type"] = kJsonApiMediaType;
-
-  http_request.url.query[L"include"] =
-      L"anime,"
-      L"anime.categories,"
-      L"anime.animeProductions,"
-      L"anime.animeProductions.producer";
-
-  http_request.body = BuildLibraryObject(request);
-
-  UseSparseFieldsetsForAnime(http_request);
-  UseSparseFieldsetsForLibraryEntries(http_request);
-}
-
-void Service::DeleteLibraryEntry(Request& request, HttpRequest& http_request) {
-  http_request.url.path = L"/edge/library-entries/" +
-                          request.data[canonical_name_ + L"-library-id"];
-
-  http_request.method = L"DELETE";
-  http_request.header[L"Content-Type"] = kJsonApiMediaType;
-}
-
-void Service::UpdateLibraryEntry(Request& request, HttpRequest& http_request) {
-  http_request.url.path = L"/edge/library-entries/" +
-                          request.data[canonical_name_ + L"-library-id"];
-
-  http_request.method = L"PATCH";
-  http_request.header[L"Content-Type"] = kJsonApiMediaType;
-
-  http_request.url.query[L"include"] =
-      L"anime,"
-      L"anime.categories,"
-      L"anime.animeProductions,"
-      L"anime.animeProductions.producer";
-
-  http_request.body = BuildLibraryObject(request);
-
-  UseSparseFieldsetsForAnime(http_request);
-  UseSparseFieldsetsForLibraryEntries(http_request);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Response handlers
-
-void Service::AuthenticateUser(Response& response, HttpResponse& http_response) {
-  Json root;
-
-  if (!ParseResponseBody(http_response.body, response, root))
-    return;
-
-  user().access_token = StrToWstr(JsonReadStr(root, "access_token"));
-}
-
-void Service::GetUser(Response& response, HttpResponse& http_response) {
-  Json root;
-
-  if (!ParseResponseBody(http_response.body, response, root))
-    return;
-
-  if (root["data"].empty()) {
-    response.data[L"error"] = L"Invalid username";
-    HandleError(http_response, response);
-    return;
-  }
-
-  const auto& user = root["data"].front();
-
-  user_.id = StrToWstr(JsonReadStr(user, "id"));
-  user_.username = StrToWstr(JsonReadStr(user["attributes"], "slug"));
-  user_.rating_system = StrToWstr(JsonReadStr(user["attributes"], "ratingSystem"));
-
-  const auto display_name = StrToWstr(JsonReadStr(user["attributes"], "name"));
-  const auto email = StrToWstr(JsonReadStr(user["attributes"], "email"));
-
-  taiga::settings.SetSyncServiceKitsuDisplayName(display_name);
-  taiga::settings.SetSyncServiceKitsuEmail(email);
-  taiga::settings.SetSyncServiceKitsuRatingSystem(user_.rating_system);
-}
-
-void Service::GetLibraryEntries(Response& response, HttpResponse& http_response) {
-  Json root;
-
-  if (!ParseResponseBody(http_response.body, response, root))
-    return;
-
-  ParseLinks(root, response);
-  const auto first_page = response.data[L"prev_page_offset"].empty();
-  const auto next_page = ToInt(response.data[L"next_page_offset"]);
-
-  if (!IsPartialLibraryRequest() && first_page) {
-    anime::db.ClearUserData();
-  }
-
-  for (const auto& value : root["data"]) {
-    ParseLibraryObject(value);
-  }
-
-  for (const auto& value : root["included"]) {
-    ParseObject(value);
-  }
-
-  if (!next_page) {
-    user_.last_synchronized = time(nullptr);  // current time
-  }
-}
-
-void Service::GetMetadataById(Response& response, HttpResponse& http_response) {
-  Json root;
-
-  if (!ParseResponseBody(http_response.body, response, root))
-    return;
-
-  const auto anime_id = ParseAnimeObject(root["data"]);
-
-  ParseCategories(root["included"], anime_id);
-  ParseProducers(root["included"], anime_id);
-}
-
-void Service::GetSeason(Response& response, HttpResponse& http_response) {
-  Json root;
-
-  if (!ParseResponseBody(http_response.body, response, root))
-    return;
-
-  for (const auto& value : root["data"]) {
-    const auto anime_id = ParseAnimeObject(value);
-    AppendString(response.data[L"ids"], ToWstr(anime_id), L",");
-  }
-
-  ParseLinks(root, response);
-}
-
-void Service::SearchTitle(Response& response, HttpResponse& http_response) {
-  Json root;
-
-  if (!ParseResponseBody(http_response.body, response, root))
-    return;
-
-  for (const auto& value : root["data"]) {
-    const auto anime_id = ParseAnimeObject(value);
-    AppendString(response.data[L"ids"], ToWstr(anime_id), L",");
-  }
-}
-
-void Service::AddLibraryEntry(Response& response, HttpResponse& http_response) {
-  UpdateLibraryEntry(response, http_response);
-}
-
-void Service::DeleteLibraryEntry(Response& response, HttpResponse& http_response) {
-  // Returns "204 No Content" status and empty response body.
-}
-
-void Service::UpdateLibraryEntry(Response& response, HttpResponse& http_response) {
-  Json root;
-
-  if (!ParseResponseBody(http_response.body, response, root))
-    return;
-
-  const auto anime_id = ParseLibraryObject(root["data"]);
-
-  if (!anime::IsValidId(anime_id))
-    return;
-
-  for (const auto& value : root["included"]) {
-    ParseObject(value);
-  }
-
-  ParseCategories(root["included"], anime_id);
-  ParseProducers(root["included"], anime_id);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-bool Service::RequestNeedsAuthentication(RequestType request_type) const {
-  switch (request_type) {
-    case kAddLibraryEntry:
-    case kDeleteLibraryEntry:
-    case kUpdateLibraryEntry:
-      return true;
-    case kGetLibraryEntries:
-    case kGetMetadataById:
-    case kGetSeason:
-    case kGetUser:
-    case kSearchTitle:
-      return !user().access_token.empty();
-  }
-
-  return false;
-}
-
-bool Service::RequestSucceeded(Response& response,
-                               const HttpResponse& http_response) {
-  const auto status_category = http_response.GetStatusCategory();
-
-  // 200 OK
-  // 201 Created
-  // 202 Accepted
-  // 204 No Content
-  if (status_category == 200)
-    return true;
-
-  // If we try to add a library entry that is already there, Kitsu returns a
-  // "422 Unprocessable Entity" response with "animeId - has already been taken"
-  // error message. Here we ignore this error and assume that our request
-  // succeeded.
-  if (response.type == kAddLibraryEntry && status_category == 400)
-    return false;
-
-  // Handle invalid anime IDs
-  if (response.type == kGetMetadataById && http_response.code == 404)
-    response.data[L"invalid_id"] = L"true";
-
-  // Error
-  Json root;
-  std::wstring error_description;
-
-  if (JsonParseString(http_response.body, root)) {
-    if (root.count("error_description")) {
-      error_description = StrToWstr(root["error_description"]);
-    } else if (root.count("errors")) {
-      const auto& errors = root["errors"];
-      if (errors.is_array() && !errors.empty()) {
-        const auto& error = errors.front();
-        error_description = StrToWstr("\"" +
-            JsonReadStr(error, "title") + ": " +
-            JsonReadStr(error, "detail") + "\"");
-      }
-    }
-  }
-
-  response.data[L"error"] = error_description;
-  HandleError(http_response, response);
-
-  return false;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-std::wstring Service::BuildLibraryObject(Request& request) const {
-  const auto anime_id = ToInt(request.data[canonical_name_ + L"-id"]);
-  const auto library_id = ToInt(request.data[canonical_name_ + L"-library-id"]);
-
+std::string BuildLibraryObject(const library::QueueItem& queue_item) {
   Json json = {
     {"data", {
       {"type", "libraryEntries"},
@@ -466,13 +174,13 @@ std::wstring Service::BuildLibraryObject(Request& request) const {
         {"anime", {
           {"data", {
             {"type", "anime"},
-            {"id", ToStr(anime_id)},
+            {"id", ToStr(queue_item.anime_id)},
           }}
         }},
         {"user", {
           {"data", {
             {"type", "users"},
-            {"id", WstrToStr(user_.id)},
+            {"id", account.id()},
           }}
         }}
       }}
@@ -482,144 +190,111 @@ std::wstring Service::BuildLibraryObject(Request& request) const {
   // According to the JSON API specification, "The `id` member is not required
   // when the resource object originates at the client and represents a new
   // resource to be created on the server."
-  if (library_id)
-    json["data"]["id"] = ToStr(library_id);
+  if (const auto anime_item = anime::db.Find(queue_item.anime_id)) {
+    if (const auto library_id = ToInt(anime_item->GetMyId())) {
+      json["data"]["id"] = ToStr(library_id);
+    }
+  }
 
   auto& attributes = json["data"]["attributes"];
 
   // Note that we send `null` (rather than `0` or `""`) to remove certain values
-  if (request.data.count(L"date_finish")) {
-    const auto finished_at = TranslateMyDateTo(request.data[L"date_finish"]);
+  if (queue_item.date_finish) {
+    const auto finished_at =
+        TranslateMyDateTo(queue_item.date_finish->to_string());
     if (!finished_at.empty()) {
       attributes["finishedAt"] = finished_at;
     } else {
       attributes["finishedAt"] = nullptr;
     }
   }
-  if (request.data.count(L"notes"))
-    attributes["notes"] = WstrToStr(request.data[L"notes"]);
-  if (request.data.count(L"episode"))
-    attributes["progress"] = ToInt(request.data[L"episode"]);
-  if (request.data.count(L"score")) {
-    const auto score = ToInt(request.data[L"score"]);
+  if (queue_item.notes)
+    attributes["notes"] = WstrToStr(*queue_item.notes);
+  if (queue_item.episode)
+    attributes["progress"] = *queue_item.episode;
+  if (queue_item.score) {
+    const auto score = *queue_item.score;
     if (score > 0) {
       attributes["ratingTwenty"] = TranslateMyRatingTo(score);
     } else {
       attributes["ratingTwenty"] = nullptr;
     }
   }
-  if (request.data.count(L"rewatched_times"))
-    attributes["reconsumeCount"] = ToInt(request.data[L"rewatched_times"]);
-  if (request.data.count(L"enable_rewatching"))
-    attributes["reconsuming"] = ToBool(request.data[L"enable_rewatching"]);
-  if (request.data.count(L"date_start")) {
-    const auto started_at = TranslateMyDateTo(request.data[L"date_start"]);
+  if (queue_item.rewatched_times)
+    attributes["reconsumeCount"] = *queue_item.rewatched_times;
+  if (queue_item.enable_rewatching)
+    attributes["reconsuming"] = *queue_item.enable_rewatching;
+  if (queue_item.date_start) {
+    const auto started_at =
+        TranslateMyDateTo(queue_item.date_start->to_string());
     if (!started_at.empty()) {
       attributes["startedAt"] = started_at;
     } else {
       attributes["startedAt"] = nullptr;
     }
   }
-  if (request.data.count(L"status"))
-    attributes["status"] = TranslateMyStatusTo(ToInt(request.data[L"status"]));
+  if (queue_item.status)
+    attributes["status"] = TranslateMyStatusTo(*queue_item.status);
 
-  return StrToWstr(json.dump());
+  return json.dump();
 }
 
-void Service::UseSparseFieldsetsForAnime(HttpRequest& http_request,
-                                         bool minimal) const {
+void UseSparseFieldsetsForAnime(hypr::Params& params, bool minimal) {
   // Requesting a restricted set of fields decreases response and download times
   // in certain cases.
-  http_request.url.query[L"fields[anime]"] =
+  std::string fields_anime =
       // attributes
-      L"abbreviatedTitles,"
-      L"ageRating,"
-      L"averageRating,"
-      L"canonicalTitle,"
-      L"endDate,"
-      L"episodeCount,"
-      L"episodeLength,"
-      L"popularityRank,"
-      L"posterImage,"
-      L"slug,"
-      L"startDate,"
-      L"subtype,"
-      L"titles,"
+      "abbreviatedTitles,"
+      "ageRating,"
+      "averageRating,"
+      "canonicalTitle,"
+      "endDate,"
+      "episodeCount,"
+      "episodeLength,"
+      "popularityRank,"
+      "posterImage,"
+      "slug,"
+      "startDate,"
+      "subtype,"
+      "titles,"
       // relationships
-      L"animeProductions,"
-      L"categories";
+      "animeProductions,"
+      "categories";
   if (!minimal) {
-    http_request.url.query[L"fields[anime]"] += L",synopsis";
+    fields_anime += ",synopsis";
   }
 
-  http_request.url.query[L"fields[animeProductions]"] = L"producer";
-  http_request.url.query[L"fields[categories]"] = L"title";
-  http_request.url.query[L"fields[producers]"] = L"name";
+  params.add("fields[anime]", fields_anime);
+  params.add("fields[animeProductions]", "producer");
+  params.add("fields[categories]", "title");
+  params.add("fields[producers]", "name");
 }
 
-void Service::UseSparseFieldsetsForLibraryEntries(HttpRequest& http_request) const {
-  http_request.url.query[L"fields[libraryEntries]"] =
+void UseSparseFieldsetsForLibraryEntries(hypr::Params& params) {
+  params.add("fields[libraryEntries]",
       // attributes
-      L"finishedAt,"
-      L"notes,"
-      L"progress,"
-      L"ratingTwenty,"
-      L"reconsumeCount,"
-      L"reconsuming,"
-      L"startedAt,"
-      L"status,"
-      L"updatedAt,"
+      "finishedAt,"
+      "notes,"
+      "progress,"
+      "ratingTwenty,"
+      "reconsumeCount,"
+      "reconsuming,"
+      "startedAt,"
+      "status,"
+      "updatedAt,"
       // relationships
-      L"anime";
+      "anime");
 }
 
-void Service::UseSparseFieldsetsForUser(HttpRequest& http_request) const {
-  http_request.url.query[L"fields[users]"] =
-      L"email,"
-      L"name,"
-      L"ratingSystem,"
-      L"slug";
+void UseSparseFieldsetsForUser(hypr::Params& params) {
+  params.add("fields[users]",
+      "email,"
+      "name,"
+      "ratingSystem,"
+      "slug");
 }
 
-void Service::ParseObject(const Json& json) const {
-  enum class Type {
-    Anime,
-    Categories,
-    LibraryEntries,
-    Producers,
-    Unknown,
-  };
-
-  const std::map<std::string, Type> table{
-    {"anime", Type::Anime},
-    {"categories", Type::Categories},
-    {"libraryEntries", Type::LibraryEntries},
-    {"producers", Type::Producers},
-  };
-
-  const auto find_type = [&](const std::string& str) {
-    const auto it = table.find(str);
-    return it != table.end() ? it->second : Type::Unknown;
-  };
-
-  switch (find_type(json["type"])) {
-    case Type::Anime:
-      ParseAnimeObject(json);
-      break;
-    case Type::Categories:
-      break;
-    case Type::LibraryEntries:
-      ParseLibraryObject(json);
-      break;
-    case Type::Producers:
-      break;
-    default:
-      LOGD(L"Invalid type: {}", StrToWstr(json["type"]));
-      break;
-  }
-}
-
-int Service::ParseAnimeObject(const Json& json) const {
+int ParseAnimeObject(const Json& json) {
   const auto anime_id = ToInt(JsonReadStr(json, "id"));
   const auto& attributes = json["attributes"];
 
@@ -629,22 +304,27 @@ int Service::ParseAnimeObject(const Json& json) const {
   }
 
   anime::Item anime_item;
-  anime_item.SetSource(this->id());
-  anime_item.SetId(ToWstr(anime_id), this->id());
+  anime_item.SetSource(kKitsu);
+  anime_item.SetId(ToWstr(anime_id), kKitsu);
   anime_item.SetLastModified(time(nullptr));  // current time
 
-  anime_item.SetAgeRating(TranslateAgeRatingFrom(JsonReadStr(attributes, "ageRating")));
-  anime_item.SetScore(TranslateSeriesRatingFrom(JsonReadStr(attributes, "averageRating")));
+  anime_item.SetAgeRating(
+      TranslateAgeRatingFrom(JsonReadStr(attributes, "ageRating")));
+  anime_item.SetScore(
+      TranslateSeriesRatingFrom(JsonReadStr(attributes, "averageRating")));
   anime_item.SetTitle(StrToWstr(JsonReadStr(attributes, "canonicalTitle")));
   anime_item.SetDateEnd(StrToWstr(JsonReadStr(attributes, "endDate")));
   anime_item.SetEpisodeCount(JsonReadInt(attributes, "episodeCount"));
   anime_item.SetEpisodeLength(JsonReadInt(attributes, "episodeLength"));
   anime_item.SetPopularity(JsonReadInt(attributes, "popularityRank"));
-  anime_item.SetImageUrl(StrToWstr(JsonReadStr(attributes["posterImage"], "small")));
+  anime_item.SetImageUrl(
+      StrToWstr(JsonReadStr(attributes["posterImage"], "small")));
   anime_item.SetSlug(StrToWstr(JsonReadStr(attributes, "slug")));
   anime_item.SetDateStart(StrToWstr(JsonReadStr(attributes, "startDate")));
-  anime_item.SetType(TranslateSeriesTypeFrom(JsonReadStr(attributes, "subtype")));
-  anime_item.SetSynopsis(anime::NormalizeSynopsis(StrToWstr(JsonReadStr(attributes, "synopsis"))));
+  anime_item.SetType(
+      TranslateSeriesTypeFrom(JsonReadStr(attributes, "subtype")));
+  anime_item.SetSynopsis(
+      anime::NormalizeSynopsis(StrToWstr(JsonReadStr(attributes, "synopsis"))));
 
   for (const auto& title : attributes["abbreviatedTitles"]) {
     if (title.is_string())
@@ -682,8 +362,8 @@ int Service::ParseAnimeObject(const Json& json) const {
   return anime::db.UpdateItem(anime_item);
 }
 
-void Service::ParseCategories(const Json& json, const int anime_id) const {
-  auto anime_item = anime::db.Find(anime_id);
+void ParseCategories(const Json& json, const int anime_id) {
+  const auto anime_item = anime::db.Find(anime_id);
 
   if (!anime_item)
     return;
@@ -702,8 +382,8 @@ void Service::ParseCategories(const Json& json, const int anime_id) const {
   anime_item->SetGenres(categories);
 }
 
-void Service::ParseProducers(const Json& json, const int anime_id) const {
-  auto anime_item = anime::db.Find(anime_id);
+void ParseProducers(const Json& json, const int anime_id) {
+  const auto anime_item = anime::db.Find(anime_id);
 
   if (!anime_item)
     return;
@@ -720,7 +400,7 @@ void Service::ParseProducers(const Json& json, const int anime_id) const {
   anime_item->SetProducers(producers);
 }
 
-int Service::ParseLibraryObject(const Json& json) const {
+int ParseLibraryObject(const Json& json) {
   const auto& media = json["relationships"]["anime"];
   const auto& attributes = json["attributes"];
 
@@ -733,58 +413,108 @@ int Service::ParseLibraryObject(const Json& json) const {
   }
 
   anime::Item anime_item;
-  anime_item.SetSource(this->id());
-  anime_item.SetId(ToWstr(anime_id), this->id());
+  anime_item.SetSource(kKitsu);
+  anime_item.SetId(ToWstr(anime_id), kKitsu);
   anime_item.AddtoUserList();
 
   anime_item.SetMyId(ToWstr(library_id));
-  anime_item.SetMyDateEnd(TranslateMyDateFrom(JsonReadStr(attributes, "finishedAt")));
+  anime_item.SetMyDateEnd(
+      TranslateMyDateFrom(JsonReadStr(attributes, "finishedAt")));
   anime_item.SetMyNotes(StrToWstr(JsonReadStr(attributes, "notes")));
   anime_item.SetMyLastWatchedEpisode(JsonReadInt(attributes, "progress"));
-  anime_item.SetMyScore(TranslateMyRatingFrom(JsonReadInt(attributes, "ratingTwenty")));
+  anime_item.SetMyScore(
+      TranslateMyRatingFrom(JsonReadInt(attributes, "ratingTwenty")));
   anime_item.SetMyRewatchedTimes(JsonReadInt(attributes, "reconsumeCount"));
   anime_item.SetMyRewatching(JsonReadBool(attributes, "reconsuming"));
-  anime_item.SetMyDateStart(TranslateMyDateFrom(JsonReadStr(attributes, "startedAt")));
-  anime_item.SetMyStatus(TranslateMyStatusFrom(JsonReadStr(attributes, "status")));
-  anime_item.SetMyLastUpdated(TranslateMyLastUpdatedFrom(JsonReadStr(attributes, "updatedAt")));
+  anime_item.SetMyDateStart(
+      TranslateMyDateFrom(JsonReadStr(attributes, "startedAt")));
+  anime_item.SetMyStatus(
+      TranslateMyStatusFrom(JsonReadStr(attributes, "status")));
+  anime_item.SetMyLastUpdated(
+      TranslateMyLastUpdatedFrom(JsonReadStr(attributes, "updatedAt")));
 
   return anime::db.UpdateItem(anime_item);
 }
 
-void Service::ParseLinks(const Json& json, Response& response) const {
-  auto parse_link = [&](const std::string& name) {
-    const auto link = JsonReadStr(json["links"], name);
-    if (!link.empty()) {
-      Url url = StrToWstr(link);
-      response.data[StrToWstr(name) + L"_page_offset"] = url.query[L"page[offset]"];
-    }
-  };
-
-  parse_link("prev");
-  parse_link("next");
+std::optional<int> GetOffset(const Json& json, const std::string& name) {
+  if (const auto link = JsonReadStr(json["links"], name); !link.empty()) {
+    Url url = StrToWstr(link);
+    return ToInt(url.query[L"offset"]);
+  }
+  return std::nullopt;
 }
 
-bool Service::ParseResponseBody(const std::wstring& body,
-                                Response& response, Json& json) {
-  if (JsonParseString(body, json))
+void ParseObject(const Json& json) {
+  enum class Type {
+    Anime,
+    Categories,
+    LibraryEntries,
+    Producers,
+    Unknown,
+  };
+
+  const std::map<std::string, Type> table{
+    {"anime", Type::Anime},
+    {"categories", Type::Categories},
+    {"libraryEntries", Type::LibraryEntries},
+    {"producers", Type::Producers},
+  };
+
+  const auto find_type = [&](const std::string& str) {
+    const auto it = table.find(str);
+    return it != table.end() ? it->second : Type::Unknown;
+  };
+
+  switch (find_type(json["type"])) {
+    case Type::Anime:
+      ParseAnimeObject(json);
+      break;
+    case Type::Categories:
+      break;
+    case Type::LibraryEntries:
+      ParseLibraryObject(json);
+      break;
+    case Type::Producers:
+      break;
+    default:
+      LOGD(L"Invalid type: {}", StrToWstr(json["type"]));
+      break;
+  }
+}
+
+bool IsPartialLibraryRequest() {
+  return account.last_synchronized() &&
+         taiga::settings.GetSyncServiceKitsuPartialLibrary();
+}
+
+bool HasError(const taiga::http::Response& response) {
+  const auto status_category = hypp::status::to_class(response.status_code());
+
+  // 200 OK
+  // 201 Created
+  // 202 Accepted
+  // 204 No Content
+  if (status_category == 200)
     return true;
 
-  switch (response.type) {
-    case kGetLibraryEntries:
-      response.data[L"error"] = L"Could not parse library entries";
-      break;
-    case kGetMetadataById:
-      response.data[L"error"] = L"Could not parse anime object";
-      break;
-    case kGetSeason:
-      response.data[L"error"] = L"Could not parse season data";
-      break;
-    case kSearchTitle:
-      response.data[L"error"] = L"Could not parse search results";
-      break;
-    case kUpdateLibraryEntry:
-      response.data[L"error"] = L"Could not parse library entry";
-      break;
+  if (Json root; JsonParseString(response.body(), root)) {
+    std::string error_description;
+    if (root.count("error_description")) {
+      error_description = root["error_description"];
+    } else if (root.count("errors")) {
+      const auto& errors = root["errors"];
+      if (errors.is_array()) {
+        for (const auto error : errors) {
+          error_description = "\"{}: {}\""_format(
+              JsonReadStr(error, "title"), JsonReadStr(error, "detail"));
+          break;
+        }
+      }
+    }
+    if (!error_description.empty()) {
+      LOGE(StrToWstr(error_description));
+      return true;
+    }
   }
 
   return false;
@@ -792,10 +522,441 @@ bool Service::ParseResponseBody(const std::wstring& body,
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool Service::IsPartialLibraryRequest() const {
-  return user_.last_synchronized &&
-         taiga::settings.GetSyncServiceKitsuPartialLibrary();
+void AuthenticateUser() {
+  auto request = BuildRequest();
+  request.set_method("POST");
+  request.set_target("https://kitsu.io/api/oauth/token");
+  request.set_header("Content-Type", "application/x-www-form-urlencoded");
+
+  auto username = Account::email();
+  if (username.empty())
+    username = Account::username();
+
+  // Resource Owner Password Credentials Grant
+  // https://tools.ietf.org/html/rfc6749#section-4.3
+  request.set_body({
+      {"grant_type", "password"},
+      {"username", username},
+      {"password", Account::password()},
+      {"client_id", kClientId},
+      {"client_secret", kClientSecret}});
+
+  const auto on_transfer = [](const taiga::http::Transfer& transfer) {
+    return OnTransfer(transfer, L"Kitsu: Authenticating user...");
+  };
+
+  const auto on_response = [](const taiga::http::Response& response) {
+    if (HasError(response)) {
+      return;
+    }
+
+    Json root;
+    if (!JsonParseString(response.body(), root)) {
+      ui::ChangeStatusText(L"Kitsu: Could not parse authentication data.");
+      return;
+    }
+
+    account.set_access_token(JsonReadStr(root, "access_token"));
+  };
+
+  taiga::http::Send(request, on_transfer, on_response);
 }
 
-}  // namespace kitsu
-}  // namespace sync
+void GetUser() {
+  auto request = BuildRequest();
+  request.set_target("{}/edge/users"_format(kBaseUrl));
+
+  hypr::Params params;
+  if (account.authenticated()) {
+    params.add("filter[self]", "true");
+  } else {
+    params.add("filter[slug]", Account::username());
+  }
+  UseSparseFieldsetsForUser(params);
+  request.set_query(params);
+
+  const auto on_transfer = [](const taiga::http::Transfer& transfer) {
+    return OnTransfer(transfer, L"Kitsu: Retrieving user information...");
+  };
+
+  const auto on_response = [](const taiga::http::Response& response) {
+    if (HasError(response)) {
+      return;
+    }
+
+    Json root;
+    if (!JsonParseString(response.body(), root)) {
+      ui::ChangeStatusText(L"Kitsu: Could not parse user data.");
+      return;
+    }
+
+    if (root["data"].empty()) {
+      ui::ChangeStatusText(L"Kitsu: Invalid username");
+      return;
+    }
+
+    const auto& user = root["data"].front();
+
+    account.set_authenticated(true);
+    account.set_id(JsonReadStr(user, "id"));
+
+    Account::set_username(JsonReadStr(user["attributes"], "slug"));
+    Account::set_rating_system(JsonReadStr(user["attributes"], "ratingSystem"));
+    Account::set_display_name(JsonReadStr(user["attributes"], "name"));
+    Account::set_email(JsonReadStr(user["attributes"], "email"));
+  };
+
+  taiga::http::Send(request, on_transfer, on_response);
+}
+
+void GetLibraryEntries(const int page) {
+  auto request = BuildRequest();
+  request.set_target("{}/edge/library-entries"_format(kBaseUrl));
+
+  hypr::Params params;
+  params.add("filter[user_id]", account.id());
+  params.add("filter[kind]", "anime");
+
+  // We don't need to download the entire library; we just need to know about
+  // the entries that have changed since the last download. `filter[since]` is
+  // quite useful in this manner, but note that the following scenario results
+  // in an undesirable behavior:
+  //
+  // 1. Get library entries via client
+  // 2. Go to website and delete entry from library
+  // 3. Get library entries via client, using `filter[since]={...}`
+  // 4. Client doesn't know entry was deleted
+  //
+  // Our "solution" to this is to allow Taiga to download the entire library
+  // after each restart (i.e. last_synchronized is not saved on exit).
+  if (IsPartialLibraryRequest()) {
+    const auto date = GetDate(account.last_synchronized() - (60 * 60 * 24));  // 1 day before, to be safe
+    params.add("filter[since]", WstrToStr(date.to_string()));
+  }
+
+  params.add("include", "anime");
+
+  // We would prefer retrieving the entire library in a single request. However,
+  // Kitsu's server fails to respond in time for large libraries.
+  params.add("page[offset]", ToStr(page));
+  params.add("page[limit]", ToStr(kLibraryMaximumPageSize));
+
+  UseSparseFieldsetsForAnime(params, true);
+  UseSparseFieldsetsForLibraryEntries(params);
+  request.set_query(params);
+
+  const auto on_transfer = [](const taiga::http::Transfer& transfer) {
+    return OnTransfer(transfer, L"Kitsu: Retrieving anime list...");
+  };
+
+  const auto on_response = [](const taiga::http::Response& response) {
+    if (HasError(response)) {
+      return;
+    }
+
+    Json root;
+    if (!JsonParseString(response.body(), root)) {
+      ui::ChangeStatusText(L"Kitsu: Could not parse anime list.");
+      return;
+    }
+
+    const auto prev_page = GetOffset(root, "prev");
+    const auto next_page = GetOffset(root, "next");
+
+    if (!IsPartialLibraryRequest() && !prev_page) {
+      anime::db.ClearUserData();
+    }
+
+    for (const auto& value : root["data"]) {
+      ParseLibraryObject(value);
+    }
+    for (const auto& value : root["included"]) {
+      ParseObject(value);
+    }
+
+    if (next_page) {
+      GetLibraryEntries(*next_page);
+    } else {
+      account.set_last_synchronized(time(nullptr));  // current time
+      sync::AfterGetLibrary();
+    }
+  };
+
+  taiga::http::Send(request, on_transfer, on_response);
+}
+
+void GetMetadataById(const int id) {
+  auto request = BuildRequest();
+  request.set_target("{}/edge/anime/{}"_format(kBaseUrl, id));
+
+  hypr::Params params{{"include",
+      "categories,"
+      "animeProductions,"
+      "animeProductions.producer"}};
+
+  UseSparseFieldsetsForAnime(params, false);
+  request.set_query(params);
+
+  const auto on_transfer = [](const taiga::http::Transfer& transfer) {
+    return OnTransfer(transfer, L"Kitsu: Retrieving anime information...");
+  };
+
+  const auto on_response = [](const taiga::http::Response& response) {
+    if (HasError(response)) {
+      return;
+    }
+
+    if (response.status_code() == 404) {
+      // @TODO: Invalid anime ID
+      return;
+    }
+
+    Json root;
+    if (!JsonParseString(response.body(), root))  {
+      ui::ChangeStatusText(L"Kitsu: Could not parse anime data.");
+      return;
+    }
+
+    const auto anime_id = ParseAnimeObject(root["data"]);
+    ParseCategories(root["included"], anime_id);
+    ParseProducers(root["included"], anime_id);
+  };
+
+  taiga::http::Send(request, on_transfer, on_response);
+}
+
+void GetSeason(const anime::Season season, const int page) {
+  auto request = BuildRequest();
+  request.set_target("{}/edge/anime"_format(kBaseUrl));
+
+  hypr::Params params{
+      {"filter[season]", WstrToStr(ui::TranslateSeasonName(season.name))},
+      {"filter[season_year]", ToStr(season.year)},
+      {"page[offset]", ToStr(page)},
+      {"page[limit]", ToStr(kJsonApiMaximumPageSize)}};
+
+  // We don't actually need the results to be sorted. But without this
+  // parameter, we get inconsistent ordering and duplicate objects.
+  params.add("sort", "-user_count");
+
+  UseSparseFieldsetsForAnime(params, false);
+  request.set_query(params);
+
+  const auto on_transfer = [season](const taiga::http::Transfer& transfer) {
+    return OnTransfer(transfer,
+        L"Kitsu: Retrieving {} anime season..."_format(
+            ui::TranslateSeason(season)));
+  };
+
+  const auto on_response = [season](const taiga::http::Response& response) {
+    if (HasError(response)) {
+      return;
+    }
+
+    Json root;
+    if (!JsonParseString(response.body(), root)) {
+      ui::ChangeStatusText(L"Kitsu: Could not parse season data.");
+      return;
+    }
+
+    const auto prev_page = GetOffset(root, "prev");
+    const auto next_page = GetOffset(root, "next");
+
+    if (!prev_page) {  // first page
+      anime::season_db.items.clear();
+    }
+
+    for (const auto& value : root["data"]) {
+      const auto anime_id = ParseAnimeObject(value);
+      anime::season_db.items.push_back(anime_id);
+      ui::OnLibraryEntryChange(anime_id);
+    }
+
+    if (next_page) {
+      GetSeason(season, *next_page);
+    } else {
+      sync::AfterGetSeason();
+    }
+  };
+
+  taiga::http::Send(request, on_transfer, on_response);
+}
+
+void SearchTitle(const std::wstring& title) {
+  auto request = BuildRequest();
+  request.set_target("{}/edge/anime"_format(kBaseUrl));
+
+  hypr::Params params{
+      {"filter[text]", WstrToStr(title)},
+      {"page[offset]", "0"},
+      {"page[limit]", ToStr(kJsonApiMaximumPageSize)}};
+
+  UseSparseFieldsetsForAnime(params, false);
+  request.set_query(params);
+
+  const auto on_transfer = [title](const taiga::http::Transfer& transfer) {
+    return OnTransfer(transfer,
+        L"Kitsu: Searching for \"{}\"..."_format(title));
+  };
+
+  const auto on_response = [](const taiga::http::Response& response) {
+    if (HasError(response)) {
+      return;
+    }
+
+    Json root;
+    if (!JsonParseString(response.body(), root)) {
+      ui::ChangeStatusText(L"Kitsu: Could not parse search results.");
+      return;
+    }
+
+    std::wstring ids;
+    for (const auto& value : root["data"]) {
+      const auto anime_id = ParseAnimeObject(value);
+      AppendString(ids, ToWstr(anime_id), L",");
+    }
+    ui::OnLibrarySearchTitle(anime::ID_UNKNOWN, ids);
+  };
+
+  taiga::http::Send(request, on_transfer, on_response);
+}
+
+void AddLibraryEntry(const library::QueueItem& queue_item) {
+  auto request = BuildRequest();
+  request.set_method("POST");
+  request.set_target("{}/edge/library-entries"_format(kBaseUrl));
+  request.set_header("Content-Type", kJsonApiMediaType);
+
+  hypr::Params params{{"include",
+      "anime,"
+      "anime.categories,"
+      "anime.animeProductions,"
+      "anime.animeProductions.producer"}};
+
+  UseSparseFieldsetsForAnime(params, false);
+  UseSparseFieldsetsForLibraryEntries(params);
+  request.set_query(params);
+
+  request.set_body(hypr::Body{BuildLibraryObject(queue_item)});
+
+  const auto on_transfer = [](const taiga::http::Transfer& transfer) {
+    return OnTransfer(transfer, L"Kitsu: Updating anime list...");
+  };
+
+  const auto on_response = [](const taiga::http::Response& response) {
+    if (HasError(response)) {
+      return;
+    }
+
+    // If we try to add a library entry that is already there, Kitsu returns a
+    // "422 Unprocessable Entity" response with "animeId - has already been taken"
+    // error message. Here we ignore this error and assume that our request
+    // succeeded.
+    if (hypp::status::to_class(response.status_code()) == 400) {
+      return;
+    }
+  };
+
+  taiga::http::Send(request, on_transfer, on_response);
+}
+
+void DeleteLibraryEntry(const int id) {
+  auto request = BuildRequest();
+  request.set_method("DELETE");
+  request.set_target("{}/edge/library-entries/{}"_format(kBaseUrl, id));
+  request.set_header("Content-Type", kJsonApiMediaType);
+
+  const auto on_transfer = [](const taiga::http::Transfer& transfer) {
+    return OnTransfer(transfer, L"Kitsu: Deleting anime from list...");
+  };
+
+  const auto on_response = [](const taiga::http::Response& response) {
+    if (HasError(response)) {
+      return;
+    }
+
+    // Returns "204 No Content" status and empty response body.
+  };
+
+  taiga::http::Send(request, on_transfer, on_response);
+}
+
+void UpdateLibraryEntry(const library::QueueItem& queue_item) {
+  const auto anime_item = anime::db.Find(queue_item.anime_id);
+  const auto library_id = ToInt(anime_item->GetMyId());
+
+  auto request = BuildRequest();
+  request.set_method("PATCH");
+  request.set_target("{}/edge/library-entries/{}"_format(kBaseUrl, library_id));
+  request.set_header("Content-Type", kJsonApiMediaType);
+
+  hypr::Params params{{"include",
+      "anime,"
+      "anime.categories,"
+      "anime.animeProductions,"
+      "anime.animeProductions.producer"}};
+
+  UseSparseFieldsetsForAnime(params, false);
+  UseSparseFieldsetsForLibraryEntries(params);
+  request.set_query(params);
+
+  request.set_body(hypr::Body{BuildLibraryObject(queue_item)});
+
+  const auto on_transfer = [](const taiga::http::Transfer& transfer) {
+    return OnTransfer(transfer, L"Kitsu: Updating anime list...");
+  };
+
+  const auto on_response = [](const taiga::http::Response& response) {
+    if (HasError(response)) {
+      return;
+    }
+
+    Json root;
+    if (!JsonParseString(response.body(), root)) {
+      ui::ChangeStatusText(L"Kitsu: Could not parse anime list entry.");
+      return;
+    }
+
+    const auto anime_id = ParseLibraryObject(root["data"]);
+
+    if (!anime::IsValidId(anime_id))
+      return;
+
+    for (const auto& value : root["included"]) {
+      ParseObject(value);
+    }
+    ParseCategories(root["included"], anime_id);
+    ParseProducers(root["included"], anime_id);
+  };
+
+  taiga::http::Send(request, on_transfer, on_response);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+Service::Service() {
+  host_ = L"kitsu.io/api";
+
+  id_ = kKitsu;
+  canonical_name_ = L"kitsu";
+  name_ = L"Kitsu";
+}
+
+bool Service::RequestNeedsAuthentication(RequestType request_type) const {
+  switch (request_type) {
+    case kAddLibraryEntry:
+    case kDeleteLibraryEntry:
+    case kUpdateLibraryEntry:
+      return true;
+    case kGetLibraryEntries:
+    case kGetMetadataById:
+    case kGetSeason:
+    case kGetUser:
+    case kSearchTitle:
+      return !user().access_token.empty();
+  }
+
+  return false;
+}
+
+}  // namespace sync::kitsu

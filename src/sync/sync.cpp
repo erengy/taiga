@@ -27,6 +27,7 @@
 #include "media/anime_util.h"
 #include "media/library/queue.h"
 #include "sync/anilist.h"
+#include "sync/kitsu.h"
 #include "sync/manager.h"
 #include "sync/myanimelist.h"
 #include "taiga/http.h"
@@ -60,11 +61,11 @@ bool AuthenticateUser() {
     case kMyAnimeList:
       myanimelist::AuthenticateUser();
       break;
+    case kKitsu:
+      kitsu::AuthenticateUser();
+      break;
     case kAniList:
       anilist::AuthenticateUser();
-      break;
-    default:
-      ServiceManager.MakeRequest(request);
       break;
   }
 
@@ -91,10 +92,10 @@ void GetUser() {
     case kMyAnimeList:
       myanimelist::GetUser();
       break;
-    case kAniList:
+    case kKitsu:
+      kitsu::GetUser();
       break;
-    default:
-      ServiceManager.MakeRequest(request);
+    case kAniList:
       break;
   }
 }
@@ -124,11 +125,11 @@ void GetLibraryEntries(const int offset) {
     case kMyAnimeList:
       myanimelist::GetLibraryEntries();
       break;
+    case kKitsu:
+      kitsu::GetLibraryEntries();
+      break;
     case kAniList:
       anilist::GetLibraryEntries();
-      break;
-    default:
-      ServiceManager.MakeRequest(request);
       break;
   }
 }
@@ -144,11 +145,11 @@ void GetMetadataById(int id) {
     case kMyAnimeList:
       myanimelist::GetMetadataById(id);
       break;
+    case kKitsu:
+      kitsu::GetMetadataById(id);
+      break;
     case kAniList:
       anilist::GetMetadataById(id);
-      break;
-    default:
-      ServiceManager.MakeRequest(request);
       break;
   }
 }
@@ -166,11 +167,11 @@ void GetSeason(const anime::Season season, const int offset) {
     case kMyAnimeList:
       myanimelist::GetSeason(season);
       break;
+    case kKitsu:
+      kitsu::GetSeason(season);
+      break;
     case kAniList:
       anilist::GetSeason(season);
-      break;
-    default:
-      ServiceManager.MakeRequest(request);
       break;
   }
 }
@@ -188,11 +189,11 @@ void SearchTitle(std::wstring title, int id) {
     case kMyAnimeList:
       myanimelist::SearchTitle(title);
       break;
+    case kKitsu:
+      kitsu::SearchTitle(title);
+      break;
     case kAniList:
       anilist::SearchTitle(title);
-      break;
-    default:
-      ServiceManager.MakeRequest(request);
       break;
   }
 }
@@ -260,11 +261,11 @@ void UpdateLibraryEntry(const library::QueueItem& queue_item) {
     case kMyAnimeList:
       myanimelist::UpdateLibraryEntry(queue_item);
       break;
+    case kKitsu:
+      kitsu::UpdateLibraryEntry(queue_item);
+      break;
     case kAniList:
       anilist::UpdateLibraryEntry(queue_item);
-      break;
-    default:
-      ServiceManager.MakeRequest(request);
       break;
   }
 }
@@ -351,15 +352,10 @@ bool UserAuthenticated() {
   switch (taiga::GetCurrentServiceId()) {
     case kMyAnimeList:
       return myanimelist::IsUserAuthenticated();
-      break;
+    case kKitsu:
+      return kitsu::IsUserAuthenticated();
     case kAniList:
       return anilist::IsUserAuthenticated();
-      break;
-    default: {
-      const auto service = taiga::GetCurrentService();
-      return service->user().authenticated;
-      break;
-    }
   }
 }
 
