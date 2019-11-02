@@ -25,6 +25,21 @@
 
 namespace taiga::http {
 
+enum HttpClientMode {
+  kSilent,
+  // Service
+  kServiceAuthenticateUser,
+  kServiceGetUser,
+  kServiceGetMetadataById,
+  kServiceGetSeason,
+  kServiceSearchTitle,
+  kServiceAddLibraryEntry,
+  kServiceDeleteLibraryEntry,
+  kServiceGetLibraryEntries,
+  kServiceUpdateLibraryEntry,
+  kMalRequestAccessToken,
+};
+
 using Request = hypr::Request;
 using Response = hypr::Response;
 using Transfer = hypr::detail::Transfer;

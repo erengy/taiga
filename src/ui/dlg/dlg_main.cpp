@@ -209,7 +209,7 @@ void MainDialog::CreateDialogControls() {
   // Insert main toolbar buttons
   BYTE fsStyle1 = BTNS_AUTOSIZE;
   BYTE fsStyle2 = BTNS_AUTOSIZE | BTNS_WHOLEDROPDOWN;
-  std::wstring tooltip = L"Synchronize list with " + taiga::GetCurrentService()->name();
+  std::wstring tooltip = L"Synchronize list with " + sync::GetCurrentServiceName();
   toolbar_main.InsertButton(0, ui::kIcon24_Sync, kToolbarButtonSync,
                             fsState, fsStyle1, 0, nullptr, tooltip.c_str());
   toolbar_main.InsertButton(1, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
@@ -875,9 +875,7 @@ void MainDialog::UpdateTitle() {
   if (!display_name.empty())
     title += L" \u2013 " + display_name;
   if (Taiga.options.debug_mode) {
-    auto service = taiga::GetCurrentService();
-    if (service)
-      title += L" @ " + service->name();
+    title += L" @ " + sync::GetCurrentServiceName();
   }
 
   auto anime_item = anime::db.Find(CurrentEpisode.anime_id);
@@ -970,14 +968,14 @@ void MainDialog::Navigation::RefreshSearchText(int previous_page) {
     case kSidebarItemAnimeList:
     case kSidebarItemSeasons:
       parent->search_bar.mode = SearchMode::Service;
-      cue_text = L"Filter list or search " + taiga::GetCurrentService()->name();
+      cue_text = L"Filter list or search " + sync::GetCurrentServiceName();
       break;
     case kSidebarItemNowPlaying:
     case kSidebarItemHistory:
     case kSidebarItemStats:
     case kSidebarItemSearch:
       parent->search_bar.mode = SearchMode::Service;
-      cue_text = L"Search " + taiga::GetCurrentService()->name() + L" for anime";
+      cue_text = L"Search " + sync::GetCurrentServiceName() + L" for anime";
       break;
     case kSidebarItemFeeds:
       parent->search_bar.mode = SearchMode::Feed;

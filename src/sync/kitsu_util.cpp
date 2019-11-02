@@ -28,15 +28,14 @@
 #include "sync/kitsu.h"
 #include "sync/kitsu_util.h"
 #include "sync/kitsu_types.h"
-#include "sync/manager.h"
 #include "taiga/settings.h"
 
 namespace sync {
 namespace kitsu {
 
 RatingSystem GetRatingSystem() {
-  const auto& service = *ServiceManager.service(sync::kKitsu);
-  return TranslateRatingSystemFrom(WstrToStr(service.user().rating_system));
+  return TranslateRatingSystemFrom(
+      WstrToStr(taiga::settings.GetSyncServiceKitsuRatingSystem()));
 }
 
 std::vector<Rating> GetMyRatings(RatingSystem rating_system) {

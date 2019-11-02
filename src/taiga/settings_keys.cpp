@@ -28,7 +28,7 @@
 #include "media/library/queue.h"
 #include "media/anime_season_db.h"
 #include "media/anime_db.h"
-#include "sync/manager.h"
+#include "sync/service.h"
 #include "taiga/announce.h"
 #include "taiga/config.h"
 #include "taiga/settings.h"
@@ -332,7 +332,7 @@ std::wstring Settings::GetSyncServiceMalUsername() const {
 
 void Settings::SetSyncServiceMalUsername(const std::wstring& username) {
   if (set_value(AppSettingKey::SyncServiceMalUsername, username)) {
-    if (GetCurrentServiceId() == sync::kMyAnimeList) {
+    if (sync::GetCurrentServiceId() == sync::kMyAnimeList) {
       changed_account_or_service_ = true;
     }
   }
@@ -343,9 +343,7 @@ std::wstring Settings::GetSyncServiceMalAccessToken() const {
 }
 
 void Settings::SetSyncServiceMalAccessToken(const std::wstring& token) {
-  if (set_value(AppSettingKey::SyncServiceMalAccessToken, token)) {
-    ServiceManager.service(sync::kMyAnimeList)->user().access_token = token;
-  }
+  set_value(AppSettingKey::SyncServiceMalAccessToken, token);
 }
 
 std::wstring Settings::GetSyncServiceMalRefreshToken() const {
@@ -353,9 +351,7 @@ std::wstring Settings::GetSyncServiceMalRefreshToken() const {
 }
 
 void Settings::SetSyncServiceMalRefreshToken(const std::wstring& token) {
-  if (set_value(AppSettingKey::SyncServiceMalRefreshToken, token)) {
-    ServiceManager.service(sync::kMyAnimeList)->user().refresh_token = token;
-  }
+  set_value(AppSettingKey::SyncServiceMalRefreshToken, token);
 }
 
 std::wstring Settings::GetSyncServiceKitsuDisplayName() const {
@@ -375,7 +371,7 @@ void Settings::SetSyncServiceKitsuEmail(const std::wstring& email) {
     set_value(AppSettingKey::SyncServiceKitsuDisplayName, std::wstring{});
     set_value(AppSettingKey::SyncServiceKitsuUsername, std::wstring{});
 
-    if (GetCurrentServiceId() == sync::kKitsu) {
+    if (sync::GetCurrentServiceId() == sync::kKitsu) {
       changed_account_or_service_ = true;
     }
   }
@@ -419,7 +415,7 @@ std::wstring Settings::GetSyncServiceAniListUsername() const {
 
 void Settings::SetSyncServiceAniListUsername(const std::wstring& username) {
   if (set_value(AppSettingKey::SyncServiceAniListUsername, username)) {
-    if (GetCurrentServiceId() == sync::kAniList) {
+    if (sync::GetCurrentServiceId() == sync::kAniList) {
       changed_account_or_service_ = true;
     }
   }

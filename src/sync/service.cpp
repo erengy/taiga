@@ -16,70 +16,52 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/format.h"
-#include "base/http.h"
+#include <map>
+
 #include "sync/service.h"
+
+#include "taiga/settings.h"
 
 namespace sync {
 
-Request::Request()
-    : service_id(kAllServices), type(kGenericRequest) {
+ServiceId GetCurrentServiceId() {
+  return taiga::settings.GetSyncActiveService();
 }
 
-Request::Request(RequestType type)
-    : service_id(kAllServices), type(type) {
+std::wstring GetCurrentServiceName() {
+  return GetServiceNameById(taiga::settings.GetSyncActiveService());
 }
 
-Response::Response()
-    : service_id(kAllServices), type(kGenericRequest) {
+std::wstring GetCurrentServiceSlug() {
+  return GetServiceSlugById(taiga::settings.GetSyncActiveService());
 }
 
-////////////////////////////////////////////////////////////////////////////////
+ServiceId GetServiceIdBySlug(const std::wstring& slug) {
+  static const std::map<std::wstring, ServiceId> services{
+    {L"myanimelist", kMyAnimeList},
+    {L"kitsu", kKitsu},
+    {L"anilist", kAniList},
+  };
 
-Service::Service()
-    : id_(0) {
+  const auto it = services.find(slug);
+  return it != services.end() ? it->second : kTaiga;
 }
 
-bool Service::RequestNeedsAuthentication(RequestType request_type) const {
-  return false;
+std::wstring GetServiceNameById(const ServiceId service_id) {
+  switch (service_id) {
+    case kMyAnimeList: return L"MyAnimeList";
+    case kKitsu: return L"Kitsu";
+    case kAniList: return L"AniList";
+    default: return L"Taiga";
+  }
 }
 
-const std::wstring& Service::host() const {
-  return host_;
-}
-
-enum_t Service::id() const {
-  return id_;
-}
-
-const std::wstring& Service::canonical_name() const {
-  return canonical_name_;
-}
-
-const std::wstring& Service::name() const {
-  return name_;
-}
-
-User& Service::user() {
-  return user_;
-}
-
-const User& Service::user() const {
-  return user_;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-void Service::HandleError(const HttpResponse& http_response,
-                          Response& response) const {
-  auto& error = response.data[L"error"];
-
-  if (!error.empty()) {
-    error = L"{} returned an error: {}"_format(name(), error);
-  } else {
-    error = L"{} returned an unknown error. "
-            L"Request type: {} - HTTP status code: {}"_format(
-            name(), response.type, http_response.code);
+std::wstring GetServiceSlugById(const ServiceId service_id) {
+  switch (service_id) {
+    case kMyAnimeList: return L"myanimelist";
+    case kKitsu: return L"kitsu";
+    case kAniList: return L"anilist";
+    default: return L"taiga";
   }
 }
 

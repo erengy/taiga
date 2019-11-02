@@ -18,8 +18,9 @@
 
 #pragma once
 
-#include "service.h"
-#include "taiga/http.h"
+#include <string>
+
+#include "taiga/http_new.h"
 
 namespace anime {
 class Season;
@@ -32,27 +33,24 @@ namespace sync {
 
 bool AuthenticateUser();
 void GetUser();
-void GetLibraryEntries(const int offset = 0);
-void GetMetadataById(int id);
-void GetSeason(const anime::Season season, const int offset);
-void SearchTitle(std::wstring title, int id);
+void GetLibraryEntries();
+void GetMetadataById(const int id);
+void GetSeason(const anime::Season season);
+void SearchTitle(const std::wstring& title, const int id);
 void Synchronize();
 void UpdateLibraryEntry(const library::QueueItem& queue_item);
 
-void DownloadImage(int anime_id, const std::wstring& image_url);
+void DownloadImage(const int anime_id, const std::wstring& image_url);
 
-bool AddAuthenticationToRequest(Request& request);
-void AddPageOffsetToRequest(const int offset, Request& request);
-bool AddServiceDataToRequest(Request& request, int id);
-bool RequestNeedsAuthentication(RequestType request_type, ServiceId service_id);
-void SetActiveServiceForRequest(Request& request);
 bool UserAuthenticated();
 void InvalidateUserAuthentication();
 bool IsUserAccountAvailable();
-bool IsUserAuthenticationAvailable();
 
-bool ServiceSupportsRequestType(RequestType request_type);
-RequestType ClientModeToRequestType(taiga::HttpClientMode client_mode);
-taiga::HttpClientMode RequestTypeToClientMode(RequestType request_type);
+void AfterGetLibrary();
+void AfterGetSeason();
+void AfterLibraryUpdate();
+
+bool OnTransfer(const taiga::http::Transfer& transfer,
+                const std::wstring& status);
 
 }  // namespace sync

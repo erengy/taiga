@@ -136,18 +136,6 @@
     <ClCompile Include="..\..\src\base\html.cpp">
       <Filter>base</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\base\http.cpp">
-      <Filter>base</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\base\http_callback.cpp">
-      <Filter>base</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\base\http_request.cpp">
-      <Filter>base</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\base\http_response.cpp">
-      <Filter>base</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\base\json.cpp">
       <Filter>base</Filter>
     </ClCompile>
@@ -406,9 +394,6 @@
     <ClCompile Include="..\..\deps\src\zlib\zutil.c">
       <Filter>deps\zlib</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\sync\manager.cpp">
-      <Filter>sync</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\sync\service.cpp">
       <Filter>sync</Filter>
     </ClCompile>
@@ -440,9 +425,6 @@
       <Filter>taiga</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\taiga\dummy.cpp">
-      <Filter>taiga</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\taiga\http.cpp">
       <Filter>taiga</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\taiga\orange.cpp">
@@ -711,9 +693,6 @@
     <ClInclude Include="..\..\src\base\html.h">
       <Filter>base</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\base\http.h">
-      <Filter>base</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\base\json.h">
       <Filter>base</Filter>
     </ClInclude>
@@ -957,9 +936,6 @@
     <ClInclude Include="..\..\deps\src\zlib\zutil.h">
       <Filter>deps\zlib</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\sync\manager.h">
-      <Filter>sync</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\sync\service.h">
       <Filter>sync</Filter>
     </ClInclude>
@@ -994,9 +970,6 @@
       <Filter>taiga</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\taiga\dummy.h">
-      <Filter>taiga</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\taiga\http.h">
       <Filter>taiga</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\taiga\orange.h">

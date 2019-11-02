@@ -21,8 +21,10 @@
 #include "sync/kitsu.h"
 
 #include "base/format.h"
+#include "base/json.h"
 #include "base/log.h"
 #include "base/string.h"
+#include "base/url.h"
 #include "media/anime_db.h"
 #include "media/anime_item.h"
 #include "media/anime_season.h"
@@ -31,7 +33,7 @@
 #include "media/library/queue.h"
 #include "sync/kitsu_types.h"
 #include "sync/kitsu_util.h"
-#include "sync/manager.h"
+#include "sync/sync.h"
 #include "taiga/http_new.h"
 #include "taiga/settings.h"
 #include "ui/translate.h"
@@ -547,6 +549,8 @@ void AuthenticateUser() {
 
   const auto on_response = [](const taiga::http::Response& response) {
     if (HasError(response)) {
+      account.set_authenticated(false);
+      ui::OnLogout();
       return;
     }
 
@@ -557,6 +561,10 @@ void AuthenticateUser() {
     }
 
     account.set_access_token(JsonReadStr(root, "access_token"));
+    account.set_authenticated(true);
+
+    ui::OnLogin();
+    GetUser();  // We need to make an additional request to get the user ID
   };
 
   taiga::http::Send(request, on_transfer, on_response);
@@ -604,12 +612,25 @@ void GetUser() {
     Account::set_rating_system(JsonReadStr(user["attributes"], "ratingSystem"));
     Account::set_display_name(JsonReadStr(user["attributes"], "name"));
     Account::set_email(JsonReadStr(user["attributes"], "email"));
+
+    ui::OnLogin();
+    if (account.authenticated()) {
+      sync::Synchronize();
+    } else {
+      GetLibraryEntries();
+    }
   };
 
   taiga::http::Send(request, on_transfer, on_response);
 }
 
 void GetLibraryEntries(const int page) {
+  if (account.id().empty()) {
+    ui::ChangeStatusText(
+        L"Kitsu: Cannot get anime list. User ID is unavailable.");
+    return;
+  }
+
   auto request = BuildRequest();
   request.set_target("{}/edge/library-entries"_format(kBaseUrl));
 
@@ -720,6 +741,8 @@ void GetMetadataById(const int id) {
     const auto anime_id = ParseAnimeObject(root["data"]);
     ParseCategories(root["included"], anime_id);
     ParseProducers(root["included"], anime_id);
+
+    ui::OnLibraryEntryChange(anime_id);
   };
 
   taiga::http::Send(request, on_transfer, on_response);
@@ -730,7 +753,8 @@ void GetSeason(const anime::Season season, const int page) {
   request.set_target("{}/edge/anime"_format(kBaseUrl));
 
   hypr::Params params{
-      {"filter[season]", WstrToStr(ui::TranslateSeasonName(season.name))},
+      {"filter[season]",
+       WstrToStr(ToLower_Copy(ui::TranslateSeasonName(season.name)))},
       {"filter[season_year]", ToStr(season.year)},
       {"page[offset]", ToStr(page)},
       {"page[limit]", ToStr(kJsonApiMaximumPageSize)}};
@@ -855,6 +879,8 @@ void AddLibraryEntry(const library::QueueItem& queue_item) {
     if (hypp::status::to_class(response.status_code()) == 400) {
       return;
     }
+
+    sync::AfterLibraryUpdate();
   };
 
   taiga::http::Send(request, on_transfer, on_response);
@@ -876,6 +902,8 @@ void DeleteLibraryEntry(const int id) {
     }
 
     // Returns "204 No Content" status and empty response body.
+
+    sync::AfterLibraryUpdate();
   };
 
   taiga::http::Send(request, on_transfer, on_response);
@@ -927,36 +955,11 @@ void UpdateLibraryEntry(const library::QueueItem& queue_item) {
     }
     ParseCategories(root["included"], anime_id);
     ParseProducers(root["included"], anime_id);
+
+    sync::AfterLibraryUpdate();
   };
 
   taiga::http::Send(request, on_transfer, on_response);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-Service::Service() {
-  host_ = L"kitsu.io/api";
-
-  id_ = kKitsu;
-  canonical_name_ = L"kitsu";
-  name_ = L"Kitsu";
-}
-
-bool Service::RequestNeedsAuthentication(RequestType request_type) const {
-  switch (request_type) {
-    case kAddLibraryEntry:
-    case kDeleteLibraryEntry:
-    case kUpdateLibraryEntry:
-      return true;
-    case kGetLibraryEntries:
-    case kGetMetadataById:
-    case kGetSeason:
-    case kGetUser:
-    case kSearchTitle:
-      return !user().access_token.empty();
-  }
-
-  return false;
 }
 
 }  // namespace sync::kitsu

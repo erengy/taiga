@@ -24,7 +24,7 @@
 #include "media/anime_util.h"
 #include "media/library/queue.h"
 #include "sync/service.h"
-#include "taiga/http.h"
+#include "taiga/http_new.h"
 #include "taiga/path.h"
 #include "taiga/settings.h"
 #include "taiga/version.h"
@@ -140,7 +140,7 @@ int Database::GetItemCount(int status, bool check_history) {
   if (check_history) {
     for (const auto& queue_item : library::queue.items) {
       if (queue_item.status ||
-          queue_item.mode == taiga::kHttpServiceDeleteLibraryEntry) {
+          queue_item.mode == taiga::http::kServiceDeleteLibraryEntry) {
         if (status == *queue_item.status) {
           count++;
         } else {
@@ -184,7 +184,7 @@ void Database::AddToList(int anime_id, int status) {
       queue_item.date_start = GetDate();
     queue_item.date_finish = GetDate();
   }
-  queue_item.mode = taiga::kHttpServiceAddLibraryEntry;
+  queue_item.mode = taiga::http::kServiceAddLibraryEntry;
   library::queue.Add(queue_item);
 
   SaveDatabase();
@@ -264,11 +264,11 @@ void Database::UpdateItem(const library::QueueItem& queue_item) {
     anime_item->SetMyDateEnd(*queue_item.date_finish);
   }
   // Delete
-  if (queue_item.mode == taiga::kHttpServiceDeleteLibraryEntry) {
+  if (queue_item.mode == taiga::http::kServiceDeleteLibraryEntry) {
     DeleteListItem(anime_item->GetId());
   }
 
-  if (queue_item.mode != taiga::kHttpServiceDeleteLibraryEntry)
+  if (queue_item.mode != taiga::http::kServiceDeleteLibraryEntry)
     anime::SetMyLastUpdateToNow(*anime_item);
 
   ui::OnLibraryEntryChange(queue_item.anime_id);

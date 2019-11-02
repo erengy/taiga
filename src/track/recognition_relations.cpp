@@ -93,7 +93,7 @@ static bool ParseRule(const std::wstring& rule) {
   auto get_id = [&](size_t index) {
     std::vector<std::wstring> ids;
     Split(match_results[index].str(), L"|", ids);
-    switch (taiga::GetCurrentServiceId()) {
+    switch (sync::GetCurrentServiceId()) {
       case sync::kMyAnimeList:
         return ids.size() > 0 ? ToInt(ids.at(0)) : 0;
       case sync::kKitsu:

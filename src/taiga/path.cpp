@@ -20,7 +20,7 @@
 
 #include "base/file.h"
 #include "base/string.h"
-#include "sync/manager.h"
+#include "sync/service.h"
 #include "taiga/config.h"
 #include "taiga/settings.h"
 #include "taiga/taiga.h"
@@ -49,7 +49,7 @@ std::wstring GetUserDirectoryName(const sync::ServiceId service_id) {
 }
 
 std::wstring GetUserDirectoryName() {
-  return GetUserDirectoryName(GetCurrentServiceId());
+  return GetUserDirectoryName(sync::GetCurrentServiceId());
 }
 
 std::wstring GetPath(Path path) {

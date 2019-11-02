@@ -192,10 +192,6 @@
     <ClCompile Include="..\..\src\base\gfx.cpp" />
     <ClCompile Include="..\..\src\base\gzip.cpp" />
     <ClCompile Include="..\..\src\base\html.cpp" />
-    <ClCompile Include="..\..\src\base\http.cpp" />
-    <ClCompile Include="..\..\src\base\http_callback.cpp" />
-    <ClCompile Include="..\..\src\base\http_request.cpp" />
-    <ClCompile Include="..\..\src\base\http_response.cpp" />
     <ClCompile Include="..\..\src\base\json.cpp" />
     <ClCompile Include="..\..\src\base\oauth.cpp" />
     <ClCompile Include="..\..\src\base\process.cpp" />
@@ -231,7 +227,6 @@
     <ClCompile Include="..\..\src\sync\anilist_util.cpp" />
     <ClCompile Include="..\..\src\sync\kitsu.cpp" />
     <ClCompile Include="..\..\src\sync\kitsu_util.cpp" />
-    <ClCompile Include="..\..\src\sync\manager.cpp" />
     <ClCompile Include="..\..\src\sync\myanimelist.cpp" />
     <ClCompile Include="..\..\src\sync\myanimelist_util.cpp" />
     <ClCompile Include="..\..\src\sync\service.cpp" />
@@ -239,7 +234,6 @@
     <ClCompile Include="..\..\src\taiga\announce.cpp" />
     <ClCompile Include="..\..\src\taiga\debug.cpp" />
     <ClCompile Include="..\..\src\taiga\dummy.cpp" />
-    <ClCompile Include="..\..\src\taiga\http.cpp" />
     <ClCompile Include="..\..\src\taiga\http_new.cpp" />
     <ClCompile Include="..\..\src\taiga\orange.cpp" />
     <ClCompile Include="..\..\src\taiga\path.cpp" />
@@ -386,7 +380,6 @@
     <ClInclude Include="..\..\src\base\gfx.h" />
     <ClInclude Include="..\..\src\base\gzip.h" />
     <ClInclude Include="..\..\src\base\html.h" />
-    <ClInclude Include="..\..\src\base\http.h" />
     <ClInclude Include="..\..\src\base\json.h" />
     <ClInclude Include="..\..\src\base\log.h" />
     <ClInclude Include="..\..\src\base\map.h" />
@@ -423,7 +416,6 @@
     <ClInclude Include="..\..\src\sync\kitsu.h" />
     <ClInclude Include="..\..\src\sync\kitsu_types.h" />
     <ClInclude Include="..\..\src\sync\kitsu_util.h" />
-    <ClInclude Include="..\..\src\sync\manager.h" />
     <ClInclude Include="..\..\src\sync\myanimelist.h" />
     <ClInclude Include="..\..\src\sync\myanimelist_util.h" />
     <ClInclude Include="..\..\src\sync\service.h" />
@@ -432,7 +424,6 @@
     <ClInclude Include="..\..\src\taiga\config.h" />
     <ClInclude Include="..\..\src\taiga\debug.h" />
     <ClInclude Include="..\..\src\taiga\dummy.h" />
-    <ClInclude Include="..\..\src\taiga\http.h" />
     <ClInclude Include="..\..\src\taiga\http_new.h" />
     <ClInclude Include="..\..\src\taiga\orange.h" />
     <ClInclude Include="..\..\src\taiga\path.h" />

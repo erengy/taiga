@@ -59,7 +59,7 @@ void SeasonDatabase::Reset() {
 }
 
 void SeasonDatabase::Review(bool hide_nsfw) {
-  if (taiga::GetCurrentServiceId() == sync::kMyAnimeList) {
+  if (sync::GetCurrentServiceId() == sync::kMyAnimeList) {
     return;
   }
 

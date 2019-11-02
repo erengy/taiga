@@ -45,7 +45,7 @@ std::wstring TranslateMyScore(const int value,
   if (!value)
     return default_char;
 
-  switch (taiga::GetCurrentServiceId()) {
+  switch (sync::GetCurrentServiceId()) {
     default:
       return ToWstr(value);
     case sync::kMyAnimeList:
@@ -60,7 +60,7 @@ std::wstring TranslateMyScore(const int value,
 }
 
 std::wstring TranslateMyScoreFull(const int value) {
-  switch (taiga::GetCurrentServiceId()) {
+  switch (sync::GetCurrentServiceId()) {
     default:
       return ToWstr(value);
     case sync::kMyAnimeList:

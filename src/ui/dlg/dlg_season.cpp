@@ -22,6 +22,7 @@
 #include "media/anime_season_db.h"
 #include "media/anime_util.h"
 #include "ui/resource.h"
+#include "sync/service.h"
 #include "sync/sync.h"
 #include "taiga/resource.h"
 #include "taiga/settings.h"
@@ -220,7 +221,7 @@ LRESULT SeasonDialog::OnListNotify(LPARAM lParam) {
         text += ui::TranslateType(anime_item->GetType()) + separator +
                 ui::TranslateNumber(anime_item->GetEpisodeCount(), L"?") + L" eps." + separator +
                 ui::TranslateScore(anime_item->GetScore()) + separator;
-        switch (taiga::GetCurrentServiceId()) {
+        switch (sync::GetCurrentServiceId()) {
           default:
             text += L"#" + ToWstr(anime_item->GetPopularity());
             break;
@@ -295,7 +296,7 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       if (!anime_item)
         break;
 
-      const auto current_service = taiga::GetCurrentServiceId();
+      const auto current_service = sync::GetCurrentServiceId();
 
       // Draw border
       rect.Inflate(-4, -4);
@@ -552,7 +553,7 @@ void SeasonDialog::GetData() {
   ui::ChangeStatusText(L"Retrieving latest data for " +
       ui::TranslateSeason(anime::season_db.current_season) + L" anime season...");
 
-  sync::GetSeason(anime::season_db.current_season, 0);
+  sync::GetSeason(anime::season_db.current_season);
 }
 
 void SeasonDialog::RefreshData(int anime_id) {
@@ -667,7 +668,7 @@ void SeasonDialog::RefreshList(bool redraw_only) {
       list_.Sort(0, -1, ui::kListSortEpisodeCount, ui::ListViewCompareProc);
       break;
     case kSeasonSortByPopularity:
-      switch (taiga::GetCurrentServiceId()) {
+      switch (sync::GetCurrentServiceId()) {
         default:
           list_.Sort(0, 1, ui::kListSortPopularity, ui::ListViewCompareProc);
           break;
@@ -788,7 +789,7 @@ void SeasonDialog::SetViewMode(int mode) {
 }
 
 int SeasonDialog::GetLineCount() const {
-  switch (taiga::GetCurrentServiceId()) {
+  switch (sync::GetCurrentServiceId()) {
     default:
     case sync::kMyAnimeList:
     case sync::kAniList:

@@ -24,7 +24,6 @@
 #include "base/string.h"
 #include "media/anime_util.h"
 #include "media/library/history.h"
-#include "sync/manager.h"
 #include "taiga/config.h"
 #include "taiga/resource.h"
 #include "taiga/settings.h"

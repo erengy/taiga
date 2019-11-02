@@ -117,11 +117,11 @@ std::wstring ReplaceVariables(const std::wstring& str,
     fields[L"total"] = ui::TranslateNumber(anime_item->GetEpisodeCount(), L"");
     fields[L"score"] = ui::TranslateMyScore(anime_item->GetMyScore(), L"");
     fields[L"season"] = ui::TranslateDateToSeasonString(anime_item->GetDateStart());
-    fields[L"id"] = anime_item->GetId(taiga::GetCurrentServiceId());
+    fields[L"id"] = anime_item->GetId(sync::GetCurrentServiceId());
     fields[L"image"] = anime_item->GetImageUrl();
     fields[L"status"] = ToWstr(anime_item->GetMyStatus());
     fields[L"rewatching"] = ToWstr(anime_item->GetMyRewatching());
-    switch (taiga::GetCurrentServiceId()) {
+    switch (sync::GetCurrentServiceId()) {
       case sync::kMyAnimeList:
         fields[L"animeurl"] = sync::myanimelist::GetAnimePage(*anime_item);
         break;

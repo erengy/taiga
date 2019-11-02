@@ -18,9 +18,7 @@
 
 #pragma once
 
-#include "base/json.h"
-#include "base/types.h"
-#include "sync/service.h"
+#include <string>
 
 namespace anime {
 class Season;
@@ -30,16 +28,6 @@ struct QueueItem;
 }
 
 namespace sync::kitsu {
-
-class Service : public sync::Service {
-public:
-  Service();
-  ~Service() {}
-
-  void BuildRequest(Request& request, HttpRequest& http_request) {}
-  void HandleResponse(Response& response, HttpResponse& http_response) {}
-  bool RequestNeedsAuthentication(RequestType request_type) const;
-};
 
 void AuthenticateUser();
 void GetUser();

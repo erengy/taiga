@@ -18,9 +18,7 @@
 
 #pragma once
 
-#include "base/json.h"
-#include "base/types.h"
-#include "sync/service.h"
+#include <string>
 
 namespace anime {
 class Season;
@@ -31,21 +29,8 @@ struct QueueItem;
 
 namespace sync::myanimelist {
 
-constexpr auto kServiceName = L"MyAnimeList";
-constexpr auto kServiceSlug = L"myanimelist";
-
 constexpr auto kClientId = "f6e398095cf7525360276786ec4407bc";
 constexpr auto kRedirectUrl = "https://taiga.moe/api/myanimelist/auth";
-
-class Service : public sync::Service {
-public:
-  Service();
-  ~Service() {}
-
-  void BuildRequest(Request& request, HttpRequest& http_request) {}
-  void HandleResponse(Response& response, HttpResponse& http_response) {}
-  bool RequestNeedsAuthentication(RequestType request_type) const;
-};
 
 void RequestAccessToken(const std::wstring& authorization_code,
                         const std::wstring& code_verifier);

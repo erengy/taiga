@@ -21,6 +21,7 @@
 #include "sync/anilist.h"
 
 #include "base/format.h"
+#include "base/json.h"
 #include "base/log.h"
 #include "base/string.h"
 #include "media/anime_db.h"
@@ -30,7 +31,7 @@
 #include "media/anime_util.h"
 #include "media/library/queue.h"
 #include "sync/anilist_util.h"
-#include "sync/manager.h"
+#include "sync/sync.h"
 #include "taiga/http_new.h"
 #include "taiga/settings.h"
 #include "ui/translate.h"
@@ -294,6 +295,7 @@ void ParseUserObject(const Json& json) {
   Account::set_username(JsonReadStr(json, "name"));
   Account::set_rating_system(
       JsonReadStr(json["mediaListOptions"], "scoreFormat"));
+  account.set_authenticated(true);
 }
 
 bool HasError(const taiga::http::Response& response) {
@@ -334,6 +336,8 @@ void AuthenticateUser() {
 
   const auto on_response = [](const taiga::http::Response& response) {
     if (HasError(response)) {
+      account.set_authenticated(false);
+      ui::OnLogout();
       return;
     }
 
@@ -344,6 +348,9 @@ void AuthenticateUser() {
     }
 
     ParseUserObject(root["data"]["Viewer"]);
+
+    ui::OnLogin();
+    sync::Synchronize();
   };
 
   taiga::http::Send(request, on_transfer, on_response);
@@ -381,6 +388,8 @@ void GetLibraryEntries() {
         ParseMediaListObject(entry);
       }
     }
+
+    sync::AfterGetLibrary();
   };
 
   taiga::http::Send(request, on_transfer, on_response);
@@ -409,7 +418,9 @@ void GetMetadataById(const int id) {
       return;
     }
 
-    ParseMediaObject(root["data"]["Media"]);
+    const int anime_id = ParseMediaObject(root["data"]["Media"]);
+
+    ui::OnLibraryEntryChange(anime_id);
   };
 
   taiga::http::Send(request, on_transfer, on_response);
@@ -525,6 +536,8 @@ void DeleteLibraryEntry(const int library_id) {
     }
 
     // Returns: {"data":{"DeleteMediaListEntry":{"deleted":true}}}
+
+    sync::AfterLibraryUpdate();
   };
 
   taiga::http::Send(request, on_transfer, on_response);
@@ -578,36 +591,11 @@ void UpdateLibraryEntry(const library::QueueItem& queue_item) {
     }
 
     ParseMediaListObject(root["data"]["SaveMediaListEntry"]);
+
+    sync::AfterLibraryUpdate();
   };
 
   taiga::http::Send(request, on_transfer, on_response);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-Service::Service() {
-  host_ = L"graphql.anilist.co";
-
-  id_ = kAniList;
-  canonical_name_ = L"anilist";
-  name_ = L"AniList";
-}
-
-bool Service::RequestNeedsAuthentication(RequestType request_type) const {
-  switch (request_type) {
-    case kAuthenticateUser:
-    case kAddLibraryEntry:
-    case kDeleteLibraryEntry:
-    case kUpdateLibraryEntry:
-      return true;
-    case kGetLibraryEntries:
-    case kGetMetadataById:
-    case kGetSeason:
-    case kSearchTitle:
-      return !user().access_token.empty();
-  }
-
-  return false;
 }
 
 }  // namespace sync::anilist

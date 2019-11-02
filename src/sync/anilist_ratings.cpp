@@ -21,13 +21,13 @@
 #include "base/string.h"
 #include "media/anime.h"
 #include "sync/anilist_util.h"
-#include "sync/manager.h"
+#include "taiga/settings.h"
 
 namespace sync::anilist {
 
 RatingSystem GetRatingSystem() {
-  const auto& service = *ServiceManager.service(sync::kAniList);
-  return TranslateRatingSystemFrom(WstrToStr(service.user().rating_system));
+  return TranslateRatingSystemFrom(
+      WstrToStr(taiga::settings.GetSyncServiceAniListRatingSystem()));
 }
 
 std::vector<Rating> GetMyRatings(const RatingSystem rating_system) {

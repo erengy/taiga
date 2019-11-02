@@ -346,8 +346,6 @@ private:
   base::Settings settings_;
 };
 
-sync::Service* GetCurrentService();
-sync::ServiceId GetCurrentServiceId();
 std::wstring GetCurrentUserDisplayName();
 std::wstring GetCurrentUserEmail();
 std::wstring GetCurrentUsername();

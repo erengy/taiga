@@ -28,6 +28,7 @@
 #include "sync/kitsu_util.h"
 #include "sync/myanimelist_util.h"
 #include "sync/sync.h"
+#include "taiga/http_new.h"
 #include "taiga/resource.h"
 #include "taiga/settings.h"
 #include "track/feed_filter_manager.h"
@@ -189,7 +190,7 @@ void PageSeriesInfo::Refresh(int anime_id, bool connect) {
   SetDlgItemText(IDC_EDIT_ANIME_ALT, text.c_str());
 
   // Set information
-  switch (taiga::GetCurrentServiceId()) {
+  switch (sync::GetCurrentServiceId()) {
     case sync::kKitsu:
       SetDlgItemText(IDC_STATIC_ANIME_DETAILS_NAMES,
           L"Type:\nEpisodes:\nStatus:\nSeason:\nCategories:\nProducers:\nScore:");
@@ -247,7 +248,7 @@ BOOL PageMyInfo::OnCommand(WPARAM wParam, LPARAM lParam) {
         int episode_value = 0;
         spin.GetPos32(episode_value);
         if (IsDlgButtonChecked(IDC_CHECK_ANIME_REWATCH)) {
-          switch (taiga::GetCurrentServiceId()) {
+          switch (sync::GetCurrentServiceId()) {
             case sync::kKitsu:
             case sync::kAniList:
               combobox.SetCurSel(anime::kWatching - 1);
@@ -257,7 +258,7 @@ BOOL PageMyInfo::OnCommand(WPARAM wParam, LPARAM lParam) {
               episode_value == anime_item->GetEpisodeCount())
             spin.SetPos32(0);
         } else {
-          switch (taiga::GetCurrentServiceId()) {
+          switch (sync::GetCurrentServiceId()) {
             case sync::kKitsu:
             case sync::kAniList:
               combobox.SetCurSel(anime_item->GetMyStatus() - 1);
@@ -386,7 +387,7 @@ void PageMyInfo::Refresh(int anime_id) {
     std::vector<sync::Rating> ratings;
     std::wstring current_rating;
     int selected_item = -1;
-    switch (taiga::GetCurrentServiceId()) {
+    switch (sync::GetCurrentServiceId()) {
       case sync::kMyAnimeList:
         ratings = sync::myanimelist::GetMyRatings();
         current_rating = sync::myanimelist::TranslateMyRating(anime_item->GetMyScore(), true);
@@ -426,7 +427,7 @@ void PageMyInfo::Refresh(int anime_id) {
 
   // Tags / Notes
   edit.SetWindowHandle(GetDlgItem(IDC_EDIT_ANIME_TAGS));
-  switch (taiga::GetCurrentServiceId()) {
+  switch (sync::GetCurrentServiceId()) {
     case sync::kMyAnimeList:
       SetDlgItemText(IDC_STATIC_TAGSNOTES, L"Tags:");
       edit.SetCueBannerText(L"Enter tags here, separated by a comma (e.g. tag1, tag2)");
@@ -524,7 +525,7 @@ bool PageMyInfo::Save() {
   // Create item
   library::QueueItem queue_item;
   queue_item.anime_id = anime_id_;
-  queue_item.mode = taiga::kHttpServiceUpdateLibraryEntry;
+  queue_item.mode = taiga::http::kServiceUpdateLibraryEntry;
 
   // Episodes watched
   queue_item.episode = GetDlgItemInt(IDC_EDIT_ANIME_PROGRESS);
@@ -544,7 +545,7 @@ bool PageMyInfo::Save() {
     queue_item.score = combobox.GetItemData(combobox.GetCurSel());
   } else {
     const auto score_text = GetDlgItemText(IDC_EDIT_ANIME_SCORE);
-    switch (taiga::GetCurrentServiceId()) {
+    switch (sync::GetCurrentServiceId()) {
       case sync::kAniList:
         switch (sync::anilist::GetRatingSystem()) {
           case sync::anilist::RatingSystem::Point_10_Decimal:
@@ -562,7 +563,7 @@ bool PageMyInfo::Save() {
   queue_item.status = GetComboSelection(IDC_COMBO_ANIME_STATUS) + 1;
 
   // Tags / Notes
-  switch (taiga::GetCurrentServiceId()) {
+  switch (sync::GetCurrentServiceId()) {
     case sync::kMyAnimeList:
       queue_item.tags = GetDlgItemText(IDC_EDIT_ANIME_TAGS);
       break;
@@ -610,7 +611,7 @@ bool PageMyInfo::Save() {
 }
 
 bool PageMyInfo::IsAdvancedScoreInput() const {
-  switch (taiga::GetCurrentServiceId()) {
+  switch (sync::GetCurrentServiceId()) {
     case sync::kAniList: {
       switch (sync::anilist::GetRatingSystem()) {
         case sync::anilist::RatingSystem::Point_100:

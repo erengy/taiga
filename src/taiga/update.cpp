@@ -56,7 +56,7 @@ void UpdateHelper::Check() {
       {"channel", channel},
       {"check", method},
       {"version", taiga::version().to_string()},
-      {"service", WstrToStr(GetCurrentService()->canonical_name())},
+      {"service", WstrToStr(sync::GetCurrentServiceSlug())},
       {"username", WstrToStr(GetCurrentUsername())}});
 
   ui::DlgUpdate.progressbar.SetPosition(0);

@@ -35,7 +35,7 @@
 namespace ui {
 
 std::wstring TranslateScore(const double value) {
-  switch (taiga::GetCurrentServiceId()) {
+  switch (sync::GetCurrentServiceId()) {
     default:
     case sync::kMyAnimeList:
       return ToWstr(value, 2);

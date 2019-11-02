@@ -33,6 +33,7 @@
 #include "media/library/queue.h"
 #include "sync/sync.h"
 #include "taiga/announce.h"
+#include "taiga/http_new.h"
 #include "taiga/path.h"
 #include "taiga/settings.h"
 #include "taiga/taiga.h"
@@ -302,7 +303,7 @@ void EndWatching(Item& item, Episode episode) {
 bool IsDeletedFromList(const Item& item) {
   for (const auto& queue_item : library::queue.items)
     if (queue_item.anime_id == item.GetId())
-      if (queue_item.mode == taiga::kHttpServiceDeleteLibraryEntry)
+      if (queue_item.mode == taiga::http::kServiceDeleteLibraryEntry)
         return true;
 
   return false;
@@ -366,10 +367,10 @@ void AddToQueue(const Item& item, const Episode& episode, bool change_status) {
 
   // Set update mode
   if (item.GetMyStatus() == kNotInList) {
-    queue_item.mode = taiga::kHttpServiceAddLibraryEntry;
+    queue_item.mode = taiga::http::kServiceAddLibraryEntry;
     change_status = true;
   } else {
-    queue_item.mode = taiga::kHttpServiceUpdateLibraryEntry;
+    queue_item.mode = taiga::http::kServiceUpdateLibraryEntry;
   }
 
   // Set rewatching status

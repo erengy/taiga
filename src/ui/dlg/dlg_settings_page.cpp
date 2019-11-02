@@ -35,7 +35,6 @@
 #include "sync/anilist_util.h"
 #include "sync/myanimelist.h"
 #include "sync/myanimelist_util.h"
-#include "sync/manager.h"
 #include "taiga/announce.h"
 #include "taiga/path.h"
 #include "taiga/resource.h"
@@ -577,7 +576,6 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
           std::wstring auth_pin;
           if (ui::EnterAuthorizationPin(L"AniList", auth_pin)) {
             taiga::settings.SetSyncServiceAniListToken(auth_pin);
-            ServiceManager.service(sync::kAniList)->user().access_token = auth_pin;
           }
           return TRUE;
         }

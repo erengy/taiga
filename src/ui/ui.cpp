@@ -32,11 +32,10 @@
 #include "media/anime_season_db.h"
 #include "media/anime_util.h"
 #include "media/library/queue.h"
-#include "sync/manager.h"
 #include "sync/service.h"
 #include "sync/sync.h"
 #include "taiga/config.h"
-#include "taiga/http.h"
+#include "taiga/http_new.h"
 #include "taiga/resource.h"
 #include "taiga/script.h"
 #include "taiga/settings.h"
@@ -115,22 +114,22 @@ bool EnterAuthorizationPin(const std::wstring& service, std::wstring& auth_pin) 
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void OnHttpError(const taiga::HttpClient& http_client, const std::wstring& error) {
-  switch (http_client.mode()) {
-    case taiga::kHttpSilent:
-    case taiga::kHttpServiceGetMetadataById:
-    case taiga::kHttpServiceSearchTitle:
+void OnHttpError(const taiga::http::HttpClientMode mode, const std::wstring& error) {
+  switch (mode) {
+    case taiga::http::kSilent:
+    case taiga::http::kServiceGetMetadataById:
+    case taiga::http::kServiceSearchTitle:
       return;
-    case taiga::kHttpServiceAuthenticateUser:
-    case taiga::kHttpServiceGetUser:
-    case taiga::kHttpServiceGetLibraryEntries:
-    case taiga::kHttpServiceAddLibraryEntry:
-    case taiga::kHttpServiceDeleteLibraryEntry:
-    case taiga::kHttpServiceUpdateLibraryEntry:
+    case taiga::http::kServiceAuthenticateUser:
+    case taiga::http::kServiceGetUser:
+    case taiga::http::kServiceGetLibraryEntries:
+    case taiga::http::kServiceAddLibraryEntry:
+    case taiga::http::kServiceDeleteLibraryEntry:
+    case taiga::http::kServiceUpdateLibraryEntry:
       ChangeStatusText(error);
       DlgMain.EnableInput(true);
       break;
-    case taiga::kHttpServiceGetSeason:
+    case taiga::http::kServiceGetSeason:
       ChangeStatusText(error);
       DlgSeason.EnableInput();
       break;
@@ -139,55 +138,56 @@ void OnHttpError(const taiga::HttpClient& http_client, const std::wstring& error
   taskbar_list.SetProgressState(TBPF_NOPROGRESS);
 }
 
-void OnHttpHeadersAvailable(const taiga::HttpClient& http_client) {
-  switch (http_client.mode()) {
-    case taiga::kHttpSilent:
-    case taiga::kHttpServiceGetMetadataById:
-    case taiga::kHttpServiceSearchTitle:
-    case taiga::kHttpMalRequestAccessToken:
+void OnHttpHeadersAvailable(const taiga::http::HttpClientMode mode) {
+  switch (mode) {
+    case taiga::http::kSilent:
+    case taiga::http::kServiceGetMetadataById:
+    case taiga::http::kServiceSearchTitle:
+    case taiga::http::kMalRequestAccessToken:
       return;
     default:
-      taskbar_list.SetProgressState(http_client.content_length() > 0 ?
-                                    TBPF_NORMAL : TBPF_INDETERMINATE);
+      //taskbar_list.SetProgressState(http_client.content_length() > 0 ? TBPF_NORMAL : TBPF_INDETERMINATE);
       break;
   }
 }
 
-void OnHttpProgress(const taiga::HttpClient& http_client) {
+void OnHttpProgress(const taiga::http::HttpClientMode mode) {
   std::wstring status;
 
-  switch (http_client.mode()) {
-    case taiga::kHttpSilent:
-    case taiga::kHttpServiceGetMetadataById:
-    case taiga::kHttpServiceSearchTitle:
-    case taiga::kHttpMalRequestAccessToken:
+  switch (mode) {
+    case taiga::http::kSilent:
+    case taiga::http::kServiceGetMetadataById:
+    case taiga::http::kServiceSearchTitle:
+    case taiga::http::kMalRequestAccessToken:
       return;
-    case taiga::kHttpServiceAuthenticateUser:
-    case taiga::kHttpServiceGetUser:
+    case taiga::http::kServiceAuthenticateUser:
+    case taiga::http::kServiceGetUser:
       status = L"Reading account information...";
       break;
-    case taiga::kHttpServiceGetLibraryEntries:
+    case taiga::http::kServiceGetLibraryEntries:
       status = L"Downloading anime list...";
       break;
-    case taiga::kHttpServiceAddLibraryEntry:
-    case taiga::kHttpServiceDeleteLibraryEntry:
-    case taiga::kHttpServiceUpdateLibraryEntry:
+    case taiga::http::kServiceAddLibraryEntry:
+    case taiga::http::kServiceDeleteLibraryEntry:
+    case taiga::http::kServiceUpdateLibraryEntry:
       status = L"Updating list...";
       break;
-    case taiga::kHttpServiceGetSeason:
+    case taiga::http::kServiceGetSeason:
       status = L"Downloading anime season data...";
       break;
   }
 
-  if (http_client.content_length() > 0) {
-    float current_length = static_cast<float>(http_client.current_length());
-    float content_length = static_cast<float>(http_client.content_length());
+  int current_length = 0;
+  int content_length = 0;
+  if (content_length > 0) {
+    float current_length = static_cast<float>(current_length);
+    float content_length = static_cast<float>(content_length);
     int percentage = static_cast<int>((current_length / content_length) * 100);
     status += L" ({}%)"_format(percentage);
     taskbar_list.SetProgressValue(static_cast<ULONGLONG>(current_length),
                                   static_cast<ULONGLONG>(content_length));
   } else {
-    status += L" ({})"_format(ToSizeString(http_client.current_length()));
+    status += L" ({})"_format(ToSizeString(current_length));
   }
 
   ChangeStatusText(status);
@@ -427,8 +427,8 @@ bool OnLibraryEntriesEditNotes(const std::vector<int> ids, std::wstring& notes) 
 ////////////////////////////////////////////////////////////////////////////////
 
 static bool AnimeListNeedsRefresh(const library::QueueItem& queue_item) {
-  return queue_item.mode == taiga::kHttpServiceAddLibraryEntry ||
-         queue_item.mode == taiga::kHttpServiceDeleteLibraryEntry ||
+  return queue_item.mode == taiga::http::kServiceAddLibraryEntry ||
+         queue_item.mode == taiga::http::kServiceDeleteLibraryEntry ||
          queue_item.status ||
          queue_item.enable_rewatching;
 }
@@ -503,7 +503,7 @@ int OnHistoryQueueClear() {
   win::TaskDialog dlg(L"Clear Queue", TD_ICON_INFORMATION);
   dlg.SetMainInstruction(L"Do you want to clear your update queue?");
   const std::wstring content = L"Queued updates will not be sent to {}."_format(
-      taiga::GetCurrentService()->name());
+      sync::GetCurrentServiceName());
   dlg.SetContent(content.c_str());
 
   dlg.UseCommandLinks(true);
@@ -729,9 +729,9 @@ bool OnSeasonRefreshRequired() {
   dlg.SetWindowTitle(title.c_str());
   dlg.SetMainIcon(TD_ICON_INFORMATION);
   dlg.SetMainInstruction(L"Would you like to refresh this season's data?");
-  auto service = taiga::GetCurrentService();
+  const auto service_name = sync::GetCurrentServiceName();
   std::wstring content =
-      L"Taiga will connect to " + service->name() + L" to retrieve missing "
+      L"Taiga will connect to " + service_name + L" to retrieve missing "
       L"information and images. Note that it may take about a minute until "
       L"Taiga gets all the data.";
   dlg.SetContent(content.c_str());
@@ -800,8 +800,8 @@ void OnSettingsServiceChange() {
   int current_page = DlgMain.navigation.GetCurrentPage();
   DlgMain.navigation.RefreshSearchText(current_page);
 
-  std::wstring tooltip = L"Synchronize list with " +
-                     taiga::GetCurrentService()->name();
+  const std::wstring tooltip =
+      L"Synchronize list with " + sync::GetCurrentServiceName();
   DlgMain.toolbar_main.SetButtonTooltip(0, tooltip.c_str());
 }
 

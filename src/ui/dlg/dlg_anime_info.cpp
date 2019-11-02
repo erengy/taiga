@@ -27,6 +27,7 @@
 #include "media/library/history.h"
 #include "media/library/queue.h"
 #include "ui/resource.h"
+#include "sync/service.h"
 #include "sync/sync.h"
 #include "taiga/resource.h"
 #include "taiga/settings.h"
@@ -686,7 +687,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
       add_info_lines(upcoming);
       content += L"\n\n";
     } else {
-      if (taiga::GetCurrentServiceId() == sync::kMyAnimeList)
+      if (sync::GetCurrentServiceId() == sync::kMyAnimeList)
         content += L"<a href=\"ViewUpcomingAnime()\">View upcoming anime</a>";
     }
 

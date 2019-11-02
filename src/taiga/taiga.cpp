@@ -29,7 +29,7 @@
 #include "taiga/announce.h"
 #include "taiga/config.h"
 #include "taiga/dummy.h"
-#include "taiga/http.h"
+#include "taiga/http_new.h"
 #include "taiga/http_new.h"
 #include "taiga/resource.h"
 #include "taiga/settings.h"

@@ -25,7 +25,7 @@
 #include "base/xml.h"
 #include "media/library/queue.h"
 #include "media/anime_db.h"
-#include "taiga/http.h"
+#include "taiga/http_new.h"
 #include "taiga/path.h"
 #include "taiga/version.h"
 #include "ui/ui.h"
@@ -170,22 +170,22 @@ bool History::Save() {
 
 int History::TranslateModeFromString(const std::wstring& mode) {
   if (mode == L"add") {
-    return taiga::kHttpServiceAddLibraryEntry;
+    return taiga::http::kServiceAddLibraryEntry;
   } else if (mode == L"delete") {
-    return taiga::kHttpServiceDeleteLibraryEntry;
+    return taiga::http::kServiceDeleteLibraryEntry;
   } else {
-    return taiga::kHttpServiceUpdateLibraryEntry;
+    return taiga::http::kServiceUpdateLibraryEntry;
   }
 }
 
 std::wstring History::TranslateModeToString(int mode) {
   switch (mode) {
-    case taiga::kHttpServiceAddLibraryEntry:
+    case taiga::http::kServiceAddLibraryEntry:
       return L"add";
-    case taiga::kHttpServiceDeleteLibraryEntry:
+    case taiga::http::kServiceDeleteLibraryEntry:
       return L"delete";
     default:
-    case taiga::kHttpServiceUpdateLibraryEntry:
+    case taiga::http::kServiceUpdateLibraryEntry:
       return L"update";
   }
 }

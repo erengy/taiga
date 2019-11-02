@@ -24,7 +24,7 @@
 #include "media/anime_util.h"
 #include "media/library/history.h"
 #include "media/library/queue.h"
-#include "taiga/http.h"
+#include "taiga/http_new.h"
 #include "taiga/resource.h"
 #include "taiga/taiga.h"
 #include "ui/dlg/dlg_history.h"
@@ -193,18 +193,18 @@ void HistoryDialog::RefreshList() {
 
     int icon = ui::kIcon16_ArrowUp;
     switch (it->mode) {
-      case taiga::kHttpServiceAddLibraryEntry:
+      case taiga::http::kServiceAddLibraryEntry:
         icon = ui::kIcon16_Plus;
         break;
-      case taiga::kHttpServiceDeleteLibraryEntry:
+      case taiga::http::kServiceDeleteLibraryEntry:
         icon = ui::kIcon16_Cross;
         break;
     }
 
     std::wstring details;
-    if (it->mode == taiga::kHttpServiceAddLibraryEntry)
+    if (it->mode == taiga::http::kServiceAddLibraryEntry)
       AppendString(details, L"Add to list");
-    if (it->mode == taiga::kHttpServiceDeleteLibraryEntry)
+    if (it->mode == taiga::http::kServiceDeleteLibraryEntry)
       AppendString(details, L"Remove from list");
     if (it->episode)
       AppendString(details, L"Episode: " + ui::TranslateNumber(*it->episode));

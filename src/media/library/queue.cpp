@@ -25,6 +25,7 @@
 #include "media/anime_util.h"
 #include "sync/sync.h"
 #include "taiga/announce.h"
+#include "taiga/http_new.h"
 #include "taiga/settings.h"
 #include "track/media.h"
 #include "track/scanner.h"
@@ -67,7 +68,7 @@ void Queue::Add(QueueItem& item, bool save) {
 
   // Add to user list
   if (anime_item && !anime_item->IsInList())
-    if (item.mode != taiga::kHttpServiceDeleteLibraryEntry)
+    if (item.mode != taiga::http::kServiceDeleteLibraryEntry)
       anime_item->AddtoUserList();
 
   // Validate values
@@ -75,7 +76,7 @@ void Queue::Add(QueueItem& item, bool save) {
     ValidateQueueItem(item, *anime_item);
   }
   switch (item.mode) {
-    case taiga::kHttpServiceUpdateLibraryEntry:
+    case taiga::http::kServiceUpdateLibraryEntry:
       if (!item.episode &&
           !item.score &&
           !item.status &&
@@ -94,8 +95,8 @@ void Queue::Add(QueueItem& item, bool save) {
   if (!updating) {
     for (auto it = items.rbegin(); it != items.rend(); ++it) {
       if (it->anime_id == item.anime_id && it->enabled) {
-        if (it->mode != taiga::kHttpServiceAddLibraryEntry &&
-            it->mode != taiga::kHttpServiceDeleteLibraryEntry) {
+        if (it->mode != taiga::http::kServiceAddLibraryEntry &&
+            it->mode != taiga::http::kServiceDeleteLibraryEntry) {
           if (!item.episode || (!it->episode && it == items.rbegin())) {
             if (item.episode)
               it->episode = *item.episode;
@@ -118,7 +119,7 @@ void Queue::Add(QueueItem& item, bool save) {
             add_new_item = false;
           }
           if (!add_new_item) {
-            it->mode = taiga::kHttpServiceUpdateLibraryEntry;
+            it->mode = taiga::http::kServiceUpdateLibraryEntry;
             it->time = GetDate().to_string() + L" " + GetTime();
           }
           break;

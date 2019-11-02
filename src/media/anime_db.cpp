@@ -25,7 +25,6 @@
 #include "media/anime_util.h"
 #include "media/library/history.h"
 #include "media/library/queue.h"
-#include "sync/manager.h"
 #include "sync/service.h"
 #include "taiga/path.h"
 #include "taiga/settings.h"
@@ -69,7 +68,7 @@ void Database::ReadDatabaseNode(XmlNode& database_node) {
     enum_t source = sync::GetServiceIdBySlug(source_name);
 
     if (source == sync::kTaiga) {
-      const auto current_service_id = taiga::GetCurrentServiceId();
+      const auto current_service_id = sync::GetCurrentServiceId();
       if (id_map.find(current_service_id) != id_map.end()) {
         source = current_service_id;
         LOGW(L"Fixed source for ID: {}", id_map[source]);

@@ -29,7 +29,6 @@
 #include "media/anime_db.h"
 #include "sync/anilist.h"
 #include "sync/anilist_ratings.h"
-#include "sync/manager.h"
 #include "taiga/settings.h"
 
 namespace sync::anilist {

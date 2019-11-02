@@ -27,7 +27,7 @@
 #include "media/anime_db.h"
 #include "media/anime_util.h"
 #include "media/library/history.h"
-#include "sync/manager.h"
+#include "sync/service.h"
 #include "sync/sync.h"
 #include "taiga/path.h"
 #include "taiga/stats.h"
@@ -285,18 +285,6 @@ bool Settings::SerializeToXml(const std::wstring& path) const {
 
 // @TODO: Remove
 void Settings::DoAfterLoad() {
-  // Services
-  ServiceManager.service(sync::kMyAnimeList)->user().access_token =
-      GetSyncServiceMalAccessToken();
-  ServiceManager.service(sync::kMyAnimeList)->user().refresh_token =
-      GetSyncServiceMalRefreshToken();
-  ServiceManager.service(sync::kKitsu)->user().rating_system =
-      GetSyncServiceKitsuRatingSystem();
-  ServiceManager.service(sync::kAniList)->user().rating_system =
-      GetSyncServiceAniListRatingSystem();
-  ServiceManager.service(sync::kAniList)->user().access_token =
-      GetSyncServiceAniListToken();
-
   // Torrent filters
   auto& feed = track::aggregator.GetFeed();
   feed.channel.link = GetTorrentDiscoverySource();
@@ -323,16 +311,8 @@ void Settings::ApplyChanges() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-sync::Service* GetCurrentService() {
-  return ServiceManager.service(settings.GetSyncActiveService());
-}
-
-sync::ServiceId GetCurrentServiceId() {
-  return settings.GetSyncActiveService();
-}
-
 std::wstring GetCurrentUserDisplayName() {
-  switch (GetCurrentServiceId()) {
+  switch (sync::GetCurrentServiceId()) {
     case sync::kKitsu: {
       const auto display_name = settings.GetSyncServiceKitsuDisplayName();
       if (!display_name.empty())
@@ -345,7 +325,7 @@ std::wstring GetCurrentUserDisplayName() {
 }
 
 std::wstring GetCurrentUserEmail() {
-  switch (GetCurrentServiceId()) {
+  switch (sync::GetCurrentServiceId()) {
     case sync::kKitsu:
       return settings.GetSyncServiceKitsuEmail();
     default:
@@ -354,7 +334,7 @@ std::wstring GetCurrentUserEmail() {
 }
 
 std::wstring GetCurrentUsername() {
-  switch (GetCurrentServiceId()) {
+  switch (sync::GetCurrentServiceId()) {
     case sync::kMyAnimeList:
       return settings.GetSyncServiceMalUsername();
     case sync::kKitsu:
@@ -367,7 +347,7 @@ std::wstring GetCurrentUsername() {
 }
 
 std::wstring GetCurrentPassword() {
-  switch (GetCurrentServiceId()) {
+  switch (sync::GetCurrentServiceId()) {
     case sync::kMyAnimeList:
       return settings.GetSyncServiceMalAccessToken();
     case sync::kKitsu:

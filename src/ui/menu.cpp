@@ -87,7 +87,7 @@ void MenuList::UpdateAnime(const anime::Item* anime_item) {
     for (auto& item : menu->items) {
       if (item.action == L"EditTags" ||
           item.action == L"EditNotes") {
-        switch (taiga::GetCurrentServiceId()) {
+        switch (sync::GetCurrentServiceId()) {
           case sync::kMyAnimeList:
             item.name = L"Set &tags...";
             item.action = L"EditTags";
@@ -221,7 +221,7 @@ void MenuList::UpdateExport() {
   if (menu) {
     for (auto& item : menu->items) {
       if (item.action == L"ExportAsMalXml") {
-        item.enabled = taiga::GetCurrentServiceId() == sync::kMyAnimeList;
+        item.enabled = sync::GetCurrentServiceId() == sync::kMyAnimeList;
         break;
       }
     }
@@ -296,7 +296,7 @@ void MenuList::UpdateScore(const anime::Item* anime_item) {
     std::vector<sync::Rating> ratings;
     std::wstring current_rating;
 
-    switch (taiga::GetCurrentServiceId()) {
+    switch (sync::GetCurrentServiceId()) {
       case sync::kMyAnimeList:
         ratings = sync::myanimelist::GetMyRatings();
         current_rating = sync::myanimelist::TranslateMyRating(

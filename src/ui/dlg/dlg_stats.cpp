@@ -167,7 +167,7 @@ void StatsDialog::Refresh() {
     Five,
     Ten,
   } rating_type = RatingType::Ten;
-  switch (taiga::GetCurrentServiceId()) {
+  switch (sync::GetCurrentServiceId()) {
     case sync::kKitsu:
       switch (sync::kitsu::GetRatingSystem()) {
         case sync::kitsu::RatingSystem::Regular:

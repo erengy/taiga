@@ -19,15 +19,16 @@
 #include "sync/myanimelist.h"
 
 #include "base/format.h"
+#include "base/json.h"
 #include "base/log.h"
 #include "base/string.h"
+#include "base/url.h"
 #include "media/anime_db.h"
 #include "media/anime_item.h"
 #include "media/anime_season.h"
 #include "media/anime_season_db.h"
 #include "media/anime_util.h"
 #include "media/library/queue.h"
-#include "sync/manager.h"
 #include "sync/myanimelist_util.h"
 #include "sync/sync.h"
 #include "taiga/http_new.h"
@@ -600,6 +601,8 @@ void DeleteLibraryEntry(const int id) {
     }
 
     // Returns either "200 OK" or "404 Not Found"
+
+    sync::AfterLibraryUpdate();
   };
 
   taiga::http::Send(request, on_transfer, on_response);
@@ -663,32 +666,6 @@ void UpdateLibraryEntry(const library::QueueItem& queue_item) {
   };
 
   taiga::http::Send(request, on_transfer, on_response);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-Service::Service() {
-  host_ = L"api.myanimelist.net";
-
-  id_ = kMyAnimeList;
-  canonical_name_ = L"myanimelist";
-  name_ = L"MyAnimeList";
-}
-
-bool Service::RequestNeedsAuthentication(RequestType request_type) const {
-  switch (request_type) {
-    case kAddLibraryEntry:
-    case kDeleteLibraryEntry:
-    case kGetLibraryEntries:
-    case kGetMetadataById:
-    case kGetSeason:
-    case kGetUser:
-    case kSearchTitle:
-    case kUpdateLibraryEntry:
-      return true;
-  }
-
-  return false;
 }
 
 }  // namespace sync::myanimelist

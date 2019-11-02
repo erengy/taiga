@@ -23,6 +23,7 @@
 #include "base/string.h"
 #include "media/anime_db.h"
 #include "media/anime_util.h"
+#include "sync/service.h"
 #include "sync/sync.h"
 #include "taiga/resource.h"
 #include "taiga/settings.h"
@@ -244,7 +245,7 @@ void SearchDialog::Search(const std::wstring& title, bool local) {
     RefreshList();
   } else {
     ui::ChangeStatusText(L"Searching {} for \"{}\"..."_format(
-                         taiga::GetCurrentService()->name(), title));
+                         sync::GetCurrentServiceName(), title));
     sync::SearchTitle(title, anime::ID_UNKNOWN);
   }
 }
