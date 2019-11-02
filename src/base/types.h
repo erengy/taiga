@@ -18,35 +18,5 @@
 
 #pragma once
 
-#include <cstdint>
-#include <map>
-#include <string>
-#include <vector>
-
-namespace base {
-namespace http {
-class Request;
-class Response;
-}
-}
-
-namespace base {
-
-// Unique ID type
-using uid_t = std::wstring;
-
-}  // namespace base
-
 // Default enumeration type
 using enum_t = unsigned char;
-
-// Dictionary types
-using dictionary_t = std::map<std::wstring, std::wstring>;
-using multidictionary_t = std::map<std::wstring, std::vector<std::wstring>>;
-
-// HTTP request and response
-using HttpRequest = base::http::Request;
-using HttpResponse = base::http::Response;
-
-// 64-bit integral data type (quadword)
-using QWORD = unsigned __int64;

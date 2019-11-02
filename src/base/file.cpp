@@ -94,8 +94,8 @@ std::wstring GetFileLastModifiedDate(const std::wstring& path) {
   return std::wstring();
 }
 
-QWORD GetFileSize(const std::wstring& path) {
-  QWORD file_size = 0;
+uint64_t GetFileSize(const std::wstring& path) {
+  uint64_t file_size = 0;
 
   Handle file_handle{OpenFileForGenericRead(path)};
 
@@ -108,13 +108,13 @@ QWORD GetFileSize(const std::wstring& path) {
   return file_size;
 }
 
-QWORD GetFolderSize(const std::wstring& path, bool recursive) {
-  QWORD folder_size = 0;
-  const QWORD max_dword = static_cast<QWORD>(MAXDWORD) + 1;
+uint64_t GetFolderSize(const std::wstring& path, bool recursive) {
+  uint64_t folder_size = 0;
+  const auto max_dword = static_cast<uint64_t>(MAXDWORD) + 1;
 
   const auto on_file = [&](const base::FileSearchResult& result) {
-    folder_size += static_cast<QWORD>(result.data.nFileSizeHigh) * max_dword +
-                   static_cast<QWORD>(result.data.nFileSizeLow);
+    folder_size += static_cast<uint64_t>(result.data.nFileSizeHigh) * max_dword +
+                   static_cast<uint64_t>(result.data.nFileSizeLow);
     return false;
   };
 
