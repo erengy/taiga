@@ -19,7 +19,7 @@
 #include "link/http.h"
 
 #include "base/string.h"
-#include "taiga/http_new.h"
+#include "taiga/http.h"
 
 namespace link::http {
 

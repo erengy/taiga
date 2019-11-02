@@ -26,7 +26,7 @@
 #include "base/xml.h"
 #include "media/anime_season_db.h"
 #include "sync/service.h"
-#include "taiga/http_new.h"
+#include "taiga/http.h"
 #include "taiga/path.h"
 #include "taiga/resource.h"
 #include "taiga/settings.h"

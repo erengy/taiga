@@ -658,11 +658,11 @@
     <ClCompile Include="..\..\src\media\anime_season_db.cpp">
       <Filter>media\anime</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\taiga\http_new.cpp">
-      <Filter>taiga</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\sync\anilist_ratings.cpp">
       <Filter>sync\anilist</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\taiga\http.cpp">
+      <Filter>taiga</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1206,11 +1206,11 @@
     <ClInclude Include="..\..\src\media\anime_season_db.h">
       <Filter>media\anime</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\taiga\http_new.h">
-      <Filter>taiga</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\sync\anilist_ratings.h">
       <Filter>sync\anilist</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\taiga\http.h">
+      <Filter>taiga</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

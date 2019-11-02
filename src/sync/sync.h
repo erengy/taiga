@@ -20,10 +20,11 @@
 
 #include <string>
 
-#include "taiga/http_new.h"
-
 namespace anime {
 class Season;
+}
+namespace hypr::detail {
+struct Transfer;
 }
 namespace library {
 struct QueueItem;
@@ -50,7 +51,7 @@ void AfterGetLibrary();
 void AfterGetSeason();
 void AfterLibraryUpdate();
 
-bool OnTransfer(const taiga::http::Transfer& transfer,
+bool OnTransfer(const hypr::detail::Transfer& transfer,
                 const std::wstring& status);
 
 }  // namespace sync

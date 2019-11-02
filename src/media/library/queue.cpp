@@ -25,7 +25,7 @@
 #include "media/anime_util.h"
 #include "sync/sync.h"
 #include "taiga/announce.h"
-#include "taiga/http_new.h"
+#include "taiga/http.h"
 #include "taiga/settings.h"
 #include "track/media.h"
 #include "track/scanner.h"

@@ -31,7 +31,7 @@
 #include "media/library/queue.h"
 #include "sync/myanimelist_util.h"
 #include "sync/sync.h"
-#include "taiga/http_new.h"
+#include "taiga/http.h"
 #include "taiga/settings.h"
 #include "ui/resource.h"
 #include "ui/translate.h"

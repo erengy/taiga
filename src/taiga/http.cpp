@@ -21,7 +21,7 @@
 #include <mutex>
 #include <thread>
 
-#include "taiga/http_new.h"
+#include "taiga/http.h"
 
 #include "base/file.h"
 #include "base/format.h"

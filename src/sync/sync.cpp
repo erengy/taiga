@@ -30,7 +30,7 @@
 #include "sync/kitsu.h"
 #include "sync/myanimelist.h"
 #include "sync/service.h"
-#include "taiga/http_new.h"
+#include "taiga/http.h"
 #include "taiga/settings.h"
 #include "ui/dialog.h"
 #include "ui/resource.h"

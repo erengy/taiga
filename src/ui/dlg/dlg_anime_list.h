@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <map>
+
 #include <windows/win/common_controls.h>
 #include <windows/win/dialog.h>
 #include <windows/win/gdi.h>

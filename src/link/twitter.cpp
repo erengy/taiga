@@ -23,7 +23,7 @@
 #include "base/json.h"
 #include "base/oauth.h"
 #include "base/string.h"
-#include "taiga/http_new.h"
+#include "taiga/http.h"
 #include "taiga/settings.h"
 #include "ui/dlg/dlg_settings.h"
 #include "ui/ui.h"

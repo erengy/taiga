@@ -28,7 +28,7 @@
 #include "sync/kitsu_util.h"
 #include "sync/myanimelist_util.h"
 #include "sync/sync.h"
-#include "taiga/http_new.h"
+#include "taiga/http.h"
 #include "taiga/resource.h"
 #include "taiga/settings.h"
 #include "track/feed_filter_manager.h"
