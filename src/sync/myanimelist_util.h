@@ -24,6 +24,7 @@
 #include "sync/service.h"
 
 namespace anime {
+enum class AgeRating;
 class Item;
 }
 
@@ -32,7 +33,7 @@ namespace myanimelist {
 
 std::vector<Rating> GetMyRatings();
 
-int TranslateAgeRatingFrom(const std::wstring& value);
+anime::AgeRating TranslateAgeRatingFrom(const std::wstring& value);
 int TranslateEpisodeLengthFrom(int value);
 int TranslateSeriesStatusFrom(const std::wstring& value);
 int TranslateSeriesTypeFrom(const std::wstring& value);

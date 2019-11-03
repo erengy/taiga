@@ -96,12 +96,12 @@ std::vector<Rating> GetMyRatings(RatingSystem rating_system) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-int TranslateAgeRatingFrom(const std::string& value) {
+anime::AgeRating TranslateAgeRatingFrom(const std::string& value) {
   static const std::map<std::string, anime::AgeRating> table{
-    {"G", anime::kAgeRatingG},
-    {"PG", anime::kAgeRatingPG},
-    {"R", anime::kAgeRatingR17},
-    {"R18", anime::kAgeRatingR18},
+    {"G", anime::AgeRating::G},
+    {"PG", anime::AgeRating::PG},
+    {"R", anime::AgeRating::R17},
+    {"R18", anime::AgeRating::R18},
   };
 
   const auto it = table.find(value);
@@ -111,7 +111,7 @@ int TranslateAgeRatingFrom(const std::string& value) {
   if (!value.empty())
     LOGD(L"Invalid value: {}", StrToWstr(value));
 
-  return anime::kUnknownAgeRating;
+  return anime::AgeRating::Unknown;
 }
 
 double TranslateSeriesRatingFrom(const std::string& value) {

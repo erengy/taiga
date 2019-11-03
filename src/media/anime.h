@@ -74,13 +74,13 @@ enum MyStatus {
   kMyStatusLast
 };
 
-enum AgeRating {
-  kUnknownAgeRating,
-  kAgeRatingG,
-  kAgeRatingPG,
-  kAgeRatingPG13,
-  kAgeRatingR17,
-  kAgeRatingR18
+enum class AgeRating {
+  Unknown,
+  G,
+  PG,
+  PG13,
+  R17,
+  R18,
 };
 
 enum TitleLanguage {
@@ -103,7 +103,7 @@ struct SeriesInformation {
   std::time_t last_modified = 0;
   int episode_count = kUnknownEpisodeCount;
   int episode_length = kUnknownEpisodeLength;
-  AgeRating age_rating = AgeRating::kUnknownAgeRating;
+  AgeRating age_rating = AgeRating::Unknown;
   SeriesStatus status = SeriesStatus::kUnknownStatus;
   SeriesType type = SeriesType::kUnknownType;
   Date start_date;

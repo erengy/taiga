@@ -58,14 +58,14 @@ std::vector<Rating> GetMyRatings() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-int TranslateAgeRatingFrom(const std::wstring& value) {
+anime::AgeRating TranslateAgeRatingFrom(const std::wstring& value) {
   static const std::map<std::wstring, anime::AgeRating> table{
-    {L"g", anime::kAgeRatingG},
-    {L"pg", anime::kAgeRatingPG},
-    {L"pg_13", anime::kAgeRatingPG13},
-    {L"r", anime::kAgeRatingR17},
-    {L"r+", anime::kAgeRatingR17},
-    {L"rx", anime::kAgeRatingR18},
+    {L"g", anime::AgeRating::G},
+    {L"pg", anime::AgeRating::PG},
+    {L"pg_13", anime::AgeRating::PG13},
+    {L"r", anime::AgeRating::R17},
+    {L"r+", anime::AgeRating::R17},
+    {L"rx", anime::AgeRating::R18},
   };
 
   const auto it = table.find(value);
@@ -75,7 +75,7 @@ int TranslateAgeRatingFrom(const std::wstring& value) {
   if (!value.empty())
     LOGD(L"Invalid value: {}", value);
 
-  return anime::kUnknownAgeRating;
+  return anime::AgeRating::Unknown;
 }
 
 int TranslateEpisodeLengthFrom(int value) {

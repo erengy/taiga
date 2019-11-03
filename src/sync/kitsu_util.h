@@ -25,6 +25,7 @@
 #include "sync/service.h"
 
 namespace anime {
+enum class AgeRating;
 class Item;
 }
 
@@ -34,7 +35,7 @@ namespace kitsu {
 RatingSystem GetRatingSystem();
 std::vector<Rating> GetMyRatings(RatingSystem rating_system);
 
-int TranslateAgeRatingFrom(const std::string& value);
+anime::AgeRating TranslateAgeRatingFrom(const std::string& value);
 double TranslateSeriesRatingFrom(const std::string& value);
 double TranslateSeriesRatingTo(double value);
 int TranslateSeriesTypeFrom(const std::string& value);

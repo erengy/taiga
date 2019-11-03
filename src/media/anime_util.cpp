@@ -194,10 +194,10 @@ bool MetadataNeedsRefresh(const Item& item) {
 ////////////////////////////////////////////////////////////////////////////////
 
 bool IsNsfw(const Item& item) {
-  if (item.GetAgeRating() == anime::kAgeRatingR18)
+  if (item.GetAgeRating() == anime::AgeRating::R18)
     return true;
 
-  if (item.GetAgeRating() == anime::kUnknownAgeRating) {
+  if (item.GetAgeRating() == anime::AgeRating::Unknown) {
     auto& genres = item.GetGenres();
     if (std::find(genres.begin(), genres.end(), L"Hentai") != genres.end())
       return true;

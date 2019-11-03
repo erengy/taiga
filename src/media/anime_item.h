@@ -22,7 +22,6 @@
 #include <vector>
 #include <memory>
 
-#include "base/types.h"
 #include "media/anime.h"
 
 class Date;
@@ -60,7 +59,7 @@ public:
   const Date& GetDateStart() const;
   const Date& GetDateEnd() const;
   const std::wstring& GetImageUrl() const;
-  enum_t GetAgeRating() const;
+  AgeRating GetAgeRating() const;
   const std::vector<std::wstring>& GetGenres() const;
   int GetPopularity() const;
   const std::vector<std::wstring>& GetProducers() const;
@@ -86,7 +85,7 @@ public:
   void SetDateEnd(const Date& date);
   void SetDateEnd(const std::wstring& date);
   void SetImageUrl(const std::wstring& url);
-  void SetAgeRating(enum_t rating);
+  void SetAgeRating(AgeRating rating);
   void SetGenres(const std::wstring& genres);
   void SetGenres(const std::vector<std::wstring>& genres);
   void SetPopularity(int popularity);

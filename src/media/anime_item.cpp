@@ -105,7 +105,7 @@ const std::wstring& Item::GetImageUrl() const {
   return series_.image_url;
 }
 
-enum_t Item::GetAgeRating() const {
+AgeRating Item::GetAgeRating() const {
   return series_.age_rating;
 }
 
@@ -230,8 +230,8 @@ void Item::SetImageUrl(const std::wstring& url) {
   series_.image_url = url;
 }
 
-void Item::SetAgeRating(enum_t rating) {
-  series_.age_rating = static_cast<AgeRating>(rating);
+void Item::SetAgeRating(AgeRating rating) {
+  series_.age_rating = rating;
 }
 
 void Item::SetGenres(const std::wstring& genres) {
