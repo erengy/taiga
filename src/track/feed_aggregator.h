@@ -21,7 +21,6 @@
 #include <string>
 #include <vector>
 
-#include "base/types.h"
 #include "track/feed.h"
 #include "track/feed_filter.h"
 

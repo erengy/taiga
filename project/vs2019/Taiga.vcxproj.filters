@@ -720,9 +720,6 @@
     <ClInclude Include="..\..\src\base\timer.h">
       <Filter>base</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\base\types.h">
-      <Filter>base</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\base\url.h">
       <Filter>base</Filter>
     </ClInclude>

@@ -24,8 +24,6 @@
 #include <windows.h>
 #include <shlobj.h>
 
-#include "types.h"
-
 unsigned long GetFileAge(const std::wstring& path);
 std::wstring GetFileLastModifiedDate(const std::wstring& path);
 uint64_t GetFileSize(const std::wstring& path);

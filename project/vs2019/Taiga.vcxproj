@@ -392,7 +392,6 @@
     <ClInclude Include="..\..\src\base\string.h" />
     <ClInclude Include="..\..\src\base\time.h" />
     <ClInclude Include="..\..\src\base\timer.h" />
-    <ClInclude Include="..\..\src\base\types.h" />
     <ClInclude Include="..\..\src\base\url.h" />
     <ClInclude Include="..\..\src\base\xml.h" />
     <ClInclude Include="..\..\src\link\discord.h" />
