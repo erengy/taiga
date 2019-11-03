@@ -313,7 +313,7 @@ void Settings::ApplyChanges() {
 
 std::wstring GetCurrentUserDisplayName() {
   switch (sync::GetCurrentServiceId()) {
-    case sync::kKitsu: {
+    case sync::ServiceId::Kitsu: {
       const auto display_name = settings.GetSyncServiceKitsuDisplayName();
       if (!display_name.empty())
         return display_name;
@@ -326,7 +326,7 @@ std::wstring GetCurrentUserDisplayName() {
 
 std::wstring GetCurrentUserEmail() {
   switch (sync::GetCurrentServiceId()) {
-    case sync::kKitsu:
+    case sync::ServiceId::Kitsu:
       return settings.GetSyncServiceKitsuEmail();
     default:
       return {};
@@ -335,11 +335,11 @@ std::wstring GetCurrentUserEmail() {
 
 std::wstring GetCurrentUsername() {
   switch (sync::GetCurrentServiceId()) {
-    case sync::kMyAnimeList:
+    case sync::ServiceId::MyAnimeList:
       return settings.GetSyncServiceMalUsername();
-    case sync::kKitsu:
+    case sync::ServiceId::Kitsu:
       return settings.GetSyncServiceKitsuUsername();
-    case sync::kAniList:
+    case sync::ServiceId::AniList:
       return settings.GetSyncServiceAniListUsername();
     default:
       return {};
@@ -348,11 +348,11 @@ std::wstring GetCurrentUsername() {
 
 std::wstring GetCurrentPassword() {
   switch (sync::GetCurrentServiceId()) {
-    case sync::kMyAnimeList:
+    case sync::ServiceId::MyAnimeList:
       return settings.GetSyncServiceMalAccessToken();
-    case sync::kKitsu:
+    case sync::ServiceId::Kitsu:
       return Base64Decode(settings.GetSyncServiceKitsuPassword());
-    case sync::kAniList:
+    case sync::ServiceId::AniList:
       return settings.GetSyncServiceAniListToken();
     default:
       return {};

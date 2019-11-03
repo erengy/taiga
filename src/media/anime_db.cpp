@@ -56,29 +56,29 @@ bool Database::LoadDatabase() {
 
 void Database::ReadDatabaseNode(XmlNode& database_node) {
   for (auto node : database_node.children(L"anime")) {
-    std::map<enum_t, std::wstring> id_map;
+    std::map<sync::ServiceId, std::wstring> id_map;
 
     for (auto id_node : node.children(L"id")) {
       const std::wstring slug = id_node.attribute(L"name").as_string();
-      const enum_t service_id = sync::GetServiceIdBySlug(slug);
+      const auto service_id = sync::GetServiceIdBySlug(slug);
       id_map[service_id] = id_node.child_value();
     }
 
     const std::wstring source_name = XmlReadStr(node, L"source");
-    enum_t source = sync::GetServiceIdBySlug(source_name);
+    auto source = sync::GetServiceIdBySlug(source_name);
 
-    if (source == sync::kTaiga) {
+    if (source == sync::ServiceId::Taiga) {
       const auto current_service_id = sync::GetCurrentServiceId();
       if (id_map.find(current_service_id) != id_map.end()) {
         source = current_service_id;
         LOGW(L"Fixed source for ID: {}", id_map[source]);
       } else {
-        LOGE(L"Invalid source for ID: {}", id_map[sync::kTaiga]);
+        LOGE(L"Invalid source for ID: {}", id_map[sync::ServiceId::Taiga]);
         continue;
       }
     }
 
-    const int id = ToInt(id_map[sync::kTaiga]);
+    const int id = ToInt(id_map[sync::ServiceId::Taiga]);
     Item& item = items[id];  // Creates the item if it doesn't exist
 
     for (const auto& [service, id] : id_map) {
@@ -124,11 +124,11 @@ void Database::WriteDatabaseNode(XmlNode& database_node) const {
   for (const auto& [id, item] : items) {
     auto anime_node = database_node.append_child(L"anime");
 
-    for (int i = 0; i <= sync::kLastService; i++) {
-      std::wstring id = item.GetId(i);
+    for (const auto service_id : sync::kServiceIds) {
+      std::wstring id = item.GetId(service_id);
       if (!id.empty()) {
         auto child = anime_node.append_child(L"id");
-        std::wstring slug = sync::GetServiceSlugById(static_cast<sync::ServiceId>(i));
+        std::wstring slug = sync::GetServiceSlugById(service_id);
         child.append_attribute(L"name") = slug.c_str();
         child.append_child(pugi::node_pcdata).set_value(id.c_str());
       }
@@ -189,7 +189,8 @@ Item* Database::Find(int id, bool log_error) {
   return nullptr;
 }
 
-Item* Database::Find(const std::wstring& id, enum_t service, bool log_error) {
+Item* Database::Find(const std::wstring& id, sync::ServiceId service,
+                     bool log_error) {
   if (!id.empty()) {
     for (auto& pair : items)
       if (id == pair.second.GetId(service))
@@ -257,8 +258,8 @@ bool Database::DeleteItem(int id) {
 int Database::UpdateItem(const Item& new_item) {
   Item* item = nullptr;
 
-  for (enum_t i = sync::kTaiga; i <= sync::kLastService; i++) {
-    item = Find(new_item.GetId(i), i, false);
+  for (const auto service_id : sync::kServiceIds) {
+    item = Find(new_item.GetId(service_id), service_id, false);
     if (item)
       break;
   }
@@ -266,7 +267,7 @@ int Database::UpdateItem(const Item& new_item) {
   if (!item) {
     auto source = new_item.GetSource();
 
-    if (source == sync::kTaiga) {
+    if (source == sync::ServiceId::Taiga) {
       LOGE(L"Invalid source for ID: {}", new_item.GetId(source));
       return ID_UNKNOWN;
     }
@@ -275,7 +276,7 @@ int Database::UpdateItem(const Item& new_item) {
 
     // Add a new item
     item = &items[id];
-    item->SetId(ToWstr(id), sync::kTaiga);
+    item->SetId(ToWstr(id), sync::ServiceId::Taiga);
   }
 
   // Update series information if new information is, well, new.
@@ -283,11 +284,13 @@ int Database::UpdateItem(const Item& new_item) {
       new_item.GetLastModified() >= item->GetLastModified()) {
     item->SetLastModified(new_item.GetLastModified());
 
-    for (enum_t i = sync::kFirstService; i <= sync::kLastService; i++)
-      if (!new_item.GetId(i).empty())
-        item->SetId(new_item.GetId(i), i);
+    for (const auto service_id : sync::kServiceIds) {
+      if (service_id != sync::ServiceId::Taiga)
+        if (!new_item.GetId(service_id).empty())
+          item->SetId(new_item.GetId(service_id), service_id);
+    }
 
-    if (new_item.GetSource() != sync::kTaiga)
+    if (new_item.GetSource() != sync::ServiceId::Taiga)
       item->SetSource(new_item.GetSource());
 
     if (new_item.GetType() != kUnknownType)

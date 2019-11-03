@@ -687,7 +687,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
       add_info_lines(upcoming);
       content += L"\n\n";
     } else {
-      if (sync::GetCurrentServiceId() == sync::kMyAnimeList)
+      if (sync::GetCurrentServiceId() == sync::ServiceId::MyAnimeList)
         content += L"<a href=\"ViewUpcomingAnime()\">View upcoming anime</a>";
     }
 

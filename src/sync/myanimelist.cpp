@@ -202,8 +202,8 @@ int ParseAnimeObject(const Json& json) {
   }
 
   anime::Item anime_item;
-  anime_item.SetSource(kMyAnimeList);
-  anime_item.SetId(ToWstr(anime_id), kMyAnimeList);
+  anime_item.SetSource(ServiceId::MyAnimeList);
+  anime_item.SetId(ToWstr(anime_id), ServiceId::MyAnimeList);
   anime_item.SetLastModified(time(nullptr));  // current time
 
   anime_item.SetTitle(StrToWstr(JsonReadStr(json, "title")));
@@ -267,8 +267,8 @@ void ParseLibraryObject(const Json& json, const int anime_id) {
   }
 
   anime::Item anime_item;
-  anime_item.SetSource(kMyAnimeList);
-  anime_item.SetId(ToWstr(anime_id), kMyAnimeList);
+  anime_item.SetSource(ServiceId::MyAnimeList);
+  anime_item.SetId(ToWstr(anime_id), ServiceId::MyAnimeList);
   anime_item.AddtoUserList();
 
   anime_item.SetMyStatus(

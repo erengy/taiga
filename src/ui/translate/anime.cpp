@@ -37,11 +37,11 @@ namespace ui {
 std::wstring TranslateScore(const double value) {
   switch (sync::GetCurrentServiceId()) {
     default:
-    case sync::kMyAnimeList:
+    case sync::ServiceId::MyAnimeList:
       return ToWstr(value, 2);
-    case sync::kKitsu:
+    case sync::ServiceId::Kitsu:
       return ToWstr(sync::kitsu::TranslateSeriesRatingTo(value), 2) + L"%";
-    case sync::kAniList:
+    case sync::ServiceId::AniList:
       return ToWstr(sync::anilist::TranslateSeriesRatingTo(value), 0) + L"%";
   }
 }

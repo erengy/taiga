@@ -22,13 +22,17 @@
 #include <vector>
 #include <memory>
 
-#include "anime.h"
+#include "base/types.h"
+#include "media/anime.h"
 
 class Date;
 
 namespace library {
 enum class QueueSearch;
 struct QueueItem;
+}
+namespace sync {
+enum class ServiceId;
 }
 
 namespace anime {
@@ -42,9 +46,9 @@ public:
   // Metadata
 
   int GetId() const;
-  const std::wstring& GetId(enum_t service) const;
+  const std::wstring& GetId(sync::ServiceId service) const;
   const std::wstring& GetSlug() const;
-  enum_t GetSource() const;
+  sync::ServiceId GetSource() const;
   int GetType() const;
   int GetEpisodeCount() const;
   int GetEpisodeLength() const;
@@ -64,9 +68,9 @@ public:
   const std::wstring& GetSynopsis() const;
   const time_t GetLastModified() const;
 
-  void SetId(const std::wstring& id, enum_t service);
+  void SetId(const std::wstring& id, sync::ServiceId service);
   void SetSlug(const std::wstring& slug);
-  void SetSource(enum_t source);
+  void SetSource(sync::ServiceId source);
   void SetType(int type);
   void SetEpisodeCount(int number);
   void SetEpisodeLength(int number);

@@ -57,8 +57,8 @@ bool Database::LoadList() {
   auto node_library = document.child(L"library");
   for (auto node : node_library.children(L"anime")) {
     Item anime_item;
-    anime_item.SetId(XmlReadStr(node, L"id"), sync::kTaiga);
-    anime_item.SetSource(sync::kTaiga);
+    anime_item.SetId(XmlReadStr(node, L"id"), sync::ServiceId::Taiga);
+    anime_item.SetSource(sync::ServiceId::Taiga);
 
     anime_item.AddtoUserList();
     anime_item.SetMyId(XmlReadStr(node, L"library_id"));

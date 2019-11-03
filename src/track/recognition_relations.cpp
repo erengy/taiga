@@ -94,11 +94,11 @@ static bool ParseRule(const std::wstring& rule) {
     std::vector<std::wstring> ids;
     Split(match_results[index].str(), L"|", ids);
     switch (sync::GetCurrentServiceId()) {
-      case sync::kMyAnimeList:
+      case sync::ServiceId::MyAnimeList:
         return ids.size() > 0 ? ToInt(ids.at(0)) : 0;
-      case sync::kKitsu:
+      case sync::ServiceId::Kitsu:
         return ids.size() > 1 ? ToInt(ids.at(1)) : 0;
-      case sync::kAniList:
+      case sync::ServiceId::AniList:
         return ids.size() > 2 ? ToInt(ids.at(2)) : 0;
       default:
         return 0;

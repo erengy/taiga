@@ -48,12 +48,12 @@ std::wstring TranslateMyScore(const int value,
   switch (sync::GetCurrentServiceId()) {
     default:
       return ToWstr(value);
-    case sync::kMyAnimeList:
+    case sync::ServiceId::MyAnimeList:
       return sync::myanimelist::TranslateMyRating(value, false);
-    case sync::kKitsu:
+    case sync::ServiceId::Kitsu:
       return sync::kitsu::TranslateMyRating(
           value, sync::kitsu::GetRatingSystem());
-    case sync::kAniList:
+    case sync::ServiceId::AniList:
       return sync::anilist::TranslateMyRating(
           value, sync::anilist::GetRatingSystem());
   }
@@ -63,12 +63,12 @@ std::wstring TranslateMyScoreFull(const int value) {
   switch (sync::GetCurrentServiceId()) {
     default:
       return ToWstr(value);
-    case sync::kMyAnimeList:
+    case sync::ServiceId::MyAnimeList:
       return sync::myanimelist::TranslateMyRating(value, true);
-    case sync::kKitsu:
+    case sync::ServiceId::Kitsu:
       return sync::kitsu::TranslateMyRating(
           value, sync::kitsu::GetRatingSystem());
-    case sync::kAniList:
+    case sync::ServiceId::AniList:
       return sync::anilist::TranslateMyRating(
           value, sync::anilist::GetRatingSystem());
   }

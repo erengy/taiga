@@ -122,13 +122,13 @@ std::wstring ReplaceVariables(const std::wstring& str,
     fields[L"status"] = ToWstr(anime_item->GetMyStatus());
     fields[L"rewatching"] = ToWstr(anime_item->GetMyRewatching());
     switch (sync::GetCurrentServiceId()) {
-      case sync::kMyAnimeList:
+      case sync::ServiceId::MyAnimeList:
         fields[L"animeurl"] = sync::myanimelist::GetAnimePage(*anime_item);
         break;
-      case sync::kKitsu:
+      case sync::ServiceId::Kitsu:
         fields[L"animeurl"] = sync::kitsu::GetAnimePage(*anime_item);
         break;
-      case sync::kAniList:
+      case sync::ServiceId::AniList:
         fields[L"animeurl"] = sync::anilist::GetAnimePage(*anime_item);
         break;
     }

@@ -22,7 +22,7 @@
 #include <vector>
 
 #include "base/time.h"
-#include "base/types.h"
+#include "sync/service.h"
 
 namespace anime {
 
@@ -99,7 +99,7 @@ struct Titles {
 struct SeriesInformation {
   anime::id_t id = AnimeId::ID_UNKNOWN;
   std::vector<std::wstring> uids;
-  enum_t source = 0;
+  sync::ServiceId source = sync::ServiceId::Taiga;
   std::time_t last_modified = 0;
   int episode_count = kUnknownEpisodeCount;
   int episode_length = kUnknownEpisodeLength;

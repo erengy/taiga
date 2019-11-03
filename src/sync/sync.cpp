@@ -42,13 +42,13 @@ bool AuthenticateUser() {
   ui::EnableDialogInput(ui::Dialog::Main, false);
 
   switch (GetCurrentServiceId()) {
-    case kMyAnimeList:
+    case ServiceId::MyAnimeList:
       myanimelist::AuthenticateUser();
       break;
-    case kKitsu:
+    case ServiceId::Kitsu:
       kitsu::AuthenticateUser();
       break;
-    case kAniList:
+    case ServiceId::AniList:
       anilist::AuthenticateUser();
       break;
   }
@@ -60,13 +60,13 @@ void GetUser() {
   ui::EnableDialogInput(ui::Dialog::Main, false);
 
   switch (GetCurrentServiceId()) {
-    case kMyAnimeList:
+    case ServiceId::MyAnimeList:
       myanimelist::GetUser();
       break;
-    case kKitsu:
+    case ServiceId::Kitsu:
       kitsu::GetUser();
       break;
-    case kAniList:
+    case ServiceId::AniList:
       break;
   }
 }
@@ -75,13 +75,13 @@ void GetLibraryEntries() {
   ui::EnableDialogInput(ui::Dialog::Main, false);
 
   switch (GetCurrentServiceId()) {
-    case kMyAnimeList:
+    case ServiceId::MyAnimeList:
       myanimelist::GetLibraryEntries();
       break;
-    case kKitsu:
+    case ServiceId::Kitsu:
       kitsu::GetLibraryEntries();
       break;
-    case kAniList:
+    case ServiceId::AniList:
       anilist::GetLibraryEntries();
       break;
   }
@@ -89,13 +89,13 @@ void GetLibraryEntries() {
 
 void GetMetadataById(const int id) {
   switch (GetCurrentServiceId()) {
-    case kMyAnimeList:
+    case ServiceId::MyAnimeList:
       myanimelist::GetMetadataById(id);
       break;
-    case kKitsu:
+    case ServiceId::Kitsu:
       kitsu::GetMetadataById(id);
       break;
-    case kAniList:
+    case ServiceId::AniList:
       anilist::GetMetadataById(id);
       break;
   }
@@ -103,13 +103,13 @@ void GetMetadataById(const int id) {
 
 void GetSeason(const anime::Season season) {
   switch (GetCurrentServiceId()) {
-    case kMyAnimeList:
+    case ServiceId::MyAnimeList:
       myanimelist::GetSeason(season);
       break;
-    case kKitsu:
+    case ServiceId::Kitsu:
       kitsu::GetSeason(season);
       break;
-    case kAniList:
+    case ServiceId::AniList:
       anilist::GetSeason(season);
       break;
   }
@@ -117,13 +117,13 @@ void GetSeason(const anime::Season season) {
 
 void SearchTitle(const std::wstring& title, const int id) {
   switch (GetCurrentServiceId()) {
-    case kMyAnimeList:
+    case ServiceId::MyAnimeList:
       myanimelist::SearchTitle(title);
       break;
-    case kKitsu:
+    case ServiceId::Kitsu:
       kitsu::SearchTitle(title);
       break;
-    case kAniList:
+    case ServiceId::AniList:
       anilist::SearchTitle(title);
       break;
   }
@@ -138,10 +138,10 @@ void Synchronize() {
     // Special case where we allow downloading lists without authentication
     if (!authenticated && !taiga::GetCurrentUsername().empty()) {
       switch (GetCurrentServiceId()) {
-        case sync::kKitsu:
+        case ServiceId::Kitsu:
           GetUser();
           break;
-        case sync::kAniList:
+        case ServiceId::AniList:
           GetLibraryEntries();
           break;
       }
@@ -159,13 +159,13 @@ void Synchronize() {
 
 void UpdateLibraryEntry(const library::QueueItem& queue_item) {
   switch (GetCurrentServiceId()) {
-    case kMyAnimeList:
+    case ServiceId::MyAnimeList:
       myanimelist::UpdateLibraryEntry(queue_item);
       break;
-    case kKitsu:
+    case ServiceId::Kitsu:
       kitsu::UpdateLibraryEntry(queue_item);
       break;
-    case kAniList:
+    case ServiceId::AniList:
       anilist::UpdateLibraryEntry(queue_item);
       break;
   }
@@ -196,11 +196,11 @@ void DownloadImage(const int anime_id, const std::wstring& image_url) {
 
 bool UserAuthenticated() {
   switch (GetCurrentServiceId()) {
-    case kMyAnimeList:
+    case ServiceId::MyAnimeList:
       return myanimelist::IsUserAuthenticated();
-    case kKitsu:
+    case ServiceId::Kitsu:
       return kitsu::IsUserAuthenticated();
-    case kAniList:
+    case ServiceId::AniList:
       return anilist::IsUserAuthenticated();
     default:
       return false;
@@ -213,12 +213,12 @@ void InvalidateUserAuthentication() {
 
 bool IsUserAccountAvailable() {
   switch (GetCurrentServiceId()) {
-    case sync::kMyAnimeList:
+    case ServiceId::MyAnimeList:
       return !taiga::settings.GetSyncServiceMalUsername().empty();
-    case sync::kKitsu:
+    case ServiceId::Kitsu:
       return !taiga::settings.GetSyncServiceKitsuEmail().empty() ||
              !taiga::settings.GetSyncServiceKitsuUsername().empty();
-    case sync::kAniList:
+    case ServiceId::AniList:
       return !taiga::settings.GetSyncServiceAniListUsername().empty();
   }
 

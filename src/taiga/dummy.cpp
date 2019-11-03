@@ -24,11 +24,11 @@
 namespace taiga {
 
 void InitializeDummies() {
-  dummy_anime.SetSource(sync::kMyAnimeList);
-  dummy_anime.SetId(L"4224", sync::kTaiga);
-  dummy_anime.SetId(L"4224", sync::kMyAnimeList);
-  dummy_anime.SetId(L"3532", sync::kKitsu);
-  dummy_anime.SetId(L"4224", sync::kAniList);
+  dummy_anime.SetSource(sync::ServiceId::MyAnimeList);
+  dummy_anime.SetId(L"4224", sync::ServiceId::Taiga);
+  dummy_anime.SetId(L"4224", sync::ServiceId::MyAnimeList);
+  dummy_anime.SetId(L"3532", sync::ServiceId::Kitsu);
+  dummy_anime.SetId(L"4224", sync::ServiceId::AniList);
   dummy_anime.SetSlug(L"toradora");
   dummy_anime.SetTitle(L"Toradora!");
   dummy_anime.SetEnglishTitle(L"Toradora!");

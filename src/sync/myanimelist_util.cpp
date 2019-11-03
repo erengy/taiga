@@ -213,7 +213,7 @@ std::wstring TranslateKeyTo(const std::wstring& key) {
 
 std::wstring GetAnimePage(const anime::Item& anime_item) {
   return L"https://myanimelist.net/anime/" +
-         anime_item.GetId(sync::kMyAnimeList) + L"/";
+         anime_item.GetId(ServiceId::MyAnimeList) + L"/";
 }
 
 void RequestAuthorizationCode(std::wstring& code_verifier) {

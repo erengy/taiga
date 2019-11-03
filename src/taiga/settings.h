@@ -32,8 +32,7 @@ namespace semaver {
 class Version;
 }
 namespace sync {
-class Service;
-enum ServiceId;
+enum class ServiceId;
 }
 namespace track {
 enum TorrentAction;

@@ -332,7 +332,7 @@ std::wstring Settings::GetSyncServiceMalUsername() const {
 
 void Settings::SetSyncServiceMalUsername(const std::wstring& username) {
   if (set_value(AppSettingKey::SyncServiceMalUsername, username)) {
-    if (sync::GetCurrentServiceId() == sync::kMyAnimeList) {
+    if (sync::GetCurrentServiceId() == sync::ServiceId::MyAnimeList) {
       changed_account_or_service_ = true;
     }
   }
@@ -371,7 +371,7 @@ void Settings::SetSyncServiceKitsuEmail(const std::wstring& email) {
     set_value(AppSettingKey::SyncServiceKitsuDisplayName, std::wstring{});
     set_value(AppSettingKey::SyncServiceKitsuUsername, std::wstring{});
 
-    if (sync::GetCurrentServiceId() == sync::kKitsu) {
+    if (sync::GetCurrentServiceId() == sync::ServiceId::Kitsu) {
       changed_account_or_service_ = true;
     }
   }
@@ -415,7 +415,7 @@ std::wstring Settings::GetSyncServiceAniListUsername() const {
 
 void Settings::SetSyncServiceAniListUsername(const std::wstring& username) {
   if (set_value(AppSettingKey::SyncServiceAniListUsername, username)) {
-    if (sync::GetCurrentServiceId() == sync::kAniList) {
+    if (sync::GetCurrentServiceId() == sync::ServiceId::AniList) {
       changed_account_or_service_ = true;
     }
   }

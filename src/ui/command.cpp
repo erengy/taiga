@@ -151,13 +151,13 @@ void ExecuteCommand(const std::wstring& str, WPARAM wParam, LPARAM lParam) {
   } else if (command == L"ViewAnimePage") {
     const auto view_anime_page = [](const int anime_id) {
       switch (sync::GetCurrentServiceId()) {
-        case sync::kMyAnimeList:
+        case sync::ServiceId::MyAnimeList:
           sync::myanimelist::ViewAnimePage(anime_id);
           break;
-        case sync::kKitsu:
+        case sync::ServiceId::Kitsu:
           sync::kitsu::ViewAnimePage(anime_id);
           break;
-        case sync::kAniList:
+        case sync::ServiceId::AniList:
           sync::anilist::ViewAnimePage(anime_id);
           break;
       }
@@ -176,7 +176,7 @@ void ExecuteCommand(const std::wstring& str, WPARAM wParam, LPARAM lParam) {
   //   Opens up upcoming anime page on MAL.
   } else if (command == L"ViewUpcomingAnime") {
     switch (sync::GetCurrentServiceId()) {
-      case sync::kMyAnimeList:
+      case sync::ServiceId::MyAnimeList:
         sync::myanimelist::ViewUpcomingAnime();
         break;
     }

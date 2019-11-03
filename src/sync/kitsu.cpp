@@ -306,8 +306,8 @@ int ParseAnimeObject(const Json& json) {
   }
 
   anime::Item anime_item;
-  anime_item.SetSource(kKitsu);
-  anime_item.SetId(ToWstr(anime_id), kKitsu);
+  anime_item.SetSource(ServiceId::Kitsu);
+  anime_item.SetId(ToWstr(anime_id), ServiceId::Kitsu);
   anime_item.SetLastModified(time(nullptr));  // current time
 
   anime_item.SetAgeRating(
@@ -415,8 +415,8 @@ int ParseLibraryObject(const Json& json) {
   }
 
   anime::Item anime_item;
-  anime_item.SetSource(kKitsu);
-  anime_item.SetId(ToWstr(anime_id), kKitsu);
+  anime_item.SetSource(ServiceId::Kitsu);
+  anime_item.SetId(ToWstr(anime_id), ServiceId::Kitsu);
   anime_item.AddtoUserList();
 
   anime_item.SetMyId(ToWstr(library_id));

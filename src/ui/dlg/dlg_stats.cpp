@@ -168,7 +168,7 @@ void StatsDialog::Refresh() {
     Ten,
   } rating_type = RatingType::Ten;
   switch (sync::GetCurrentServiceId()) {
-    case sync::kKitsu:
+    case sync::ServiceId::Kitsu:
       switch (sync::kitsu::GetRatingSystem()) {
         case sync::kitsu::RatingSystem::Regular:
           rating_type = RatingType::Five;

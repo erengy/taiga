@@ -88,12 +88,12 @@ void MenuList::UpdateAnime(const anime::Item* anime_item) {
       if (item.action == L"EditTags" ||
           item.action == L"EditNotes") {
         switch (sync::GetCurrentServiceId()) {
-          case sync::kMyAnimeList:
+          case sync::ServiceId::MyAnimeList:
             item.name = L"Set &tags...";
             item.action = L"EditTags";
             break;
-          case sync::kKitsu:
-          case sync::kAniList:
+          case sync::ServiceId::Kitsu:
+          case sync::ServiceId::AniList:
             item.name = L"Set &notes...";
             item.action = L"EditNotes";
             break;
@@ -221,7 +221,7 @@ void MenuList::UpdateExport() {
   if (menu) {
     for (auto& item : menu->items) {
       if (item.action == L"ExportAsMalXml") {
-        item.enabled = sync::GetCurrentServiceId() == sync::kMyAnimeList;
+        item.enabled = sync::GetCurrentServiceId() == sync::ServiceId::MyAnimeList;
         break;
       }
     }
@@ -297,19 +297,19 @@ void MenuList::UpdateScore(const anime::Item* anime_item) {
     std::wstring current_rating;
 
     switch (sync::GetCurrentServiceId()) {
-      case sync::kMyAnimeList:
+      case sync::ServiceId::MyAnimeList:
         ratings = sync::myanimelist::GetMyRatings();
         current_rating = sync::myanimelist::TranslateMyRating(
             anime_item->GetMyScore(), true);
         break;
-      case sync::kKitsu: {
+      case sync::ServiceId::Kitsu: {
         const auto rating_system = sync::kitsu::GetRatingSystem();
         ratings = sync::kitsu::GetMyRatings(rating_system);
         current_rating = sync::kitsu::TranslateMyRating(
             anime_item->GetMyScore(), rating_system);
         break;
       }
-      case sync::kAniList: {
+      case sync::ServiceId::AniList: {
         const auto rating_system = sync::anilist::GetRatingSystem();
         ratings = sync::anilist::GetMyRatings(rating_system);
         current_rating = sync::anilist::TranslateMyRating(

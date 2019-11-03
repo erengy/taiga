@@ -21,7 +21,7 @@
 #include <string>
 
 namespace sync {
-enum ServiceId;
+enum class ServiceId;
 }
 
 namespace taiga {

@@ -204,8 +204,8 @@ int ParseMediaObject(const Json& json) {
   }
 
   anime::Item anime_item;
-  anime_item.SetSource(kAniList);
-  anime_item.SetId(ToWstr(anime_id), kAniList);
+  anime_item.SetSource(ServiceId::AniList);
+  anime_item.SetId(ToWstr(anime_id), ServiceId::AniList);
   anime_item.SetLastModified(time(nullptr));  // current time
 
   anime_item.SetTitle(StrToWstr(JsonReadStr(json["title"], "userPreferred")));
@@ -266,8 +266,8 @@ int ParseMediaListObject(const Json& json) {
   ParseMediaObject(json["media"]);
 
   anime::Item anime_item;
-  anime_item.SetSource(kAniList);
-  anime_item.SetId(ToWstr(anime_id), kAniList);
+  anime_item.SetSource(ServiceId::AniList);
+  anime_item.SetId(ToWstr(anime_id), ServiceId::AniList);
   anime_item.AddtoUserList();
 
   anime_item.SetMyId(ToWstr(library_id));

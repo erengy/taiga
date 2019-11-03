@@ -191,7 +191,7 @@ void PageSeriesInfo::Refresh(int anime_id, bool connect) {
 
   // Set information
   switch (sync::GetCurrentServiceId()) {
-    case sync::kKitsu:
+    case sync::ServiceId::Kitsu:
       SetDlgItemText(IDC_STATIC_ANIME_DETAILS_NAMES,
           L"Type:\nEpisodes:\nStatus:\nSeason:\nCategories:\nProducers:\nScore:");
       break;
@@ -249,8 +249,8 @@ BOOL PageMyInfo::OnCommand(WPARAM wParam, LPARAM lParam) {
         spin.GetPos32(episode_value);
         if (IsDlgButtonChecked(IDC_CHECK_ANIME_REWATCH)) {
           switch (sync::GetCurrentServiceId()) {
-            case sync::kKitsu:
-            case sync::kAniList:
+            case sync::ServiceId::Kitsu:
+            case sync::ServiceId::AniList:
               combobox.SetCurSel(anime::kWatching - 1);
               break;
           }
@@ -259,8 +259,8 @@ BOOL PageMyInfo::OnCommand(WPARAM wParam, LPARAM lParam) {
             spin.SetPos32(0);
         } else {
           switch (sync::GetCurrentServiceId()) {
-            case sync::kKitsu:
-            case sync::kAniList:
+            case sync::ServiceId::Kitsu:
+            case sync::ServiceId::AniList:
               combobox.SetCurSel(anime_item->GetMyStatus() - 1);
               break;
           }
@@ -388,17 +388,17 @@ void PageMyInfo::Refresh(int anime_id) {
     std::wstring current_rating;
     int selected_item = -1;
     switch (sync::GetCurrentServiceId()) {
-      case sync::kMyAnimeList:
+      case sync::ServiceId::MyAnimeList:
         ratings = sync::myanimelist::GetMyRatings();
         current_rating = sync::myanimelist::TranslateMyRating(anime_item->GetMyScore(), true);
         break;
-      case sync::kKitsu: {
+      case sync::ServiceId::Kitsu: {
         const auto rating_system = sync::kitsu::GetRatingSystem();
         ratings = sync::kitsu::GetMyRatings(rating_system);
         current_rating = sync::kitsu::TranslateMyRating(anime_item->GetMyScore(), rating_system);
         break;
       }
-      case sync::kAniList: {
+      case sync::ServiceId::AniList: {
         const auto rating_system = sync::anilist::GetRatingSystem();
         ratings = sync::anilist::GetMyRatings(rating_system);
         current_rating = sync::anilist::TranslateMyRating(anime_item->GetMyScore(), rating_system);
@@ -428,13 +428,13 @@ void PageMyInfo::Refresh(int anime_id) {
   // Tags / Notes
   edit.SetWindowHandle(GetDlgItem(IDC_EDIT_ANIME_TAGS));
   switch (sync::GetCurrentServiceId()) {
-    case sync::kMyAnimeList:
+    case sync::ServiceId::MyAnimeList:
       SetDlgItemText(IDC_STATIC_TAGSNOTES, L"Tags:");
       edit.SetCueBannerText(L"Enter tags here, separated by a comma (e.g. tag1, tag2)");
       edit.SetText(anime_item->GetMyTags());
       break;
-    case sync::kKitsu:
-    case sync::kAniList:
+    case sync::ServiceId::Kitsu:
+    case sync::ServiceId::AniList:
       SetDlgItemText(IDC_STATIC_TAGSNOTES, L"Notes:");
       edit.SetCueBannerText(L"Enter your notes about this anime");
       edit.SetText(anime_item->GetMyNotes());
@@ -546,7 +546,7 @@ bool PageMyInfo::Save() {
   } else {
     const auto score_text = GetDlgItemText(IDC_EDIT_ANIME_SCORE);
     switch (sync::GetCurrentServiceId()) {
-      case sync::kAniList:
+      case sync::ServiceId::AniList:
         switch (sync::anilist::GetRatingSystem()) {
           case sync::anilist::RatingSystem::Point_10_Decimal:
             queue_item.score = static_cast<int>(ToDouble(score_text) * 10);
@@ -564,11 +564,11 @@ bool PageMyInfo::Save() {
 
   // Tags / Notes
   switch (sync::GetCurrentServiceId()) {
-    case sync::kMyAnimeList:
+    case sync::ServiceId::MyAnimeList:
       queue_item.tags = GetDlgItemText(IDC_EDIT_ANIME_TAGS);
       break;
-    case sync::kKitsu:
-    case sync::kAniList:
+    case sync::ServiceId::Kitsu:
+    case sync::ServiceId::AniList:
       queue_item.notes = GetDlgItemText(IDC_EDIT_ANIME_TAGS);
       break;
   }
@@ -612,7 +612,7 @@ bool PageMyInfo::Save() {
 
 bool PageMyInfo::IsAdvancedScoreInput() const {
   switch (sync::GetCurrentServiceId()) {
-    case sync::kAniList: {
+    case sync::ServiceId::AniList: {
       switch (sync::anilist::GetRatingSystem()) {
         case sync::anilist::RatingSystem::Point_100:
         case sync::anilist::RatingSystem::Point_10_Decimal:

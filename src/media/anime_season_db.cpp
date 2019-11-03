@@ -59,7 +59,7 @@ void SeasonDatabase::Reset() {
 }
 
 void SeasonDatabase::Review(bool hide_nsfw) {
-  if (sync::GetCurrentServiceId() == sync::kMyAnimeList) {
+  if (sync::GetCurrentServiceId() == sync::ServiceId::MyAnimeList) {
     return;
   }
 

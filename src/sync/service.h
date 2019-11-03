@@ -18,17 +18,23 @@
 
 #pragma once
 
+#include <array>
 #include <string>
 
 namespace sync {
 
-enum ServiceId {
-  kTaiga = 0,
-  kFirstService = 1,
-  kMyAnimeList = 1,
-  kKitsu = 2,
-  kAniList = 3,
-  kLastService = 3
+enum class ServiceId {
+  Taiga,
+  MyAnimeList,
+  Kitsu,
+  AniList,
+};
+
+constexpr std::array<ServiceId, 4> kServiceIds{
+  ServiceId::Taiga,
+  ServiceId::MyAnimeList,
+  ServiceId::Kitsu,
+  ServiceId::AniList
 };
 
 struct Rating {

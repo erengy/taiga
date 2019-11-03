@@ -29,7 +29,7 @@
 namespace anime {
 
 Item::Item() {
-  series_.uids.resize(sync::kLastService + 1);
+  series_.uids.resize(sync::kServiceIds.size());
 }
 
 Item::~Item() {
@@ -41,17 +41,17 @@ int Item::GetId() const {
   return series_.id;
 }
 
-const std::wstring& Item::GetId(enum_t service) const {
-  assert(series_.uids.size() > service);
+const std::wstring& Item::GetId(sync::ServiceId service) const {
+  assert(series_.uids.size() > static_cast<size_t>(service));
 
-  return series_.uids.at(service);
+  return series_.uids.at(static_cast<size_t>(service));
 }
 
 const std::wstring& Item::GetSlug() const {
   return series_.slug;
 }
 
-enum_t Item::GetSource() const {
+sync::ServiceId Item::GetSource() const {
   return series_.source;
 }
 
@@ -135,13 +135,10 @@ const time_t Item::GetLastModified() const {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void Item::SetId(const std::wstring& id, enum_t service) {
-  if (series_.uids.size() < static_cast<size_t>(service) + 1)
-    series_.uids.resize(service + 1);
+void Item::SetId(const std::wstring& id, sync::ServiceId service) {
+  series_.uids.at(static_cast<size_t>(service)) = id;
 
-  series_.uids.at(service) = id;
-
-  if (service == 0) {
+  if (static_cast<size_t>(service) == 0) {
     series_.id = ToInt(id);
   }
 }
@@ -150,7 +147,7 @@ void Item::SetSlug(const std::wstring& slug) {
   series_.slug = slug;
 }
 
-void Item::SetSource(enum_t source) {
+void Item::SetSource(sync::ServiceId source) {
   series_.source = source;
 }
 

@@ -38,29 +38,29 @@ std::wstring GetCurrentServiceSlug() {
 
 ServiceId GetServiceIdBySlug(const std::wstring& slug) {
   static const std::map<std::wstring, ServiceId> services{
-    {L"myanimelist", kMyAnimeList},
-    {L"kitsu", kKitsu},
-    {L"anilist", kAniList},
+    {L"myanimelist", ServiceId::MyAnimeList},
+    {L"kitsu", ServiceId::Kitsu},
+    {L"anilist", ServiceId::AniList},
   };
 
   const auto it = services.find(slug);
-  return it != services.end() ? it->second : kTaiga;
+  return it != services.end() ? it->second : ServiceId::Taiga;
 }
 
 std::wstring GetServiceNameById(const ServiceId service_id) {
   switch (service_id) {
-    case kMyAnimeList: return L"MyAnimeList";
-    case kKitsu: return L"Kitsu";
-    case kAniList: return L"AniList";
+    case ServiceId::MyAnimeList: return L"MyAnimeList";
+    case ServiceId::Kitsu: return L"Kitsu";
+    case ServiceId::AniList: return L"AniList";
     default: return L"Taiga";
   }
 }
 
 std::wstring GetServiceSlugById(const ServiceId service_id) {
   switch (service_id) {
-    case kMyAnimeList: return L"myanimelist";
-    case kKitsu: return L"kitsu";
-    case kAniList: return L"anilist";
+    case ServiceId::MyAnimeList: return L"myanimelist";
+    case ServiceId::Kitsu: return L"kitsu";
+    case ServiceId::AniList: return L"anilist";
     default: return L"taiga";
   }
 }

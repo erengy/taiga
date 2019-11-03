@@ -31,7 +31,7 @@ namespace library {
 struct QueueItem;
 }
 namespace sync {
-enum ServiceId;
+enum class ServiceId;
 }
 namespace taiga {
 class HttpClient;
