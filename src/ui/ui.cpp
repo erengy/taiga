@@ -427,8 +427,8 @@ bool OnLibraryEntriesEditNotes(const std::vector<int> ids, std::wstring& notes) 
 ////////////////////////////////////////////////////////////////////////////////
 
 static bool AnimeListNeedsRefresh(const library::QueueItem& queue_item) {
-  return queue_item.mode == taiga::http::kServiceAddLibraryEntry ||
-         queue_item.mode == taiga::http::kServiceDeleteLibraryEntry ||
+  return queue_item.mode == library::QueueItemMode::Add ||
+         queue_item.mode == library::QueueItemMode::Delete ||
          queue_item.status ||
          queue_item.enable_rewatching;
 }

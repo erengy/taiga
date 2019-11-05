@@ -303,7 +303,7 @@ void EndWatching(Item& item, Episode episode) {
 bool IsDeletedFromList(const Item& item) {
   for (const auto& queue_item : library::queue.items)
     if (queue_item.anime_id == item.GetId())
-      if (queue_item.mode == taiga::http::kServiceDeleteLibraryEntry)
+      if (queue_item.mode == library::QueueItemMode::Delete)
         return true;
 
   return false;
@@ -367,10 +367,10 @@ void AddToQueue(const Item& item, const Episode& episode, bool change_status) {
 
   // Set update mode
   if (item.GetMyStatus() == kNotInList) {
-    queue_item.mode = taiga::http::kServiceAddLibraryEntry;
+    queue_item.mode = library::QueueItemMode::Add;
     change_status = true;
   } else {
-    queue_item.mode = taiga::http::kServiceUpdateLibraryEntry;
+    queue_item.mode = library::QueueItemMode::Update;
   }
 
   // Set rewatching status

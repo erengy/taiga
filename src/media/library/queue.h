@@ -41,10 +41,16 @@ enum class QueueSearch {
   Tags,
 };
 
+enum class QueueItemMode {
+  Add,
+  Delete,
+  Update,
+};
+
 struct QueueItem {
   bool enabled = true;
   int anime_id = 0;
-  int mode = 0;
+  QueueItemMode mode = QueueItemMode::Update;
   std::wstring reason;
   std::wstring time;
 
@@ -86,6 +92,9 @@ private:
   bool in_process_ = false;
   std::queue<anime::Episode> queue_;
 };
+
+QueueItemMode TranslateQueueItemModeFromString(const std::wstring& mode);
+std::wstring TranslateQueueItemModeToString(const QueueItemMode mode);
 
 inline Queue queue;
 inline ConfirmationQueue confirmation_queue;

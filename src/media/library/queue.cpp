@@ -68,7 +68,7 @@ void Queue::Add(QueueItem& item, bool save) {
 
   // Add to user list
   if (anime_item && !anime_item->IsInList())
-    if (item.mode != taiga::http::kServiceDeleteLibraryEntry)
+    if (item.mode != QueueItemMode::Delete)
       anime_item->AddtoUserList();
 
   // Validate values
@@ -76,7 +76,7 @@ void Queue::Add(QueueItem& item, bool save) {
     ValidateQueueItem(item, *anime_item);
   }
   switch (item.mode) {
-    case taiga::http::kServiceUpdateLibraryEntry:
+    case QueueItemMode::Update:
       if (!item.episode &&
           !item.score &&
           !item.status &&
@@ -95,8 +95,8 @@ void Queue::Add(QueueItem& item, bool save) {
   if (!updating) {
     for (auto it = items.rbegin(); it != items.rend(); ++it) {
       if (it->anime_id == item.anime_id && it->enabled) {
-        if (it->mode != taiga::http::kServiceAddLibraryEntry &&
-            it->mode != taiga::http::kServiceDeleteLibraryEntry) {
+        if (it->mode != QueueItemMode::Add &&
+            it->mode != QueueItemMode::Delete) {
           if (!item.episode || (!it->episode && it == items.rbegin())) {
             if (item.episode)
               it->episode = *item.episode;
@@ -119,7 +119,7 @@ void Queue::Add(QueueItem& item, bool save) {
             add_new_item = false;
           }
           if (!add_new_item) {
-            it->mode = taiga::http::kServiceUpdateLibraryEntry;
+            it->mode = QueueItemMode::Update;
             it->time = GetDate().to_string() + L" " + GetTime();
           }
           break;
@@ -383,6 +383,30 @@ void ConfirmationQueue::Process() {
   }
 
   in_process_ = false;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+QueueItemMode TranslateQueueItemModeFromString(const std::wstring& mode) {
+  if (mode == L"add") {
+    return QueueItemMode::Add;
+  } else if (mode == L"delete") {
+    return QueueItemMode::Delete;
+  } else {
+    return QueueItemMode::Update;
+  }
+}
+
+std::wstring TranslateQueueItemModeToString(const QueueItemMode mode) {
+  switch (mode) {
+    case QueueItemMode::Add:
+      return L"add";
+    case QueueItemMode::Delete:
+      return L"delete";
+    default:
+    case QueueItemMode::Update:
+      return L"update";
+  }
 }
 
 }  // namespace library

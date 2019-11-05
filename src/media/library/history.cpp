@@ -86,7 +86,7 @@ void History::ReadQueue(const XmlDocument& document) {
     QueueItem queue_item;
 
     queue_item.anime_id = item.attribute(L"anime_id").as_int(anime::ID_NOTINLIST);
-    queue_item.mode = TranslateModeFromString(item.attribute(L"mode").value());
+    queue_item.mode = TranslateQueueItemModeFromString(item.attribute(L"mode").value());
     queue_item.time = item.attribute(L"time").value();
 
     #define READ_ATTRIBUTE_BOOL(x, y) \
@@ -148,7 +148,8 @@ bool History::Save() {
     #define APPEND_ATTRIBUTE_DATE(x, y) \
         if (y) node_item.append_attribute(x) = (*y).to_string().c_str();
     node_item.append_attribute(L"anime_id") = queue_item.anime_id;
-    node_item.append_attribute(L"mode") = TranslateModeToString(queue_item.mode).c_str();
+    node_item.append_attribute(L"mode") =
+        TranslateQueueItemModeToString(queue_item.mode).c_str();
     node_item.append_attribute(L"time") = queue_item.time.c_str();
     APPEND_ATTRIBUTE(L"episode", queue_item.episode);
     APPEND_ATTRIBUTE(L"score", queue_item.score);
@@ -166,28 +167,6 @@ bool History::Save() {
 
   const auto path = taiga::GetPath(taiga::Path::UserHistory);
   return XmlSaveDocumentToFile(document, path);
-}
-
-int History::TranslateModeFromString(const std::wstring& mode) {
-  if (mode == L"add") {
-    return taiga::http::kServiceAddLibraryEntry;
-  } else if (mode == L"delete") {
-    return taiga::http::kServiceDeleteLibraryEntry;
-  } else {
-    return taiga::http::kServiceUpdateLibraryEntry;
-  }
-}
-
-std::wstring History::TranslateModeToString(int mode) {
-  switch (mode) {
-    case taiga::http::kServiceAddLibraryEntry:
-      return L"add";
-    case taiga::http::kServiceDeleteLibraryEntry:
-      return L"delete";
-    default:
-    case taiga::http::kServiceUpdateLibraryEntry:
-      return L"update";
-  }
 }
 
 }  // namespace library

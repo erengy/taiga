@@ -193,18 +193,18 @@ void HistoryDialog::RefreshList() {
 
     int icon = ui::kIcon16_ArrowUp;
     switch (it->mode) {
-      case taiga::http::kServiceAddLibraryEntry:
+      case library::QueueItemMode::Add:
         icon = ui::kIcon16_Plus;
         break;
-      case taiga::http::kServiceDeleteLibraryEntry:
+      case library::QueueItemMode::Delete:
         icon = ui::kIcon16_Cross;
         break;
     }
 
     std::wstring details;
-    if (it->mode == taiga::http::kServiceAddLibraryEntry)
+    if (it->mode == library::QueueItemMode::Add)
       AppendString(details, L"Add to list");
-    if (it->mode == taiga::http::kServiceDeleteLibraryEntry)
+    if (it->mode == library::QueueItemMode::Delete)
       AppendString(details, L"Remove from list");
     if (it->episode)
       AppendString(details, L"Episode: " + ui::TranslateNumber(*it->episode));

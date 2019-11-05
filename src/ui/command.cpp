@@ -439,7 +439,7 @@ void ExecuteCommand(const std::wstring& str, WPARAM wParam, LPARAM lParam) {
         queue_item.date_start = Date();
       if (value == 1 || value == 2)
         queue_item.date_finish = Date();
-      queue_item.mode = taiga::http::kServiceUpdateLibraryEntry;
+      queue_item.mode = library::QueueItemMode::Update;
       library::queue.Add(queue_item);
     }
 
@@ -455,7 +455,7 @@ void ExecuteCommand(const std::wstring& str, WPARAM wParam, LPARAM lParam) {
       library::QueueItem queue_item;
       queue_item.anime_id = anime_id;
       queue_item.date_start = anime_item->GetDateStart();
-      queue_item.mode = taiga::http::kServiceUpdateLibraryEntry;
+      queue_item.mode = library::QueueItemMode::Update;
       library::queue.Add(queue_item);
     }
 
@@ -471,7 +471,7 @@ void ExecuteCommand(const std::wstring& str, WPARAM wParam, LPARAM lParam) {
       library::QueueItem queue_item;
       queue_item.anime_id = anime_id;
       queue_item.date_finish = anime_item->GetDateEnd();
-      queue_item.mode = taiga::http::kServiceUpdateLibraryEntry;
+      queue_item.mode = library::QueueItemMode::Update;
       library::queue.Add(queue_item);
     }
 
@@ -490,7 +490,7 @@ void ExecuteCommand(const std::wstring& str, WPARAM wParam, LPARAM lParam) {
       library::QueueItem queue_item;
       queue_item.anime_id = anime_id;
       queue_item.date_finish = GetDate(last_updated);
-      queue_item.mode = taiga::http::kServiceUpdateLibraryEntry;
+      queue_item.mode = library::QueueItemMode::Update;
       library::queue.Add(queue_item);
     }
 
@@ -503,7 +503,7 @@ void ExecuteCommand(const std::wstring& str, WPARAM wParam, LPARAM lParam) {
       for (const auto& anime_id : anime_ids) {
         library::QueueItem queue_item;
         queue_item.anime_id = anime_id;
-        queue_item.mode = taiga::http::kServiceDeleteLibraryEntry;
+        queue_item.mode = library::QueueItemMode::Delete;
         library::queue.Add(queue_item);
       }
     }
@@ -541,7 +541,7 @@ void ExecuteCommand(const std::wstring& str, WPARAM wParam, LPARAM lParam) {
       library::QueueItem queue_item;
       queue_item.anime_id = anime_id;
       queue_item.score = ToInt(body);
-      queue_item.mode = taiga::http::kServiceUpdateLibraryEntry;
+      queue_item.mode = library::QueueItemMode::Update;
       library::queue.Add(queue_item);
     }
 
@@ -570,7 +570,7 @@ void ExecuteCommand(const std::wstring& str, WPARAM wParam, LPARAM lParam) {
           break;
       }
       queue_item.anime_id = anime_id;
-      queue_item.mode = taiga::http::kServiceUpdateLibraryEntry;
+      queue_item.mode = library::QueueItemMode::Update;
       library::queue.Add(queue_item);
     }
 
@@ -586,7 +586,7 @@ void ExecuteCommand(const std::wstring& str, WPARAM wParam, LPARAM lParam) {
         library::QueueItem queue_item;
         queue_item.anime_id = anime_id;
         queue_item.tags = tags;
-        queue_item.mode = taiga::http::kServiceUpdateLibraryEntry;
+        queue_item.mode = library::QueueItemMode::Update;
         library::queue.Add(queue_item);
       }
     }
@@ -602,7 +602,7 @@ void ExecuteCommand(const std::wstring& str, WPARAM wParam, LPARAM lParam) {
         library::QueueItem queue_item;
         queue_item.anime_id = anime_id;
         queue_item.notes = notes;
-        queue_item.mode = taiga::http::kServiceUpdateLibraryEntry;
+        queue_item.mode = library::QueueItemMode::Update;
         library::queue.Add(queue_item);
       }
     }

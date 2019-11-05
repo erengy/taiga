@@ -44,9 +44,6 @@ public:
 
 private:
   void ReadQueue(const XmlDocument& document);
-
-  int TranslateModeFromString(const std::wstring& mode);
-  std::wstring TranslateModeToString(int mode);
 };
 
 inline class History history;

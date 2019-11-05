@@ -525,7 +525,7 @@ bool PageMyInfo::Save() {
   // Create item
   library::QueueItem queue_item;
   queue_item.anime_id = anime_id_;
-  queue_item.mode = taiga::http::kServiceUpdateLibraryEntry;
+  queue_item.mode = library::QueueItemMode::Update;
 
   // Episodes watched
   queue_item.episode = GetDlgItemInt(IDC_EDIT_ANIME_PROGRESS);
