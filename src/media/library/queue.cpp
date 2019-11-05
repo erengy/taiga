@@ -191,9 +191,18 @@ void Queue::Check(bool automatic) {
   }
 
   updating = true;
-  ui::ChangeStatusText(L"Updating list... (" + anime::GetPreferredTitle(*anime_item) + L")");
 
-  sync::UpdateLibraryEntry(items[index]);
+  switch (items[index].mode) {
+    case QueueItemMode::Add:
+      sync::AddLibraryEntry(items[index]);
+      break;
+    case QueueItemMode::Delete:
+      sync::DeleteLibraryEntry(items[index].anime_id);
+      break;
+    case QueueItemMode::Update:
+      sync::UpdateLibraryEntry(items[index]);
+      break;
+  }
 }
 
 void Queue::Clear(bool save) {

@@ -174,6 +174,48 @@ void Synchronize() {
   }
 }
 
+void AddLibraryEntry(const library::QueueItem& queue_item) {
+  const auto anime_item = anime::db.Find(queue_item.anime_id);
+  if (!anime_item)
+    return;
+
+  ui::ChangeStatusText(L"{}: Updating anime list... ({})"_format(
+      sync::GetCurrentServiceName(), anime::GetPreferredTitle(*anime_item)));
+
+  switch (GetCurrentServiceId()) {
+    case ServiceId::MyAnimeList:
+      myanimelist::AddLibraryEntry(queue_item);
+      break;
+    case ServiceId::Kitsu:
+      kitsu::AddLibraryEntry(queue_item);
+      break;
+    case ServiceId::AniList:
+      anilist::AddLibraryEntry(queue_item);
+      break;
+  }
+}
+
+void DeleteLibraryEntry(const int id) {
+  const auto anime_item = anime::db.Find(id);
+  if (!anime_item)
+    return;
+
+  ui::ChangeStatusText(L"{}: Deleting anime from list... ({})"_format(
+      sync::GetCurrentServiceName(), anime::GetPreferredTitle(*anime_item)));
+
+  switch (GetCurrentServiceId()) {
+    case ServiceId::MyAnimeList:
+      myanimelist::DeleteLibraryEntry(id);
+      break;
+    case ServiceId::Kitsu:
+      kitsu::DeleteLibraryEntry(id);
+      break;
+    case ServiceId::AniList:
+      anilist::DeleteLibraryEntry(id);
+      break;
+  }
+}
+
 void UpdateLibraryEntry(const library::QueueItem& queue_item) {
   const auto anime_item = anime::db.Find(queue_item.anime_id);
   if (!anime_item)
