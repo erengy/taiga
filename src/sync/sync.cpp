@@ -34,12 +34,15 @@
 #include "taiga/settings.h"
 #include "ui/dialog.h"
 #include "ui/resource.h"
+#include "ui/translate.h"
 #include "ui/ui.h"
 
 namespace sync {
 
 bool AuthenticateUser() {
   ui::EnableDialogInput(ui::Dialog::Main, false);
+  ui::ChangeStatusText(L"{}: Authenticating user..."_format(
+      sync::GetCurrentServiceName()));
 
   switch (GetCurrentServiceId()) {
     case ServiceId::MyAnimeList:
@@ -58,6 +61,8 @@ bool AuthenticateUser() {
 
 void GetUser() {
   ui::EnableDialogInput(ui::Dialog::Main, false);
+  ui::ChangeStatusText(L"{}: Retrieving user information..."_format(
+      sync::GetCurrentServiceName()));
 
   switch (GetCurrentServiceId()) {
     case ServiceId::MyAnimeList:
@@ -73,6 +78,8 @@ void GetUser() {
 
 void GetLibraryEntries() {
   ui::EnableDialogInput(ui::Dialog::Main, false);
+  ui::ChangeStatusText(L"{}: Retrieving anime list..."_format(
+      sync::GetCurrentServiceName()));
 
   switch (GetCurrentServiceId()) {
     case ServiceId::MyAnimeList:
@@ -88,6 +95,9 @@ void GetLibraryEntries() {
 }
 
 void GetMetadataById(const int id) {
+  ui::ChangeStatusText(L"{}: Retrieving anime information..."_format(
+      sync::GetCurrentServiceName()));
+
   switch (GetCurrentServiceId()) {
     case ServiceId::MyAnimeList:
       myanimelist::GetMetadataById(id);
@@ -102,6 +112,10 @@ void GetMetadataById(const int id) {
 }
 
 void GetSeason(const anime::Season season) {
+  ui::EnableDialogInput(ui::Dialog::Seasons, false);
+  ui::ChangeStatusText(L"{}: Retrieving {} anime season..."_format(
+      sync::GetCurrentServiceName(), ui::TranslateSeason(season)));
+
   switch (GetCurrentServiceId()) {
     case ServiceId::MyAnimeList:
       myanimelist::GetSeason(season);
@@ -116,6 +130,9 @@ void GetSeason(const anime::Season season) {
 }
 
 void SearchTitle(const std::wstring& title, const int id) {
+  ui::ChangeStatusText(L"{}: Searching for \"{}\"..."_format(
+      sync::GetCurrentServiceName(), title));
+
   switch (GetCurrentServiceId()) {
     case ServiceId::MyAnimeList:
       myanimelist::SearchTitle(title);
@@ -158,6 +175,13 @@ void Synchronize() {
 }
 
 void UpdateLibraryEntry(const library::QueueItem& queue_item) {
+  const auto anime_item = anime::db.Find(queue_item.anime_id);
+  if (!anime_item)
+    return;
+
+  ui::ChangeStatusText(L"{}: Updating anime list... ({})"_format(
+      sync::GetCurrentServiceName(), anime::GetPreferredTitle(*anime_item)));
+
   switch (GetCurrentServiceId()) {
     case ServiceId::MyAnimeList:
       myanimelist::UpdateLibraryEntry(queue_item);

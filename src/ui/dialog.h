@@ -27,6 +27,7 @@ enum class Dialog {
   About,
   AnimeInformation,
   Main,
+  Seasons,
   Settings,
   Torrents,
   Update,

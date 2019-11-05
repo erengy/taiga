@@ -549,10 +549,6 @@ void SeasonDialog::EnableInput(bool enable) {
 }
 
 void SeasonDialog::GetData() {
-  EnableInput(false);
-  ui::ChangeStatusText(L"Retrieving latest data for " +
-      ui::TranslateSeason(anime::season_db.current_season) + L" anime season...");
-
   sync::GetSeason(anime::season_db.current_season);
 }
 

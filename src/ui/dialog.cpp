@@ -23,6 +23,7 @@
 #include "ui/dlg/dlg_about.h"
 #include "ui/dlg/dlg_anime_info.h"
 #include "ui/dlg/dlg_main.h"
+#include "ui/dlg/dlg_season.h"
 #include "ui/dlg/dlg_settings.h"
 #include "ui/dlg/dlg_torrent.h"
 #include "ui/dlg/dlg_update.h"
@@ -74,6 +75,9 @@ void EnableDialogInput(Dialog dialog, bool enable) {
   switch (dialog) {
     case Dialog::Main:
       DlgMain.EnableInput(enable);
+      break;
+    case Dialog::Seasons:
+      DlgSeason.EnableInput(enable);
       break;
     case Dialog::Torrents:
       DlgTorrent.EnableInput(enable);
