@@ -129,7 +129,7 @@ void GetSeason(const anime::Season season) {
   }
 }
 
-void SearchTitle(const std::wstring& title, const int id) {
+void SearchTitle(const std::wstring& title) {
   ui::ChangeStatusText(L"{}: Searching for \"{}\"..."_format(
       sync::GetCurrentServiceName(), title));
 

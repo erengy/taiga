@@ -37,7 +37,7 @@ void GetUser();
 void GetLibraryEntries();
 void GetMetadataById(const int id);
 void GetSeason(const anime::Season season);
-void SearchTitle(const std::wstring& title, const int id);
+void SearchTitle(const std::wstring& title);
 void Synchronize();
 void UpdateLibraryEntry(const library::QueueItem& queue_item);
 

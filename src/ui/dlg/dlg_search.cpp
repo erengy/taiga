@@ -244,7 +244,7 @@ void SearchDialog::Search(const std::wstring& title, bool local) {
     Meow.Search(title, anime_ids_);
     RefreshList();
   } else {
-    sync::SearchTitle(title, anime::ID_UNKNOWN);
+    sync::SearchTitle(title);
   }
 }
 
