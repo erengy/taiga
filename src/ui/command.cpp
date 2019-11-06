@@ -697,9 +697,10 @@ void ExecuteCommand(const std::wstring& str, WPARAM wParam, LPARAM lParam) {
     anime::season_db.Set(anime::Season(body));
     taiga::settings.SetAppSeasonsLastSeason(
         ui::TranslateSeason(anime::season_db.current_season));
-    ui::OnSeasonLoad(false);
     if (anime::season_db.items.empty()) {
-      ui::DlgSeason.GetData();
+      sync::GetSeason(anime::season_db.current_season);
+    } else {
+      ui::OnLibraryGetSeason();
     }
 
   // Season_GroupBy(group)
@@ -721,9 +722,7 @@ void ExecuteCommand(const std::wstring& str, WPARAM wParam, LPARAM lParam) {
   //   lParam is a pointer to a vector of anime IDs.
   } else if (command == L"Season_RefreshItemData") {
     const auto& anime_ids = *reinterpret_cast<std::vector<int>*>(lParam);
-    for (const auto& anime_id : anime_ids) {
-      ui::DlgSeason.RefreshData(anime_id);
-    }
+    ui::DlgSeason.RefreshData(anime_ids);
 
   // Season_ViewAs(mode)
   //   Changes view mode.

@@ -116,7 +116,7 @@ BOOL SeasonDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
   switch (LOWORD(wParam)) {
     // Refresh data
     case 101:
-      GetData();
+      sync::GetSeason(anime::season_db.current_season);
       return TRUE;
   }
 
@@ -547,34 +547,16 @@ void SeasonDialog::EnableInput(bool enable) {
   list_.Enable(enable);
 }
 
-void SeasonDialog::GetData() {
-  sync::GetSeason(anime::season_db.current_season);
-}
+void SeasonDialog::RefreshData(const std::vector<int>& anime_ids) {
+  for (const auto& id : anime_ids) {
+    sync::GetMetadataById(id);
 
-void SeasonDialog::RefreshData(int anime_id) {
-  ui::SetSharedCursor(IDC_WAIT);
-
-  for (const auto& id : anime::season_db.items) {
-    if (anime_id > 0 && anime_id != id)
-      continue;
-
-    auto anime_item = anime::db.Find(id);
-    if (!anime_item)
-      continue;
-
-    // Download missing image
-    if (anime_id > 0) {
-      sync::DownloadImage(anime_id, anime_item->GetImageUrl());
-    } else {
-      ui::image_db.Load(id, true, true);
+    if (const auto anime_item = anime::db.Find(id)) {
+      if (!anime_item->GetImageUrl().empty()) {
+        sync::DownloadImage(id, anime_item->GetImageUrl());
+      }
     }
-
-    // Get details
-    if (anime_id > 0 || anime::MetadataNeedsRefresh(*anime_item))
-      sync::GetMetadataById(id);
   }
-
-  ui::SetSharedCursor(IDC_ARROW);
 }
 
 void SeasonDialog::RefreshList(bool redraw_only) {

@@ -624,42 +624,6 @@ void OnRecognitionFail() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void OnSeasonLoad(bool refresh) {
-  DlgSeason.RefreshList();
-  DlgSeason.RefreshStatus();
-  DlgSeason.RefreshToolbar();
-  DlgSeason.EnableInput();
-
-  if (refresh && OnSeasonRefreshRequired())
-    DlgSeason.RefreshData();
-}
-
-void OnSeasonLoadFail() {
-  ChangeStatusText(L"Could not load anime season data.");
-  DlgSeason.EnableInput();
-}
-
-bool OnSeasonRefreshRequired() {
-  win::TaskDialog dlg;
-  std::wstring title = L"Season - " + ui::TranslateSeason(anime::season_db.current_season);
-  dlg.SetWindowTitle(title.c_str());
-  dlg.SetMainIcon(TD_ICON_INFORMATION);
-  dlg.SetMainInstruction(L"Would you like to refresh this season's data?");
-  const auto service_name = sync::GetCurrentServiceName();
-  std::wstring content =
-      L"Taiga will connect to " + service_name + L" to retrieve missing "
-      L"information and images. Note that it may take about a minute until "
-      L"Taiga gets all the data.";
-  dlg.SetContent(content.c_str());
-  dlg.AddButton(L"Yes", IDYES);
-  dlg.AddButton(L"No", IDNO);
-  dlg.Show(DlgMain.GetWindowHandle());
-
-  return dlg.GetSelectedButtonID() == IDYES;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
 void OnSettingsAccountEmpty() {
   win::TaskDialog dlg(TAIGA_APP_NAME, TD_ICON_INFORMATION);
   dlg.SetMainInstruction(L"Would you like to set your account information?");

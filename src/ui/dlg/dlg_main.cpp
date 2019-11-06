@@ -24,6 +24,7 @@
 #include "media/anime.h"
 #include "media/anime_db.h"
 #include "media/anime_util.h"
+#include "media/anime_season_db.h"
 #include "media/library/queue.h"
 #include "ui/resource.h"
 #include "sync/myanimelist_util.h"
@@ -486,7 +487,7 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
               return TRUE;
             case kSidebarItemSeasons:
               // Refresh season data
-              DlgSeason.RefreshData();
+              sync::GetSeason(anime::season_db.current_season);
               return TRUE;
             case kSidebarItemFeeds: {
               // Check new torrents

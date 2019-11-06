@@ -59,8 +59,7 @@ public:
   LRESULT OnToolbarNotify(LPARAM lParam);
 
   void EnableInput(bool enable = true);
-  void GetData();
-  void RefreshData(int anime_id = 0);
+  void RefreshData(const std::vector<int>& anime_ids);
   void RefreshList(bool redraw_only = false);
   void RefreshStatus();
   void RefreshToolbar();
