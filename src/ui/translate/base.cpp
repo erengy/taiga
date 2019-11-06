@@ -48,8 +48,8 @@ std::wstring TranslateDate(const Date& date) {
 
 std::wstring TranslateDateRange(const std::pair<Date, Date>& range) {
   const auto& [a, b] = range;
-  return L"{} {} to {} {}"_format(TranslateMonth(a.month()), b.year(),
-                                  TranslateMonth(a.month()), b.year());
+  return L"{} {} to {} {}"_format(TranslateMonth(a.month()), a.year(),
+                                  TranslateMonth(b.month()), b.year());
 }
 
 std::wstring TranslateMonth(const int month) {
