@@ -226,6 +226,11 @@ public:
   void AddToQueue(QueuedRequest&& item) {
     std::lock_guard lock{mutex_};
 
+    if (shutdown_) {
+      LOGD(L"Shutting down...");
+      return;
+    }
+
     const auto& authority = item.request.target().uri.authority;
 
     if (!authority) {
@@ -241,10 +246,6 @@ public:
     std::lock_guard lock{mutex_};
 
     if (queue_.empty()) {
-      return;
-    }
-    if (shutdown_) {
-      LOGD(L"Shutting down...");
       return;
     }
     if (ReachedMaxConnections()) {
