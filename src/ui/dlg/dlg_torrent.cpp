@@ -135,6 +135,8 @@ BOOL TorrentDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
       DlgMain.edit.SetText(L"");
       if (GetKeyState(VK_CONTROL) & 0x8000) {
         auto& feed = track::aggregator.GetFeed();
+        if (feed.channel.link.empty())
+          feed.channel.link = taiga::settings.GetTorrentDiscoverySource();
         feed.Load();
         track::aggregator.ExamineData(feed);
         RefreshList();

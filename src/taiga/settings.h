@@ -49,8 +49,6 @@ public:
   bool Load();
   bool Save();
 
-  void DoAfterLoad();
-
   void ApplyChanges();
   bool HandleCompatibility();
 

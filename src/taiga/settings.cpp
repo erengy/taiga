@@ -283,13 +283,6 @@ bool Settings::SerializeToXml(const std::wstring& path) const {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// @TODO: Remove
-void Settings::DoAfterLoad() {
-  // Torrent filters
-  auto& feed = track::aggregator.GetFeed();
-  feed.channel.link = GetTorrentDiscoverySource();
-}
-
 void Settings::ApplyChanges() {
   if (changed_account_or_service_) {
     anime::db.LoadList();

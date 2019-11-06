@@ -155,11 +155,9 @@ void App::Uninitialize() {
 void App::LoadData() {
   track::media_players.Load();
 
-  if (settings.Load()) {
-    settings.DoAfterLoad();
+  if (settings.Load())
     if (settings.HandleCompatibility())
       settings.Save();
-  }
 
   ui::Theme.Load();
   ui::Menus.Load();
