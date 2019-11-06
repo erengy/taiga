@@ -159,7 +159,7 @@ static void SendRequest(Request request,
     on_response(response);
   }
 
-  // @TODO: pool.ProcessQueue();
+  ProcessQueue();
 };
 
 class Client final {
@@ -398,6 +398,10 @@ static detail::Pool pool;
 
 void Init() {
   hypr::init();
+}
+
+void ProcessQueue() {
+  pool.ProcessQueue();
 }
 
 void Shutdown() {

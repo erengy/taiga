@@ -48,6 +48,7 @@ using ResponseCallback = std::function<void(const Response&)>;
 using TransferCallback = std::function<bool(const Transfer&)>;
 
 void Init();
+void ProcessQueue();
 void Shutdown();
 
 void Send(const Request& request,
