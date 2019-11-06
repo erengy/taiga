@@ -32,6 +32,20 @@ struct QueueItem;
 
 namespace sync {
 
+enum class RequestType {
+  RequestAccessToken,
+  RefreshAccessToken,
+  AuthenticateUser,
+  GetUser,
+  GetMetadataById,
+  GetSeason,
+  SearchTitle,
+  AddLibraryEntry,
+  DeleteLibraryEntry,
+  GetLibraryEntries,
+  UpdateLibraryEntry,
+};
+
 bool AuthenticateUser();
 void GetUser();
 void GetLibraryEntries();
@@ -49,11 +63,9 @@ bool UserAuthenticated();
 void InvalidateUserAuthentication();
 bool IsUserAccountAvailable();
 
-void AfterGetLibrary();
-void AfterGetSeason();
-void AfterLibraryUpdate();
-
-bool OnTransfer(const hypr::detail::Transfer& transfer,
+void OnError(const RequestType type);
+bool OnTransfer(const RequestType type, const hypr::detail::Transfer& transfer,
                 const std::wstring& status);
+void OnResponse(const RequestType type);
 
 }  // namespace sync

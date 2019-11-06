@@ -293,42 +293,98 @@ bool IsUserAccountAvailable() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void AfterGetLibrary() {
-  anime::db.SaveDatabase();
-  anime::db.SaveList();
-
-  ui::ChangeStatusText(L"Successfully downloaded the list.");
-  ui::OnLibraryChange();
-}
-
-void AfterGetSeason() {
-  anime::season_db.Review();
-
-  ui::ClearStatusText();
-  ui::OnLibraryGetSeason();
-
-  for (const auto& anime_id : anime::season_db.items) {
-    ui::image_db.Load(anime_id, true, true);
+bool HasProgress(const RequestType type) {
+  switch (type) {
+    case RequestType::RequestAccessToken:
+    case RequestType::RefreshAccessToken:
+    case RequestType::AuthenticateUser:
+    case RequestType::GetUser:
+    case RequestType::GetMetadataById:
+    case RequestType::GetSeason:
+    case RequestType::SearchTitle:
+    case RequestType::AddLibraryEntry:
+    case RequestType::DeleteLibraryEntry:
+    case RequestType::GetLibraryEntries:
+    case RequestType::UpdateLibraryEntry:
+    default:
+      return true;
   }
 }
 
-void AfterLibraryUpdate() {
-  library::queue.updating = false;
-  ui::ClearStatusText();
+void OnError(const RequestType type) {
+  if (HasProgress(type)) {
+    ui::taskbar_list.SetProgressState(TBPF_NOPROGRESS);
+  }
 
-  if (const auto queue_item = library::queue.GetCurrentItem()) {
-    anime::db.UpdateItem(*queue_item);
-    anime::db.SaveList();
-    library::queue.Remove();
-    library::queue.Check(false);
+  switch (type) {
+    default:
+      ui::EnableDialogInput(ui::Dialog::Main, true);
+      break;
+    case RequestType::GetSeason:
+      ui::EnableDialogInput(ui::Dialog::Seasons, true);
+      break;
   }
 }
 
-bool OnTransfer(const taiga::http::Transfer& transfer,
+bool OnTransfer(const RequestType type, const taiga::http::Transfer& transfer,
                 const std::wstring& status) {
-  ui::ChangeStatusText(
-      L"{} ({})"_format(status, taiga::http::util::to_string(transfer)));
+  if (HasProgress(type)) {
+    if (transfer.current == transfer.total) {
+      ui::taskbar_list.SetProgressState(TBPF_NOPROGRESS);
+    } else if (transfer.total) {
+      ui::taskbar_list.SetProgressValue(transfer.current, transfer.total);
+    } else {
+      ui::taskbar_list.SetProgressState(TBPF_INDETERMINATE);
+    }
+
+    ui::ChangeStatusText(
+        L"{} ({})"_format(status, taiga::http::util::to_string(transfer)));
+  }
+
   return true;
+}
+
+void OnResponse(const RequestType type) {
+  if (HasProgress(type)) {
+    ui::taskbar_list.SetProgressState(TBPF_NOPROGRESS);
+    ui::ClearStatusText();
+  }
+
+  switch (type) {
+    case RequestType::RequestAccessToken:
+    case RequestType::RefreshAccessToken:
+      ui::EnableDialogInput(ui::Dialog::Main, true);
+      break;
+
+    case RequestType::AuthenticateUser:
+      ui::OnLogin();
+      sync::Synchronize();
+      break;
+
+    case RequestType::GetLibraryEntries:
+      anime::db.SaveDatabase();
+      anime::db.SaveList();
+      ui::ChangeStatusText(L"Successfully downloaded anime list.");
+      ui::OnLibraryChange();
+      break;
+
+    case RequestType::GetSeason:
+      anime::season_db.Review();
+      ui::OnLibraryGetSeason();
+      ui::image_db.Load(anime::season_db.items);
+      ui::EnableDialogInput(ui::Dialog::Seasons, true);
+      break;
+
+    case RequestType::UpdateLibraryEntry:
+      library::queue.updating = false;
+      if (const auto queue_item = library::queue.GetCurrentItem()) {
+        anime::db.UpdateItem(*queue_item);
+        anime::db.SaveList();
+        library::queue.Remove();
+        library::queue.Check(false);
+      }
+      break;
+  }
 }
 
 }  // namespace sync
