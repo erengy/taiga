@@ -126,10 +126,6 @@ void OnLibraryChange() {
   DlgMain.EnableInput(true);
 }
 
-void OnLibraryChangeFailure() {
-  DlgMain.EnableInput(true);
-}
-
 void OnLibraryEntryAdd(int id) {
   if (DlgAnime.GetCurrentId() == id)
     DlgAnime.Refresh(false, false, true, false);
@@ -190,23 +186,13 @@ void OnLibraryGetSeason() {
   DlgSeason.RefreshList();
   DlgSeason.RefreshStatus();
   DlgSeason.RefreshToolbar();
-  DlgSeason.EnableInput();
 }
 
-void OnLibrarySearchTitle(int id, const std::wstring& results) {
-  std::vector<std::wstring> split_vector;
-  Split(results, L",", split_vector);
-  RemoveEmptyStrings(split_vector);
-
-  std::vector<int> ids;
-  for (const auto& id_str : split_vector) {
-    int id = ToInt(id_str);
-    ids.push_back(id);
+void OnLibrarySearchTitle(const std::vector<int> ids) {
+  for (const auto id : ids) {
     OnLibraryEntryChange(id);
   }
-
-  if (id == anime::ID_UNKNOWN)
-    DlgSearch.ParseResults(ids);
+  DlgSearch.ParseResults(ids);
 }
 
 void OnLibraryEntryChangeFailure(int id) {
@@ -885,10 +871,6 @@ void OnLogin() {
 
   DlgMain.UpdateTip();
   DlgMain.UpdateTitle();
-  DlgMain.EnableInput(true);
-}
-
-void OnLogout() {
   DlgMain.EnableInput(true);
 }
 

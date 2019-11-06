@@ -37,12 +37,12 @@ enum class RequestType {
   RefreshAccessToken,
   AuthenticateUser,
   GetUser,
+  GetLibraryEntries,
   GetMetadataById,
   GetSeason,
   SearchTitle,
   AddLibraryEntry,
   DeleteLibraryEntry,
-  GetLibraryEntries,
   UpdateLibraryEntry,
 };
 
@@ -67,5 +67,7 @@ void OnError(const RequestType type);
 bool OnTransfer(const RequestType type, const hypr::detail::Transfer& transfer,
                 const std::wstring& status);
 void OnResponse(const RequestType type);
+
+void OnInvalidAnimeId(const int id);
 
 }  // namespace sync

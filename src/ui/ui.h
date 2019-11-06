@@ -68,13 +68,12 @@ void DisplayErrorMessage(const std::wstring& text, const std::wstring& caption);
 bool EnterAuthorizationPin(const std::wstring& service, std::wstring& auth_pin);
 
 void OnLibraryChange();
-void OnLibraryChangeFailure();
 void OnLibraryEntryAdd(int id);
 void OnLibraryEntryChange(int id);
 void OnLibraryEntryDelete(int id);
 void OnLibraryEntryImageChange(int id);
 void OnLibraryGetSeason();
-void OnLibrarySearchTitle(int id, const std::wstring& results);
+void OnLibrarySearchTitle(const std::vector<int> ids);
 void OnLibraryEntryChangeFailure(int id);
 void OnLibraryUpdateFailure(int id, const std::wstring& reason, bool not_approved);
 
@@ -127,7 +126,6 @@ void OnMalRequestAccessToken(bool success);
 bool OnTwitterTokenEntry(std::wstring& auth_pin);
 
 void OnLogin();
-void OnLogout();
 
 void OnUpdateAvailable();
 void OnUpdateNotAvailable(bool relations = false);

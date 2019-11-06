@@ -46,7 +46,7 @@ bool AuthenticateUser() {
 
   switch (GetCurrentServiceId()) {
     case ServiceId::MyAnimeList:
-      myanimelist::AuthenticateUser();
+      myanimelist::RefreshAccessToken();
       break;
     case ServiceId::Kitsu:
       kitsu::AuthenticateUser();
@@ -299,12 +299,12 @@ bool HasProgress(const RequestType type) {
     case RequestType::RefreshAccessToken:
     case RequestType::AuthenticateUser:
     case RequestType::GetUser:
+    case RequestType::GetLibraryEntries:
     case RequestType::GetMetadataById:
     case RequestType::GetSeason:
     case RequestType::SearchTitle:
     case RequestType::AddLibraryEntry:
     case RequestType::DeleteLibraryEntry:
-    case RequestType::GetLibraryEntries:
     case RequestType::UpdateLibraryEntry:
     default:
       return true;
@@ -317,11 +317,19 @@ void OnError(const RequestType type) {
   }
 
   switch (type) {
-    default:
+    case RequestType::RefreshAccessToken:
+    case RequestType::AuthenticateUser:
+    case RequestType::GetUser:
+    case RequestType::GetLibraryEntries:
       ui::EnableDialogInput(ui::Dialog::Main, true);
       break;
     case RequestType::GetSeason:
       ui::EnableDialogInput(ui::Dialog::Seasons, true);
+      break;
+    case RequestType::AddLibraryEntry:
+    case RequestType::DeleteLibraryEntry:
+    case RequestType::UpdateLibraryEntry:
+      library::queue.updating = false;
       break;
   }
 }
@@ -352,20 +360,27 @@ void OnResponse(const RequestType type) {
 
   switch (type) {
     case RequestType::RequestAccessToken:
+      break;
+
     case RequestType::RefreshAccessToken:
       ui::EnableDialogInput(ui::Dialog::Main, true);
       break;
 
     case RequestType::AuthenticateUser:
       ui::OnLogin();
-      sync::Synchronize();
+      break;
+
+    case RequestType::GetUser:
+      ui::OnLogin();
       break;
 
     case RequestType::GetLibraryEntries:
       anime::db.SaveDatabase();
       anime::db.SaveList();
-      ui::ChangeStatusText(L"Successfully downloaded anime list.");
       ui::OnLibraryChange();
+      break;
+
+    case RequestType::GetMetadataById:
       break;
 
     case RequestType::GetSeason:
@@ -375,6 +390,11 @@ void OnResponse(const RequestType type) {
       ui::EnableDialogInput(ui::Dialog::Seasons, true);
       break;
 
+    case RequestType::SearchTitle:
+      break;
+
+    case RequestType::AddLibraryEntry:
+    case RequestType::DeleteLibraryEntry:
     case RequestType::UpdateLibraryEntry:
       library::queue.updating = false;
       if (const auto queue_item = library::queue.GetCurrentItem()) {
@@ -384,6 +404,18 @@ void OnResponse(const RequestType type) {
         library::queue.Check(false);
       }
       break;
+  }
+}
+
+void OnInvalidAnimeId(const int id) {
+  if (const auto anime_item = anime::db.Find(id)) {
+    const bool in_list = anime_item->IsInList();
+    if (anime::db.DeleteItem(id)) {
+      anime::db.SaveDatabase();
+      if (in_list) {
+        anime::db.SaveList();
+      }
+    }
   }
 }
 

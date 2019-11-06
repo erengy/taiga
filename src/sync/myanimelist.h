@@ -34,7 +34,7 @@ constexpr auto kRedirectUrl = "https://taiga.moe/api/myanimelist/auth";
 
 void RequestAccessToken(const std::wstring& authorization_code,
                         const std::wstring& code_verifier);
-void AuthenticateUser();
+void RefreshAccessToken();
 void GetUser();
 void GetLibraryEntries(const int page_offset = 0);
 void GetMetadataById(const int id);
