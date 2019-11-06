@@ -26,6 +26,7 @@
 
 #include "base/file.h"
 #include "base/format.h"
+#include "base/log.h"
 #include "base/string.h"
 #include "media/anime_db.h"
 #include "track/episode.h"
@@ -67,6 +68,7 @@
 namespace ui {
 
 void ChangeStatusText(const std::wstring& status) {
+  LOGD(status);
   DlgMain.ChangeStatus(status);
 }
 
