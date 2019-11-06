@@ -105,13 +105,6 @@ static void Debug(const curl_infotype type, std::string_view data) {
   }
 }
 
-static void HandleError(const Response& response) {
-  if (!response.error()) {
-    return;
-  }
-  LOGE(util::to_string(response.error(), util::GetUrlHost(response.url())));
-}
-
 static void SendRequest(Request request,
                         const TransferCallback& on_transfer,
                         const ResponseCallback& on_response,
@@ -146,9 +139,8 @@ static void SendRequest(Request request,
 
   // @TODO: Do the rest in the main thread
 
-  HandleError(response);
-
   if (response.error()) {
+    LOGE(util::to_string(response.error(), util::GetUrlHost(response.url())));
     taiga::stats.connections_failed++;
   } else {
     taiga::stats.connections_succeeded++;
