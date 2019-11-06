@@ -35,7 +35,6 @@
 #include "taiga/announce.h"
 #include "taiga/path.h"
 #include "taiga/settings.h"
-#include "taiga/taiga.h"
 #include "taiga/timer.h"
 #include "track/feed_aggregator.h"
 #include "track/feed_filter.h"

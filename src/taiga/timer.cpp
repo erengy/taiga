@@ -28,6 +28,7 @@
 #include "taiga/announce.h"
 #include "taiga/settings.h"
 #include "taiga/stats.h"
+#include "taiga/taiga.h"
 #include "track/feed_aggregator.h"
 #include "track/media.h"
 #include "track/scanner.h"
@@ -54,7 +55,7 @@ Timer::Timer(unsigned int id, int interval, bool repeat)
 }
 
 void Timer::OnTimeout() {
-  if (interval() >= 60) {
+  if (interval() >= 60 && Taiga.options.verbose) {
     LOGD(L"ID: {}, Interval: {}", id(), this->interval());
   }
 

@@ -25,7 +25,6 @@
 #include "media/library/history.h"
 #include "media/library/queue.h"
 #include "taiga/resource.h"
-#include "taiga/taiga.h"
 #include "ui/dlg/dlg_history.h"
 #include "ui/dlg/dlg_main.h"
 #include "ui/command.h"

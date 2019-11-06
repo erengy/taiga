@@ -33,7 +33,6 @@
 #include "sync/service.h"
 #include "taiga/resource.h"
 #include "taiga/settings.h"
-#include "taiga/taiga.h"
 #include "taiga/timer.h"
 #include "track/play.h"
 #include "ui/dlg/dlg_anime_list.h"

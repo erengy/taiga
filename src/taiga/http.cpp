@@ -53,8 +53,8 @@ static hypr::Options GetOptions() {
   // Complete connection within 30 seconds (default is 300 seconds)
   options.timeout = std::chrono::seconds{30};
 
-  // Enable debug mode to log requests and responses
-  options.verbose = Taiga.options.debug_mode;
+  // Log verbose information about libcurl's operations
+  options.verbose = Taiga.options.debug_mode && Taiga.options.verbose;
 
 #ifdef _DEBUG
   // Skip SSL verifications in debug build
@@ -256,7 +256,9 @@ public:
       return;
     }
     if (ReachedMaxConnections()) {
-      LOGD(L"Reached max connections");
+      if (Taiga.options.verbose) {
+        LOGD(L"Reached max connections");
+      }
       return;
     }
 
@@ -265,7 +267,9 @@ public:
         const auto& item = items[i];
 
         if (ReachedMaxConnections(host)) {
-          LOGD(L"Reached max connections for host: {}", StrToWstr(host));
+          if (Taiga.options.verbose) {
+            LOGD(L"Reached max connections for host: {}", StrToWstr(host));
+          }
           break;
         }
 
@@ -297,14 +301,18 @@ private:
     if (settings.GetAppConnectionReuseActive()) {
       for (auto& client : clients) {
         if (client.state() == Client::State::Ready) {
-          LOGD(L"Reusing client for {}", StrToWstr(host));
+          if (Taiga.options.verbose) {
+            LOGD(L"Reusing client for {}", StrToWstr(host));
+          }
           return client;
         }
       }
     }
 
     auto& client = clients.emplace_back();
-    LOGD(L"Created new client for {} ({})", StrToWstr(host), clients.size());
+    if (Taiga.options.verbose) {
+      LOGD(L"Created new client for {} ({})", StrToWstr(host), clients.size());
+    }
     return client;
   }
 

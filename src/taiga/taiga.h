@@ -27,6 +27,7 @@ namespace detail {
 struct CommandLineOptions {
   bool allow_multiple_instances = false;
   bool debug_mode = false;
+  bool verbose = false;
 };
 
 }  // namespace detail

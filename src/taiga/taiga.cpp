@@ -61,6 +61,9 @@ CommandLineOptions ParseCommandLine() {
     } else if (arg == L"debug") {
       options.debug_mode = true;
       found = true;
+    } else if (arg == L"verbose") {
+      options.verbose = true;
+      found = true;
     }
 
     if (found) {
