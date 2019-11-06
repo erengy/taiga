@@ -385,7 +385,7 @@ std::wstring to_string(const hypr::Error& error, const std::wstring& host) {
 std::wstring to_string(const Transfer& transfer) {
   if (transfer.total > 0) {
     const auto percentage = static_cast<float>(transfer.current) /
-                            static_cast<float>(transfer.total);
+                            static_cast<float>(transfer.total) * 100;
     return L"{}%"_format(percentage);
   } else {
     return ToSizeString(transfer.current);
