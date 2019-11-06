@@ -145,7 +145,6 @@ static void SendRequest(Request request,
   } else {
     taiga::stats.connections_succeeded++;
   }
-  ui::OnHttpReadComplete();
 
   if (on_response) {
     on_response(response);

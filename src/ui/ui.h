@@ -33,9 +33,6 @@ struct QueueItem;
 namespace sync {
 enum class ServiceId;
 }
-namespace taiga {
-class HttpClient;
-}
 namespace track {
 class Feed;
 }
@@ -69,11 +66,6 @@ int StatusToIcon(int status);
 
 void DisplayErrorMessage(const std::wstring& text, const std::wstring& caption);
 bool EnterAuthorizationPin(const std::wstring& service, std::wstring& auth_pin);
-
-void OnHttpError(const taiga::HttpClient& http_client, const std::wstring& error);
-void OnHttpHeadersAvailable(const taiga::HttpClient& http_client);
-void OnHttpProgress(const taiga::HttpClient& http_client);
-void OnHttpReadComplete();
 
 void OnLibraryChange();
 void OnLibraryChangeFailure();
