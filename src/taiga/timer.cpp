@@ -26,7 +26,6 @@
 #include "media/library/queue.h"
 #include "ui/resource.h"
 #include "taiga/announce.h"
-#include "taiga/http.h"
 #include "taiga/settings.h"
 #include "taiga/stats.h"
 #include "track/feed_aggregator.h"

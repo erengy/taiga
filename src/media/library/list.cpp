@@ -24,7 +24,6 @@
 #include "media/anime_util.h"
 #include "media/library/queue.h"
 #include "sync/service.h"
-#include "taiga/http.h"
 #include "taiga/path.h"
 #include "taiga/settings.h"
 #include "taiga/version.h"

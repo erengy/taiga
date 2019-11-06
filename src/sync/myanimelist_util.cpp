@@ -32,7 +32,6 @@
 #include "sync/myanimelist.h"
 #include "sync/myanimelist_util.h"
 #include "sync/service.h"
-#include "taiga/http.h"
 #include "taiga/settings.h"
 
 namespace sync {

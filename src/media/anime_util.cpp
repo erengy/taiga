@@ -33,7 +33,6 @@
 #include "media/library/queue.h"
 #include "sync/sync.h"
 #include "taiga/announce.h"
-#include "taiga/http.h"
 #include "taiga/path.h"
 #include "taiga/settings.h"
 #include "taiga/taiga.h"

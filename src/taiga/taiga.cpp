@@ -30,7 +30,6 @@
 #include "taiga/config.h"
 #include "taiga/dummy.h"
 #include "taiga/http.h"
-#include "taiga/http.h"
 #include "taiga/resource.h"
 #include "taiga/settings.h"
 #include "taiga/taiga.h"

@@ -25,7 +25,6 @@
 #include "base/xml.h"
 #include "media/library/queue.h"
 #include "media/anime_db.h"
-#include "taiga/http.h"
 #include "taiga/path.h"
 #include "taiga/version.h"
 #include "ui/ui.h"
