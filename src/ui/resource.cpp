@@ -29,93 +29,77 @@
 
 namespace ui {
 
-bool ImageDatabase::Load(int anime_id, bool load, bool download) {
-  if (!anime::IsValidId(anime_id))
-    return false;
+void ImageDatabase::Load(const int anime_id, const bool download) {
+  if (GetImage(anime_id))
+    return;
 
-  if (items_.find(anime_id) != items_.end()) {
-    if (anime::IsValidId(items_[anime_id].data)) {
-      return true;
-    } else if (!load) {
-      return false;
-    }
-  }
+  LoadFile(anime_id);
 
-  if (items_[anime_id].Load(anime::GetImagePath(anime_id))) {
-    items_[anime_id].data = anime_id;
-    if (download) {
-      // Refresh if current file is too old
-      auto anime_item = anime::db.Find(anime_id);
-      if (anime_item && anime_item->GetAiringStatus() != anime::kFinishedAiring) {
-        // Check last modified date (>= 7 days)
-        if (GetFileAge(anime::GetImagePath(anime_id)) / (60 * 60 * 24) >= 7) {
-          sync::DownloadImage(anime_id, anime_item->GetImageUrl());
-        }
-      }
-    }
-    return true;
-  } else {
-    items_[anime_id].data = -1;
-  }
+  const auto is_old_image = [](const anime::Item& anime_item) {
+    return (anime_item.GetAiringStatus() != anime::kFinishedAiring) &&
+           (GetFileAge(anime::GetImagePath(anime_item.GetId())) /
+                (60 * 60 * 24) >= 7);  // >= 7 days
+  };
 
   if (download) {
-    auto anime_item = anime::db.Find(anime_id);
-    if (anime_item)
-      sync::DownloadImage(anime_id, anime_item->GetImageUrl());
+    if (const auto anime_item = anime::db.Find(anime_id)) {
+      if (!anime::IsValidId(items_[anime_id].data) ||
+          is_old_image(*anime_item)) {
+        sync::DownloadImage(anime_id, anime_item->GetImageUrl());
+      }
+    }
   }
-
-  return false;
 }
 
-bool ImageDatabase::Reload(int anime_id) {
+void ImageDatabase::Load(const std::vector<int>& anime_ids) {
+  for (const auto anime_id : anime_ids) {
+    Load(anime_id, true);
+  }
+}
+
+bool ImageDatabase::LoadFile(const int anime_id) {
   if (!anime::IsValidId(anime_id))
     return false;
 
   if (items_[anime_id].Load(anime::GetImagePath(anime_id))) {
     items_[anime_id].data = anime_id;
-    return true;
   } else {
     items_[anime_id].data = -1;
   }
 
-  return false;
+  return anime::IsValidId(items_[anime_id].data);
 }
 
 void ImageDatabase::FreeMemory() {
-  for (const auto& [anime_id, anime_item] : ::anime::db.items) {
-    bool erase = true;
-
+  for (const auto& [anime_id, anime_item] : anime::db.items) {
     if (items_.find(anime_id) == items_.end())
       continue;
 
     if (ui::DlgAnime.GetCurrentId() == anime_id ||
-        ui::DlgNowPlaying.GetCurrentId() == anime_id)
-      erase = false;
+        ui::DlgNowPlaying.GetCurrentId() == anime_id) {
+      continue;
+    }
 
-    if (!anime::season_db.items.empty())
-      if (std::find(anime::season_db.items.begin(), anime::season_db.items.end(),
-                    anime_id) != anime::season_db.items.end())
-        if (ui::DlgSeason.IsVisible())
-          erase = false;
+    if (ui::DlgSeason.IsVisible()) {
+      const auto& items = anime::season_db.items;
+      if (std::find(items.begin(), items.end(), anime_id) != items.end())
+        continue;
+    }
 
-    if (erase)
-      items_.erase(anime_id);
+    items_.erase(anime_id);
   }
 }
 
 void ImageDatabase::Clear() {
   items_.clear();
-
-  std::wstring path = taiga::GetPath(taiga::Path::DatabaseImage);
-  DeleteFolder(path);
+  DeleteFolder(taiga::GetPath(taiga::Path::DatabaseImage));
 }
 
-base::Image* ImageDatabase::GetImage(int anime_id) {
-  if (items_.find(anime_id) != items_.end())
-    if (items_[anime_id].data > 0)
-      return &items_[anime_id];
-
-  return nullptr;
+base::Image* ImageDatabase::GetImage(const int anime_id) {
+  if (const auto it = items_.find(anime_id); it != items_.end()) {
+    return anime::IsValidId(it->second.data) ? &it->second : nullptr;
+  }
+  return LoadFile(anime_id) ? &items_[anime_id] : nullptr;
 }
 
 }  // namespace ui

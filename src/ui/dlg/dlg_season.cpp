@@ -327,8 +327,7 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
           rect_details.right, rect_image.bottom);
 
       // Draw image
-      if (ui::image_db.Load(anime_item->GetId(), false, false)) {
-        auto image = ui::image_db.GetImage(anime_item->GetId());
+      if (const auto image = ui::image_db.GetImage(anime_item->GetId())) {
         rect_image = ResizeRect(rect_image,
                                 image->rect.Width(),
                                 image->rect.Height(),

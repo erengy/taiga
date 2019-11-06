@@ -19,6 +19,7 @@
 #pragma once
 
 #include <map>
+#include <vector>
 
 #include "base/gfx.h"
 
@@ -30,16 +31,17 @@ public:
   virtual ~ImageDatabase() {}
 
   // Loads a picture into memory, downloads a new file if requested.
-  bool Load(int anime_id, bool load, bool download);
+  void Load(const int anime_id, const bool download);
+  void Load(const std::vector<int>& anime_ids);
 
-  bool Reload(int anime_id);
+  bool LoadFile(const int anime_id);
 
   // Releases image data from memory if an image is not in sight.
   void FreeMemory();
   void Clear();
 
   // Returns a pointer to requested image if available.
-  base::Image* GetImage(int anime_id);
+  base::Image* GetImage(const int anime_id);
 
 private:
   std::map<int, base::Image> items_;

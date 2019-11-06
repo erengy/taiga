@@ -159,8 +159,7 @@ BOOL AnimeDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         dc.FillRect(rect, ::GetSysColor(COLOR_WINDOW));
         rect.Inflate(-1, -1);
         // Paint image
-        auto image = ui::image_db.GetImage(anime_id_);
-        if (anime::IsValidId(anime_id_) && image) {
+        if (const auto image = ui::image_db.GetImage(anime_id_)) {
           dc.SetStretchBltMode(HALFTONE);
           dc.StretchBlt(rect.left, rect.top, rect.Width(), rect.Height(),
                         image->dc.Get(),
@@ -517,7 +516,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
 
   // Load image
   if (image) {
-    ui::image_db.Load(anime_id_, true, connect);
+    ui::image_db.Load(anime_id_, connect);
     win::Rect rect;
     GetClientRect(&rect);
     SIZE size = {rect.Width(), rect.Height()};
@@ -756,8 +755,7 @@ void AnimeDialog::UpdateControlPositions(const SIZE* size) {
   if (current_page_ != AnimePageType::None) {
     win::Rect rect_image = rect;
     rect_image.right = rect_image.left + ScaleX(150);
-    auto image = ui::image_db.GetImage(anime_id_);
-    if (image) {
+    if (const auto image = ui::image_db.GetImage(anime_id_)) {
       rect_image = ResizeRect(rect_image,
                               image->rect.Width(), image->rect.Height(),
                               true, true, false);
