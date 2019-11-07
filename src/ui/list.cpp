@@ -83,7 +83,8 @@ int SortAsText(LPCWSTR str1, LPCWSTR str2) {
 ////////////////////////////////////////////////////////////////////////////////
 
 int SortListByAiringStatus(const anime::Item& item1, const anime::Item& item2) {
-  return CompareValues<int>(item1.GetAiringStatus(), item2.GetAiringStatus());
+  return CompareValues<int>(static_cast<int>(item1.GetAiringStatus()),
+                            static_cast<int>(item2.GetAiringStatus()));
 }
 
 int SortListByMyDate(const Date& date1, const Date& date2) {

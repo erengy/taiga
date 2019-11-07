@@ -82,17 +82,17 @@ int TranslateEpisodeLengthFrom(int value) {
   return std::chrono::duration_cast<std::chrono::minutes>(seconds).count();
 }
 
-int TranslateSeriesStatusFrom(const std::wstring& value) {
+anime::SeriesStatus TranslateSeriesStatusFrom(const std::wstring& value) {
   if (IsEqual(value, L"currently_airing")) {
-    return anime::kAiring;
+    return anime::SeriesStatus::Airing;
   } else if (IsEqual(value, L"finished_airing")) {
-    return anime::kFinishedAiring;
+    return anime::SeriesStatus::FinishedAiring;
   } else if (IsEqual(value, L"not_yet_aired")) {
-    return anime::kNotYetAired;
+    return anime::SeriesStatus::NotYetAired;
   }
 
   LOGW(L"Invalid value: {}", value);
-  return anime::kUnknownStatus;
+  return anime::SeriesStatus::Unknown;
 }
 
 anime::SeriesType TranslateSeriesTypeFrom(const std::wstring& value) {

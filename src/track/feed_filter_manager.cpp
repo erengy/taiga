@@ -180,7 +180,7 @@ void FeedFilterManager::InitializePresets() {
   ADD_PRESET(kFeedFilterActionSelect, kFeedFilterMatchAll, true, kFeedFilterOptionDefault,
       L"Select airing anime in plan to watch",
       L"Selects files that belong to an airing anime that you're planning to watch");
-  ADD_CONDITION(kFeedFilterElement_Meta_Status, kFeedFilterOperator_Equals, ToWstr(anime::kAiring));
+  ADD_CONDITION(kFeedFilterElement_Meta_Status, kFeedFilterOperator_Equals, ToWstr(static_cast<int>(anime::SeriesStatus::Airing)));
   ADD_CONDITION(kFeedFilterElement_User_Status, kFeedFilterOperator_Equals, ToWstr(anime::kPlanToWatch));
 
   // Discard dropped
@@ -464,7 +464,7 @@ std::wstring FeedFilterManager::TranslateValue(
     case kFeedFilterElement_User_Status:
       return ui::TranslateMyStatus(ToInt(condition.value), false);
     case kFeedFilterElement_Meta_Status:
-      return ui::TranslateStatus(ToInt(condition.value));
+      return ui::TranslateStatus(static_cast<anime::SeriesStatus>(ToInt(condition.value)));
     case kFeedFilterElement_Meta_Type:
       return ui::TranslateType(static_cast<anime::SeriesType>(ToInt(condition.value)));
     default:

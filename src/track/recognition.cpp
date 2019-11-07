@@ -172,9 +172,9 @@ int Engine::Identify(anime::Episode& episode, bool give_score,
         if (anime_item) {
           const int last_episode = [&anime_item]() {
             switch (anime_item->GetAiringStatus()) {
-              case anime::kFinishedAiring:
+              case anime::SeriesStatus::FinishedAiring:
                 return anime_item->GetEpisodeCount();
-              case anime::kAiring:
+              case anime::SeriesStatus::Airing:
                 return anime::GetLastEpisodeNumber(*anime_item);
               default:
                 return 0;

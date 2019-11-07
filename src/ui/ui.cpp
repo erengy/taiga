@@ -80,13 +80,13 @@ void SetSharedCursor(LPCWSTR name) {
                                                 0, 0, LR_SHARED)));
 }
 
-int StatusToIcon(int status) {
+int StatusToIcon(anime::SeriesStatus status) {
   switch (status) {
-    case anime::kAiring:
+    case anime::SeriesStatus::Airing:
       return kIcon16_Green;
-    case anime::kFinishedAiring:
+    case anime::SeriesStatus::FinishedAiring:
       return kIcon16_Blue;
-    case anime::kNotYetAired:
+    case anime::SeriesStatus::NotYetAired:
       return kIcon16_Red;
     default:
       return kIcon16_Gray;

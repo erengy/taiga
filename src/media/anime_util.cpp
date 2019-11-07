@@ -62,34 +62,34 @@ SeriesStatus GetAiringStatus(const Item& item) {
   const Date now = GetDateJapan();
 
   if (!IsValidDate(item.GetDateStart()))
-    return kNotYetAired;
+    return SeriesStatus::NotYetAired;
   const Date start = assume_worst_case(item.GetDateStart());
   if (now < start)
-    return kNotYetAired;
+    return SeriesStatus::NotYetAired;
 
   // We don't need to check the end date for single-episode anime
   if (item.GetEpisodeCount() == 1)
-    return kFinishedAiring;
+    return SeriesStatus::FinishedAiring;
 
   if (!IsValidDate(item.GetDateEnd()))
-    return kAiring;
+    return SeriesStatus::Airing;
   const Date end = assume_worst_case(item.GetDateEnd());
   if (now <= end)
-    return kAiring;
+    return SeriesStatus::Airing;
 
-  return kFinishedAiring;
+  return SeriesStatus::FinishedAiring;
 }
 
 bool IsAiredYet(const Item& item) {
   switch (item.GetAiringStatus(false)) {
-    case kFinishedAiring:
-    case kAiring:
+    case SeriesStatus::FinishedAiring:
+    case SeriesStatus::Airing:
       return true;
   }
 
   switch (GetAiringStatus(item)) {
-    case kFinishedAiring:
-    case kAiring:
+    case SeriesStatus::FinishedAiring:
+    case SeriesStatus::Airing:
       return true;
   }
 
@@ -97,10 +97,10 @@ bool IsAiredYet(const Item& item) {
 }
 
 bool IsFinishedAiring(const Item& item) {
-  if (item.GetAiringStatus(false) == kFinishedAiring)
+  if (item.GetAiringStatus(false) == SeriesStatus::FinishedAiring)
     return true;
 
-  if (GetAiringStatus(item) == kFinishedAiring)
+  if (GetAiringStatus(item) == SeriesStatus::FinishedAiring)
     return true;
 
   return false;
@@ -168,7 +168,7 @@ bool IsItemOldEnough(const Item& item) {
 
   const auto duration = Duration(time(nullptr) - item.GetLastModified());
 
-  if (item.GetAiringStatus() == kFinishedAiring) {
+  if (item.GetAiringStatus() == SeriesStatus::FinishedAiring) {
     return duration.days() >= 7;  // 1 week
   } else {
     return duration.hours() >= 1;
@@ -492,7 +492,7 @@ bool IsValidEpisodeNumber(int number, int total, int watched) {
 }
 
 int GetLastEpisodeNumber(const Item& item) {
-  if (item.GetAiringStatus() == kFinishedAiring)
+  if (item.GetAiringStatus() == SeriesStatus::FinishedAiring)
     return item.GetEpisodeCount();
 
   int number = 0;

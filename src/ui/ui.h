@@ -24,6 +24,7 @@
 #include <windows/win/taskbar.h>
 
 namespace anime {
+enum class SeriesStatus;
 class Episode;
 class Item;
 };
@@ -62,7 +63,7 @@ inline win::TaskbarList taskbar_list;
 void ChangeStatusText(const std::wstring& status);
 void ClearStatusText();
 void SetSharedCursor(LPCWSTR name);
-int StatusToIcon(int status);
+int StatusToIcon(anime::SeriesStatus status);
 
 void DisplayErrorMessage(const std::wstring& text, const std::wstring& caption);
 bool EnterAuthorizationPin(const std::wstring& service, std::wstring& auth_pin);

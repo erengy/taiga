@@ -67,7 +67,7 @@ int Item::GetEpisodeLength() const {
   return series_.episode_length;
 }
 
-int Item::GetAiringStatus(bool check_date) const {
+SeriesStatus Item::GetAiringStatus(bool check_date) const {
   if (!check_date)
     return series_.status;
 
@@ -168,8 +168,8 @@ void Item::SetEpisodeLength(int number) {
   series_.episode_length = number;
 }
 
-void Item::SetAiringStatus(int status) {
-  series_.status = static_cast<SeriesStatus>(status);
+void Item::SetAiringStatus(SeriesStatus status) {
+  series_.status = status;
 }
 
 void Item::SetTitle(const std::wstring& title) {
@@ -535,7 +535,7 @@ void Item::SetFolder(const std::wstring& folder) {
 
 void Item::SetLastAiredEpisodeNumber(int number) {
   if (number > local_info_.last_aired_episode) {
-    if (GetAiringStatus() == kFinishedAiring) {
+    if (GetAiringStatus() == SeriesStatus::FinishedAiring) {
       local_info_.last_aired_episode = GetEpisodeCount();
     } else {
       local_info_.last_aired_episode = number;

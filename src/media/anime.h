@@ -42,11 +42,17 @@ enum AnimeId {
   ID_UNKNOWN = 0
 };
 
-enum SeriesStatus {
-  kUnknownStatus,
-  kFinishedAiring,
-  kAiring,
-  kNotYetAired
+enum class SeriesStatus {
+  Unknown,
+  FinishedAiring,
+  Airing,
+  NotYetAired
+};
+
+constexpr std::array<SeriesStatus, 3> kSeriesStatuses{
+  SeriesStatus::FinishedAiring,
+  SeriesStatus::Airing,
+  SeriesStatus::NotYetAired,
 };
 
 enum class SeriesType {
@@ -114,7 +120,7 @@ struct SeriesInformation {
   int episode_count = kUnknownEpisodeCount;
   int episode_length = kUnknownEpisodeLength;
   AgeRating age_rating = AgeRating::Unknown;
-  SeriesStatus status = SeriesStatus::kUnknownStatus;
+  SeriesStatus status = SeriesStatus::Unknown;
   SeriesType type = SeriesType::Unknown;
   Date start_date;
   Date end_date;

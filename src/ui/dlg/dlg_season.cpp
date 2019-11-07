@@ -344,14 +344,14 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       // Draw title background
       COLORREF color;
       switch (anime_item->GetAiringStatus()) {
-        case anime::kAiring:
+        case anime::SeriesStatus::Airing:
           color = ui::kColorLightGreen;
           break;
-        case anime::kFinishedAiring:
+        case anime::SeriesStatus::FinishedAiring:
         default:
           color = ui::kColorLightBlue;
           break;
-        case anime::kNotYetAired:
+        case anime::SeriesStatus::NotYetAired:
           color = ui::kColorLightRed;
           break;
       }
@@ -576,8 +576,8 @@ void SeasonDialog::RefreshList(bool redraw_only) {
   list_.EnableGroupView(true);  // Required for XP
   switch (taiga::settings.GetAppSeasonsGroupBy()) {
     case kSeasonGroupByAiringStatus:
-      for (int i = anime::kFinishedAiring; i <= anime::kNotYetAired; i++) {
-        list_.InsertGroup(i, ui::TranslateStatus(i).c_str(), true, false);
+      for (const auto status : anime::kSeriesStatuses) {
+        list_.InsertGroup(static_cast<int>(status), ui::TranslateStatus(status).c_str(), true, false);
       }
       break;
     case kSeasonGroupByListStatus:
@@ -620,7 +620,7 @@ void SeasonDialog::RefreshList(bool redraw_only) {
     int group = -1;
     switch (taiga::settings.GetAppSeasonsGroupBy()) {
       case kSeasonGroupByAiringStatus:
-        group = anime_item->GetAiringStatus();
+        group = static_cast<int>(anime_item->GetAiringStatus());
         break;
       case kSeasonGroupByListStatus: {
         group = anime_item->GetMyStatus();

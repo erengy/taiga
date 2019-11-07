@@ -32,7 +32,7 @@ std::wstring TranslateMonth(const int month);
 std::wstring TranslateNumber(const int value, const std::wstring& default_char = L"-");
 
 std::wstring TranslateScore(const double value);
-std::wstring TranslateStatus(const int value);
+std::wstring TranslateStatus(const anime::SeriesStatus value);
 std::wstring TranslateType(const anime::SeriesType value);
 anime::SeriesType TranslateType(const std::wstring& value);
 

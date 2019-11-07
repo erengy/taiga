@@ -76,7 +76,7 @@ bool EvaluateCondition(const FeedFilterCondition& condition,
       is_numeric = true;
       break;
     case kFeedFilterElement_Meta_Status:
-      element = ToWstr(anime ? anime->GetAiringStatus() : anime::kUnknownStatus);
+      element = ToWstr(static_cast<int>(anime ? anime->GetAiringStatus() : anime::SeriesStatus::Unknown));
       is_numeric = true;
       break;
     case kFeedFilterElement_Meta_Type:

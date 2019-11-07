@@ -36,7 +36,7 @@ void ImageDatabase::Load(const int anime_id, const bool download) {
   LoadFile(anime_id);
 
   const auto is_old_image = [](const anime::Item& anime_item) {
-    return (anime_item.GetAiringStatus() != anime::kFinishedAiring) &&
+    return (anime_item.GetAiringStatus() != anime::SeriesStatus::FinishedAiring) &&
            (GetFileAge(anime::GetImagePath(anime_item.GetId())) /
                 (60 * 60 * 24) >= 7);  // >= 7 days
   };

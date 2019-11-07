@@ -46,12 +46,13 @@ std::wstring TranslateScore(const double value) {
   }
 }
 
-std::wstring TranslateStatus(const int value) {
+std::wstring TranslateStatus(const anime::SeriesStatus value) {
   switch (value) {
-    case anime::kAiring: return L"Currently airing";
-    case anime::kFinishedAiring: return L"Finished airing";
-    case anime::kNotYetAired: return L"Not yet aired";
-    default: return ToWstr(value);
+    case anime::SeriesStatus::Unknown: return L"Unknown";
+    case anime::SeriesStatus::Airing: return L"Currently airing";
+    case anime::SeriesStatus::FinishedAiring: return L"Finished airing";
+    case anime::SeriesStatus::NotYetAired: return L"Not yet aired";
+    default: return L"";
   }
 }
 

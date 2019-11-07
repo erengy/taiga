@@ -51,7 +51,7 @@ public:
   SeriesType GetType() const;
   int GetEpisodeCount() const;
   int GetEpisodeLength() const;
-  int GetAiringStatus(bool check_date = true) const;
+  SeriesStatus GetAiringStatus(bool check_date = true) const;
   const std::wstring& GetTitle() const;
   const std::wstring& GetEnglishTitle(bool fallback = false) const;
   const std::wstring& GetJapaneseTitle() const;
@@ -73,7 +73,7 @@ public:
   void SetType(SeriesType type);
   void SetEpisodeCount(int number);
   void SetEpisodeLength(int number);
-  void SetAiringStatus(int status);
+  void SetAiringStatus(SeriesStatus status);
   void SetTitle(const std::wstring& title);
   void SetEnglishTitle(const std::wstring& title);
   void SetJapaneseTitle(const std::wstring& title);

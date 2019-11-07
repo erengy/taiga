@@ -168,7 +168,7 @@ void Database::AddToList(int anime_id, int status) {
     return;
   }
 
-  if (status == anime::kUnknownStatus)
+  if (status == anime::kNotInList)
     status = anime::IsAiredYet(*anime_item) ? anime::kWatching :
                                               anime::kPlanToWatch;
 
