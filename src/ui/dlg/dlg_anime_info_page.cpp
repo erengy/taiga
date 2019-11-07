@@ -250,17 +250,17 @@ BOOL PageMyInfo::OnCommand(WPARAM wParam, LPARAM lParam) {
           switch (sync::GetCurrentServiceId()) {
             case sync::ServiceId::Kitsu:
             case sync::ServiceId::AniList:
-              combobox.SetCurSel(anime::kWatching - 1);
+              combobox.SetCurSel(static_cast<int>(anime::MyStatus::Watching) - 1);
               break;
           }
-          if (anime_item->GetMyStatus() == anime::kCompleted &&
+          if (anime_item->GetMyStatus() == anime::MyStatus::Completed &&
               episode_value == anime_item->GetEpisodeCount())
             spin.SetPos32(0);
         } else {
           switch (sync::GetCurrentServiceId()) {
             case sync::ServiceId::Kitsu:
             case sync::ServiceId::AniList:
-              combobox.SetCurSel(anime_item->GetMyStatus() - 1);
+              combobox.SetCurSel(static_cast<int>(anime_item->GetMyStatus()) - 1);
               break;
           }
           if (episode_value == 0)
@@ -277,8 +277,8 @@ BOOL PageMyInfo::OnCommand(WPARAM wParam, LPARAM lParam) {
       if (HIWORD(wParam) == CBN_SELENDOK) {
         // Selected "Completed"
         win::ComboBox combobox = GetDlgItem(IDC_COMBO_ANIME_STATUS);
-        if (combobox.GetItemData(combobox.GetCurSel()) == anime::kCompleted)
-          if (anime_item->GetMyStatus() != anime::kCompleted &&
+        if (combobox.GetItemData(combobox.GetCurSel()) == static_cast<int>(anime::MyStatus::Completed))
+          if (anime_item->GetMyStatus() != anime::MyStatus::Completed &&
               anime_item->GetEpisodeCount() > 0)
             SendDlgItemMessage(IDC_SPIN_ANIME_PROGRESS, UDM_SETPOS32, 0, anime_item->GetEpisodeCount());
         combobox.SetWindowHandle(nullptr);
@@ -372,10 +372,12 @@ void PageMyInfo::Refresh(int anime_id) {
 
   // Status
   win::ComboBox combobox = GetDlgItem(IDC_COMBO_ANIME_STATUS);
-  if (combobox.GetCount() == 0)
-    for (int i = anime::kMyStatusFirst; i < anime::kMyStatusLast; i++)
-      combobox.AddItem(ui::TranslateMyStatus(i, false).c_str(), i);
-  combobox.SetCurSel(anime_item->GetMyStatus() - 1);
+  if (combobox.GetCount() == 0) {
+    for (const auto status : anime::kMyStatuses) {
+      combobox.AddItem(ui::TranslateMyStatus(status, false).c_str(), static_cast<int>(status));
+    }
+  }
+  combobox.SetCurSel(static_cast<int>(anime_item->GetMyStatus()) - 1);
   combobox.SetWindowHandle(nullptr);
 
   // Score
@@ -559,7 +561,8 @@ bool PageMyInfo::Save() {
   combobox.SetWindowHandle(nullptr);
 
   // Status
-  queue_item.status = GetComboSelection(IDC_COMBO_ANIME_STATUS) + 1;
+  queue_item.status = static_cast<anime::MyStatus>(
+      GetComboSelection(IDC_COMBO_ANIME_STATUS) + 1);
 
   // Tags / Notes
   switch (sync::GetCurrentServiceId()) {

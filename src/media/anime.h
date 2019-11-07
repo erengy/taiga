@@ -79,15 +79,21 @@ constexpr int kUnknownEpisodeLength = -1;
 constexpr double kUnknownScore = 0.0;
 constexpr int kUserScoreMax = 100;
 
-enum MyStatus {
-  kMyStatusFirst = 1,
-  kNotInList = 0,
-  kWatching,
-  kCompleted,
-  kOnHold,
-  kDropped,
-  kPlanToWatch,
-  kMyStatusLast
+enum class MyStatus {
+  NotInList,
+  Watching,
+  Completed,
+  OnHold,
+  Dropped,
+  PlanToWatch,
+};
+
+constexpr std::array<MyStatus, 5> kMyStatuses{
+  MyStatus::Watching,
+  MyStatus::Completed,
+  MyStatus::OnHold,
+  MyStatus::Dropped,
+  MyStatus::PlanToWatch,
 };
 
 enum class AgeRating {
@@ -139,7 +145,7 @@ struct MyInformation {
   std::wstring id;
   int watched_episodes = 0;
   int score = 0;
-  int status = MyStatus::kNotInList;
+  MyStatus status = MyStatus::NotInList;
   int rewatched_times = 0;
   bool rewatching = false;
   int rewatching_ep = 0;

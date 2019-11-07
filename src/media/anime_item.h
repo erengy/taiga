@@ -101,7 +101,7 @@ public:
   const std::wstring& GetMyId() const;
   int GetMyLastWatchedEpisode(bool check_queue = true) const;
   int GetMyScore(bool check_queue = true) const;
-  int GetMyStatus(bool check_queue = true) const;
+  MyStatus GetMyStatus(bool check_queue = true) const;
   int GetMyRewatchedTimes(bool check_queue = true) const;
   bool GetMyRewatching(bool check_queue = true) const;
   int GetMyRewatchingEp() const;
@@ -114,7 +114,7 @@ public:
   void SetMyId(const std::wstring& id);
   void SetMyLastWatchedEpisode(int number);
   void SetMyScore(int score);
-  void SetMyStatus(int status);
+  void SetMyStatus(MyStatus status);
   void SetMyRewatchedTimes(int rewatched_times);
   void SetMyRewatching(bool rewatching);
   void SetMyRewatchingEp(int rewatching_ep);

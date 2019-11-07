@@ -119,7 +119,7 @@ std::wstring ReplaceVariables(const std::wstring& str,
     fields[L"season"] = ui::TranslateDateToSeasonString(anime_item->GetDateStart());
     fields[L"id"] = anime_item->GetId(sync::GetCurrentServiceId());
     fields[L"image"] = anime_item->GetImageUrl();
-    fields[L"status"] = ToWstr(anime_item->GetMyStatus());
+    fields[L"status"] = ToWstr(static_cast<int>(anime_item->GetMyStatus()));
     fields[L"rewatching"] = ToWstr(anime_item->GetMyRewatching());
     switch (sync::GetCurrentServiceId()) {
       case sync::ServiceId::MyAnimeList:

@@ -71,9 +71,9 @@ const std::wstring& Statistics::CalculateLifePlannedToWatch() {
 
   for (const auto& [id, item] : anime::db.items) {
     switch (item.GetMyStatus()) {
-      case anime::kNotInList:
-      case anime::kCompleted:
-      case anime::kDropped:
+      case anime::MyStatus::NotInList:
+      case anime::MyStatus::Completed:
+      case anime::MyStatus::Dropped:
         continue;
     }
 

@@ -99,7 +99,8 @@ void History::ReadQueue(const XmlDocument& document) {
 
     READ_ATTRIBUTE_INT(queue_item.episode, L"episode");
     READ_ATTRIBUTE_INT(queue_item.score, L"score");
-    READ_ATTRIBUTE_INT(queue_item.status, L"status");
+    if (!item.attribute(L"status").empty())
+      queue_item.status = static_cast<anime::MyStatus>(item.attribute(L"status").as_int());
     READ_ATTRIBUTE_BOOL(queue_item.enable_rewatching, L"enable_rewatching");
     READ_ATTRIBUTE_INT(queue_item.rewatched_times, L"rewatched_times");
     READ_ATTRIBUTE_STR(queue_item.tags, L"tags");
@@ -152,7 +153,8 @@ bool History::Save() {
     node_item.append_attribute(L"time") = queue_item.time.c_str();
     APPEND_ATTRIBUTE(L"episode", queue_item.episode);
     APPEND_ATTRIBUTE(L"score", queue_item.score);
-    APPEND_ATTRIBUTE(L"status", queue_item.status);
+    if (queue_item.status)
+      node_item.append_attribute(L"status") = static_cast<int>(*queue_item.status);
     APPEND_ATTRIBUTE(L"enable_rewatching", queue_item.enable_rewatching);
     APPEND_ATTRIBUTE(L"rewatched_times", queue_item.rewatched_times);
     APPEND_ATTRIBUTE_STR(L"tags", queue_item.tags);

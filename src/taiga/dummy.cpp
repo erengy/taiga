@@ -44,7 +44,7 @@ void InitializeDummies() {
   dummy_anime.AddtoUserList();
   dummy_anime.SetMyLastWatchedEpisode(25);
   dummy_anime.SetMyScore(anime::kUserScoreMax);
-  dummy_anime.SetMyStatus(anime::kCompleted);
+  dummy_anime.SetMyStatus(anime::MyStatus::Completed);
   dummy_anime.SetMyTags(L"comedy, romance, drama");
   dummy_anime.SetMyNotes(L"Best series ever!");
 

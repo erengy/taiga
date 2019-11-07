@@ -304,9 +304,9 @@ int Item::GetMyScore(bool check_queue) const {
   return queue_item ? *queue_item->score : my_info_->score;
 }
 
-int Item::GetMyStatus(bool check_queue) const {
+MyStatus Item::GetMyStatus(bool check_queue) const {
   if (!my_info_.get())
-    return kNotInList;
+    return MyStatus::NotInList;
 
   library::QueueItem* queue_item = check_queue ?
       SearchQueue(library::QueueSearch::Status) : nullptr;
@@ -408,7 +408,7 @@ void Item::SetMyScore(int score) {
   my_info_->score = score;
 }
 
-void Item::SetMyStatus(int status) {
+void Item::SetMyStatus(MyStatus status) {
   assert(my_info_.get());
 
   my_info_->status = status;
@@ -604,7 +604,7 @@ void Item::AddtoUserList() {
 }
 
 bool Item::IsInList() const {
-  return my_info_.get() && GetMyStatus() != kNotInList;
+  return my_info_.get() && GetMyStatus() != MyStatus::NotInList;
 }
 
 void Item::RemoveFromUserList() {

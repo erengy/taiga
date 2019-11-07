@@ -62,7 +62,7 @@ enum AnimeListTooltips {
 AnimeListDialog DlgAnimeList;
 
 AnimeListDialog::AnimeListDialog()
-    : current_status_(anime::kWatching) {
+    : current_status_(anime::MyStatus::Watching) {
 }
 
 BOOL AnimeListDialog::OnInitDialog() {
@@ -94,10 +94,15 @@ BOOL AnimeListDialog::OnInitDialog() {
   listview.InsertColumns();
 
   // Insert tabs and list groups
-  listview.InsertGroup(anime::kNotInList, ui::TranslateMyStatus(anime::kNotInList, false).c_str());
-  for (int i = anime::kMyStatusFirst; i < anime::kMyStatusLast; i++) {
-    tab.InsertItem(i - 1, ui::TranslateMyStatus(i, true).c_str(), (LPARAM)i);
-    listview.InsertGroup(i, ui::TranslateMyStatus(i, false).c_str());
+  listview.InsertGroup(
+      static_cast<int>(anime::MyStatus::NotInList),
+      ui::TranslateMyStatus(anime::MyStatus::NotInList, false).c_str());
+  for (const auto status : anime::kMyStatuses) {
+    tab.InsertItem(static_cast<int>(status) - 1,
+                   ui::TranslateMyStatus(status, true).c_str(),
+                   static_cast<LPARAM>(status));
+    listview.InsertGroup(static_cast<int>(status),
+                         ui::TranslateMyStatus(status, false).c_str());
   }
 
   // Track mouse leave event for the list view
@@ -108,8 +113,8 @@ BOOL AnimeListDialog::OnInitDialog() {
   TrackMouseEvent(&tme);
 
   // Refresh
-  RefreshList(anime::kWatching);
-  RefreshTabs(anime::kWatching);
+  RefreshList(anime::MyStatus::Watching);
+  RefreshTabs(anime::MyStatus::Watching);
 
   // Success
   return TRUE;
@@ -185,7 +190,7 @@ INT_PTR AnimeListDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
                           reinterpret_cast<LPARAM>(&anime_ids));
           } else {
             for (const auto& id : anime_ids) {
-              anime::db.AddToList(id, status);
+              anime::db.AddToList(id, static_cast<anime::MyStatus>(status));
             }
           }
           break;
@@ -603,8 +608,8 @@ void AnimeListDialog::ListView::RefreshItem(int index) {
   }
 
   if (columns[kColumnUserProgress].visible && progress_bars_visible) {
-    if (anime_item->GetMyStatus() != anime::kDropped &&
-        (anime_item->GetMyStatus() != anime::kCompleted || anime_item->GetMyRewatching())) {
+    if (anime_item->GetMyStatus() != anime::MyStatus::Dropped &&
+        (anime_item->GetMyStatus() != anime::MyStatus::Completed || anime_item->GetMyRewatching())) {
       if (anime_item->GetMyLastWatchedEpisode() > 0)
         button_visible[0] = true;
       if (anime_item->GetEpisodeCount() > anime_item->GetMyLastWatchedEpisode() ||
@@ -1002,19 +1007,19 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, int index,
     } else {
       switch (anime_item.GetMyStatus()) {
         default:
-        case anime::kWatching:
+        case anime::MyStatus::Watching:
           list_progress_type = ui::kListProgressWatching;
           break;
-        case anime::kCompleted:
+        case anime::MyStatus::Completed:
           list_progress_type = ui::kListProgressCompleted;
           break;
-        case anime::kOnHold:
+        case anime::MyStatus::OnHold:
           list_progress_type = ui::kListProgressOnHold;
           break;
-        case anime::kDropped:
+        case anime::MyStatus::Dropped:
           list_progress_type = ui::kListProgressDropped;
           break;
-        case anime::kPlanToWatch:
+        case anime::MyStatus::PlanToWatch:
           list_progress_type = ui::kListProgressPlanToWatch;
           break;
       }
@@ -1129,7 +1134,7 @@ void AnimeListDialog::ListView::DrawProgressText(HDC hdc, RECT* rc,
     dc.SetTextColor(::GetSysColor(COLOR_GRAYTEXT));
   } else if (!anime::IsValidEpisodeNumber(eps_watched, eps_total)) {
     dc.SetTextColor(::GetSysColor(COLOR_HIGHLIGHT));
-  } else if (eps_watched < eps_total && anime_item.GetMyStatus() == anime::kCompleted) {
+  } else if (eps_watched < eps_total && anime_item.GetMyStatus() == anime::MyStatus::Completed) {
     dc.SetTextColor(::GetSysColor(COLOR_HIGHLIGHT));
   }
   dc.DrawText(text.c_str(), text.length(), rcText,
@@ -1297,8 +1302,8 @@ LRESULT AnimeListDialog::OnTabNotify(LPARAM lParam) {
     // Tab select
     case TCN_SELCHANGE: {
       int tab_index = tab.GetCurrentlySelected();
-      int index = static_cast<int>(tab.GetItemParam(tab_index));
-      RefreshList(index);
+      const auto status = static_cast<anime::MyStatus>(tab.GetItemParam(tab_index));
+      RefreshList(status);
       break;
     }
   }
@@ -1320,7 +1325,7 @@ anime::Item* AnimeListDialog::GetCurrentItem() {
   return anime::db.Find(GetCurrentId());
 }
 
-int AnimeListDialog::GetCurrentStatus() {
+anime::MyStatus AnimeListDialog::GetCurrentStatus() {
   return current_status_;
 }
 
@@ -1335,7 +1340,7 @@ void AnimeListDialog::RebuildIdCache() {
     listview.id_cache[listview.GetItemParam(i)] = i;
 }
 
-void AnimeListDialog::RefreshList(int index) {
+void AnimeListDialog::RefreshList(std::optional<anime::MyStatus> status) {
   if (!IsWindow())
     return;
 
@@ -1343,12 +1348,12 @@ void AnimeListDialog::RefreshList(int index) {
 
   // Remember current position
   int current_position = -1;
-  if (index == -1 && !group_view)
+  if (!status && !group_view)
     current_position = listview.GetTopIndex() + listview.GetCountPerPage() - 1;
 
   // Remember current status
-  if (index > anime::kNotInList)
-    current_status_ = index;
+  if (status && *status != anime::MyStatus::NotInList)
+    current_status_ = *status;
 
   // Disable drawing
   listview.SetRedraw(FALSE);
@@ -1361,7 +1366,7 @@ void AnimeListDialog::RefreshList(int index) {
   listview.EnableGroupView(group_view);
 
   // Add items to list
-  std::vector<int> group_count(anime::kMyStatusLast);
+  std::map<anime::MyStatus, int> group_count;
   int group_index = -1;
   int i = 0;
   for (const auto& [anime_id, anime_item] : anime::db.items) {
@@ -1371,7 +1376,7 @@ void AnimeListDialog::RefreshList(int index) {
       continue;
     if (!group_view) {
       if (anime_item.GetMyRewatching()) {
-        if (current_status_ != anime::kWatching)
+        if (current_status_ != anime::MyStatus::Watching)
           continue;
       } else if (current_status_ != anime_item.GetMyStatus()) {
         continue;
@@ -1380,8 +1385,8 @@ void AnimeListDialog::RefreshList(int index) {
     if (!DlgMain.search_bar.filters.CheckItem(anime_item, kSidebarItemAnimeList))
       continue;
 
-    group_count.at(anime_item.GetMyStatus())++;
-    group_index = group_view ? anime_item.GetMyStatus() : -1;
+    group_count[anime_item.GetMyStatus()]++;
+    group_index = group_view ? static_cast<int>(anime_item.GetMyStatus()) : -1;
     i = listview.GetItemCount();
 
     listview.InsertItem(i, group_index, -1,
@@ -1396,9 +1401,9 @@ void AnimeListDialog::RefreshList(int index) {
 
   // Set group headers
   if (group_view) {
-    for (int i = anime::kMyStatusFirst; i < anime::kMyStatusLast; i++) {
-      std::wstring text = ui::TranslateMyStatus(i, false);
-      text += group_count.at(i) > 0 ? L" (" + ToWstr(group_count.at(i)) + L")" : L"";
+    for (const auto status : anime::kMyStatuses) {
+      std::wstring text = ui::TranslateMyStatus(status, false);
+      text += group_count[status] > 0 ? L" ({})"_format(group_count[status]) : L"";
       listview.SetGroupText(i, text.c_str());
     }
   }
@@ -1468,24 +1473,25 @@ void AnimeListDialog::RefreshListItemColumns(int index, const anime::Item& anime
   }
 }
 
-void AnimeListDialog::RefreshTabs(int index) {
+void AnimeListDialog::RefreshTabs(std::optional<anime::MyStatus> status) {
   if (!IsWindow())
     return;
 
   // Remember last index
-  if (index > anime::kNotInList)
-    current_status_ = index;
+  if (status && *status != anime::MyStatus::NotInList)
+    current_status_ = *status;
 
   // Disable drawing
   tab.SetRedraw(FALSE);
 
   // Refresh text
-  for (int i = anime::kMyStatusFirst; i < anime::kMyStatusLast; i++)
-    tab.SetItemText(i - 1, ui::TranslateMyStatus(i, true).c_str());
+  for (const auto status : anime::kMyStatuses) {
+    tab.SetItemText(static_cast<int>(status) - 1, ui::TranslateMyStatus(status, true).c_str());
+  }
 
   // Select related tab
   bool group_view = !DlgMain.search_bar.filters.text[kSidebarItemAnimeList].empty();
-  int tab_index = current_status_;
+  int tab_index = static_cast<int>(current_status_);
   if (group_view) {
     tab_index = -1;
   } else {
@@ -1511,7 +1517,7 @@ void AnimeListDialog::GoToPreviousTab() {
 
   tab.SetCurrentlySelected(tab_index);
 
-  int status = static_cast<int>(tab.GetItemParam(tab_index));
+  const auto status = static_cast<anime::MyStatus>(tab.GetItemParam(tab_index));
   RefreshList(status);
 }
 
@@ -1527,7 +1533,7 @@ void AnimeListDialog::GoToNextTab() {
 
   tab.SetCurrentlySelected(tab_index);
 
-  int status = static_cast<int>(tab.GetItemParam(tab_index));
+  const auto status = static_cast<anime::MyStatus>(tab.GetItemParam(tab_index));
   RefreshList(status);
 }
 

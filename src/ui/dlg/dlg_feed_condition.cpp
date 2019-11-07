@@ -275,9 +275,9 @@ void FeedConditionDialog::ChooseElement(int element_index) {
       std::vector<anime_pair> title_list;
       for (const auto& [id, item] : anime::db.items) {
         switch (item.GetMyStatus()) {
-          case anime::kNotInList:
-          case anime::kCompleted:
-          case anime::kDropped:
+          case anime::MyStatus::NotInList:
+          case anime::MyStatus::Completed:
+          case anime::MyStatus::Dropped:
             continue;
           default:
             title_list.push_back(std::make_pair(id, anime::GetPreferredTitle(item)));
@@ -314,12 +314,9 @@ void FeedConditionDialog::ChooseElement(int element_index) {
       break;
     case track::kFeedFilterElement_User_Status:
       RECREATE_COMBO(CBS_DROPDOWNLIST);
-      value_combo_.AddItem(ui::TranslateMyStatus(anime::kNotInList, false).c_str(), anime::kNotInList);
-      value_combo_.AddItem(ui::TranslateMyStatus(anime::kWatching, false).c_str(), anime::kWatching);
-      value_combo_.AddItem(ui::TranslateMyStatus(anime::kCompleted, false).c_str(), anime::kCompleted);
-      value_combo_.AddItem(ui::TranslateMyStatus(anime::kOnHold, false).c_str(), anime::kOnHold);
-      value_combo_.AddItem(ui::TranslateMyStatus(anime::kDropped, false).c_str(), anime::kDropped);
-      value_combo_.AddItem(ui::TranslateMyStatus(anime::kPlanToWatch, false).c_str(), anime::kPlanToWatch);
+      for (const auto status : anime::kMyStatuses) {
+        value_combo_.AddItem(ui::TranslateMyStatus(status, false).c_str(), static_cast<int>(status));
+      }
       break;
     case track::kFeedFilterElement_Episode_Number:
     case track::kFeedFilterElement_Meta_Episodes:

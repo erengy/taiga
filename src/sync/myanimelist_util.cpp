@@ -154,33 +154,33 @@ int TranslateMyRatingTo(int value) {
   return (value * 10) / anime::kUserScoreMax;
 }
 
-int TranslateMyStatusFrom(const std::wstring& value) {
+anime::MyStatus TranslateMyStatusFrom(const std::wstring& value) {
   if (IsEqual(value, L"watching")) {
-    return anime::kWatching;
+    return anime::MyStatus::Watching;
   } else if (IsEqual(value, L"completed")) {
-    return anime::kCompleted;
+    return anime::MyStatus::Completed;
   } else if (IsEqual(value, L"on_hold")) {
-    return anime::kOnHold;
+    return anime::MyStatus::OnHold;
   } else if (IsEqual(value, L"dropped")) {
-    return anime::kDropped;
+    return anime::MyStatus::Dropped;
   } else if (IsEqual(value, L"plan_to_watch")) {
-    return anime::kPlanToWatch;
+    return anime::MyStatus::PlanToWatch;
   }
 
   LOGW(L"Invalid value: {}", value);
-  return anime::kNotInList;
+  return anime::MyStatus::NotInList;
 }
 
-std::wstring TranslateMyStatusTo(int value) {
+std::wstring TranslateMyStatusTo(anime::MyStatus value) {
   switch (value) {
-    case anime::kWatching: return L"watching";
-    case anime::kCompleted: return L"completed";
-    case anime::kOnHold: return L"on_hold";
-    case anime::kDropped: return L"dropped";
-    case anime::kPlanToWatch: return L"plan_to_watch";
+    case anime::MyStatus::Watching: return L"watching";
+    case anime::MyStatus::Completed: return L"completed";
+    case anime::MyStatus::OnHold: return L"on_hold";
+    case anime::MyStatus::Dropped: return L"dropped";
+    case anime::MyStatus::PlanToWatch: return L"plan_to_watch";
   }
 
-  LOGW(L"Invalid value: {}", value);
+  LOGW(L"Invalid value: {}", static_cast<int>(value));
   return L"watching";
 }
 

@@ -274,7 +274,7 @@ int ParseMediaListObject(const Json& json) {
 
   const auto status = JsonReadStr(json, "status");
   if (status == kRepeatingMediaListStatus) {
-    anime_item.SetMyStatus(anime::kWatching);
+    anime_item.SetMyStatus(anime::MyStatus::Watching);
     anime_item.SetMyRewatching(true);
   } else {
     anime_item.SetMyStatus(TranslateMyStatusFrom(status));

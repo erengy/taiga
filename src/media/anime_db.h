@@ -51,9 +51,9 @@ public:
   bool LoadList();
   bool SaveList(bool include_database = false) const;
 
-  int GetItemCount(int status, bool check_history = true);
+  int GetItemCount(MyStatus status, bool check_history = true);
 
-  void AddToList(int anime_id, int status);
+  void AddToList(int anime_id, MyStatus status);
   void ClearUserData();
   bool DeleteListItem(int anime_id);
   void UpdateItem(const library::QueueItem& queue_item);

@@ -174,26 +174,26 @@ void FeedFilterManager::InitializePresets() {
   ADD_PRESET(kFeedFilterActionSelect, kFeedFilterMatchAny, true, kFeedFilterOptionDefault,
       L"Select currently watching",
       L"Selects files that belong to anime that you're currently watching");
-  ADD_CONDITION(kFeedFilterElement_User_Status, kFeedFilterOperator_Equals, ToWstr(anime::kWatching));
+  ADD_CONDITION(kFeedFilterElement_User_Status, kFeedFilterOperator_Equals, ToWstr(static_cast<int>(anime::MyStatus::Watching)));
 
   // Select airing anime in plan to watch
   ADD_PRESET(kFeedFilterActionSelect, kFeedFilterMatchAll, true, kFeedFilterOptionDefault,
       L"Select airing anime in plan to watch",
       L"Selects files that belong to an airing anime that you're planning to watch");
   ADD_CONDITION(kFeedFilterElement_Meta_Status, kFeedFilterOperator_Equals, ToWstr(static_cast<int>(anime::SeriesStatus::Airing)));
-  ADD_CONDITION(kFeedFilterElement_User_Status, kFeedFilterOperator_Equals, ToWstr(anime::kPlanToWatch));
+  ADD_CONDITION(kFeedFilterElement_User_Status, kFeedFilterOperator_Equals, ToWstr(static_cast<int>(anime::MyStatus::PlanToWatch)));
 
   // Discard dropped
   ADD_PRESET(kFeedFilterActionDiscard, kFeedFilterMatchAll, true, kFeedFilterOptionDefault,
       L"Discard dropped",
       L"Discards files that belong to anime that you've dropped watching");
-  ADD_CONDITION(kFeedFilterElement_User_Status, kFeedFilterOperator_Equals, ToWstr(anime::kDropped));
+  ADD_CONDITION(kFeedFilterElement_User_Status, kFeedFilterOperator_Equals, ToWstr(static_cast<int>(anime::MyStatus::Dropped)));
 
   // Discard and deactivate not-in-list anime
   ADD_PRESET(kFeedFilterActionDiscard, kFeedFilterMatchAny, true, kFeedFilterOptionDeactivate,
       L"Discard and deactivate not-in-list anime",
       L"Discards files that do not belong to any anime in your list");
-  ADD_CONDITION(kFeedFilterElement_User_Status, kFeedFilterOperator_Equals, ToWstr(anime::kNotInList));
+  ADD_CONDITION(kFeedFilterElement_User_Status, kFeedFilterOperator_Equals, ToWstr(static_cast<int>(anime::MyStatus::NotInList)));
 
   // Discard watched and available episodes
   ADD_PRESET(kFeedFilterActionDiscard, kFeedFilterMatchAny, true, kFeedFilterOptionDefault,
@@ -462,7 +462,7 @@ std::wstring FeedFilterManager::TranslateValue(
       }
     }
     case kFeedFilterElement_User_Status:
-      return ui::TranslateMyStatus(ToInt(condition.value), false);
+      return ui::TranslateMyStatus(static_cast<anime::MyStatus>(ToInt(condition.value)), false);
     case kFeedFilterElement_Meta_Status:
       return ui::TranslateStatus(static_cast<anime::SeriesStatus>(ToInt(condition.value)));
     case kFeedFilterElement_Meta_Type:

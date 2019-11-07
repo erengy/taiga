@@ -40,7 +40,7 @@ static void ValidateQueueItem(QueueItem& item, const anime::Item& anime_item) {
     if (anime_item.GetMyScore() == *item.score || *item.score < 0 || *item.score > anime::kUserScoreMax)
       item.score.reset();
   if (item.status)
-    if (anime_item.GetMyStatus() == *item.status || *item.status < anime::kMyStatusFirst || *item.status >= anime::kMyStatusLast)
+    if (anime_item.GetMyStatus() == *item.status || *item.status == anime::MyStatus::NotInList)
       item.status.reset();
   if (item.enable_rewatching)
     if (anime_item.GetMyRewatching() == *item.enable_rewatching)

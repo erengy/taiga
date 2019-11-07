@@ -25,6 +25,7 @@
 
 namespace anime {
 enum class AgeRating;
+enum class MyStatus;
 enum class SeriesStatus;
 enum class SeriesType;
 class Item;
@@ -43,8 +44,8 @@ std::wstring TranslateMyLastUpdatedFrom(const std::string& value);
 std::wstring TranslateMyRating(int value, bool full);
 int TranslateMyRatingFrom(int value);
 int TranslateMyRatingTo(int value);
-int TranslateMyStatusFrom(const std::wstring& value);
-std::wstring TranslateMyStatusTo(int value);
+anime::MyStatus TranslateMyStatusFrom(const std::wstring& value);
+std::wstring TranslateMyStatusTo(anime::MyStatus value);
 std::wstring TranslateKeyTo(const std::wstring& key);
 
 std::wstring GetAnimePage(const anime::Item& anime_item);

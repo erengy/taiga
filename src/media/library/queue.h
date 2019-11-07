@@ -25,6 +25,7 @@
 
 #include "base/time.h"
 #include "base/xml.h"
+#include "media/anime.h"
 #include "track/episode.h"
 
 namespace library {
@@ -55,7 +56,7 @@ struct QueueItem {
   std::wstring time;
 
   std::optional<int> episode;
-  std::optional<int> status;
+  std::optional<anime::MyStatus> status;
   std::optional<int> score;
   std::optional<Date> date_start;
   std::optional<Date> date_finish;

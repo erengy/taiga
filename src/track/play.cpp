@@ -110,7 +110,7 @@ bool PlayNextEpisode(int anime_id) {
 bool PlayNextEpisodeOfLastWatchedAnime() {
   const auto check_item = [](const int anime_id) {
     const auto anime_item = anime::db.Find(anime_id);
-    return anime_item && anime_item->GetMyStatus() != anime::kCompleted;
+    return anime_item && anime_item->GetMyStatus() != anime::MyStatus::Completed;
   };
 
   const auto& queue_items = library::queue.items;
@@ -146,9 +146,9 @@ bool PlayRandomAnime() {
     if (!anime_item.IsNextEpisodeAvailable())
       continue;
     switch (anime_item.GetMyStatus()) {
-      case anime::kNotInList:
-      case anime::kCompleted:
-      case anime::kDropped:
+      case anime::MyStatus::NotInList:
+      case anime::MyStatus::Completed:
+      case anime::MyStatus::Dropped:
         continue;
     }
     valid_ids.push_back(anime_item.GetId());
@@ -171,7 +171,7 @@ bool PlayRandomEpisode(int anime_id) {
   if (!anime_item)
     return false;
 
-  const int total = anime_item->GetMyStatus() == anime::kCompleted ?
+  const int total = anime_item->GetMyStatus() == anime::MyStatus::Completed ?
       anime_item->GetEpisodeCount() : anime_item->GetMyLastWatchedEpisode() + 1;
   const int max_tries = anime_item->GetFolder().empty() ? 3 : 10;
 

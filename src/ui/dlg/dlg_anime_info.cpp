@@ -572,7 +572,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
       if (std::find(anime_ids.begin(), anime_ids.end(), anime_id) == anime_ids.end()) {
         auto anime_item = anime::db.Find(anime_id);
         if (anime_item)
-          if (anime_item->GetMyStatus() == anime::kWatching || anime_item->GetMyRewatching())
+          if (anime_item->GetMyStatus() == anime::MyStatus::Watching || anime_item->GetMyRewatching())
             anime_ids.push_back(anime_id);
       }
     };
@@ -638,7 +638,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
     // Airing times
     std::vector<int> recently_started, recently_finished, upcoming;
     for (const auto& [anime_id, item] : anime::db.items) {
-      if (item.GetMyStatus() != anime::kPlanToWatch)
+      if (item.GetMyStatus() != anime::MyStatus::PlanToWatch)
         continue;
       const Date& date_start = item.GetDateStart();
       const Date& date_end = item.GetDateEnd();
@@ -703,10 +703,10 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
     if (anime_item && anime_item->IsInList()) {
       content += L"<a href=\"EditAll({})\">Edit</a>"_format(anime_id_);
     } else {
-      int status = anime::kPlanToWatch;
+      auto status = anime::MyStatus::PlanToWatch;
       if (mode_ == AnimeDialogMode::NowPlaying || CurrentEpisode.anime_id == anime_id_)
-        status = anime::kWatching;
-      content += L"<a href=\"AddToList({})\">Add to list</a>"_format(status);
+        status = anime::MyStatus::Watching;
+      content += L"<a href=\"AddToList({})\">Add to list</a>"_format(static_cast<int>(status));
     }
     if (anime_item && mode_ == AnimeDialogMode::NowPlaying) {
       content += L" \u2022 <a id=\"menu\" href=\"Announce\">Share</a>";

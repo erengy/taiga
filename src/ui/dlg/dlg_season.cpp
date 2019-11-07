@@ -581,8 +581,8 @@ void SeasonDialog::RefreshList(bool redraw_only) {
       }
       break;
     case kSeasonGroupByListStatus:
-      for (int i = anime::kNotInList; i <= anime::kPlanToWatch; i++) {
-        list_.InsertGroup(i, ui::TranslateMyStatus(i, false).c_str(), true, false);
+      for (const auto status : anime::kMyStatuses) {
+        list_.InsertGroup(static_cast<int>(status), ui::TranslateMyStatus(status, false).c_str(), true, false);
       }
       break;
     case kSeasonGroupByType:
@@ -623,7 +623,7 @@ void SeasonDialog::RefreshList(bool redraw_only) {
         group = static_cast<int>(anime_item->GetAiringStatus());
         break;
       case kSeasonGroupByListStatus: {
-        group = anime_item->GetMyStatus();
+        group = static_cast<int>(anime_item->GetMyStatus());
         break;
       }
       case kSeasonGroupByType:

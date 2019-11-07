@@ -594,16 +594,18 @@ BOOL FeedFilterDialog::DialogPage2::OnInitDialog() {
   anime_list.InsertColumn(0, 0, 0, 0, L"Title");
 
   // Insert list groups
-  for (int i = anime::kMyStatusFirst; i < anime::kMyStatusLast; i++)
-    anime_list.InsertGroup(i, ui::TranslateMyStatus(i, false).c_str(),
-                           true, i != anime::kWatching);
+  for (const auto status : anime::kMyStatuses) {
+    anime_list.InsertGroup(static_cast<int>(status),
+                           ui::TranslateMyStatus(status, false).c_str(), true,
+                           status != anime::MyStatus::Watching);
+  }
 
   // Add anime to list
   int list_index = 0;
   for (const auto& [id, anime_item] : anime::db.items) {
     if (!anime_item.IsInList())
       continue;
-    anime_list.InsertItem(list_index, anime_item.GetMyStatus(),
+    anime_list.InsertItem(list_index, static_cast<int>(anime_item.GetMyStatus()),
                           StatusToIcon(anime_item.GetAiringStatus()), 0, nullptr,
                           LPSTR_TEXTCALLBACK, static_cast<int>(anime_item.GetId()));
     for (const auto& anime_id : parent->filter.anime_ids) {

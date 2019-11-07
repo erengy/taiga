@@ -214,7 +214,7 @@ bool StartNewRewatch(int anime_id) {
 
   library::QueueItem queue_item;
   queue_item.anime_id = anime_item->GetId();
-  queue_item.status = kWatching;
+  queue_item.status = MyStatus::Watching;
   queue_item.enable_rewatching = true;
   queue_item.episode = 0;
   library::queue.Add(queue_item);
@@ -318,7 +318,7 @@ bool IsUpdateAllowed(const Item& item, const Episode& episode, bool ignore_updat
       return false;
   }
 
-  if (item.GetMyStatus() == kCompleted && !item.GetMyRewatching())
+  if (item.GetMyStatus() == MyStatus::Completed && !item.GetMyRewatching())
     return false;
 
   int number = GetEpisodeHigh(episode);
@@ -364,7 +364,7 @@ void AddToQueue(const Item& item, const Episode& episode, bool change_status) {
     queue_item.date_finish = GetDate();
 
   // Set update mode
-  if (item.GetMyStatus() == kNotInList) {
+  if (item.GetMyStatus() == MyStatus::NotInList) {
     queue_item.mode = library::QueueItemMode::Add;
     change_status = true;
   } else {
@@ -382,11 +382,11 @@ void AddToQueue(const Item& item, const Episode& episode, bool change_status) {
   if (change_status) {
     // Move to completed
     if (item.GetEpisodeCount() == *queue_item.episode && *queue_item.episode > 0) {
-      queue_item.status = kCompleted;
+      queue_item.status = MyStatus::Completed;
     // Move to watching
-    } else if (item.GetMyStatus() != kWatching || *queue_item.episode == 1) {
+    } else if (item.GetMyStatus() != MyStatus::Watching || *queue_item.episode == 1) {
       if (!item.GetMyRewatching()) {
-        queue_item.status = kWatching;
+        queue_item.status = MyStatus::Watching;
       }
     }
   }

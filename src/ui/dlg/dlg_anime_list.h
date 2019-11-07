@@ -19,12 +19,14 @@
 #pragma once
 
 #include <map>
+#include <optional>
 
 #include <windows/win/common_controls.h>
 #include <windows/win/dialog.h>
 #include <windows/win/gdi.h>
 
 namespace anime {
+enum class MyStatus;
 class Item;
 }
 
@@ -70,14 +72,14 @@ public:
   int GetCurrentId();
   std::vector<int> GetCurrentIds();
   anime::Item* GetCurrentItem();
-  int GetCurrentStatus();
+  anime::MyStatus GetCurrentStatus();
   void RebuildIdCache();
 
   int GetListIndex(int anime_id);
-  void RefreshList(int index = -1);
+  void RefreshList(std::optional<anime::MyStatus> status = std::nullopt);
   void RefreshListItem(int anime_id);
   void RefreshListItemColumns(int index, const anime::Item& anime_item);
-  void RefreshTabs(int index = -1);
+  void RefreshTabs(std::optional<anime::MyStatus> status = std::nullopt);
 
   void GoToPreviousTab();
   void GoToNextTab();
@@ -140,7 +142,7 @@ public:
   win::Tab tab;
 
 private:
-  int current_status_;
+  anime::MyStatus current_status_;
 };
 
 extern AnimeListDialog DlgAnimeList;

@@ -124,13 +124,13 @@ std::wstring TranslateMyRating(int value, RatingSystem rating_system) {
   return ToWstr(value);
 }
 
-int TranslateMyStatusFrom(const std::string& value) {
+anime::MyStatus TranslateMyStatusFrom(const std::string& value) {
   static const std::map<std::string, anime::MyStatus> table{
-    {"CURRENT", anime::kWatching},
-    {"PLANNING", anime::kPlanToWatch},
-    {"COMPLETED", anime::kCompleted},
-    {"DROPPED", anime::kDropped},
-    {"PAUSED", anime::kOnHold},
+    {"CURRENT", anime::MyStatus::Watching},
+    {"PLANNING", anime::MyStatus::PlanToWatch},
+    {"COMPLETED", anime::MyStatus::Completed},
+    {"DROPPED", anime::MyStatus::Dropped},
+    {"PAUSED", anime::MyStatus::OnHold},
   };
 
   const auto it = table.find(value);
@@ -138,16 +138,16 @@ int TranslateMyStatusFrom(const std::string& value) {
     return it->second;
 
   LOGW(L"Invalid value: {}", StrToWstr(value));
-  return anime::kNotInList;
+  return anime::MyStatus::NotInList;
 }
 
-std::string TranslateMyStatusTo(int value) {
+std::string TranslateMyStatusTo(anime::MyStatus value) {
   switch (value) {
-    case anime::kWatching: return "CURRENT";
-    case anime::kCompleted: return "COMPLETED";
-    case anime::kOnHold: return "PAUSED";
-    case anime::kDropped: return "DROPPED";
-    case anime::kPlanToWatch: return "PLANNING";
+    case anime::MyStatus::Watching: return "CURRENT";
+    case anime::MyStatus::Completed: return "COMPLETED";
+    case anime::MyStatus::OnHold: return "PAUSED";
+    case anime::MyStatus::Dropped: return "DROPPED";
+    case anime::MyStatus::PlanToWatch: return "PLANNING";
   }
 
   LOGW(L"Invalid value: {}", value);

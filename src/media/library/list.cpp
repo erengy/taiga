@@ -65,7 +65,7 @@ bool Database::LoadList() {
     anime_item.SetMyDateStart(XmlReadStr(node, L"date_start"));
     anime_item.SetMyDateEnd(XmlReadStr(node, L"date_end"));
     anime_item.SetMyScore(XmlReadInt(node, L"score"));
-    anime_item.SetMyStatus(XmlReadInt(node, L"status"));
+    anime_item.SetMyStatus(static_cast<MyStatus>(XmlReadInt(node, L"status")));
     anime_item.SetMyRewatchedTimes(XmlReadInt(node, L"rewatched_times"));
     anime_item.SetMyRewatching(XmlReadInt(node, L"rewatching"));
     anime_item.SetMyRewatchingEp(XmlReadInt(node, L"rewatching_ep"));
@@ -104,7 +104,7 @@ bool Database::SaveList(bool include_database) const {
       XmlWriteStr(node, L"date_start", item.GetMyDateStart().to_string());
       XmlWriteStr(node, L"date_end", item.GetMyDateEnd().to_string());
       XmlWriteInt(node, L"score", item.GetMyScore(false));
-      XmlWriteInt(node, L"status", item.GetMyStatus(false));
+      XmlWriteInt(node, L"status", static_cast<int>(item.GetMyStatus(false)));
       XmlWriteInt(node, L"rewatched_times", item.GetMyRewatchedTimes());
       XmlWriteInt(node, L"rewatching", item.GetMyRewatching(false));
       XmlWriteInt(node, L"rewatching_ep", item.GetMyRewatchingEp());
@@ -121,13 +121,13 @@ bool Database::SaveList(bool include_database) const {
 ////////////////////////////////////////////////////////////////////////////////
 
 // @TODO: Move to util
-int Database::GetItemCount(int status, bool check_history) {
+int Database::GetItemCount(MyStatus status, bool check_history) {
   // Get current count
   int count = 0;
   for (const auto& it : items) {
     const auto& item = it.second;
     if (item.GetMyRewatching()) {
-      if (status == kWatching)
+      if (status == MyStatus::Watching)
         ++count;
     } else {
       if (item.GetMyStatus(false) == status)
@@ -156,7 +156,7 @@ int Database::GetItemCount(int status, bool check_history) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void Database::AddToList(int anime_id, int status) {
+void Database::AddToList(int anime_id, MyStatus status) {
   auto anime_item = Find(anime_id);
 
   if (!anime_item || anime_item->IsInList())
@@ -168,16 +168,16 @@ void Database::AddToList(int anime_id, int status) {
     return;
   }
 
-  if (status == anime::kNotInList)
-    status = anime::IsAiredYet(*anime_item) ? anime::kWatching :
-                                              anime::kPlanToWatch;
+  if (status == anime::MyStatus::NotInList)
+    status = anime::IsAiredYet(*anime_item) ? anime::MyStatus::Watching :
+                                              anime::MyStatus::PlanToWatch;
 
   anime_item->AddtoUserList();
 
   library::QueueItem queue_item;
   queue_item.anime_id = anime_id;
   queue_item.status = status;
-  if (status == anime::kCompleted) {
+  if (status == anime::MyStatus::Completed) {
     queue_item.episode = anime_item->GetEpisodeCount();
     if (anime_item->GetEpisodeCount() == 1)
       queue_item.date_start = GetDate();

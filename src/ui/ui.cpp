@@ -438,12 +438,12 @@ int OnHistoryProcessConfirmationQueue(anime::Episode& episode) {
   if (anime_item->GetEpisodeCount() == 1)
     episode.set_episode_number(1);
 
-  if (anime_item->GetMyStatus() != anime::kNotInList &&
+  if (anime_item->GetMyStatus() != anime::MyStatus::NotInList &&
       anime_item->GetMyRewatching() == false) {
     if (anime_item->GetEpisodeCount() == number) {  // Completed
       dlg.AddButton(L"Update and move\n"
                     L"Update and set as completed", IDCANCEL);
-    } else if (anime_item->GetMyStatus() != anime::kWatching) {  // Watching
+    } else if (anime_item->GetMyStatus() != anime::MyStatus::Watching) {  // Watching
       dlg.AddButton(L"Update and move\n"
                     L"Update and set as watching", IDCANCEL);
     }
@@ -515,10 +515,10 @@ void OnAnimeWatchingStart(const anime::Item& anime_item,
                           const anime::Episode& episode) {
   DlgNowPlaying.SetCurrentId(anime_item.GetId());
 
-  int list_status = anime_item.GetMyStatus();
+  auto list_status = anime_item.GetMyStatus();
   if (anime_item.GetMyRewatching())
-    list_status = anime::kWatching;
-  if (list_status != anime::kNotInList &&
+    list_status = anime::MyStatus::Watching;
+  if (list_status != anime::MyStatus::NotInList &&
       list_status != DlgAnimeList.GetCurrentStatus()) {
     DlgAnimeList.RefreshList(list_status);
     DlgAnimeList.RefreshTabs(list_status);
@@ -709,8 +709,8 @@ void OnSettingsThemeChange() {
 void OnSettingsUserChange() {
   DlgMain.treeview.RefreshHistoryCounter();
   DlgMain.UpdateTitle();
-  DlgAnimeList.RefreshList(anime::kWatching);
-  DlgAnimeList.RefreshTabs(anime::kWatching);
+  DlgAnimeList.RefreshList(anime::MyStatus::Watching);
+  DlgAnimeList.RefreshTabs(anime::MyStatus::Watching);
   DlgHistory.RefreshList();
   DlgNowPlaying.Refresh();
   DlgSearch.RefreshList();

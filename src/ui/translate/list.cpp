@@ -74,7 +74,7 @@ std::wstring TranslateMyScoreFull(const int value) {
   }
 }
 
-std::wstring TranslateMyStatus(const int value, bool add_count) {
+std::wstring TranslateMyStatus(const anime::MyStatus value, bool add_count) {
   const auto with_count = [&value, &add_count](std::wstring str) {
     if (add_count)
       str += L" (" + ToWstr(anime::db.GetItemCount(value)) + L")";
@@ -82,12 +82,12 @@ std::wstring TranslateMyStatus(const int value, bool add_count) {
   };
 
   switch (value) {
-    case anime::kNotInList: return with_count(L"Not in list");
-    case anime::kWatching: return with_count(L"Currently watching");
-    case anime::kCompleted: return with_count(L"Completed");
-    case anime::kOnHold: return with_count(L"On hold");
-    case anime::kDropped: return with_count(L"Dropped");
-    case anime::kPlanToWatch: return with_count(L"Plan to watch");
+    case anime::MyStatus::NotInList: return with_count(L"Not in list");
+    case anime::MyStatus::Watching: return with_count(L"Currently watching");
+    case anime::MyStatus::Completed: return with_count(L"Completed");
+    case anime::MyStatus::OnHold: return with_count(L"On hold");
+    case anime::MyStatus::Dropped: return with_count(L"Dropped");
+    case anime::MyStatus::PlanToWatch: return with_count(L"Plan to watch");
     default: return L"";
   }
 }

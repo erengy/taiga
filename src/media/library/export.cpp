@@ -60,14 +60,14 @@ bool ExportAsMalXml(const std::wstring& path) {
     }
   };
 
-  constexpr auto tr_my_status = [](int status) {
+  constexpr auto tr_my_status = [](anime::MyStatus status) {
     switch (status) {
       default:
-      case anime::kWatching: return L"Watching";
-      case anime::kCompleted: return L"Completed";
-      case anime::kOnHold: return L"On-Hold";
-      case anime::kDropped: return L"Dropped";
-      case anime::kPlanToWatch: return L"Plan to Watch";
+      case anime::MyStatus::Watching: return L"Watching";
+      case anime::MyStatus::Completed: return L"Completed";
+      case anime::MyStatus::OnHold: return L"On-Hold";
+      case anime::MyStatus::Dropped: return L"Dropped";
+      case anime::MyStatus::PlanToWatch: return L"Plan to Watch";
     }
   };
 
@@ -90,11 +90,11 @@ bool ExportAsMalXml(const std::wstring& path) {
   XmlWriteStr(node_myinfo, L"user_name", taiga::GetCurrentUsername());
   XmlWriteInt(node_myinfo, L"user_export_type", 1);  // anime
   XmlWriteInt(node_myinfo, L"user_total_anime", count_total_anime());
-  XmlWriteInt(node_myinfo, L"user_total_watching", anime::db.GetItemCount(anime::kWatching));
-  XmlWriteInt(node_myinfo, L"user_total_completed", anime::db.GetItemCount(anime::kCompleted));
-  XmlWriteInt(node_myinfo, L"user_total_onhold", anime::db.GetItemCount(anime::kOnHold));
-  XmlWriteInt(node_myinfo, L"user_total_dropped", anime::db.GetItemCount(anime::kDropped));
-  XmlWriteInt(node_myinfo, L"user_total_plantowatch", anime::db.GetItemCount(anime::kPlanToWatch));
+  XmlWriteInt(node_myinfo, L"user_total_watching", anime::db.GetItemCount(anime::MyStatus::Watching));
+  XmlWriteInt(node_myinfo, L"user_total_completed", anime::db.GetItemCount(anime::MyStatus::Completed));
+  XmlWriteInt(node_myinfo, L"user_total_onhold", anime::db.GetItemCount(anime::MyStatus::OnHold));
+  XmlWriteInt(node_myinfo, L"user_total_dropped", anime::db.GetItemCount(anime::MyStatus::Dropped));
+  XmlWriteInt(node_myinfo, L"user_total_plantowatch", anime::db.GetItemCount(anime::MyStatus::PlanToWatch));
 
   for (const auto& [id, item] : anime::db.items) {
     if (item.IsInList()) {
@@ -129,7 +129,7 @@ bool ExportAsMalXml(const std::wstring& path) {
 }
 
 bool ExportAsMarkdown(const std::wstring& path) {
-  std::map<int, std::vector<std::wstring>> status_lists;
+  std::map<anime::MyStatus, std::vector<std::wstring>> status_lists;
 
   for (const auto& [id, item] : anime::db.items) {
     if (item.IsInList()) {

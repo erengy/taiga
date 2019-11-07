@@ -298,7 +298,7 @@ void ExecuteCommand(const std::wstring& str, WPARAM wParam, LPARAM lParam) {
   //   wParam is a BOOL value that defines lParam.
   //   lParam is an anime ID, or a pointer to a vector of anime IDs.
   } else if (command == L"AddToList") {
-    int status = ToInt(body);
+    const auto status = static_cast<anime::MyStatus>(ToInt(body));
     if (!wParam) {
       int anime_id = static_cast<int>(lParam);
       anime::db.AddToList(anime_id, status);
@@ -552,12 +552,12 @@ void ExecuteCommand(const std::wstring& str, WPARAM wParam, LPARAM lParam) {
     const auto& anime_ids = *reinterpret_cast<std::vector<int>*>(lParam);
     for (const auto& anime_id : anime_ids) {
       library::QueueItem queue_item;
-      queue_item.status = ToInt(body);
+      queue_item.status = static_cast<anime::MyStatus>(ToInt(body));
       auto anime_item = anime::db.Find(anime_id);
       if (!anime_item)
         continue;
       switch (*queue_item.status) {
-        case anime::kCompleted:
+        case anime::MyStatus::Completed:
           queue_item.episode = anime_item->GetEpisodeCount();
           if (*queue_item.episode == 0)
             queue_item.episode.reset();

@@ -84,7 +84,7 @@ bool EvaluateCondition(const FeedFilterCondition& condition,
       is_numeric = true;
       break;
     case kFeedFilterElement_User_Status:
-      element = ToWstr(anime ? anime->GetMyStatus() : anime::kNotInList);
+      element = ToWstr(static_cast<int>(anime ? anime->GetMyStatus() : anime::MyStatus::NotInList));
       is_numeric = true;
       break;
     case kFeedFilterElement_User_Tags:
