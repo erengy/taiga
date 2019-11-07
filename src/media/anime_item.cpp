@@ -55,7 +55,7 @@ sync::ServiceId Item::GetSource() const {
   return series_.source;
 }
 
-int Item::GetType() const {
+SeriesType Item::GetType() const {
   return series_.type;
 }
 
@@ -151,8 +151,8 @@ void Item::SetSource(sync::ServiceId source) {
   series_.source = source;
 }
 
-void Item::SetType(int type) {
-  series_.type = static_cast<SeriesType>(type);
+void Item::SetType(SeriesType type) {
+  series_.type = type;
 }
 
 void Item::SetEpisodeCount(int number) {

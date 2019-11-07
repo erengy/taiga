@@ -55,30 +55,32 @@ std::wstring TranslateStatus(const int value) {
   }
 }
 
-std::wstring TranslateType(const int value) {
+std::wstring TranslateType(const anime::SeriesType value) {
   switch (value) {
-    case anime::kTv: return L"TV";
-    case anime::kOva: return L"OVA";
-    case anime::kMovie: return L"Movie";
-    case anime::kSpecial: return L"Special";
-    case anime::kOna: return L"ONA";
-    case anime::kMusic: return L"Music";
+    case anime::SeriesType::Tv: return L"TV";
+    case anime::SeriesType::Ova: return L"OVA";
+    case anime::SeriesType::Movie: return L"Movie";
+    case anime::SeriesType::Special: return L"Special";
+    case anime::SeriesType::Ona: return L"ONA";
+    case anime::SeriesType::Music: return L"Music";
     default: return L"";
   }
 }
 
-int TranslateType(const std::wstring& value) {
+anime::SeriesType TranslateType(const std::wstring& value) {
   static const std::map<std::wstring, anime::SeriesType> types{
-      {L"tv", anime::kTv},
-      {L"ova", anime::kOva}, {L"oav", anime::kOva},
-      {L"movie", anime::kMovie}, {L"gekijouban", anime::kMovie},
-      {L"special", anime::kSpecial},
-      {L"ona", anime::kOna},
-      {L"music", anime::kMusic},
+      {L"tv", anime::SeriesType::Tv},
+      {L"ova", anime::SeriesType::Ova},
+      {L"oav", anime::SeriesType::Ova},
+      {L"movie", anime::SeriesType::Movie},
+      {L"gekijouban", anime::SeriesType::Movie},
+      {L"special", anime::SeriesType::Special},
+      {L"ona", anime::SeriesType::Ona},
+      {L"music", anime::SeriesType::Music},
     };
 
   auto it = types.find(ToLower_Copy(value));
-  return it != types.end() ? it->second : anime::kUnknownType;
+  return it != types.end() ? it->second : anime::SeriesType::Unknown;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

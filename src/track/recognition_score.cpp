@@ -105,7 +105,7 @@ static double BonusScore(const anime::Episode& episode, int id) {
         score += 0.1;
 
     auto anime_type = ui::TranslateType(episode.anime_type());
-    if (anime_type != anime::kUnknownType)
+    if (anime_type != anime::SeriesType::Unknown)
       if (anime_type == anime_item->GetType())
         score += 0.1;
   }

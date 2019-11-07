@@ -587,8 +587,8 @@ void SeasonDialog::RefreshList(bool redraw_only) {
       break;
     case kSeasonGroupByType:
     default:
-      for (int i = anime::kTv; i <= anime::kMusic; i++) {
-        list_.InsertGroup(i, ui::TranslateType(i).c_str(), true, false);
+      for (const auto type : anime::kSeriesTypes) {
+        list_.InsertGroup(static_cast<int>(type), ui::TranslateType(type).c_str(), true, false);
       }
       break;
   }
@@ -628,7 +628,7 @@ void SeasonDialog::RefreshList(bool redraw_only) {
       }
       case kSeasonGroupByType:
       default:
-        group = anime_item->GetType();
+        group = static_cast<int>(anime_item->GetType());
         break;
     }
     list_.InsertItem(i - anime::season_db.items.begin(),

@@ -48,7 +48,7 @@ public:
   const std::wstring& GetId(sync::ServiceId service) const;
   const std::wstring& GetSlug() const;
   sync::ServiceId GetSource() const;
-  int GetType() const;
+  SeriesType GetType() const;
   int GetEpisodeCount() const;
   int GetEpisodeLength() const;
   int GetAiringStatus(bool check_date = true) const;
@@ -70,7 +70,7 @@ public:
   void SetId(const std::wstring& id, sync::ServiceId service);
   void SetSlug(const std::wstring& slug);
   void SetSource(sync::ServiceId source);
-  void SetType(int type);
+  void SetType(SeriesType type);
   void SetEpisodeCount(int number);
   void SetEpisodeLength(int number);
   void SetAiringStatus(int status);

@@ -466,7 +466,7 @@ std::wstring FeedFilterManager::TranslateValue(
     case kFeedFilterElement_Meta_Status:
       return ui::TranslateStatus(ToInt(condition.value));
     case kFeedFilterElement_Meta_Type:
-      return ui::TranslateType(ToInt(condition.value));
+      return ui::TranslateType(static_cast<anime::SeriesType>(ToInt(condition.value)));
     default:
       if (condition.value.empty()) {
         return L"(empty)";

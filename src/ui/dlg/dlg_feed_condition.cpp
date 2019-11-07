@@ -308,12 +308,9 @@ void FeedConditionDialog::ChooseElement(int element_index) {
       break;
     case track::kFeedFilterElement_Meta_Type:
       RECREATE_COMBO(CBS_DROPDOWNLIST);
-      value_combo_.AddItem(ui::TranslateType(anime::kTv).c_str(), anime::kTv);
-      value_combo_.AddItem(ui::TranslateType(anime::kOva).c_str(), anime::kOva);
-      value_combo_.AddItem(ui::TranslateType(anime::kMovie).c_str(), anime::kMovie);
-      value_combo_.AddItem(ui::TranslateType(anime::kSpecial).c_str(), anime::kSpecial);
-      value_combo_.AddItem(ui::TranslateType(anime::kOna).c_str(), anime::kOna);
-      value_combo_.AddItem(ui::TranslateType(anime::kMusic).c_str(), anime::kMusic);
+      for (const auto type : anime::kSeriesTypes) {
+        value_combo_.AddItem(ui::TranslateType(type).c_str(), static_cast<int>(type));
+      }
       break;
     case track::kFeedFilterElement_User_Status:
       RECREATE_COMBO(CBS_DROPDOWNLIST);

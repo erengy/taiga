@@ -122,14 +122,14 @@ double TranslateSeriesRatingTo(double value) {
   return value * 10.0;
 }
 
-int TranslateSeriesTypeFrom(const std::string& value) {
+anime::SeriesType TranslateSeriesTypeFrom(const std::string& value) {
   static const std::map<std::string, anime::SeriesType> table{
-    {"TV", anime::kTv},
-    {"special", anime::kSpecial},
-    {"OVA", anime::kOva},
-    {"ONA", anime::kOna},
-    {"movie", anime::kMovie},
-    {"music", anime::kMusic},
+    {"TV", anime::SeriesType::Tv},
+    {"special", anime::SeriesType::Special},
+    {"OVA", anime::SeriesType::Ova},
+    {"ONA", anime::SeriesType::Ona},
+    {"movie", anime::SeriesType::Movie},
+    {"music", anime::SeriesType::Music},
   };
 
   const auto it = table.find(value);
@@ -139,7 +139,7 @@ int TranslateSeriesTypeFrom(const std::string& value) {
   if (!value.empty())
     LOGW(L"Invalid value: {}", StrToWstr(value));
 
-  return anime::kUnknownType;
+  return anime::SeriesType::Unknown;
 }
 
 std::wstring TranslateMyDateFrom(const std::string& value) {

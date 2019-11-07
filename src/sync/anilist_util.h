@@ -25,6 +25,7 @@
 #include "sync/service.h"
 
 namespace anime {
+enum class SeriesType;
 class Item;
 }
 
@@ -37,7 +38,7 @@ Json TranslateFuzzyDateTo(const Date& date);
 std::string TranslateSeasonTo(const std::wstring& value);
 double TranslateSeriesRatingFrom(int value);
 double TranslateSeriesRatingTo(double value);
-int TranslateSeriesTypeFrom(const std::string& value);
+anime::SeriesType TranslateSeriesTypeFrom(const std::string& value);
 std::wstring TranslateMyRating(int value, RatingSystem rating_system);
 int TranslateMyStatusFrom(const std::string& value);
 std::string TranslateMyStatusTo(int value);

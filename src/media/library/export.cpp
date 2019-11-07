@@ -47,16 +47,16 @@ bool ExportAsMalXml(const std::wstring& path) {
     return count;
   };
 
-  constexpr auto tr_series_type = [](int type) {
+  constexpr auto tr_series_type = [](anime::SeriesType type) {
     switch (type) {
       default:
-      case anime::kUnknownType: return L"Unknown";
-      case anime::kTv: return L"TV";
-      case anime::kOva: return L"OVA";
-      case anime::kMovie: return L"Movie";
-      case anime::kSpecial: return L"Special";
-      case anime::kOna: return L"ONA";
-      case anime::kMusic: return L"Music";
+      case anime::SeriesType::Unknown: return L"Unknown";
+      case anime::SeriesType::Tv: return L"TV";
+      case anime::SeriesType::Ova: return L"OVA";
+      case anime::SeriesType::Movie: return L"Movie";
+      case anime::SeriesType::Special: return L"Special";
+      case anime::SeriesType::Ona: return L"ONA";
+      case anime::SeriesType::Music: return L"Music";
     }
   };
 

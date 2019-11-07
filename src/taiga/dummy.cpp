@@ -34,7 +34,7 @@ void InitializeDummies() {
   dummy_anime.SetEnglishTitle(L"Toradora!");
   dummy_anime.SetJapaneseTitle(L"\u3068\u3089\u30C9\u30E9\uFF01");
   dummy_anime.SetSynonyms(L"Tiger X Dragon");
-  dummy_anime.SetType(anime::kTv);
+  dummy_anime.SetType(anime::SeriesType::Tv);
   dummy_anime.SetEpisodeCount(25);
   dummy_anime.SetEpisodeLength(24);
   dummy_anime.SetAiringStatus(anime::kFinishedAiring);

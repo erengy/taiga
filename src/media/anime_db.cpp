@@ -87,7 +87,7 @@ void Database::ReadDatabaseNode(XmlNode& database_node) {
 
     item.SetSource(source);
     item.SetTitle(XmlReadStr(node, L"title"));
-    item.SetType(XmlReadInt(node, L"type"));
+    item.SetType(static_cast<SeriesType>(XmlReadInt(node, L"type")));
     item.SetAiringStatus(XmlReadInt(node, L"status"));
     item.SetAgeRating(static_cast<AgeRating>(XmlReadInt(node, L"age_rating")));
     item.SetGenres(XmlReadStr(node, L"genres"));
@@ -153,7 +153,7 @@ void Database::WriteDatabaseNode(XmlNode& database_node) const {
     XML_WS(L"english", item.GetEnglishTitle(), pugi::node_cdata);
     XML_WS(L"japanese", item.GetJapaneseTitle(), pugi::node_cdata);
     XML_WC(L"synonym", item.GetSynonyms(), pugi::node_cdata);
-    XML_WI(L"type", item.GetType());
+    XML_WI(L"type", static_cast<int>(item.GetType()));
     XML_WI(L"status", item.GetAiringStatus());
     XML_WI(L"episode_count", item.GetEpisodeCount());
     XML_WI(L"episode_length", item.GetEpisodeLength());
@@ -293,7 +293,7 @@ int Database::UpdateItem(const Item& new_item) {
     if (new_item.GetSource() != sync::ServiceId::Taiga)
       item->SetSource(new_item.GetSource());
 
-    if (new_item.GetType() != kUnknownType)
+    if (new_item.GetType() != SeriesType::Unknown)
       item->SetType(new_item.GetType());
     if (new_item.GetEpisodeCount() != kUnknownEpisodeCount)
       item->SetEpisodeCount(new_item.GetEpisodeCount());

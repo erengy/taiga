@@ -95,27 +95,27 @@ int TranslateSeriesStatusFrom(const std::wstring& value) {
   return anime::kUnknownStatus;
 }
 
-int TranslateSeriesTypeFrom(const std::wstring& value) {
+anime::SeriesType TranslateSeriesTypeFrom(const std::wstring& value) {
   if (IsEqual(value, L"unknown")) {
-    return anime::kUnknownType;
+    return anime::SeriesType::Unknown;
   } else if (IsEqual(value, L"tv")) {
-    return anime::kTv;
+    return anime::SeriesType::Tv;
   } else if (IsEqual(value, L"ova")) {
-    return anime::kOva;
+    return anime::SeriesType::Ova;
   } else if (IsEqual(value, L"movie")) {
-    return anime::kMovie;
+    return anime::SeriesType::Movie;
   } else if (IsEqual(value, L"special")) {
-    return anime::kSpecial;
+    return anime::SeriesType::Special;
   } else if (IsEqual(value, L"ona")) {
-    return anime::kOna;
+    return anime::SeriesType::Ona;
   } else if (IsEqual(value, L"music")) {
-    return anime::kMusic;
+    return anime::SeriesType::Music;
   }
 
   if (!value.empty())
     LOGW(L"Invalid value: {}", value);
 
-  return anime::kUnknownType;
+  return anime::SeriesType::Unknown;
 }
 
 std::wstring TranslateMyLastUpdatedFrom(const std::string& value) {

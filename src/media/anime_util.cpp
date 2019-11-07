@@ -113,12 +113,12 @@ int EstimateDuration(const Item& item) {
     // Approximate duration in minutes
     switch (item.GetType()) {
       default:
-      case anime::kTv:      duration = 24; break;
-      case anime::kOva:     duration = 24; break;
-      case anime::kMovie:   duration = 90; break;
-      case anime::kSpecial: duration = 12; break;
-      case anime::kOna:     duration = 24; break;
-      case anime::kMusic:   duration =  5; break;
+      case SeriesType::Tv:      duration = 24; break;
+      case SeriesType::Ova:     duration = 24; break;
+      case SeriesType::Movie:   duration = 90; break;
+      case SeriesType::Special: duration = 12; break;
+      case SeriesType::Ona:     duration = 24; break;
+      case SeriesType::Music:   duration =  5; break;
     }
   }
 
@@ -127,7 +127,7 @@ int EstimateDuration(const Item& item) {
 
 int EstimateLastAiredEpisodeNumber(const Item& item) {
   // Can't estimate for other types of anime
-  if (item.GetType() != kTv)
+  if (item.GetType() != SeriesType::Tv)
     return 0;
 
   // TV series air weekly, so the number of weeks that has passed since the day

@@ -33,8 +33,8 @@ std::wstring TranslateNumber(const int value, const std::wstring& default_char =
 
 std::wstring TranslateScore(const double value);
 std::wstring TranslateStatus(const int value);
-std::wstring TranslateType(const int value);
-int TranslateType(const std::wstring& value);
+std::wstring TranslateType(const anime::SeriesType value);
+anime::SeriesType TranslateType(const std::wstring& value);
 
 std::wstring TranslateDateToSeasonString(const Date& date);
 std::wstring TranslateSeasonName(const anime::Season::Name name);

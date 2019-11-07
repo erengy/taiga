@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <array>
 #include <string>
 #include <vector>
 
@@ -48,14 +49,23 @@ enum SeriesStatus {
   kNotYetAired
 };
 
-enum SeriesType {
-  kUnknownType,
-  kTv,
-  kOva,
-  kMovie,
-  kSpecial,
-  kOna,
-  kMusic
+enum class SeriesType {
+  Unknown,
+  Tv,
+  Ova,
+  Movie,
+  Special,
+  Ona,
+  Music,
+};
+
+constexpr std::array<SeriesType, 6> kSeriesTypes{
+  SeriesType::Tv,
+  SeriesType::Ova,
+  SeriesType::Movie,
+  SeriesType::Special,
+  SeriesType::Ona,
+  SeriesType::Music,
 };
 
 constexpr int kUnknownEpisodeCount = -1;
@@ -105,7 +115,7 @@ struct SeriesInformation {
   int episode_length = kUnknownEpisodeLength;
   AgeRating age_rating = AgeRating::Unknown;
   SeriesStatus status = SeriesStatus::kUnknownStatus;
-  SeriesType type = SeriesType::kUnknownType;
+  SeriesType type = SeriesType::Unknown;
   Date start_date;
   Date end_date;
   float score = 0.0f;
