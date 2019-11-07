@@ -658,9 +658,9 @@ void UpdateLibraryEntry(const library::QueueItem& queue_item) {
   if (queue_item.episode)
     fields[L"num_watched_episodes"] = ToWstr(*queue_item.episode);
   if (queue_item.status)
-    fields[L"status"] = ToWstr(*queue_item.status);
+    fields[L"status"] = TranslateMyStatusTo(*queue_item.status);
   if (queue_item.score)
-    fields[L"score"] = ToWstr(*queue_item.score);
+    fields[L"score"] = ToWstr(TranslateMyRatingTo(*queue_item.score));
   if (queue_item.date_start)
     fields[L"start_date"] = queue_item.date_start->to_string();
   if (queue_item.date_finish)
