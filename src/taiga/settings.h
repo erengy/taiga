@@ -26,7 +26,7 @@
 #include "taiga/settings_keys.h"
 
 namespace anime {
-enum TitleLanguage;
+enum class TitleLanguage;
 }
 namespace semaver {
 class Version;

@@ -83,10 +83,10 @@ enum class AgeRating {
   R18,
 };
 
-enum TitleLanguage {
-  kTitleLanguageRomaji,
-  kTitleLanguageEnglish,
-  kTitleLanguageNative,
+enum class TitleLanguage {
+  Romaji,
+  English,
+  Native,
 };
 
 struct Titles {

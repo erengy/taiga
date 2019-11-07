@@ -556,18 +556,18 @@ void Settings::SetAppListSortOrderSecondary(const int order) {
 
 anime::TitleLanguage Settings::GetAppListTitleLanguagePreference() const {
   const auto slug = value<std::wstring>(AppSettingKey::AppListTitleLanguagePreference);
-  if (slug == L"english") return anime::kTitleLanguageEnglish;
-  if (slug == L"native") return anime::kTitleLanguageNative;
-  return anime::kTitleLanguageRomaji;
+  if (slug == L"english") return anime::TitleLanguage::English;
+  if (slug == L"native") return anime::TitleLanguage::Native;
+  return anime::TitleLanguage::Romaji;
 }
 
 void Settings::SetAppListTitleLanguagePreference(const anime::TitleLanguage language) {
   const std::wstring slug = [&language]() {
     switch (language) {
       default:
-      case anime::kTitleLanguageRomaji: return L"romaji";
-      case anime::kTitleLanguageEnglish: return L"english";
-      case anime::kTitleLanguageNative: return L"native";
+      case anime::TitleLanguage::Romaji: return L"romaji";
+      case anime::TitleLanguage::English: return L"english";
+      case anime::TitleLanguage::Native: return L"native";
     }
   }();
   set_value(AppSettingKey::AppListTitleLanguagePreference, slug);

@@ -37,9 +37,9 @@ bool Settings::HandleCompatibility() {
   if (version <= semaver::Version(1, 3, 0)) {
     // Set title language preference
     if (GetAppListDisplayEnglishTitles()) {
-      SetAppListTitleLanguagePreference(anime::kTitleLanguageEnglish);
+      SetAppListTitleLanguagePreference(anime::TitleLanguage::English);
     } else {
-      SetAppListTitleLanguagePreference(anime::kTitleLanguageRomaji);
+      SetAppListTitleLanguagePreference(anime::TitleLanguage::Romaji);
     }
   }
 

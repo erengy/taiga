@@ -551,11 +551,11 @@ int EstimateEpisodeCount(const Item& item) {
 const std::wstring& GetPreferredTitle(const Item& item) {
   switch (taiga::settings.GetAppListTitleLanguagePreference()) {
     default:
-    case anime::kTitleLanguageRomaji:
+    case anime::TitleLanguage::Romaji:
       return item.GetTitle();
-    case anime::kTitleLanguageEnglish:
+    case anime::TitleLanguage::English:
       return item.GetEnglishTitle(true);
-    case anime::kTitleLanguageNative: {
+    case anime::TitleLanguage::Native: {
       const auto& native_title = item.GetJapaneseTitle();
       return !native_title.empty() ? native_title : item.GetTitle();
     }
