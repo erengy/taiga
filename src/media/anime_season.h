@@ -20,13 +20,13 @@
 
 #include <string>
 
-#include "base/comparable.h"
+#include <nstd/compare.hpp>
 
 class Date;
 
 namespace anime {
 
-class Season : public base::Comparable<Season> {
+class Season : public nstd::Comparable<Season> {
 public:
   enum Name {
     kUnknown,
@@ -53,8 +53,7 @@ public:
   Name name;
   unsigned short year;
 
-private:
-  base::CompareResult Compare(const Season& season) const;
+  int compare(const Season& season) const override;
 };
 
 }  // namespace anime

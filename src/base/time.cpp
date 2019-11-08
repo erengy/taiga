@@ -110,13 +110,13 @@ void Date::set_day(unsigned short day) {
 }
 
 template <typename T>
-base::CompareResult FuzzyCompareDate(const T& lhs, const T& rhs) {
-  if (!lhs) return base::kGreaterThan;
-  if (!rhs) return base::kLessThan;
-  return lhs < rhs ? base::kLessThan : base::kGreaterThan;
+int FuzzyCompareDate(const T& lhs, const T& rhs) {
+  if (!lhs) return nstd::cmp::greater;
+  if (!rhs) return nstd::cmp::less;
+  return lhs < rhs ? nstd::cmp::less : nstd::cmp::greater;
 }
 
-base::CompareResult Date::Compare(const Date& date) const {
+int Date::compare(const Date& date) const {
   if (year() != date.year()) {
     return FuzzyCompareDate(year(), date.year());
   }
@@ -126,7 +126,7 @@ base::CompareResult Date::Compare(const Date& date) const {
   if (day() != date.day()) {
     return FuzzyCompareDate(day(), date.day());
   }
-  return base::kEqualTo;
+  return nstd::cmp::equal;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

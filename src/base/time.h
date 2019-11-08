@@ -24,14 +24,13 @@
 #include <windows.h>
 
 #include <date/date.h>
-
-#include "comparable.h"
+#include <nstd/compare.hpp>
 
 // @TODO: Rename to `Date`
 using DateFull = date::year_month_day;
 
 // @TODO: Rename to `FuzzyDate`
-class Date : public base::Comparable<Date> {
+class Date : public nstd::Comparable<Date> {
 public:
   Date();
   explicit Date(const std::wstring& date);
@@ -57,9 +56,9 @@ public:
   void set_month(unsigned short month);
   void set_day(unsigned short day);
 
-private:
-  base::CompareResult Compare(const Date& date) const override;
+  int compare(const Date& date) const override;
 
+private:
   date::year year_;
   date::month month_;
   date::day day_;

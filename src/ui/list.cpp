@@ -18,10 +18,10 @@
 
 #include "ui/list.h"
 
+#include <nstd/compare.hpp>
 #include <windows/win/common_controls.h>
 #include <windows/win/gdi.h>
 
-#include "base/comparable.h"
 #include "base/string.h"
 #include "base/time.h"
 #include "media/anime_db.h"
@@ -32,15 +32,6 @@
 #include "track/feed.h"
 
 namespace ui {
-
-template<class T>
-static int CompareValues(const T& first, const T& second) {
-  if (first != second)
-    return first < second ? base::kLessThan : base::kGreaterThan;
-  return base::kEqualTo;
-}
-
-////////////////////////////////////////////////////////////////////////////////
 
 int SortAsEpisodeRange(const std::wstring& str1, const std::wstring& str2) {
   auto is_volume = [](const std::wstring& str) {
@@ -59,21 +50,21 @@ int SortAsEpisodeRange(const std::wstring& str1, const std::wstring& str2) {
   bool is_volume2 = is_volume(str2);
 
   if (is_volume1 && is_volume2) {
-    return CompareValues<int>(get_volume(str1), get_volume(str2));
+    return nstd::compare<int>(get_volume(str1), get_volume(str2));
   } else if (!is_volume1 && !is_volume2) {
-    return CompareValues<int>(get_last_number_in_range(str1),
+    return nstd::compare<int>(get_last_number_in_range(str1),
                               get_last_number_in_range(str2));
   } else {
-    return is_volume1 ? base::kLessThan : base::kGreaterThan;
+    return is_volume1 ? nstd::cmp::less : nstd::cmp::greater;
   }
 }
 
 int SortAsNumber(LPCWSTR str1, LPCWSTR str2) {
-  return CompareValues<int>(ToInt(str1), ToInt(str2));
+  return nstd::compare<int>(ToInt(str1), ToInt(str2));
 }
 
 int SortListAsRfc822DateTime(LPCWSTR str1, LPCWSTR str2) {
-  return CompareValues<time_t>(ConvertRfc822(str1), ConvertRfc822(str2));
+  return nstd::compare<time_t>(ConvertRfc822(str1), ConvertRfc822(str2));
 }
 
 int SortAsText(LPCWSTR str1, LPCWSTR str2) {
@@ -83,16 +74,16 @@ int SortAsText(LPCWSTR str1, LPCWSTR str2) {
 ////////////////////////////////////////////////////////////////////////////////
 
 int SortListByAiringStatus(const anime::Item& item1, const anime::Item& item2) {
-  return CompareValues<int>(static_cast<int>(item1.GetAiringStatus()),
+  return nstd::compare<int>(static_cast<int>(item1.GetAiringStatus()),
                             static_cast<int>(item2.GetAiringStatus()));
 }
 
 int SortListByMyDate(const Date& date1, const Date& date2) {
   if (date1 != date2)
     if (!anime::IsValidDate(date1) || !anime::IsValidDate(date2))
-      return anime::IsValidDate(date2) ? base::kLessThan : base::kGreaterThan;
+      return anime::IsValidDate(date2) ? nstd::cmp::less : nstd::cmp::greater;
 
-  return CompareValues<Date>(date1, date2);
+  return nstd::compare<Date>(date1, date2);
 }
 
 int SortListByMyDateStart(const anime::Item& item1, const anime::Item& item2) {
@@ -123,15 +114,15 @@ int SortListByDateStart(const anime::Item& item1, const anime::Item& item2) {
     assume_worst_case(date2);
   }
 
-  return CompareValues<Date>(date1, date2);
+  return nstd::compare<Date>(date1, date2);
 }
 
 int SortListByEpisodeCount(const anime::Item& item1, const anime::Item& item2) {
-  return CompareValues<int>(item1.GetEpisodeCount(), item2.GetEpisodeCount());
+  return nstd::compare<int>(item1.GetEpisodeCount(), item2.GetEpisodeCount());
 }
 
 int SortListByLastUpdated(const anime::Item& item1, const anime::Item& item2) {
-  return CompareValues<time_t>(ToTime(item1.GetMyLastUpdated()),
+  return nstd::compare<time_t>(ToTime(item1.GetMyLastUpdated()),
                                ToTime(item2.GetMyLastUpdated()));
 }
 
@@ -141,9 +132,9 @@ int SortListByPopularity(const anime::Item& item1, const anime::Item& item2) {
 
   if (val1 != val2)
     if (val1 == 0 || val2 == 0)
-      return val2 == 0 ? base::kLessThan : base::kGreaterThan;
+      return val2 == 0 ? nstd::cmp::less : nstd::cmp::greater;
 
-  return CompareValues<int>(val1, val2);
+  return nstd::compare<int>(val1, val2);
 }
 
 int SortListByProgress(const anime::Item& item1, const anime::Item& item2) {
@@ -153,19 +144,19 @@ int SortListByProgress(const anime::Item& item1, const anime::Item& item2) {
   anime::GetProgressRatios(item2, unused2, ratio2);
 
   if (ratio1 != ratio2) {
-    return CompareValues<float>(ratio1, ratio2);
+    return nstd::compare<float>(ratio1, ratio2);
   } else {
-    return CompareValues<int>(anime::EstimateEpisodeCount(item1),
+    return nstd::compare<int>(anime::EstimateEpisodeCount(item1),
                               anime::EstimateEpisodeCount(item2));
   }
 }
 
 int SortListByMyScore(const anime::Item& item1, const anime::Item& item2) {
-  return CompareValues<double>(item1.GetMyScore(), item2.GetMyScore());
+  return nstd::compare<double>(item1.GetMyScore(), item2.GetMyScore());
 }
 
 int SortListByScore(const anime::Item& item1, const anime::Item& item2) {
-  return CompareValues<double>(item1.GetScore(), item2.GetScore());
+  return nstd::compare<double>(item1.GetScore(), item2.GetScore());
 }
 
 int SortListByTitle(const anime::Item& item1, const anime::Item& item2) {
@@ -174,7 +165,7 @@ int SortListByTitle(const anime::Item& item1, const anime::Item& item2) {
 }
 
 int SortListBySeason(const anime::Item& item1, const anime::Item& item2) {
-  return CompareValues<anime::Season>(anime::Season{item1.GetDateStart()},
+  return nstd::compare<anime::Season>(anime::Season{item1.GetDateStart()},
                                       anime::Season{item2.GetDateStart()});
 }
 
@@ -193,7 +184,7 @@ int SortList(int type, LPCWSTR str1, LPCWSTR str2) {
       return SortListAsRfc822DateTime(str1, str2);
   }
 
-  return base::kEqualTo;
+  return nstd::cmp::equal;
 }
 
 int SortList(int type, int order, int id1, int id2) {
@@ -229,7 +220,7 @@ int SortList(int type, int order, int id1, int id2) {
     }
   }
 
-  return base::kEqualTo;
+  return nstd::cmp::equal;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -237,10 +228,10 @@ int SortList(int type, int order, int id1, int id2) {
 static int ListViewCompare(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort,
                            bool secondary) {
   if (!lParamSort)
-    return base::kEqualTo;
+    return nstd::cmp::equal;
 
   const auto list = reinterpret_cast<win::ListView*>(lParamSort);
-  int return_value = base::kEqualTo;
+  int return_value = nstd::cmp::equal;
 
   switch (list->GetSortType(secondary)) {
     case kListSortDefault:
@@ -260,7 +251,7 @@ static int ListViewCompare(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort,
       const auto item1 = reinterpret_cast<track::FeedItem*>(list->GetItemParam(lParam1));
       const auto item2 = reinterpret_cast<track::FeedItem*>(list->GetItemParam(lParam2));
       if (item1 && item2)
-        return_value = CompareValues<UINT64>(item1->file_size, item2->file_size);
+        return_value = nstd::compare<UINT64>(item1->file_size, item2->file_size);
       break;
     }
 
@@ -284,7 +275,7 @@ static int ListViewCompare(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort,
     }
   }
 
-  if (!secondary && return_value == base::kEqualTo) {
+  if (!secondary && return_value == nstd::cmp::equal) {
     if (list->GetSortColumn(false) != list->GetSortColumn(true)) {
       return ListViewCompare(lParam1, lParam2, lParamSort, true);
     }
@@ -309,7 +300,7 @@ int CALLBACK AnimeListCompareProc(LPARAM lParam1, LPARAM lParam2,
       bool available1 = item1->IsNextEpisodeAvailable();
       bool available2 = item2->IsNextEpisodeAvailable();
       if (available1 != available2)
-        return CompareValues<bool>(!available1, !available2);
+        return nstd::compare<bool>(!available1, !available2);
     }
   }
 

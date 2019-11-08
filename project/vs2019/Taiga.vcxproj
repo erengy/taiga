@@ -371,7 +371,6 @@
     <ClInclude Include="..\..\src\base\atf.h" />
     <ClInclude Include="..\..\src\base\base64.h" />
     <ClInclude Include="..\..\src\base\command_line.h" />
-    <ClInclude Include="..\..\src\base\comparable.h" />
     <ClInclude Include="..\..\src\base\crypto.h" />
     <ClInclude Include="..\..\src\base\file.h" />
     <ClInclude Include="..\..\src\base\file_monitor.h" />

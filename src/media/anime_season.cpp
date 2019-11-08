@@ -20,9 +20,10 @@
 #include <regex>
 #include <vector>
 
+#include "media/anime_season.h"
+
 #include "base/string.h"
 #include "base/time.h"
-#include "media/anime_season.h"
 
 namespace anime {
 
@@ -148,24 +149,24 @@ void Season::GetInterval(Date& date_start, Date& date_end) const {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-base::CompareResult Season::Compare(const Season& season) const {
+int Season::compare(const Season& season) const {
   if (year != season.year) {
     if (year == 0)
-      return base::kGreaterThan;
+      return nstd::cmp::greater;
     if (season.year == 0)
-      return base::kLessThan;
-    return year < season.year ? base::kLessThan : base::kGreaterThan;
+      return nstd::cmp::less;
+    return year < season.year ? nstd::cmp::less : nstd::cmp::greater;
   }
 
   if (name != season.name) {
     if (name == Season::kUnknown)
-      return base::kGreaterThan;
+      return nstd::cmp::greater;
     if (season.name == Season::kUnknown)
-      return base::kLessThan;
-    return name < season.name ? base::kLessThan : base::kGreaterThan;
+      return nstd::cmp::less;
+    return name < season.name ? nstd::cmp::less : nstd::cmp::greater;
   }
 
-  return base::kEqualTo;
+  return nstd::cmp::equal;
 }
 
 }  // namespace anime
