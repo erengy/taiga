@@ -19,7 +19,6 @@
 #pragma once
 
 #include <string>
-#include <windows.h>
 
 namespace anime {
 class Episode;

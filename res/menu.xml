@@ -351,6 +351,7 @@
 		<item name="Score"            action="%score%"/>
 		<item name="Watching status"  action="%status%"/>
 		<item name="Rewatching"       action="%rewatching%"/>
+		<item name="Notes"            action="%notes%"/>
 		<item type="separator"/>
 		<item name="Filename"         action="%file%"/>
 		<item name="Episode number"   action="%episode%"/>

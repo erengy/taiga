@@ -72,6 +72,7 @@ static const std::set<std::wstring> script_variables = {
       L"image",
       L"manual",
       L"name",
+      L"notes",
       L"playstatus",
       L"resolution",
       L"rewatching",
@@ -121,6 +122,7 @@ std::wstring ReplaceVariables(const std::wstring& str,
     fields[L"image"] = anime_item->GetImageUrl();
     fields[L"status"] = ToWstr(static_cast<int>(anime_item->GetMyStatus()));
     fields[L"rewatching"] = ToWstr(anime_item->GetMyRewatching());
+    fields[L"notes"] = anime_item->GetMyNotes();
     switch (sync::GetCurrentServiceId()) {
       case sync::ServiceId::MyAnimeList:
         fields[L"animeurl"] = sync::myanimelist::GetAnimePage(*anime_item);
