@@ -16,7 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <algorithm>
+#include <nstd/algorithm.hpp>
 
 #include "media/anime_season_db.h"
 
@@ -97,7 +97,7 @@ void SeasonDatabase::Review(bool hide_nsfw) {
 
   // Check for missing items
   for (const auto& [anime_id, anime_item] : anime::db.items) {
-    if (std::find(items.begin(), items.end(), anime_id) != items.end())
+    if (nstd::contains(items, anime_id))
       continue;
     if (is_nsfw(anime_item) || !is_within_date_interval(anime_item))
       continue;

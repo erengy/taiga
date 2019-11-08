@@ -16,6 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <nstd/algorithm.hpp>
+
 #include "track/feed_filter_manager.h"
 
 #include "base/log.h"
@@ -568,8 +570,7 @@ bool GetFansubFilter(int anime_id, std::vector<std::wstring>& groups) {
   bool found = false;
 
   for (const auto& filter : feed_filter_manager.filters) {
-    if (std::find(filter.anime_ids.begin(), filter.anime_ids.end(),
-                  anime_id) != filter.anime_ids.end()) {
+    if (nstd::contains(filter.anime_ids, anime_id)) {
       for (const auto& condition : filter.conditions) {
         if (condition.element == track::kFeedFilterElement_Episode_Group) {
           groups.push_back(condition.value);

@@ -19,6 +19,8 @@
 #include <windows.h>
 #include <uxtheme.h>
 
+#include <nstd/algorithm.hpp>
+
 #include "base/format.h"
 #include "base/string.h"
 #include "base/process.h"
@@ -569,7 +571,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
     // Recently watched
     std::vector<int> anime_ids;
     auto list_anime_ids = [&anime_ids](int anime_id) {
-      if (std::find(anime_ids.begin(), anime_ids.end(), anime_id) == anime_ids.end()) {
+      if (!nstd::contains(anime_ids, anime_id)) {
         auto anime_item = anime::db.Find(anime_id);
         if (anime_item)
           if (anime_item->GetMyStatus() == anime::MyStatus::Watching || anime_item->GetMyRewatching())

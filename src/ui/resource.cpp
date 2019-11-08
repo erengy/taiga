@@ -16,12 +16,15 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <nstd/algorithm.hpp>
+
+#include "ui/resource.h"
+
 #include "base/file.h"
 #include "media/anime.h"
 #include "media/anime_db.h"
 #include "media/anime_season_db.h"
 #include "media/anime_util.h"
-#include "ui/resource.h"
 #include "sync/sync.h"
 #include "taiga/path.h"
 #include "ui/dlg/dlg_anime_info.h"
@@ -80,10 +83,9 @@ void ImageDatabase::FreeMemory() {
       continue;
     }
 
-    if (ui::DlgSeason.IsVisible()) {
-      const auto& items = anime::season_db.items;
-      if (std::find(items.begin(), items.end(), anime_id) != items.end())
-        continue;
+    if (ui::DlgSeason.IsVisible() &&
+        nstd::contains(anime::season_db.items, anime_id)) {
+      continue;
     }
 
     items_.erase(anime_id);

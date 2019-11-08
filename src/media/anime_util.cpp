@@ -18,6 +18,10 @@
 
 #include <algorithm>
 
+#include <nstd/algorithm.hpp>
+
+#include "media/anime_util.h"
+
 #include "base/file.h"
 #include "base/format.h"
 #include "base/html.h"
@@ -29,7 +33,6 @@
 #include "media/anime_db.h"
 #include "track/episode.h"
 #include "track/episode_util.h"
-#include "media/anime_util.h"
 #include "media/library/queue.h"
 #include "sync/sync.h"
 #include "taiga/announce.h"
@@ -196,8 +199,7 @@ bool IsNsfw(const Item& item) {
     return true;
 
   if (item.GetAgeRating() == anime::AgeRating::Unknown) {
-    auto& genres = item.GetGenres();
-    if (std::find(genres.begin(), genres.end(), L"Hentai") != genres.end())
+    if (nstd::contains(item.GetGenres(), std::wstring{L"Hentai"}))
       return true;
   }
 
