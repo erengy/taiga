@@ -184,7 +184,7 @@ void Queue::Check(bool automatic) {
     return;
   }
 
-  if (!sync::UserAuthenticated()) {
+  if (!sync::IsUserAuthenticated()) {
     sync::AuthenticateUser();
     return;
   }

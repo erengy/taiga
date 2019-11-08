@@ -39,5 +39,6 @@ void DeleteLibraryEntry(const int id);
 void UpdateLibraryEntry(const library::QueueItem& queue_item);
 
 bool IsUserAuthenticated();
+void InvalidateUserAuthentication();
 
 }  // namespace sync::anilist

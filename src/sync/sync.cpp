@@ -147,7 +147,7 @@ void SearchTitle(const std::wstring& title) {
 }
 
 void Synchronize() {
-  bool authenticated = UserAuthenticated();
+  bool authenticated = IsUserAuthenticated();
 
   if (!authenticated) {
     authenticated = AuthenticateUser();
@@ -260,7 +260,7 @@ void DownloadImage(const int anime_id, const std::wstring& image_url) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool UserAuthenticated() {
+bool IsUserAuthenticated() {
   switch (GetCurrentServiceId()) {
     case ServiceId::MyAnimeList:
       return myanimelist::IsUserAuthenticated();
@@ -274,7 +274,17 @@ bool UserAuthenticated() {
 }
 
 void InvalidateUserAuthentication() {
-  // @TODO
+  switch (GetCurrentServiceId()) {
+    case ServiceId::MyAnimeList:
+      myanimelist::InvalidateUserAuthentication();
+      break;
+    case ServiceId::Kitsu:
+      kitsu::InvalidateUserAuthentication();
+      break;
+    case ServiceId::AniList:
+      anilist::InvalidateUserAuthentication();
+      break;
+  }
 }
 
 bool IsUserAccountAvailable() {

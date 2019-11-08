@@ -364,7 +364,7 @@ void OnHistoryAddItem(const library::QueueItem& queue_item) {
       DlgAnimeList.listview.SortFromSettings();
   }
 
-  if (!sync::UserAuthenticated()) {
+  if (!sync::IsUserAuthenticated()) {
     auto anime_item = anime::db.Find(queue_item.anime_id);
     if (anime_item) {
       ChangeStatusText(L"\"{}\" is queued for update."_format(

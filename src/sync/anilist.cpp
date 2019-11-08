@@ -102,6 +102,10 @@ bool IsUserAuthenticated() {
   return account.authenticated();
 }
 
+void InvalidateUserAuthentication() {
+  account.set_authenticated(false);
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 taiga::http::Request BuildRequest() {
@@ -311,7 +315,7 @@ bool HasError(const taiga::http::Response& response) {
 
   if (Json root; JsonParseString(response.body(), root)) {
     if (root.count("errors")) {
-      if (const auto& errors = root["errors"];  errors.is_array()) {
+      if (const auto& errors = root["errors"]; errors.is_array()) {
         for (const auto& error : errors) {
           auto error_description = StrToWstr(JsonReadStr(error, "message"));
           if (error.count("validation")) {

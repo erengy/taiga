@@ -59,7 +59,7 @@ void UpdateLibraryEntry(const library::QueueItem& queue_item);
 
 void DownloadImage(const int anime_id, const std::wstring& image_url);
 
-bool UserAuthenticated();
+bool IsUserAuthenticated();
 void InvalidateUserAuthentication();
 bool IsUserAccountAvailable();
 

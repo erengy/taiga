@@ -87,6 +87,10 @@ bool IsUserAuthenticated() {
   return account.authenticated();
 }
 
+void InvalidateUserAuthentication() {
+  account.set_authenticated(false);
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 taiga::http::Request BuildRequest() {
