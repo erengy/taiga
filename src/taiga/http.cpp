@@ -350,7 +350,7 @@ private:
 
 namespace util {
 
-std::wstring GetUrlHost(const hypp::Uri& uri) {
+std::wstring GetUrlHost(const Uri& uri) {
   if (uri.authority.has_value()) {
     return StrToWstr(uri.authority->host);
   }
@@ -367,7 +367,7 @@ std::wstring GetUrlHost(const std::string_view url) {
   return {};
 }
 
-std::wstring to_string(const hypr::Error& error, const std::wstring& host) {
+std::wstring to_string(const Error& error, const std::wstring& host) {
   std::wstring message = StrToWstr(error.str());
   TrimRight(message, L" \r\n");
   message = L"{} ({})"_format(message, error.code);

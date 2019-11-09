@@ -25,9 +25,11 @@
 
 namespace taiga::http {
 
+using Error = hypr::Error;
 using Request = hypr::Request;
 using Response = hypr::Response;
 using Transfer = hypr::detail::Transfer;
+using Uri = hypp::Uri;
 
 using ResponseCallback = std::function<void(const Response&)>;
 using TransferCallback = std::function<bool(const Transfer&)>;
@@ -42,9 +44,9 @@ void Send(const Request& request,
 
 namespace util {
 
-std::wstring GetUrlHost(const hypp::Uri& uri);
+std::wstring GetUrlHost(const Uri& uri);
 std::wstring GetUrlHost(const std::string_view url);
-std::wstring to_string(const hypr::Error& error, const std::wstring& host);
+std::wstring to_string(const Error& error, const std::wstring& host);
 std::wstring to_string(const Transfer& transfer);
 
 }  // namespace util
