@@ -36,6 +36,7 @@
 #include "sync/sync.h"
 #include "taiga/http.h"
 #include "taiga/settings.h"
+#include "track/recognition.h"
 #include "ui/translate.h"
 #include "ui/ui.h"
 
@@ -307,8 +308,10 @@ int ParseAnimeObject(const Json& json) {
     return anime::ID_UNKNOWN;
   }
 
-  anime::Item anime_item;
+  auto& anime_item = anime::db.items[anime_id];
+
   anime_item.SetSource(ServiceId::Kitsu);
+  anime_item.SetId(anime_id);
   anime_item.SetId(ToWstr(anime_id), ServiceId::Kitsu);
   anime_item.SetLastModified(time(nullptr));  // current time
 
@@ -330,10 +333,12 @@ int ParseAnimeObject(const Json& json) {
   anime_item.SetSynopsis(
       anime::NormalizeSynopsis(StrToWstr(JsonReadStr(attributes, "synopsis"))));
 
+  std::vector<std::wstring> synonyms;
   for (const auto& title : attributes["abbreviatedTitles"]) {
     if (title.is_string())
-      anime_item.InsertSynonym(StrToWstr(title));
+      synonyms.push_back(StrToWstr(title));
   }
+  anime_item.SetSynonyms(synonyms);
 
   enum class TitleLanguage {
     en,     // English
@@ -363,7 +368,9 @@ int ParseAnimeObject(const Json& json) {
     }
   }
 
-  return anime::db.UpdateItem(anime_item);
+  Meow.UpdateTitles(anime_item);
+
+  return anime_id;
 }
 
 void ParseCategories(const Json& json, const int anime_id) {
@@ -416,9 +423,8 @@ int ParseLibraryObject(const Json& json) {
     return anime::ID_UNKNOWN;
   }
 
-  anime::Item anime_item;
-  anime_item.SetSource(ServiceId::Kitsu);
-  anime_item.SetId(ToWstr(anime_id), ServiceId::Kitsu);
+  auto& anime_item = anime::db.items[anime_id];
+
   anime_item.AddtoUserList();
 
   anime_item.SetMyId(ToWstr(library_id));
@@ -437,7 +443,7 @@ int ParseLibraryObject(const Json& json) {
   anime_item.SetMyLastUpdated(
       TranslateMyLastUpdatedFrom(JsonReadStr(attributes, "updatedAt")));
 
-  return anime::db.UpdateItem(anime_item);
+  return anime_id;
 }
 
 std::optional<int> GetOffset(const Json& json, const std::string& name) {

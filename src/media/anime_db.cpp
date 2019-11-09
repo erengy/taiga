@@ -29,7 +29,6 @@
 #include "taiga/path.h"
 #include "taiga/settings.h"
 #include "taiga/version.h"
-#include "track/recognition.h"
 #include "ui/ui.h"
 
 namespace anime {
@@ -253,125 +252,6 @@ bool Database::DeleteItem(int id) {
   }
 
   return false;
-}
-
-int Database::UpdateItem(const Item& new_item) {
-  Item* item = nullptr;
-
-  for (const auto service_id : sync::kServiceIds) {
-    item = Find(new_item.GetId(service_id), service_id, false);
-    if (item)
-      break;
-  }
-
-  if (!item) {
-    auto source = new_item.GetSource();
-
-    if (source == sync::ServiceId::Taiga) {
-      LOGE(L"Invalid source for ID: {}", new_item.GetId(source));
-      return ID_UNKNOWN;
-    }
-
-    int id = ToInt(new_item.GetId(source));
-
-    // Add a new item
-    item = &items[id];
-    item->SetId(ToWstr(id), sync::ServiceId::Taiga);
-  }
-
-  // Update series information if new information is, well, new.
-  if (!item->GetLastModified() ||
-      new_item.GetLastModified() >= item->GetLastModified()) {
-    item->SetLastModified(new_item.GetLastModified());
-
-    for (const auto service_id : sync::kServiceIds) {
-      if (service_id != sync::ServiceId::Taiga)
-        if (!new_item.GetId(service_id).empty())
-          item->SetId(new_item.GetId(service_id), service_id);
-    }
-
-    if (new_item.GetSource() != sync::ServiceId::Taiga)
-      item->SetSource(new_item.GetSource());
-
-    if (new_item.GetType() != SeriesType::Unknown)
-      item->SetType(new_item.GetType());
-    if (new_item.GetEpisodeCount() != kUnknownEpisodeCount)
-      item->SetEpisodeCount(new_item.GetEpisodeCount());
-    if (new_item.GetEpisodeLength() != kUnknownEpisodeLength)
-      item->SetEpisodeLength(new_item.GetEpisodeLength());
-    if (new_item.GetAiringStatus(false) != SeriesStatus::Unknown)
-      item->SetAiringStatus(new_item.GetAiringStatus());
-    if (!new_item.GetSlug().empty())
-      item->SetSlug(new_item.GetSlug());
-    if (!new_item.GetTitle().empty())
-      item->SetTitle(new_item.GetTitle());
-    if (!new_item.GetEnglishTitle(false).empty())
-      item->SetEnglishTitle(new_item.GetEnglishTitle());
-    if (!new_item.GetJapaneseTitle().empty())
-      item->SetJapaneseTitle(new_item.GetJapaneseTitle());
-    if (!new_item.GetSynonyms().empty())
-      item->SetSynonyms(new_item.GetSynonyms());
-    if (IsValidDate(new_item.GetDateStart()))
-      item->SetDateStart(new_item.GetDateStart());
-    if (IsValidDate(new_item.GetDateEnd()))
-      item->SetDateEnd(new_item.GetDateEnd());
-    if (!new_item.GetImageUrl().empty())
-      item->SetImageUrl(new_item.GetImageUrl());
-    if (new_item.GetAgeRating() != AgeRating::Unknown)
-      item->SetAgeRating(new_item.GetAgeRating());
-    if (!new_item.GetGenres().empty())
-      item->SetGenres(new_item.GetGenres());
-    if (new_item.GetPopularity() > 0)
-      item->SetPopularity(new_item.GetPopularity());
-    if (!new_item.GetProducers().empty())
-      item->SetProducers(new_item.GetProducers());
-    if (new_item.GetScore() != kUnknownScore)
-      item->SetScore(new_item.GetScore());
-    if (!new_item.GetSynopsis().empty())
-      item->SetSynopsis(new_item.GetSynopsis());
-
-    // Update clean titles, if necessary
-    if (!new_item.GetTitle().empty() ||
-        !new_item.GetSynonyms().empty() ||
-        !new_item.GetEnglishTitle(false).empty() ||
-        !new_item.GetJapaneseTitle().empty())
-      Meow.UpdateTitles(*item);
-  }
-
-  // Update user information
-  if (new_item.IsInList()) {
-    // Make sure our pointer to MyInformation class is valid
-    item->AddtoUserList();
-
-    if (!item->GetNextEpisodePath().empty() &&
-        item->GetMyLastWatchedEpisode() != new_item.GetMyLastWatchedEpisode()) {
-      // Next episode path is no longer valid
-      item->SetNextEpisodePath(L"");
-    }
-
-    item->SetMyId(new_item.GetMyId());
-    item->SetMyLastWatchedEpisode(new_item.GetMyLastWatchedEpisode(false));
-    item->SetMyScore(new_item.GetMyScore(false));
-    item->SetMyStatus(new_item.GetMyStatus(false));
-    item->SetMyRewatchedTimes(new_item.GetMyRewatchedTimes());
-    item->SetMyRewatching(new_item.GetMyRewatching(false));
-    item->SetMyRewatchingEp(new_item.GetMyRewatchingEp());
-    item->SetMyDateStart(new_item.GetMyDateStart());
-    item->SetMyDateEnd(new_item.GetMyDateEnd());
-    item->SetMyLastUpdated(new_item.GetMyLastUpdated());
-    item->SetMyTags(new_item.GetMyTags(false));
-    item->SetMyNotes(new_item.GetMyNotes(false));
-  }
-
-  // Update local information
-  {
-    if (new_item.GetLastAiredEpisodeNumber())
-      item->SetLastAiredEpisodeNumber(new_item.GetLastAiredEpisodeNumber());
-    if (new_item.GetNextEpisodeTime())
-      item->SetNextEpisodeTime(new_item.GetNextEpisodeTime());
-  }
-
-  return item->GetId();
 }
 
 }  // namespace anime

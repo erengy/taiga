@@ -18,8 +18,10 @@
 
 #pragma once
 
+#include <string>
 #include <map>
 
+#include "media/anime.h"
 #include "media/anime_item.h"
 
 namespace library {
@@ -45,7 +47,6 @@ public:
 
   void ClearInvalidItems();
   bool DeleteItem(int id);
-  int UpdateItem(const Item& item);
 
 public:
   bool LoadList();

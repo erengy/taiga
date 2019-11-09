@@ -18,9 +18,10 @@
 
 #include <assert.h>
 
+#include "media/anime_item.h"
+
 #include "base/string.h"
 #include "base/time.h"
-#include "media/anime_item.h"
 #include "media/anime_util.h"
 #include "media/library/queue.h"
 #include "sync/service.h"
@@ -135,10 +136,14 @@ const time_t Item::GetLastModified() const {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+void Item::SetId(const int id) {
+  series_.id = id;
+}
+
 void Item::SetId(const std::wstring& id, sync::ServiceId service) {
   series_.uids.at(static_cast<size_t>(service)) = id;
 
-  if (static_cast<size_t>(service) == 0) {
+  if (service == sync::ServiceId::Taiga) {
     series_.id = ToInt(id);
   }
 }

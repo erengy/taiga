@@ -55,9 +55,8 @@ bool Database::LoadList() {
 
   auto node_library = document.child(L"library");
   for (auto node : node_library.children(L"anime")) {
-    Item anime_item;
-    anime_item.SetId(XmlReadStr(node, L"id"), sync::ServiceId::Taiga);
-    anime_item.SetSource(sync::ServiceId::Taiga);
+    const auto id = XmlReadInt(node, L"id");
+    auto& anime_item = items[id];
 
     anime_item.AddtoUserList();
     anime_item.SetMyId(XmlReadStr(node, L"library_id"));
@@ -72,8 +71,6 @@ bool Database::LoadList() {
     anime_item.SetMyTags(XmlReadStr(node, L"tags"));
     anime_item.SetMyNotes(XmlReadStr(node, L"notes"));
     anime_item.SetMyLastUpdated(XmlReadStr(node, L"last_updated"));
-
-    UpdateItem(anime_item);
   }
 
   HandleListCompatibility(meta_version);

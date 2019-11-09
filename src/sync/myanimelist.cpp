@@ -33,6 +33,7 @@
 #include "sync/sync.h"
 #include "taiga/http.h"
 #include "taiga/settings.h"
+#include "track/recognition.h"
 #include "ui/resource.h"
 #include "ui/translate.h"
 #include "ui/ui.h"
@@ -208,8 +209,10 @@ int ParseAnimeObject(const Json& json) {
     return anime::ID_UNKNOWN;
   }
 
-  anime::Item anime_item;
+  auto& anime_item = anime::db.items[anime_id];
+
   anime_item.SetSource(ServiceId::MyAnimeList);
+  anime_item.SetId(anime_id);
   anime_item.SetId(ToWstr(anime_id), ServiceId::MyAnimeList);
   anime_item.SetLastModified(time(nullptr));  // current time
 
@@ -238,10 +241,12 @@ int ParseAnimeObject(const Json& json) {
   if (json.contains("alternative_titles")) {
     const auto& alternative_titles = json["alternative_titles"];
     if (alternative_titles.contains("synonyms")) {
-      for (const auto& title : alternative_titles["synonyms"]) {
-        if (title.is_string())
-          anime_item.InsertSynonym(StrToWstr(title));
+      std::vector<std::wstring> synonyms;
+      for (const auto& synonym : alternative_titles["synonyms"]) {
+        if (synonym.is_string())
+          synonyms.push_back(StrToWstr(synonym));
       }
+      anime_item.SetSynonyms(synonyms);
     }
     anime_item.SetEnglishTitle(
         StrToWstr(JsonReadStr(alternative_titles, "en")));
@@ -264,7 +269,9 @@ int ParseAnimeObject(const Json& json) {
   anime_item.SetGenres(get_names(json, "genres"));
   anime_item.SetProducers(get_names(json, "studios"));
 
-  return anime::db.UpdateItem(anime_item);
+  Meow.UpdateTitles(anime_item);
+
+  return anime_id;
 }
 
 void ParseLibraryObject(const Json& json, const int anime_id) {
@@ -273,11 +280,9 @@ void ParseLibraryObject(const Json& json, const int anime_id) {
     return;
   }
 
-  anime::Item anime_item;
-  anime_item.SetSource(ServiceId::MyAnimeList);
-  anime_item.SetId(ToWstr(anime_id), ServiceId::MyAnimeList);
-  anime_item.AddtoUserList();
+  auto& anime_item = anime::db.items[anime_id];
 
+  anime_item.AddtoUserList();
   anime_item.SetMyStatus(
       TranslateMyStatusFrom(StrToWstr(JsonReadStr(json, "status"))));
   anime_item.SetMyScore(TranslateMyRatingFrom(JsonReadInt(json, "score")));
@@ -290,8 +295,6 @@ void ParseLibraryObject(const Json& json, const int anime_id) {
   anime_item.SetMyNotes(StrToWstr(JsonReadStr(json, "comments")));
   anime_item.SetMyLastUpdated(
       TranslateMyLastUpdatedFrom(JsonReadStr(json, "updated_at")));
-
-  anime::db.UpdateItem(anime_item);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -34,6 +34,7 @@
 #include "sync/sync.h"
 #include "taiga/http.h"
 #include "taiga/settings.h"
+#include "track/recognition.h"
 #include "ui/translate.h"
 #include "ui/ui.h"
 
@@ -207,8 +208,10 @@ int ParseMediaObject(const Json& json) {
     return anime::ID_UNKNOWN;
   }
 
-  anime::Item anime_item;
+  auto& anime_item = anime::db.items[anime_id];
+
   anime_item.SetSource(ServiceId::AniList);
+  anime_item.SetId(anime_id);
   anime_item.SetId(ToWstr(anime_id), ServiceId::AniList);
   anime_item.SetLastModified(time(nullptr));  // current time
 
@@ -234,10 +237,12 @@ int ParseMediaObject(const Json& json) {
   }
   anime_item.SetGenres(genres);
 
+  std::vector<std::wstring> synonyms;
   for (const auto& synonym : json["synonyms"]) {
     if (synonym.is_string())
-      anime_item.InsertSynonym(StrToWstr(synonym));
+      synonyms.push_back(StrToWstr(synonym));
   }
+  anime_item.SetSynonyms(synonyms);
 
   std::vector<std::wstring> studios;
   for (const auto& edge : json["studios"]["edges"]) {
@@ -255,7 +260,9 @@ int ParseMediaObject(const Json& json) {
     }
   }
 
-  return anime::db.UpdateItem(anime_item);
+  Meow.UpdateTitles(anime_item);
+
+  return anime_id;
 }
 
 int ParseMediaListObject(const Json& json) {
@@ -269,11 +276,9 @@ int ParseMediaListObject(const Json& json) {
 
   ParseMediaObject(json["media"]);
 
-  anime::Item anime_item;
-  anime_item.SetSource(ServiceId::AniList);
-  anime_item.SetId(ToWstr(anime_id), ServiceId::AniList);
-  anime_item.AddtoUserList();
+  auto& anime_item = anime::db.items[anime_id];
 
+  anime_item.AddtoUserList();
   anime_item.SetMyId(ToWstr(library_id));
 
   const auto status = JsonReadStr(json, "status");
@@ -292,7 +297,7 @@ int ParseMediaListObject(const Json& json) {
   anime_item.SetMyDateEnd(TranslateFuzzyDateFrom(json["completedAt"]));
   anime_item.SetMyLastUpdated(ToWstr(JsonReadInt(json, "updatedAt")));
 
-  return anime::db.UpdateItem(anime_item);
+  return anime_id;
 }
 
 void ParseUserObject(const Json& json) {
