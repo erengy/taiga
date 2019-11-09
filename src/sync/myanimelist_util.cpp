@@ -184,30 +184,6 @@ std::wstring TranslateMyStatusTo(anime::MyStatus value) {
   return L"watching";
 }
 
-std::wstring TranslateKeyTo(const std::wstring& key) {
-  if (IsEqual(key, L"episode")) {
-    return L"num_watched_episodes";
-  } else if (IsEqual(key, L"status")) {
-    return key;
-  } else if (IsEqual(key, L"score")) {
-    return key;
-  } else if (IsEqual(key, L"date_start")) {
-    return L"start_date";
-  } else if (IsEqual(key, L"date_finish")) {
-    return L"finish_date";
-  } else if (IsEqual(key, L"enable_rewatching")) {
-    return L"is_rewatching";
-  } else if (IsEqual(key, L"rewatched_times")) {
-    return L"num_times_rewatched";
-  } else if (IsEqual(key, L"tags")) {
-    return key;
-  } else if (IsEqual(key, L"notes")) {
-    return L"comments";
-  }
-
-  return std::wstring();
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 
 std::wstring GetAnimePage(const anime::Item& anime_item) {

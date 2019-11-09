@@ -46,7 +46,6 @@ int TranslateMyRatingFrom(int value);
 int TranslateMyRatingTo(int value);
 anime::MyStatus TranslateMyStatusFrom(const std::wstring& value);
 std::wstring TranslateMyStatusTo(anime::MyStatus value);
-std::wstring TranslateKeyTo(const std::wstring& key);
 
 std::wstring GetAnimePage(const anime::Item& anime_item);
 void RequestAuthorizationCode(std::wstring& code_verifier);
