@@ -28,10 +28,6 @@ bool JsonParseString(const std::string& str, Json& output) {
   }
 }
 
-bool JsonParseString(const std::wstring& str, Json& output) {
-  return JsonParseString(WstrToStr(str), output);
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 
 bool JsonReadBool(const Json& json, const std::string& key) {
