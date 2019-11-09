@@ -661,27 +661,27 @@ void UpdateLibraryEntry(const library::QueueItem& queue_item) {
   request.set_query({{"fields", WstrToStr(GetListStatusFields())}});
   request.set_header("Content-Type", "application/x-www-form-urlencoded");
 
-  query_t fields;
+  hypr::Params params;
   if (queue_item.episode)
-    fields[L"num_watched_episodes"] = ToWstr(*queue_item.episode);
+    params.add("num_watched_episodes", ToStr(*queue_item.episode));
   if (queue_item.status)
-    fields[L"status"] = TranslateMyStatusTo(*queue_item.status);
+    params.add("status", TranslateMyStatusTo(*queue_item.status));
   if (queue_item.score)
-    fields[L"score"] = ToWstr(TranslateMyRatingTo(*queue_item.score));
+    params.add("score", ToStr(TranslateMyRatingTo(*queue_item.score)));
   if (queue_item.date_start)
-    fields[L"start_date"] = queue_item.date_start->to_string();
+    params.add("start_date", WstrToStr(queue_item.date_start->to_string()));
   if (queue_item.date_finish)
-    fields[L"finish_date"] = queue_item.date_finish->to_string();
+    params.add("finish_date", WstrToStr(queue_item.date_finish->to_string()));
   if (queue_item.enable_rewatching)
-    fields[L"is_rewatching"] = ToWstr(*queue_item.enable_rewatching);
+    params.add("is_rewatching", ToStr(*queue_item.enable_rewatching));
   if (queue_item.rewatched_times)
-    fields[L"num_times_rewatched"] = ToWstr(*queue_item.rewatched_times);
+    params.add("num_times_rewatched", ToStr(*queue_item.rewatched_times));
   if (queue_item.tags)
-    fields[L"tags"] = *queue_item.tags;
+    params.add("tags", WstrToStr(*queue_item.tags));
   if (queue_item.notes)
-    fields[L"comments"] = *queue_item.notes;
+    params.add("comments", WstrToStr(*queue_item.notes));
 
-  request.set_body(hypr::Body{WstrToStr(BuildUrlParameters(fields))});
+  request.set_body(params);
 
   const auto on_transfer = [](const taiga::http::Transfer& transfer) {
     return OnTransfer(RequestType::UpdateLibraryEntry, transfer,
