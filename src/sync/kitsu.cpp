@@ -505,13 +505,11 @@ bool HasError(const taiga::http::Response& response) {
     return true;
   }
 
-  const auto status_category = hypp::status::to_class(response.status_code());
-
   // 200 OK
   // 201 Created
   // 202 Accepted
   // 204 No Content
-  if (status_category == 200)
+  if (response.status_class() == 200)
     return true;
 
   if (Json root; JsonParseString(response.body(), root)) {

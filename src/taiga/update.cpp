@@ -240,7 +240,7 @@ bool UpdateHelper::Download() {
     const auto file = GetFileName(StrToWstr(std::string{response.url()}));
     download_path_ = path + file;
 
-    if (hypp::status::to_class(response.status_code()) == 200 &&
+    if (response.status_class() == 200 &&
         SaveToFile(response.body(), download_path_)) {
       RunInstaller();
     } else {

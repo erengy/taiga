@@ -245,7 +245,7 @@ void DownloadImage(const int anime_id, const std::wstring& image_url) {
   request.set_target(WstrToStr(image_url));
 
   const auto on_response = [anime_id](const taiga::http::Response& response) {
-    if (hypp::status::to_class(response.status_code()) == 200) {
+    if (response.status_class() == 200) {
       SaveToFile(response.body(), anime::GetImagePath(anime_id));
       if (ui::image_db.LoadFile(anime_id))
         ui::OnLibraryEntryImageChange(anime_id);
