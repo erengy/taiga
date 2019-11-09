@@ -707,7 +707,7 @@ void UpdateLibraryEntry(const library::QueueItem& queue_item) {
       return;
     }
 
-    ParseLibraryObject(root["data"], id);
+    ParseLibraryObject(root, id);
 
     sync::OnResponse(RequestType::UpdateLibraryEntry);
   };
