@@ -386,7 +386,7 @@ std::wstring to_string(const Transfer& transfer) {
   if (transfer.total > 0) {
     const auto percentage = static_cast<float>(transfer.current) /
                             static_cast<float>(transfer.total) * 100;
-    return L"{}%"_format(percentage);
+    return L"{}%"_format(static_cast<int>(percentage));
   } else {
     return ToSizeString(transfer.current);
   }
