@@ -25,8 +25,6 @@
 #include "media/anime_db.h"
 #include "media/anime_item.h"
 #include "media/anime_util.h"
-#include "sync/service.h"
-#include "taiga/settings.h"
 #include "taiga/taiga.h"
 
 namespace anime {
@@ -60,10 +58,6 @@ void SeasonDatabase::Reset() {
 }
 
 void SeasonDatabase::Review(bool hide_nsfw) {
-  if (sync::GetCurrentServiceId() == sync::ServiceId::MyAnimeList) {
-    return;
-  }
-
   const auto [date_start, date_end] = current_season.to_date_range();
 
   const auto is_within_date_interval =
