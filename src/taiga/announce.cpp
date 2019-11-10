@@ -43,7 +43,7 @@ void Announcer::Clear(int modes, bool force) {
 
   if (modes & kAnnounceToHttp)
     if (settings.GetShareHttpEnabled() || force)
-      link::http::Send(settings.GetShareHttpUrl(), L"");
+      link::http::Send(WstrToStr(settings.GetShareHttpUrl()), {});
 }
 
 void Announcer::Do(int modes, anime::Episode* episode, bool force) {
@@ -56,9 +56,9 @@ void Announcer::Do(int modes, anime::Episode* episode, bool force) {
   if (modes & kAnnounceToHttp) {
     if (settings.GetShareHttpEnabled() || force) {
       LOGD(L"HTTP");
-      const auto data = ReplaceVariables(settings.GetShareHttpFormat(),
-                                         *episode, true, force);
-      link::http::Send(settings.GetShareHttpUrl(), data);
+      const auto data = WstrToStr(ReplaceVariables(
+          settings.GetShareHttpFormat(), *episode, true, force));
+      link::http::Send(WstrToStr(settings.GetShareHttpUrl()), data);
     }
   }
 

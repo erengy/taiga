@@ -22,6 +22,6 @@
 
 namespace link::http {
 
-bool Send(const std::wstring& url, const std::wstring& data);
+bool Send(const std::string& url, const std::string& data);
 
 }  // namespace link::http

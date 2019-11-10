@@ -18,20 +18,19 @@
 
 #include "link/http.h"
 
-#include "base/string.h"
 #include "taiga/http.h"
 
 namespace link::http {
 
-bool Send(const std::wstring& url, const std::wstring& data) {
+bool Send(const std::string& url, const std::string& data) {
   if (url.empty() || data.empty())
     return false;
 
   taiga::http::Request request;
   request.set_method("POST");
-  request.set_target(WstrToStr(url));
+  request.set_target(url);
   request.set_header("Content-Type", "application/x-www-form-urlencoded");
-  request.set_body(hypr::Body{WstrToStr(data)});
+  request.set_body(hypr::Body{data});
 
   taiga::http::Send(request, nullptr, nullptr);
 

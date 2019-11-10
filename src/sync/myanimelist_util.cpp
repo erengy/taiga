@@ -171,17 +171,17 @@ anime::MyStatus TranslateMyStatusFrom(const std::wstring& value) {
   return anime::MyStatus::NotInList;
 }
 
-std::wstring TranslateMyStatusTo(anime::MyStatus value) {
+std::string TranslateMyStatusTo(anime::MyStatus value) {
   switch (value) {
-    case anime::MyStatus::Watching: return L"watching";
-    case anime::MyStatus::Completed: return L"completed";
-    case anime::MyStatus::OnHold: return L"on_hold";
-    case anime::MyStatus::Dropped: return L"dropped";
-    case anime::MyStatus::PlanToWatch: return L"plan_to_watch";
+    case anime::MyStatus::Watching: return "watching";
+    case anime::MyStatus::Completed: return "completed";
+    case anime::MyStatus::OnHold: return "on_hold";
+    case anime::MyStatus::Dropped: return "dropped";
+    case anime::MyStatus::PlanToWatch: return "plan_to_watch";
   }
 
   LOGW(L"Invalid value: {}", static_cast<int>(value));
-  return L"watching";
+  return "watching";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
