@@ -20,8 +20,9 @@
 #include <map>
 #include <regex>
 
-#include "base/string.h"
 #include "media/anime_filter.h"
+
+#include "base/string.h"
 #include "media/anime_item.h"
 #include "media/anime_util.h"
 #include "ui/translate.h"
@@ -202,7 +203,8 @@ bool Filters::CheckItem(const Item& item, int text_index) const {
         break;
 
       case SearchField::Season: {
-        const auto season = ui::TranslateDateToSeasonString(item.GetDateStart());
+        const auto season =
+            ui::TranslateDateToSeasonString(item.GetDateStart());
         if (!CheckString(season, term.value))
           return false;
         break;

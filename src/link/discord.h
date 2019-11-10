@@ -28,6 +28,7 @@ void Initialize();
 void Shutdown();
 
 void ClearPresence();
-void UpdatePresence(const std::string& details, const std::string& state, time_t timestamp);
+void UpdatePresence(const std::string& details, const std::string& state,
+                    const time_t timestamp);
 
 }  // namespace link::discord

@@ -20,9 +20,9 @@
 
 #include "base/log.h"
 #include "base/string.h"
-#include "media/library/history.h"
 #include "media/anime_db.h"
 #include "media/anime_util.h"
+#include "media/library/history.h"
 #include "sync/sync.h"
 #include "taiga/announce.h"
 #include "taiga/settings.h"

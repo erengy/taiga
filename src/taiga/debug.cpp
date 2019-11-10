@@ -16,9 +16,10 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "taiga/debug.h"
+
 #include "base/string.h"
 #include "media/anime_db.h"
-#include "taiga/debug.h"
 #include "ui/dlg/dlg_main.h"
 #include "ui/dialog.h"
 

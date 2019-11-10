@@ -20,6 +20,8 @@
 
 #include <anitomy/anitomy/keyword.h>
 
+#include "track/recognition.h"
+
 #include "base/log.h"
 #include "base/string.h"
 #include "media/anime.h"
@@ -27,10 +29,8 @@
 #include "media/anime_util.h"
 #include "track/episode.h"
 #include "track/episode_util.h"
-#include "track/recognition.h"
 
-namespace track {
-namespace recognition {
+namespace track::recognition {
 
 bool Engine::ValidateOptions(anime::Episode& episode, int anime_id,
                              const MatchOptions& match_options,
@@ -189,5 +189,4 @@ bool Engine::IsAudioFileExtension(const std::wstring& extension) const {
   return extensions.count(ToLower_Copy(extension));
 }
 
-}  // namespace recognition
-}  // namespace track
+}  // namespace track::recognition

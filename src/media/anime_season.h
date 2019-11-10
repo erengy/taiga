@@ -56,11 +56,4 @@ public:
   date::year year;
 };
 
-constexpr std::array<Season::Name, 4> kSeasons{
-  Season::Name::Winter,
-  Season::Name::Spring,
-  Season::Name::Summer,
-  Season::Name::Fall
-};
-
 }  // namespace anime

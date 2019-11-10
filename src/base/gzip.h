@@ -23,4 +23,5 @@
 bool UncompressGzippedString(const std::string& input, std::string& output);
 
 bool DeflateString(const std::string& input, std::string& output);
-bool InflateString(const std::string& input, std::string& output, size_t output_length);
+bool InflateString(const std::string& input, std::string& output,
+                   size_t output_length);

@@ -16,10 +16,11 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "html.h"
-#include "rss.h"
-#include "string.h"
-#include "xml.h"
+#include "base/rss.h"
+
+#include "base/html.h"
+#include "base/string.h"
+#include "base/xml.h"
 
 namespace rss {
 

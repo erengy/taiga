@@ -110,7 +110,8 @@ bool PlayNextEpisode(int anime_id) {
 bool PlayNextEpisodeOfLastWatchedAnime() {
   const auto check_item = [](const int anime_id) {
     const auto anime_item = anime::db.Find(anime_id);
-    return anime_item && anime_item->GetMyStatus() != anime::MyStatus::Completed;
+    return anime_item &&
+           anime_item->GetMyStatus() != anime::MyStatus::Completed;
   };
 
   const auto& queue_items = library::queue.items;

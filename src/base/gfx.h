@@ -26,14 +26,11 @@ namespace base {
 
 class Image {
 public:
-  Image();
-  virtual ~Image() {}
-
   bool Load(const std::wstring& file);
 
   win::Dc dc;
   win::Rect rect;
-  LPARAM data;
+  LPARAM data = 0;
 };
 
 }  // namespace base

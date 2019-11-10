@@ -20,10 +20,11 @@
 #include <string>
 #include <windows.h>
 
-#include "base64.h"
-#include "crypto.h"
-#include "gzip.h"
-#include "string.h"
+#include "base/crypto.h"
+
+#include "base/base64.h"
+#include "base/gzip.h"
+#include "base/string.h"
 
 StringCoder::StringCoder()
     : magic_string_("TAI"),
@@ -60,8 +61,8 @@ bool StringCoder::Encode(const std::wstring& metadata, const std::wstring& data,
   return true;
 }
 
-bool StringCoder::Decode(const std::wstring& input,
-                         std::wstring& metadata, std::wstring& data) {
+bool StringCoder::Decode(const std::wstring& input, std::wstring& metadata,
+                         std::wstring& data) {
   if (input.empty())
     return false;
 

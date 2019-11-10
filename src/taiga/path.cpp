@@ -19,6 +19,7 @@
 #include "taiga/path.h"
 
 #include "base/file.h"
+#include "base/format.h"
 #include "base/string.h"
 #include "sync/service.h"
 #include "taiga/config.h"
@@ -82,13 +83,13 @@ std::wstring GetPath(Path path) {
     case Path::Theme:
       return data_path + L"theme\\";
     case Path::ThemeCurrent:
-      return data_path + L"theme\\" + settings.GetAppInterfaceTheme() + L"\\theme.xml";
+      return data_path + L"theme\\{}\\theme.xml"_format(settings.GetAppInterfaceTheme());
     case Path::User:
       return data_path + L"user\\";
     case Path::UserHistory:
-      return data_path + L"user\\" + GetUserDirectoryName() + L"\\history.xml";
+      return data_path + L"user\\{}\\history.xml"_format(GetUserDirectoryName());
     case Path::UserLibrary:
-      return data_path + L"user\\" + GetUserDirectoryName() + L"\\anime.xml";
+      return data_path + L"user\\{}\\anime.xml"_format(GetUserDirectoryName());
   }
 }
 

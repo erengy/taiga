@@ -34,8 +34,7 @@ public:
     Unknown,
   };
 
-  DirectoryChangeNotification(DWORD action,
-                              const std::wstring& filename,
+  DirectoryChangeNotification(DWORD action, const std::wstring& filename,
                               const std::wstring& path);
 
   DWORD action;

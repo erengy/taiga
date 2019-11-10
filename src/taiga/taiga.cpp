@@ -18,6 +18,8 @@
 
 #include <windows/win/taskbar.h>
 
+#include "taiga/taiga.h"
+
 #include "base/command_line.h"
 #include "base/file.h"
 #include "base/log.h"
@@ -32,7 +34,6 @@
 #include "taiga/http.h"
 #include "taiga/resource.h"
 #include "taiga/settings.h"
-#include "taiga/taiga.h"
 #include "taiga/version.h"
 #include "track/feed_aggregator.h"
 #include "track/media.h"

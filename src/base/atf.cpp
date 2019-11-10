@@ -16,8 +16,9 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "atf.h"
-#include "string.h"
+#include "base/atf.h"
+
+#include "base/string.h"
 
 // @TODO: Replace with https://github.com/erengy/atf when available
 

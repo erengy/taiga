@@ -19,19 +19,19 @@
 #include <anitomy/anitomy/anitomy.h>
 #include <anitomy/anitomy/keyword.h>
 
+#include "track/recognition.h"
+
 #include "base/log.h"
 #include "base/string.h"
 #include "media/anime.h"
 #include "media/anime_db.h"
-#include "track/episode.h"
 #include "media/anime_util.h"
 #include "taiga/settings.h"
-#include "track/recognition.h"
+#include "track/episode.h"
 
 track::recognition::Engine Meow;
 
-namespace track {
-namespace recognition {
+namespace track::recognition {
 
 bool Engine::Parse(std::wstring filename, const ParseOptions& parse_options,
                    anime::Episode& episode) const {
@@ -458,5 +458,4 @@ bool Engine::GetTitleFromPath(anime::Episode& episode) {
   return true;
 }
 
-}  // namespace recognition
-}  // namespace track
+}  // namespace track::recognition

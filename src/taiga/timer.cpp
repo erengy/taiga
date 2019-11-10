@@ -18,17 +18,14 @@
 
 #include "taiga/timer.h"
 
-#include "base/log.h"
 #include "base/string.h"
 #include "media/anime.h"
 #include "media/anime_db.h"
 #include "media/anime_util.h"
 #include "media/library/queue.h"
-#include "ui/resource.h"
 #include "taiga/announce.h"
 #include "taiga/settings.h"
 #include "taiga/stats.h"
-#include "taiga/taiga.h"
 #include "track/feed_aggregator.h"
 #include "track/media.h"
 #include "track/scanner.h"
@@ -36,6 +33,7 @@
 #include "ui/dlg/dlg_main.h"
 #include "ui/dlg/dlg_stats.h"
 #include "ui/dlg/dlg_torrent.h"
+#include "ui/resource.h"
 
 namespace taiga {
 
@@ -55,10 +53,6 @@ Timer::Timer(unsigned int id, int interval, bool repeat)
 }
 
 void Timer::OnTimeout() {
-  if (interval() >= 60 && Taiga.options.verbose) {
-    LOGD(L"ID: {}, Interval: {}", id(), this->interval());
-  }
-
   switch (id()) {
     case kTimerAnimeList:
       ui::DlgAnimeList.listview.RefreshLastUpdateColumn();
@@ -127,7 +121,8 @@ void TimerManager::UpdateEnabledState() {
   timer_library.set_enabled(!settings.GetLibraryWatchFolders());
 
   // Media
-  bool media_player_is_running = track::media_players.GetRunningPlayer() != nullptr;
+  bool media_player_is_running =
+      track::media_players.GetRunningPlayer() != nullptr;
   bool media_player_is_active = track::media_players.IsPlayerActive();
   bool episode_processed = CurrentEpisode.processed || timer_media.ticks() == 0;
   timer_media.set_enabled(media_player_is_running && media_player_is_active &&

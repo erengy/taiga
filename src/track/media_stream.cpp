@@ -24,11 +24,10 @@
 #include "base/process.h"
 #include "base/string.h"
 #include "base/url.h"
-#include "track/episode.h"
 #include "taiga/settings.h"
+#include "track/episode.h"
 
-namespace track {
-namespace recognition {
+namespace track::recognition {
 
 static const std::vector<StreamData> stream_data{
   // AnimeLab
@@ -304,10 +303,12 @@ void CleanStreamTitle(const StreamData& stream_data, std::string& title) {
       break;
     }
     case Stream::Wakanim: {
-      static const std::regex pattern{"(?:Episode (\\d+)|Film|Movie) - (?:ENGDUB - )?(.+)"};
+      static const std::regex pattern{
+          "(?:Episode (\\d+)|Film|Movie) - (?:ENGDUB - )?(.+)"};
       std::smatch match;
       if (std::regex_match(title, match, pattern))
-        title = match.str(2) + (match.length(1) ? " - Episode " + match.str(1) : "");
+        title = match.str(2) +
+                (match.length(1) ? " - Episode " + match.str(1) : "");
       break;
     }
   }
@@ -380,5 +381,4 @@ void NormalizeWebBrowserTitle(const std::wstring& url, std::wstring& title) {
   RemoveCommonWebBrowserAffixes(title);
 }
 
-}  // namespace recognition
-}  // namespace track
+}  // namespace track::recognition

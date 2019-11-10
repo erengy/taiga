@@ -75,7 +75,8 @@ void Announcer::Do(int modes, anime::Episode* episode, bool force) {
       auto timestamp = std::time(nullptr);
       if (!force)
         timestamp -= settings.GetSyncUpdateDelay();
-      link::discord::UpdatePresence(WstrToStr(details), WstrToStr(state), timestamp);
+      link::discord::UpdatePresence(WstrToStr(details), WstrToStr(state),
+                                    timestamp);
     }
   }
 
@@ -97,8 +98,8 @@ void Announcer::Do(int modes, anime::Episode* episode, bool force) {
   if (modes & kAnnounceToTwitter) {
     if (settings.GetShareTwitterEnabled() || force) {
       LOGD(L"Twitter");
-      const auto status_text = ReplaceVariables(settings.GetShareTwitterFormat(),
-                                                *episode, false, force);
+      const auto status_text = ReplaceVariables(
+          settings.GetShareTwitterFormat(), *episode, false, force);
       link::twitter::SetStatusText(status_text);
     }
   }

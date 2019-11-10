@@ -19,6 +19,8 @@
 #include <algorithm>
 #include <map>
 
+#include "media/library/export.h"
+
 #include "base/file.h"
 #include "base/format.h"
 #include "base/string.h"
@@ -27,7 +29,6 @@
 #include "media/anime_db.h"
 #include "media/anime_item.h"
 #include "media/anime_util.h"
-#include "media/library/export.h"
 #include "media/library/queue.h"
 #include "sync/myanimelist_util.h"
 #include "taiga/settings.h"

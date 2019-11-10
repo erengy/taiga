@@ -210,7 +210,6 @@
     <ClCompile Include="..\..\src\link\mirc.cpp" />
     <ClCompile Include="..\..\src\link\twitter.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />
-    <ClCompile Include="..\..\src\media\anime.cpp" />
     <ClCompile Include="..\..\src\media\anime_db.cpp" />
     <ClCompile Include="..\..\src\media\anime_filter.cpp" />
     <ClCompile Include="..\..\src\media\anime_item.cpp" />

@@ -20,6 +20,8 @@
 #include <chrono>
 #include <regex>
 
+#include "sync/myanimelist_util.h"
+
 #include "base/file.h"
 #include "base/format.h"
 #include "base/html.h"
@@ -30,12 +32,10 @@
 #include "media/anime.h"
 #include "media/anime_db.h"
 #include "sync/myanimelist.h"
-#include "sync/myanimelist_util.h"
 #include "sync/service.h"
 #include "taiga/settings.h"
 
-namespace sync {
-namespace myanimelist {
+namespace sync::myanimelist {
 
 std::vector<Rating> GetMyRatings() {
   constexpr int k = anime::kUserScoreMax / 10;
@@ -245,5 +245,4 @@ void ViewUpcomingAnime() {
               L"&em=0&ed=0&ey=0&o=2&w=&c[]=a&c[]=d&cv=1");
 }
 
-}  // namespace myanimelist
-}  // namespace sync
+}  // namespace sync::myanimelist

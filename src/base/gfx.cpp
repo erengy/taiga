@@ -21,13 +21,9 @@
 
 #include <windows/win/gdi_plus.h>
 
-#include "gfx.h"
+#include "base/gfx.h"
 
 namespace base {
-
-Image::Image()
-    : data(0) {
-}
 
 bool Image::Load(const std::wstring& path) {
   ::DeleteObject(dc.DetachBitmap());

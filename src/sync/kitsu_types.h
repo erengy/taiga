@@ -18,8 +18,7 @@
 
 #pragma once
 
-namespace sync {
-namespace kitsu {
+namespace sync::kitsu {
 
 enum MyPrivacy {
   kPrivate = 1,
@@ -42,5 +41,4 @@ enum class RatingSystem {
 
 constexpr auto kDefaultRatingSystem = RatingSystem::Regular;
 
-}  // namespace kitsu
-}  // namespace sync
+}  // namespace sync::kitsu

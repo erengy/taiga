@@ -20,8 +20,9 @@
 #include <vector>
 #include <windows.h>
 
-#include "command_line.h"
-#include "string.h"
+#include "base/command_line.h"
+
+#include "base/string.h"
 
 namespace base {
 

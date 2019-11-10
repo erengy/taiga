@@ -20,10 +20,11 @@
 
 #include <windows/win/error.h>
 
-#include "file.h"
-#include "file_search.h"
-#include "log.h"
-#include "string.h"
+#include "base/file_search.h"
+
+#include "base/file.h"
+#include "base/log.h"
+#include "base/string.h"
 
 namespace base {
 

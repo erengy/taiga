@@ -28,15 +28,15 @@
 #include "base/string.h"
 #include "media/anime.h"
 #include "media/anime_db.h"
-#include "track/episode.h"
 #include "media/anime_util.h"
 #include "taiga/path.h"
 #include "taiga/settings.h"
 #include "taiga/timer.h"
+#include "track/episode.h"
 #include "track/media_stream.h"
 #include "track/recognition.h"
-#include "ui/dlg/dlg_anime_info.h"
 #include "ui/dialog.h"
+#include "ui/dlg/dlg_anime_info.h"
 #include "ui/ui.h"
 
 namespace track {

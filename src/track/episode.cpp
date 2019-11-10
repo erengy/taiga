@@ -213,12 +213,14 @@ int Episode::GetElementAsInt(anitomy::ElementCategory category,
   return it != elements_.end() ? ToInt(it->second) : default_value;
 }
 
-const std::wstring& Episode::GetElementAsString(anitomy::ElementCategory category) const {
+const std::wstring& Episode::GetElementAsString(
+    anitomy::ElementCategory category) const {
   auto it = elements_.find(category);
   return it != elements_.end() ? it->second : EmptyString();
 }
 
-number_range_t Episode::GetElementAsRange(anitomy::ElementCategory category) const {
+number_range_t Episode::GetElementAsRange(
+    anitomy::ElementCategory category) const {
   const auto numbers = elements_.get_all(category);
   number_range_t range{
     numbers.empty() ? 0 : ToInt(numbers.front()),
@@ -227,7 +229,8 @@ number_range_t Episode::GetElementAsRange(anitomy::ElementCategory category) con
   return range;
 }
 
-std::wstring Episode::GetElementsAsString(anitomy::ElementCategory category) const {
+std::wstring Episode::GetElementsAsString(
+    anitomy::ElementCategory category) const {
   return Join(elements_.get_all(category), L" ");
 }
 

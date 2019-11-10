@@ -381,9 +381,9 @@ void ParseCategories(const Json& json, const int anime_id) {
 
   std::vector<std::wstring> categories;
 
-  // Here we assume that all listed categories are related to this anime. In order
-  // to parse an array of anime objects with categories, we would need to extract
-  // category IDs from `relationships/categories/data` for each anime.
+  // Here we assume that all listed categories are related to this anime. In
+  // order to parse an array of anime objects with categories, we would need to
+  // extract category IDs from `relationships/categories/data` for each anime.
   for (const auto& value : json) {
     if (value["type"] == "categories") {
       categories.push_back(StrToWstr(value["attributes"]["title"]));
@@ -676,7 +676,8 @@ void GetLibraryEntries(const int page) {
   // Our "solution" to this is to allow Taiga to download the entire library
   // after each restart (i.e. last_synchronized is not saved on exit).
   if (IsPartialLibraryRequest()) {
-    const auto date = GetDate(account.last_synchronized() - (60 * 60 * 24));  // 1 day before, to be safe
+    const auto date = GetDate(account.last_synchronized() -
+                              (60 * 60 * 24));  // 1 day before, to be safe
     params.add("filter[since]", WstrToStr(date.to_string()));
   }
 
@@ -971,7 +972,8 @@ void DeleteLibraryEntry(const int id) {
       if (response.status_code() == 404) {
         // We consider "404 Not Found" to be a success.
       } else {
-        ui::OnLibraryUpdateFailure(id, StrToWstr(response.error().str()), false);
+        ui::OnLibraryUpdateFailure(id, StrToWstr(response.error().str()),
+                                   false);
         sync::OnError(RequestType::DeleteLibraryEntry);
         return;
       }

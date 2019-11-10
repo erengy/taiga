@@ -16,10 +16,10 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "xml.h"
+#include "base/xml.h"
 
-#include "file.h"
-#include "string.h"
+#include "base/file.h"
+#include "base/string.h"
 
 XmlAttribute XmlAttr(XmlNode& node, const std::wstring_view name) {
   auto attr = node.attribute(name.data());

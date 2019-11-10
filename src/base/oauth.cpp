@@ -23,12 +23,12 @@
 #include <string_view>
 #include <vector>
 
-#include "oauth.h"
+#include "base/oauth.h"
 
-#include "base64.h"
-#include "crypto.h"
-#include "string.h"
-#include "url.h"
+#include "base/base64.h"
+#include "base/crypto.h"
+#include "base/string.h"
+#include "base/url.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // OAuth implementation is based on codebrook-twitter-oauth example code

@@ -16,8 +16,9 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "json.h"
-#include "string.h"
+#include "base/json.h"
+
+#include "base/string.h"
 
 bool JsonParseString(const std::string& str, Json& output) {
   try {
@@ -47,5 +48,6 @@ int JsonReadInt(const Json& json, const std::string& key) {
 
 std::string JsonReadStr(const Json& json, const std::string& key) {
   const auto it = json.find(key);
-  return it != json.end() && it->is_string() ? it->get<std::string>() : std::string();
+  return it != json.end() && it->is_string() ? it->get<std::string>()
+                                             : std::string();
 }

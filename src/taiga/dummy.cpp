@@ -40,7 +40,8 @@ void InitializeDummies() {
   dummy_anime.SetAiringStatus(anime::SeriesStatus::FinishedAiring);
   dummy_anime.SetDateStart(Date(2008, 10, 1));
   dummy_anime.SetDateEnd(Date(2009, 3, 25));
-  dummy_anime.SetImageUrl(L"https://cdn.myanimelist.net/images/anime/13/22128.jpg");
+  dummy_anime.SetImageUrl(
+      L"https://cdn.myanimelist.net/images/anime/13/22128.jpg");
   dummy_anime.AddtoUserList();
   dummy_anime.SetMyLastWatchedEpisode(25);
   dummy_anime.SetMyScore(anime::kUserScoreMax);

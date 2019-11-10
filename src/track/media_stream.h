@@ -22,8 +22,7 @@
 #include <string>
 #include <vector>
 
-namespace track {
-namespace recognition {
+namespace track::recognition {
 
 enum class Stream {
   Animelab,
@@ -57,5 +56,4 @@ void EnableStream(const Stream stream, const bool enabled);
 bool GetTitleFromStreamingMediaProvider(const std::wstring& url, std::wstring& title);
 void NormalizeWebBrowserTitle(const std::wstring& url, std::wstring& title);
 
-}  // namespace recognition
-}  // namespace track
+}  // namespace track::recognition

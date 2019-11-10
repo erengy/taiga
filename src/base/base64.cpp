@@ -20,8 +20,9 @@
 
 #include <base64/base64.h>
 
-#include "base64.h"
-#include "string.h"
+#include "base/base64.h"
+
+#include "base/string.h"
 
 std::string Base64Decode(const std::string& str) {
   if (str.empty())

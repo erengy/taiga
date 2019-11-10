@@ -18,8 +18,9 @@
 
 #include <vector>
 
-#include "string.h"
-#include "url.h"
+#include "base/url.h"
+
+#include "base/string.h"
 
 Url::Url()
     : protocol(base::http::Protocol::Http), port(0) {

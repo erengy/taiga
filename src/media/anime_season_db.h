@@ -26,21 +26,14 @@ namespace anime {
 
 class SeasonDatabase {
 public:
-  // Checkes if a significant portion of season data is empty and requires
-  // refreshing.
   bool IsRefreshRequired() const;
 
   void Set(const Season& season);
   void Reset();
 
-  // Improves season data by excluding invalid items (i.e. postpones series) and
-  // adding missing ones from the anime database.
   void Review(bool hide_nsfw = true);
 
-  // Only IDs are stored here, actual info is kept in anime::Database.
   std::vector<int> items;
-
-  // Current season (e.g. "Spring 2012")
   Season current_season;
 };
 

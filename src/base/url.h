@@ -20,18 +20,16 @@
 
 #include <string>
 
-#include "map.h"
+#include "base/map.h"
 
 using query_t = base::multimap<std::wstring, std::wstring>;
 
-namespace base {
-namespace http {
+namespace base::http {
 enum class Protocol {
   Http,
   Https,
   Relative,
 };
-}
 }
 
 class Url {
@@ -57,4 +55,5 @@ public:
 
 std::wstring BuildUrlParameters(const query_t& parameters);
 std::wstring DecodeUrl(const std::wstring& input);
-std::wstring EncodeUrl(const std::wstring& input, bool encode_unreserved = false);
+std::wstring EncodeUrl(const std::wstring& input,
+                       bool encode_unreserved = false);

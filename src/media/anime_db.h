@@ -43,7 +43,8 @@ public:
   bool SaveDatabase() const;
 
   Item* Find(int id, bool log_error = true);
-  Item* Find(const std::wstring& id, sync::ServiceId service, bool log_error = true);
+  Item* Find(const std::wstring& id, sync::ServiceId service,
+             bool log_error = true);
 
   void ClearInvalidItems();
   bool DeleteItem(int id);

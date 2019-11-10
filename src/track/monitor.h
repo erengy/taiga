@@ -25,7 +25,8 @@ namespace track {
 class Monitor : public DirectoryMonitor {
 public:
   void Enable(bool enabled = true);
-  void HandleChangeNotification(const DirectoryChangeNotification& notification) const override;
+  void HandleChangeNotification(
+      const DirectoryChangeNotification& notification) const override;
 
 private:
   void OnDirectory(const DirectoryChangeNotification& notification) const;

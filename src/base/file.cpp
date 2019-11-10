@@ -23,12 +23,13 @@
 #include <windows/win/error.h>
 #include <windows/win/registry.h>
 
-#include "file.h"
-#include "file_search.h"
-#include "format.h"
-#include "log.h"
-#include "string.h"
-#include "time.h"
+#include "base/file.h"
+
+#include "base/file_search.h"
+#include "base/format.h"
+#include "base/log.h"
+#include "base/string.h"
+#include "base/time.h"
 
 using anisthesia::win::Handle;
 
@@ -113,8 +114,9 @@ uint64_t GetFolderSize(const std::wstring& path, bool recursive) {
   const auto max_dword = static_cast<uint64_t>(MAXDWORD) + 1;
 
   const auto on_file = [&](const base::FileSearchResult& result) {
-    folder_size += static_cast<uint64_t>(result.data.nFileSizeHigh) * max_dword +
-                   static_cast<uint64_t>(result.data.nFileSizeLow);
+    folder_size +=
+        static_cast<uint64_t>(result.data.nFileSizeHigh) * max_dword +
+        static_cast<uint64_t>(result.data.nFileSizeLow);
     return false;
   };
 
@@ -306,7 +308,7 @@ std::wstring GetDefaultAppPath(const std::wstring& extension,
   if (!path.empty()) {
     size_t position = 0;
     bool inside_quotes = false;
-    for ( ; position < path.size(); ++position) {
+    for (; position < path.size(); ++position) {
       if (path.at(position) == ' ') {
         if (!inside_quotes)
           break;
@@ -339,7 +341,7 @@ std::wstring GetFinalPathNameByHandle(HANDLE handle) {
 
   auto get_final_path_name_by_handle = [&]() {
     return ::GetFinalPathNameByHandle(handle, &buffer.front(), buffer.size(),
-        FILE_NAME_NORMALIZED | VOLUME_NAME_DOS);
+                                      FILE_NAME_NORMALIZED | VOLUME_NAME_DOS);
   };
 
   auto result = get_final_path_name_by_handle();
@@ -375,9 +377,10 @@ unsigned int PopulateFiles(std::vector<std::wstring>& file_list,
   unsigned int file_count = 0;
 
   const auto on_file = [&](const base::FileSearchResult& result) {
-    if (extension.empty() || IsEqual(GetFileExtension(result.name), extension)) {
-      file_list.push_back(trim_extension ?
-                          GetFileWithoutExtension(result.name) : result.name);
+    if (extension.empty() ||
+        IsEqual(GetFileExtension(result.name), extension)) {
+      file_list.push_back(trim_extension ? GetFileWithoutExtension(result.name)
+                                         : result.name);
       file_count++;
     }
     return false;
@@ -428,7 +431,8 @@ bool SaveToFile(LPCVOID data, DWORD length, const std::wstring& path,
   Handle file_handle{OpenFileForGenericWrite(path)};
   if (file_handle.get() != INVALID_HANDLE_VALUE) {
     DWORD bytes_written = 0;
-    result = ::WriteFile(file_handle.get(), data, length, &bytes_written, nullptr);
+    result =
+        ::WriteFile(file_handle.get(), data, length, &bytes_written, nullptr);
   }
 
   return result != FALSE;

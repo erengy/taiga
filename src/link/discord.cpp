@@ -74,16 +74,15 @@ void ClearPresence() {
   RunCallbacks();
 }
 
-void UpdatePresence(const std::string& details,
-                    const std::string& state,
-                    time_t timestamp) {
+void UpdatePresence(const std::string& details, const std::string& state,
+                    const time_t timestamp) {
   const std::string small_image_key = WstrToStr(sync::GetCurrentServiceSlug());
 
   const std::string small_image_text =
-      taiga::settings.GetShareDiscordUsernameEnabled() ?
-      WstrToStr(L"{} at {}"_format(taiga::GetCurrentUserDisplayName(),
-                                   sync::GetCurrentServiceName())) :
-      WstrToStr(sync::GetCurrentServiceName());
+      taiga::settings.GetShareDiscordUsernameEnabled()
+          ? WstrToStr(L"{} at {}"_format(taiga::GetCurrentUserDisplayName(),
+                                         sync::GetCurrentServiceName()))
+          : WstrToStr(sync::GetCurrentServiceName());
 
   DiscordRichPresence presence = {0};
   presence.state = state.c_str();

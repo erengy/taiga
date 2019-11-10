@@ -18,9 +18,9 @@
 
 #include "media/library/list_util.h"
 
-#include "media/library/queue.h"
 #include "media/anime_db.h"
 #include "media/anime_util.h"
+#include "media/library/queue.h"
 #include "track/episode.h"
 
 namespace anime {

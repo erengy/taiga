@@ -29,7 +29,8 @@ std::wstring GetFileLastModifiedDate(const std::wstring& path);
 uint64_t GetFileSize(const std::wstring& path);
 uint64_t GetFolderSize(const std::wstring& path, bool recursive);
 
-bool Execute(const std::wstring& path, const std::wstring& parameters = L"", int show_command = SW_SHOWNORMAL);
+bool Execute(const std::wstring& path, const std::wstring& parameters = L"",
+             int show_command = SW_SHOWNORMAL);
 bool ExecuteLink(const std::wstring& link);
 
 bool OpenFolderAndSelectFile(const std::wstring& path);
@@ -49,15 +50,21 @@ bool PathExists(const std::wstring& path);
 void ValidateFileName(std::wstring& file);
 
 std::wstring ExpandEnvironmentStrings(const std::wstring& path);
-std::wstring GetDefaultAppPath(const std::wstring& extension, const std::wstring& default_value = L"");
+std::wstring GetDefaultAppPath(const std::wstring& extension,
+                               const std::wstring& default_value = L"");
 std::wstring GetKnownFolderPath(REFKNOWNFOLDERID rfid);
 std::wstring GetFinalPath(const std::wstring& path);
 
-unsigned int PopulateFiles(std::vector<std::wstring>& file_list, const std::wstring& path, const std::wstring& extension = L"", bool recursive = false, bool trim_extension = false);
+unsigned int PopulateFiles(std::vector<std::wstring>& file_list,
+                           const std::wstring& path,
+                           const std::wstring& extension = L"",
+                           bool recursive = false, bool trim_extension = false);
 
 bool ReadFromFile(const std::wstring& path, std::string& output);
-bool SaveToFile(LPCVOID data, DWORD length, const std::wstring& path, bool take_backup = false);
-bool SaveToFile(const std::string& data, const std::wstring& path, bool take_backup = false);
+bool SaveToFile(LPCVOID data, DWORD length, const std::wstring& path,
+                bool take_backup = false);
+bool SaveToFile(const std::string& data, const std::wstring& path,
+                bool take_backup = false);
 
 UINT64 ParseSizeString(std::wstring value);
 std::wstring ToSizeString(const UINT64 size);

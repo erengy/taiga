@@ -20,7 +20,7 @@
 
 #include <zlib/zlib.h>
 
-#include "gzip.h"
+#include "base/gzip.h"
 
 bool UncompressGzippedString(const std::string& input, std::string& output) {
   z_stream stream;

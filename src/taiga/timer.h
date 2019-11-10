@@ -54,7 +54,8 @@ protected:
   void OnTick() override;
 
 private:
-  static void CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime);
+  static void CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent,
+                                 DWORD dwTime);
 };
 
 inline TimerManager timers;

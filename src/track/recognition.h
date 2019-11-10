@@ -30,8 +30,7 @@ class Episode;
 class Item;
 }
 
-namespace track {
-namespace recognition {
+namespace track::recognition {
 
 using scores_t = std::map<int, double>;
 using sorted_scores_t = std::vector<std::pair<int, double>>;
@@ -115,7 +114,6 @@ private:
   sorted_scores_t scores_;
 };
 
-}  // namespace recognition
-}  // namespace track
+}  // namespace track::recognition
 
 extern track::recognition::Engine Meow;

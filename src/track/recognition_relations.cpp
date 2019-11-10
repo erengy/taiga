@@ -20,6 +20,8 @@
 
 #include <semaver.hpp>
 
+#include "track/recognition.h"
+
 #include "base/file.h"
 #include "base/format.h"
 #include "base/log.h"
@@ -27,10 +29,8 @@
 #include "taiga/path.h"
 #include "taiga/settings.h"
 #include "taiga/version.h"
-#include "track/recognition.h"
 
-namespace track {
-namespace recognition {
+namespace track::recognition {
 
 class Relation {
 public:
@@ -246,5 +246,4 @@ bool Engine::SearchEpisodeRedirection(
   return true;
 }
 
-}  // namespace recognition
-}  // namespace track
+}  // namespace track::recognition

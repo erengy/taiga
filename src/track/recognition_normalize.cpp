@@ -22,8 +22,7 @@
 
 #include "track/recognition.h"
 
-namespace track {
-namespace recognition {
+namespace track::recognition {
 
 void Engine::Normalize(std::wstring& title, int type,
                        bool normalized_before) const {
@@ -207,5 +206,4 @@ void Engine::ErasePunctuation(std::wstring& str, int type,
     str.erase(it, str.end());
 }
 
-}  // namespace recognition
-}  // namespace track
+}  // namespace track::recognition

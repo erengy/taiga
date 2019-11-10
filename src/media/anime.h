@@ -27,19 +27,18 @@
 
 namespace anime {
 
-using id_t = int;
-
-// ID_NOTINLIST
-//   Used in Episode data to denote the item is not in user's list.
-//   Item may or may not be in the database.
-//
-// ID_UNKNOWN
-//   There's no item in the database with this ID.
-//   This is the default ID for all anime items.
-//
 enum AnimeId {
   ID_NOTINLIST = -1,
   ID_UNKNOWN = 0
+};
+
+enum class AgeRating {
+  Unknown,
+  G,
+  PG,
+  PG13,
+  R17,
+  R18,
 };
 
 enum class SeriesStatus {
@@ -47,12 +46,6 @@ enum class SeriesStatus {
   FinishedAiring,
   Airing,
   NotYetAired
-};
-
-constexpr std::array<SeriesStatus, 3> kSeriesStatuses{
-  SeriesStatus::FinishedAiring,
-  SeriesStatus::Airing,
-  SeriesStatus::NotYetAired,
 };
 
 enum class SeriesType {
@@ -65,20 +58,6 @@ enum class SeriesType {
   Music,
 };
 
-constexpr std::array<SeriesType, 6> kSeriesTypes{
-  SeriesType::Tv,
-  SeriesType::Ova,
-  SeriesType::Movie,
-  SeriesType::Special,
-  SeriesType::Ona,
-  SeriesType::Music,
-};
-
-constexpr int kUnknownEpisodeCount = -1;
-constexpr int kUnknownEpisodeLength = -1;
-constexpr double kUnknownScore = 0.0;
-constexpr int kUserScoreMax = 100;
-
 enum class MyStatus {
   NotInList,
   Watching,
@@ -86,6 +65,27 @@ enum class MyStatus {
   OnHold,
   Dropped,
   PlanToWatch,
+};
+
+enum class TitleLanguage {
+  Romaji,
+  English,
+  Native,
+};
+
+constexpr std::array<SeriesStatus, 3> kSeriesStatuses{
+  SeriesStatus::FinishedAiring,
+  SeriesStatus::Airing,
+  SeriesStatus::NotYetAired,
+};
+
+constexpr std::array<SeriesType, 6> kSeriesTypes{
+  SeriesType::Tv,
+  SeriesType::Ova,
+  SeriesType::Movie,
+  SeriesType::Special,
+  SeriesType::Ona,
+  SeriesType::Music,
 };
 
 constexpr std::array<MyStatus, 5> kMyStatuses{
@@ -96,20 +96,10 @@ constexpr std::array<MyStatus, 5> kMyStatuses{
   MyStatus::PlanToWatch,
 };
 
-enum class AgeRating {
-  Unknown,
-  G,
-  PG,
-  PG13,
-  R17,
-  R18,
-};
-
-enum class TitleLanguage {
-  Romaji,
-  English,
-  Native,
-};
+constexpr int kUnknownEpisodeCount = -1;
+constexpr int kUnknownEpisodeLength = -1;
+constexpr double kUnknownScore = 0.0;
+constexpr int kUserScoreMax = 100;
 
 struct Titles {
   std::wstring romaji;
@@ -119,7 +109,7 @@ struct Titles {
 };
 
 struct SeriesInformation {
-  anime::id_t id = AnimeId::ID_UNKNOWN;
+  int id = AnimeId::ID_UNKNOWN;
   std::vector<std::wstring> uids;
   sync::ServiceId source = sync::ServiceId::Taiga;
   std::time_t last_modified = 0;
@@ -140,7 +130,6 @@ struct SeriesInformation {
   std::vector<std::wstring> producers;
 };
 
-// Invalid for anime items that are not in user's list
 struct MyInformation {
   std::wstring id;
   int watched_episodes = 0;
@@ -156,7 +145,6 @@ struct MyInformation {
   std::wstring notes;
 };
 
-// For all kinds of other temporary information
 struct LocalInformation {
   int last_aired_episode = 0;
   std::vector<bool> available_episodes;

@@ -26,7 +26,8 @@ namespace base {
 template <class... Args>
 void Log(const monolog::Level level, const monolog::Source& source,
          const std::wstring& str, const Args&... args) {
-  const monolog::Record record{sizeof...(Args) ? fmt::format(str, args...) : str};
+  const monolog::Record record{sizeof...(Args) ? fmt::format(str, args...)
+                                               : str};
   monolog::log.Write(level, record, source);
 }
 

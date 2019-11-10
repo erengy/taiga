@@ -18,13 +18,14 @@
 
 #include <cmath>
 
+#include "taiga/update.h"
+
 #include "base/file.h"
 #include "base/log.h"
 #include "base/string.h"
 #include "base/time.h"
 #include "base/url.h"
 #include "base/xml.h"
-#include "media/anime_season_db.h"
 #include "sync/service.h"
 #include "taiga/http.h"
 #include "taiga/path.h"
@@ -32,7 +33,6 @@
 #include "taiga/settings.h"
 #include "taiga/taiga.h"
 #include "taiga/version.h"
-#include "taiga/update.h"
 #include "track/recognition.h"
 #include "ui/dlg/dlg_main.h"
 #include "ui/dlg/dlg_update.h"

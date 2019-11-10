@@ -588,7 +588,8 @@ void DeleteLibraryEntry(const int id) {
       if (response.status_code() == 404) {
         // We consider "404 Not Found" to be a success.
       } else {
-        ui::OnLibraryUpdateFailure(id, StrToWstr(response.error().str()), false);
+        ui::OnLibraryUpdateFailure(id, StrToWstr(response.error().str()),
+                                   false);
         sync::OnError(RequestType::DeleteLibraryEntry);
         return;
       }

@@ -16,15 +16,14 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "file.h"
-#include "file_monitor.h"
-#include "log.h"
-#include "string.h"
+#include "base/file_monitor.h"
+
+#include "base/file.h"
+#include "base/log.h"
+#include "base/string.h"
 
 DirectoryChangeNotification::DirectoryChangeNotification(
-    DWORD action,
-    const std::wstring& filename,
-    const std::wstring& path)
+    DWORD action, const std::wstring& filename, const std::wstring& path)
     : action(action),
       filename(std::make_pair(filename, L"")),
       path(path),
@@ -46,8 +45,7 @@ DirectoryChangeEntry::DirectoryChangeEntry(HANDLE directory_handle,
 ////////////////////////////////////////////////////////////////////////////////
 
 DirectoryMonitor::DirectoryMonitor()
-    : completion_port_(nullptr),
-      window_handle_(nullptr) {
+    : completion_port_(nullptr), window_handle_(nullptr) {
   thread_.parent = this;
 }
 
@@ -56,9 +54,7 @@ DirectoryMonitor::~DirectoryMonitor() {
   Clear();
 }
 
-void DirectoryMonitor::SetWindowHandle(HWND hwnd) {
-  window_handle_ = hwnd;
-}
+void DirectoryMonitor::SetWindowHandle(HWND hwnd) { window_handle_ = hwnd; }
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -106,15 +102,11 @@ bool DirectoryMonitor::Start() {
 
   for (auto& entry : entries_) {
     auto completion_key = reinterpret_cast<ULONG_PTR>(&entry);
-    completion_port_ = ::CreateIoCompletionPort(entry.directory_handle_,
-                                                completion_port_,
-                                                completion_key,
-                                                0);
+    completion_port_ = ::CreateIoCompletionPort(
+        entry.directory_handle_, completion_port_, completion_key, 0);
     if (completion_port_)
-      ::PostQueuedCompletionStatus(completion_port_,
-                                   sizeof(entry),
-                                   completion_key,
-                                   &entry.overlapped_);
+      ::PostQueuedCompletionStatus(completion_port_, sizeof(entry),
+                                   completion_key, &entry.overlapped_);
   }
 
   return true;
@@ -160,11 +152,9 @@ void DirectoryMonitor::MonitorProc() {
   LPOVERLAPPED overlapped;
 
   do {
-    ::GetQueuedCompletionStatus(completion_port_,
-                                &number_of_bytes,
+    ::GetQueuedCompletionStatus(completion_port_, &number_of_bytes,
                                 reinterpret_cast<PULONG_PTR>(&entry),
-                                &overlapped,
-                                INFINITE);
+                                &overlapped, INFINITE);
 
     if (entry && number_of_bytes > 0) {
       win::Lock lock(critical_section_);
@@ -256,14 +246,14 @@ void DirectoryMonitor::Callback(DirectoryChangeEntry& entry) {
 
     if (notification.action != FILE_ACTION_REMOVED) {
       std::wstring path = entry.path + notification.filename.first;
-      notification.type = FolderExists(path) ?
-          DirectoryChangeNotification::Type::Directory :
-          DirectoryChangeNotification::Type::File;
+      notification.type = FolderExists(path)
+                              ? DirectoryChangeNotification::Type::Directory
+                              : DirectoryChangeNotification::Type::File;
     } else {
       std::wstring extension = GetFileExtension(notification.filename.first);
-      notification.type = !ValidateFileExtension(extension, 4) ?
-          DirectoryChangeNotification::Type::Directory :
-          DirectoryChangeNotification::Type::File;
+      notification.type = !ValidateFileExtension(extension, 4)
+                              ? DirectoryChangeNotification::Type::Directory
+                              : DirectoryChangeNotification::Type::File;
     }
 
     LogFileAction(entry, notification);

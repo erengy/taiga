@@ -18,6 +18,8 @@
 
 #include <map>
 
+#include "sync/kitsu_util.h"
+
 #include "base/file.h"
 #include "base/format.h"
 #include "base/log.h"
@@ -26,12 +28,10 @@
 #include "media/anime.h"
 #include "media/anime_db.h"
 #include "sync/kitsu.h"
-#include "sync/kitsu_util.h"
 #include "sync/kitsu_types.h"
 #include "taiga/settings.h"
 
-namespace sync {
-namespace kitsu {
+namespace sync::kitsu {
 
 RatingSystem GetRatingSystem() {
   return TranslateRatingSystemFrom(
@@ -262,5 +262,4 @@ void ViewProfile() {
       taiga::settings.GetSyncServiceKitsuUsername()));
 }
 
-}  // namespace kitsu
-}  // namespace sync
+}  // namespace sync::kitsu

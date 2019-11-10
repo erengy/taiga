@@ -77,8 +77,8 @@ const std::wstring& Statistics::CalculateLifePlannedToWatch() {
         continue;
     }
 
-    const int episodes = EstimateEpisodeCount(item) -
-                         item.GetMyLastWatchedEpisode();
+    const int episodes =
+        EstimateEpisodeCount(item) - item.GetMyLastWatchedEpisode();
 
     seconds += (EstimateDuration(item) * 60) * episodes;
   }
@@ -95,8 +95,7 @@ const std::wstring& Statistics::CalculateLifeSpentWatching() {
       continue;
 
     int episodes_watched = item.GetMyLastWatchedEpisode();
-    episodes_watched += item.GetMyRewatchedTimes() *
-                        item.GetEpisodeCount();
+    episodes_watched += item.GetMyRewatchedTimes() * item.GetEpisodeCount();
 
     seconds += (EstimateDuration(item) * 60) * episodes_watched;
   }
@@ -151,8 +150,8 @@ float Statistics::CalculateScoreDeviation() {
     }
   }
 
-  score_deviation = items_scored > 0 ?
-      std::sqrt(sum_squares / items_scored) : 0.0f;
+  score_deviation =
+      items_scored > 0 ? std::sqrt(sum_squares / items_scored) : 0.0f;
 
   return score_deviation;
 }

@@ -206,7 +206,8 @@ void ScanAvailableEpisodes(bool silent, int anime_id, int episode_number) {
 
     // Search the cached episode path
     if (!found && !anime_item->GetNextEpisodePath().empty()) {
-      std::wstring next_episode_path = GetPathOnly(anime_item->GetNextEpisodePath());
+      const auto next_episode_path =
+          GetPathOnly(anime_item->GetNextEpisodePath());
       if (!IsEqual(next_episode_path, anime_item->GetFolder())) {
         scanner.options.skip_directories = true;
         scanner.options.skip_files = false;

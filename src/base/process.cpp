@@ -18,7 +18,7 @@
 
 #include <windows.h>
 
-#include "process.h"
+#include "base/process.h"
 
 bool CheckInstance(LPCWSTR mutex_name, LPCWSTR class_name) {
   if (::CreateMutexW(NULL, FALSE, mutex_name) == NULL ||

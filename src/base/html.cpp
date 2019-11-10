@@ -20,8 +20,9 @@
 #include <string>
 #include <unordered_map>
 
-#include "html.h"
-#include "string.h"
+#include "base/html.h"
+
+#include "base/string.h"
 
 // Source: http://www.w3.org/TR/html4/sgml/entities.html
 static const std::unordered_map<std::wstring, wchar_t> html_entities{

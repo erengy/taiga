@@ -574,9 +574,6 @@
     <ClCompile Include="..\..\src\media\library\list.cpp">
       <Filter>media\library</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\media\anime.cpp">
-      <Filter>media\anime</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\media\anime_db.cpp">
       <Filter>media\anime</Filter>
     </ClCompile>

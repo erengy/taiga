@@ -208,7 +208,8 @@ bool Database::DeleteListItem(int anime_id) {
 
   anime_item->RemoveFromUserList();
 
-  ui::ChangeStatusText(L"Item deleted. (" + anime::GetPreferredTitle(*anime_item) + L")");
+  ui::ChangeStatusText(L"Item deleted. (" +
+                       anime::GetPreferredTitle(*anime_item) + L")");
   ui::OnLibraryEntryDelete(anime_item->GetId());
 
   if (CurrentEpisode.anime_id == anime_id)
@@ -225,47 +226,33 @@ void Database::UpdateItem(const library::QueueItem& queue_item) {
 
   anime_item->AddtoUserList();
 
-  // Edit episode
-  if (queue_item.episode) {
+  if (queue_item.episode)
     anime_item->SetMyLastWatchedEpisode(*queue_item.episode);
-  }
-  // Edit score
-  if (queue_item.score) {
+  if (queue_item.score)
     anime_item->SetMyScore(*queue_item.score);
-  }
-  // Edit status
-  if (queue_item.status) {
+  if (queue_item.status)
     anime_item->SetMyStatus(*queue_item.status);
-  }
-  // Edit rewatching status
-  if (queue_item.enable_rewatching) {
+  if (queue_item.enable_rewatching)
     anime_item->SetMyRewatching(*queue_item.enable_rewatching);
-  }
-  if (queue_item.rewatched_times) {
+  if (queue_item.rewatched_times)
     anime_item->SetMyRewatchedTimes(*queue_item.rewatched_times);
-  }
-  // Edit tags
-  if (queue_item.tags) {
+  if (queue_item.tags)
     anime_item->SetMyTags(*queue_item.tags);
-  }
-  // Edit notes
-  if (queue_item.notes) {
+  if (queue_item.notes)
     anime_item->SetMyNotes(*queue_item.notes);
-  }
-  // Edit dates
-  if (queue_item.date_start) {
+  if (queue_item.date_start)
     anime_item->SetMyDateStart(*queue_item.date_start);
-  }
-  if (queue_item.date_finish) {
+  if (queue_item.date_finish)
     anime_item->SetMyDateEnd(*queue_item.date_finish);
-  }
-  // Delete
-  if (queue_item.mode == library::QueueItemMode::Delete) {
-    DeleteListItem(anime_item->GetId());
-  }
 
-  if (queue_item.mode != library::QueueItemMode::Delete)
-    anime::SetMyLastUpdateToNow(*anime_item);
+  switch (queue_item.mode) {
+    case library::QueueItemMode::Delete:
+      DeleteListItem(queue_item.anime_id);
+      break;
+    default:
+      anime::SetMyLastUpdateToNow(*anime_item);
+      break;
+  }
 
   ui::OnLibraryEntryChange(queue_item.anime_id);
 }

@@ -18,15 +18,15 @@
 
 #include <algorithm>
 
+#include "track/recognition.h"
+
 #include "base/string.h"
 #include "media/anime_db.h"
-#include "track/episode.h"
 #include "media/anime_util.h"
-#include "track/recognition.h"
+#include "track/episode.h"
 #include "ui/translate.h"
 
-namespace track {
-namespace recognition {
+namespace track::recognition {
 
 sorted_scores_t Engine::GetScores() const {
   return scores_;
@@ -158,5 +158,4 @@ int Engine::ScoreTitle(const std::wstring& str, const anime::Episode& episode,
   return anime::ID_UNKNOWN;
 }
 
-}  // namespace recognition
-}  // namespace track
+}  // namespace track::recognition
