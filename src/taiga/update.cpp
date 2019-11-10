@@ -237,7 +237,7 @@ bool UpdateHelper::Download() {
     }
 
     const auto path = GetPathOnly(download_path_);
-    const auto file = GetFileName(StrToWstr(std::string{response.url()}));
+    const auto file = GetFileName(StrToWstr(response.url()));
     download_path_ = path + file;
 
     if (response.status_class() == 200 &&

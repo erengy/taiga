@@ -440,7 +440,7 @@ bool Aggregator::ValidateFeedDownload(const taiga::http::Response& response) {
   if (response.status_code() >= 400) {
     if (response.status_code() == 404) {
       ui::OnFeedDownloadError(
-          L"File not found at " + StrToWstr(std::string{response.url()}));
+          L"File not found at " + StrToWstr(response.url()));
     } else {
       ui::OnFeedDownloadError(
           L"Invalid HTTP response ({})"_format(response.status_code()));
@@ -450,8 +450,8 @@ bool Aggregator::ValidateFeedDownload(const taiga::http::Response& response) {
 
   // Check response body
   if (StartsWith(StrToWstr(response.body()), L"<!DOCTYPE html>")) {
-    ui::OnFeedDownloadError(
-        L"Invalid torrent file: " + StrToWstr(std::string{response.url()}));
+    ui::OnFeedDownloadError(L"Invalid torrent file: " +
+                            StrToWstr(response.url()));
     return false;
   }
 
@@ -469,8 +469,7 @@ bool Aggregator::ValidateFeedDownload(const taiga::http::Response& response) {
     if (content_type.empty())
       return true;  // We can't check the header if it doesn't exist
 
-    return allowed_types.count(
-               ToLower_Copy(StrToWstr(std::string{content_type}))) > 0;
+    return allowed_types.count(ToLower_Copy(StrToWstr(content_type))) > 0;
   };
 
   auto has_content_disposition = [&]() {
@@ -481,7 +480,7 @@ bool Aggregator::ValidateFeedDownload(const taiga::http::Response& response) {
     // Allow invalid MIME types when Content-Disposition field is present
     if (!has_content_disposition()) {
       ui::OnFeedDownloadError(L"Invalid content type: " +
-          StrToWstr(std::string{response.header("content-type")}));
+                              StrToWstr(response.header("content-type")));
       return false;
     }
   }

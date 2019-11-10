@@ -124,8 +124,7 @@ bool HasError(const taiga::http::Response& response) {
     if (response.status_code() == 401) {
       // WWW-Authenticate:
       // Bearer error="invalid_token",error_description="The access token expired"
-      const auto value =
-          StrToWstr(std::string{response.header("www-authenticate")});
+      const auto value = StrToWstr(response.header("www-authenticate"));
       if (!value.empty()) {
         const auto error = InStr(value, L"error=\"", L"\"");
         if (error == L"invalid_token") {
