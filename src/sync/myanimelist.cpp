@@ -111,54 +111,57 @@ taiga::http::Request BuildRequest() {
 }
 
 bool HasError(const taiga::http::Response& response) {
+  std::wstring error_description;
+  const RequestType type = RequestType::UpdateLibraryEntry;
+
   if (response.error()) {
-    LOGE(StrToWstr(response.error().str()));
-    ui::ChangeStatusText(
-        L"MyAnimeList: {}"_format(StrToWstr(response.error().str())));
-    return true;
-  }
+    error_description = StrToWstr(response.error().str());
+  } else {
+    if (response.status_code() == 200) {
+      return false;
+    }
 
-  if (response.status_code() == 200) {
-    return false;
-  }
-
-  if (response.status_code() == 401) {
-    // WWW-Authenticate:
-    // Bearer error="invalid_token",error_description="The access token expired"
-    const auto value =
-        StrToWstr(std::string{response.header("www-authenticate")});
-    if (!value.empty()) {
-      const auto error = InStr(value, L"error=\"", L"\"");
-      if (error == L"invalid_token") {
-        // @TODO: Access token expired
-      }
-      const auto error_description =
-          InStr(value, L"error_description=\"", L"\"");
-      if (!error_description.empty()) {
-        LOGE(error_description);
-        ui::ChangeStatusText(L"MyAnimeList: {}"_format(error_description));
-        return true;
+    if (response.status_code() == 401) {
+      // WWW-Authenticate:
+      // Bearer error="invalid_token",error_description="The access token expired"
+      const auto value =
+          StrToWstr(std::string{response.header("www-authenticate")});
+      if (!value.empty()) {
+        const auto error = InStr(value, L"error=\"", L"\"");
+        if (error == L"invalid_token") {
+          // @TODO: Access token expired
+        }
+        error_description = InStr(value, L"error_description=\"", L"\"");
       }
     }
-  }
 
-  if (Json root; JsonParseString(response.body(), root)) {
-    const auto error = StrToWstr(JsonReadStr(root, "error"));
-    if (error == L"invalid_request") {
-      // @TODO: Refresh token expired
-    }
-    auto error_description = StrToWstr(JsonReadStr(root, "message"));
-    if (const auto hint = JsonReadStr(root, "hint"); !hint.empty()) {
-      error_description += L" ({})"_format(StrToWstr(hint));
-    }
-    if (!error_description.empty()) {
-      LOGE(error_description);
-      ui::ChangeStatusText(L"MyAnimeList: {}"_format(error_description));
-      return true;
+    if (error_description.empty()) {
+      if (Json root; JsonParseString(response.body(), root)) {
+        const auto error = StrToWstr(JsonReadStr(root, "error"));
+        if (error == L"invalid_request") {
+          // @TODO: Refresh token expired
+        }
+        error_description = StrToWstr(JsonReadStr(root, "message"));
+        if (const auto hint = JsonReadStr(root, "hint"); !hint.empty()) {
+          error_description += L" ({})"_format(StrToWstr(hint));
+        }
+      }
     }
   }
 
-  return false;
+  if (!error_description.empty()) {
+    LOGE(error_description);
+    ui::ChangeStatusText(L"MyAnimeList: {}"_format(error_description));
+    switch (type) {
+      case RequestType::AddLibraryEntry:
+      case RequestType::DeleteLibraryEntry:
+      case RequestType::UpdateLibraryEntry:
+        // @TODO: ui::OnLibraryUpdateFailure(id, error_description, false);
+        break;
+    }
+  }
+
+  return !error_description.empty();
 }
 
 std::wstring GetAnimeFields() {
