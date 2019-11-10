@@ -377,7 +377,7 @@ void MenuList::UpdateSeason() {
   if (menu) {
     menu->items.clear();
 
-    const auto season_min = anime::Season(anime::Season::Name::kWinter, 2010);
+    const auto season_min = anime::Season(anime::Season::Name::Winter, date::year{2010});
     const auto season_max = ++anime::Season(GetDate());  // Next season
 
     auto create_item = [](win::Menu& menu, const anime::Season& season) {
@@ -402,12 +402,12 @@ void MenuList::UpdateSeason() {
         const anime::Season& season_max) {
       int current_year = 0;
       for (auto season = season_max; season >= season_min; --season) {
-        std::wstring submenu_name = L"Season" + ToWstr(season.year);
+        std::wstring submenu_name = L"Season" + ToWstr(static_cast<int>(season.year));
         auto submenu = create_submenu(submenu_name);
-        if (current_year == 0 || current_year != season.year) {
-          menu.CreateItem(L"", ToWstr(season.year), submenu_name);
+        if (current_year == 0 || current_year != static_cast<int>(season.year)) {
+          menu.CreateItem(L"", ToWstr(static_cast<int>(season.year)), submenu_name);
           submenu->items.clear();
-          current_year = season.year;
+          current_year = static_cast<int>(season.year);
         }
         create_item(*submenu, season);
       }
@@ -432,8 +432,8 @@ void MenuList::UpdateSeason() {
       submenu->items.clear();
       menu->CreateItem(L"", ToWstr(decade) + L"s", submenu_name);
       create_available_seasons(*submenu,
-          anime::Season(anime::Season::Name::kWinter, decade),
-          anime::Season(anime::Season::Name::kFall, decade + 9));
+          anime::Season(anime::Season::Name::Winter, date::year{decade}),
+          anime::Season(anime::Season::Name::Fall, date::year{decade + 9}));
     }
   }
 

@@ -45,6 +45,10 @@ Date::Date(const SYSTEMTIME& st)
     : year_(st.wYear), month_(st.wMonth), day_(st.wDay) {
 }
 
+Date::Date(date::year year, date::month month, date::day day)
+    : year_(year), month_(month), day_(day) {
+}
+
 Date::Date(unsigned short year, unsigned short month, unsigned short day)
     : year_(year), month_(month), day_(day) {
 }

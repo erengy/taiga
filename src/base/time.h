@@ -36,6 +36,7 @@ public:
   explicit Date(const std::wstring& date);
   explicit Date(const DateFull& date);
   explicit Date(const SYSTEMTIME& st);
+  explicit Date(date::year year, date::month month, date::day day);
   explicit Date(unsigned short year, unsigned short month, unsigned short day);
 
   Date& operator=(const Date& date);

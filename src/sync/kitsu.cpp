@@ -784,13 +784,16 @@ void GetMetadataById(const int id) {
 }
 
 void GetSeason(const anime::Season season, const int page) {
+  const auto season_year = static_cast<int>(season.year);
+  const auto season_name =
+      WstrToStr(ToLower_Copy(ui::TranslateSeasonName(season.name)));
+
   auto request = BuildRequest();
   request.set_target("{}/edge/anime"_format(kBaseUrl));
 
   hypr::Params params{
-      {"filter[season]",
-       WstrToStr(ToLower_Copy(ui::TranslateSeasonName(season.name)))},
-      {"filter[season_year]", ToStr(season.year)},
+      {"filter[season]", season_name},
+      {"filter[season_year]", ToStr(season_year)},
       {"page[offset]", ToStr(page)},
       {"page[limit]", ToStr(kJsonApiMaximumPageSize)}};
 

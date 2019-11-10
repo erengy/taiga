@@ -694,7 +694,7 @@ void ExecuteCommand(const std::wstring& str, WPARAM wParam, LPARAM lParam) {
   // Season_Load(file)
   //   Loads season data.
   } else if (command == L"Season_Load") {
-    anime::season_db.Set(anime::Season(body));
+    anime::season_db.Set(anime::Season(WstrToStr(body)));
     taiga::settings.SetAppSeasonsLastSeason(
         ui::TranslateSeason(anime::season_db.current_season));
     if (anime::season_db.items.empty()) {

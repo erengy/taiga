@@ -64,14 +64,14 @@ void SeasonDatabase::Review(bool hide_nsfw) {
     return;
   }
 
-  Date date_start, date_end;
-  current_season.GetInterval(date_start, date_end);
+  const auto [date_start, date_end] = current_season.to_date_range();
 
   const auto is_within_date_interval =
       [&date_start, &date_end](const Item& anime_item) {
-        const Date& anime_start = anime_item.GetDateStart();
+        const auto& anime_start = anime_item.GetDateStart();
         if (anime_start.year() && anime_start.month())
-          if (date_start <= anime_start && anime_start <= date_end) return true;
+          if (Date{date_start} <= anime_start && anime_start <= Date{date_end})
+            return true;
         return false;
       };
 
@@ -80,7 +80,7 @@ void SeasonDatabase::Review(bool hide_nsfw) {
   };
 
   // Check for invalid items
-  for (size_t i = 0; i < items.size(); i++) {
+  for (size_t i = 0; i < items.size(); ++i) {
     const int anime_id = items.at(i);
     if (const auto anime_item = anime::db.Find(anime_id)) {
       const Date& anime_start = anime_item->GetDateStart();

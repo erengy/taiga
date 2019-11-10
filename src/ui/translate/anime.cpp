@@ -96,22 +96,22 @@ std::wstring TranslateDateToSeasonString(const Date& date) {
 std::wstring TranslateSeasonName(const anime::Season::Name name) {
   switch (name) {
     default:
-    case anime::Season::Name::kUnknown: return L"Unknown";
-    case anime::Season::Name::kWinter: return L"Winter";
-    case anime::Season::Name::kSpring: return L"Spring";
-    case anime::Season::Name::kSummer: return L"Summer";
-    case anime::Season::Name::kFall: return L"Fall";
+    case anime::Season::Name::Unknown: return L"Unknown";
+    case anime::Season::Name::Winter: return L"Winter";
+    case anime::Season::Name::Spring: return L"Spring";
+    case anime::Season::Name::Summer: return L"Summer";
+    case anime::Season::Name::Fall: return L"Fall";
   }
 }
 
 std::wstring TranslateSeason(const anime::Season& season) {
-  return L"{} {}"_format(TranslateSeasonName(season.name), season.year);
+  return L"{} {}"_format(TranslateSeasonName(season.name),
+                         static_cast<int>(season.year));
 }
 
 std::wstring TranslateSeasonToMonths(const anime::Season& season) {
-  Date date_start, date_end;
-  season.GetInterval(date_start, date_end);
-  return TranslateDateRange({date_start, date_end});
+  const auto [date_start, date_end] = season.to_date_range();
+  return TranslateDateRange({Date{date_start}, Date{date_end}});
 }
 
 }  // namespace ui

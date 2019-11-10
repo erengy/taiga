@@ -18,42 +18,49 @@
 
 #pragma once
 
+#include <array>
 #include <string>
 
 #include <nstd/compare.hpp>
 
-class Date;
+#include "base/time.h"
 
 namespace anime {
 
-class Season : public nstd::Comparable<Season> {
+class Season final : public nstd::Comparable<Season> {
 public:
-  enum Name {
-    kUnknown,
-    kWinter,
-    kSpring,
-    kSummer,
-    kFall
+  enum class Name {
+    Unknown,
+    Winter,
+    Spring,
+    Summer,
+    Fall
   };
 
-  Season();
-  Season(Name name, unsigned short year);
-  Season(const Date& date);
-  Season(const std::wstring& str);
-  ~Season() {}
-
-  Season& operator = (const Season& season);
-  Season& operator ++ ();
-  Season& operator -- ();
+  Season() = default;
+  explicit Season(Name name, date::year year) : name{name}, year{year} {}
+  explicit Season(const DateFull& date) : Season{Date{date}} {}
+  explicit Season(const Date& date);
+  explicit Season(const std::string& str);
 
   operator bool() const;
 
-  void GetInterval(Date& date_start, Date& date_end) const;
-
-  Name name;
-  unsigned short year;
+  Season& operator++();
+  Season& operator--();
 
   int compare(const Season& season) const override;
+
+  std::pair<DateFull, DateFull> to_date_range() const;
+
+  Name name = Name::Unknown;
+  date::year year;
+};
+
+constexpr std::array<Season::Name, 4> kSeasons{
+  Season::Name::Winter,
+  Season::Name::Spring,
+  Season::Name::Summer,
+  Season::Name::Fall
 };
 
 }  // namespace anime

@@ -87,7 +87,7 @@ BOOL SeasonDialog::OnInitDialog() {
   // Load the last selected season
   const auto last_season = taiga::settings.GetAppSeasonsLastSeason();
   if (!last_season.empty()) {
-    anime::season_db.Set(anime::Season(last_season));
+    anime::season_db.Set(anime::Season(WstrToStr(last_season)));
   }
 
   // Refresh

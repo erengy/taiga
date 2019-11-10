@@ -29,7 +29,6 @@ class Date;
 namespace anime {
 
 class Item;
-class Season;
 
 bool IsValidId(int anime_id);
 

@@ -16,157 +16,197 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <map>
 #include <regex>
-#include <vector>
+#include <unordered_map>
+
+#include <nstd/string.hpp>
 
 #include "media/anime_season.h"
 
 #include "base/string.h"
-#include "base/time.h"
+#include "sync/service.h"
 
 namespace anime {
 
-Season::Season()
-    : name(kUnknown), year(0) {
+namespace {
+
+constexpr auto UnknownSeason = Season::Name::Unknown;
+constexpr auto Winter = Season::Name::Winter;
+constexpr auto Spring = Season::Name::Spring;
+constexpr auto Summer = Season::Name::Summer;
+constexpr auto Fall = Season::Name::Fall;
+
+bool ShiftedSeasons() {
+  switch (sync::GetCurrentServiceId()) {
+    case sync::ServiceId::MyAnimeList:
+      return false;  // Winter: January, February, March
+    default:
+      return true;  // Winter: December, January, February
+  }
 }
 
-Season::Season(Name name, unsigned short year)
-    : name(name), year(year) {
+Season::Name GetSeasonName(const date::month& month) {
+  if (ShiftedSeasons()) {
+    switch (static_cast<unsigned>(month)) {
+      default: return UnknownSeason;
+      case 12: case  1: case  2: return Winter;
+      case  3: case  4: case  5: return Spring;
+      case  6: case  7: case  8: return Summer;
+      case  9: case 10: case 11: return Fall;
+    }
+  } else {
+    switch (static_cast<unsigned>(month)) {
+      default: return UnknownSeason;
+      case  1: case  2: case  3: return Winter;
+      case  4: case  5: case  6: return Spring;
+      case  7: case  8: case  9: return Summer;
+      case 10: case 11: case 12: return Fall;
+    }
+  }
 }
+
+constexpr Season::Name GetNextSeasonName(const Season::Name name) {
+  switch (name) {
+    default: return UnknownSeason;
+    case Winter: return Spring;
+    case Spring: return Summer;
+    case Summer: return Fall;
+    case Fall:   return Winter;
+  }
+}
+
+constexpr Season::Name GetPreviousSeasonName(const Season::Name name) {
+  switch (name) {
+    default: return UnknownSeason;
+    case Winter: return Fall;
+    case Spring: return Winter;
+    case Summer: return Spring;
+    case Fall:   return Summer;
+  }
+}
+
+std::pair<date::month, date::month> GetSeasonRange(const Season::Name name) {
+  if (ShiftedSeasons()) {
+    switch (name) {
+      default: return {};
+      case Winter: return {date::December,  date::February};
+      case Spring: return {date::March,     date::May};
+      case Summer: return {date::June,      date::August};
+      case Fall:   return {date::September, date::November};
+    }
+  } else {
+    switch (name) {
+      default: return {};
+      case Winter: return {date::January, date::March};
+      case Spring: return {date::April,   date::June};
+      case Summer: return {date::July,    date::September};
+      case Fall:   return {date::October, date::December};
+    }
+  }
+}
+
+}  // namespace
 
 Season::Season(const Date& date) {
-  year = date.year();
+  if (date.month()) {
+    name = GetSeasonName(date::month{date.month()});
+  }
 
-  if (date.month() == 0 || date.month() > 12) {
-    name = kUnknown;
-  } else if (date.month() < 3) {   // Jan-Feb
-    name = kWinter;
-  } else if (date.month() < 6) {   // Mar-May
-    name = kSpring;
-  } else if (date.month() < 9) {   // Jun-Aug
-    name = kSummer;
-  } else if (date.month() < 12) {  // Sep-Nov
-    name = kFall;
-  } else {                       // Dec
-    name = kWinter;
-    year += 1;
+  if (date.year()) {
+    year = date::year{date.year()};
+    if (ShiftedSeasons() && date.month() &&
+        date::month{date.month()} == date::December) {
+      ++year;  // e.g. December 2018 -> Winter 2019
+    }
   }
 }
 
-Season::Season(const std::wstring& str) : Season() {
-  static const std::map<std::wstring, Season::Name> seasons{
-    {L"winter", kWinter},
-    {L"spring", kSpring},
-    {L"summer", kSummer},
-    {L"fall", kFall},
+Season::Season(const std::string& str) {
+  static const std::unordered_map<std::string, Season::Name> seasons{
+    {"winter", Winter},
+    {"spring", Spring},
+    {"summer", Summer},
+    {"fall", Fall}
   };
 
-  static const std::wregex pattern(L"([A-Za-z]+)[ _](\\d{4})");
-  std::wsmatch match_results;
+  static const std::regex pattern{"([A-Za-z]{4,6})[ _](\\d{4})"};
+  std::smatch match_results;
 
   if (std::regex_match(str, match_results, pattern)) {
-    auto it = seasons.find(ToLower_Copy(match_results[1]));
-    if (it != seasons.end())
+    const auto it = seasons.find(nstd::tolower_string(match_results[1]));
+    if (it != seasons.end()) {
       name = it->second;
-    year = ToInt(match_results[2]);
+    }
+    year = date::year{ToInt(match_results[2])};
   }
 }
 
-Season& Season::operator=(const Season& season) {
-  name = season.name;
-  year = season.year;
+////////////////////////////////////////////////////////////////////////////////
 
-  return *this;
+Season::operator bool() const {
+  return name != UnknownSeason && year.ok();
 }
 
 Season& Season::operator++() {
-  switch (name) {
-    case kWinter:
-      name = kSpring;
-      break;
-    case kSpring:
-      name = kSummer;
-      break;
-    case kSummer:
-      name = kFall;
-      break;
-    case kFall:
-      name = kWinter;
-      ++year;
-      break;
+  name = GetNextSeasonName(name);
+
+  if (name == Winter) {
+    ++year;
   }
 
   return *this;
 }
 
 Season& Season::operator--() {
-  switch (name) {
-    case kWinter:
-      name = kFall;
-      --year;
-      break;
-    case kSpring:
-      name = kWinter;
-      break;
-    case kSummer:
-      name = kSpring;
-      break;
-    case kFall:
-      name = kSummer;
-      break;
+  name = GetPreviousSeasonName(name);
+
+  if (name == Fall) {
+    --year;
   }
 
   return *this;
-}
-
-Season::operator bool() const {
-  return name != kUnknown && year > 0;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-void Season::GetInterval(Date& date_start, Date& date_end) const {
-  static std::map<Name, std::pair<int, int>> interval{
-    {kUnknown, {0, 0}},
-    {kWinter, {12, 2}},
-    {kSpring, {3, 5}},
-    {kSummer, {6, 8}},
-    {kFall, {9, 11}},
-  };
-  static const std::vector<int> days_in_months{
-    31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31
-  };
-
-  date_start.set_year(name == kWinter ? year - 1 : year);
-  date_start.set_month(interval[name].first);
-  date_start.set_day(1);
-
-  date_end.set_year(year);
-  date_end.set_month(interval[name].second);
-  date_end.set_day(days_in_months[date_end.month() - 1]);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 int Season::compare(const Season& season) const {
   if (year != season.year) {
-    if (year == 0)
+    if (!year.ok())
       return nstd::cmp::greater;
-    if (season.year == 0)
+    if (!season.year.ok())
       return nstd::cmp::less;
     return year < season.year ? nstd::cmp::less : nstd::cmp::greater;
   }
 
   if (name != season.name) {
-    if (name == Season::kUnknown)
-      return nstd::cmp::greater;
-    if (season.name == Season::kUnknown)
+    if (name == UnknownSeason)
+      return nstd::cmp::greater;  // Unknown seasons are in the future
+    if (season.name == UnknownSeason)
       return nstd::cmp::less;
     return name < season.name ? nstd::cmp::less : nstd::cmp::greater;
   }
 
   return nstd::cmp::equal;
+}
+
+std::pair<DateFull, DateFull> Season::to_date_range() const {
+  if (!(*this)) {
+    return {};
+  }
+
+  const auto months = GetSeasonRange(name);
+
+  return {
+    {
+      ShiftedSeasons() && name == Winter ? year - date::years{1} : year,
+      months.first,
+      date::day{1}
+    },
+    date::year_month_day_last{
+      year,
+      date::month_day_last(months.second)
+    }
+  };
 }
 
 }  // namespace anime

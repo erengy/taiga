@@ -525,12 +525,13 @@ void GetMetadataById(const int id) {
 }
 
 void GetSeason(const anime::Season season, const int page_offset) {
+  const auto season_year = static_cast<int>(season.year);
   const auto season_name =
       WstrToStr(ToLower_Copy(ui::TranslateSeasonName(season.name)));
 
   auto request = BuildRequest();
   request.set_target(
-      "{}/anime/season/{}/{}"_format(kBaseUrl, season.year, season_name));
+      "{}/anime/season/{}/{}"_format(kBaseUrl, season_year, season_name));
   request.set_query({
       {"limit", ToStr(kSeasonPageLimit)},
       {"offset", ToStr(page_offset)},
