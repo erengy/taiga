@@ -19,6 +19,7 @@
 #pragma once
 
 #include <array>
+#include <map>
 #include <string>
 #include <vector>
 
@@ -110,8 +111,8 @@ struct Titles {
 
 struct SeriesInformation {
   int id = AnimeId::ID_UNKNOWN;
-  std::vector<std::wstring> uids;
-  sync::ServiceId source = sync::ServiceId::Taiga;
+  std::map<sync::ServiceId, std::wstring> uids;
+  sync::ServiceId source = sync::ServiceId::Unknown;
   std::time_t last_modified = 0;
   int episode_count = kUnknownEpisodeCount;
   int episode_length = kUnknownEpisodeLength;

@@ -105,8 +105,6 @@ BOOL SettingsPage::OnInitDialog() {
     case kSettingsPageServicesMain: {
       win::ComboBox combo(GetDlgItem(IDC_COMBO_SERVICE));
       for (const auto service_id : sync::kServiceIds) {
-        if (service_id == sync::ServiceId::Taiga)
-          continue;
         combo.AddItem(sync::GetServiceNameById(service_id).c_str(),
                       static_cast<LPARAM>(service_id));
         if (service_id == taiga::settings.GetSyncActiveService())

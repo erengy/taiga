@@ -29,23 +29,13 @@
 
 namespace anime {
 
-Item::Item() {
-  series_.uids.resize(sync::kServiceIds.size());
-}
-
-Item::~Item() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
 int Item::GetId() const {
   return series_.id;
 }
 
 const std::wstring& Item::GetId(sync::ServiceId service) const {
-  assert(series_.uids.size() > static_cast<size_t>(service));
-
-  return series_.uids.at(static_cast<size_t>(service));
+  const auto it = series_.uids.find(service);
+  return it != series_.uids.end() ? it->second : EmptyString();
 }
 
 const std::wstring& Item::GetSlug() const {
@@ -136,14 +126,10 @@ const time_t Item::GetLastModified() const {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void Item::SetId(const int id) {
-  series_.id = id;
-}
-
 void Item::SetId(const std::wstring& id, sync::ServiceId service) {
-  series_.uids.at(static_cast<size_t>(service)) = id;
+  series_.uids[service] = id;
 
-  if (service == sync::ServiceId::Taiga) {
+  if (service == sync::GetCurrentServiceId()) {
     series_.id = ToInt(id);
   }
 }

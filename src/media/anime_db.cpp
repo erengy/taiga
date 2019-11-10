@@ -16,6 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <nstd/algorithm.hpp>
+
 #include "media/anime_db.h"
 
 #include "base/log.h"
@@ -60,24 +62,24 @@ void Database::ReadDatabaseNode(XmlNode& database_node) {
     for (auto id_node : node.children(L"id")) {
       const std::wstring slug = id_node.attribute(L"name").as_string();
       const auto service_id = sync::GetServiceIdBySlug(slug);
-      id_map[service_id] = id_node.child_value();
+      if (service_id != sync::ServiceId::Unknown)
+        id_map[service_id] = id_node.child_value();
     }
 
-    const std::wstring source_name = XmlReadStr(node, L"source");
-    auto source = sync::GetServiceIdBySlug(source_name);
-
-    if (source == sync::ServiceId::Taiga) {
+    auto source = sync::GetServiceIdBySlug(XmlReadStr(node, L"source"));
+    if (source == sync::ServiceId::Unknown) {
       const auto current_service_id = sync::GetCurrentServiceId();
-      if (id_map.find(current_service_id) != id_map.end()) {
+      if (nstd::contains(id_map, current_service_id)) {
         source = current_service_id;
-        LOGW(L"Fixed source for ID: {}", id_map[source]);
+        LOGW(L"Fixed source to {} ({}).", sync::GetCurrentServiceName(),
+             id_map[source]);
       } else {
-        LOGE(L"Invalid source for ID: {}", id_map[sync::ServiceId::Taiga]);
+        LOGE(L"Discarding data from unknown source.");
         continue;
       }
     }
 
-    const int id = ToInt(id_map[sync::ServiceId::Taiga]);
+    const int id = ToInt(id_map[sync::GetCurrentServiceId()]);
     Item& item = items[id];  // Creates the item if it doesn't exist
 
     for (const auto& [service, id] : id_map) {
@@ -124,10 +126,10 @@ void Database::WriteDatabaseNode(XmlNode& database_node) const {
     auto anime_node = database_node.append_child(L"anime");
 
     for (const auto service_id : sync::kServiceIds) {
-      std::wstring id = item.GetId(service_id);
+      const auto id = item.GetId(service_id);
       if (!id.empty()) {
         auto child = anime_node.append_child(L"id");
-        std::wstring slug = sync::GetServiceSlugById(service_id);
+        const auto slug = sync::GetServiceSlugById(service_id);
         child.append_attribute(L"name") = slug.c_str();
         child.append_child(pugi::node_pcdata).set_value(id.c_str());
       }

@@ -24,8 +24,7 @@
 namespace taiga {
 
 void InitializeDummies() {
-  dummy_anime.SetSource(sync::ServiceId::MyAnimeList);
-  dummy_anime.SetId(L"4224", sync::ServiceId::Taiga);
+  dummy_anime.SetSource(sync::GetCurrentServiceId());
   dummy_anime.SetId(L"4224", sync::ServiceId::MyAnimeList);
   dummy_anime.SetId(L"3532", sync::ServiceId::Kitsu);
   dummy_anime.SetId(L"4224", sync::ServiceId::AniList);

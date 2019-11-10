@@ -44,7 +44,7 @@ ServiceId GetServiceIdBySlug(const std::wstring& slug) {
   };
 
   const auto it = services.find(slug);
-  return it != services.end() ? it->second : ServiceId::Taiga;
+  return it != services.end() ? it->second : ServiceId::Unknown;
 }
 
 std::wstring GetServiceNameById(const ServiceId service_id) {

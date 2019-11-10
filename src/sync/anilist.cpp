@@ -211,7 +211,6 @@ int ParseMediaObject(const Json& json) {
   auto& anime_item = anime::db.items[anime_id];
 
   anime_item.SetSource(ServiceId::AniList);
-  anime_item.SetId(anime_id);
   anime_item.SetId(ToWstr(anime_id), ServiceId::AniList);
   anime_item.SetLastModified(time(nullptr));  // current time
 

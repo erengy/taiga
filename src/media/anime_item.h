@@ -36,11 +36,8 @@ enum class ServiceId;
 
 namespace anime {
 
-class Item {
+class Item final {
 public:
-  Item();
-  virtual ~Item();
-
   //////////////////////////////////////////////////////////////////////////////
   // Metadata
 
@@ -67,7 +64,6 @@ public:
   const std::wstring& GetSynopsis() const;
   const time_t GetLastModified() const;
 
-  void SetId(const int id);
   void SetId(const std::wstring& id, sync::ServiceId service);
   void SetSlug(const std::wstring& slug);
   void SetSource(sync::ServiceId source);

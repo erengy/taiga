@@ -24,14 +24,13 @@
 namespace sync {
 
 enum class ServiceId {
-  Taiga,
+  Unknown,
   MyAnimeList,
   Kitsu,
   AniList,
 };
 
-constexpr std::array<ServiceId, 4> kServiceIds{
-  ServiceId::Taiga,
+constexpr std::array<ServiceId, 3> kServiceIds{
   ServiceId::MyAnimeList,
   ServiceId::Kitsu,
   ServiceId::AniList
