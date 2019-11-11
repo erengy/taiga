@@ -447,8 +447,10 @@ int ParseLibraryObject(const Json& json) {
 
 std::optional<int> GetOffset(const Json& json, const std::string& name) {
   if (const auto link = JsonReadStr(json["links"], name); !link.empty()) {
-    Url url = StrToWstr(link);
-    return ToInt(url.query[L"offset"]);
+    const Url url = StrToWstr(link);
+    if (const auto it = url.query.find(L"offset"); it != url.query.end()) {
+      return ToInt(it->second);
+    }
   }
   return std::nullopt;
 }
@@ -724,7 +726,7 @@ void GetLibraryEntries(const int page) {
       ParseObject(value);
     }
 
-    if (next_page) {
+    if (next_page && *next_page > 0) {
       GetLibraryEntries(*next_page);
     } else {
       account.set_last_synchronized(time(nullptr));  // current time
@@ -837,7 +839,7 @@ void GetSeason(const anime::Season season, const int page) {
       ui::OnLibraryEntryChange(anime_id);
     }
 
-    if (next_page) {
+    if (next_page && *next_page > 0) {
       GetSeason(season, *next_page);
     } else {
       sync::OnResponse(RequestType::GetSeason);

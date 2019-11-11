@@ -195,12 +195,14 @@ std::wstring GetListStatusFields() {
          L"updated_at";
 }
 
-int GetOffset(const Json& json, const std::string& name) {
+std::optional<int> GetOffset(const Json& json, const std::string& name) {
   if (const auto link = JsonReadStr(json["paging"], name); !link.empty()) {
-    Url url = StrToWstr(link);
-    return ToInt(url.query[L"offset"]);
+    const Url url = StrToWstr(link);
+    if (const auto it = url.query.find(L"offset"); it != url.query.end()) {
+      return ToInt(it->second);
+    }
   }
-  return 0;
+  return std::nullopt;
 }
 
 int ParseAnimeObject(const Json& json) {
@@ -465,7 +467,7 @@ void GetLibraryEntries(const int page_offset) {
     const auto previous_page_offset = GetOffset(root, "previous");
     const auto next_page_offset = GetOffset(root, "next");
 
-    if (previous_page_offset == 0) {  // first page
+    if (!previous_page_offset) {  // first page
       anime::db.ClearUserData();
     }
 
@@ -476,8 +478,8 @@ void GetLibraryEntries(const int page_offset) {
       }
     }
 
-    if (next_page_offset > 0) {
-      GetLibraryEntries(next_page_offset);
+    if (next_page_offset && *next_page_offset > 0) {
+      GetLibraryEntries(*next_page_offset);
     } else {
       sync::OnResponse(RequestType::GetLibraryEntries);
     }
@@ -562,7 +564,7 @@ void GetSeason(const anime::Season season, const int page_offset) {
     const auto previous_page_offset = GetOffset(root, "previous");
     const auto next_page_offset = GetOffset(root, "next");
 
-    if (previous_page_offset == 0) {  // first page
+    if (!previous_page_offset) {  // first page
       anime::season_db.items.clear();
     }
 
@@ -572,8 +574,8 @@ void GetSeason(const anime::Season season, const int page_offset) {
       ui::OnLibraryEntryChange(anime_id);
     }
 
-    if (next_page_offset > 0) {
-      GetSeason(season, next_page_offset);
+    if (next_page_offset && *next_page_offset > 0) {
+      GetSeason(season, *next_page_offset);
     } else {
       sync::OnResponse(RequestType::GetSeason);
     }
