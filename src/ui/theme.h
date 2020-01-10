@@ -51,6 +51,8 @@ enum Icons16px {
   kIcon16_FunnelPlus,
   kIcon16_FunnelPencil,
   kIcon16_Calendar,
+  kIcon16_CalendarPrev,
+  kIcon16_CalendarNext,
   kIcon16_Category,
   kIcon16_Sort,
   kIcon16_Balloon,

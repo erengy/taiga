@@ -38,6 +38,16 @@
 
 namespace ui {
 
+enum SeasonToolbarCommand {
+  kCommandSelectSeason = 100,
+  kCommandPreviousSeason,
+  kCommandNextSeason,
+  kCommandRefreshSeason,
+  kCommandSeasonGroupBy,
+  kCommandSeasonSortBy,
+  kCommandSeasonView,
+};
+
 SeasonDialog DlgSeason;
 
 SeasonDialog::SeasonDialog()
@@ -66,14 +76,18 @@ BOOL SeasonDialog::OnInitDialog() {
 
   // Insert toolbar buttons
   BYTE fsState = TBSTATE_ENABLED;
+  BYTE fsStyle0 = BTNS_AUTOSIZE;
   BYTE fsStyle1 = BTNS_AUTOSIZE | BTNS_SHOWTEXT;
   BYTE fsStyle2 = BTNS_AUTOSIZE | BTNS_SHOWTEXT | BTNS_WHOLEDROPDOWN;
-  toolbar_.InsertButton(0, ui::kIcon16_Calendar, 100, fsState, fsStyle2, 0, L"Select season", L"Select season");
-  toolbar_.InsertButton(1, ui::kIcon16_Refresh,  101, fsState, fsStyle1, 1, L"Refresh data", L"Download anime details and missing images");
-  toolbar_.InsertButton(2, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
-  toolbar_.InsertButton(3, ui::kIcon16_Category, 103, fsState, fsStyle2, 3, L"Group by", nullptr);
-  toolbar_.InsertButton(4, ui::kIcon16_Sort,     104, fsState, fsStyle2, 4, L"Sort by", nullptr);
-  toolbar_.InsertButton(5, ui::kIcon16_Details,  105, fsState, fsStyle2, 5, L"View", nullptr);
+  toolbar_.InsertButton(0, ui::kIcon16_Calendar, kCommandSelectSeason, fsState, fsStyle2, 0, L"Select season", L"Select season");
+  toolbar_.InsertButton(1, ui::kIcon16_CalendarPrev, kCommandPreviousSeason, fsState, fsStyle0, 1, nullptr, L"Previous season");
+  toolbar_.InsertButton(2, ui::kIcon16_CalendarNext, kCommandNextSeason, fsState, fsStyle0, 2, nullptr, L"Next season");
+  toolbar_.InsertButton(3, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
+  toolbar_.InsertButton(4, ui::kIcon16_Refresh, kCommandRefreshSeason, fsState, fsStyle1, 4, L"Refresh data", L"Download anime details and missing images");
+  toolbar_.InsertButton(5, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
+  toolbar_.InsertButton(6, ui::kIcon16_Category, kCommandSeasonGroupBy, fsState, fsStyle2, 6, L"Group by", nullptr);
+  toolbar_.InsertButton(7, ui::kIcon16_Sort, kCommandSeasonSortBy, fsState, fsStyle2, 7, L"Sort by", nullptr);
+  toolbar_.InsertButton(8, ui::kIcon16_Details, kCommandSeasonView, fsState, fsStyle2, 8, L"View", nullptr);
 
   // Create rebar
   rebar_.Attach(GetDlgItem(IDC_REBAR_SEASON));
@@ -114,8 +128,18 @@ INT_PTR SeasonDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 BOOL SeasonDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
   // Toolbar
   switch (LOWORD(wParam)) {
+    // Previous/Next season
+    case kCommandPreviousSeason:
+    case kCommandNextSeason: {
+      auto season = anime::season_db.current_season;
+      const auto season_str = ui::TranslateSeason(
+          LOWORD(wParam) == kCommandPreviousSeason ? --season : ++season);
+      ui::ExecuteCommand(L"Season_Load(" + season_str + L")");
+      return TRUE;
+    }
+
     // Refresh data
-    case 101:
+    case kCommandRefreshSeason:
       sync::GetSeason(anime::season_db.current_season);
       return TRUE;
   }
@@ -504,19 +528,19 @@ LRESULT SeasonDialog::OnToolbarNotify(LPARAM lParam) {
       std::wstring command;
       switch (LOWORD(nmt->iItem)) {
         // Select season
-        case 100:
+        case kCommandSelectSeason:
           command = ui::Menus.Show(GetWindowHandle(), rect.left, rect.bottom, L"SeasonSelect");
           break;
         // Group by
-        case 103:
+        case kCommandSeasonGroupBy:
           command = ui::Menus.Show(GetWindowHandle(), rect.left, rect.bottom, L"SeasonGroup");
           break;
         // Sort by
-        case 104:
+        case kCommandSeasonSortBy:
           command = ui::Menus.Show(GetWindowHandle(), rect.left, rect.bottom, L"SeasonSort");
           break;
         // View as
-        case 105:
+        case kCommandSeasonView:
           command = ui::Menus.Show(GetWindowHandle(), rect.left, rect.bottom, L"SeasonView");
           break;
       }
@@ -684,7 +708,9 @@ void SeasonDialog::RefreshToolbar() {
       ui::TranslateSeason(anime::season_db.current_season).c_str() :
       L"Select season");
 
-  toolbar_.EnableButton(101, anime::season_db.current_season);
+  toolbar_.EnableButton(kCommandPreviousSeason, anime::season_db.current_season);
+  toolbar_.EnableButton(kCommandNextSeason, anime::season_db.current_season);
+  toolbar_.EnableButton(kCommandRefreshSeason, anime::season_db.current_season);
 
   std::wstring text = L"Group by: ";
   switch (taiga::settings.GetAppSeasonsGroupBy()) {
@@ -699,7 +725,7 @@ void SeasonDialog::RefreshToolbar() {
       text += L"Type";
       break;
   }
-  toolbar_.SetButtonText(3, text.c_str());
+  toolbar_.SetButtonText(6, text.c_str());
 
   text = L"Sort by: ";
   switch (taiga::settings.GetAppSeasonsSortBy()) {
@@ -720,7 +746,7 @@ void SeasonDialog::RefreshToolbar() {
       text += L"Title";
       break;
   }
-  toolbar_.SetButtonText(4, text.c_str());
+  toolbar_.SetButtonText(7, text.c_str());
 
   text = L"View: ";
   switch (taiga::settings.GetAppSeasonsViewAs()) {
@@ -732,7 +758,7 @@ void SeasonDialog::RefreshToolbar() {
       text += L"Details";
       break;
   }
-  toolbar_.SetButtonText(5, text.c_str());
+  toolbar_.SetButtonText(8, text.c_str());
 }
 
 void SeasonDialog::SetViewMode(int mode) {

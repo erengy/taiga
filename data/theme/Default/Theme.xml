@@ -27,6 +27,8 @@
 			<icon name="funnel-plus"/>
 			<icon name="funnel-pencil"/>
 			<icon name="calendar-month"/>
+			<icon name="calendar-previous"/>
+			<icon name="calendar-next"/>
 			<icon name="category"/>
 			<icon name="sort-quantity-descending"/>
 			<icon name="balloon-left"/>
