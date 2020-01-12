@@ -538,10 +538,10 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
   // Set content
   if (anime_id_ == anime::ID_NOTINLIST) {
     std::vector<int> passive_links;
-    std::wstring content = L"Taiga was unable to identify this title, and it needs your help.\n\n";
+    std::wstring content = L"Taiga was unable to identify this title, and needs your help.\n\n";
     if (!scores_.empty()) {
       int count = 0;
-      content += L"Please choose the correct one from the list below:\n\n";
+      content += L"Please choose the correct anime from the list below:\n\n";
       for (const auto& pair : scores_) {
         passive_links.push_back(passive_links.empty() ? 1 : passive_links.back() + 2);
         content += L"  \u2022 <a href=\"score\" id=\"{0}\">{1}</a>"
@@ -622,8 +622,8 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
         watched_last_week++;
     }
     if (watched_last_week > 0) {
-      content += L"You've watched {} {} in the last week.\n\n"_format(
-          watched_last_week, watched_last_week == 1 ? L"episode" : L"episodes");
+      content += L"You've watched {} episode{} last week.\n\n"_format(
+          watched_last_week, watched_last_week == 1 ? L"" : L"s");
     }
 
     // Available episodes
@@ -633,8 +633,9 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
         available_episodes++;
     }
     if (available_episodes > 0) {
-      content += L"There are at least {} new {} available in library folders.\n\n"_format(
-          available_episodes, available_episodes == 1 ? L"episode" : L"episodes");
+      const bool single = available_episodes == 1;
+      content += L"There {} at least {} new episode{} available in library folders.\n\n"_format(
+          single ? L"is" : L"are", available_episodes, single ? L"" : L"s");
     }
 
     // Airing times
