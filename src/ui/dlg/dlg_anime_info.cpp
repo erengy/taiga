@@ -570,13 +570,12 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
 
     // Recently watched
     std::vector<int> anime_ids;
-    auto list_anime_ids = [&anime_ids](int anime_id) {
-      if (!nstd::contains(anime_ids, anime_id)) {
-        auto anime_item = anime::db.Find(anime_id);
-        if (anime_item)
+    const auto list_anime_ids = [&anime_ids](int anime_id) {
+      if (!nstd::contains(anime_ids, anime_id))
+        if (const auto anime_item = anime::db.Find(anime_id))
           if (anime_item->GetMyStatus() == anime::MyStatus::Watching || anime_item->GetMyRewatching())
-            anime_ids.push_back(anime_id);
-      }
+            if (anime_item->IsNextEpisodeAvailable())
+              anime_ids.push_back(anime_id);
     };
     for (auto it = library::queue.items.crbegin(); it != library::queue.items.crend(); ++it) {
       if (it->episode) {
@@ -588,12 +587,18 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
         list_anime_ids(it->anime_id);
       }
     }
+    for (const auto& [anime_id, anime_item] : anime::db.items) {
+      if (anime_item.IsInList()) {
+        list_anime_ids(anime_id);  // @TODO: sort by last updated?
+      }
+    }
     int recently_watched = 0;
     for (const auto& id : anime_ids) {
-      auto anime_item = anime::db.Find(id);
-      if (!anime_item || !anime_item->IsNextEpisodeAvailable())
+      const auto anime_item = anime::db.Find(id);
+      if (!anime_item)
         continue;
-      std::wstring title = L"{} #{}"_format(anime::GetPreferredTitle(*anime_item), anime_item->GetMyLastWatchedEpisode() + 1);
+      const std::wstring title = L"{} #{}"_format(
+          anime::GetPreferredTitle(*anime_item), anime_item->GetMyLastWatchedEpisode() + 1);
       content += L"\u2022 <a href=\"PlayNext({})\">{}</a>\n"_format(id, title);
       recently_watched++;
       if (recently_watched >= 20)
