@@ -268,6 +268,8 @@ public:
   void SetTorrentDownloadAppPath(const std::wstring& path);
   std::wstring GetTorrentDownloadLocation() const;
   void SetTorrentDownloadLocation(const std::wstring& path);
+  std::wstring GetTorrentDownloadFileLocation() const;
+  void SetTorrentDownloadFileLocation(const std::wstring& path);
   bool GetTorrentDownloadUseAnimeFolder() const;
   void SetTorrentDownloadUseAnimeFolder(const bool enabled);
   bool GetTorrentDownloadFallbackOnFolder() const;

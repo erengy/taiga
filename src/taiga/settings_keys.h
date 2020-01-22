@@ -136,6 +136,7 @@ enum class AppSettingKey {
   TorrentDownloadAppOpen,
   TorrentDownloadAppPath,
   TorrentDownloadLocation,
+  TorrentDownloadFileLocation,
   TorrentDownloadUseAnimeFolder,
   TorrentDownloadFallbackOnFolder,
   TorrentDownloadCreateSubfolder,

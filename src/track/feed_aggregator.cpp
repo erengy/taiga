@@ -297,9 +297,13 @@ void Aggregator::HandleFeedDownload(Feed& feed, const std::string& data) {
   std::wstring file;
 
   if (!data.empty()) {
+    auto path = AddTrailingSlash(taiga::settings.GetTorrentDownloadFileLocation());
+    if (path.empty())
+      path = feed.GetDataPath();
+
     file = feed_item->title;
     ValidateFileName(file);
-    file = feed.GetDataPath() + file + L".torrent";
+    file = path + file + L".torrent";
 
     SaveToFile(data, file);
 

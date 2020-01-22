@@ -40,6 +40,7 @@ std::vector<AdvancedSetting> GetAdvancedSettingKeys() {
     AdvancedSetting::SyncServiceKitsuPartialLibrary,
     AdvancedSetting::ShareDiscordApplicationId,
     AdvancedSetting::TorrentFilterArchiveMaxCount,
+    AdvancedSetting::TorrentDownloadFileLocation,
     AdvancedSetting::TorrentDownloadUseMagnet,
   };
   return keys;
@@ -79,6 +80,8 @@ std::wstring GetAdvancedSettingDescription(const AdvancedSetting key) {
       return L"Sharing / Discord / Application ID";
     case AdvancedSetting::TorrentFilterArchiveMaxCount:
       return L"Torrents / Archive limit";
+    case AdvancedSetting::TorrentDownloadFileLocation:
+      return L"Torrents / Download path for .torrent files";
     case AdvancedSetting::TorrentDownloadUseMagnet:
       return L"Torrents / Use magnet links if available";
   }
@@ -124,6 +127,8 @@ std::wstring GetAdvancedSettingValue(const AdvancedSetting key) {
       return taiga::settings.GetShareDiscordApplicationId();
     case AdvancedSetting::TorrentFilterArchiveMaxCount:
       return ToWstr(taiga::settings.GetTorrentFilterArchiveMaxCount());
+    case AdvancedSetting::TorrentDownloadFileLocation:
+      return taiga::settings.GetTorrentDownloadFileLocation();
     case AdvancedSetting::TorrentDownloadUseMagnet:
       return bool_to_wstr(taiga::settings.GetTorrentDownloadUseMagnet());
   }
@@ -180,6 +185,9 @@ void SetAdvancedSetting(const AdvancedSetting key, const std::wstring& value) {
       break;
     case AdvancedSetting::TorrentFilterArchiveMaxCount:
       taiga::settings.SetTorrentFilterArchiveMaxCount(ToInt(value));
+      break;
+    case AdvancedSetting::TorrentDownloadFileLocation:
+      taiga::settings.SetTorrentDownloadFileLocation(value);
       break;
     case AdvancedSetting::TorrentDownloadUseMagnet:
       taiga::settings.SetTorrentDownloadUseMagnet(ToBool(value));

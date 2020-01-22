@@ -212,6 +212,7 @@ void Settings::InitKeyMap() const {
       {AppSettingKey::TorrentDownloadAppOpen, {"rss/torrent/application/open", true}},
       {AppSettingKey::TorrentDownloadAppPath, {"rss/torrent/application/path", std::wstring{GetDefaultAppPath(L".torrent", kDefaultTorrentAppPath)}}},
       {AppSettingKey::TorrentDownloadLocation, {"rss/torrent/options/downloadpath", std::wstring{}}},
+      {AppSettingKey::TorrentDownloadFileLocation, {"rss/torrent/options/filedownloadpath", std::wstring{}}},
       {AppSettingKey::TorrentDownloadUseAnimeFolder, {"rss/torrent/options/autosetfolder", true}},
       {AppSettingKey::TorrentDownloadFallbackOnFolder, {"rss/torrent/options/autousefolder", false}},
       {AppSettingKey::TorrentDownloadCreateSubfolder, {"rss/torrent/options/autocreatefolder", false}},
@@ -1179,6 +1180,14 @@ std::wstring Settings::GetTorrentDownloadLocation() const {
 
 void Settings::SetTorrentDownloadLocation(const std::wstring& path) {
   set_value(AppSettingKey::TorrentDownloadLocation, path);
+}
+
+std::wstring Settings::GetTorrentDownloadFileLocation() const {
+  return value<std::wstring>(AppSettingKey::TorrentDownloadFileLocation);
+}
+
+void Settings::SetTorrentDownloadFileLocation(const std::wstring& path) {
+  set_value(AppSettingKey::TorrentDownloadFileLocation, path);
 }
 
 bool Settings::GetTorrentDownloadUseAnimeFolder() const {
