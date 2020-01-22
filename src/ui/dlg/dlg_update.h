@@ -29,6 +29,7 @@ public:
   ~UpdateDialog() {}
 
   INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+  BOOL OnClose();
   BOOL OnDestroy();
   BOOL OnInitDialog();
   void OnPaint(HDC hdc, LPPAINTSTRUCT lpps);

@@ -42,8 +42,7 @@ public:
 
   std::wstring GetCurrentAnimeRelationsModified() const;
 
-  class Item : public rss::Item {
-  public:
+  struct Item : rss::Item {
     std::wstring taiga_anime_relations_location;
     std::wstring taiga_anime_relations_modified;
   };
@@ -62,7 +61,6 @@ private:
   std::atomic_bool transfer_cancelled_ = false;
   bool restart_required_ = false;
   bool update_available_ = false;
-  std::wstring client_uid_;
 };
 
 }  // namespace detail

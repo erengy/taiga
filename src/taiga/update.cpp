@@ -61,6 +61,8 @@ void UpdateHelper::Check() {
 
   ui::DlgUpdate.progressbar.SetPosition(0);
 
+  transfer_cancelled_ = false;
+
   const auto on_transfer = [this](const taiga::http::Transfer& transfer) {
     return OnTransfer(transfer);
   };
@@ -211,6 +213,8 @@ bool UpdateHelper::Download() {
 
   download_path_ = AddTrailingSlash(GetPathOnly(Taiga.GetModulePath()));
   download_path_ += GetFileName(latest_item_->link);
+
+  transfer_cancelled_ = false;
 
   taiga::http::Request request;
   request.set_target(WstrToStr(latest_item_->link));

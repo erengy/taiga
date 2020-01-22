@@ -71,10 +71,13 @@ INT_PTR UpdateDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
   return DialogProcDefault(hwnd, uMsg, wParam, lParam);
 }
 
-BOOL UpdateDialog::OnDestroy() {
-  // Clean up
+BOOL UpdateDialog::OnClose() {
   taiga::updater.Cancel();
 
+  return FALSE;
+}
+
+BOOL UpdateDialog::OnDestroy() {
   if (taiga::updater.IsRestartRequired()) {
     if (DlgMain.IsWindow()) {
       DlgMain.PostMessage(WM_DESTROY);
