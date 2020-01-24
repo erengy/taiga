@@ -42,7 +42,7 @@ namespace sync {
 bool AuthenticateUser() {
   ui::EnableDialogInput(ui::Dialog::Main, false);
   ui::ChangeStatusText(L"{}: Authenticating user..."_format(
-      sync::GetCurrentServiceName()));
+      GetCurrentServiceName()));
 
   switch (GetCurrentServiceId()) {
     case ServiceId::MyAnimeList:
@@ -62,7 +62,7 @@ bool AuthenticateUser() {
 void GetUser() {
   ui::EnableDialogInput(ui::Dialog::Main, false);
   ui::ChangeStatusText(L"{}: Retrieving user information..."_format(
-      sync::GetCurrentServiceName()));
+      GetCurrentServiceName()));
 
   switch (GetCurrentServiceId()) {
     case ServiceId::MyAnimeList:
@@ -79,7 +79,7 @@ void GetUser() {
 void GetLibraryEntries() {
   ui::EnableDialogInput(ui::Dialog::Main, false);
   ui::ChangeStatusText(L"{}: Retrieving anime list..."_format(
-      sync::GetCurrentServiceName()));
+      GetCurrentServiceName()));
 
   switch (GetCurrentServiceId()) {
     case ServiceId::MyAnimeList:
@@ -96,7 +96,7 @@ void GetLibraryEntries() {
 
 void GetMetadataById(const int id) {
   ui::ChangeStatusText(L"{}: Retrieving anime information..."_format(
-      sync::GetCurrentServiceName()));
+      GetCurrentServiceName()));
 
   switch (GetCurrentServiceId()) {
     case ServiceId::MyAnimeList:
@@ -114,7 +114,7 @@ void GetMetadataById(const int id) {
 void GetSeason(const anime::Season season) {
   ui::EnableDialogInput(ui::Dialog::Seasons, false);
   ui::ChangeStatusText(L"{}: Retrieving {} anime season..."_format(
-      sync::GetCurrentServiceName(), ui::TranslateSeason(season)));
+      GetCurrentServiceName(), ui::TranslateSeason(season)));
 
   switch (GetCurrentServiceId()) {
     case ServiceId::MyAnimeList:
@@ -131,7 +131,7 @@ void GetSeason(const anime::Season season) {
 
 void SearchTitle(const std::wstring& title) {
   ui::ChangeStatusText(L"{}: Searching for \"{}\"..."_format(
-      sync::GetCurrentServiceName(), title));
+      GetCurrentServiceName(), title));
 
   switch (GetCurrentServiceId()) {
     case ServiceId::MyAnimeList:
@@ -180,7 +180,7 @@ void AddLibraryEntry(const library::QueueItem& queue_item) {
     return;
 
   ui::ChangeStatusText(L"{}: Updating anime list... ({})"_format(
-      sync::GetCurrentServiceName(), anime::GetPreferredTitle(*anime_item)));
+      GetCurrentServiceName(), anime::GetPreferredTitle(*anime_item)));
 
   switch (GetCurrentServiceId()) {
     case ServiceId::MyAnimeList:
@@ -201,7 +201,7 @@ void DeleteLibraryEntry(const int id) {
     return;
 
   ui::ChangeStatusText(L"{}: Deleting anime from list... ({})"_format(
-      sync::GetCurrentServiceName(), anime::GetPreferredTitle(*anime_item)));
+      GetCurrentServiceName(), anime::GetPreferredTitle(*anime_item)));
 
   switch (GetCurrentServiceId()) {
     case ServiceId::MyAnimeList:
@@ -222,7 +222,7 @@ void UpdateLibraryEntry(const library::QueueItem& queue_item) {
     return;
 
   ui::ChangeStatusText(L"{}: Updating anime list... ({})"_format(
-      sync::GetCurrentServiceName(), anime::GetPreferredTitle(*anime_item)));
+      GetCurrentServiceName(), anime::GetPreferredTitle(*anime_item)));
 
   switch (GetCurrentServiceId()) {
     case ServiceId::MyAnimeList:
