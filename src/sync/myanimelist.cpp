@@ -16,6 +16,9 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <functional>
+#include <optional>
+
 #include "sync/myanimelist.h"
 
 #include "base/format.h"
@@ -41,6 +44,24 @@
 namespace sync::myanimelist {
 
 // @TODO: Link to API documentation when available
+
+struct Error {
+  enum class Type {
+    // 401 Unauthorized
+    // WWW-Authenticate: Bearer error="invalid_token",error_description="The access token expired"
+    // {"error":"invalid_token"}
+    AccessTokenExpired,
+
+    // 401 Unauthorized
+    // {"error":"invalid_request","message":"The refresh token is invalid.","hint":"Token has expired"}
+    RefreshTokenExpired,
+
+    Other,
+  };
+
+  Type type = Type::Other;
+  std::wstring description;
+};
 
 constexpr auto kBaseUrl = "https://api.myanimelist.net/v2";
 constexpr auto kLibraryPageLimit = 1000;
@@ -94,6 +115,13 @@ void InvalidateUserAuthentication() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+void SetAuthorizationHeader(taiga::http::Request& request) {
+  const auto access_token = Account::access_token();
+  if (!access_token.empty()) {
+    request.set_header("Authorization", "Bearer {}"_format(access_token));
+  }
+}
+
 taiga::http::Request BuildRequest() {
   taiga::http::Request request;
 
@@ -102,65 +130,63 @@ taiga::http::Request BuildRequest() {
       {"Accept-Charset", "utf-8"},
       {"Accept-Encoding", "gzip"}});
 
-  const auto access_token = Account::access_token();
-  if (!access_token.empty()) {
-    request.set_header("Authorization", "Bearer {}"_format(access_token));
-  }
+  SetAuthorizationHeader(request);
 
   return request;
 }
 
-bool HasError(const taiga::http::Response& response) {
-  std::wstring error_description;
-  const RequestType type = RequestType::UpdateLibraryEntry;
+std::optional<Error> HasError(const taiga::http::Response& response) {
+  if (response.status_class() == 200) {
+    return std::nullopt;
+  }
+
+  Error error;
 
   if (response.error()) {
-    error_description = StrToWstr(response.error().str());
-  } else {
-    if (response.status_code() == 200) {
-      return false;
-    }
+    error.description = StrToWstr(response.error().str());
+    return error;
+  }
 
-    if (response.status_code() == 401) {
-      // WWW-Authenticate:
-      // Bearer error="invalid_token",error_description="The access token expired"
-      const auto value = StrToWstr(response.header("www-authenticate"));
-      if (!value.empty()) {
-        const auto error = InStr(value, L"error=\"", L"\"");
-        if (error == L"invalid_token") {
-          // @TODO: Access token expired
-        }
-        error_description = InStr(value, L"error_description=\"", L"\"");
+  if (const auto value = response.header("www-authenticate"); !value.empty()) {
+    error.description = InStr(StrToWstr(value), L"error_description=\"", L"\"");
+    if (InStr(StrToWstr(value), L"error=\"", L"\"") == L"invalid_token") {
+      error.type = Error::Type::AccessTokenExpired;
+      return error;
+    }
+  }
+
+  if (Json root; JsonParseString(response.body(), root)) {
+    if (root.contains("error")) {
+      if (JsonReadStr(root, "error") == "invalid_request") {
+        error.type = Error::Type::RefreshTokenExpired;
       }
     }
-
-    if (error_description.empty()) {
-      if (Json root; JsonParseString(response.body(), root)) {
-        const auto error = StrToWstr(JsonReadStr(root, "error"));
-        if (error == L"invalid_request") {
-          // @TODO: Refresh token expired
-        }
-        error_description = StrToWstr(JsonReadStr(root, "message"));
-        if (const auto hint = JsonReadStr(root, "hint"); !hint.empty()) {
-          error_description += L" ({})"_format(StrToWstr(hint));
-        }
+    if (root.contains("message") && error.description.empty()) {
+      error.description = StrToWstr(JsonReadStr(root, "message"));
+      if (const auto hint = JsonReadStr(root, "hint"); !hint.empty()) {
+        error.description += L" ({})"_format(StrToWstr(hint));
       }
     }
   }
 
-  if (!error_description.empty()) {
-    LOGE(error_description);
-    ui::ChangeStatusText(L"MyAnimeList: {}"_format(error_description));
-    switch (type) {
-      case RequestType::AddLibraryEntry:
-      case RequestType::DeleteLibraryEntry:
-      case RequestType::UpdateLibraryEntry:
-        // @TODO: ui::OnLibraryUpdateFailure(id, error_description, false);
+  return error;
+}
+
+void HandleError(const Error& error) {
+  if (!error.description.empty()) {
+    switch (error.type) {
+      case Error::Type::AccessTokenExpired:
+      case Error::Type::RefreshTokenExpired:
+        LOGD(error.description);
+        break;
+
+      case Error::Type::Other:
+      default:
+        LOGE(error.description);
+        ui::ChangeStatusText(L"MyAnimeList: {}"_format(error.description));
         break;
     }
   }
-
-  return !error_description.empty();
 }
 
 std::wstring GetAnimeFields() {
@@ -321,7 +347,8 @@ void RequestAccessToken(const std::wstring& authorization_code,
   };
 
   const auto on_response = [](const taiga::http::Response& response) {
-    if (HasError(response)) {
+    if (const auto error = HasError(response)) {
+      HandleError(*error);
       sync::OnError(RequestType::RequestAccessToken);
       ui::OnMalRequestAccessToken(false);
       return;
@@ -345,7 +372,7 @@ void RequestAccessToken(const std::wstring& authorization_code,
   taiga::http::Send(request, on_transfer, on_response);
 }
 
-void RefreshAccessToken() {
+void RefreshAccessToken(std::function<void()> after_response) {
   const auto refresh_token = Account::refresh_token();
   if (refresh_token.empty()) {
     ui::ChangeStatusText(L"MyAnimeList: Refresh token is unavailable.");
@@ -366,9 +393,15 @@ void RefreshAccessToken() {
                       L"MyAnimeList: Refreshing access token...");
   };
 
-  const auto on_response = [](const taiga::http::Response& response) {
-    if (HasError(response)) {
+  const auto on_response = [after_response](const taiga::http::Response& response) {
+    if (const auto error = HasError(response)) {
+      HandleError(*error);
       account.set_authenticated(false);
+      if (error->type == Error::Type::RefreshTokenExpired) {
+        ui::ChangeStatusText(
+            L"MyAnimeList: Refresh token has expired. "
+            L"Please re-authorize your account via Settings.");
+      }
       sync::OnError(RequestType::RefreshAccessToken);
       return;
     }
@@ -389,10 +422,42 @@ void RefreshAccessToken() {
 
     sync::OnResponse(RequestType::RefreshAccessToken);
 
-    GetUser();
+    if (after_response) {
+      after_response();
+    }
   };
 
   taiga::http::Send(request, on_transfer, on_response);
+}
+
+void RefreshAccessToken() {
+  RefreshAccessToken([]() { GetUser(); });
+}
+
+void SendRequest(taiga::http::Request request,
+                 taiga::http::TransferCallback on_transfer,
+                 taiga::http::ResponseCallback on_response) {
+  const auto handle_response = [=](const taiga::http::Response& response) {
+    if (const auto error = HasError(response)) {
+      HandleError(*error);
+
+      if (error->type == Error::Type::AccessTokenExpired) {
+        account.set_authenticated(false);
+        // Refresh the access token and retry the original request
+        RefreshAccessToken([=]() mutable {
+          SetAuthorizationHeader(request);
+          taiga::http::Send(request, on_transfer, on_response);
+        });
+        return;
+      }
+    }
+
+    if (on_response) {
+      on_response(response);
+    }
+  };
+
+  taiga::http::Send(request, on_transfer, handle_response);
 }
 
 void GetUser() {
@@ -431,7 +496,7 @@ void GetUser() {
     }
   };
 
-  taiga::http::Send(request, on_transfer, on_response);
+  SendRequest(request, on_transfer, on_response);
 }
 
 void GetLibraryEntries(const int page_offset) {
@@ -485,7 +550,7 @@ void GetLibraryEntries(const int page_offset) {
     }
   };
 
-  taiga::http::Send(request, on_transfer, on_response);
+  SendRequest(request, on_transfer, on_response);
 }
 
 void GetMetadataById(const int id) {
@@ -524,7 +589,7 @@ void GetMetadataById(const int id) {
     sync::OnResponse(RequestType::GetMetadataById);
   };
 
-  taiga::http::Send(request, on_transfer, on_response);
+  SendRequest(request, on_transfer, on_response);
 }
 
 void GetSeason(const anime::Season season, const int page_offset) {
@@ -581,7 +646,7 @@ void GetSeason(const anime::Season season, const int page_offset) {
     }
   };
 
-  taiga::http::Send(request, on_transfer, on_response);
+  SendRequest(request, on_transfer, on_response);
 }
 
 void SearchTitle(const std::wstring& title) {
@@ -622,7 +687,7 @@ void SearchTitle(const std::wstring& title) {
     sync::OnResponse(RequestType::SearchTitle);
   };
 
-  taiga::http::Send(request, on_transfer, on_response);
+  SendRequest(request, on_transfer, on_response);
 }
 
 void AddLibraryEntry(const library::QueueItem& queue_item) {
@@ -640,12 +705,11 @@ void DeleteLibraryEntry(const int id) {
   };
 
   const auto on_response = [id](const taiga::http::Response& response) {
-    if (HasError(response)) {
+    if (const auto error = HasError(response)) {
       if (response.status_code() == 404) {
         // We consider "404 Not Found" to be a success.
       } else {
-        ui::OnLibraryUpdateFailure(id, StrToWstr(response.error().str()),
-                                   false);
+        ui::OnLibraryUpdateFailure(id, error->description, false);
         sync::OnError(RequestType::DeleteLibraryEntry);
         return;
       }
@@ -654,7 +718,7 @@ void DeleteLibraryEntry(const int id) {
     sync::OnResponse(RequestType::DeleteLibraryEntry);
   };
 
-  taiga::http::Send(request, on_transfer, on_response);
+  SendRequest(request, on_transfer, on_response);
 }
 
 void UpdateLibraryEntry(const library::QueueItem& queue_item) {
@@ -694,12 +758,11 @@ void UpdateLibraryEntry(const library::QueueItem& queue_item) {
   };
 
   const auto on_response = [id](const taiga::http::Response& response) {
-    if (HasError(response)) {
-      auto error_description = StrToWstr(response.error().str());
+    if (auto error = HasError(response)) {
       if (response.status_code() == 404) {
-        error_description = L"MyAnimeList: Anime list entry does not exist.";
+        error->description = L"Anime list entry does not exist";
       }
-      ui::OnLibraryUpdateFailure(id, error_description, false);
+      ui::OnLibraryUpdateFailure(id, error->description, false);
       sync::OnError(RequestType::UpdateLibraryEntry);
       return;
     }
@@ -717,7 +780,7 @@ void UpdateLibraryEntry(const library::QueueItem& queue_item) {
     sync::OnResponse(RequestType::UpdateLibraryEntry);
   };
 
-  taiga::http::Send(request, on_transfer, on_response);
+  SendRequest(request, on_transfer, on_response);
 }
 
 }  // namespace sync::myanimelist
