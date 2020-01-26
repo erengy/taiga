@@ -350,7 +350,7 @@ void RequestAccessToken(const std::wstring& authorization_code,
     if (const auto error = HasError(response)) {
       HandleError(*error);
       sync::OnError(RequestType::RequestAccessToken);
-      ui::OnMalRequestAccessToken(false);
+      ui::OnMalRequestAccessTokenError(error->description);
       return;
     }
 
@@ -358,7 +358,7 @@ void RequestAccessToken(const std::wstring& authorization_code,
 
     if (!JsonParseString(response.body(), json)) {
       sync::OnError(RequestType::RequestAccessToken);
-      ui::OnMalRequestAccessToken(false);
+      ui::OnMalRequestAccessTokenError(L"Could not parse the response.");
       return;
     }
 
@@ -366,7 +366,7 @@ void RequestAccessToken(const std::wstring& authorization_code,
     Account::set_refresh_token(JsonReadStr(json, "refresh_token"));
 
     sync::OnResponse(RequestType::RequestAccessToken);
-    ui::OnMalRequestAccessToken(true);
+    ui::OnMalRequestAccessTokenSuccess();
   };
 
   taiga::http::Send(request, on_transfer, on_response);

@@ -843,14 +843,17 @@ void OnMircDdeConnectionSuccess(const std::vector<std::wstring>& channels,
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void OnMalRequestAccessToken(bool success) {
-  win::TaskDialog dlg(TAIGA_APP_NAME,
-                      success ? TD_ICON_INFORMATION : TD_ICON_ERROR);
-  if (success) {
-    dlg.SetMainInstruction(L"MyAnimeList token request succeeded.");
-  } else {
-    dlg.SetMainInstruction(L"MyAnimeList token request failed.");
-  }
+void OnMalRequestAccessTokenSuccess() {
+  win::TaskDialog dlg(TAIGA_APP_NAME, TD_ICON_INFORMATION);
+  dlg.SetMainInstruction(L"MyAnimeList authorization succeeded.");
+  dlg.AddButton(L"OK", IDOK);
+  dlg.Show(DlgSettings.GetWindowHandle());
+}
+
+void OnMalRequestAccessTokenError(const std::wstring& description) {
+  win::TaskDialog dlg(TAIGA_APP_NAME, TD_ICON_ERROR);
+  dlg.SetMainInstruction(L"MyAnimeList authorization failed.");
+  dlg.SetContent(description.c_str());
   dlg.AddButton(L"OK", IDOK);
   dlg.Show(DlgSettings.GetWindowHandle());
 }
