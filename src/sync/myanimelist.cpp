@@ -56,6 +56,10 @@ struct Error {
     // {"error":"invalid_request","message":"The refresh token is invalid.","hint":"Token has expired"}
     RefreshTokenExpired,
 
+    // 403 Forbidden
+    // {"message":"","error":"forbidden"}
+    Forbidden,
+
     Other,
   };
 
@@ -136,15 +140,15 @@ taiga::http::Request BuildRequest() {
 }
 
 std::optional<Error> HasError(const taiga::http::Response& response) {
-  if (response.status_class() == 200) {
-    return std::nullopt;
-  }
-
   Error error;
 
   if (response.error()) {
     error.description = StrToWstr(response.error().str());
     return error;
+  }
+
+  if (response.status_class() == 200) {
+    return std::nullopt;
   }
 
   if (const auto value = response.header("www-authenticate"); !value.empty()) {
@@ -157,8 +161,12 @@ std::optional<Error> HasError(const taiga::http::Response& response) {
 
   if (Json root; JsonParseString(response.body(), root)) {
     if (root.contains("error")) {
-      if (JsonReadStr(root, "error") == "invalid_request") {
-        error.type = Error::Type::RefreshTokenExpired;
+      static const std::map<std::string, Error::Type> known_errors{
+          {"forbidden", Error::Type::Forbidden},
+          {"invalid_request", Error::Type::RefreshTokenExpired}};
+      const auto it = known_errors.find(JsonReadStr(root, "error"));
+      if (it != known_errors.end()) {
+        error.type = it->second;
       }
     }
     if (root.contains("message") && error.description.empty()) {
@@ -169,23 +177,32 @@ std::optional<Error> HasError(const taiga::http::Response& response) {
     }
   }
 
+  if (error.description.empty()) {
+    if (error.type == Error::Type::Forbidden) {
+      error.description = L"Please set up your account via Settings.";
+    }
+  }
+  if (error.description.empty()) {
+    error.description = L"Unknown error ({} {})"_format(
+        response.status_code(), StrToWstr(response.reason_phrase()));
+  }
+
   return error;
 }
 
 void HandleError(const Error& error) {
-  if (!error.description.empty()) {
-    switch (error.type) {
-      case Error::Type::AccessTokenExpired:
-      case Error::Type::RefreshTokenExpired:
-        LOGD(error.description);
-        break;
+  switch (error.type) {
+    case Error::Type::AccessTokenExpired:
+    case Error::Type::RefreshTokenExpired:
+      LOGD(error.description);
+      break;
 
-      case Error::Type::Other:
-      default:
-        LOGE(error.description);
-        ui::ChangeStatusText(L"MyAnimeList: {}"_format(error.description));
-        break;
-    }
+    case Error::Type::Forbidden:
+    case Error::Type::Other:
+    default:
+      LOGE(error.description);
+      ui::ChangeStatusText(L"MyAnimeList: {}"_format(error.description));
+      break;
   }
 }
 
