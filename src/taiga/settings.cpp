@@ -317,15 +317,6 @@ std::wstring GetCurrentUserDisplayName() {
   return GetCurrentUsername();
 }
 
-std::wstring GetCurrentUserEmail() {
-  switch (sync::GetCurrentServiceId()) {
-    case sync::ServiceId::Kitsu:
-      return settings.GetSyncServiceKitsuEmail();
-    default:
-      return {};
-  }
-}
-
 std::wstring GetCurrentUsername() {
   switch (sync::GetCurrentServiceId()) {
     case sync::ServiceId::MyAnimeList:
@@ -334,19 +325,6 @@ std::wstring GetCurrentUsername() {
       return settings.GetSyncServiceKitsuUsername();
     case sync::ServiceId::AniList:
       return settings.GetSyncServiceAniListUsername();
-    default:
-      return {};
-  }
-}
-
-std::wstring GetCurrentPassword() {
-  switch (sync::GetCurrentServiceId()) {
-    case sync::ServiceId::MyAnimeList:
-      return settings.GetSyncServiceMalAccessToken();
-    case sync::ServiceId::Kitsu:
-      return Base64Decode(settings.GetSyncServiceKitsuPassword());
-    case sync::ServiceId::AniList:
-      return settings.GetSyncServiceAniListToken();
     default:
       return {};
   }

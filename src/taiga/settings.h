@@ -346,9 +346,7 @@ private:
 };
 
 std::wstring GetCurrentUserDisplayName();
-std::wstring GetCurrentUserEmail();
 std::wstring GetCurrentUsername();
-std::wstring GetCurrentPassword();
 
 inline Settings settings;
 

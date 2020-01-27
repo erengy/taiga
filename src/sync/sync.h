@@ -46,7 +46,7 @@ enum class RequestType {
   UpdateLibraryEntry,
 };
 
-bool AuthenticateUser();
+void AuthenticateUser();
 void GetUser();
 void GetLibraryEntries();
 void GetMetadataById(const int id);
@@ -62,6 +62,7 @@ void DownloadImage(const int anime_id, const std::wstring& image_url);
 bool IsUserAuthenticated();
 void InvalidateUserAuthentication();
 bool IsUserAccountAvailable();
+bool IsUserAuthenticationAvailable();
 
 void OnError(const RequestType type);
 bool OnTransfer(const RequestType type, const hypr::detail::Transfer& transfer,

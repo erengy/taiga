@@ -39,7 +39,7 @@
 
 namespace sync {
 
-bool AuthenticateUser() {
+void AuthenticateUser() {
   ui::EnableDialogInput(ui::Dialog::Main, false);
   ui::ChangeStatusText(L"{}: Authenticating user..."_format(
       GetCurrentServiceName()));
@@ -55,8 +55,6 @@ bool AuthenticateUser() {
       anilist::AuthenticateUser();
       break;
   }
-
-  return true;
 }
 
 void GetUser() {
@@ -147,13 +145,12 @@ void SearchTitle(const std::wstring& title) {
 }
 
 void Synchronize() {
-  bool authenticated = IsUserAuthenticated();
+  if (!IsUserAuthenticated()) {
+    if (IsUserAuthenticationAvailable()) {
+      AuthenticateUser();
 
-  if (!authenticated) {
-    authenticated = AuthenticateUser();
-
-    // Special case where we allow downloading lists without authentication
-    if (!authenticated && !taiga::GetCurrentUsername().empty()) {
+    // Allow downloading lists without authentication
+    } else if (IsUserAccountAvailable()) {
       switch (GetCurrentServiceId()) {
         case ServiceId::Kitsu:
           GetUser();
@@ -296,6 +293,19 @@ bool IsUserAccountAvailable() {
              !taiga::settings.GetSyncServiceKitsuUsername().empty();
     case ServiceId::AniList:
       return !taiga::settings.GetSyncServiceAniListUsername().empty();
+  }
+
+  return false;
+}
+
+bool IsUserAuthenticationAvailable() {
+  switch (GetCurrentServiceId()) {
+    case ServiceId::MyAnimeList:
+      return !taiga::settings.GetSyncServiceMalRefreshToken().empty();
+    case ServiceId::Kitsu:
+      return !taiga::settings.GetSyncServiceKitsuPassword().empty();
+    case ServiceId::AniList:
+      return !taiga::settings.GetSyncServiceAniListToken().empty();
   }
 
   return false;
