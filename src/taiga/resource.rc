@@ -492,7 +492,7 @@ FONT 9, "Segoe UI", 400, 0, 0
     EDITTEXT        IDC_EDIT_USER_KITSU, 12, 28, 141, 12, ES_AUTOHSCROLL, WS_EX_LEFT
     LTEXT           "Password:", IDC_STATIC, 160, 18, 141, 8, SS_LEFT, WS_EX_LEFT
     EDITTEXT        IDC_EDIT_PASS_KITSU, 160, 28, 141, 12, ES_AUTOHSCROLL | ES_PASSWORD, WS_EX_LEFT
-    CONTROL         "<a href=""URL(https://kitsu.io)"">Create a new Kitsu account</a>", IDC_LINK_ACCOUNT_KITSU, "SysLink", 0x50010004, 12, 47, 141, 8, 0x00000000
+    CONTROL         "<a href=""URL(https://kitsu.io)"">Create a new Kitsu account</a> and make sure to <a href=""URL(https://kitsu.io/settings/profile)"">set your profile URL</a>", IDC_LINK_ACCOUNT_KITSU, "SysLink", 0x50010004, 12, 47, 288, 8, 0x00000000
 }
 
 
