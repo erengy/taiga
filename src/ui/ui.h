@@ -98,7 +98,6 @@ void OnAnimeWatchingEnd(const anime::Item& anime_item, const anime::Episode& epi
 bool OnRecognitionCancelConfirm();
 void OnRecognitionFail();
 
-void OnSettingsAccountEmpty();
 bool OnSettingsEditAdvanced(const std::wstring& description, bool is_password, std::wstring& value);
 void OnSettingsChange();
 void OnSettingsLibraryFoldersEmpty();

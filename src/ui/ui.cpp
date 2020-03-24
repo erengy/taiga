@@ -610,19 +610,6 @@ void OnRecognitionFail() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void OnSettingsAccountEmpty() {
-  win::TaskDialog dlg(TAIGA_APP_NAME, TD_ICON_INFORMATION);
-  dlg.SetMainInstruction(L"Would you like to set your account information?");
-  dlg.SetContent(L"Anime search requires authentication, which means, you need "
-                 L"to enter a valid username and password to search "
-                 L"MyAnimeList.");
-  dlg.AddButton(L"Yes", IDYES);
-  dlg.AddButton(L"No", IDNO);
-  dlg.Show(DlgMain.GetWindowHandle());
-  if (dlg.GetSelectedButtonID() == IDYES)
-    ShowDlgSettings(kSettingsSectionServices, kSettingsPageServicesMain);
-}
-
 bool OnSettingsEditAdvanced(const std::wstring& description,
                             bool is_password, std::wstring& value) {
   InputDialog dlg;
