@@ -18,6 +18,11 @@
 
 #include <vector>
 
+#include <hypp/detail/uri.hpp>
+#include <hypp/generator/uri.hpp>
+#include <hypp/parser/uri.hpp>
+#include <hypp/uri.hpp>
+
 #include "base/url.h"
 
 #include "base/string.h"
@@ -161,59 +166,16 @@ std::wstring BuildUrlParameters(const query_t& parameters) {
       output += L"&";
     output += parameter.first;
     if (!parameter.second.empty())
-      output += L"=" + EncodeUrl(parameter.second, false);
+      output += L"=" + EncodeUrl(parameter.second);
   }
 
   return output;
 }
 
 std::wstring DecodeUrl(const std::wstring& input) {
-  std::string output;
-  output.reserve(input.size());
-
-  for (size_t i = 0; i < input.length(); i++) {
-    if (input[i] == L'%' &&
-        i + 2 < input.length() &&
-        IsHexadecimalChar(input[i + 1]) && IsHexadecimalChar(input[i + 2])) {
-      char c = 0;
-      constexpr auto digits = L"0123456789ABCDEF";
-      for (char j = 0; j < 16; j++) {
-        if (input[i + 1] == digits[j])
-          c += j << 4;
-        if (input[i + 2] == digits[j])
-          c += j;
-      }
-      output.append(1, c);
-      i += 2;
-    } else {
-      output.append(1, static_cast<char>(input[i]));
-    }
-  }
-
-  return StrToWstr(output);
+  return StrToWstr(hypp::detail::uri::decode(WstrToStr(input)));
 }
 
-std::wstring EncodeUrl(const std::wstring& input, bool encode_unreserved) {
-  std::string str = WstrToStr(input);
-
-  std::wstring output;
-  output.reserve(input.size() * 2);
-
-  for (size_t i = 0; i < str.length(); i++) {
-    if ((str[i] >= '0' && str[i] <= '9') ||
-        (str[i] >= 'A' && str[i] <= 'Z') ||
-        (str[i] >= 'a' && str[i] <= 'z') ||
-        (!encode_unreserved &&
-         (str[i] == '-' || str[i] == '.' ||
-          str[i] == '_' || str[i] == '~'))) {
-      output.append(1, static_cast<wchar_t>(str[i]));
-    } else {
-      constexpr auto digits = L"0123456789ABCDEF";
-      output.append(L"%");
-      output.append(&digits[(str[i] >> 4) & 0x0F], 1);
-      output.append(&digits[str[i] & 0x0F], 1);
-    }
-  }
-
-  return output;
+std::wstring EncodeUrl(const std::wstring& input) {
+  return StrToWstr(hypp::detail::uri::encode(WstrToStr(input)));
 }

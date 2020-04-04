@@ -24,7 +24,6 @@
 #include "base/log.h"
 #include "base/string.h"
 #include "base/time.h"
-#include "base/url.h"
 #include "base/xml.h"
 #include "sync/service.h"
 #include "taiga/http.h"

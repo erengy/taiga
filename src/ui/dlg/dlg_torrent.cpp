@@ -22,7 +22,6 @@
 #include "base/format.h"
 #include "base/gfx.h"
 #include "base/string.h"
-#include "base/url.h"
 #include "media/anime_db.h"
 #include "media/anime_util.h"
 #include "taiga/resource.h"
