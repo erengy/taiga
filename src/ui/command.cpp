@@ -225,7 +225,7 @@ void ExecuteCommand(const std::wstring& str, WPARAM wParam, LPARAM lParam) {
     auto anime_item = anime::db.Find(anime_id);
     if (anime_item) {
       std::wstring title = anime_item->GetTitle();
-      ReplaceString(body, L"%title%", EncodeUrl(title));
+      ReplaceString(body, L"%title%", Url::Encode(title));
     }
     ExecuteLink(body);
 

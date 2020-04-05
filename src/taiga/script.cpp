@@ -173,7 +173,7 @@ std::wstring ReplaceVariables(const std::wstring& str,
   if (url_encode) {
     for (auto& [name, value] : fields) {
       if (value) {
-        value = EncodeUrl(*value);
+        value = Url::Encode(*value);
       }
     }
   }

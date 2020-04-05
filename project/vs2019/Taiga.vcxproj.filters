@@ -693,9 +693,6 @@
     <ClInclude Include="..\..\src\base\log.h">
       <Filter>base</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\base\map.h">
-      <Filter>base</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\base\oauth.h">
       <Filter>base</Filter>
     </ClInclude>

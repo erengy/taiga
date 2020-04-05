@@ -16,166 +16,78 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <vector>
-
 #include <hypp/detail/uri.hpp>
 #include <hypp/generator/uri.hpp>
 #include <hypp/parser/uri.hpp>
 #include <hypp/uri.hpp>
+#include <nstd/string.hpp>
 
 #include "base/url.h"
 
+#include "base/log.h"
 #include "base/string.h"
 
-Url::Url()
-    : protocol(base::http::Protocol::Http), port(0) {
+Url::Url(const std::wstring& url) {
+  Parse(url);
 }
-
-Url::Url(const std::wstring& url)
-    : protocol(base::http::Protocol::Http), port(0) {
-  Crack(url);
-}
-
-////////////////////////////////////////////////////////////////////////////////
 
 Url& Url::operator=(const Url& url) {
-  protocol = url.protocol;
-  host = url.host;
-  port = url.port;
-  path = url.path;
-  query = url.query;
-  fragment = url.fragment;
-
+  this->uri_ = url.uri_;
   return *this;
 }
 
 void Url::operator=(const std::wstring& url) {
-  Crack(url);
+  Parse(url);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-
-void Url::Clear() {
-  protocol = base::http::Protocol::Http;
-  host.clear();
-  port = 0;
-  path.clear();
-  query.clear();
-  fragment.clear();
+std::wstring Url::host() const {
+  return uri_.authority.has_value() ? StrToWstr(uri_.authority->host)
+                                    : std::wstring{};
 }
 
-std::wstring Url::Build() const {
-  std::wstring url;
-
-  switch (protocol) {
-    case base::http::Protocol::Http:
-    case base::http::Protocol::Relative:
-    default:
-      url += L"http";
-      break;
-    case base::http::Protocol::Https:
-      url += L"https";
-      break;
+Url::query_t Url::query() const {
+  if (!uri_.query.has_value()) {
+    return {};
   }
-  url += L"://";
 
-  url += host;
+  query_t query;
 
-  if (port > 0)
-    url += L":" + ToWstr(port);
+  const auto parameters = nstd::split(uri_.query.value(), "&");
+  for (const auto& parameter : parameters) {
+    const auto [name, _, value] = nstd::partition(parameter, "=");
+    query[Decode(StrToWstr(name))] = Decode(StrToWstr(value));
+  }
 
-  url += path;
-
-  if (!query.empty())
-    url += L"?" + BuildUrlParameters(query);
-
-  if (!fragment.empty())
-    url += L"#" + fragment;
-
-  return url;
+  return query;
 }
 
-void Url::Crack(std::wstring url) {
-  Clear();
+hypp::Uri Url::uri() const {
+  return uri_;
+}
 
+std::wstring Url::to_wstring() const {
+  return StrToWstr(hypp::to_string(uri_));
+}
+
+void Url::Parse(std::wstring url) {
   Trim(url, L"\t\n\r ");
 
-  // Get protocol
-  size_t i = url.find(L"://", 0);
-  if (i != std::wstring::npos) {
-    std::wstring scheme = url.substr(0, i);
-    url = url.substr(i + 3);
-    if (IsEqual(scheme, L"https"))
-      protocol = base::http::Protocol::Https;
+  const std::string uri = WstrToStr(url);
+  hypp::Parser parser{uri};
+
+  if (auto expected = hypp::ParseUri(parser)) {
+    uri_ = expected.value();
   } else {
-    i = url.find(L"//", 0);
-    if (i == 0) {
-      url = url.substr(2);
-      protocol = base::http::Protocol::Relative;
-    }
-  }
-
-  // Get host and path
-  i = url.find(L"/", 0);
-  if (i == std::wstring::npos)
-    i = url.length();
-  host = url.substr(0, i);
-  path = url.substr(i);
-
-  // Get port number
-  i = host.find(L":", 0);
-  if (i != std::wstring::npos) {
-    port = ToInt(host.substr(i + 1));
-    host = host.substr(0, i);
-  }
-
-  // Get fragment
-  i = path.find(L"#", 0);
-  if (i != std::wstring::npos) {
-    fragment = path.substr(i + 1);
-    path = path.substr(0, i);
-  }
-
-  // Get query string
-  i = path.find(L"?", 0);
-  if (i != std::wstring::npos) {
-    std::wstring query_string = path.substr(i + 1);
-    path = path.substr(0, i);
-    std::vector<std::wstring> parameters;
-    Split(query_string, L"&", parameters);
-    for (const auto& parameter : parameters) {
-      i = parameter.find(L"=", 0);
-      if (i != std::wstring::npos) {
-        std::wstring name = DecodeUrl(parameter.substr(0, i));
-        std::wstring value = DecodeUrl(parameter.substr(i + 1));
-        query.insert(std::make_pair(name, value));
-      } else {
-        query.insert(std::make_pair(parameter, L""));
-      }
-    }
+    LOGE(L"Could not parse URL: {}\nReason: {}", url,
+         StrToWstr(hypp::to_string(expected.error())));
+    uri_ = {};
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-
-std::wstring BuildUrlParameters(const query_t& parameters) {
-  std::wstring output;
-
-  for (const auto& parameter : parameters) {
-    if (!output.empty())
-      output += L"&";
-    output += parameter.first;
-    if (!parameter.second.empty())
-      output += L"=" + EncodeUrl(parameter.second);
-  }
-
-  return output;
-}
-
-std::wstring DecodeUrl(const std::wstring& input) {
+std::wstring Url::Decode(const std::wstring& input) {
   return StrToWstr(hypp::detail::uri::decode(WstrToStr(input)));
 }
 
-std::wstring EncodeUrl(const std::wstring& input) {
+std::wstring Url::Encode(const std::wstring& input) {
   return StrToWstr(hypp::detail::uri::encode(WstrToStr(input)));
 }

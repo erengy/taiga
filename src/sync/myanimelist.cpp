@@ -241,7 +241,7 @@ std::wstring GetListStatusFields() {
 std::optional<int> GetOffset(const Json& json, const std::string& name) {
   if (const auto link = JsonReadStr(json["paging"], name); !link.empty()) {
     const Url url = StrToWstr(link);
-    if (const auto it = url.query.find(L"offset"); it != url.query.end()) {
+    if (const auto it = url.query().find(L"offset"); it != url.query().end()) {
       return ToInt(it->second);
     }
   }

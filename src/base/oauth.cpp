@@ -44,7 +44,7 @@ std::wstring BuildAuthorizationHeader(
     const Access& access,
     const std::optional<Parameters>& post_parameters) {
   // Build request parameters
-  const Parameters get_parameters = detail::ParseQuery(Url(url).query);
+  const Parameters get_parameters = detail::ParseQuery(Url(url));
 
   // Build signed OAuth parameters
   const Parameters signed_parameters = detail::BuildSignedParameters(
@@ -113,8 +113,8 @@ Parameters BuildSignedParameters(
 
   // Prepare the signature base
   const std::wstring signature_base = http_method +
-      L"&" + EncodeUrl(NormalizeUrl(url)) +
-      L"&" + EncodeUrl(SortParameters(all_parameters));
+      L"&" + Url::Encode(NormalizeUrl(url)) +
+      L"&" + Url::Encode(SortParameters(all_parameters));
 
   // Obtain a signature and add it to header parameters
   oauth_parameters[L"oauth_signature"] =
@@ -141,14 +141,14 @@ std::wstring CreateSignature(
     const std::wstring& access_token_secret) {
   // Create a SHA-1 hash of signature
   const std::wstring key =
-      EncodeUrl(consumer_secret) + L"&" + EncodeUrl(access_token_secret);
+      Url::Encode(consumer_secret) + L"&" + Url::Encode(access_token_secret);
   const std::string hash = HmacSha1(WstrToStr(key), WstrToStr(signature_base));
 
   // Encode signature in Base64
   const std::wstring signature = StrToWstr(Base64Encode(hash));
 
   // Return URL-encoded signature
-  return EncodeUrl(signature);
+  return Url::Encode(signature);
 }
 
 std::wstring CreateTimestamp() {
@@ -160,19 +160,20 @@ std::wstring CreateTimestamp() {
 }
 
 std::wstring NormalizeUrl(const std::wstring& url) {
-  Url url_components = url;
+  auto uri = Url(url).uri();
 
   // Strip off ? and # elements in the path
-  url_components.query.clear();
-  url_components.fragment.clear();
+  uri.query.reset();
+  uri.fragment.reset();
 
   // Build and return normal URL
-  return url_components.Build();
+  return Url(uri).to_wstring();
 }
 
-Parameters ParseQuery(const query_t& query) {
+Parameters ParseQuery(const Url& url) {
   Parameters parameters;
 
+  const auto query = url.query();
   for (const auto& pair : query) {
     parameters[pair.first] = pair.second;
   }

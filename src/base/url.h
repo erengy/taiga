@@ -18,41 +18,33 @@
 
 #pragma once
 
+#include <map>
 #include <string>
 
-#include "base/map.h"
+#include <hypp/uri.hpp>
 
-using query_t = base::multimap<std::wstring, std::wstring>;
-
-namespace base::http {
-enum class Protocol {
-  Http,
-  Https,
-  Relative,
-};
-}
-
-class Url {
+class Url final {
 public:
-  Url();
-  Url(const std::wstring& url);
-  ~Url() {}
+  using query_t = std::map<std::wstring, std::wstring>;
 
-  void Clear();
-  std::wstring Build() const;
-  void Crack(std::wstring url);
+  Url() = default;
+  Url(const hypp::Uri& uri) : uri_{uri} {}
+  Url(const std::wstring& url);
 
   Url& operator=(const Url& url);
   void operator=(const std::wstring& url);
 
-  base::http::Protocol protocol;
-  std::wstring host;
-  unsigned short port;
-  std::wstring path;
-  query_t query;
-  std::wstring fragment;
-};
+  std::wstring to_wstring() const;
 
-std::wstring BuildUrlParameters(const query_t& parameters);
-std::wstring DecodeUrl(const std::wstring& input);
-std::wstring EncodeUrl(const std::wstring& input);
+  std::wstring host() const;
+  query_t query() const;
+  hypp::Uri uri() const;
+
+  void Parse(std::wstring url);
+
+  static std::wstring Decode(const std::wstring& input);
+  static std::wstring Encode(const std::wstring& input);
+
+private:
+  hypp::Uri uri_;
+};

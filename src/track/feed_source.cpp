@@ -39,7 +39,7 @@ FeedSource GetFeedSource(const std::wstring& channel_link) {
 
   const Url url(channel_link);
   for (const auto& pair : sources) {
-    if (InStr(url.host, pair.first, 0, true) > -1) {
+    if (InStr(url.host(), pair.first, 0, true) > -1) {
       return pair.second;
     }
   }

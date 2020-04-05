@@ -22,7 +22,7 @@
 #include <optional>
 #include <string>
 
-#include "base/url.h"
+class Url;
 
 namespace oauth {
 
@@ -66,7 +66,7 @@ std::wstring CreateSignature(
 std::wstring CreateTimestamp();
 
 std::wstring NormalizeUrl(const std::wstring& url);
-Parameters ParseQuery(const query_t& query);
+Parameters ParseQuery(const Url& url);
 std::wstring SortParameters(const Parameters& parameters);
 
 }  // namespace detail

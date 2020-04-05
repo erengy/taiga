@@ -380,7 +380,6 @@
     <ClInclude Include="..\..\src\base\html.h" />
     <ClInclude Include="..\..\src\base\json.h" />
     <ClInclude Include="..\..\src\base\log.h" />
-    <ClInclude Include="..\..\src\base\map.h" />
     <ClInclude Include="..\..\src\base\oauth.h" />
     <ClInclude Include="..\..\src\base\preprocessor.h" />
     <ClInclude Include="..\..\src\base\process.h" />

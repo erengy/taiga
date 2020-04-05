@@ -150,7 +150,7 @@ std::wstring Feed::GetDataPath() const {
 
   if (!channel.link.empty()) {
     Url url(channel.link);
-    path += Base64Encode(url.host, true) + L"\\";
+    path += Base64Encode(url.host(), true) + L"\\";
   }
 
   return path;

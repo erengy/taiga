@@ -334,7 +334,7 @@ bool GetTitleFromStreamingMediaProvider(const std::wstring& url,
 void IgnoreCommonWebBrowserTitles(const std::wstring& address,
                                   std::wstring& title) {
   const Url url(address);
-  if (!url.host.empty() && StartsWith(title, url.host))  // Chrome
+  if (!url.host().empty() && StartsWith(title, url.host()))  // Chrome
     title.clear();
   if (StartsWith(title, L"http://") || StartsWith(title, L"https://"))
     title.clear();

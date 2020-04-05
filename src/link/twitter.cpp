@@ -23,6 +23,7 @@
 #include "base/json.h"
 #include "base/oauth.h"
 #include "base/string.h"
+#include "base/url.h"
 #include "taiga/http.h"
 #include "taiga/settings.h"
 #include "ui/dlg/dlg_settings.h"
@@ -142,7 +143,7 @@ bool SetStatusText(const std::wstring& status_text) {
   previous_status_text = status_text;
 
   oauth::Parameters post_parameters;
-  post_parameters[L"status"] = EncodeUrl(status_text);
+  post_parameters[L"status"] = Url::Encode(status_text);
 
   constexpr auto kTarget = "https://api.twitter.com/1.1/statuses/update.json";
 
