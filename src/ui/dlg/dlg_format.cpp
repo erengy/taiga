@@ -16,13 +16,14 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "ui/dlg/dlg_format.h"
+
 #include "base/html.h"
 #include "base/string.h"
 #include "taiga/dummy.h"
 #include "taiga/resource.h"
 #include "taiga/script.h"
 #include "taiga/settings.h"
-#include "ui/dlg/dlg_format.h"
 #include "ui/menu.h"
 
 namespace ui {
@@ -96,6 +97,33 @@ BOOL FormatDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
         int pos = cr.cpMin + answer.size();
         rich_edit_.SetSel(pos, pos);
         rich_edit_.SetFocus();
+      }
+      return TRUE;
+    }
+
+    // Reset button
+    case IDABORT: {
+      base::Settings::value_t value;
+      switch (mode) {
+        case FormatDialogMode::Http:
+          value = taiga::settings.GetDefaultValue(
+              taiga::AppSettingKey::ShareHttpFormat);
+          break;
+        case FormatDialogMode::Mirc:
+          value = taiga::settings.GetDefaultValue(
+              taiga::AppSettingKey::ShareMircFormat);
+          break;
+        case FormatDialogMode::Twitter:
+          value = taiga::settings.GetDefaultValue(
+              taiga::AppSettingKey::ShareTwitterFormat);
+          break;
+        case FormatDialogMode::Balloon:
+          value = taiga::settings.GetDefaultValue(
+              taiga::AppSettingKey::SyncNotifyFormat);
+          break;
+      }
+      if (base::GetSettingValueType(value) == base::SettingValueType::Wstring) {
+        rich_edit_.SetText(std::get<std::wstring>(value));
       }
       return TRUE;
     }

@@ -52,6 +52,8 @@ public:
   void ApplyChanges();
   bool HandleCompatibility();
 
+  base::Settings::value_t GetDefaultValue(const AppSettingKey key) const;
+
   // Meta
   semaver::Version GetMetaVersion() const;
 

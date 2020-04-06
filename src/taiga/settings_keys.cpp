@@ -241,6 +241,13 @@ void Settings::InitKeyMap() const {
   }
 }
 
+base::Settings::value_t Settings::GetDefaultValue(
+    const AppSettingKey key) const {
+  InitKeyMap();
+  const auto& app_setting = key_map_[key];
+  return app_setting.default_value;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename T>
