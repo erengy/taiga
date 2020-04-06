@@ -20,6 +20,7 @@
 #include <uxtheme.h>
 
 #include <windows/win/common_dialogs.h>
+#include <windows/win/task_dialog.h>
 
 #include "base/base64.h"
 #include "base/crypto.h"
@@ -424,6 +425,8 @@ BOOL SettingsPage::OnInitDialog() {
       toolbar.InsertButton(5, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
       toolbar.InsertButton(6, ui::kIcon16_Import,    106, fsState1, 0, 6, nullptr, L"Import filters...");
       toolbar.InsertButton(7, ui::kIcon16_Export,    107, fsState1, 0, 7, nullptr, L"Export filters...");
+      toolbar.InsertButton(8, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
+      toolbar.InsertButton(9, ui::kIcon16_Cross,     109, fsState1, 0, 9, nullptr, L"Reset filters");
       toolbar.SetWindowHandle(nullptr);
       break;
     }
@@ -782,6 +785,30 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
             dlg.title = L"Export Filters";
             dlg.info = L"Copy the text below and share it with other people:";
             dlg.Show(parent->GetWindowHandle());
+          }
+          return TRUE;
+        }
+        // Reset filters
+        case 109: {
+          win::TaskDialog dlg;
+          dlg.SetWindowTitle(L"Reset Torrent Filters");
+          dlg.SetMainIcon(TD_ICON_INFORMATION);
+          dlg.SetMainInstruction(L"Are you sure you want to reset the filters?");
+          dlg.SetContent(L"All custom filters will be lost.");
+          dlg.AddButton(L"Yes", IDYES);
+          dlg.AddButton(L"No", IDNO);
+          dlg.Show(parent->GetWindowHandle());
+          if (dlg.GetSelectedButtonID() == IDYES) {
+            track::feed_filter_manager.filters.clear();
+            track::feed_filter_manager.AddPresets();
+            parent->feed_filters_.resize(
+                track::feed_filter_manager.filters.size());
+            std::copy(track::feed_filter_manager.filters.begin(),
+                      track::feed_filter_manager.filters.end(),
+                      parent->feed_filters_.begin());
+            win::ListView list = GetDlgItem(IDC_LIST_TORRENT_FILTER);
+            parent->RefreshTorrentFilterList(list.GetWindowHandle());
+            list.SetWindowHandle(nullptr);
           }
           return TRUE;
         }
