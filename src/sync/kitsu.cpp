@@ -512,7 +512,7 @@ bool HasError(const taiga::http::Response& response) {
   // 202 Accepted
   // 204 No Content
   if (response.status_class() == 200)
-    return true;
+    return false;
 
   if (Json root; JsonParseString(response.body(), root)) {
     std::string error_description;
