@@ -23,10 +23,10 @@
 namespace ui {
 
 enum SettingsPages {
-  kSettingsPageAdvanced = 1,
+  kSettingsPageAdvancedSettings = 1,
+  kSettingsPageAdvancedCache,
   kSettingsPageAppGeneral,
   kSettingsPageAppList,
-  kSettingsPageLibraryCache,
   kSettingsPageLibraryFolders,
   kSettingsPageRecognitionGeneral,
   kSettingsPageRecognitionMedia,

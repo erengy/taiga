@@ -71,11 +71,11 @@ void SettingsPage::Create() {
   UINT resource_id = 0;
   switch (index) {
     #define SETRESOURCEID(page, id) case page: resource_id = id; break;
-    SETRESOURCEID(kSettingsPageAdvanced, IDD_SETTINGS_ADVANCED);
+    SETRESOURCEID(kSettingsPageAdvancedSettings, IDD_SETTINGS_ADVANCED);
+    SETRESOURCEID(kSettingsPageAdvancedCache, IDD_SETTINGS_ADVANCED_CACHE);
     SETRESOURCEID(kSettingsPageAppGeneral, IDD_SETTINGS_APP_GENERAL);
     SETRESOURCEID(kSettingsPageAppList, IDD_SETTINGS_APP_LIST);
     SETRESOURCEID(kSettingsPageLibraryFolders, IDD_SETTINGS_LIBRARY_FOLDERS);
-    SETRESOURCEID(kSettingsPageLibraryCache, IDD_SETTINGS_LIBRARY_CACHE);
     SETRESOURCEID(kSettingsPageRecognitionGeneral, IDD_SETTINGS_RECOGNITION_GENERAL);
     SETRESOURCEID(kSettingsPageRecognitionMedia, IDD_SETTINGS_RECOGNITION_MEDIA);
     SETRESOURCEID(kSettingsPageRecognitionStream, IDD_SETTINGS_RECOGNITION_STREAM);
@@ -156,11 +156,6 @@ BOOL SettingsPage::OnInitDialog() {
         list.InsertItem(i, -1, ui::kIcon16_Folder, 0, nullptr, taiga::settings.library_folders[i].c_str(), 0);
       list.SetWindowHandle(nullptr);
       CheckDlgButton(IDC_CHECK_FOLDERS_WATCH, taiga::settings.GetLibraryWatchFolders());
-      break;
-    }
-    // Library > Cache
-    case kSettingsPageLibraryCache: {
-      parent->RefreshCache();
       break;
     }
 
@@ -433,8 +428,8 @@ BOOL SettingsPage::OnInitDialog() {
 
     ////////////////////////////////////////////////////////////////////////////
 
-    // Advanced
-    case kSettingsPageAdvanced: {
+    // Advanced > Settings
+    case kSettingsPageAdvancedSettings: {
       for (const auto key : GetAdvancedSettingKeys()) {
         parent->advanced_settings_[key] = GetAdvancedSettingValue(key);
       }
@@ -454,6 +449,11 @@ BOOL SettingsPage::OnInitDialog() {
       }
       list.Sort(0, 1, 0, ui::ListViewCompareProc);
       list.SetWindowHandle(nullptr);
+      break;
+    }
+    // Advanced > Cache
+    case kSettingsPageAdvancedCache: {
+      parent->RefreshCache();
       break;
     }
   }

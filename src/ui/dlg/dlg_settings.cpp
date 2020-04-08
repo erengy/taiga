@@ -80,7 +80,6 @@ void SettingsDialog::SetCurrentSection(SettingsSections section) {
       break;
     case kSettingsSectionLibrary:
       tab_.InsertItem(0, L"Folders", kSettingsPageLibraryFolders);
-      tab_.InsertItem(1, L"Cache", kSettingsPageLibraryCache);
       break;
     case kSettingsSectionApplication:
       tab_.InsertItem(0, L"Anime list", kSettingsPageAppList);
@@ -103,7 +102,8 @@ void SettingsDialog::SetCurrentSection(SettingsSections section) {
       tab_.InsertItem(2, L"Filters", kSettingsPageTorrentsFilters);
       break;
     case kSettingsSectionAdvanced:
-      tab_.InsertItem(0, L"Advanced settings", kSettingsPageAdvanced);
+      tab_.InsertItem(0, L"Settings", kSettingsPageAdvancedSettings);
+      tab_.InsertItem(1, L"Cache", kSettingsPageAdvancedCache);
       break;
   }
 }
@@ -346,7 +346,7 @@ void SettingsDialog::OnOK() {
   }
 
   // Advanced
-  page = &pages[kSettingsPageAdvanced];
+  page = &pages[kSettingsPageAdvancedSettings];
   if (page->IsWindow()) {
     for (const auto& [key, value] : advanced_settings_) {
       SetAdvancedSetting(key, value);
@@ -467,7 +467,7 @@ int SettingsDialog::AddTorrentFilterToList(HWND hwnd_list, const track::FeedFilt
 void SettingsDialog::RefreshCache() {
   std::wstring text;
   taiga::stats.CalculateLocalData();
-  SettingsPage& page = pages[kSettingsPageLibraryCache];
+  SettingsPage& page = pages[kSettingsPageAdvancedCache];
 
   // History
   text = ToWstr(library::history.items.size()) + L" item(s)";

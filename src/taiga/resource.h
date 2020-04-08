@@ -21,9 +21,9 @@
 #define IDD_SEASON                              125
 #define IDD_SETTINGS                            126
 #define IDD_SETTINGS_ADVANCED                   127
-#define IDD_SETTINGS_APP_GENERAL                128
-#define IDD_SETTINGS_APP_LIST                   129
-#define IDD_SETTINGS_LIBRARY_CACHE              130
+#define IDD_SETTINGS_ADVANCED_CACHE             128
+#define IDD_SETTINGS_APP_GENERAL                129
+#define IDD_SETTINGS_APP_LIST                   130
 #define IDD_SETTINGS_LIBRARY_FOLDERS            131
 #define IDD_SETTINGS_RECOGNITION_GENERAL        132
 #define IDD_SETTINGS_RECOGNITION_MEDIA          133
