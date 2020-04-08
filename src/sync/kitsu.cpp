@@ -46,7 +46,7 @@ namespace sync::kitsu {
 // API documentation:
 // https://kitsu.docs.apiary.io
 
-constexpr auto kBaseUrl = "https://kitsu.io/api/edge";
+constexpr auto kBaseUrl = "https://kitsu.io/api";
 
 // Kitsu requires use of the JSON API media type: http://jsonapi.org/format/
 constexpr auto kJsonApiMediaType = "application/vnd.api+json";
@@ -543,7 +543,7 @@ bool HasError(const taiga::http::Response& response) {
 void AuthenticateUser() {
   auto request = BuildRequest();
   request.set_method("POST");
-  request.set_target("https://kitsu.io/api/oauth/token");
+  request.set_target("{}/oauth/token"_format(kBaseUrl));
   request.set_header("Content-Type", "application/x-www-form-urlencoded");
 
   auto username = Account::email();
