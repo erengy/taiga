@@ -450,7 +450,7 @@ std::optional<int> GetOffset(const Json& json, const std::string& name) {
   if (const auto link = JsonReadStr(json["links"], name); !link.empty()) {
     const Url url = StrToWstr(link);
     const auto query = url.query();
-    if (const auto it = query.find(L"offset"); it != query.end()) {
+    if (const auto it = query.find(L"page[offset]"); it != query.end()) {
       return ToInt(it->second);
     }
   }
