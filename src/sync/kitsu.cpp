@@ -20,6 +20,7 @@
 
 #include "sync/kitsu.h"
 
+#include "base/base64.h"
 #include "base/format.h"
 #include "base/json.h"
 #include "base/log.h"
@@ -92,10 +93,10 @@ public:
   }
 
   static std::string password() {
-    return WstrToStr(taiga::settings.GetSyncServiceKitsuPassword());
+    return WstrToStr(Base64Decode(taiga::settings.GetSyncServiceKitsuPassword()));
   }
   static void set_password(const std::string& password) {
-    taiga::settings.SetSyncServiceKitsuPassword(StrToWstr(password));
+    taiga::settings.SetSyncServiceKitsuPassword(Base64Encode(StrToWstr(password)));
   }
 
   static std::string rating_system() {

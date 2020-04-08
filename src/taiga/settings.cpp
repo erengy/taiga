@@ -20,7 +20,6 @@
 
 #include "taiga/settings.h"
 
-#include "base/base64.h"
 #include "base/log.h"
 #include "base/string.h"
 #include "base/xml.h"
