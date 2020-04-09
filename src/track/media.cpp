@@ -125,7 +125,7 @@ std::vector<anisthesia::Player> GetEnabledPlayers(
   std::vector<anisthesia::Player> results;
 
   for (const auto& player : players) {
-    if (!player.enabled)
+    if (!taiga::settings.GetMediaPlayerEnabled(StrToWstr(player.name)))
       continue;
 
     switch (player.type) {

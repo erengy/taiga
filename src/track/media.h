@@ -34,13 +34,7 @@ enum class PlayStatus {
   Updated,
 };
 
-class MediaPlayer : public anisthesia::Player {
-public:
-  MediaPlayer(const anisthesia::Player& player)
-      : anisthesia::Player(player) {}
-
-  bool enabled = true;
-};
+using MediaPlayer = anisthesia::Player;
 
 class MediaPlayers {
 public:

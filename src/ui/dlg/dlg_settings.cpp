@@ -260,7 +260,8 @@ void SettingsDialog::OnOK() {
     taiga::settings.SetRecognitionDetectMediaPlayers(page->IsDlgButtonChecked(IDC_CHECK_DETECT_MEDIA_PLAYER) == TRUE);
     list.SetWindowHandle(page->GetDlgItem(IDC_LIST_MEDIA));
     for (int i = 0; i < list.GetItemCount(); ++i) {
-      track::media_players.items[list.GetItemParam(i)].enabled = list.GetCheckState(i);
+      const auto& player = track::media_players.items[list.GetItemParam(i)];
+      taiga::settings.SetMediaPlayerEnabled(StrToWstr(player.name), list.GetCheckState(i));
     }
     list.SetWindowHandle(nullptr);
   }

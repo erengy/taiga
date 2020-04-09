@@ -1390,4 +1390,20 @@ void Settings::SetLibraryFolders(const std::vector<std::wstring>& folders) {
   }
 }
 
+bool Settings::GetMediaPlayerEnabled(const std::wstring& player) const {
+  std::lock_guard lock{mutex_};
+  const auto it = media_players_enabled_.find(player);
+  return it != media_players_enabled_.end() ? it->second : true;
+}
+
+void Settings::SetMediaPlayerEnabled(const std::wstring& player,
+                                     const bool enabled) {
+  std::lock_guard lock{mutex_};
+  const auto it = media_players_enabled_.find(player);
+  if (it == media_players_enabled_.end() || it->second != enabled) {
+    media_players_enabled_[player] = enabled;
+    modified_ = true;
+  }
+}
+
 }  // namespace taiga

@@ -243,11 +243,13 @@ BOOL SettingsPage::OnInitDialog() {
       header.SetWindowHandle(nullptr);
 
       for (size_t i = 0; i < track::media_players.items.size(); i++) {
-        if (track::media_players.items[i].type == anisthesia::PlayerType::WebBrowser)
+        const auto& player = track::media_players.items[i];
+        if (player.type == anisthesia::PlayerType::WebBrowser)
           continue;
         int j = list.InsertItem(i, 0, ui::kIcon16_AppBlue, 0, nullptr,
-                                StrToWstr(track::media_players.items[i].name).c_str(), i);
-        list.SetCheckState(j, track::media_players.items[i].enabled);
+                                StrToWstr(player.name).c_str(), i);
+        list.SetCheckState(
+            j, taiga::settings.GetMediaPlayerEnabled(StrToWstr(player.name)));
       }
       list.SetColumnWidth(0, LVSCW_AUTOSIZE_USEHEADER);
       list.SetWindowHandle(nullptr);

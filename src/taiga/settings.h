@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <map>
 #include <mutex>
 #include <string>
 #include <vector>
@@ -321,6 +322,8 @@ public:
 
   std::vector<std::wstring> GetLibraryFolders() const;
   void SetLibraryFolders(const std::vector<std::wstring>& folders);
+  bool GetMediaPlayerEnabled(const std::wstring& player) const;
+  void SetMediaPlayerEnabled(const std::wstring& player, const bool enabled);
 
 private:
   struct AppSetting {
@@ -340,6 +343,7 @@ private:
   bool SerializeToXml(const std::wstring& path) const;
 
   std::vector<std::wstring> library_folders_;
+  std::map<std::wstring, bool> media_players_enabled_;
 
   mutable std::map<AppSettingKey, AppSetting> key_map_;
   mutable std::mutex mutex_;

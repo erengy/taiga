@@ -34,7 +34,6 @@
 #include "taiga/version.h"
 #include "track/feed_aggregator.h"
 #include "track/feed_filter_manager.h"
-#include "track/media.h"
 #include "ui/dlg/dlg_anime_list.h"
 #include "ui/menu.h"
 #include "ui/ui.h"
@@ -160,13 +159,8 @@ bool Settings::DeserializeFromXml(const std::wstring& path) {
   // Media players
   const auto node_players = settings.child(L"recognition").child(L"mediaplayers");
   for (const auto player : node_players.children(L"player")) {
-    const auto name = WstrToStr(player.attribute(L"name").value());
-    for (auto& media_player : track::media_players.items) {
-      if (media_player.name == name) {
-        media_player.enabled = player.attribute(L"enabled").as_bool();
-        break;
-      }
-    }
+    media_players_enabled_[player.attribute(L"name").value()] =
+        player.attribute(L"enabled").as_bool();
   }
 
   // Anime list columns
@@ -256,10 +250,10 @@ bool Settings::SerializeToXml(const std::wstring& path) const {
 
   // Media players
   auto mediaplayers = settings.child(L"recognition").child(L"mediaplayers");
-  for (const auto& media_player : track::media_players.items) {
+  for (const auto& [name, enabled] : media_players_enabled_) {
     auto player = mediaplayers.append_child(L"player");
-    player.append_attribute(L"name") = StrToWstr(media_player.name).c_str();
-    player.append_attribute(L"enabled") = media_player.enabled;
+    player.append_attribute(L"name") = name.c_str();
+    player.append_attribute(L"enabled") = enabled;
   }
 
   // Anime list columns
