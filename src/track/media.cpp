@@ -151,7 +151,7 @@ bool GetTitleFromDefaultPlayer(const std::vector<anisthesia::Media>& media,
   bool invalid_file = false;
   const bool check_library_folders =
       taiga::settings.GetSyncUpdateOutOfRoot() &&
-      !taiga::settings.library_folders.empty();
+      !taiga::settings.GetLibraryFolders().empty();
 
   for (const auto& item : media) {
     for (const auto& information : item.information) {

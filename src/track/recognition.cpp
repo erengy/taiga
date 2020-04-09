@@ -359,7 +359,7 @@ bool Engine::GetTitleFromPath(anime::Episode& episode) {
 
   std::wstring path = episode.folder;
 
-  for (const auto& library_folder : taiga::settings.library_folders) {
+  for (const auto& library_folder : taiga::settings.GetLibraryFolders()) {
     if (StartsWith(path, library_folder)) {
       path.erase(0, library_folder.size());
       break;

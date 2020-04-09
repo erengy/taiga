@@ -254,10 +254,11 @@ void MenuList::UpdateFolders() {
   if (menu) {
     menu->items.clear();
 
-    if (!taiga::settings.library_folders.empty()) {
+    const auto library_folders = taiga::settings.GetLibraryFolders();
+    if (!library_folders.empty()) {
       // Add folders
-      for (size_t i = 0; i < taiga::settings.library_folders.size(); ++i) {
-        const auto& library_folder = taiga::settings.library_folders.at(i);
+      for (size_t i = 0; i < library_folders.size(); ++i) {
+        const auto& library_folder = library_folders.at(i);
         auto name = library_folder;
         if (i <= 9)
           name += L"\tAlt+" + ToWstr(i + 1);

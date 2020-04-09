@@ -336,7 +336,9 @@ void ExecuteCommand(const std::wstring& str, WPARAM wParam, LPARAM lParam) {
     std::wstring path;
     if (win::BrowseForFolder(ui::GetWindowHandle(ui::Dialog::Main),
                              L"Add a Library Folder", L"", path)) {
-      taiga::settings.library_folders.push_back(path);
+      auto library_folders = taiga::settings.GetLibraryFolders();
+      library_folders.push_back(path);
+      taiga::settings.SetLibraryFolders(library_folders);
       if (taiga::settings.GetLibraryWatchFolders())
         track::monitor.Enable();
       ui::ShowDlgSettings(ui::kSettingsSectionLibrary, ui::kSettingsPageLibraryFolders);
@@ -621,8 +623,9 @@ void ExecuteCommand(const std::wstring& str, WPARAM wParam, LPARAM lParam) {
     if (anime_item->GetFolder().empty()) {
       if (ui::OnAnimeFolderNotFound()) {
         std::wstring default_path, path;
-        if (!taiga::settings.library_folders.empty())
-          default_path = taiga::settings.library_folders.front();
+        const auto library_folders = taiga::settings.GetLibraryFolders();
+        if (!library_folders.empty())
+          default_path = library_folders.front();
         if (win::BrowseForFolder(ui::GetWindowHandle(ui::Dialog::Main),
                                  L"Select Anime Folder",
                                  default_path, path)) {

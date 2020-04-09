@@ -422,7 +422,7 @@ void GetUpcomingTitles(std::vector<int>& anime_ids) {
 ////////////////////////////////////////////////////////////////////////////////
 
 bool IsInsideLibraryFolders(const std::wstring& path) {
-  for (auto library_folder : taiga::settings.library_folders) {
+  for (auto library_folder : taiga::settings.GetLibraryFolders()) {
     library_folder = GetNormalizedPath(GetFinalPath(library_folder));
     if (StartsWith(path, library_folder))
       return true;

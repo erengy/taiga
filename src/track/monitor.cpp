@@ -97,7 +97,7 @@ void Monitor::Enable(bool enabled) {
   Clear();
 
   if (enabled) {
-    for (const auto& folder : taiga::settings.library_folders) {
+    for (const auto& folder : taiga::settings.GetLibraryFolders()) {
       Add(folder);
     }
     Start();

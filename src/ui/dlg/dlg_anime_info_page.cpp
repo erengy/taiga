@@ -227,10 +227,11 @@ BOOL PageMyInfo::OnCommand(WPARAM wParam, LPARAM lParam) {
     // Browse anime folder
     case IDC_BUTTON_BROWSE: {
       std::wstring default_path, path;
+      const auto library_folders = taiga::settings.GetLibraryFolders();
       if (!anime_item->GetFolder().empty()) {
         default_path = anime_item->GetFolder();
-      } else if (!taiga::settings.library_folders.empty()) {
-        default_path = taiga::settings.library_folders.front();
+      } else if (!library_folders.empty()) {
+        default_path = library_folders.front();
       }
       if (win::BrowseForFolder(parent->GetWindowHandle(), L"Select Anime Folder",
                                default_path, path)) {

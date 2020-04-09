@@ -319,7 +319,8 @@ public:
   int GetAppSeasonsViewAs() const;
   void SetAppSeasonsViewAs(const int view_as);
 
-  std::vector<std::wstring> library_folders;
+  std::vector<std::wstring> GetLibraryFolders() const;
+  void SetLibraryFolders(const std::vector<std::wstring>& folders);
 
 private:
   struct AppSetting {
@@ -337,6 +338,8 @@ private:
 
   bool DeserializeFromXml(const std::wstring& path);
   bool SerializeToXml(const std::wstring& path) const;
+
+  std::vector<std::wstring> library_folders_;
 
   mutable std::map<AppSettingKey, AppSetting> key_map_;
   mutable std::mutex mutex_;

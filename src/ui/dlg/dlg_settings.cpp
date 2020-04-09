@@ -205,12 +205,13 @@ void SettingsDialog::OnOK() {
   page = &pages[kSettingsPageLibraryFolders];
   if (page->IsWindow()) {
     list.SetWindowHandle(page->GetDlgItem(IDC_LIST_FOLDERS_ROOT));
-    taiga::settings.library_folders.clear();
+    std::vector<std::wstring> library_folders;
     for (int i = 0; i < list.GetItemCount(); i++) {
       std::wstring folder;
       list.GetItemText(i, 0, folder);
-      taiga::settings.library_folders.push_back(folder);
+      library_folders.push_back(folder);
     }
+    taiga::settings.SetLibraryFolders(library_folders);
     taiga::settings.SetLibraryWatchFolders(page->IsDlgButtonChecked(IDC_CHECK_FOLDERS_WATCH));
     list.SetWindowHandle(nullptr);
   }

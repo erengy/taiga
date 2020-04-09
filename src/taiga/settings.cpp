@@ -139,10 +139,10 @@ bool Settings::DeserializeFromXml(const std::wstring& path) {
   }
 
   // Folders
-  library_folders.clear();
+  library_folders_.clear();
   const auto node_folders = settings.child(L"anime").child(L"folders");
   for (const auto folder : node_folders.children(L"root")) {
-    library_folders.push_back(folder.attribute(L"folder").value());
+    library_folders_.push_back(folder.attribute(L"folder").value());
   }
 
   // Anime items
@@ -232,7 +232,7 @@ bool Settings::SerializeToXml(const std::wstring& path) const {
 
   // Library folders
   auto folders = settings.child(L"anime").child(L"folders");
-  for (const auto& folder : library_folders) {
+  for (const auto& folder : library_folders_) {
     auto root = folders.append_child(L"root");
     root.append_attribute(L"folder") = folder.c_str();
   }

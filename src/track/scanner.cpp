@@ -169,8 +169,10 @@ void ScanAvailableEpisodes(bool silent) {
 void ScanAvailableEpisodes(bool silent, int anime_id, int episode_number) {
   using track::scanner;
 
+  const auto library_folders = taiga::settings.GetLibraryFolders();
+
   // Check if any library folder is available
-  if (!silent && taiga::settings.library_folders.empty()) {
+  if (!silent && library_folders.empty()) {
     ui::OnSettingsLibraryFoldersEmpty();
     return;
   }
@@ -219,7 +221,7 @@ void ScanAvailableEpisodes(bool silent, int anime_id, int episode_number) {
 
   if (!found) {
     // Search library folders for available episodes
-    for (const auto& folder : taiga::settings.library_folders) {
+    for (const auto& folder : library_folders) {
       if (!FolderExists(folder))
         continue;  // Might be a disconnected external drive
       bool skip_directories = false;

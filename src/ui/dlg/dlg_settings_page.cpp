@@ -152,8 +152,10 @@ BOOL SettingsPage::OnInitDialog() {
       list.SetExtendedStyle(LVS_EX_DOUBLEBUFFER);
       list.SetImageList(ui::Theme.GetImageList16().GetHandle());
       list.SetTheme();
-      for (size_t i = 0; i < taiga::settings.library_folders.size(); i++)
-        list.InsertItem(i, -1, ui::kIcon16_Folder, 0, nullptr, taiga::settings.library_folders[i].c_str(), 0);
+      const auto library_folders = taiga::settings.GetLibraryFolders();
+      for (size_t i = 0; i < library_folders.size(); ++i) {
+        list.InsertItem(i, -1, ui::kIcon16_Folder, 0, nullptr, library_folders[i].c_str(), 0);
+      }
       list.SetWindowHandle(nullptr);
       CheckDlgButton(IDC_CHECK_FOLDERS_WATCH, taiga::settings.GetLibraryWatchFolders());
       break;
@@ -362,8 +364,9 @@ BOOL SettingsPage::OnInitDialog() {
       CheckDlgButton(IDC_CHECK_TORRENT_AUTOSETFOLDER, taiga::settings.GetTorrentDownloadUseAnimeFolder());
       CheckDlgButton(IDC_CHECK_TORRENT_AUTOUSEFOLDER, taiga::settings.GetTorrentDownloadFallbackOnFolder());
       CheckDlgButton(IDC_CHECK_TORRENT_AUTOCREATEFOLDER, taiga::settings.GetTorrentDownloadCreateSubfolder());
-      for (size_t i = 0; i < taiga::settings.library_folders.size(); i++)
-        AddComboString(IDC_COMBO_TORRENT_FOLDER, taiga::settings.library_folders[i].c_str());
+      for (const auto folder : taiga::settings.GetLibraryFolders()) {
+        AddComboString(IDC_COMBO_TORRENT_FOLDER, folder.c_str());
+      }
       SetDlgItemText(IDC_COMBO_TORRENT_FOLDER, taiga::settings.GetTorrentDownloadLocation().c_str());
       EnableDlgItem(IDC_CHECK_TORRENT_AUTOUSEFOLDER, taiga::settings.GetTorrentDownloadUseAnimeFolder());
       enabled = taiga::settings.GetTorrentDownloadUseAnimeFolder() &&

@@ -1375,4 +1375,19 @@ void Settings::SetAppSeasonsViewAs(const int view_as) {
   set_value(AppSettingKey::AppSeasonsViewAs, view_as);
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
+std::vector<std::wstring> Settings::GetLibraryFolders() const {
+  std::lock_guard lock{mutex_};
+  return library_folders_;
+}
+
+void Settings::SetLibraryFolders(const std::vector<std::wstring>& folders) {
+  std::lock_guard lock{mutex_};
+  if (library_folders_ != folders) {
+    library_folders_ = folders;
+    modified_ = true;
+  }
+}
+
 }  // namespace taiga

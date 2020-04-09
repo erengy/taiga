@@ -504,10 +504,11 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
 
     case WM_SYSKEYDOWN: {
       if (IsNumericChar(pMsg->wParam)) {
-        int index = (pMsg->wParam - '0') - 1;
+        const int index = (pMsg->wParam - '0') - 1;
+        const auto library_folders = taiga::settings.GetLibraryFolders();
         if (index >= 0 &&
-            index < static_cast<int>(taiga::settings.library_folders.size())) {
-          Execute(taiga::settings.library_folders.at(index));
+            index < static_cast<int>(library_folders.size())) {
+          Execute(library_folders.at(index));
           return TRUE;
         }
       } else if (handle_menu_accelerator()) {
