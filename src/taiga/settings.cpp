@@ -34,7 +34,6 @@
 #include "taiga/version.h"
 #include "track/feed_aggregator.h"
 #include "track/feed_filter_manager.h"
-#include "ui/dlg/dlg_anime_list.h"
 #include "ui/menu.h"
 #include "ui/ui.h"
 
@@ -164,17 +163,13 @@ bool Settings::DeserializeFromXml(const std::wstring& path) {
   }
 
   // Anime list columns
-  ui::DlgAnimeList.listview.InitializeColumns();
   const auto node_list_columns = settings.child(L"program").child(L"list").child(L"columns");
   for (const auto column : node_list_columns.children(L"column")) {
-    const std::wstring name = column.attribute(L"name").value();
-    const auto column_type = ui::AnimeListDialog::ListView::TranslateColumnName(name);
-    if (column_type != ui::kColumnUnknown) {
-      auto& data = ui::DlgAnimeList.listview.columns[column_type];
-      data.order = column.attribute(L"order").as_int();
-      data.visible = column.attribute(L"visible").as_bool();
-      data.width = column.attribute(L"width").as_int();
-    }
+    const std::wstring key = column.attribute(L"name").value();
+    auto& data = anime_list_columns_[key];
+    data.order = column.attribute(L"order").as_int();
+    data.visible = column.attribute(L"visible").as_bool();
+    data.width = column.attribute(L"width").as_int();
   }
 
   // Torrent filters
@@ -258,10 +253,9 @@ bool Settings::SerializeToXml(const std::wstring& path) const {
 
   // Anime list columns
   auto list_columns = settings.child(L"program").child(L"list").append_child(L"columns");
-  for (const auto& it : ui::DlgAnimeList.listview.columns) {
-    const auto& column = it.second;
+  for (const auto& [key, column] : anime_list_columns_) {
     auto node = list_columns.append_child(L"column");
-    node.append_attribute(L"name") = column.key.c_str();
+    node.append_attribute(L"name") = key.c_str();
     node.append_attribute(L"order") = column.order;
     node.append_attribute(L"visible") = column.visible;
     node.append_attribute(L"width") = column.width;
@@ -321,6 +315,16 @@ std::wstring GetCurrentUsername() {
     default:
       return {};
   }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+int Settings::AnimeListColumn::compare(
+  const Settings::AnimeListColumn& rhs) const {
+  if (order != rhs.order) return nstd::compare(order, rhs.order);
+  if (visible != rhs.visible) return nstd::compare(visible, rhs.visible);
+  if (width != rhs.width) return nstd::compare(width, rhs.width);
+  return nstd::cmp::equal;
 }
 
 }  // namespace taiga

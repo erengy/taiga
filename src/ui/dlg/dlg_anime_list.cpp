@@ -91,6 +91,7 @@ BOOL AnimeListDialog::OnInitDialog() {
   }
 
   // Insert list columns
+  listview.InitializeColumns();
   listview.InsertColumns();
 
   // Insert tabs and list groups
@@ -343,6 +344,7 @@ void AnimeListDialog::OnContextMenu(HWND hwnd, POINT pt) {
         const auto column_type = listview.TranslateColumnName(command);
         auto& column = listview.columns[column_type];
         column.visible = !column.visible;
+        listview.UpdateColumnSetting(column_type);
       }
       listview.RefreshColumns(reset);
     }
@@ -725,7 +727,7 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
     case LVN_COLUMNCLICK: {
       auto lplv = reinterpret_cast<LPNMLISTVIEW>(lParam);
       const bool same_column = lplv->iSubItem == listview.GetSortColumn();
-      auto column_type = listview.FindColumnAtSubItemIndex(lplv->iSubItem);
+      const auto column_type = listview.FindColumnAtSubItemIndex(lplv->iSubItem);
       int order = listview.GetDefaultSortOrder(column_type);
       if (same_column)
         order = listview.GetSortOrder() * -1;
@@ -1539,7 +1541,7 @@ void AnimeListDialog::GoToNextTab() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void AnimeListDialog::ListView::InitializeColumns() {
+void AnimeListDialog::ListView::InitializeColumns(bool reset) {
   columns.clear();
 
   int i = 0;
@@ -1584,6 +1586,20 @@ void AnimeListDialog::ListView::InitializeColumns() {
       {kColumnUserLastUpdated, false, i, i++,
        0, static_cast<unsigned short>(ScaleX(100)), static_cast<unsigned short>(ScaleX(85)),
        LVCFMT_CENTER, L"Last updated", L"user_last_updated"})));
+
+  if (reset) {
+    for (const auto& [column_type, _] : columns) {
+      UpdateColumnSetting(column_type);
+    }
+  } else {
+    for (auto& [_, data] : columns) {
+      if (const auto& column = taiga::settings.GetAnimeListColumn(data.key)) {
+        data.order = column->order;
+        data.visible = column->visible;
+        data.width = column->width;
+      }
+    }
+  }
 }
 
 void AnimeListDialog::ListView::InsertColumns() {
@@ -1718,20 +1734,19 @@ void AnimeListDialog::ListView::MoveColumn(int index, int new_visible_order) {
   if (new_order == order)
     return;
 
-  for (auto& it : columns) {
-    auto& column = it.second;
+  for (auto& [column_type, column] : columns) {
     if (column.index == index) {
       column.order = new_order;
     } else if (column.order >= std::min(order, new_order) &&
                column.order <= std::max(order, new_order)) {
       column.order += new_order > order ? -1 : 1;
     }
+    UpdateColumnSetting(column_type);
   }
 }
 
 AnimeListColumn AnimeListDialog::ListView::FindColumnAtSubItemIndex(int index) {
-  for (auto& it : columns) {
-    auto& column = it.second;
+  for (const auto& [_, column] : columns) {
     if (column.index == index)
       return column.column;
   }
@@ -1740,7 +1755,7 @@ AnimeListColumn AnimeListDialog::ListView::FindColumnAtSubItemIndex(int index) {
 
 void AnimeListDialog::ListView::RefreshColumns(bool reset) {
   if (reset)
-    InitializeColumns();
+    InitializeColumns(reset);
   InsertColumns();
   parent->RefreshList();
 }
@@ -1767,12 +1782,23 @@ void AnimeListDialog::ListView::RefreshLastUpdateColumn() {
 }
 
 void AnimeListDialog::ListView::SetColumnSize(int index, unsigned short width) {
-  for (auto& it : columns) {
-    auto& column = it.second;
+  for (auto& [column_type, column] : columns) {
     if (column.index == index) {
       column.width = width;
+      UpdateColumnSetting(column_type);
       break;
     }
+  }
+}
+
+void AnimeListDialog::ListView::UpdateColumnSetting(
+    const AnimeListColumn column) const {
+  if (const auto it = columns.find(column); it != columns.end()) {
+    taiga::Settings::AnimeListColumn data;
+    data.order = it->second.order;
+    data.visible = it->second.visible;
+    data.width = it->second.width;
+    taiga::settings.SetAnimeListColumn(it->second.key, data);
   }
 }
 
@@ -1790,7 +1816,7 @@ AnimeListColumn AnimeListDialog::ListView::TranslateColumnName(const std::wstrin
     {L"user_rating", kColumnUserRating},
   };
 
-  auto it = names.find(name);
+  const auto it = names.find(name);
   return it != names.end() ? it->second : kColumnUnknown;
 }
 

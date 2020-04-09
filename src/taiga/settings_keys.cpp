@@ -1406,4 +1406,24 @@ void Settings::SetMediaPlayerEnabled(const std::wstring& player,
   }
 }
 
+std::optional<Settings::AnimeListColumn> Settings::GetAnimeListColumn(
+    const std::wstring& key) const {
+  std::lock_guard lock{mutex_};
+  const auto it = anime_list_columns_.find(key);
+  if (it != anime_list_columns_.end()) {
+    return it->second;
+  }
+  return std::nullopt;
+}
+
+void Settings::SetAnimeListColumn(const std::wstring& key,
+                                  const Settings::AnimeListColumn& column) {
+  std::lock_guard lock{mutex_};
+  const auto it = anime_list_columns_.find(key);
+  if (it == anime_list_columns_.end() || it->second != column) {
+    anime_list_columns_[key] = column;
+    modified_ = true;
+  }
+}
+
 }  // namespace taiga

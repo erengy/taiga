@@ -118,13 +118,14 @@ public:
       std::wstring key;
     };
     std::map<AnimeListColumn, ColumnData> columns;
-    void InitializeColumns();
+    void InitializeColumns(bool reset = false);
     void InsertColumns();
     void MoveColumn(int index, int new_visible_order);
     void SetColumnSize(int index, unsigned short width);
     AnimeListColumn FindColumnAtSubItemIndex(int index);
     void RefreshColumns(bool reset = false);
     void RefreshLastUpdateColumn();
+    void UpdateColumnSetting(const AnimeListColumn column) const;
     static AnimeListColumn TranslateColumnName(const std::wstring& name);
 
     win::Rect button_rect[3];

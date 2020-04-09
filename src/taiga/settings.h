@@ -20,8 +20,11 @@
 
 #include <map>
 #include <mutex>
+#include <optional>
 #include <string>
 #include <vector>
+
+#include <nstd/compare.hpp>
 
 #include "base/settings.h"
 #include "taiga/settings_keys.h"
@@ -44,6 +47,15 @@ namespace taiga {
 
 class Settings {
 public:
+  class AnimeListColumn : public nstd::Comparable<AnimeListColumn> {
+  public:
+    int order = 0;
+    bool visible = true;
+    int width = 0;
+
+    int compare(const AnimeListColumn& rhs) const override;
+  };
+
   Settings() = default;
   ~Settings();
 
@@ -324,6 +336,8 @@ public:
   void SetLibraryFolders(const std::vector<std::wstring>& folders);
   bool GetMediaPlayerEnabled(const std::wstring& player) const;
   void SetMediaPlayerEnabled(const std::wstring& player, const bool enabled);
+  std::optional<AnimeListColumn> GetAnimeListColumn(const std::wstring& key) const;
+  void SetAnimeListColumn(const std::wstring& key, const AnimeListColumn& column);
 
 private:
   struct AppSetting {
@@ -344,6 +358,7 @@ private:
 
   std::vector<std::wstring> library_folders_;
   std::map<std::wstring, bool> media_players_enabled_;
+  std::map<std::wstring, AnimeListColumn> anime_list_columns_;
 
   mutable std::map<AppSettingKey, AppSetting> key_map_;
   mutable std::mutex mutex_;
