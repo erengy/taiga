@@ -79,14 +79,6 @@ enum FeedFilterOption {
   kFeedFilterOptionHide
 };
 
-enum FeedFilterShortcodeType {
-  kFeedFilterShortcodeAction,
-  kFeedFilterShortcodeElement,
-  kFeedFilterShortcodeMatch,
-  kFeedFilterShortcodeOperator,
-  kFeedFilterShortcodeOption
-};
-
 class Feed;
 class FeedItem;
 

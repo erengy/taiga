@@ -44,6 +44,7 @@
 #include "taiga/version.h"
 #include "track/feed_aggregator.h"
 #include "track/feed_filter_manager.h"
+#include "track/feed_filter_util.h"
 #include "track/media.h"
 #include "track/media_stream.h"
 #include "ui/dlg/dlg_feed_filter.h"
@@ -696,7 +697,7 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
           ExecuteCommand(L"TorrentAddFilter", TRUE, reinterpret_cast<LPARAM>(parent->GetWindowHandle()));
           if (!DlgFeedFilter.filter.conditions.empty()) {
             if (DlgFeedFilter.filter.name.empty())
-              DlgFeedFilter.filter.name = track::feed_filter_manager.CreateNameFromConditions(DlgFeedFilter.filter);
+              DlgFeedFilter.filter.name = track::util::CreateNameFromConditions(DlgFeedFilter.filter);
             parent->feed_filters_.push_back(DlgFeedFilter.filter);
             win::ListView list = GetDlgItem(IDC_LIST_TORRENT_FILTER);
             parent->RefreshTorrentFilterList(list.GetWindowHandle());

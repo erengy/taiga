@@ -31,13 +31,12 @@
 #include "track/episode_util.h"
 #include "track/feed.h"
 #include "track/feed_aggregator.h"
-#include "ui/translate.h"
+#include "track/feed_filter_util.h"
 
 namespace track {
 
 FeedFilterManager::FeedFilterManager() {
   InitializePresets();
-  InitializeShortcodes();
 }
 
 void FeedFilterManager::AddPresets(std::vector<FeedFilter>& filters) {
@@ -230,51 +229,6 @@ void FeedFilterManager::InitializePresets() {
   #undef ADD_PRESET
 }
 
-void FeedFilterManager::InitializeShortcodes() {
-  action_shortcodes_[kFeedFilterActionDiscard] = L"discard";
-  action_shortcodes_[kFeedFilterActionSelect] = L"select";
-  action_shortcodes_[kFeedFilterActionPrefer] = L"prefer";
-
-  element_shortcodes_[kFeedFilterElement_Meta_Id] = L"meta_id";
-  element_shortcodes_[kFeedFilterElement_Meta_Status] = L"meta_status";
-  element_shortcodes_[kFeedFilterElement_Meta_Type] = L"meta_type";
-  element_shortcodes_[kFeedFilterElement_Meta_Episodes] = L"meta_episodes";
-  element_shortcodes_[kFeedFilterElement_Meta_DateStart] = L"meta_date_start";
-  element_shortcodes_[kFeedFilterElement_Meta_DateEnd] = L"meta_date_end";
-  element_shortcodes_[kFeedFilterElement_User_Status] = L"user_status";
-  element_shortcodes_[kFeedFilterElement_User_Tags] = L"user_tags";
-  element_shortcodes_[kFeedFilterElement_Local_EpisodeAvailable] = L"local_episode_available";
-  element_shortcodes_[kFeedFilterElement_Episode_Title] = L"episode_title";
-  element_shortcodes_[kFeedFilterElement_Episode_Number] = L"episode_number";
-  element_shortcodes_[kFeedFilterElement_Episode_Version] = L"episode_version";
-  element_shortcodes_[kFeedFilterElement_Episode_Group] = L"episode_group";
-  element_shortcodes_[kFeedFilterElement_Episode_VideoResolution] = L"episode_video_resolution";
-  element_shortcodes_[kFeedFilterElement_Episode_VideoType] = L"episode_video_type";
-  element_shortcodes_[kFeedFilterElement_File_Title] = L"file_title";
-  element_shortcodes_[kFeedFilterElement_File_Category] = L"file_category";
-  element_shortcodes_[kFeedFilterElement_File_Description] = L"file_description";
-  element_shortcodes_[kFeedFilterElement_File_Link] = L"file_link";
-  element_shortcodes_[kFeedFilterElement_File_Size] = L"file_size";
-
-  match_shortcodes_[kFeedFilterMatchAll] = L"all";
-  match_shortcodes_[kFeedFilterMatchAny] = L"any";
-
-  operator_shortcodes_[kFeedFilterOperator_Equals] = L"equals";
-  operator_shortcodes_[kFeedFilterOperator_NotEquals] = L"notequals";
-  operator_shortcodes_[kFeedFilterOperator_IsGreaterThan] = L"gt";
-  operator_shortcodes_[kFeedFilterOperator_IsGreaterThanOrEqualTo] = L"ge";
-  operator_shortcodes_[kFeedFilterOperator_IsLessThan] = L"lt";
-  operator_shortcodes_[kFeedFilterOperator_IsLessThanOrEqualTo] = L"le";
-  operator_shortcodes_[kFeedFilterOperator_BeginsWith] = L"beginswith";
-  operator_shortcodes_[kFeedFilterOperator_EndsWith] = L"endswith";
-  operator_shortcodes_[kFeedFilterOperator_Contains] = L"contains";
-  operator_shortcodes_[kFeedFilterOperator_NotContains] = L"notcontains";
-
-  option_shortcodes_[kFeedFilterOptionDefault] = L"default";
-  option_shortcodes_[kFeedFilterOptionDeactivate] = L"deactivate";
-  option_shortcodes_[kFeedFilterOptionHide] = L"hide";
-}
-
 bool FeedFilterManager::Import(const std::wstring& input,
                                std::vector<FeedFilter>& filters) {
   XmlDocument document;
@@ -294,14 +248,14 @@ void FeedFilterManager::Import(const XmlNode& node_filter,
   for (auto item : node_filter.children(L"item")) {
     FeedFilter filter;
 
-    filter.action = static_cast<FeedFilterAction>(GetIndexFromShortcode(
-        kFeedFilterShortcodeAction, item.attribute(L"action").value()));
+    filter.action = static_cast<FeedFilterAction>(util::GetIndexFromShortcode(
+        util::Shortcode::Action, item.attribute(L"action").value()));
     filter.enabled = item.attribute(L"enabled").as_bool();
-    filter.match = static_cast<FeedFilterMatch>(GetIndexFromShortcode(
-        kFeedFilterShortcodeMatch, item.attribute(L"match").value()));
+    filter.match = static_cast<FeedFilterMatch>(util::GetIndexFromShortcode(
+        util::Shortcode::Match, item.attribute(L"match").value()));
     filter.name = item.attribute(L"name").value();
-    filter.option = static_cast<FeedFilterOption>(GetIndexFromShortcode(
-        kFeedFilterShortcodeOption, item.attribute(L"option").value()));
+    filter.option = static_cast<FeedFilterOption>(util::GetIndexFromShortcode(
+        util::Shortcode::Option, item.attribute(L"option").value()));
 
     for (auto anime : item.children(L"anime")) {
       filter.anime_ids.push_back(anime.attribute(L"id").as_int());
@@ -309,10 +263,10 @@ void FeedFilterManager::Import(const XmlNode& node_filter,
 
     for (auto condition : item.children(L"condition")) {
       filter.AddCondition(
-          static_cast<FeedFilterElement>(GetIndexFromShortcode(
-              kFeedFilterShortcodeElement, condition.attribute(L"element").value())),
-          static_cast<FeedFilterOperator>(GetIndexFromShortcode(
-              kFeedFilterShortcodeOperator, condition.attribute(L"operator").value())),
+          static_cast<FeedFilterElement>(util::GetIndexFromShortcode(
+              util::Shortcode::Element, condition.attribute(L"element").value())),
+          static_cast<FeedFilterOperator>(util::GetIndexFromShortcode(
+              util::Shortcode::Operator, condition.attribute(L"operator").value())),
           condition.attribute(L"value").value());
     }
 
@@ -335,12 +289,12 @@ void FeedFilterManager::Export(pugi::xml_node& node_filter,
                                const std::vector<FeedFilter>& filters) {
   for (const auto& feed_filter : filters) {
     auto item = node_filter.append_child(L"item");
-    item.append_attribute(L"action") = GetShortcodeFromIndex(
-            kFeedFilterShortcodeAction, feed_filter.action).c_str();
-    item.append_attribute(L"match") = GetShortcodeFromIndex(
-            kFeedFilterShortcodeMatch, feed_filter.match).c_str();
-    item.append_attribute(L"option") = GetShortcodeFromIndex(
-            kFeedFilterShortcodeOption, feed_filter.option).c_str();
+    item.append_attribute(L"action") = util::GetShortcodeFromIndex(
+        util::Shortcode::Action, feed_filter.action).c_str();
+    item.append_attribute(L"match") = util::GetShortcodeFromIndex(
+        util::Shortcode::Match, feed_filter.match).c_str();
+    item.append_attribute(L"option") = util::GetShortcodeFromIndex(
+        util::Shortcode::Option, feed_filter.option).c_str();
     item.append_attribute(L"enabled") = feed_filter.enabled;
     item.append_attribute(L"name") = feed_filter.name.c_str();
 
@@ -351,10 +305,10 @@ void FeedFilterManager::Export(pugi::xml_node& node_filter,
 
     for (const auto& condition : feed_filter.conditions) {
       auto node = item.append_child(L"condition");
-      node.append_attribute(L"element") = GetShortcodeFromIndex(
-              kFeedFilterShortcodeElement, condition.element).c_str();
-      node.append_attribute(L"operator") = GetShortcodeFromIndex(
-              kFeedFilterShortcodeOperator, condition.op).c_str();
+      node.append_attribute(L"element") = util::GetShortcodeFromIndex(
+          util::Shortcode::Element, condition.element).c_str();
+      node.append_attribute(L"operator") = util::GetShortcodeFromIndex(
+          util::Shortcode::Operator, condition.op).c_str();
       node.append_attribute(L"value") = condition.value.c_str();
     }
   }
@@ -362,225 +316,6 @@ void FeedFilterManager::Export(pugi::xml_node& node_filter,
 
 void FeedFilterManager::Export(pugi::xml_node& node_filter) {
   Export(node_filter, filters_);
-}
-
-std::wstring FeedFilterManager::CreateNameFromConditions(
-    const FeedFilter& filter) {
-  // TODO
-  return L"New Filter";
-}
-
-std::wstring FeedFilterManager::TranslateCondition(
-    const FeedFilterCondition& condition) {
-  return TranslateElement(condition.element) + L" " +
-         TranslateOperator(condition.op) + L" \"" +
-         TranslateValue(condition) + L"\"";
-}
-
-std::wstring FeedFilterManager::TranslateConditions(const FeedFilter& filter,
-                                                    size_t index) {
-  std::wstring str;
-
-  size_t max_index = (filter.match == kFeedFilterMatchAll) ?
-      filter.conditions.size() : index + 1;
-
-  for (size_t i = index; i < max_index; i++) {
-    if (i > index)
-      str += L" & ";
-    str += TranslateCondition(filter.conditions[i]);
-  }
-
-  return str;
-}
-
-std::wstring FeedFilterManager::TranslateElement(int element) {
-  switch (element) {
-    case kFeedFilterElement_File_Title:
-      return L"File name";
-    case kFeedFilterElement_File_Category:
-      return L"File category";
-    case kFeedFilterElement_File_Description:
-      return L"File description";
-    case kFeedFilterElement_File_Link:
-      return L"File link";
-    case kFeedFilterElement_File_Size:
-      return L"File size";
-    case kFeedFilterElement_Meta_Id:
-      return L"Anime ID";
-    case kFeedFilterElement_Episode_Title:
-      return L"Episode title";
-    case kFeedFilterElement_Meta_DateStart:
-      return L"Anime date started";
-    case kFeedFilterElement_Meta_DateEnd:
-      return L"Anime date ended";
-    case kFeedFilterElement_Meta_Episodes:
-      return L"Anime episode count";
-    case kFeedFilterElement_Meta_Status:
-      return L"Anime airing status";
-    case kFeedFilterElement_Meta_Type:
-      return L"Anime type";
-    case kFeedFilterElement_User_Status:
-      return L"Anime watching status";
-    case kFeedFilterElement_User_Tags:
-      return L"Anime tags";
-    case kFeedFilterElement_Episode_Number:
-      return L"Episode number";
-    case kFeedFilterElement_Episode_Version:
-      return L"Episode version";
-    case kFeedFilterElement_Local_EpisodeAvailable:
-      return L"Episode availability";
-    case kFeedFilterElement_Episode_Group:
-      return L"Episode fansub group";
-    case kFeedFilterElement_Episode_VideoResolution:
-      return L"Episode video resolution";
-    case kFeedFilterElement_Episode_VideoType:
-      return L"Episode video type";
-    default:
-      return L"?";
-  }
-}
-
-std::wstring FeedFilterManager::TranslateOperator(int op) {
-  switch (op) {
-    case kFeedFilterOperator_Equals:
-      return L"is";
-    case kFeedFilterOperator_NotEquals:
-      return L"is not";
-    case kFeedFilterOperator_IsGreaterThan:
-      return L"is greater than";
-    case kFeedFilterOperator_IsGreaterThanOrEqualTo:
-      return L"is greater than or equal to";
-    case kFeedFilterOperator_IsLessThan:
-      return L"is less than";
-    case kFeedFilterOperator_IsLessThanOrEqualTo:
-      return L"is less than or equal to";
-    case kFeedFilterOperator_BeginsWith:
-      return L"begins with";
-    case kFeedFilterOperator_EndsWith:
-      return L"ends with";
-    case kFeedFilterOperator_Contains:
-      return L"contains";
-    case kFeedFilterOperator_NotContains:
-      return L"does not contain";
-    default:
-      return L"?";
-  }
-}
-
-std::wstring FeedFilterManager::TranslateValue(
-    const FeedFilterCondition& condition) {
-  switch (condition.element) {
-    case kFeedFilterElement_Meta_Id: {
-      if (condition.value.empty()) {
-        return L"(?)";
-      } else {
-        auto anime_item = anime::db.Find(ToInt(condition.value));
-        if (anime_item) {
-          return condition.value + L" (" + anime::GetPreferredTitle(*anime_item) + L")";
-        } else {
-          return condition.value + L" (?)";
-        }
-      }
-    }
-    case kFeedFilterElement_User_Status:
-      return ui::TranslateMyStatus(static_cast<anime::MyStatus>(ToInt(condition.value)), false);
-    case kFeedFilterElement_Meta_Status:
-      return ui::TranslateStatus(static_cast<anime::SeriesStatus>(ToInt(condition.value)));
-    case kFeedFilterElement_Meta_Type:
-      return ui::TranslateType(static_cast<anime::SeriesType>(ToInt(condition.value)));
-    default:
-      if (condition.value.empty()) {
-        return L"(empty)";
-      } else {
-        return condition.value;
-      }
-  }
-}
-
-std::wstring FeedFilterManager::TranslateMatching(int match) {
-  switch (match) {
-    case kFeedFilterMatchAll:
-      return L"All conditions";
-    case kFeedFilterMatchAny:
-      return L"Any condition";
-    default:
-      return L"?";
-  }
-}
-
-std::wstring FeedFilterManager::TranslateAction(int action) {
-  switch (action) {
-    case kFeedFilterActionDiscard:
-      return L"Discard matched items";
-    case kFeedFilterActionSelect:
-      return L"Select matched items";
-    case kFeedFilterActionPrefer:
-      return L"Prefer matched items to similar ones";
-    default:
-      return L"?";
-  }
-}
-
-std::wstring FeedFilterManager::TranslateOption(int option) {
-  switch (option) {
-    case kFeedFilterOptionDefault:
-      return L"Default";
-    case kFeedFilterOptionDeactivate:
-      return L"Deactivate discarded items";
-    case kFeedFilterOptionHide:
-      return L"Hide discarded items";
-    default:
-      return L"?";
-  }
-}
-
-std::wstring FeedFilterManager::GetShortcodeFromIndex(
-    FeedFilterShortcodeType type, int index) {
-  switch (type) {
-    case kFeedFilterShortcodeAction:
-      return action_shortcodes_[index];
-    case kFeedFilterShortcodeElement:
-      return element_shortcodes_[index];
-    case kFeedFilterShortcodeMatch:
-      return match_shortcodes_[index];
-    case kFeedFilterShortcodeOperator:
-      return operator_shortcodes_[index];
-    case kFeedFilterShortcodeOption:
-      return option_shortcodes_[index];
-  }
-
-  return std::wstring();
-}
-
-int FeedFilterManager::GetIndexFromShortcode(FeedFilterShortcodeType type,
-                                             const std::wstring& shortcode) {
-  std::map<int, std::wstring>* shortcodes = nullptr;
-  switch (type) {
-    case kFeedFilterShortcodeAction:
-      shortcodes = &action_shortcodes_;
-      break;
-    case kFeedFilterShortcodeElement:
-      shortcodes = &element_shortcodes_;
-      break;
-    case kFeedFilterShortcodeMatch:
-      shortcodes = &match_shortcodes_;
-      break;
-    case kFeedFilterShortcodeOperator:
-      shortcodes = &operator_shortcodes_;
-      break;
-    case kFeedFilterShortcodeOption:
-      shortcodes = &option_shortcodes_;
-      break;
-  }
-
-  for (const auto& pair : *shortcodes) {
-    if (IsEqual(pair.second, shortcode))
-      return pair.first;
-  }
-
-  LOGD(L"Shortcode: \"{}\" for type \"{}\" is not found.", shortcode, type);
-
-  return -1;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

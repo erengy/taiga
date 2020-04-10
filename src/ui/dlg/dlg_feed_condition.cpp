@@ -26,7 +26,7 @@
 #include "taiga/resource.h"
 #include "track/feed.h"
 #include "track/feed_filter.h"
-#include "track/feed_filter_manager.h"
+#include "track/feed_filter_util.h"
 #include "ui/dlg/dlg_feed_condition.h"
 #include "ui/translate.h"
 
@@ -54,7 +54,7 @@ BOOL FeedConditionDialog::OnInitDialog() {
 
   // Add elements
   for (int i = 0; i < track::kFeedFilterElement_Count; i++) {
-    element_combo_.AddItem(track::feed_filter_manager.TranslateElement(i).c_str(), i);
+    element_combo_.AddItem(track::util::TranslateElement(i).c_str(), i);
   }
 
   // Set element
@@ -183,7 +183,7 @@ void FeedConditionDialog::ChooseElement(int element_index) {
   operator_combo_.ResetContent();
 
   #define ADD_OPERATOR(op) \
-    operator_combo_.AddItem(track::feed_filter_manager.TranslateOperator(op).c_str(), op);
+    operator_combo_.AddItem(track::util::TranslateOperator(op).c_str(), op);
 
   switch (element_index) {
     case track::kFeedFilterElement_File_Size:

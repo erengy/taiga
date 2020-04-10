@@ -28,6 +28,7 @@
 #include "track/episode_util.h"
 #include "track/feed.h"
 #include "track/feed_filter_manager.h"
+#include "track/feed_filter_util.h"
 
 namespace track {
 
@@ -373,7 +374,7 @@ bool FeedFilter::Filter(Feed& feed, FeedItem& item, bool recursive) {
   if (Taiga.options.debug_mode) {
     std::wstring filter_text =
         (item.IsDiscarded() ? L"!FILTER :: " : L"FILTER :: ") +
-        feed_filter_manager.TranslateConditions(*this, condition_index);
+        util::TranslateConditions(*this, condition_index);
     item.description = filter_text + L" -- " + item.description;
   }
 
