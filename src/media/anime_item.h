@@ -63,6 +63,8 @@ public:
   double GetScore() const;
   const std::wstring& GetSynopsis() const;
   const time_t GetLastModified() const;
+  int GetLastAiredEpisodeNumber() const;
+  time_t GetNextEpisodeTime() const;
 
   void SetId(const std::wstring& id, sync::ServiceId service);
   void SetSlug(const std::wstring& slug);
@@ -91,6 +93,8 @@ public:
   void SetScore(double score);
   void SetSynopsis(const std::wstring& synopsis);
   void SetLastModified(time_t modified);
+  void SetLastAiredEpisodeNumber(int number);
+  void SetNextEpisodeTime(const time_t time);
 
   //////////////////////////////////////////////////////////////////////////////
   // Library data
@@ -128,17 +132,13 @@ public:
 
   int GetAvailableEpisodeCount() const;
   const std::wstring& GetFolder() const;
-  int GetLastAiredEpisodeNumber() const;
   const std::wstring& GetNextEpisodePath() const;
-  time_t GetNextEpisodeTime() const;
   bool GetUseAlternative() const;
   const std::vector<std::wstring>& GetUserSynonyms() const;
 
   bool SetEpisodeAvailability(int number, bool available, const std::wstring& path);
   void SetFolder(const std::wstring& folder);
-  void SetLastAiredEpisodeNumber(int number);
   void SetNextEpisodePath(const std::wstring& path);
-  void SetNextEpisodeTime(const time_t time);
   void SetUseAlternative(bool use_alternative);
   void SetUserSynonyms(const std::wstring& synonyms);
   void SetUserSynonyms(const std::vector<std::wstring>& synonyms);

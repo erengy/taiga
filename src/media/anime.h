@@ -129,6 +129,8 @@ struct SeriesInformation {
   Titles titles;
   std::vector<std::wstring> genres;
   std::vector<std::wstring> producers;
+  int last_aired_episode = 0;
+  std::time_t next_episode_time = 0;
 };
 
 struct MyInformation {
@@ -147,10 +149,6 @@ struct MyInformation {
 };
 
 struct LocalInformation {
-  // @TODO: Move to SeriesInformation?
-  int last_aired_episode = 0;
-  time_t next_episode_time = 0;
-
   // @TODO: Move to application settings?
   std::vector<bool> available_episodes;
   std::wstring next_episode_path;

@@ -108,6 +108,8 @@ void Database::ReadDatabaseNode(XmlNode& database_node) {
     item.SetEpisodeCount(XmlReadInt(node, L"episode_count"));
     item.SetSlug(XmlReadStr(node, L"slug"));
     item.SetImageUrl(XmlReadStr(node, L"image"));
+    item.SetLastAiredEpisodeNumber(XmlReadInt(node, L"last_aired_episode"));
+    item.SetNextEpisodeTime(ToTime(XmlReadStr(node, L"next_episode_time")));
   }
 }
 
@@ -148,6 +150,8 @@ void Database::WriteDatabaseNode(XmlNode& database_node) const {
       if (!v.empty()) XmlWriteStr(anime_node, n, v, t)
     #define XML_WF(n, v, t) \
       if (v > 0.0) XmlWriteStr(anime_node, n, ToWstr(v), t)
+    #define XML_WT(n, v, t) \
+      if (v > 0) XmlWriteStr(anime_node, n, ToWstr(v), t)
     XML_WS(L"source", source, pugi::node_pcdata);
     XML_WS(L"slug", item.GetSlug(), pugi::node_pcdata);
     XML_WS(L"title", item.GetTitle(), pugi::node_cdata);
@@ -167,7 +171,10 @@ void Database::WriteDatabaseNode(XmlNode& database_node) const {
     XML_WF(L"score", item.GetScore(), pugi::node_pcdata);
     XML_WI(L"popularity", item.GetPopularity());
     XML_WS(L"synopsis", item.GetSynopsis(), pugi::node_cdata);
-    XML_WS(L"modified", ToWstr(item.GetLastModified()), pugi::node_pcdata);
+    XML_WI(L"last_aired_episode", item.GetLastAiredEpisodeNumber());
+    XML_WT(L"next_episode_time", item.GetNextEpisodeTime(), pugi::node_pcdata);
+    XML_WT(L"modified", item.GetLastModified(), pugi::node_pcdata);
+    #undef XML_WT
     #undef XML_WF
     #undef XML_WS
     #undef XML_WI

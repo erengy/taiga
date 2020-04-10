@@ -124,6 +124,14 @@ const time_t Item::GetLastModified() const {
   return series_.last_modified;
 }
 
+int Item::GetLastAiredEpisodeNumber() const {
+  return series_.last_aired_episode;
+}
+
+time_t Item::GetNextEpisodeTime() const {
+  return series_.next_episode_time;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 void Item::SetId(const std::wstring& id, sync::ServiceId service) {
@@ -263,6 +271,16 @@ void Item::SetSynopsis(const std::wstring& synopsis) {
 
 void Item::SetLastModified(time_t modified) {
   series_.last_modified = modified;
+}
+
+void Item::SetLastAiredEpisodeNumber(int number) {
+  if (number > series_.last_aired_episode) {
+    series_.last_aired_episode = number;
+  }
+}
+
+void Item::SetNextEpisodeTime(const time_t time) {
+  series_.next_episode_time = time;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -472,16 +490,8 @@ const std::wstring& Item::GetFolder() const {
   return local_info_.folder;
 }
 
-int Item::GetLastAiredEpisodeNumber() const {
-  return local_info_.last_aired_episode;
-}
-
 const std::wstring& Item::GetNextEpisodePath() const {
   return local_info_.next_episode_path;
-}
-
-time_t Item::GetNextEpisodeTime() const {
-  return local_info_.next_episode_time;
 }
 
 bool Item::GetUseAlternative() const {
@@ -520,22 +530,8 @@ void Item::SetFolder(const std::wstring& folder) {
   local_info_.folder = folder;
 }
 
-void Item::SetLastAiredEpisodeNumber(int number) {
-  if (number > local_info_.last_aired_episode) {
-    if (GetAiringStatus() == SeriesStatus::FinishedAiring) {
-      local_info_.last_aired_episode = GetEpisodeCount();
-    } else {
-      local_info_.last_aired_episode = number;
-    }
-  }
-}
-
 void Item::SetNextEpisodePath(const std::wstring& path) {
   local_info_.next_episode_path = path;
-}
-
-void Item::SetNextEpisodeTime(const time_t time) {
-  local_info_.next_episode_time = time;
 }
 
 void Item::SetUseAlternative(bool use_alternative) {
