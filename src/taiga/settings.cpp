@@ -174,9 +174,8 @@ bool Settings::DeserializeFromXml(const std::wstring& path) {
 
   // Torrent filters
   const auto node_filter = settings.child(L"rss").child(L"torrent").child(L"filter");
-  track::feed_filter_manager.Import(node_filter, track::feed_filter_manager.filters);
-  if (track::feed_filter_manager.filters.empty())
-    track::feed_filter_manager.AddPresets();
+  track::feed_filter_manager.Import(node_filter);
+  track::feed_filter_manager.AddPresets();
 
   return parse_result;
 }
@@ -263,7 +262,7 @@ bool Settings::SerializeToXml(const std::wstring& path) const {
 
   // Torrent filters
   auto torrent_filter = settings.child(L"rss").child(L"torrent").child(L"filter");
-  track::feed_filter_manager.Export(torrent_filter, track::feed_filter_manager.filters);
+  track::feed_filter_manager.Export(torrent_filter);
 
   return XmlSaveDocumentToFile(document, path);
 }
@@ -287,6 +286,11 @@ void Settings::ApplyChanges() {
   ui::Menus.UpdateFolders();
 
   timers.UpdateIntervalsFromSettings();
+}
+
+void Settings::SetModified() {
+  std::lock_guard lock{mutex_};
+  modified_ = true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

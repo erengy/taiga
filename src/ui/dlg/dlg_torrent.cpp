@@ -217,12 +217,7 @@ void TorrentDialog::OnContextMenu(HWND hwnd, POINT pt) {
           list_.SetCheckState(i, FALSE);
         }
       }
-      track::feed_filter_manager.AddFilter(
-          track::kFeedFilterActionDiscard, track::kFeedFilterMatchAll, track::kFeedFilterOptionDefault,
-          true, L"Discard \"{}\""_format(anime::GetPreferredTitle(*anime_item)));
-      track::feed_filter_manager.filters.back().AddCondition(
-          track::kFeedFilterElement_Meta_Id, track::kFeedFilterOperator_Equals,
-          ToWstr(anime_item->GetId()));
+      track::feed_filter_manager.AddDiscardFilter(feed_item->episode_data.anime_id);
     }
 
   } else if (answer == L"SelectFansub") {
@@ -240,7 +235,7 @@ void TorrentDialog::OnContextMenu(HWND hwnd, POINT pt) {
           }
         }
       }
-      track::SetFansubFilter(anime_id, group_name, video_resolution);
+      track::feed_filter_manager.SetFansubFilter(anime_id, group_name, video_resolution);
     }
 
   } else if (answer == L"MoreTorrents") {

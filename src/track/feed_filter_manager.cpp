@@ -20,6 +20,7 @@
 
 #include "track/feed_filter_manager.h"
 
+#include "base/format.h"
 #include "base/log.h"
 #include "base/string.h"
 #include "base/xml.h"
@@ -39,21 +40,23 @@ FeedFilterManager::FeedFilterManager() {
   InitializeShortcodes();
 }
 
-void FeedFilterManager::AddPresets() {
-  for (const auto& preset : presets) {
-    if (!preset.is_default)
-      continue;
+void FeedFilterManager::AddPresets(std::vector<FeedFilter>& filters) {
+  if (!filters.empty())
+    return;
 
-    AddFilter(preset.filter.action, preset.filter.match,
-              preset.filter.option, preset.filter.enabled,
-              preset.filter.name);
-
-    for (const auto& condition : preset.filter.conditions) {
-      filters.back().AddCondition(condition.element,
-                                  condition.op,
-                                  condition.value);
+  for (const auto& preset : presets_) {
+    if (preset.is_default) {
+      filters.push_back(preset.filter);
     }
   }
+}
+
+void FeedFilterManager::AddPresets() {
+  AddPresets(filters_);
+}
+
+std::vector<FeedFilterPreset> FeedFilterManager::GetPresets() const {
+  return presets_;
 }
 
 void FeedFilterManager::AddFilter(FeedFilterAction action,
@@ -61,16 +64,28 @@ void FeedFilterManager::AddFilter(FeedFilterAction action,
                                   FeedFilterOption option,
                                   bool enabled,
                                   const std::wstring& name) {
-  filters.resize(filters.size() + 1);
-  filters.back().action = action;
-  filters.back().enabled = enabled;
-  filters.back().match = match;
-  filters.back().name = name;
-  filters.back().option = option;
+  filters_.resize(filters_.size() + 1);
+  filters_.back().action = action;
+  filters_.back().enabled = enabled;
+  filters_.back().match = match;
+  filters_.back().name = name;
+  filters_.back().option = option;
+
+  taiga::settings.SetModified();
+}
+
+std::vector<FeedFilter> FeedFilterManager::GetFilters() const {
+  return filters_;
+}
+
+void FeedFilterManager::SetFilters(const std::vector<FeedFilter>& filters) {
+  filters_ = filters;
+
+  taiga::settings.SetModified();
 }
 
 void FeedFilterManager::Cleanup() {
-  for (auto filter = filters.begin(); filter != filters.end(); ++filter) {
+  for (auto filter = filters_.begin(); filter != filters_.end(); ++filter) {
     auto& ids = filter->anime_ids;
     for (auto id = ids.begin(); id != ids.end(); ++id) {
       if (!anime::db.Find(*id)) {
@@ -78,9 +93,10 @@ void FeedFilterManager::Cleanup() {
           id = ids.erase(id) - 1;
           continue;
         } else {
-          filter = filters.erase(filter) - 1;
+          filter = filters_.erase(filter) - 1;
           break;
         }
+        taiga::settings.SetModified();
       }
     }
   }
@@ -91,7 +107,7 @@ void FeedFilterManager::Filter(Feed& feed, bool preferences) {
     return;
 
   for (auto& item : feed.items) {
-    for (auto& filter : filters) {
+    for (auto& filter : filters_) {
       if (preferences != (filter.action == kFeedFilterActionPrefer))
         continue;
       filter.Filter(feed, item, true);
@@ -128,16 +144,16 @@ void FeedFilterManager::MarkNewEpisodes(Feed& feed) {
 
 void FeedFilterManager::InitializePresets() {
   #define ADD_PRESET(action_, match_, is_default_, option_, name_, description_) \
-      presets.resize(presets.size() + 1); \
-      presets.back().description = description_; \
-      presets.back().is_default = is_default_; \
-      presets.back().filter.action = action_; \
-      presets.back().filter.enabled = true; \
-      presets.back().filter.match = match_; \
-      presets.back().filter.option = option_; \
-      presets.back().filter.name = name_;
+      presets_.resize(presets_.size() + 1); \
+      presets_.back().description = description_; \
+      presets_.back().is_default = is_default_; \
+      presets_.back().filter.action = action_; \
+      presets_.back().filter.enabled = true; \
+      presets_.back().filter.match = match_; \
+      presets_.back().filter.option = option_; \
+      presets_.back().filter.name = name_;
   #define ADD_CONDITION(e, o, v) \
-      presets.back().filter.AddCondition(e, o, v);
+      presets_.back().filter.AddCondition(e, o, v);
 
   /* Preset filters */
 
@@ -304,6 +320,10 @@ void FeedFilterManager::Import(const XmlNode& node_filter,
   }
 }
 
+void FeedFilterManager::Import(const pugi::xml_node& node_filter) {
+  Import(node_filter, filters_);
+}
+
 void FeedFilterManager::Export(std::wstring& output,
                                const std::vector<FeedFilter>& filters) {
   XmlDocument node_filter;
@@ -315,14 +335,11 @@ void FeedFilterManager::Export(pugi::xml_node& node_filter,
                                const std::vector<FeedFilter>& filters) {
   for (const auto& feed_filter : filters) {
     auto item = node_filter.append_child(L"item");
-    item.append_attribute(L"action") =
-        feed_filter_manager.GetShortcodeFromIndex(
+    item.append_attribute(L"action") = GetShortcodeFromIndex(
             kFeedFilterShortcodeAction, feed_filter.action).c_str();
-    item.append_attribute(L"match") =
-        feed_filter_manager.GetShortcodeFromIndex(
+    item.append_attribute(L"match") = GetShortcodeFromIndex(
             kFeedFilterShortcodeMatch, feed_filter.match).c_str();
-    item.append_attribute(L"option") =
-        feed_filter_manager.GetShortcodeFromIndex(
+    item.append_attribute(L"option") = GetShortcodeFromIndex(
             kFeedFilterShortcodeOption, feed_filter.option).c_str();
     item.append_attribute(L"enabled") = feed_filter.enabled;
     item.append_attribute(L"name") = feed_filter.name.c_str();
@@ -334,15 +351,17 @@ void FeedFilterManager::Export(pugi::xml_node& node_filter,
 
     for (const auto& condition : feed_filter.conditions) {
       auto node = item.append_child(L"condition");
-      node.append_attribute(L"element") =
-          feed_filter_manager.GetShortcodeFromIndex(
+      node.append_attribute(L"element") = GetShortcodeFromIndex(
               kFeedFilterShortcodeElement, condition.element).c_str();
-      node.append_attribute(L"operator") =
-          feed_filter_manager.GetShortcodeFromIndex(
+      node.append_attribute(L"operator") = GetShortcodeFromIndex(
               kFeedFilterShortcodeOperator, condition.op).c_str();
       node.append_attribute(L"value") = condition.value.c_str();
     }
   }
+}
+
+void FeedFilterManager::Export(pugi::xml_node& node_filter) {
+  Export(node_filter, filters_);
 }
 
 std::wstring FeedFilterManager::CreateNameFromConditions(
@@ -566,10 +585,11 @@ int FeedFilterManager::GetIndexFromShortcode(FeedFilterShortcodeType type,
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool GetFansubFilter(int anime_id, std::vector<std::wstring>& groups) {
+bool FeedFilterManager::GetFansubFilter(int anime_id,
+                                        std::vector<std::wstring>& groups) {
   bool found = false;
 
-  for (const auto& filter : feed_filter_manager.filters) {
+  for (const auto& filter : filters_) {
     if (nstd::contains(filter.anime_ids, anime_id)) {
       for (const auto& condition : filter.conditions) {
         if (condition.element == track::kFeedFilterElement_Episode_Group) {
@@ -583,8 +603,9 @@ bool GetFansubFilter(int anime_id, std::vector<std::wstring>& groups) {
   return found;
 }
 
-bool SetFansubFilter(int anime_id, const std::wstring& group_name,
-                     const std::wstring& video_resolution) {
+bool FeedFilterManager::SetFansubFilter(int anime_id,
+                                        const std::wstring& group_name,
+                                        const std::wstring& video_resolution) {
   const auto find_condition = [](track::FeedFilter& filter,
                                  track::FeedFilterElement element) {
     return std::find_if(
@@ -595,8 +616,7 @@ bool SetFansubFilter(int anime_id, const std::wstring& group_name,
   };
 
   // Check existing filters
-  auto& filters = feed_filter_manager.filters;
-  for (auto it = filters.begin(); it != filters.end(); ++it) {
+  for (auto it = filters_.begin(); it != filters_.end(); ++it) {
     auto& filter = *it;
     auto id = std::find(
         filter.anime_ids.begin(), filter.anime_ids.end(), anime_id);
@@ -614,13 +634,14 @@ bool SetFansubFilter(int anime_id, const std::wstring& group_name,
     if (filter.anime_ids.size() > 1) {
       filter.anime_ids.erase(id);
       if (group_name.empty()) {
+        taiga::settings.SetModified();
         return true;
       } else {
         break;
       }
     } else {
       if (group_name.empty()) {
-        filters.erase(it);
+        filters_.erase(it);
       } else {
         group_condition->value = group_name;
         if (!video_resolution.empty()) {
@@ -632,6 +653,7 @@ bool SetFansubFilter(int anime_id, const std::wstring& group_name,
           }
         }
       }
+      taiga::settings.SetModified();
       return true;
     }
   }
@@ -645,18 +667,34 @@ bool SetFansubFilter(int anime_id, const std::wstring& group_name,
     return false;
 
   // Create new filter
-  feed_filter_manager.AddFilter(
-      track::kFeedFilterActionPrefer, track::kFeedFilterMatchAll, track::kFeedFilterOptionDefault,
-      true, L"[Fansub] " + GetPreferredTitle(*anime_item));
-  feed_filter_manager.filters.back().AddCondition(
-      track::kFeedFilterElement_Episode_Group, track::kFeedFilterOperator_Equals,
-      group_name);
+  AddFilter(track::kFeedFilterActionPrefer, track::kFeedFilterMatchAll,
+            track::kFeedFilterOptionDefault, true,
+            L"[Fansub] " + GetPreferredTitle(*anime_item));
+  filters_.back().AddCondition(track::kFeedFilterElement_Episode_Group,
+                               track::kFeedFilterOperator_Equals, group_name);
   if (!video_resolution.empty()) {
-    feed_filter_manager.filters.back().AddCondition(
-        track::kFeedFilterElement_Episode_VideoResolution, track::kFeedFilterOperator_Equals,
-        video_resolution);
+    filters_.back().AddCondition(
+        track::kFeedFilterElement_Episode_VideoResolution,
+        track::kFeedFilterOperator_Equals, video_resolution);
   }
-  feed_filter_manager.filters.back().anime_ids.push_back(anime_id);
+  filters_.back().anime_ids.push_back(anime_id);
+
+  return true;
+}
+
+bool FeedFilterManager::AddDiscardFilter(int anime_id) {
+  auto anime_item = anime::db.Find(anime_id);
+
+  if (!anime_item)
+    return false;
+
+  AddFilter(track::kFeedFilterActionDiscard, track::kFeedFilterMatchAll,
+            track::kFeedFilterOptionDefault, true,
+            L"Discard \"{}\""_format(anime::GetPreferredTitle(*anime_item)));
+  filters_.back().AddCondition(track::kFeedFilterElement_Meta_Id,
+                               track::kFeedFilterOperator_Equals,
+                               ToWstr(anime_item->GetId()));
+
   return true;
 }
 

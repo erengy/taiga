@@ -328,7 +328,7 @@ LRESULT PageMyInfo::OnNotify(int idCtrl, LPNMHDR pnmh) {
         case NM_RETURN: {
           // Set/change fansub group preference
           std::vector<std::wstring> groups;
-          track::GetFansubFilter(anime_id_, groups);
+          track::feed_filter_manager.GetFansubFilter(anime_id_, groups);
           if (groups.size() > 1) {
             ShowDlgSettings(kSettingsSectionTorrents, kSettingsPageTorrentsFilters);
             RefreshFansubPreference();
@@ -340,7 +340,7 @@ LRESULT PageMyInfo::OnNotify(int idCtrl, LPNMHDR pnmh) {
             dlg.text = text;
             dlg.Show(parent->GetWindowHandle());
             if (dlg.result == IDOK && dlg.text != text)
-              if (track::SetFansubFilter(anime_id_, dlg.text, L""))
+              if (track::feed_filter_manager.SetFansubFilter(anime_id_, dlg.text, L""))
                 RefreshFansubPreference();
           }
           return TRUE;
@@ -504,7 +504,7 @@ void PageMyInfo::RefreshFansubPreference() {
   std::wstring text;
   std::vector<std::wstring> groups;
 
-  if (track::GetFansubFilter(anime_id_, groups)) {
+  if (track::feed_filter_manager.GetFansubFilter(anime_id_, groups)) {
     for (const auto& group : groups) {
       if (!text.empty())
         text += L" or ";

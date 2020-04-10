@@ -64,6 +64,7 @@ public:
 
   void ApplyChanges();
   bool HandleCompatibility();
+  void SetModified();
 
   base::Settings::value_t GetDefaultValue(const AppSettingKey key) const;
 

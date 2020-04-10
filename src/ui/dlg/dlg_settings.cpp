@@ -342,9 +342,7 @@ void SettingsDialog::OnOK() {
       if (filter) filter->enabled = list.GetCheckState(i) == TRUE;
     }
     list.SetWindowHandle(nullptr);
-    track::feed_filter_manager.filters.clear();
-    for (auto it = feed_filters_.begin(); it != feed_filters_.end(); ++it)
-      track::feed_filter_manager.filters.push_back(*it);
+    track::feed_filter_manager.SetFilters(feed_filters_);
   }
 
   // Advanced

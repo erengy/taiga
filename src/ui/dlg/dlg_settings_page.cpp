@@ -404,10 +404,7 @@ BOOL SettingsPage::OnInitDialog() {
       list.SetColumnWidth(0, LVSCW_AUTOSIZE_USEHEADER);
       list.InsertGroup(0, L"General filters", true, false);
       list.InsertGroup(1, L"Limited filters", true, false);
-      parent->feed_filters_.resize(track::feed_filter_manager.filters.size());
-      std::copy(track::feed_filter_manager.filters.begin(),
-                track::feed_filter_manager.filters.end(),
-                parent->feed_filters_.begin());
+      parent->feed_filters_ = track::feed_filter_manager.GetFilters();
       parent->RefreshTorrentFilterList(list.GetWindowHandle());
       list.SetWindowHandle(nullptr);
       // Initialize toolbar
@@ -804,13 +801,8 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
           dlg.AddButton(L"No", IDNO);
           dlg.Show(parent->GetWindowHandle());
           if (dlg.GetSelectedButtonID() == IDYES) {
-            track::feed_filter_manager.filters.clear();
-            track::feed_filter_manager.AddPresets();
-            parent->feed_filters_.resize(
-                track::feed_filter_manager.filters.size());
-            std::copy(track::feed_filter_manager.filters.begin(),
-                      track::feed_filter_manager.filters.end(),
-                      parent->feed_filters_.begin());
+            parent->feed_filters_.clear();
+            track::feed_filter_manager.AddPresets(parent->feed_filters_);
             win::ListView list = GetDlgItem(IDC_LIST_TORRENT_FILTER);
             parent->RefreshTorrentFilterList(list.GetWindowHandle());
             list.SetWindowHandle(nullptr);

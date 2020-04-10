@@ -38,8 +38,12 @@ public:
   void InitializePresets();
   void InitializeShortcodes();
 
+  void AddPresets(std::vector<FeedFilter>& filters);
   void AddPresets();
+  std::vector<FeedFilterPreset> GetPresets() const;
   void AddFilter(FeedFilterAction action, FeedFilterMatch match, FeedFilterOption option, bool enabled, const std::wstring& name);
+  std::vector<FeedFilter> GetFilters() const;
+  void SetFilters(const std::vector<FeedFilter>& filters);
   void Cleanup();
   void Filter(Feed& feed, bool preferences);
   void FilterArchived(Feed& feed);
@@ -47,8 +51,10 @@ public:
 
   bool Import(const std::wstring& input, std::vector<FeedFilter>& filters);
   void Import(const pugi::xml_node& node_filter, std::vector<FeedFilter>& filters);
+  void Import(const pugi::xml_node& node_filter);
   void Export(std::wstring& output, const std::vector<FeedFilter>& filters);
   void Export(pugi::xml_node& node_filter, const std::vector<FeedFilter>& filters);
+  void Export(pugi::xml_node& node_filter);
 
   std::wstring CreateNameFromConditions(const FeedFilter& filter);
   std::wstring TranslateCondition(const FeedFilterCondition& condition);
@@ -63,20 +69,20 @@ public:
   std::wstring GetShortcodeFromIndex(FeedFilterShortcodeType type, int index);
   int GetIndexFromShortcode(FeedFilterShortcodeType type, const std::wstring& shortcode);
 
-public:
-  std::vector<FeedFilter> filters;
-  std::vector<FeedFilterPreset> presets;
+  bool GetFansubFilter(int anime_id, std::vector<std::wstring>& groups);
+  bool SetFansubFilter(int anime_id, const std::wstring& group_name, const std::wstring& video_resolution);
+  bool AddDiscardFilter(int anime_id);
 
 private:
+  std::vector<FeedFilter> filters_;
+  std::vector<FeedFilterPreset> presets_;
+
   std::map<int, std::wstring> action_shortcodes_;
   std::map<int, std::wstring> element_shortcodes_;
   std::map<int, std::wstring> match_shortcodes_;
   std::map<int, std::wstring> operator_shortcodes_;
   std::map<int, std::wstring> option_shortcodes_;
 };
-
-bool GetFansubFilter(int anime_id, std::vector<std::wstring>& groups);
-bool SetFansubFilter(int anime_id, const std::wstring& group_name, const std::wstring& video_resolution);
 
 inline FeedFilterManager feed_filter_manager;
 

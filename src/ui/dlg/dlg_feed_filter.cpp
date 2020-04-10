@@ -267,7 +267,7 @@ BOOL FeedFilterDialog::DialogPage0::OnInitDialog() {
   preset_list.SetView(LV_VIEW_TILE);
 
   // Insert presets
-  for (const auto& preset : track::feed_filter_manager.presets) {
+  for (const auto& preset : track::feed_filter_manager.GetPresets()) {
     if (preset.is_default)
       continue;
     int icon_ = ui::kIcon16_Funnel;
