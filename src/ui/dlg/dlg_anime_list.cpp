@@ -555,8 +555,8 @@ void AnimeListDialog::ListView::RefreshItem(int index) {
     return;
   }
 
-  int anime_id = GetItemParam(index);
-  auto anime_item = anime::db.Find(anime_id);
+  const int anime_id = GetItemParam(index);
+  const auto anime_item = anime::db.Find(anime_id);
 
   if (!anime_item || !anime_item->IsInList())
     return;
@@ -591,7 +591,8 @@ void AnimeListDialog::ListView::RefreshItem(int index) {
     win::Rect rect_item;
     get_subitem_rect(kColumnAnimeStatus, rect_item);
     if (rect_item.PtIn(pt)) {
-      const std::wstring text = anime_item->GetPlaying() ? L"Now playing" :
+      const bool playing = anime_id == CurrentEpisode.anime_id;
+      const std::wstring text = playing ? L"Now playing" :
           ui::TranslateStatus(anime_item->GetAiringStatus());
       update_tooltip(kTooltipAnimeStatus, text.c_str(), &rect_item);
     }
@@ -957,7 +958,8 @@ void AnimeListDialog::ListView::DrawAiringStatus(HDC hdc, RECT* rc,
   win::Dc dc = hdc;
   win::Rect rect = *rc;
 
-  int icon_index = anime_item.GetPlaying() ? ui::kIcon16_Play :
+  const bool playing = anime_item.GetId() == CurrentEpisode.anime_id;
+  const int icon_index = playing ? ui::kIcon16_Play :
       StatusToIcon(anime_item.GetAiringStatus());
 
   int cx = ScaleX(16);
@@ -1239,7 +1241,7 @@ LRESULT AnimeListDialog::OnListCustomDraw(LPARAM lParam) {
       }
 
       // Indicate currently playing
-      if (anime_item->GetPlaying()) {
+      if (anime_item->GetId() == CurrentEpisode.anime_id) {
         pCD->clrTextBk = ui::kColorLightGreen;
         static HFONT hFontDefault = ChangeDCFont(pCD->nmcd.hdc, nullptr, -1, true, -1, -1);
         static HFONT hFontBold = reinterpret_cast<HFONT>(GetCurrentObject(pCD->nmcd.hdc, OBJ_FONT));

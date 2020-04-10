@@ -147,13 +147,15 @@ struct MyInformation {
 };
 
 struct LocalInformation {
+  // @TODO: Move to SeriesInformation?
   int last_aired_episode = 0;
+  time_t next_episode_time = 0;
+
+  // @TODO: Move to application settings?
   std::vector<bool> available_episodes;
   std::wstring next_episode_path;
-  time_t next_episode_time = 0;
   std::wstring folder;
   std::vector<std::wstring> synonyms;
-  bool playing = false;
   bool use_alternative = false;
 };
 

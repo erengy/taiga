@@ -131,7 +131,6 @@ public:
   int GetLastAiredEpisodeNumber() const;
   const std::wstring& GetNextEpisodePath() const;
   time_t GetNextEpisodeTime() const;
-  bool GetPlaying() const;
   bool GetUseAlternative() const;
   const std::vector<std::wstring>& GetUserSynonyms() const;
 
@@ -140,7 +139,6 @@ public:
   void SetLastAiredEpisodeNumber(int number);
   void SetNextEpisodePath(const std::wstring& path);
   void SetNextEpisodeTime(const time_t time);
-  void SetPlaying(bool playing);
   void SetUseAlternative(bool use_alternative);
   void SetUserSynonyms(const std::wstring& synonyms);
   void SetUserSynonyms(const std::vector<std::wstring>& synonyms);

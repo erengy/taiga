@@ -484,10 +484,6 @@ time_t Item::GetNextEpisodeTime() const {
   return local_info_.next_episode_time;
 }
 
-bool Item::GetPlaying() const {
-  return local_info_.playing;
-}
-
 bool Item::GetUseAlternative() const {
   return local_info_.use_alternative;
 }
@@ -540,10 +536,6 @@ void Item::SetNextEpisodePath(const std::wstring& path) {
 
 void Item::SetNextEpisodeTime(const time_t time) {
   local_info_.next_episode_time = time;
-}
-
-void Item::SetPlaying(bool playing) {
-  local_info_.playing = playing;
 }
 
 void Item::SetUseAlternative(bool use_alternative) {
