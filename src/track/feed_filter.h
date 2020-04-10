@@ -82,54 +82,29 @@ enum FeedFilterOption {
 class Feed;
 class FeedItem;
 
-class FeedFilterCondition {
-public:
-  FeedFilterCondition();
-  ~FeedFilterCondition() {}
-
-  FeedFilterCondition& operator=(const FeedFilterCondition& condition);
-
-  void Reset();
-
-public:
-  FeedFilterElement element;
-  FeedFilterOperator op;
+struct FeedFilterCondition {
+  FeedFilterElement element = kFeedFilterElement_File_Title;
+  FeedFilterOperator op = kFeedFilterOperator_Equals;
   std::wstring value;
 };
 
-class FeedFilter {
-public:
-  FeedFilter();
-  ~FeedFilter() {}
-
-  FeedFilter& operator=(const FeedFilter& filter);
-
-  void AddCondition(FeedFilterElement element, FeedFilterOperator op, const std::wstring& value);
-  bool Filter(Feed& feed, FeedItem& item, bool recursive);
-  void Reset();
-
-public:
-  bool ApplyPreferenceFilter(Feed& feed, FeedItem& item);
-
+struct FeedFilter {
   std::wstring name;
-  bool enabled;
-
-  FeedFilterAction action;
-  FeedFilterMatch match;
-  FeedFilterOption option;
-
+  bool enabled = true;
+  FeedFilterAction action = kFeedFilterActionDiscard;
+  FeedFilterMatch match = kFeedFilterMatchAll;
+  FeedFilterOption option = kFeedFilterOptionDefault;
   std::vector<int> anime_ids;
   std::vector<FeedFilterCondition> conditions;
 };
 
-class FeedFilterPreset {
-public:
-  FeedFilterPreset();
-  ~FeedFilterPreset() {}
-
+struct FeedFilterPreset {
   std::wstring description;
   FeedFilter filter;
-  bool is_default;
+  bool is_default = false;
 };
+
+bool ApplyFilter(const FeedFilter& filter, Feed& feed, FeedItem& item, bool recursive);
+bool ApplyPreferenceFilter(const FeedFilter& filter, Feed& feed, FeedItem& item);
 
 }  // namespace track

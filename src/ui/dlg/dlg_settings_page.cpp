@@ -693,7 +693,7 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
         }
         // Add global filter
         case 100: {
-          DlgFeedFilter.filter.Reset();
+          DlgFeedFilter.filter = {};
           ExecuteCommand(L"TorrentAddFilter", TRUE, reinterpret_cast<LPARAM>(parent->GetWindowHandle()));
           if (!DlgFeedFilter.filter.conditions.empty()) {
             if (DlgFeedFilter.filter.name.empty())

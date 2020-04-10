@@ -32,12 +32,12 @@
 
 namespace track {
 
-bool EvaluateCondition(const FeedFilterCondition& condition,
-                       const FeedItem& item) {
+static bool EvaluateCondition(const FeedFilterCondition& condition,
+                              const FeedItem& item) {
   bool is_numeric = false;
   std::wstring element;
   std::wstring value = ReplaceVariables(condition.value, item.episode_data);
-  auto anime = anime::db.Find(item.episode_data.anime_id);
+  const auto anime = anime::db.Find(item.episode_data.anime_id);
 
   switch (condition.element) {
     case kFeedFilterElement_File_Title:
@@ -216,72 +216,18 @@ bool EvaluateCondition(const FeedFilterCondition& condition,
 
 ////////////////////////////////////////////////////////////////////////////////
 
-FeedFilterCondition::FeedFilterCondition()
-    : element(kFeedFilterElement_Meta_Id),
-      op(kFeedFilterOperator_Equals) {
-}
-
-FeedFilterCondition& FeedFilterCondition::operator=(const FeedFilterCondition& condition) {
-  element = condition.element;
-  op = condition.op;
-  value = condition.value;
-
-  return *this;
-}
-
-void FeedFilterCondition::Reset() {
-  element = kFeedFilterElement_File_Title;
-  op = kFeedFilterOperator_Equals;
-  value.clear();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-FeedFilter::FeedFilter()
-    : action(kFeedFilterActionDiscard),
-      enabled(true),
-      match(kFeedFilterMatchAll),
-      option(kFeedFilterOptionDefault) {
-}
-
-FeedFilter& FeedFilter::operator=(const FeedFilter& filter) {
-  action = filter.action;
-  enabled = filter.enabled;
-  match = filter.match;
-  name = filter.name;
-  option = filter.option;
-
-  conditions.resize(filter.conditions.size());
-  std::copy(filter.conditions.begin(), filter.conditions.end(),
-            conditions.begin());
-
-  anime_ids.resize(filter.anime_ids.size());
-  std::copy(filter.anime_ids.begin(), filter.anime_ids.end(),
-            anime_ids.begin());
-
-  return *this;
-}
-
-void FeedFilter::AddCondition(FeedFilterElement element,
-                              FeedFilterOperator op,
-                              const std::wstring& value) {
-  conditions.resize(conditions.size() + 1);
-  conditions.back().element = element;
-  conditions.back().op = op;
-  conditions.back().value = value;
-}
-
-bool FeedFilter::Filter(Feed& feed, FeedItem& item, bool recursive) {
-  if (!enabled)
+bool ApplyFilter(const FeedFilter& filter, Feed& feed, FeedItem& item,
+                 bool recursive) {
+  if (!filter.enabled)
     return false;
 
   // No need to filter if the item was discarded before
   if (item.IsDiscarded())
     return false;
 
-  if (!anime_ids.empty()) {
+  if (!filter.anime_ids.empty()) {
     bool apply_filter = false;
-    for (const auto& id : anime_ids) {
+    for (const auto& id : filter.anime_ids) {
       if (id == item.episode_data.anime_id) {
         apply_filter = true;
         break;
@@ -294,11 +240,11 @@ bool FeedFilter::Filter(Feed& feed, FeedItem& item, bool recursive) {
   bool matched = false;
   size_t condition_index = 0;  // Used only for debugging purposes
 
-  switch (match) {
+  switch (filter.match) {
     case kFeedFilterMatchAll:
       matched = true;
-      for (size_t i = 0; i < conditions.size(); i++) {
-        if (!EvaluateCondition(conditions.at(i), item)) {
+      for (size_t i = 0; i < filter.conditions.size(); i++) {
+        if (!EvaluateCondition(filter.conditions.at(i), item)) {
           matched = false;
           condition_index = i;
           break;
@@ -307,8 +253,8 @@ bool FeedFilter::Filter(Feed& feed, FeedItem& item, bool recursive) {
       break;
     case kFeedFilterMatchAny:
       matched = false;
-      for (size_t i = 0; i < conditions.size(); i++) {
-        if (EvaluateCondition(conditions.at(i), item)) {
+      for (size_t i = 0; i < filter.conditions.size(); i++) {
+        if (EvaluateCondition(filter.conditions.at(i), item)) {
           matched = true;
           condition_index = i;
           break;
@@ -317,11 +263,11 @@ bool FeedFilter::Filter(Feed& feed, FeedItem& item, bool recursive) {
       break;
   }
 
-  switch (action) {
+  switch (filter.action) {
     case kFeedFilterActionDiscard:
       if (matched) {
         // Discard matched items, regardless of their previous state
-        item.Discard(option);
+        item.Discard(filter.option);
       } else {
         return false;  // Filter doesn't apply to this item
       }
@@ -339,18 +285,18 @@ bool FeedFilter::Filter(Feed& feed, FeedItem& item, bool recursive) {
     case kFeedFilterActionPrefer: {
       if (recursive) {
         // Filters are strong if they're limited, weak otherwise
-        bool strong_preference = !anime_ids.empty();
+        const bool strong_preference = !filter.anime_ids.empty();
         if (strong_preference) {
           if (matched) {
             // Select matched items, if they were not discarded before
             item.state = FeedItemState::Selected;
           } else {
             // Discard mismatched items, regardless of their previous state
-            item.Discard(option);
+            item.Discard(filter.option);
           }
         } else {
           if (matched) {
-            if (!ApplyPreferenceFilter(feed, item))
+            if (!ApplyPreferenceFilter(filter, feed, item))
               return false;  // Filter didn't have any effect
           } else {
             return false;  // Filter doesn't apply to this item
@@ -362,7 +308,7 @@ bool FeedFilter::Filter(Feed& feed, FeedItem& item, bool recursive) {
         // this point, we don't care whether the preference is weak or strong.
         if (!matched) {
           // Discard mismatched items, regardless of their previous state
-          item.Discard(option);
+          item.Discard(filter.option);
         } else {
           return false;  // Filter doesn't apply to this item
         }
@@ -374,17 +320,18 @@ bool FeedFilter::Filter(Feed& feed, FeedItem& item, bool recursive) {
   if (Taiga.options.debug_mode) {
     std::wstring filter_text =
         (item.IsDiscarded() ? L"!FILTER :: " : L"FILTER :: ") +
-        util::TranslateConditions(*this, condition_index);
+        util::TranslateConditions(filter, condition_index);
     item.description = filter_text + L" -- " + item.description;
   }
 
   return true;
 }
 
-bool FeedFilter::ApplyPreferenceFilter(Feed& feed, FeedItem& item) {
+bool ApplyPreferenceFilter(const FeedFilter& filter, Feed& feed,
+                           FeedItem& item) {
   std::map<FeedFilterElement, bool> element_found;
 
-  for (const auto& condition : conditions) {
+  for (const auto& condition : filter.conditions) {
     switch (condition.element) {
       case kFeedFilterElement_Meta_Id:
       case kFeedFilterElement_Episode_Title:
@@ -426,26 +373,11 @@ bool FeedFilter::ApplyPreferenceFilter(Feed& feed, FeedItem& item) {
         continue;
 
     // Try applying the same filter
-    bool result = Filter(feed, feed_item, false);
+    const bool result = ApplyFilter(filter, feed, feed_item, false);
     filter_applied = filter_applied || result;
   }
 
   return filter_applied;
-}
-
-void FeedFilter::Reset() {
-  enabled = true;
-  action = kFeedFilterActionDiscard;
-  match = kFeedFilterMatchAll;
-  anime_ids.clear();
-  conditions.clear();
-  name.clear();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-FeedFilterPreset::FeedFilterPreset()
-    : is_default(false) {
 }
 
 }  // namespace track

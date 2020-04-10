@@ -58,21 +58,6 @@ std::vector<FeedFilterPreset> FeedFilterManager::GetPresets() const {
   return presets_;
 }
 
-void FeedFilterManager::AddFilter(FeedFilterAction action,
-                                  FeedFilterMatch match,
-                                  FeedFilterOption option,
-                                  bool enabled,
-                                  const std::wstring& name) {
-  filters_.resize(filters_.size() + 1);
-  filters_.back().action = action;
-  filters_.back().enabled = enabled;
-  filters_.back().match = match;
-  filters_.back().name = name;
-  filters_.back().option = option;
-
-  taiga::settings.SetModified();
-}
-
 std::vector<FeedFilter> FeedFilterManager::GetFilters() const {
   return filters_;
 }
@@ -83,33 +68,15 @@ void FeedFilterManager::SetFilters(const std::vector<FeedFilter>& filters) {
   taiga::settings.SetModified();
 }
 
-void FeedFilterManager::Cleanup() {
-  for (auto filter = filters_.begin(); filter != filters_.end(); ++filter) {
-    auto& ids = filter->anime_ids;
-    for (auto id = ids.begin(); id != ids.end(); ++id) {
-      if (!anime::db.Find(*id)) {
-        if (ids.size() > 1) {
-          id = ids.erase(id) - 1;
-          continue;
-        } else {
-          filter = filters_.erase(filter) - 1;
-          break;
-        }
-        taiga::settings.SetModified();
-      }
-    }
-  }
-}
-
 void FeedFilterManager::Filter(Feed& feed, bool preferences) {
   if (!taiga::settings.GetTorrentFilterEnabled())
     return;
 
   for (auto& item : feed.items) {
-    for (auto& filter : filters_) {
+    for (const auto& filter : filters_) {
       if (preferences != (filter.action == kFeedFilterActionPrefer))
         continue;
-      filter.Filter(feed, item, true);
+      ApplyFilter(filter, feed, item, true);
     }
   }
 }
@@ -120,8 +87,7 @@ void FeedFilterManager::FilterArchived(Feed& feed) {
       if (aggregator.archive.Contains(item.title)) {
         item.state = FeedItemState::DiscardedNormal;
         if (Taiga.options.debug_mode) {
-          std::wstring filter_text = L"!FILTER :: Archived";
-          item.description = filter_text + L" -- " + item.description;
+          item.description = L"!FILTER :: Archived -- " + item.description;
         }
       }
     }
@@ -130,9 +96,8 @@ void FeedFilterManager::FilterArchived(Feed& feed) {
 
 void FeedFilterManager::MarkNewEpisodes(Feed& feed) {
   for (auto& feed_item : feed.items) {
-    auto anime_item = anime::db.Find(feed_item.episode_data.anime_id);
-    if (anime_item) {
-      int number = anime::GetEpisodeHigh(feed_item.episode_data);
+    if (const auto anime_item = anime::db.Find(feed_item.episode_data.anime_id)) {
+      const int number = anime::GetEpisodeHigh(feed_item.episode_data);
       if (number > anime_item->GetMyLastWatchedEpisode())
         feed_item.episode_data.new_episode = true;
     }
@@ -142,91 +107,94 @@ void FeedFilterManager::MarkNewEpisodes(Feed& feed) {
 ////////////////////////////////////////////////////////////////////////////////
 
 void FeedFilterManager::InitializePresets() {
-  #define ADD_PRESET(action_, match_, is_default_, option_, name_, description_) \
-      presets_.resize(presets_.size() + 1); \
-      presets_.back().description = description_; \
-      presets_.back().is_default = is_default_; \
-      presets_.back().filter.action = action_; \
-      presets_.back().filter.enabled = true; \
-      presets_.back().filter.match = match_; \
-      presets_.back().filter.option = option_; \
-      presets_.back().filter.name = name_;
-  #define ADD_CONDITION(e, o, v) \
-      presets_.back().filter.AddCondition(e, o, v);
+  const auto add_preset = [this](FeedFilterAction action, FeedFilterMatch match,
+                                 bool is_default, FeedFilterOption option,
+                                 std::wstring name, std::wstring description) {
+    FeedFilterPreset preset;
+    preset.description = description;
+    preset.is_default = is_default;
+    preset.filter.action = action;
+    preset.filter.enabled = true;
+    preset.filter.match = match;
+    preset.filter.option = option;
+    preset.filter.name = name;
+    presets_.push_back(std::move(preset));
+  };
+  const auto add_condition = [this](FeedFilterElement element,
+                                    FeedFilterOperator op, std::wstring value) {
+    presets_.back().filter.conditions.push_back({element, op, value});
+  };
 
   /* Preset filters */
 
   // Custom
-  ADD_PRESET(kFeedFilterActionDiscard, kFeedFilterMatchAll, false, kFeedFilterOptionDefault,
+  add_preset(kFeedFilterActionDiscard, kFeedFilterMatchAll, false, kFeedFilterOptionDefault,
       L"(Custom)",
       L"Lets you create a custom filter from scratch");
 
   // Fansub group
-  ADD_PRESET(kFeedFilterActionPrefer, kFeedFilterMatchAll, false, kFeedFilterOptionDefault,
+  add_preset(kFeedFilterActionPrefer, kFeedFilterMatchAll, false, kFeedFilterOptionDefault,
       L"[Fansub] Anime",
       L"Lets you choose a fansub group for one or more anime");
-  ADD_CONDITION(kFeedFilterElement_Episode_Group, kFeedFilterOperator_Equals, L"TaigaSubs (change this)");
+  add_condition(kFeedFilterElement_Episode_Group, kFeedFilterOperator_Equals, L"TaigaSubs (change this)");
 
   // Discard bad video keywords
-  ADD_PRESET(kFeedFilterActionDiscard, kFeedFilterMatchAny, false, kFeedFilterOptionDefault,
+  add_preset(kFeedFilterActionDiscard, kFeedFilterMatchAny, false, kFeedFilterOptionDefault,
       L"Discard bad video keywords",
       L"Discards everything that is AVI, DIVX, LQ, RMVB, SD, WMV or XVID");
-  ADD_CONDITION(kFeedFilterElement_Episode_VideoType, kFeedFilterOperator_Contains, L"AVI");
-  ADD_CONDITION(kFeedFilterElement_Episode_VideoType, kFeedFilterOperator_Contains, L"DIVX");
-  ADD_CONDITION(kFeedFilterElement_Episode_VideoType, kFeedFilterOperator_Contains, L"LQ");
-  ADD_CONDITION(kFeedFilterElement_Episode_VideoType, kFeedFilterOperator_Contains, L"RMVB");
-  ADD_CONDITION(kFeedFilterElement_Episode_VideoType, kFeedFilterOperator_Contains, L"SD");
-  ADD_CONDITION(kFeedFilterElement_Episode_VideoType, kFeedFilterOperator_Contains, L"WMV");
-  ADD_CONDITION(kFeedFilterElement_Episode_VideoType, kFeedFilterOperator_Contains, L"XVID");
+  add_condition(kFeedFilterElement_Episode_VideoType, kFeedFilterOperator_Contains, L"AVI");
+  add_condition(kFeedFilterElement_Episode_VideoType, kFeedFilterOperator_Contains, L"DIVX");
+  add_condition(kFeedFilterElement_Episode_VideoType, kFeedFilterOperator_Contains, L"LQ");
+  add_condition(kFeedFilterElement_Episode_VideoType, kFeedFilterOperator_Contains, L"RMVB");
+  add_condition(kFeedFilterElement_Episode_VideoType, kFeedFilterOperator_Contains, L"SD");
+  add_condition(kFeedFilterElement_Episode_VideoType, kFeedFilterOperator_Contains, L"WMV");
+  add_condition(kFeedFilterElement_Episode_VideoType, kFeedFilterOperator_Contains, L"XVID");
 
   // Prefer new versions
-  ADD_PRESET(kFeedFilterActionPrefer, kFeedFilterMatchAny, false, kFeedFilterOptionDefault,
+  add_preset(kFeedFilterActionPrefer, kFeedFilterMatchAny, false, kFeedFilterOptionDefault,
       L"Prefer new versions",
       L"Prefers v2 files and above when there are earlier releases of the same episode as well");
-  ADD_CONDITION(kFeedFilterElement_Episode_Version, kFeedFilterOperator_IsGreaterThan, L"1");
+  add_condition(kFeedFilterElement_Episode_Version, kFeedFilterOperator_IsGreaterThan, L"1");
 
   /* Default filters */
 
   // Select currently watching
-  ADD_PRESET(kFeedFilterActionSelect, kFeedFilterMatchAny, true, kFeedFilterOptionDefault,
+  add_preset(kFeedFilterActionSelect, kFeedFilterMatchAny, true, kFeedFilterOptionDefault,
       L"Select currently watching",
       L"Selects files that belong to anime that you're currently watching");
-  ADD_CONDITION(kFeedFilterElement_User_Status, kFeedFilterOperator_Equals, ToWstr(static_cast<int>(anime::MyStatus::Watching)));
+  add_condition(kFeedFilterElement_User_Status, kFeedFilterOperator_Equals, ToWstr(static_cast<int>(anime::MyStatus::Watching)));
 
   // Select airing anime in plan to watch
-  ADD_PRESET(kFeedFilterActionSelect, kFeedFilterMatchAll, true, kFeedFilterOptionDefault,
+  add_preset(kFeedFilterActionSelect, kFeedFilterMatchAll, true, kFeedFilterOptionDefault,
       L"Select airing anime in plan to watch",
       L"Selects files that belong to an airing anime that you're planning to watch");
-  ADD_CONDITION(kFeedFilterElement_Meta_Status, kFeedFilterOperator_Equals, ToWstr(static_cast<int>(anime::SeriesStatus::Airing)));
-  ADD_CONDITION(kFeedFilterElement_User_Status, kFeedFilterOperator_Equals, ToWstr(static_cast<int>(anime::MyStatus::PlanToWatch)));
+  add_condition(kFeedFilterElement_Meta_Status, kFeedFilterOperator_Equals, ToWstr(static_cast<int>(anime::SeriesStatus::Airing)));
+  add_condition(kFeedFilterElement_User_Status, kFeedFilterOperator_Equals, ToWstr(static_cast<int>(anime::MyStatus::PlanToWatch)));
 
   // Discard dropped
-  ADD_PRESET(kFeedFilterActionDiscard, kFeedFilterMatchAll, true, kFeedFilterOptionDefault,
+  add_preset(kFeedFilterActionDiscard, kFeedFilterMatchAll, true, kFeedFilterOptionDefault,
       L"Discard dropped",
       L"Discards files that belong to anime that you've dropped watching");
-  ADD_CONDITION(kFeedFilterElement_User_Status, kFeedFilterOperator_Equals, ToWstr(static_cast<int>(anime::MyStatus::Dropped)));
+  add_condition(kFeedFilterElement_User_Status, kFeedFilterOperator_Equals, ToWstr(static_cast<int>(anime::MyStatus::Dropped)));
 
   // Discard and deactivate not-in-list anime
-  ADD_PRESET(kFeedFilterActionDiscard, kFeedFilterMatchAny, true, kFeedFilterOptionDeactivate,
+  add_preset(kFeedFilterActionDiscard, kFeedFilterMatchAny, true, kFeedFilterOptionDeactivate,
       L"Discard and deactivate not-in-list anime",
       L"Discards files that do not belong to any anime in your list");
-  ADD_CONDITION(kFeedFilterElement_User_Status, kFeedFilterOperator_Equals, ToWstr(static_cast<int>(anime::MyStatus::NotInList)));
+  add_condition(kFeedFilterElement_User_Status, kFeedFilterOperator_Equals, ToWstr(static_cast<int>(anime::MyStatus::NotInList)));
 
   // Discard watched and available episodes
-  ADD_PRESET(kFeedFilterActionDiscard, kFeedFilterMatchAny, true, kFeedFilterOptionDefault,
+  add_preset(kFeedFilterActionDiscard, kFeedFilterMatchAny, true, kFeedFilterOptionDefault,
       L"Discard watched and available episodes",
       L"Discards episodes you've already watched or downloaded");
-  ADD_CONDITION(kFeedFilterElement_Episode_Number, kFeedFilterOperator_IsLessThanOrEqualTo, L"%watched%");
-  ADD_CONDITION(kFeedFilterElement_Local_EpisodeAvailable, kFeedFilterOperator_Equals, L"True");
+  add_condition(kFeedFilterElement_Episode_Number, kFeedFilterOperator_IsLessThanOrEqualTo, L"%watched%");
+  add_condition(kFeedFilterElement_Local_EpisodeAvailable, kFeedFilterOperator_Equals, L"True");
 
   // Prefer high-resolution files
-  ADD_PRESET(kFeedFilterActionPrefer, kFeedFilterMatchAny, true, kFeedFilterOptionDefault,
+  add_preset(kFeedFilterActionPrefer, kFeedFilterMatchAny, true, kFeedFilterOptionDefault,
       L"Prefer high-resolution files",
       L"Prefers 720p files when there are other files of the same episode as well");
-  ADD_CONDITION(kFeedFilterElement_Episode_VideoResolution, kFeedFilterOperator_Equals, L"720p");
-
-  #undef ADD_CONDITION
-  #undef ADD_PRESET
+  add_condition(kFeedFilterElement_Episode_VideoResolution, kFeedFilterOperator_Equals, L"720p");
 }
 
 bool FeedFilterManager::Import(const std::wstring& input,
@@ -262,12 +230,14 @@ void FeedFilterManager::Import(const XmlNode& node_filter,
     }
 
     for (auto condition : item.children(L"condition")) {
-      filter.AddCondition(
-          static_cast<FeedFilterElement>(util::GetIndexFromShortcode(
-              util::Shortcode::Element, condition.attribute(L"element").value())),
-          static_cast<FeedFilterOperator>(util::GetIndexFromShortcode(
-              util::Shortcode::Operator, condition.attribute(L"operator").value())),
-          condition.attribute(L"value").value());
+      filter.conditions.push_back(
+          {static_cast<FeedFilterElement>(util::GetIndexFromShortcode(
+               util::Shortcode::Element,
+               condition.attribute(L"element").value())),
+           static_cast<FeedFilterOperator>(util::GetIndexFromShortcode(
+               util::Shortcode::Operator,
+               condition.attribute(L"operator").value())),
+           condition.attribute(L"value").value()});
     }
 
     filters.push_back(filter);
@@ -327,7 +297,7 @@ bool FeedFilterManager::GetFansubFilter(int anime_id,
   for (const auto& filter : filters_) {
     if (nstd::contains(filter.anime_ids, anime_id)) {
       for (const auto& condition : filter.conditions) {
-        if (condition.element == track::kFeedFilterElement_Episode_Group) {
+        if (condition.element == kFeedFilterElement_Episode_Group) {
           groups.push_back(condition.value);
           found = true;
         }
@@ -341,30 +311,29 @@ bool FeedFilterManager::GetFansubFilter(int anime_id,
 bool FeedFilterManager::SetFansubFilter(int anime_id,
                                         const std::wstring& group_name,
                                         const std::wstring& video_resolution) {
-  const auto find_condition = [](track::FeedFilter& filter,
-                                 track::FeedFilterElement element) {
-    return std::find_if(
-        filter.conditions.begin(), filter.conditions.end(),
-        [&element](const track::FeedFilterCondition& condition) {
-          return condition.element == element;
-        });
+  const auto find_condition = [](FeedFilter& filter,
+                                 FeedFilterElement element) {
+    return std::find_if(filter.conditions.begin(), filter.conditions.end(),
+                        [&element](const FeedFilterCondition& condition) {
+                          return condition.element == element;
+                        });
   };
 
   // Check existing filters
   for (auto it = filters_.begin(); it != filters_.end(); ++it) {
     auto& filter = *it;
-    auto id = std::find(
+    const auto id = std::find(
         filter.anime_ids.begin(), filter.anime_ids.end(), anime_id);
     if (id == filter.anime_ids.end())
       continue;
 
     const auto group_condition =
-        find_condition(filter, track::kFeedFilterElement_Episode_Group);
+        find_condition(filter, kFeedFilterElement_Episode_Group);
     if (group_condition == filter.conditions.end())
       continue;
 
     const auto resolution_condition =
-        find_condition(filter, track::kFeedFilterElement_Episode_VideoResolution);
+        find_condition(filter, kFeedFilterElement_Episode_VideoResolution);
 
     if (filter.anime_ids.size() > 1) {
       filter.anime_ids.erase(id);
@@ -383,8 +352,9 @@ bool FeedFilterManager::SetFansubFilter(int anime_id,
           if (resolution_condition != filter.conditions.end()) {
             resolution_condition->value = video_resolution;
           } else {
-            filter.AddCondition(track::kFeedFilterElement_Episode_VideoResolution,
-                                track::kFeedFilterOperator_Equals, video_resolution);
+            filter.conditions.push_back(
+                {kFeedFilterElement_Episode_VideoResolution,
+                 kFeedFilterOperator_Equals, video_resolution});
           }
         }
       }
@@ -396,39 +366,50 @@ bool FeedFilterManager::SetFansubFilter(int anime_id,
   if (group_name.empty())
     return false;
 
-  auto anime_item = anime::db.Find(anime_id);
+  const auto anime_item = anime::db.Find(anime_id);
 
   if (!anime_item)
     return false;
 
   // Create new filter
-  AddFilter(track::kFeedFilterActionPrefer, track::kFeedFilterMatchAll,
-            track::kFeedFilterOptionDefault, true,
-            L"[Fansub] " + GetPreferredTitle(*anime_item));
-  filters_.back().AddCondition(track::kFeedFilterElement_Episode_Group,
-                               track::kFeedFilterOperator_Equals, group_name);
+  FeedFilter filter;
+  filter.action = kFeedFilterActionPrefer;
+  filter.match = kFeedFilterMatchAll;
+  filter.option = kFeedFilterOptionDefault;
+  filter.enabled = true;
+  filter.name = L"[Fansub] " + anime::GetPreferredTitle(*anime_item);
+  filter.conditions.push_back({kFeedFilterElement_Episode_Group,
+                               kFeedFilterOperator_Equals, group_name});
   if (!video_resolution.empty()) {
-    filters_.back().AddCondition(
-        track::kFeedFilterElement_Episode_VideoResolution,
-        track::kFeedFilterOperator_Equals, video_resolution);
+    filter.conditions.push_back({kFeedFilterElement_Episode_VideoResolution,
+                                 kFeedFilterOperator_Equals, video_resolution});
   }
-  filters_.back().anime_ids.push_back(anime_id);
+  filter.anime_ids.push_back(anime_id);
+  filters_.push_back(std::move(filter));
+
+  taiga::settings.SetModified();
 
   return true;
 }
 
 bool FeedFilterManager::AddDiscardFilter(int anime_id) {
-  auto anime_item = anime::db.Find(anime_id);
+  const auto anime_item = anime::db.Find(anime_id);
 
   if (!anime_item)
     return false;
 
-  AddFilter(track::kFeedFilterActionDiscard, track::kFeedFilterMatchAll,
-            track::kFeedFilterOptionDefault, true,
-            L"Discard \"{}\""_format(anime::GetPreferredTitle(*anime_item)));
-  filters_.back().AddCondition(track::kFeedFilterElement_Meta_Id,
-                               track::kFeedFilterOperator_Equals,
-                               ToWstr(anime_item->GetId()));
+  FeedFilter filter;
+  filter.action = kFeedFilterActionDiscard;
+  filter.match = kFeedFilterMatchAll;
+  filter.option = kFeedFilterOptionDefault;
+  filter.enabled = true;
+  filter.name = L"Discard \"{}\""_format(anime::GetPreferredTitle(*anime_item));
+  filter.conditions.push_back({kFeedFilterElement_Meta_Id,
+                               kFeedFilterOperator_Equals,
+                               ToWstr(anime_item->GetId())});
+  filters_.push_back(std::move(filter));
+
+  taiga::settings.SetModified();
 
   return true;
 }

@@ -34,15 +34,12 @@ public:
   FeedFilterManager();
   ~FeedFilterManager() {}
 
-  void InitializePresets();
-
   void AddPresets(std::vector<FeedFilter>& filters);
   void AddPresets();
   std::vector<FeedFilterPreset> GetPresets() const;
-  void AddFilter(FeedFilterAction action, FeedFilterMatch match, FeedFilterOption option, bool enabled, const std::wstring& name);
   std::vector<FeedFilter> GetFilters() const;
   void SetFilters(const std::vector<FeedFilter>& filters);
-  void Cleanup();
+
   void Filter(Feed& feed, bool preferences);
   void FilterArchived(Feed& feed);
   void MarkNewEpisodes(Feed& feed);
@@ -59,6 +56,8 @@ public:
   bool AddDiscardFilter(int anime_id);
 
 private:
+  void InitializePresets();
+
   std::vector<FeedFilter> filters_;
   std::vector<FeedFilterPreset> presets_;
 };

@@ -86,7 +86,7 @@ INT_PTR FeedFilterDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
 }
 
 void FeedFilterDialog::OnCancel() {
-  filter.Reset();
+  filter = {};
   EndDialog(IDCANCEL);
 }
 
@@ -335,7 +335,7 @@ bool FeedFilterDialog::DialogPage0::BuildFilter(track::FeedFilter& filter) {
     auto preset = reinterpret_cast<track::FeedFilterPreset*>(
         preset_list.GetItemParam(selected_item));
     if (!preset || preset->filter.conditions.empty()) {
-      parent->filter.Reset();
+      parent->filter = {};
       return false;
     }
     parent->filter = preset->filter;
@@ -412,13 +412,13 @@ BOOL FeedFilterDialog::DialogPage1::OnCommand(WPARAM wParam, LPARAM lParam) {
   switch (LOWORD(wParam)) {
     // Add new condition
     case 100: {
-      DlgFeedCondition.condition.Reset();
+      DlgFeedCondition.condition = {};
       DlgFeedCondition.Create(IDD_FEED_CONDITION, GetWindowHandle());
       if (DlgFeedCondition.condition.element != track::kFeedFilterElement_None) {
-        parent->filter.AddCondition(
+        parent->filter.conditions.push_back({
             DlgFeedCondition.condition.element,
             DlgFeedCondition.condition.op,
-            DlgFeedCondition.condition.value);
+            DlgFeedCondition.condition.value});
         RefreshConditionList();
         condition_list.SelectItem(condition_list.GetItemCount() - 1);
       }
