@@ -32,6 +32,19 @@
 
 namespace track {
 
+template <typename T>
+bool ApplyFilterOperator(const T& a, const T& b, const FeedFilterOperator op) {
+  switch (op) {
+    default:
+    case kFeedFilterOperator_Equals: return a == b;
+    case kFeedFilterOperator_NotEquals: return a != b;
+    case kFeedFilterOperator_IsGreaterThan: return a > b;
+    case kFeedFilterOperator_IsGreaterThanOrEqualTo: return a >= b;
+    case kFeedFilterOperator_IsLessThan: return a < b;
+    case kFeedFilterOperator_IsLessThanOrEqualTo: return a <= b;
+  }
+}
+
 static bool EvaluateCondition(const FeedFilterCondition& condition,
                               const FeedItem& item) {
   bool is_numeric = false;
@@ -126,80 +139,37 @@ static bool EvaluateCondition(const FeedFilterCondition& condition,
 
   switch (condition.op) {
     case kFeedFilterOperator_Equals:
-      if (is_numeric) {
-        if (condition.element == kFeedFilterElement_File_Size)
-          return ToUint64(element) == ParseSizeString(value);
-        if (IsEqual(value, L"True"))
-          return ToInt(element) == TRUE;
-        return ToInt(element) == ToInt(value);
-      } else {
-        if (condition.element == kFeedFilterElement_Episode_VideoResolution) {
-          return anime::GetVideoResolutionHeight(element) == anime::GetVideoResolutionHeight(condition.value);
-        } else {
-          return IsEqual(element, value);
-        }
-      }
     case kFeedFilterOperator_NotEquals:
-      if (is_numeric) {
-        if (condition.element == kFeedFilterElement_File_Size)
-          return ToUint64(element) != ParseSizeString(value);
-        if (IsEqual(value, L"True"))
-          return ToInt(element) == TRUE;
-        return ToInt(element) != ToInt(value);
-      } else {
-        if (condition.element == kFeedFilterElement_Episode_VideoResolution) {
-          return anime::GetVideoResolutionHeight(element) != anime::GetVideoResolutionHeight(condition.value);
-        } else {
-          return !IsEqual(element, value);
-        }
-      }
     case kFeedFilterOperator_IsGreaterThan:
-      if (is_numeric) {
-        if (condition.element == kFeedFilterElement_File_Size)
-          return ToUint64(element) > ParseSizeString(value);
-        return ToInt(element) > ToInt(value);
-      } else {
-        if (condition.element == kFeedFilterElement_Episode_VideoResolution) {
-          return anime::GetVideoResolutionHeight(element) > anime::GetVideoResolutionHeight(condition.value);
-        } else {
-          return CompareStrings(element, condition.value) > 0;
-        }
-      }
     case kFeedFilterOperator_IsGreaterThanOrEqualTo:
-      if (is_numeric) {
-        if (condition.element == kFeedFilterElement_File_Size)
-          return ToUint64(element) >= ParseSizeString(value);
-        return ToInt(element) >= ToInt(value);
-      } else {
-        if (condition.element == kFeedFilterElement_Episode_VideoResolution) {
-          return anime::GetVideoResolutionHeight(element) >= anime::GetVideoResolutionHeight(condition.value);
-        } else {
-          return CompareStrings(element, condition.value) >= 0;
-        }
-      }
     case kFeedFilterOperator_IsLessThan:
-      if (is_numeric) {
-        if (condition.element == kFeedFilterElement_File_Size)
-          return ToUint64(element) < ParseSizeString(value);
-        return ToInt(element) < ToInt(value);
-      } else {
-        if (condition.element == kFeedFilterElement_Episode_VideoResolution) {
-          return anime::GetVideoResolutionHeight(element) < anime::GetVideoResolutionHeight(condition.value);
-        } else {
-          return CompareStrings(element, condition.value) < 0;
-        }
-      }
     case kFeedFilterOperator_IsLessThanOrEqualTo:
       if (is_numeric) {
-        if (condition.element == kFeedFilterElement_File_Size)
-          return ToUint64(element) <= ParseSizeString(value);
-        return ToInt(element) <= ToInt(value);
+        if (condition.element == kFeedFilterElement_File_Size) {
+          return ApplyFilterOperator(ToUint64(element), ParseSizeString(value),
+                                     condition.op);
+        }
+        if (condition.op == kFeedFilterOperator_Equals ||
+            condition.op == kFeedFilterOperator_NotEquals) {
+          if (IsEqual(value, L"True")) {
+            return ApplyFilterOperator(ToInt(element), TRUE, condition.op);
+          }
+        }
+        return ApplyFilterOperator(ToInt(element), ToInt(value), condition.op);
+
       } else {
         if (condition.element == kFeedFilterElement_Episode_VideoResolution) {
-          return anime::GetVideoResolutionHeight(element) <= anime::GetVideoResolutionHeight(condition.value);
-        } else {
-          return CompareStrings(element, condition.value) <= 0;
+          return ApplyFilterOperator(
+              anime::GetVideoResolutionHeight(element),
+              anime::GetVideoResolutionHeight(condition.value), condition.op);
         }
+        if (condition.op == kFeedFilterOperator_Equals ||
+            condition.op == kFeedFilterOperator_NotEquals) {
+          return ApplyFilterOperator(IsEqual(element, value), true,
+                                     condition.op);
+        }
+        return ApplyFilterOperator(CompareStrings(element, condition.value), 0,
+                                   condition.op);
       }
     case kFeedFilterOperator_BeginsWith:
       return StartsWith(element, value);
