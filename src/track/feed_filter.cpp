@@ -16,6 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <nstd/algorithm.hpp>
+
 #include "track/feed_filter.h"
 
 #include "base/file.h"
@@ -48,95 +50,82 @@ bool ApplyFilterOperator(const T& a, const T& b, const FeedFilterOperator op) {
 
 static bool EvaluateCondition(const FeedFilterCondition& condition,
                               const FeedItem& item) {
-  bool is_numeric = false;
-  std::wstring element;
-  std::wstring value = ReplaceVariables(condition.value, item.episode_data);
-  const auto anime = anime::db.Find(item.episode_data.anime_id);
+  const auto element = [&condition, &item]() -> std::wstring {
+    const auto anime = anime::db.Find(item.episode_data.anime_id);
 
-  switch (condition.element) {
-    case kFeedFilterElement_File_Title:
-      element = item.title;
-      break;
-    case kFeedFilterElement_File_Category:
-      element = TranslateTorrentCategory(item.torrent_category);
-      break;
-    case kFeedFilterElement_File_Description:
-      element = item.description;
-      break;
-    case kFeedFilterElement_File_Link:
-      element = item.link;
-      break;
-    case kFeedFilterElement_File_Size:
-      element = ToWstr(item.file_size);
-      is_numeric = true;
-      break;
-    case kFeedFilterElement_Meta_Id:
-      element = ToWstr(anime ? anime->GetId() : anime::ID_UNKNOWN);
-      is_numeric = true;
-      break;
-    case kFeedFilterElement_Episode_Title:
-      element = item.episode_data.anime_title();
-      break;
-    case kFeedFilterElement_Meta_DateStart:
-      if (anime)
-        element = anime->GetDateStart().to_string();
-      break;
-    case kFeedFilterElement_Meta_DateEnd:
-      if (anime)
-        element = anime->GetDateEnd().to_string();
-      break;
-    case kFeedFilterElement_Meta_Episodes:
-      if (anime)
-        element = ToWstr(anime->GetEpisodeCount());
-      is_numeric = true;
-      break;
-    case kFeedFilterElement_Meta_Status:
-      element = ToWstr(static_cast<int>(anime ? anime->GetAiringStatus() : anime::SeriesStatus::Unknown));
-      is_numeric = true;
-      break;
-    case kFeedFilterElement_Meta_Type:
-      element = ToWstr(static_cast<int>(anime ? anime->GetType() : anime::SeriesType::Unknown));
-      is_numeric = true;
-      break;
-    case kFeedFilterElement_User_Status:
-      element = ToWstr(static_cast<int>(anime ? anime->GetMyStatus() : anime::MyStatus::NotInList));
-      is_numeric = true;
-      break;
-    case kFeedFilterElement_User_Tags:
-      if (anime)
-        element = anime->GetMyTags();
-      break;
-    case kFeedFilterElement_Episode_Number:
-      if (!item.episode_data.episode_number()) {
-        element = anime ? ToWstr(anime->GetEpisodeCount()) : L"";
-      } else {
-        element = ToWstr(anime::GetEpisodeHigh(item.episode_data));
-      }
-      is_numeric = true;
-      break;
-    case kFeedFilterElement_Episode_Version:
-      element = ToWstr(item.episode_data.release_version());  // defaults to 1
-      is_numeric = true;
-      break;
-    case kFeedFilterElement_Local_EpisodeAvailable:
-      if (anime)
-        element = ToWstr(anime->IsEpisodeAvailable(
-            anime::GetEpisodeHigh(item.episode_data)));
-      is_numeric = true;
-      break;
-    case kFeedFilterElement_Episode_Group:
-      element = item.episode_data.release_group();
-      break;
-    case kFeedFilterElement_Episode_VideoResolution:
-      element = item.episode_data.video_resolution();
-      break;
-    case kFeedFilterElement_Episode_VideoType:
-      element = item.episode_data.video_terms();
-      break;
-  }
+    switch (condition.element) {
+      case kFeedFilterElement_File_Title:
+        return item.title;
+      case kFeedFilterElement_File_Category:
+        return TranslateTorrentCategory(item.torrent_category);
+      case kFeedFilterElement_File_Description:
+        return item.description;
+      case kFeedFilterElement_File_Link:
+        return item.link;
+      case kFeedFilterElement_File_Size:
+        return ToWstr(item.file_size);
+      case kFeedFilterElement_Meta_Id:
+        return ToWstr(anime ? anime->GetId() : anime::ID_UNKNOWN);
+      case kFeedFilterElement_Episode_Title:
+        return item.episode_data.anime_title();
+      case kFeedFilterElement_Meta_DateStart:
+        return anime ? anime->GetDateStart().to_string() : std::wstring{};
+      case kFeedFilterElement_Meta_DateEnd:
+        return anime ? anime->GetDateEnd().to_string() : std::wstring{};
+      case kFeedFilterElement_Meta_Episodes:
+        return anime ? ToWstr(anime->GetEpisodeCount()) : std::wstring{};
+      case kFeedFilterElement_Meta_Status:
+        return ToWstr(static_cast<int>(anime ? anime->GetAiringStatus()
+                                             : anime::SeriesStatus::Unknown));
+      case kFeedFilterElement_Meta_Type:
+        return ToWstr(static_cast<int>(anime ? anime->GetType()
+                                             : anime::SeriesType::Unknown));
+      case kFeedFilterElement_User_Status:
+        return ToWstr(static_cast<int>(anime ? anime->GetMyStatus()
+                                             : anime::MyStatus::NotInList));
+      case kFeedFilterElement_User_Tags:
+        return anime ? anime->GetMyTags() : std::wstring{};
+      case kFeedFilterElement_Episode_Number:
+        if (!item.episode_data.episode_number()) {
+          return anime ? ToWstr(anime->GetEpisodeCount()) : std::wstring{};
+        } else {
+          return ToWstr(anime::GetEpisodeHigh(item.episode_data));
+        }
+      case kFeedFilterElement_Episode_Version:
+        return ToWstr(item.episode_data.release_version());  // defaults to 1
+      case kFeedFilterElement_Local_EpisodeAvailable:
+        return anime ? ToWstr(anime->IsEpisodeAvailable(
+                           anime::GetEpisodeHigh(item.episode_data)))
+                     : std::wstring{};
+      case kFeedFilterElement_Episode_Group:
+        return item.episode_data.release_group();
+      case kFeedFilterElement_Episode_VideoResolution:
+        return item.episode_data.video_resolution();
+      case kFeedFilterElement_Episode_VideoType:
+        return item.episode_data.video_terms();
+    }
+  }();
 
-  if (element.empty() || value.empty())
-    is_numeric = false;
+  const auto value = ReplaceVariables(condition.value, item.episode_data);
+
+  const auto is_numeric = [&condition, &element, &value]() {
+    if (element.empty() || value.empty())
+      return false;  // see issue #639
+    switch (condition.element) {
+      case kFeedFilterElement_File_Size:
+      case kFeedFilterElement_Meta_Id:
+      case kFeedFilterElement_Meta_Episodes:
+      case kFeedFilterElement_Meta_Status:
+      case kFeedFilterElement_Meta_Type:;
+      case kFeedFilterElement_User_Status:
+      case kFeedFilterElement_Episode_Number:
+      case kFeedFilterElement_Episode_Version:
+      case kFeedFilterElement_Local_EpisodeAvailable:
+        return true;
+      default:
+        return false;
+    }
+  };
 
   switch (condition.op) {
     case kFeedFilterOperator_Equals:
@@ -145,11 +134,16 @@ static bool EvaluateCondition(const FeedFilterCondition& condition,
     case kFeedFilterOperator_IsGreaterThanOrEqualTo:
     case kFeedFilterOperator_IsLessThan:
     case kFeedFilterOperator_IsLessThanOrEqualTo:
-      if (is_numeric) {
-        if (condition.element == kFeedFilterElement_File_Size) {
+      switch (condition.element) {
+        case kFeedFilterElement_File_Size:
           return ApplyFilterOperator(ToUint64(element), ParseSizeString(value),
                                      condition.op);
-        }
+        case kFeedFilterElement_Episode_VideoResolution:
+          return ApplyFilterOperator(
+              anime::GetVideoResolutionHeight(element),
+              anime::GetVideoResolutionHeight(condition.value), condition.op);
+      }
+      if (is_numeric()) {
         if (condition.op == kFeedFilterOperator_Equals ||
             condition.op == kFeedFilterOperator_NotEquals) {
           if (IsEqual(value, L"True")) {
@@ -157,13 +151,7 @@ static bool EvaluateCondition(const FeedFilterCondition& condition,
           }
         }
         return ApplyFilterOperator(ToInt(element), ToInt(value), condition.op);
-
       } else {
-        if (condition.element == kFeedFilterElement_Episode_VideoResolution) {
-          return ApplyFilterOperator(
-              anime::GetVideoResolutionHeight(element),
-              anime::GetVideoResolutionHeight(condition.value), condition.op);
-        }
         if (condition.op == kFeedFilterOperator_Equals ||
             condition.op == kFeedFilterOperator_NotEquals) {
           return ApplyFilterOperator(IsEqual(element, value), true,
@@ -197,15 +185,9 @@ bool ApplyFilter(const FeedFilter& filter, Feed& feed, FeedItem& item,
     return false;
 
   if (!filter.anime_ids.empty()) {
-    bool apply_filter = false;
-    for (const auto& id : filter.anime_ids) {
-      if (id == item.episode_data.anime_id) {
-        apply_filter = true;
-        break;
-      }
-    }
-    if (!apply_filter)
+    if (!nstd::contains(filter.anime_ids, item.episode_data.anime_id)) {
       return false;  // Filter doesn't apply to this item
+    }
   }
 
   bool matched = false;
@@ -256,8 +238,7 @@ bool ApplyFilter(const FeedFilter& filter, Feed& feed, FeedItem& item,
     case kFeedFilterActionPrefer: {
       if (recursive) {
         // Filters are strong if they're limited, weak otherwise
-        const bool strong_preference = !filter.anime_ids.empty();
-        if (strong_preference) {
+        if (const bool strong_preference = !filter.anime_ids.empty()) {
           if (matched) {
             // Select matched items, if they were not discarded before
             item.state = FeedItemState::Selected;
