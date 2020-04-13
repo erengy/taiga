@@ -87,7 +87,7 @@ void FeedFilterManager::FilterArchived(Feed& feed) {
       if (aggregator.archive.Contains(item.title)) {
         item.state = FeedItemState::DiscardedNormal;
         if (Taiga.options.debug_mode) {
-          item.description = L"!FILTER :: Archived -- " + item.description;
+          item.description = L"[\u274c] Archived -- " + item.description;
         }
       }
     }

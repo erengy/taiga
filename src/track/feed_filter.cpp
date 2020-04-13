@@ -19,6 +19,7 @@
 #include "track/feed_filter.h"
 
 #include "base/file.h"
+#include "base/format.h"
 #include "base/string.h"
 #include "media/anime.h"
 #include "media/anime_db.h"
@@ -288,10 +289,9 @@ bool ApplyFilter(const FeedFilter& filter, Feed& feed, FeedItem& item,
   }
 
   if (Taiga.options.debug_mode) {
-    std::wstring filter_text =
-        (item.IsDiscarded() ? L"!FILTER :: " : L"FILTER :: ") +
-        util::TranslateConditions(filter, condition_index);
-    item.description = filter_text + L" -- " + item.description;
+    item.description = L"[{}] {} -- {}"_format(
+        item.IsDiscarded() ? L"\u274c" : L"\u2713",
+        util::TranslateConditions(filter, condition_index), item.description);
   }
 
   return true;
