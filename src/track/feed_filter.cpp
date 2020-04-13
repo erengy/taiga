@@ -141,7 +141,7 @@ static bool EvaluateCondition(const FeedFilterCondition& condition,
         case kFeedFilterElement_Episode_VideoResolution:
           return ApplyFilterOperator(
               anime::GetVideoResolutionHeight(element),
-              anime::GetVideoResolutionHeight(condition.value), condition.op);
+              anime::GetVideoResolutionHeight(value), condition.op);
       }
       if (is_numeric()) {
         if (condition.op == kFeedFilterOperator_Equals ||
@@ -157,7 +157,7 @@ static bool EvaluateCondition(const FeedFilterCondition& condition,
           return ApplyFilterOperator(IsEqual(element, value), true,
                                      condition.op);
         }
-        return ApplyFilterOperator(CompareStrings(element, condition.value), 0,
+        return ApplyFilterOperator(CompareStrings(element, value), 0,
                                    condition.op);
       }
     case kFeedFilterOperator_BeginsWith:
