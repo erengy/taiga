@@ -20,11 +20,11 @@
 
 namespace track {
 
-bool PlayEpisode(int anime_id, int number);
-bool PlayLastEpisode(int anime_id);
-bool PlayNextEpisode(int anime_id);
+bool PlayEpisode(const int anime_id, int number);
+bool PlayLastEpisode(const int anime_id);
+bool PlayNextEpisode(const int anime_id);
 bool PlayNextEpisodeOfLastWatchedAnime();
 bool PlayRandomAnime();
-bool PlayRandomEpisode(int anime_id);
+bool PlayRandomEpisode(const int anime_id);
 
 }  // namespace track

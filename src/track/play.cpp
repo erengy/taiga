@@ -33,14 +33,13 @@
 
 namespace track {
 
-bool PlayEpisode(int anime_id, int number) {
-  auto anime_item = anime::db.Find(anime_id);
+bool PlayEpisode(const int anime_id, int number) {
+  const auto anime_item = anime::db.Find(anime_id);
 
   if (!anime_item)
     return false;
 
-  if (number > anime_item->GetEpisodeCount() &&
-      anime::IsValidEpisodeCount(anime_item->GetEpisodeCount()))
+  if (!anime::IsValidEpisodeNumber(number, anime_item->GetEpisodeCount()))
     return false;
 
   if (number == 0)
@@ -50,7 +49,7 @@ bool PlayEpisode(int anime_id, int number) {
 
   // Check saved episode path
   if (number == anime_item->GetMyLastWatchedEpisode() + 1) {
-    const std::wstring& next_episode_path = anime_item->GetNextEpisodePath();
+    const auto& next_episode_path = anime_item->GetNextEpisodePath();
     if (!next_episode_path.empty()) {
       if (FileExists(next_episode_path)) {
         file_path = next_episode_path;
@@ -63,7 +62,7 @@ bool PlayEpisode(int anime_id, int number) {
 
   // Scan available episodes
   if (file_path.empty()) {
-    ScanAvailableEpisodes(false, anime_item->GetId(), number);
+    ScanAvailableEpisodes(false, anime_id, number);
     if (anime_item->IsEpisodeAvailable(number)) {
       file_path = track::scanner.path_found();
     }
@@ -71,7 +70,7 @@ bool PlayEpisode(int anime_id, int number) {
 
   if (file_path.empty()) {
     ui::ChangeStatusText(L"Could not find episode #{} ({})."_format(
-                         number, GetPreferredTitle(*anime_item)));
+        number, anime::GetPreferredTitle(*anime_item)));
     return false;
   }
 
@@ -83,8 +82,8 @@ bool PlayEpisode(int anime_id, int number) {
   }
 }
 
-bool PlayLastEpisode(int anime_id) {
-  auto anime_item = anime::db.Find(anime_id);
+bool PlayLastEpisode(const int anime_id) {
+  const auto anime_item = anime::db.Find(anime_id);
 
   if (!anime_item)
     return false;
@@ -92,17 +91,16 @@ bool PlayLastEpisode(int anime_id) {
   return PlayEpisode(anime_id, anime_item->GetMyLastWatchedEpisode());
 }
 
-bool PlayNextEpisode(int anime_id) {
-  auto anime_item = anime::db.Find(anime_id);
+bool PlayNextEpisode(const int anime_id) {
+  const auto anime_item = anime::db.Find(anime_id);
 
   if (!anime_item)
     return false;
 
   int number = anime_item->GetMyLastWatchedEpisode() + 1;
 
-  if (anime::IsValidEpisodeCount(anime_item->GetEpisodeCount()))
-    if (number > anime_item->GetEpisodeCount())
-      number = 1;  // Play the first episode of completed series
+  if (!anime::IsValidEpisodeNumber(number, anime_item->GetEpisodeCount()))
+    number = 1;  // Play the first episode of completed series
 
   return PlayEpisode(anime_id, number);
 }
@@ -166,8 +164,8 @@ bool PlayRandomAnime() {
   return false;
 }
 
-bool PlayRandomEpisode(int anime_id) {
-  auto anime_item = anime::db.Find(anime_id);
+bool PlayRandomEpisode(const int anime_id) {
+  const auto anime_item = anime::db.Find(anime_id);
 
   if (!anime_item)
     return false;
