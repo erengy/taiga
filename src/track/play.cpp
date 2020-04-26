@@ -18,6 +18,8 @@
 
 #include "track/play.h"
 
+#include <numeric>
+
 #include "base/file.h"
 #include "base/format.h"
 #include "base/log.h"
@@ -170,13 +172,18 @@ bool PlayRandomEpisode(const int anime_id) {
   if (!anime_item)
     return false;
 
-  const int total = anime_item->GetMyStatus() == anime::MyStatus::Completed ?
-      anime_item->GetEpisodeCount() : anime_item->GetMyLastWatchedEpisode() + 1;
+  const int total = anime_item->GetMyStatus() == anime::MyStatus::Completed
+                        ? anime_item->GetEpisodeCount()
+                        : anime_item->GetMyLastWatchedEpisode() + 1;
+
   const int max_tries = anime_item->GetFolder().empty() ? 3 : 10;
 
-  for (int i = 0; i < std::min(total, max_tries); i++) {
-    const int episode_number = Random::get(1, total);
-    if (PlayEpisode(anime_item->GetId(), episode_number))
+  std::vector<int> episodes(std::min(total, max_tries));
+  std::iota(episodes.begin(), episodes.end(), 1);
+  Random::shuffle(episodes);
+
+  for (const auto& episode_number : episodes) {
+    if (PlayEpisode(anime_id, episode_number))
       return true;
   }
 
