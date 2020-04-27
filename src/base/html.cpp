@@ -17,15 +17,17 @@
 */
 
 #include <algorithm>
+#include <functional>
 #include <string>
+#include <string_view>
 #include <unordered_map>
 
 #include "base/html.h"
 
 #include "base/string.h"
 
-// Source: http://www.w3.org/TR/html4/sgml/entities.html
-static const std::unordered_map<std::wstring, wchar_t> html_entities{
+// Source: https://www.w3.org/TR/html4/sgml/entities.html
+static const std::unordered_map<std::wstring_view, wchar_t> html_entities{
   //////////////////////////////////////////////////////////////////////////////
   // ISO 8859-1 characters
 
@@ -316,72 +318,44 @@ static const std::unordered_map<std::wstring, wchar_t> html_entities{
 };
 
 void DecodeHtmlEntities(std::wstring& str) {
-  static const auto minmax_entity_length = std::minmax_element(
-      html_entities.begin(), html_entities.end(),
-      [](const std::pair<std::wstring, wchar_t>& a,
-         const std::pair<std::wstring, wchar_t>& b) {
-        return a.first.size() < b.first.size();
-      });
-  static const auto min_entity_length = minmax_entity_length.first->first.size();
-  static const auto max_entity_length = minmax_entity_length.second->first.size();
+  constexpr size_t kMinEntityLength = 2;
+  constexpr size_t kMaxEntityLength = 8;
 
-  if (InStr(str, L"&") == -1)
-    return;
+  const auto peek = [&str](const size_t pos) {
+    return pos < str.size() ? str[pos] : L'\0';
+  };
 
-  size_t pos = 0;
-  size_t reference_pos = 0;
-  unsigned int character_value = -1;
-
-  for (size_t i = 0; i < str.size(); i++) {
-    if (str.at(i) == L'&') {
-      reference_pos = i;
-      character_value = -1;
-      if (++i == str.size()) return;
-
-      // Numeric character references
-      if (str.at(i) == L'#') {
-        if (++i == str.size()) return;
-        // Hexadecimal (&#xhhhh;)
-        if (str.at(i) == L'x') {
-          if (++i == str.size()) return;
-          pos = i;
-          while (i < str.size() && IsHexadecimalChar(str.at(i))) i++;
-          if (i > pos && i < str.size() && str.at(i) == L';') {
-            character_value = wcstoul(str.substr(pos, i - pos).c_str(),
-                                      nullptr, 16);
-          }
-        // Decimal (&#nnnn;)
-        } else {
-          pos = i;
-          while (i < str.size() && IsNumericChar(str.at(i))) i++;
-          if (i > pos && i < str.size() && str.at(i) == L';') {
-            character_value = ToInt(str.substr(pos, i - pos));
-          }
+  using predicate_t = std::function<bool(const wchar_t)>;
+  const auto read = [&str](const size_t pos, predicate_t pred) {
+    const auto it = std::find_if_not(str.begin() + pos, str.end(), pred);
+    if (it != str.end() && *it == L';') {
+      const auto count = std::distance(str.begin() + pos, it);
+      return std::wstring_view(str.data() + pos, count);
+    }
+    return std::wstring_view{};
+  };
+  
+  size_t pos = str.find(L'&');
+  for (; pos != str.npos; pos = str.find(L'&', ++pos)) {
+    if (peek(pos + 1) == L'#') {
+      if (peek(pos + 2) == L'x') {
+        if (const auto view = read(pos + 3, IsHexadecimalChar); !view.empty()) {
+          const auto c = static_cast<wchar_t>(wcstoul(view.data(), nullptr, 16));
+          str.replace(pos, 3 + view.size() + 1, 1, c);  // &#x26;
         }
-
-      // Character entity references
       } else {
-        pos = i;
-        while (i < str.size() && IsAlphanumericChar(str.at(i))) i++;
-        if (i > pos && i < str.size() && str.at(i) == L';') {
-          size_t length = i - pos;
-          if (length >= min_entity_length &&
-              length <= max_entity_length) {
-            const auto entity_name = str.substr(pos, length);
-            auto it = html_entities.find(entity_name);
-            if (it != html_entities.end()) {
-              character_value = it->second;
-            }
-          }
+        if (const auto view = read(pos + 2, IsNumericChar); !view.empty()) {
+          const auto c = static_cast<wchar_t>(ToInt(std::wstring{view}));
+          str.replace(pos, 2 + view.size() + 1, 1, c);  // &#38;
         }
       }
-
-      if (character_value <= 0xFFFD) {
-        str.replace(reference_pos, i - reference_pos + 1,
-                    std::wstring(1, static_cast<wchar_t>(character_value)));
-        i = reference_pos - 1;
-      } else {
-        i = reference_pos;
+    } else {
+      const auto view = read(pos + 1, IsAlphanumericChar);
+      if (kMinEntityLength <= view.size() && view.size() <= kMaxEntityLength) {
+        const auto it = html_entities.find(view);
+        if (it != html_entities.end()) {
+          str.replace(pos, 1 + view.size() + 1, 1, it->second);  // &amp;
+        }
       }
     }
   }
