@@ -29,18 +29,13 @@ void EraseLeft(std::wstring& str1, const std::wstring& str2, bool case_insensiti
 void EraseRight(std::wstring& str1, const std::wstring& str2, bool case_insensitive = false);
 void RemoveEmptyStrings(std::vector<std::wstring>& input);
 
-std::wstring CharLeft(const std::wstring& str, int length);
-std::wstring CharRight(const std::wstring& str, int length);
-
 int CompareStrings(const std::wstring& str1, const std::wstring& str2, bool case_insensitive = true, size_t max_count = MAX_PATH);
 inline bool IsCharsEqual(const wchar_t c1, const wchar_t c2);
 bool IsEqual(const std::wstring& str1, const std::wstring& str2);
 
 int InStr(const std::wstring& str1, const std::wstring& str2, int pos = 0, bool case_insensitive = false);
 std::wstring InStr(const std::wstring& str1, const std::wstring& str2_left, const std::wstring& str2_right);
-int InStrRev(const std::wstring& str1, const std::wstring& str2, int pos);
 int InStrChars(const std::wstring& str1, const std::wstring& str2, int pos);
-int InStrCharsRev(const std::wstring& str1, const std::wstring& str2, int pos);
 
 bool IsAlphanumericChar(const wchar_t c);
 bool IsAlphanumericString(const std::wstring& str);
@@ -48,17 +43,11 @@ bool IsHexadecimalChar(const wchar_t c);
 bool IsHexadecimalString(const std::wstring& str);
 bool IsNumericChar(const wchar_t c);
 bool IsNumericString(const std::wstring& str);
-bool IsWhitespace(const wchar_t c);
 
 bool StartsWith(const std::wstring& str, const std::wstring& search);
 bool EndsWith(const std::wstring& str, const std::wstring& search);
-bool IntersectsWith(const std::wstring& str1, const std::wstring& str2);
-
-bool MatchRegex(const std::wstring& str, const std::wstring& pattern);
-bool SearchRegex(const std::wstring& str, const std::wstring& pattern);
 
 size_t LongestCommonSubsequenceLength(const std::wstring& str1, const std::wstring& str2);
-size_t LongestCommonSubstringLength(const std::wstring& str1, const std::wstring& str2);
 double JaroWinklerDistance(const std::wstring& str1, const std::wstring& str2);
 double LevenshteinDistance(const std::wstring& str1, const std::wstring& str2);
 
@@ -68,13 +57,11 @@ void GetTrigrams(const std::wstring& str, trigram_container_t& output);
 double CompareTrigrams(const trigram_container_t& t1, const trigram_container_t& t2);
 
 void ReplaceChar(std::wstring& str, const wchar_t c, const wchar_t replace_with);
-void ReplaceChars(std::wstring& str, const wchar_t chars[], const std::wstring& replace_with);
 bool ReplaceString(std::wstring& str, size_t offset, const std::wstring& find_this, const std::wstring& replace_with, bool whole_word_only, bool replace_all_instances);
 bool ReplaceString(std::wstring& str, const std::wstring& find_this, const std::wstring& replace_with);
 
 std::wstring Join(const std::vector<std::wstring>& join_vector, const std::wstring& separator);
 void Split(const std::wstring& str, const std::wstring& separator, std::vector<std::wstring>& split_vector);
-std::wstring SubStr(const std::wstring& str, const std::wstring& sub_begin, const std::wstring& sub_end);
 size_t Tokenize(const std::wstring& str, const std::wstring& delimiters, std::vector<std::wstring>& tokens);
 
 std::wstring StrToWstr(const std::string& str, UINT code_page = CP_UTF8);

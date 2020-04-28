@@ -17,11 +17,8 @@
 */
 
 #include <algorithm>
-#include <functional>
 #include <iomanip>
 #include <locale>
-#include <map>
-#include <regex>
 #include <sstream>
 
 #include "base/string.h"
@@ -107,18 +104,6 @@ void RemoveEmptyStrings(vector<wstring>& input) {
 ////////////////////////////////////////////////////////////////////////////////
 // Searching and comparison
 
-wstring CharLeft(const wstring& str, int length) {
-  return str.substr(0, length);
-}
-
-wstring CharRight(const wstring& str, int length) {
-  if (length > static_cast<int>(str.length())) {
-    return str.substr(0, str.length());
-  } else {
-    return str.substr(str.length() - length, length);
-  }
-}
-
 int CompareStrings(const wstring& str1, const wstring& str2,
                    bool case_insensitive, size_t max_count) {
   if (case_insensitive) {
@@ -164,18 +149,8 @@ wstring InStr(const wstring& str1, const wstring& str2_left,
   return output;
 }
 
-int InStrRev(const wstring& str1, const wstring& str2, int pos) {
-  size_t i = str1.rfind(str2, pos);
-  return (i != wstring::npos) ? i : -1;
-}
-
 int InStrChars(const wstring& str1, const wstring& str2, int pos) {
   size_t i = str1.find_first_of(str2, pos);
-  return (i != wstring::npos) ? i : -1;
-}
-
-int InStrCharsRev(const wstring& str1, const wstring& str2, int pos) {
-  size_t i = str1.find_last_of(str2, pos);
   return (i != wstring::npos) ? i : -1;
 }
 
@@ -218,10 +193,6 @@ bool IsNumericString(const wstring& str) {
          std::all_of(str.begin(), str.end(), IsNumericChar);
 }
 
-bool IsWhitespace(const wchar_t c) {
-  return c == ' ' || c == '\r' || c == '\n' || c == '\t';
-}
-
 bool StartsWith(const wstring& str1, const wstring& str2) {
   return str1.compare(0, str2.length(), str2) == 0;
 }
@@ -231,22 +202,6 @@ bool EndsWith(const wstring& str1, const wstring& str2) {
     return false;
 
   return str1.compare(str1.length() - str2.length(), str2.length(), str2) == 0;
-}
-
-bool IntersectsWith(const std::wstring& str1, const std::wstring& str2) {
-  if (str1.empty() || str2.empty())
-    return false;
-
-  return std::min(str1.size(), str2.size()) ==
-         LongestCommonSubsequenceLength(str1, str2);
-}
-
-bool MatchRegex(const wstring& str, const wstring& pattern) {
-  return std::regex_match(str, std::wregex(pattern));
-}
-
-bool SearchRegex(const wstring& str, const wstring& pattern) {
-  return std::regex_search(str, std::wregex(pattern));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -274,39 +229,6 @@ size_t LongestCommonSubsequenceLength(const wstring& str1,
   }
 
   return table.back().back();
-}
-
-size_t LongestCommonSubstringLength(const wstring& str1, const wstring& str2) {
-  if (str1.empty() || str2.empty())
-    return 0;
-
-  const size_t len1 = str1.length();
-  const size_t len2 = str2.length();
-
-  vector<vector<size_t>> table(len1);
-  for (auto it = table.begin(); it != table.end(); ++it)
-    it->resize(len2);
-
-  size_t longest_length = 0;
-
-  for (size_t i = 0; i < len1; i++) {
-    for (size_t j = 0; j < len2; j++) {
-      if (str1[i] == str2[j]) {
-        if (i == 0 || j == 0) {
-          table[i][j] = 1;
-        } else {
-          table[i][j] = table[i - 1][j - 1] + 1;
-        }
-        if (table[i][j] > longest_length) {
-          longest_length = table[i][j];
-        }
-      } else {
-        table[i][j] = 0;
-      }
-    }
-  }
-
-  return longest_length;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -450,20 +372,6 @@ void ReplaceChar(wstring& str, const wchar_t c, const wchar_t replace_with) {
   } while (pos != wstring::npos);
 }
 
-void ReplaceChars(wstring& str, const wchar_t chars[],
-                  const wstring& replace_with) {
-  if (chars == replace_with)
-    return;
-
-  size_t pos = 0;
-
-  do {
-    pos = str.find_first_of(chars, pos);
-    if (pos != wstring::npos)
-      str.replace(pos, 1, replace_with);
-  } while (pos != wstring::npos);
-}
-
 bool ReplaceString(wstring& str,
                    size_t offset,
                    const wstring& find_this,
@@ -544,19 +452,6 @@ void Split(const wstring& str, const wstring& separator,
 
     index_begin = index_end + separator.length();
   } while (index_begin <= str.length());
-}
-
-wstring SubStr(const wstring& str, const wstring& sub_begin,
-               const wstring& sub_end) {
-  size_t index_begin = str.find(sub_begin, 0);
-  if (index_begin == wstring::npos)
-    return L"";
-
-  size_t index_end = str.find(sub_end, index_begin);
-  if (index_end == wstring::npos)
-    index_end = str.length();
-
-  return str.substr(index_begin + 1, index_end - index_begin - 1);
 }
 
 size_t Tokenize(const wstring& str, const wstring& delimiters,
