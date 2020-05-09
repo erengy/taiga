@@ -25,9 +25,6 @@
     <Filter Include="deps\anisthesia">
       <UniqueIdentifier>{11b92802-1a55-4c3d-97ea-65840c4c1c7c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="deps\anisthesia\win">
-      <UniqueIdentifier>{fe12b9e1-1532-4a4b-ab16-d0cd47f4308f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="deps\anitomy">
       <UniqueIdentifier>{09fde2fa-d11a-4179-b5ef-8f3924a3ab25}</UniqueIdentifier>
     </Filter>
@@ -178,23 +175,23 @@
     <ClCompile Include="..\..\deps\src\anisthesia\src\util.cpp">
       <Filter>deps\anisthesia</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\deps\src\anisthesia\src\win\open_files.cpp">
-      <Filter>deps\anisthesia\win</Filter>
+    <ClCompile Include="..\..\deps\src\anisthesia\src\win_open_files.cpp">
+      <Filter>deps\anisthesia</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\deps\src\anisthesia\src\win\platform.cpp">
-      <Filter>deps\anisthesia\win</Filter>
+    <ClCompile Include="..\..\deps\src\anisthesia\src\win_platform.cpp">
+      <Filter>deps\anisthesia</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\deps\src\anisthesia\src\win\strategies.cpp">
-      <Filter>deps\anisthesia\win</Filter>
+    <ClCompile Include="..\..\deps\src\anisthesia\src\win_strategies.cpp">
+      <Filter>deps\anisthesia</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\deps\src\anisthesia\src\win\ui_automation.cpp">
-      <Filter>deps\anisthesia\win</Filter>
+    <ClCompile Include="..\..\deps\src\anisthesia\src\win_ui_automation.cpp">
+      <Filter>deps\anisthesia</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\deps\src\anisthesia\src\win\util.cpp">
-      <Filter>deps\anisthesia\win</Filter>
+    <ClCompile Include="..\..\deps\src\anisthesia\src\win_util.cpp">
+      <Filter>deps\anisthesia</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\deps\src\anisthesia\src\win\windows.cpp">
-      <Filter>deps\anisthesia\win</Filter>
+    <ClCompile Include="..\..\deps\src\anisthesia\src\win_windows.cpp">
+      <Filter>deps\anisthesia</Filter>
     </ClCompile>
     <ClCompile Include="..\..\deps\src\anitomy\anitomy\anitomy.cpp">
       <Filter>deps\anitomy</Filter>
@@ -720,29 +717,29 @@
     <ClInclude Include="..\..\src\base\xml.h">
       <Filter>base</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\deps\src\anisthesia\src\media.h">
+    <ClInclude Include="..\..\deps\src\anisthesia\include\media.hpp">
       <Filter>deps\anisthesia</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\deps\src\anisthesia\src\player.h">
+    <ClInclude Include="..\..\deps\src\anisthesia\include\player.hpp">
       <Filter>deps\anisthesia</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\deps\src\anisthesia\src\util.h">
+    <ClInclude Include="..\..\deps\src\anisthesia\include\util.hpp">
       <Filter>deps\anisthesia</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\deps\src\anisthesia\src\win\open_files.h">
-      <Filter>deps\anisthesia\win</Filter>
+    <ClInclude Include="..\..\deps\src\anisthesia\include\win_open_files.hpp">
+      <Filter>deps\anisthesia</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\deps\src\anisthesia\src\win\platform.h">
-      <Filter>deps\anisthesia\win</Filter>
+    <ClInclude Include="..\..\deps\src\anisthesia\include\win_platform.hpp">
+      <Filter>deps\anisthesia</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\deps\src\anisthesia\src\win\ui_automation.h">
-      <Filter>deps\anisthesia\win</Filter>
+    <ClInclude Include="..\..\deps\src\anisthesia\include\win_ui_automation.hpp">
+      <Filter>deps\anisthesia</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\deps\src\anisthesia\src\win\util.h">
-      <Filter>deps\anisthesia\win</Filter>
+    <ClInclude Include="..\..\deps\src\anisthesia\include\win_util.hpp">
+      <Filter>deps\anisthesia</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\deps\src\anisthesia\src\win\windows.h">
-      <Filter>deps\anisthesia\win</Filter>
+    <ClInclude Include="..\..\deps\src\anisthesia\include\win_windows.hpp">
+      <Filter>deps\anisthesia</Filter>
     </ClInclude>
     <ClInclude Include="..\..\deps\src\anitomy\anitomy\anitomy.h">
       <Filter>deps\anitomy</Filter>

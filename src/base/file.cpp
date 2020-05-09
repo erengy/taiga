@@ -19,7 +19,7 @@
 #include <fstream>
 #include <shlobj.h>
 
-#include <anisthesia/src/win/util.h>
+#include <anisthesia/win_util.hpp>
 #include <windows/win/error.h>
 #include <windows/win/registry.h>
 
@@ -31,7 +31,7 @@
 #include "base/string.h"
 #include "base/time.h"
 
-using anisthesia::win::Handle;
+using anisthesia::win::detail::Handle;
 
 HANDLE OpenFileForGenericRead(const std::wstring& path) {
   return ::CreateFile(GetExtendedLengthPath(path).c_str(),

@@ -60,7 +60,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;NOMINMAX;_WINDOWS;_WIN32_WINNT=0x0600;PUGIXML_NO_XPATH;PUGIXML_WCHAR_MODE;FMT_EXCEPTIONS=0;UTF8PROC_STATIC;CURL_STATICLIB;HTTP_ONLY;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)\x\x\%(RelativeDir)</ObjectFileName>
-      <AdditionalIncludeDirectories>..\..\deps\src;..\..\deps\src\curl\include;..\..\deps\src\date\include;..\..\deps\src\discord-rpc\include;..\..\deps\src\fmt\include;..\..\deps\src\hypp\include;..\..\deps\src\hypr\include;..\..\deps\src\json\single_include;..\..\deps\src\nstd\include;..\..\deps\src\pugixml\src;..\..\deps\src\random\include;..\..\deps\src\rapidjson\include;..\..\deps\src\semaver\include;..\..\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\deps\src;..\..\deps\src\anisthesia\include;..\..\deps\src\curl\include;..\..\deps\src\date\include;..\..\deps\src\discord-rpc\include;..\..\deps\src\fmt\include;..\..\deps\src\hypp\include;..\..\deps\src\hypr\include;..\..\deps\src\json\single_include;..\..\deps\src\nstd\include;..\..\deps\src\pugixml\src;..\..\deps\src\random\include;..\..\deps\src\rapidjson\include;..\..\deps\src\semaver\include;..\..\src</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -88,7 +88,7 @@
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <ObjectFileName>$(IntDir)\x\x\%(RelativeDir)</ObjectFileName>
-      <AdditionalIncludeDirectories>..\..\deps\src;..\..\deps\src\curl\include;..\..\deps\src\date\include;..\..\deps\src\discord-rpc\include;..\..\deps\src\fmt\include;..\..\deps\src\hypp\include;..\..\deps\src\hypr\include;..\..\deps\src\json\single_include;..\..\deps\src\nstd\include;..\..\deps\src\pugixml\src;..\..\deps\src\random\include;..\..\deps\src\rapidjson\include;..\..\deps\src\semaver\include;..\..\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\deps\src;..\..\deps\src\anisthesia\include;..\..\deps\src\curl\include;..\..\deps\src\date\include;..\..\deps\src\discord-rpc\include;..\..\deps\src\fmt\include;..\..\deps\src\hypp\include;..\..\deps\src\hypr\include;..\..\deps\src\json\single_include;..\..\deps\src\nstd\include;..\..\deps\src\pugixml\src;..\..\deps\src\random\include;..\..\deps\src\rapidjson\include;..\..\deps\src\semaver\include;..\..\src</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -109,12 +109,12 @@
   <ItemGroup>
     <ClCompile Include="..\..\deps\src\anisthesia\src\player.cpp" />
     <ClCompile Include="..\..\deps\src\anisthesia\src\util.cpp" />
-    <ClCompile Include="..\..\deps\src\anisthesia\src\win\open_files.cpp" />
-    <ClCompile Include="..\..\deps\src\anisthesia\src\win\platform.cpp" />
-    <ClCompile Include="..\..\deps\src\anisthesia\src\win\strategies.cpp" />
-    <ClCompile Include="..\..\deps\src\anisthesia\src\win\ui_automation.cpp" />
-    <ClCompile Include="..\..\deps\src\anisthesia\src\win\util.cpp" />
-    <ClCompile Include="..\..\deps\src\anisthesia\src\win\windows.cpp" />
+    <ClCompile Include="..\..\deps\src\anisthesia\src\win_open_files.cpp" />
+    <ClCompile Include="..\..\deps\src\anisthesia\src\win_platform.cpp" />
+    <ClCompile Include="..\..\deps\src\anisthesia\src\win_strategies.cpp" />
+    <ClCompile Include="..\..\deps\src\anisthesia\src\win_ui_automation.cpp" />
+    <ClCompile Include="..\..\deps\src\anisthesia\src\win_util.cpp" />
+    <ClCompile Include="..\..\deps\src\anisthesia\src\win_windows.cpp" />
     <ClCompile Include="..\..\deps\src\anitomy\anitomy\anitomy.cpp" />
     <ClCompile Include="..\..\deps\src\anitomy\anitomy\element.cpp" />
     <ClCompile Include="..\..\deps\src\anitomy\anitomy\keyword.cpp" />
@@ -294,14 +294,14 @@
     <ClCompile Include="..\..\src\ui\ui.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\deps\src\anisthesia\src\media.h" />
-    <ClInclude Include="..\..\deps\src\anisthesia\src\player.h" />
-    <ClInclude Include="..\..\deps\src\anisthesia\src\util.h" />
-    <ClInclude Include="..\..\deps\src\anisthesia\src\win\open_files.h" />
-    <ClInclude Include="..\..\deps\src\anisthesia\src\win\platform.h" />
-    <ClInclude Include="..\..\deps\src\anisthesia\src\win\ui_automation.h" />
-    <ClInclude Include="..\..\deps\src\anisthesia\src\win\util.h" />
-    <ClInclude Include="..\..\deps\src\anisthesia\src\win\windows.h" />
+    <ClInclude Include="..\..\deps\src\anisthesia\include\media.hpp" />
+    <ClInclude Include="..\..\deps\src\anisthesia\include\player.hpp" />
+    <ClInclude Include="..\..\deps\src\anisthesia\include\util.hpp" />
+    <ClInclude Include="..\..\deps\src\anisthesia\include\win_open_files.hpp" />
+    <ClInclude Include="..\..\deps\src\anisthesia\include\win_platform.hpp" />
+    <ClInclude Include="..\..\deps\src\anisthesia\include\win_ui_automation.hpp" />
+    <ClInclude Include="..\..\deps\src\anisthesia\include\win_util.hpp" />
+    <ClInclude Include="..\..\deps\src\anisthesia\include\win_windows.hpp" />
     <ClInclude Include="..\..\deps\src\anitomy\anitomy\anitomy.h" />
     <ClInclude Include="..\..\deps\src\anitomy\anitomy\element.h" />
     <ClInclude Include="..\..\deps\src\anitomy\anitomy\keyword.h" />

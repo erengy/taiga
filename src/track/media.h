@@ -22,8 +22,7 @@
 #include <string>
 #include <vector>
 
-#include <anisthesia/src/player.h>
-#include <anisthesia/src/win/platform.h>
+#include <anisthesia.hpp>
 
 namespace track {
 namespace recognition {

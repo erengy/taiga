@@ -158,7 +158,7 @@ bool GetTitleFromDefaultPlayer(const std::vector<anisthesia::Media>& media,
       auto value = StrToWstr(information.value);
 
       switch (information.type) {
-        case anisthesia::MediaInformationType::File: {
+        case anisthesia::MediaInfoType::File: {
           value = GetNormalizedPath(value);
           const auto file_extension = GetFileExtension(value);
 
@@ -194,8 +194,8 @@ bool GetTitleFromDefaultPlayer(const std::vector<anisthesia::Media>& media,
         }
 
         default:
-        case anisthesia::MediaInformationType::Title:
-        case anisthesia::MediaInformationType::Unknown: {
+        case anisthesia::MediaInfoType::Title:
+        case anisthesia::MediaInfoType::Unknown: {
           if (!invalid_file) {
             title = value;
             return true;
@@ -221,19 +221,19 @@ bool GetTitleFromWebBrowser(const std::vector<anisthesia::Media>& media,
     for (const auto& information : item.information) {
       const auto value = StrToWstr(information.value);
       switch (information.type) {
-        case anisthesia::MediaInformationType::Tab:
+        case anisthesia::MediaInfoType::Tab:
           tabs.push_back(value);
           break;
-        case anisthesia::MediaInformationType::Title:
+        case anisthesia::MediaInfoType::Title:
           if (page_title.empty())
             page_title = value;
           break;
-        case anisthesia::MediaInformationType::Url:
+        case anisthesia::MediaInfoType::Url:
           url = value;
           break;
         // We prefer the regular window title, because Chrome appends the audio
         // state to tab accessibility labels.
-        case anisthesia::MediaInformationType::Unknown:
+        case anisthesia::MediaInfoType::Unknown:
           page_title = value;
           break;
       }
@@ -296,7 +296,7 @@ bool MediaPlayers::CheckRunningPlayers() {
   const auto enabled_players = GetEnabledPlayers(items);
   std::vector<anisthesia::win::Result> results;
 
-  const auto media_proc = [](const anisthesia::MediaInformation&) {
+  const auto media_proc = [](const anisthesia::MediaInfo&) {
     return true;  // Accept all media
   };
 
