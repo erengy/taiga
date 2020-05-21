@@ -409,7 +409,7 @@ void Aggregator::HandleFeedDownloadOpen(FeedItem& feed_item,
         parameters = LR"(/directory "{}" "{}")"_format(download_path, file);
       // Deluge
       } else if (InStr(app_filename, L"deluge-console", 0, true) > -1) {
-        parameters = LR"(add -p \"{}\" \"{}\")"_format(download_path, file);
+        parameters = LR"(add -p \""{}\"" \""{}\"")"_format(download_path, file);
         show_command = SW_HIDE;
       // Transmission
       } else if (InStr(app_filename, L"transmission-remote", 0, true) > -1) {
