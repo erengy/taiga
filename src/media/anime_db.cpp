@@ -143,7 +143,7 @@ void Database::WriteDatabaseNode(XmlNode& database_node) const {
     #define XML_WC(n, v, t) \
       if (!v.empty()) XmlWriteChildNodes(anime_node, v, n, t)
     #define XML_WD(n, v) \
-      if (v) XmlWriteStr(anime_node, n, v.to_string())
+      if (!v.empty()) XmlWriteStr(anime_node, n, v.to_string())
     #define XML_WI(n, v) \
       if (v > 0) XmlWriteInt(anime_node, n, v)
     #define XML_WS(n, v, t) \

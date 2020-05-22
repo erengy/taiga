@@ -47,6 +47,7 @@ public:
   explicit operator SYSTEMTIME() const;
   explicit operator DateFull() const;
 
+  bool empty() const;
   std::wstring to_string() const;
 
   unsigned short year() const;

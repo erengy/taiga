@@ -85,6 +85,10 @@ Date::operator DateFull() const {
   return DateFull{year_, month_, day_};
 }
 
+bool Date::empty() const {
+  return !year() && !month() && !day();
+}
+
 // YYYY-MM-DD
 std::wstring Date::to_string() const {
   return L"{:0>4}-{:0>2}-{:0>2}"_format(year(), month(), day());
