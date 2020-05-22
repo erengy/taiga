@@ -22,6 +22,7 @@
 #include "base/format.h"
 #include "base/gfx.h"
 #include "base/string.h"
+#include "base/url.h"
 #include "media/anime_db.h"
 #include "media/anime_util.h"
 #include "taiga/resource.h"
@@ -523,7 +524,7 @@ void TorrentDialog::Search(std::wstring url, std::wstring title) {
   DlgMain.edit.SetText(title);
   DlgMain.ChangeStatus(L"Searching torrents for \"{}\"..."_format(title));
 
-  ReplaceString(url, L"%title%", title);
+  ReplaceString(url, L"%title%", Url::Encode(title));
   track::aggregator.CheckFeed(url);
 }
 
