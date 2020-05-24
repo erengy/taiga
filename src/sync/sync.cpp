@@ -152,6 +152,10 @@ void Synchronize() {
     // Allow downloading lists without authentication
     } else if (IsUserAccountAvailable()) {
       switch (GetCurrentServiceId()) {
+        case ServiceId::MyAnimeList:
+          // MyAnimeList does not allow this, but we need to display an error
+          GetLibraryEntries();
+          break;
         case ServiceId::Kitsu:
           GetUser();
           break;
