@@ -38,12 +38,12 @@ bool JsonReadBool(const Json& json, const std::string& key) {
 
 double JsonReadDouble(const Json& json, const std::string& key) {
   const auto it = json.find(key);
-  return it != json.end() && it->is_number_float() ? it->get<double>() : 0.0;
+  return it != json.end() && it->is_number() ? it->get<double>() : 0.0;
 }
 
 int JsonReadInt(const Json& json, const std::string& key) {
   const auto it = json.find(key);
-  return it != json.end() && it->is_number_integer() ? it->get<int>() : 0;
+  return it != json.end() && it->is_number() ? it->get<int>() : 0;
 }
 
 std::string JsonReadStr(const Json& json, const std::string& key) {
