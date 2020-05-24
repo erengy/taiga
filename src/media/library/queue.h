@@ -52,7 +52,6 @@ struct QueueItem {
   bool enabled = true;
   int anime_id = 0;
   QueueItemMode mode = QueueItemMode::Update;
-  std::wstring reason;
   std::wstring time;
 
   std::optional<int> episode;

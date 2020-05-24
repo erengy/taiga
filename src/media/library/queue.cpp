@@ -163,7 +163,7 @@ void Queue::Check(bool automatic) {
   if (updating || items.empty())
     return;
 
-  auto& queue_item = items.front();
+  const auto& queue_item = items.front();
 
   if (!queue_item.enabled) {
     LOGD(L"Item is disabled, removing...");
@@ -181,8 +181,7 @@ void Queue::Check(bool automatic) {
   }
 
   if (automatic && !taiga::settings.GetAppOptionEnableSync()) {
-    queue_item.reason = L"Automatic synchronization is disabled";
-    LOGD(queue_item.reason);
+    LOGD(L"Automatic synchronization is disabled");
     return;
   }
 
