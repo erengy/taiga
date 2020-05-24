@@ -63,8 +63,7 @@ void Timer::OnTimeout() {
       break;
 
     case kTimerHistory:
-      if (!library::queue.updating)
-        library::queue.Check(true);
+      library::queue.Check(true);
       break;
 
     case kTimerLibrary:

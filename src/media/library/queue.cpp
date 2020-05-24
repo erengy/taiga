@@ -160,7 +160,7 @@ void Queue::Add(QueueItem& item, bool save) {
 }
 
 void Queue::Check(bool automatic) {
-  if (items.empty())
+  if (updating || items.empty())
     return;
 
   if (!items[index].enabled) {

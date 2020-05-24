@@ -416,13 +416,13 @@ void OnResponse(const RequestType type) {
     case RequestType::AddLibraryEntry:
     case RequestType::DeleteLibraryEntry:
     case RequestType::UpdateLibraryEntry:
-      library::queue.updating = false;
       if (const auto queue_item = library::queue.GetCurrentItem()) {
         anime::db.UpdateItem(*queue_item);
         anime::db.SaveList();
         library::queue.Remove();
-        library::queue.Check(false);
       }
+      library::queue.updating = false;
+      library::queue.Check(false);
       break;
   }
 }
