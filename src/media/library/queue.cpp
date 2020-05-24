@@ -163,24 +163,26 @@ void Queue::Check(bool automatic) {
   if (updating || items.empty())
     return;
 
-  if (!items[index].enabled) {
+  auto& queue_item = items.front();
+
+  if (!queue_item.enabled) {
     LOGD(L"Item is disabled, removing...");
-    Remove(index, true, true, false);
+    Remove(0, true, true, false);
     Check(automatic);
     return;
   }
 
-  auto anime_item = anime::db.Find(items[index].anime_id);
+  const auto anime_item = anime::db.Find(queue_item.anime_id);
   if (!anime_item) {
-    LOGW(L"Item not found in list, removing... ID: {}", items[index].anime_id);
-    Remove(index, true, true, false);
+    LOGW(L"Item not found in list, removing... ID: {}", queue_item.anime_id);
+    Remove(0, true, true, false);
     Check(automatic);
     return;
   }
 
   if (automatic && !taiga::settings.GetAppOptionEnableSync()) {
-    items[index].reason = L"Automatic synchronization is disabled";
-    LOGD(items[index].reason);
+    queue_item.reason = L"Automatic synchronization is disabled";
+    LOGD(queue_item.reason);
     return;
   }
 
@@ -191,22 +193,21 @@ void Queue::Check(bool automatic) {
 
   updating = true;
 
-  switch (items[index].mode) {
+  switch (queue_item.mode) {
     case QueueItemMode::Add:
-      sync::AddLibraryEntry(items[index]);
+      sync::AddLibraryEntry(queue_item);
       break;
     case QueueItemMode::Delete:
-      sync::DeleteLibraryEntry(items[index].anime_id);
+      sync::DeleteLibraryEntry(queue_item.anime_id);
       break;
     case QueueItemMode::Update:
-      sync::UpdateLibraryEntry(items[index]);
+      sync::UpdateLibraryEntry(queue_item);
       break;
   }
 }
 
 void Queue::Clear(bool save) {
   items.clear();
-  index = 0;
 
   ui::OnHistoryChange();
 
@@ -217,7 +218,7 @@ void Queue::Clear(bool save) {
 void Queue::Merge(bool save) {
   while (auto queue_item = GetCurrentItem()) {
     anime::db.UpdateItem(*queue_item);
-    Remove(index, false, true, true);
+    Remove(0, false, true, true);
   }
 
   ui::OnHistoryChange();
@@ -295,7 +296,7 @@ QueueItem* Queue::FindItem(int anime_id, QueueSearch search_mode) {
 
 QueueItem* Queue::GetCurrentItem() {
   if (!items.empty())
-    return &items.at(index);
+    return &items.front();
 
   return nullptr;
 }
@@ -311,10 +312,7 @@ int Queue::GetItemCount() {
 }
 
 void Queue::Remove(int index, bool save, bool refresh, bool to_history) {
-  if (index == -1)
-    index = this->index;
-
-  if (index < static_cast<int>(items.size())) {
+  if (0 <= index && index < static_cast<int>(items.size())) {
     auto it = items.begin() + index;
     const QueueItem queue_item = *it;
 
