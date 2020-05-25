@@ -338,10 +338,19 @@ void ParseLibraryObject(const Json& json, const int anime_id) {
   anime_item.SetMyDateStart(StrToWstr(JsonReadStr(json, "start_date")));
   anime_item.SetMyDateEnd(StrToWstr(JsonReadStr(json, "finish_date")));
   anime_item.SetMyRewatchedTimes(JsonReadInt(json, "num_times_rewatched"));
-  anime_item.SetMyTags(StrToWstr(JsonReadStr(json, "tags")));
   anime_item.SetMyNotes(StrToWstr(JsonReadStr(json, "comments")));
   anime_item.SetMyLastUpdated(
       TranslateMyLastUpdatedFrom(JsonReadStr(json, "updated_at")));
+
+  std::vector<std::wstring> tags;
+  if (json.contains("tags") && json["tags"].is_array()) {
+    for (const auto& tag : json["tags"]) {
+      if (tag.is_string()) {
+        tags.push_back(StrToWstr(tag.get<std::string>()));
+      }
+    }
+  }
+  anime_item.SetMyTags(Join(tags, L", "));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
