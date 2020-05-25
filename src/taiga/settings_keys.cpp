@@ -30,9 +30,9 @@
 #include "media/library/queue.h"
 #include "sync/service.h"
 #include "taiga/announce.h"
+#include "taiga/app.h"
 #include "taiga/config.h"
 #include "taiga/settings.h"
-#include "taiga/taiga.h"
 #include "track/feed_aggregator.h"
 #include "track/monitor.h"
 #include "ui/dlg/dlg_anime_list.h"
@@ -593,7 +593,7 @@ void Settings::SetAppBehaviorAutostart(const bool enabled) {
                    L"Software\\Microsoft\\Windows\\CurrentVersion\\Run",
                    0, KEY_SET_VALUE);
   if (enabled) {
-    registry.SetValue(TAIGA_APP_NAME, Taiga.GetModulePath());
+    registry.SetValue(TAIGA_APP_NAME, app.GetModulePath());
   } else {
     registry.DeleteValue(TAIGA_APP_NAME);
   }

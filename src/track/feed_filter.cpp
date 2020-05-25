@@ -26,8 +26,8 @@
 #include "media/anime.h"
 #include "media/anime_db.h"
 #include "media/anime_util.h"
+#include "taiga/app.h"
 #include "taiga/script.h"
-#include "taiga/taiga.h"
 #include "track/episode_util.h"
 #include "track/feed.h"
 #include "track/feed_filter_manager.h"
@@ -269,7 +269,7 @@ bool ApplyFilter(const FeedFilter& filter, Feed& feed, FeedItem& item,
     }
   }
 
-  if (Taiga.options.debug_mode) {
+  if (taiga::app.options.debug_mode) {
     item.description = L"[{}] {} -- {}"_format(
         item.IsDiscarded() ? L"\u274c" : L"\u2713",
         util::TranslateConditions(filter, condition_index), item.description);

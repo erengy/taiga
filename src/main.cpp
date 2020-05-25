@@ -16,8 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "taiga/taiga.h"
+#include "taiga/app.h"
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
-  return Taiga.Run();
+  return taiga::app.Run();
 }

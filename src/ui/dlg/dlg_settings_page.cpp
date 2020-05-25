@@ -37,10 +37,10 @@
 #include "sync/myanimelist.h"
 #include "sync/myanimelist_util.h"
 #include "taiga/announce.h"
+#include "taiga/app.h"
 #include "taiga/path.h"
 #include "taiga/resource.h"
 #include "taiga/settings.h"
-#include "taiga/taiga.h"
 #include "taiga/version.h"
 #include "track/feed_aggregator.h"
 #include "track/feed_filter_manager.h"
@@ -607,12 +607,12 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
 
         // Browse for torrent application
         case IDC_BUTTON_TORRENT_BROWSE_APP: {
-          std::wstring current_directory = Taiga.GetCurrentDirectory();
+          std::wstring current_directory = taiga::app.GetCurrentDirectory();
           std::wstring path = win::BrowseForFile(
               GetWindowHandle(), L"Select Torrent Application",
               L"Executable files (*.exe)\0*.exe\0\0");
-          if (current_directory != Taiga.GetCurrentDirectory())
-            Taiga.SetCurrentDirectory(current_directory);
+          if (current_directory != taiga::app.GetCurrentDirectory())
+            taiga::app.SetCurrentDirectory(current_directory);
           if (!path.empty())
             SetDlgItemText(IDC_EDIT_TORRENT_APP, path.c_str());
           return TRUE;

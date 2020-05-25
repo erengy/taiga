@@ -18,7 +18,7 @@
 
 #include <windows/win/taskbar.h>
 
-#include "taiga/taiga.h"
+#include "taiga/app.h"
 
 #include "base/command_line.h"
 #include "base/file.h"
@@ -41,8 +41,6 @@
 #include "ui/menu.h"
 #include "ui/theme.h"
 #include "ui/ui.h"
-
-taiga::App Taiga;
 
 namespace taiga {
 
@@ -75,6 +73,24 @@ CommandLineOptions ParseCommandLine() {
   }
 
   return options;
+}
+
+void LoadData() {
+  track::media_players.Load();
+
+  if (settings.Load())
+    if (settings.HandleCompatibility())
+      settings.Save();
+
+  ui::Theme.Load();
+  ui::Menus.Load();
+
+  anime::db.LoadDatabase();
+  anime::db.LoadList();
+  anime::db.ClearInvalidItems();
+
+  library::history.Load();
+  track::aggregator.archive.Load();
 }
 
 }  // namespace detail
@@ -114,7 +130,7 @@ BOOL App::InitInstance() {
   OleInitialize(nullptr);
 
   // Load data
-  LoadData();
+  detail::LoadData();
 
   InitializeDummies();
 
@@ -133,7 +149,8 @@ BOOL App::InitInstance() {
 
 void App::Uninitialize() {
   // Announce
-  if (track::media_players.play_status == track::recognition::PlayStatus::Playing) {
+  if (track::media_players.play_status ==
+      track::recognition::PlayStatus::Playing) {
     track::media_players.play_status = track::recognition::PlayStatus::Stopped;
     announcer.Do(kAnnounceToHttp);
   }
@@ -151,24 +168,6 @@ void App::Uninitialize() {
 
   // Exit
   PostQuitMessage();
-}
-
-void App::LoadData() {
-  track::media_players.Load();
-
-  if (settings.Load())
-    if (settings.HandleCompatibility())
-      settings.Save();
-
-  ui::Theme.Load();
-  ui::Menus.Load();
-
-  anime::db.LoadDatabase();
-  anime::db.LoadList();
-  anime::db.ClearInvalidItems();
-
-  library::history.Load();
-  track::aggregator.archive.Load();
 }
 
 }  // namespace taiga

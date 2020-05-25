@@ -25,7 +25,7 @@
 #include "media/anime_db.h"
 #include "media/anime_item.h"
 #include "media/anime_util.h"
-#include "taiga/taiga.h"
+#include "taiga/app.h"
 
 namespace anime {
 
@@ -81,7 +81,7 @@ void SeasonDatabase::Review(bool hide_nsfw) {
       if (is_nsfw(*anime_item) ||
           (IsValidDate(anime_start) && !is_within_date_interval(*anime_item))) {
         items.erase(items.begin() + i--);
-        if (Taiga.options.verbose) {
+        if (taiga::app.options.verbose) {
           LOGD(L"Removed item: #{} \"{}\" ({})", anime_id,
                anime_item->GetTitle(), anime_start.to_string());
         }
@@ -96,7 +96,7 @@ void SeasonDatabase::Review(bool hide_nsfw) {
     if (is_nsfw(anime_item) || !is_within_date_interval(anime_item))
       continue;
     items.push_back(anime_id);
-    if (Taiga.options.verbose) {
+    if (taiga::app.options.verbose) {
       LOGD(L"Added item: #{} \"{}\" ({})", anime_id, anime_item.GetTitle(),
            anime_item.GetDateStart().to_string());
     }

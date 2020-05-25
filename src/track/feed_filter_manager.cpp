@@ -26,8 +26,8 @@
 #include "base/xml.h"
 #include "media/anime_db.h"
 #include "media/anime_util.h"
+#include "taiga/app.h"
 #include "taiga/settings.h"
-#include "taiga/taiga.h"
 #include "track/episode_util.h"
 #include "track/feed.h"
 #include "track/feed_aggregator.h"
@@ -86,7 +86,7 @@ void FeedFilterManager::FilterArchived(Feed& feed) {
     if (!item.IsDiscarded()) {
       if (aggregator.archive.Contains(item.title)) {
         item.state = FeedItemState::DiscardedNormal;
-        if (Taiga.options.debug_mode) {
+        if (taiga::app.options.debug_mode) {
           item.description = L"[\u274c] Archived -- " + item.description;
         }
       }

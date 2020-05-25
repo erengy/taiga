@@ -28,10 +28,10 @@
 #include "base/gzip.h"
 #include "base/log.h"
 #include "base/string.h"
+#include "taiga/app.h"
 #include "taiga/config.h"
 #include "taiga/settings.h"
 #include "taiga/stats.h"
-#include "taiga/taiga.h"
 #include "ui/ui.h"
 
 namespace taiga::http {
@@ -54,7 +54,7 @@ static hypr::Options GetOptions() {
   options.timeout = std::chrono::seconds{30};
 
   // Log verbose information about libcurl's operations
-  options.verbose = Taiga.options.debug_mode && Taiga.options.verbose;
+  options.verbose = app.options.debug_mode && app.options.verbose;
 
 #ifdef _DEBUG
   // Skip SSL verifications in debug build
@@ -248,7 +248,7 @@ public:
       return;
     }
     if (ReachedMaxConnections()) {
-      if (Taiga.options.verbose) {
+      if (app.options.verbose) {
         LOGD(L"Reached max connections");
       }
       return;
@@ -259,7 +259,7 @@ public:
         const auto& item = items[i];
 
         if (ReachedMaxConnections(host)) {
-          if (Taiga.options.verbose) {
+          if (app.options.verbose) {
             LOGD(L"Reached max connections for host: {}", StrToWstr(host));
           }
           break;
@@ -293,7 +293,7 @@ private:
     if (settings.GetAppConnectionReuseActive()) {
       for (auto& client : clients) {
         if (client.state() == Client::State::Ready) {
-          if (Taiga.options.verbose) {
+          if (app.options.verbose) {
             LOGD(L"Reusing client for {}", StrToWstr(host));
           }
           return client;
@@ -302,7 +302,7 @@ private:
     }
 
     auto& client = clients.emplace_back();
-    if (Taiga.options.verbose) {
+    if (app.options.verbose) {
       LOGD(L"Created new client for {} ({})", StrToWstr(host), clients.size());
     }
     return client;

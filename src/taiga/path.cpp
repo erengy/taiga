@@ -22,9 +22,9 @@
 #include "base/format.h"
 #include "base/string.h"
 #include "sync/service.h"
+#include "taiga/app.h"
 #include "taiga/config.h"
 #include "taiga/settings.h"
-#include "taiga/taiga.h"
 
 namespace taiga {
 
@@ -33,7 +33,7 @@ std::wstring GetDataPath() {
 
 #ifdef TAIGA_PORTABLE
   // Return current path in portable mode
-  path = GetPathOnly(Taiga.GetModulePath());
+  path = GetPathOnly(app.GetModulePath());
 #else
   // Return %AppData% folder
   path = GetKnownFolderPath(FOLDERID_RoamingAppData);

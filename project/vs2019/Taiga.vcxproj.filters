@@ -439,9 +439,6 @@
     <ClCompile Include="..\..\src\taiga\stats.cpp">
       <Filter>taiga</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\taiga\taiga.cpp">
-      <Filter>taiga</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\taiga\timer.cpp">
       <Filter>taiga</Filter>
     </ClCompile>
@@ -660,6 +657,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\track\feed_filter_util.cpp">
       <Filter>track\torrents</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\taiga\app.cpp">
+      <Filter>taiga</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -978,9 +978,6 @@
     <ClInclude Include="..\..\src\taiga\stats.h">
       <Filter>taiga</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\taiga\taiga.h">
-      <Filter>taiga</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\taiga\timer.h">
       <Filter>taiga</Filter>
     </ClInclude>
@@ -1202,6 +1199,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\track\feed_filter_util.h">
       <Filter>track\torrents</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\taiga\app.h">
+      <Filter>taiga</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

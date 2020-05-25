@@ -26,11 +26,11 @@
 #include "base/time.h"
 #include "base/xml.h"
 #include "sync/service.h"
+#include "taiga/app.h"
 #include "taiga/http.h"
 #include "taiga/path.h"
 #include "taiga/resource.h"
 #include "taiga/settings.h"
-#include "taiga/taiga.h"
 #include "taiga/version.h"
 #include "track/recognition.h"
 #include "ui/dlg/dlg_main.h"
@@ -210,7 +210,7 @@ bool UpdateHelper::Download() {
   if (!latest_item_)
     return false;
 
-  download_path_ = AddTrailingSlash(GetPathOnly(Taiga.GetModulePath()));
+  download_path_ = AddTrailingSlash(GetPathOnly(app.GetModulePath()));
   download_path_ += GetFileName(latest_item_->link);
 
   transfer_cancelled_ = false;
@@ -263,7 +263,7 @@ bool UpdateHelper::RunInstaller() {
   // /S runs the installer silently, /D overrides the default installation
   // directory. Do not rely on the current directory here, as it isn't
   // guaranteed to be the same as the module path.
-  std::wstring parameters = L"/S /D=" + GetPathOnly(Taiga.GetModulePath());
+  std::wstring parameters = L"/S /D=" + GetPathOnly(app.GetModulePath());
 
   restart_required_ = Execute(download_path_, parameters);
 

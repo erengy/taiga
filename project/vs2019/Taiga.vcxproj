@@ -240,7 +240,7 @@
     <ClCompile Include="..\..\src\taiga\settings.cpp" />
     <ClCompile Include="..\..\src\taiga\settings_keys.cpp" />
     <ClCompile Include="..\..\src\taiga\stats.cpp" />
-    <ClCompile Include="..\..\src\taiga\taiga.cpp" />
+    <ClCompile Include="..\..\src\taiga\app.cpp" />
     <ClCompile Include="..\..\src\taiga\timer.cpp" />
     <ClCompile Include="..\..\src\taiga\update.cpp" />
     <ClCompile Include="..\..\src\taiga\version.cpp" />
@@ -429,7 +429,7 @@
     <ClInclude Include="..\..\src\taiga\settings.h" />
     <ClInclude Include="..\..\src\taiga\settings_keys.h" />
     <ClInclude Include="..\..\src\taiga\stats.h" />
-    <ClInclude Include="..\..\src\taiga\taiga.h" />
+    <ClInclude Include="..\..\src\taiga\app.h" />
     <ClInclude Include="..\..\src\taiga\timer.h" />
     <ClInclude Include="..\..\src\taiga\update.h" />
     <ClInclude Include="..\..\src\taiga\version.h" />

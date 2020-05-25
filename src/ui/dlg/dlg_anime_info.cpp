@@ -28,12 +28,11 @@
 #include "media/anime_util.h"
 #include "media/library/history.h"
 #include "media/library/queue.h"
-#include "ui/resource.h"
 #include "sync/service.h"
 #include "sync/sync.h"
+#include "taiga/app.h"
 #include "taiga/resource.h"
 #include "taiga/settings.h"
-#include "taiga/taiga.h"
 #include "track/episode_util.h"
 #include "track/recognition.h"
 #include "ui/dlg/dlg_anime_info.h"
@@ -41,6 +40,7 @@
 #include "ui/dlg/dlg_main.h"
 #include "ui/command.h"
 #include "ui/menu.h"
+#include "ui/resource.h"
 #include "ui/theme.h"
 #include "ui/ui.h"
 
@@ -547,7 +547,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
         content += L"  \u2022 <a href=\"score\" id=\"{0}\">{1}</a>"
                    L" <a href=\"Info({0})\">[?]</a>"_format(
                    pair.first, anime::GetPreferredTitle(anime::db.items[pair.first]));
-        if (Taiga.options.debug_mode)
+        if (taiga::app.options.debug_mode)
           content += L" [Score: {}]"_format(pair.second);
         content += L"\n";
         if (++count >= 10)

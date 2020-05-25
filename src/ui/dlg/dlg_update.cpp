@@ -17,9 +17,9 @@
 */
 
 #include "base/gfx.h"
+#include "taiga/app.h"
 #include "taiga/config.h"
 #include "taiga/resource.h"
-#include "taiga/taiga.h"
 #include "taiga/update.h"
 #include "ui/dlg/dlg_main.h"
 #include "ui/dlg/dlg_update.h"
@@ -82,7 +82,7 @@ BOOL UpdateDialog::OnDestroy() {
     if (DlgMain.IsWindow()) {
       DlgMain.PostMessage(WM_DESTROY);
     } else {
-      Taiga.Uninitialize();
+      taiga::app.Uninitialize();
     }
   } else {
     // Create/activate main window

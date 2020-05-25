@@ -36,14 +36,12 @@ class App : public win::App {
 public:
   ~App();
 
-  BOOL InitInstance();
+  BOOL InitInstance() override;
   void Uninitialize();
-
-  void LoadData();
 
   detail::CommandLineOptions options;
 };
 
-}  // namespace taiga
+inline App app;
 
-extern taiga::App Taiga;
+}  // namespace taiga

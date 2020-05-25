@@ -35,11 +35,11 @@
 #include "media/library/queue.h"
 #include "sync/service.h"
 #include "sync/sync.h"
+#include "taiga/app.h"
 #include "taiga/config.h"
 #include "taiga/resource.h"
 #include "taiga/script.h"
 #include "taiga/settings.h"
-#include "taiga/taiga.h"
 #include "taiga/update.h"
 #include "taiga/version.h"
 #include "track/episode_util.h"
@@ -602,7 +602,7 @@ void OnRecognitionFail() {
     }
 
   } else {
-    if (Taiga.options.debug_mode)
+    if (taiga::app.options.debug_mode)
       ChangeStatusText(StrToWstr(track::media_players.current_player_name()) +
                        L" is running.");
   }
