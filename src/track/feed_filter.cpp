@@ -103,6 +103,8 @@ static bool EvaluateCondition(const FeedFilterCondition& condition,
         return item.episode_data.video_resolution();
       case kFeedFilterElement_Episode_VideoType:
         return item.episode_data.video_terms();
+      default:
+        return std::wstring{};
     }
   }();
 
