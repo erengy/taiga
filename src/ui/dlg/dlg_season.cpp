@@ -16,6 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "base/format.h"
 #include "base/gfx.h"
 #include "base/string.h"
 #include "media/anime_db.h"
@@ -595,24 +596,36 @@ void SeasonDialog::RefreshList(bool redraw_only) {
   // Disable drawing
   list_.SetRedraw(FALSE);
 
+  struct ListGroup {
+    int item_count = 0;
+    std::wstring text;
+  };
+  std::map<int, ListGroup> groups;
+
   // Insert list groups
   list_.RemoveAllGroups();
   list_.EnableGroupView(true);  // Required for XP
   switch (taiga::settings.GetAppSeasonsGroupBy()) {
     case kSeasonGroupByAiringStatus:
       for (const auto status : anime::kSeriesStatuses) {
-        list_.InsertGroup(static_cast<int>(status), ui::TranslateStatus(status).c_str(), true, false);
+        ListGroup group{0, ui::TranslateStatus(status)};
+        groups[static_cast<int>(status)] = group;
+        list_.InsertGroup(static_cast<int>(status), group.text.c_str(), true, false);
       }
       break;
     case kSeasonGroupByListStatus:
       for (const auto status : anime::kMyStatuses) {
-        list_.InsertGroup(static_cast<int>(status), ui::TranslateMyStatus(status, false).c_str(), true, false);
+        ListGroup group{0, ui::TranslateMyStatus(status, false)};
+        groups[static_cast<int>(status)] = group;
+        list_.InsertGroup(static_cast<int>(status), group.text.c_str(), true, false);
       }
       break;
     case kSeasonGroupByType:
     default:
       for (const auto type : anime::kSeriesTypes) {
-        list_.InsertGroup(static_cast<int>(type), ui::TranslateType(type).c_str(), true, false);
+        ListGroup group{0, ui::TranslateType(type)};
+        groups[static_cast<int>(type)] = group;
+        list_.InsertGroup(static_cast<int>(type), group.text.c_str(), true, false);
       }
       break;
   }
@@ -655,6 +668,7 @@ void SeasonDialog::RefreshList(bool redraw_only) {
         group = static_cast<int>(anime_item->GetType());
         break;
     }
+    groups[group].item_count += 1;
     list_.InsertItem(i - anime::season_db.items.begin(),
                      group, -1, 0, nullptr, LPSTR_TEXTCALLBACK,
                      static_cast<LPARAM>(anime_item->GetId()));
@@ -685,6 +699,11 @@ void SeasonDialog::RefreshList(bool redraw_only) {
     default:
       list_.Sort(0, 1, ui::kListSortTitle, ui::ListViewCompareProc);
       break;
+  }
+
+  // Update group headers
+  for (const auto& [index, group] : groups) {
+    list_.SetGroupText(index, L"{} ({})"_format(group.text, group.item_count).c_str());
   }
 
   // Redraw
