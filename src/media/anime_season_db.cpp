@@ -57,7 +57,7 @@ void SeasonDatabase::Reset() {
   items.clear();
 }
 
-void SeasonDatabase::Review(bool hide_nsfw) {
+void SeasonDatabase::Review() {
   const auto [date_start, date_end] = current_season.to_date_range();
 
   const auto is_within_date_interval =
@@ -69,34 +69,49 @@ void SeasonDatabase::Review(bool hide_nsfw) {
         return false;
       };
 
-  const auto is_nsfw = [&hide_nsfw](const Item& anime_item) {
-    return hide_nsfw && IsNsfw(anime_item);
-  };
+  std::set<int> unique_ids;
 
-  // Check for invalid items
+  // Remove invalid items
   for (size_t i = 0; i < items.size(); ++i) {
     const int anime_id = items.at(i);
-    if (const auto anime_item = anime::db.Find(anime_id)) {
-      const Date& anime_start = anime_item->GetDateStart();
-      if (is_nsfw(*anime_item) ||
-          (IsValidDate(anime_start) && !is_within_date_interval(*anime_item))) {
-        items.erase(items.begin() + i--);
-        if (taiga::app.options.verbose) {
-          LOGD(L"Removed item: #{} \"{}\" ({})", anime_id,
-               anime_item->GetTitle(), anime_start.to_string());
-        }
+    const auto anime_item = anime::db.Find(anime_id);
+
+    const auto remove_item = [&](const std::wstring& reason) {
+      items.erase(items.begin() + i--);
+      if (taiga::app.options.verbose) {
+        LOGD(L"Removed item: #{} \"{}\" ({})", anime_id,
+             anime_item ? anime_item->GetTitle() : L"", reason);
       }
+    };
+
+    if (!anime_item) {
+      remove_item(L"Unavailable");
+      continue;
+    }
+    if (const auto [_, inserted] = unique_ids.insert(anime_id); !inserted) {
+      remove_item(L"Duplicate");
+      continue;
+    }
+    if (IsNsfw(*anime_item)) {
+      remove_item(L"NSFW");
+      continue;
+    }
+    if (!is_within_date_interval(*anime_item)) {
+      remove_item(L"Date: " + anime_item->GetDateStart().to_string());
+      continue;
     }
   }
 
-  // Check for missing items
+  // Add missing items
   for (const auto& [anime_id, anime_item] : anime::db.items) {
     if (nstd::contains(items, anime_id))
       continue;
-    if (is_nsfw(anime_item) || !is_within_date_interval(anime_item))
+
+    if (IsNsfw(anime_item) || !is_within_date_interval(anime_item))
       continue;
+
     items.push_back(anime_id);
-    if (taiga::app.options.verbose) {
+    if (taiga::app.options.verbose && !unique_ids.empty()) {
       LOGD(L"Added item: #{} \"{}\" ({})", anime_id, anime_item.GetTitle(),
            anime_item.GetDateStart().to_string());
     }

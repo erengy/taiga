@@ -31,7 +31,7 @@ public:
   void Set(const Season& season);
   void Reset();
 
-  void Review(bool hide_nsfw = true);
+  void Review();
 
   std::vector<int> items;
   Season current_season;
