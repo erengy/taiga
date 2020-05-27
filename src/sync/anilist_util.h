@@ -21,8 +21,9 @@
 #include <string>
 
 #include "base/json.h"
-#include "base/time.h"
 #include "sync/service.h"
+
+class Date;
 
 namespace anime {
 enum class MyStatus;

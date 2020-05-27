@@ -31,8 +31,7 @@ enum class SeriesType;
 class Item;
 }
 
-namespace sync {
-namespace kitsu {
+namespace sync::kitsu {
 
 RatingSystem GetRatingSystem();
 std::vector<Rating> GetMyRatings(RatingSystem rating_system);
@@ -57,5 +56,4 @@ void ViewFeed();
 void ViewLibrary();
 void ViewProfile();
 
-}  // namespace kitsu
-}  // namespace sync
+}  // namespace sync::kitsu

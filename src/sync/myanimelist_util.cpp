@@ -77,6 +77,21 @@ anime::AgeRating TranslateAgeRatingFrom(const std::wstring& value) {
   return anime::AgeRating::Unknown;
 }
 
+Date TranslateDateFrom(const std::wstring& value) {
+  // YYYY-MM-DD
+  if (value.size() >= 10) {
+    return Date(value);
+  // YYYY-MM
+  } else if (value.size() == 7) {
+    return Date(L"{}-00"_format(value));
+  // YYYY
+  } else if (value.size() == 4) {
+    return Date(L"{}-00-00"_format(value));
+  } else {
+    return Date{};
+  }
+}
+
 int TranslateEpisodeLengthFrom(int value) {
   const auto seconds = std::chrono::seconds{value};
   return std::chrono::duration_cast<std::chrono::minutes>(seconds).count();
