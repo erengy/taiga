@@ -18,25 +18,8 @@
 
 #pragma once
 
-#include <chrono>
-#include <string>
+namespace taiga::debug {
 
-namespace debug {
-
-class Tester {
-public:
-  using clock_t = std::chrono::steady_clock;
-
-  Tester();
-
-  void Start();
-  void Stop(std::wstring str, bool display_result);
-
-private:
-  clock_t::time_point t0_;
-};
-
-void Print(std::wstring text);
 void Test();
 
-}  // namespace debug
+}  // namespace taiga::debug

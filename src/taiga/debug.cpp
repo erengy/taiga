@@ -16,56 +16,43 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <chrono>
+
 #include "taiga/debug.h"
 
-#include "base/string.h"
-#include "media/anime_db.h"
+#include "base/format.h"
+#include "base/log.h"
 #include "ui/dlg/dlg_main.h"
-#include "ui/dialog.h"
 
-namespace debug {
+namespace taiga::debug {
 
-Tester::Tester()
-    : t0_(clock_t::duration::zero()) {
-}
-
-void Tester::Start() {
-  t0_ = clock_t::now();
-}
-
-void Tester::Stop(std::wstring str, bool display_result) {
+class Tester {
+public:
+  using clock_t = std::chrono::steady_clock;
   using duration_t =
       std::chrono::duration<float, std::chrono::milliseconds::period>;
 
-  const auto now = clock_t::now();
-  const auto duration = std::chrono::duration_cast<duration_t>(now - t0_);
-  t0_ = now;
+  void Stop(std::wstring str) {
+    const auto duration =
+        std::chrono::duration_cast<duration_t>(clock_t::now() - t0_);
 
-  if (display_result) {
-    str = ToWstr(duration.count(), 2) + L"ms | Text: [" + str + L"]";
+    str = L"{:.2f}ms | [{}]"_format(duration.count(), str);
+    LOGD(str);
     ui::DlgMain.SetText(str);
   }
-}
+
+private:
+  clock_t::time_point t0_{clock_t::now()};
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void Print(std::wstring text) {
-#ifdef _DEBUG
-  ::OutputDebugString(text.c_str());
-#else
-  UNREFERENCED_PARAMETER(text);
-#endif
-}
-
 void Test() {
-  // Define variables
   std::wstring str;
 
-  // Start ticking
-  Tester test;
-  test.Start();
+  Tester tester;
 
-  for (int i = 0; i < 10000; i++) {
+  for (int i = 0; i < 10000; ++i) {
     // Do some tests here
     //       ___
     //      {o,o}
@@ -74,8 +61,7 @@ void Test() {
     //      O RLY?
   }
 
-  // Show result
-  test.Stop(str, true);
+  tester.Stop(str);
 }
 
-}  // namespace debug
+}  // namespace taiga::debug

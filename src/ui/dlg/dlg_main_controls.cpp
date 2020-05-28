@@ -207,7 +207,7 @@ BOOL MainDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
       return TRUE;
     // Debug
     case kToolbarButtonDebug:
-      debug::Test();
+      taiga::debug::Test();
       return TRUE;
   }
 
