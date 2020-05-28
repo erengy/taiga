@@ -512,9 +512,12 @@ void TorrentDialog::Search(std::wstring url, int anime_id) {
     return;
 
   std::wstring title = anime_item->GetTitle();
-  if (anime_item->GetUseAlternative() &&
-      anime_item->UserSynonymsAvailable())
-    title = anime_item->GetUserSynonyms().front();
+  if (anime_item->GetUseAlternative()) {
+    const auto synonyms = anime_item->GetUserSynonyms();
+    if (!synonyms.empty()) {
+      title = synonyms.front();
+    }
+  }
 
   Search(url, title);
 }

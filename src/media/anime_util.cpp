@@ -430,18 +430,21 @@ bool IsInsideLibraryFolders(const std::wstring& path) {
 }
 
 bool ValidateFolder(Item& item) {
-  if (item.GetFolder().empty())
+  const auto folder = item.GetFolder();
+
+  if (folder.empty())
     return false;
 
-  if (FolderExists(item.GetFolder()))
+  if (FolderExists(folder))
     return true;
 
-  LOGD(L"Folder doesn't exist anymore.\nPath: {}", item.GetFolder());
+  LOGD(L"Folder doesn't exist anymore.\nPath: {}", folder);
 
   item.SetFolder(L"");
 
-  for (int i = 1; i <= item.GetAvailableEpisodeCount(); i++)
+  for (int i = 1; i <= item.GetAvailableEpisodeCount(); ++i) {
     item.SetEpisodeAvailability(i, false, L"");
+  }
 
   return false;
 }

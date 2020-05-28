@@ -56,6 +56,12 @@ public:
     int compare(const AnimeListColumn& rhs) const override;
   };
 
+  struct AnimeSettings {
+    std::wstring folder;
+    std::vector<std::wstring> synonyms;
+    bool use_alternative = false;
+  };
+
   Settings() = default;
   ~Settings();
 
@@ -335,10 +341,19 @@ public:
 
   std::vector<std::wstring> GetLibraryFolders() const;
   void SetLibraryFolders(const std::vector<std::wstring>& folders);
+
   bool GetMediaPlayerEnabled(const std::wstring& player) const;
   void SetMediaPlayerEnabled(const std::wstring& player, const bool enabled);
+
   std::optional<AnimeListColumn> GetAnimeListColumn(const std::wstring& key) const;
   void SetAnimeListColumn(const std::wstring& key, const AnimeListColumn& column);
+
+  std::wstring GetAnimeFolder(const int id) const;
+  void SetAnimeFolder(const int id, const std::wstring& folder);
+  bool GetAnimeUseAlternative(const int id) const;
+  void SetAnimeUseAlternative(const int id, const bool enabled);
+  std::vector<std::wstring> GetAnimeUserSynonyms(const int id) const;
+  void SetAnimeUserSynonyms(const int id, const std::vector<std::wstring>& synonyms);
 
 private:
   struct AppSetting {
@@ -360,6 +375,7 @@ private:
   std::vector<std::wstring> library_folders_;
   std::map<std::wstring, bool> media_players_enabled_;
   std::map<std::wstring, AnimeListColumn> anime_list_columns_;
+  std::map<int, AnimeSettings> anime_settings_;
 
   mutable std::map<AppSettingKey, AppSetting> key_map_;
   mutable std::mutex mutex_;

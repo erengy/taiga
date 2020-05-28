@@ -131,21 +131,20 @@ public:
   // Local data
 
   int GetAvailableEpisodeCount() const;
-  const std::wstring& GetFolder() const;
+  std::wstring GetFolder() const;
   const std::wstring& GetNextEpisodePath() const;
   bool GetUseAlternative() const;
-  const std::vector<std::wstring>& GetUserSynonyms() const;
+  std::vector<std::wstring> GetUserSynonyms() const;
 
   bool SetEpisodeAvailability(int number, bool available, const std::wstring& path);
   void SetFolder(const std::wstring& folder);
   void SetNextEpisodePath(const std::wstring& path);
   void SetUseAlternative(bool use_alternative);
   void SetUserSynonyms(const std::wstring& synonyms);
-  void SetUserSynonyms(const std::vector<std::wstring>& synonyms);
+  void SetUserSynonyms(std::vector<std::wstring> synonyms);
 
   bool IsEpisodeAvailable(int number) const;
   bool IsNextEpisodeAvailable() const;
-  bool UserSynonymsAvailable() const;
 
   //////////////////////////////////////////////////////////////////////////////
 

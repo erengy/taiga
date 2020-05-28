@@ -259,9 +259,10 @@ void ScanAvailableEpisodesQuick(int anime_id) {
 
     if (anime_id != anime::ID_UNKNOWN && anime_item.GetId() != anime_id)
       continue;
-    if (anime_item.GetFolder().empty())
-      continue;
-    if (!FolderExists(anime_item.GetFolder()))
+
+    const auto folder = anime_item.GetFolder();
+
+    if (folder.empty() || !FolderExists(folder))
       continue;
 
     scanner.set_anime_id(anime_item.GetId());
@@ -272,7 +273,7 @@ void ScanAvailableEpisodesQuick(int anime_id) {
     scanner.options.skip_files = false;
     scanner.options.skip_subdirectories = false;
 
-    scanner.Search(anime_item.GetFolder());
+    scanner.Search(folder);
   }
 
   ui::OnScanAvailableEpisodesFinished();

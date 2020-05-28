@@ -148,10 +148,11 @@ bool Settings::DeserializeFromXml(const std::wstring& path) {
   for (const auto item : node_items.children(L"item")) {
     const int anime_id = item.attribute(L"id").as_int();
     if (anime::IsValidId(anime_id)) {
-      auto& anime_item = anime::db.items[anime_id];
-      anime_item.SetFolder(item.attribute(L"folder").value());
-      anime_item.SetUserSynonyms(item.attribute(L"titles").value());
-      anime_item.SetUseAlternative(item.attribute(L"use_alternative").as_bool());
+      auto& anime_item = anime_settings_[anime_id];
+      anime_item.folder = item.attribute(L"folder").value();
+      Split(item.attribute(L"titles").value(), L"; ", anime_item.synonyms);
+      RemoveEmptyStrings(anime_item.synonyms);
+      anime_item.use_alternative = item.attribute(L"use_alternative").as_bool();
     }
   }
 
@@ -227,19 +228,20 @@ bool Settings::SerializeToXml(const std::wstring& path) const {
 
   // Anime items
   auto items = settings.child(L"anime").append_child(L"items");
-  for (const auto& [id, anime_item] : anime::db.items) {
-    if (anime_item.GetFolder().empty() &&
-        !anime_item.UserSynonymsAvailable() &&
-        !anime_item.GetUseAlternative())
+  for (const auto& [anime_id, anime_item] : anime_settings_) {
+    if (anime_item.folder.empty() &&
+        anime_item.synonyms.empty() &&
+        !anime_item.use_alternative) {
       continue;
+    }
     auto item = items.append_child(L"item");
-    item.append_attribute(L"id") = anime_item.GetId();
-    if (!anime_item.GetFolder().empty())
-      item.append_attribute(L"folder") = anime_item.GetFolder().c_str();
-    if (anime_item.UserSynonymsAvailable())
-      item.append_attribute(L"titles") = Join(anime_item.GetUserSynonyms(), L"; ").c_str();
-    if (anime_item.GetUseAlternative())
-      item.append_attribute(L"use_alternative") = anime_item.GetUseAlternative();
+    item.append_attribute(L"id") = anime_id;
+    if (!anime_item.folder.empty())
+      item.append_attribute(L"folder") = anime_item.folder.c_str();
+    if (!anime_item.synonyms.empty())
+      item.append_attribute(L"titles") = Join(anime_item.synonyms, L"; ").c_str();
+    if (anime_item.use_alternative)
+      item.append_attribute(L"use_alternative") = anime_item.use_alternative;
   }
 
   // Media players

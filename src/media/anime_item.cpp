@@ -25,6 +25,7 @@
 #include "media/anime_util.h"
 #include "media/library/queue.h"
 #include "sync/service.h"
+#include "taiga/settings.h"
 #include "ui/ui.h"
 
 namespace anime {
@@ -486,8 +487,8 @@ int Item::GetAvailableEpisodeCount() const {
   return static_cast<int>(local_info_.available_episodes.size());
 }
 
-const std::wstring& Item::GetFolder() const {
-  return local_info_.folder;
+std::wstring Item::GetFolder() const {
+  return taiga::settings.GetAnimeFolder(GetId());
 }
 
 const std::wstring& Item::GetNextEpisodePath() const {
@@ -495,11 +496,11 @@ const std::wstring& Item::GetNextEpisodePath() const {
 }
 
 bool Item::GetUseAlternative() const {
-  return local_info_.use_alternative;
+  return taiga::settings.GetAnimeUseAlternative(GetId());
 }
 
-const std::vector<std::wstring>& Item::GetUserSynonyms() const {
-  return local_info_.synonyms;
+std::vector<std::wstring> Item::GetUserSynonyms() const {
+  return taiga::settings.GetAnimeUserSynonyms(GetId());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -527,7 +528,7 @@ bool Item::SetEpisodeAvailability(int number, bool available,
 }
 
 void Item::SetFolder(const std::wstring& folder) {
-  local_info_.folder = folder;
+  taiga::settings.SetAnimeFolder(GetId(), folder);
 }
 
 void Item::SetNextEpisodePath(const std::wstring& path) {
@@ -535,7 +536,7 @@ void Item::SetNextEpisodePath(const std::wstring& path) {
 }
 
 void Item::SetUseAlternative(bool use_alternative) {
-  local_info_.use_alternative = use_alternative;
+  taiga::settings.SetAnimeUseAlternative(GetId(), use_alternative);
 }
 
 void Item::SetUserSynonyms(const std::wstring& synonyms) {
@@ -545,9 +546,10 @@ void Item::SetUserSynonyms(const std::wstring& synonyms) {
   SetUserSynonyms(temp);
 }
 
-void Item::SetUserSynonyms(const std::vector<std::wstring>& synonyms) {
-  local_info_.synonyms = synonyms;
-  RemoveEmptyStrings(local_info_.synonyms);
+void Item::SetUserSynonyms(std::vector<std::wstring> synonyms) {
+  RemoveEmptyStrings(synonyms);
+
+  taiga::settings.SetAnimeUserSynonyms(GetId(), synonyms);
 
   if (!synonyms.empty() && CurrentEpisode.anime_id == anime::ID_NOTINLIST) {
     CurrentEpisode.Set(anime::ID_UNKNOWN);
@@ -567,10 +569,6 @@ bool Item::IsEpisodeAvailable(int number) const {
 
 bool Item::IsNextEpisodeAvailable() const {
   return IsEpisodeAvailable(GetMyLastWatchedEpisode() + 1);
-}
-
-bool Item::UserSynonymsAvailable() const {
-  return !local_info_.synonyms.empty();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

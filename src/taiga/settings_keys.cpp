@@ -1426,4 +1426,52 @@ void Settings::SetAnimeListColumn(const std::wstring& key,
   }
 }
 
+std::wstring Settings::GetAnimeFolder(const int id) const {
+  std::lock_guard lock{mutex_};
+  const auto it = anime_settings_.find(id);
+  return it != anime_settings_.end() ? it->second.folder : std::wstring{};
+}
+
+void Settings::SetAnimeFolder(const int id, const std::wstring& folder) {
+  std::lock_guard lock{mutex_};
+  const auto it = anime_settings_.find(id);
+  if (it == anime_settings_.end() || it->second.folder != folder) {
+    anime_settings_[id].folder = folder;
+    modified_ = true;
+  }
+}
+
+bool Settings::GetAnimeUseAlternative(const int id) const {
+  std::lock_guard lock{mutex_};
+  const auto it = anime_settings_.find(id);
+  return it != anime_settings_.end() ? it->second.use_alternative : false;
+}
+
+void Settings::SetAnimeUseAlternative(const int id, const bool enabled) {
+  std::lock_guard lock{mutex_};
+  const auto it = anime_settings_.find(id);
+  if (it == anime_settings_.end() || it->second.use_alternative != enabled) {
+    anime_settings_[id].use_alternative = enabled;
+    modified_ = true;
+  }
+}
+
+std::vector<std::wstring> Settings::GetAnimeUserSynonyms(
+    const int id) const {
+  std::lock_guard lock{mutex_};
+  const auto it = anime_settings_.find(id);
+  return it != anime_settings_.end() ? it->second.synonyms
+                                     : std::vector<std::wstring>{};
+}
+
+void Settings::SetAnimeUserSynonyms(const int id,
+                                    const std::vector<std::wstring>& synonyms) {
+  std::lock_guard lock{mutex_};
+  const auto it = anime_settings_.find(id);
+  if (it == anime_settings_.end() || it->second.synonyms != synonyms) {
+    anime_settings_[id].synonyms = synonyms;
+    modified_ = true;
+  }
+}
+
 }  // namespace taiga

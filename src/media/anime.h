@@ -149,12 +149,8 @@ struct MyInformation {
 };
 
 struct LocalInformation {
-  // @TODO: Move to application settings?
   std::vector<bool> available_episodes;
   std::wstring next_episode_path;
-  std::wstring folder;
-  std::vector<std::wstring> synonyms;
-  bool use_alternative = false;
 };
 
 }  // namespace anime
