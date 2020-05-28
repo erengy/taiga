@@ -29,8 +29,6 @@
 #include "taiga/settings.h"
 #include "track/episode.h"
 
-track::recognition::Engine Meow;
-
 namespace track::recognition {
 
 bool Engine::Parse(std::wstring filename, const ParseOptions& parse_options,

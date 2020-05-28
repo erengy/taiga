@@ -92,4 +92,4 @@ private:
 
 }  // namespace anime
 
-extern anime::Episode CurrentEpisode;
+inline anime::Episode CurrentEpisode;

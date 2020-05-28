@@ -23,8 +23,6 @@
 #include "media/anime_db.h"
 #include "ui/menu.h"
 
-anime::Episode CurrentEpisode;
-
 namespace anime {
 
 Episode::Episode()

@@ -116,4 +116,4 @@ private:
 
 }  // namespace track::recognition
 
-extern track::recognition::Engine Meow;
+inline track::recognition::Engine Meow;
