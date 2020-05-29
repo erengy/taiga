@@ -856,13 +856,16 @@ void MainDialog::UpdateStatusTimer() {
 
 void MainDialog::UpdateTip() {
   std::wstring tip = TAIGA_APP_NAME;
+
   if (taiga::app.options.debug_mode)
     tip += L" [debug]";
 
-  auto anime_item = anime::db.Find(CurrentEpisode.anime_id);
-  if (anime_item) {
-    tip += L"\nWatching: " + anime::GetPreferredTitle(*anime_item) +
-           PushString(L" #", anime::GetEpisodeRange(CurrentEpisode));
+  if (const auto anime_item = anime::db.Find(CurrentEpisode.anime_id)) {
+    tip += L"\nWatching: " + anime::GetPreferredTitle(*anime_item);
+
+    if (anime_item->GetEpisodeCount() != 1) {
+      tip += PushString(L" #", anime::GetEpisodeRange(CurrentEpisode));
+    }
   }
 
   taskbar.Modify(tip.c_str());
@@ -870,23 +873,28 @@ void MainDialog::UpdateTip() {
 
 void MainDialog::UpdateTitle() {
   std::wstring title = TAIGA_APP_NAME;
+
   if (taiga::app.options.debug_mode)
     title += L" [debug]";
 
   const auto display_name = taiga::GetCurrentUserDisplayName();
   if (!display_name.empty())
     title += L" \u2013 " + display_name;
-  if (taiga::app.options.debug_mode) {
+  if (taiga::app.options.debug_mode)
     title += L" @ " + sync::GetCurrentServiceName();
-  }
 
-  auto anime_item = anime::db.Find(CurrentEpisode.anime_id);
-  if (anime_item) {
-    title += L" \u2013 " + anime::GetPreferredTitle(*anime_item) +
-             PushString(L" #", anime::GetEpisodeRange(CurrentEpisode));
-    if (taiga::settings.GetSyncUpdateOutOfRange() &&
-        anime::GetEpisodeLow(CurrentEpisode) > anime_item->GetMyLastWatchedEpisode() + 1) {
-      title += L" (out of range)";
+  if (const auto anime_item = anime::db.Find(CurrentEpisode.anime_id)) {
+    title += L" \u2013 " + anime::GetPreferredTitle(*anime_item);
+
+    if (anime_item->GetEpisodeCount() != 1) {
+      title += PushString(L" #", anime::GetEpisodeRange(CurrentEpisode));
+    }
+
+    if (taiga::settings.GetSyncUpdateOutOfRange()) {
+      if (anime::GetEpisodeLow(CurrentEpisode) >
+          anime_item->GetMyLastWatchedEpisode() + 1) {
+        title += L" (out of range)";
+      }
     }
   }
 
