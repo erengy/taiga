@@ -49,6 +49,8 @@ enum SeasonToolbarCommand {
   kCommandSeasonView,
 };
 
+constexpr int kNotInListGroupIndex = 1000;
+
 SeasonDialog DlgSeason;
 
 SeasonDialog::SeasonDialog()
@@ -613,13 +615,17 @@ void SeasonDialog::RefreshList(bool redraw_only) {
         list_.InsertGroup(static_cast<int>(status), group.text.c_str(), true, false);
       }
       break;
-    case kSeasonGroupByListStatus:
+    case kSeasonGroupByListStatus: {
       for (const auto status : anime::kMyStatuses) {
         ListGroup group{0, ui::TranslateMyStatus(status, false)};
         groups[static_cast<int>(status)] = group;
         list_.InsertGroup(static_cast<int>(status), group.text.c_str(), true, false);
       }
+      ListGroup group{0, ui::TranslateMyStatus(anime::MyStatus::NotInList, false)};
+      groups[kNotInListGroupIndex] = group;
+      list_.InsertGroup(kNotInListGroupIndex, group.text.c_str(), true, false);
       break;
+    }
     case kSeasonGroupByType:
     default:
       for (const auto type : anime::kSeriesTypes) {
@@ -660,7 +666,10 @@ void SeasonDialog::RefreshList(bool redraw_only) {
         group = static_cast<int>(anime_item->GetAiringStatus());
         break;
       case kSeasonGroupByListStatus: {
-        group = static_cast<int>(anime_item->GetMyStatus());
+        const auto my_status = anime_item->GetMyStatus();
+        group = my_status == anime::MyStatus::NotInList
+                    ? kNotInListGroupIndex
+                    : static_cast<int>(my_status);
         break;
       }
       case kSeasonGroupByType:
