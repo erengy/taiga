@@ -277,8 +277,16 @@ bool PathExists(const std::wstring& path) {
 }
 
 void ValidateFileName(std::wstring& file) {
-  EraseChars(file, L"\\/:*?\"<>|");
-  TrimRight(file, L".");
+  // Remove reserved characters, strip whitespace and trailing period
+  // See: https://docs.microsoft.com/en-us/windows/win32/fileio/naming-a-file
+  EraseChars(file, LR"(<>:"/\|?*)");
+  TrimLeft(file);
+  TrimRight(file, L" .");
+
+  // Collapse whitespace
+  // This is not really required, but looks subjectively better. Besides, while
+  // the file system supports consecutive spaces, some applications might not.
+  while (ReplaceString(file, L"  ", L" "));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
