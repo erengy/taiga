@@ -27,17 +27,13 @@
 #include "base/log.h"
 #include "base/string.h"
 
-Url::Url(const std::wstring& url) {
-  Parse(url);
-}
-
 Url& Url::operator=(const Url& url) {
   this->uri_ = url.uri_;
   return *this;
 }
 
 void Url::operator=(const std::wstring& url) {
-  Parse(url);
+  *this = Parse(url);
 }
 
 std::wstring Url::host() const {
@@ -69,19 +65,20 @@ std::wstring Url::to_wstring() const {
   return StrToWstr(hypp::to_string(uri_));
 }
 
-void Url::Parse(std::wstring url) {
+Url Url::Parse(std::wstring url, const bool log_errors) {
   Trim(url, L"\t\n\r ");
 
   const std::string uri = WstrToStr(url);
   hypp::Parser parser{uri};
 
   if (auto expected = hypp::ParseUri(parser)) {
-    uri_ = expected.value();
-  } else {
-    LOGE(L"Could not parse URL: {}\nReason: {}", url,
+    return Url{expected.value()};
+  } else if (log_errors) {
+    LOGE(L"Could not parse URL: {} | Reason: {}", url,
          StrToWstr(hypp::to_string(expected.error())));
-    uri_ = {};
   }
+
+  return {};
 }
 
 std::wstring Url::Decode(const std::wstring& input) {

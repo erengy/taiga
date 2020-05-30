@@ -21,6 +21,7 @@
 
 #include "track/media_stream.h"
 
+#include "base/format.h"
 #include "base/process.h"
 #include "base/string.h"
 #include "base/url.h"
@@ -333,10 +334,19 @@ bool GetTitleFromStreamingMediaProvider(const std::wstring& url,
 
 void IgnoreCommonWebBrowserTitles(const std::wstring& address,
                                   std::wstring& title) {
-  const Url url(address);
-  if (!url.host().empty() && StartsWith(title, url.host()))  // Chrome
-    title.clear();
-  if (StartsWith(title, L"http://") || StartsWith(title, L"https://"))
+  const auto has_http_scheme = [](const std::wstring& str) {
+    return StartsWith(str, L"http://") || StartsWith(str, L"https://");
+  };
+  if (!address.empty()) {
+    const Url url = Url::Parse(
+        // Chrome's address bar hides the scheme, so what we have might be an
+        // invalid HTTP URI ("www." is hidden too, which does not affect us).
+        has_http_scheme(address) ? address : L"http://{}"_format(address),
+        false);
+    if (!url.host().empty() && StartsWith(title, url.host()))  // Chrome
+      title.clear();
+  }
+  if (has_http_scheme(title))
     title.clear();
 
   static const std::set<std::wstring> common_titles{

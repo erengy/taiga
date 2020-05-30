@@ -29,7 +29,7 @@ public:
 
   Url() = default;
   Url(const hypp::Uri& uri) : uri_{uri} {}
-  Url(const std::wstring& url);
+  Url(const std::wstring& url) : Url(Parse(url)) {}
 
   Url& operator=(const Url& url);
   void operator=(const std::wstring& url);
@@ -40,7 +40,7 @@ public:
   query_t query() const;
   hypp::Uri uri() const;
 
-  void Parse(std::wstring url);
+  static Url Parse(std::wstring url, const bool log_errors = true);
 
   static std::wstring Decode(const std::wstring& input);
   static std::wstring Encode(const std::wstring& input);
