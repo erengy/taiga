@@ -28,6 +28,9 @@
 namespace hypr::detail {
 struct Transfer;
 }
+namespace taiga::http {
+using Transfer = hypr::detail::Transfer;
+}
 
 namespace taiga {
 
@@ -53,7 +56,7 @@ private:
   bool IsAnimeRelationsAvailable() const;
   bool ParseData(std::wstring data);
   bool RunInstaller();
-  bool OnTransfer(const hypr::detail::Transfer& transfer);
+  bool OnTransfer(const taiga::http::Transfer& transfer);
 
   std::wstring download_path_;
   std::unique_ptr<Item> current_item_;

@@ -29,6 +29,9 @@ struct Transfer;
 namespace library {
 struct QueueItem;
 }
+namespace taiga::http {
+using Transfer = hypr::detail::Transfer;
+}
 
 namespace sync {
 
@@ -65,7 +68,7 @@ bool IsUserAccountAvailable();
 bool IsUserAuthenticationAvailable();
 
 void OnError(const RequestType type);
-bool OnTransfer(const RequestType type, const hypr::detail::Transfer& transfer,
+bool OnTransfer(const RequestType type, const taiga::http::Transfer& transfer,
                 const std::wstring& status);
 void OnResponse(const RequestType type);
 

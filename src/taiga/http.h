@@ -19,6 +19,7 @@
 #pragma once
 
 #include <functional>
+#include <string_view>
 
 #include <hypp.hpp>
 #include <hypr.hpp>
