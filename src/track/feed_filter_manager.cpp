@@ -54,11 +54,11 @@ void FeedFilterManager::AddPresets() {
   AddPresets(filters_);
 }
 
-std::vector<FeedFilterPreset> FeedFilterManager::GetPresets() const {
+const std::vector<FeedFilterPreset>& FeedFilterManager::GetPresets() const {
   return presets_;
 }
 
-std::vector<FeedFilter> FeedFilterManager::GetFilters() const {
+const std::vector<FeedFilter>& FeedFilterManager::GetFilters() const {
   return filters_;
 }
 

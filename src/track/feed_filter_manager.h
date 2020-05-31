@@ -36,8 +36,8 @@ public:
 
   void AddPresets(std::vector<FeedFilter>& filters);
   void AddPresets();
-  std::vector<FeedFilterPreset> GetPresets() const;
-  std::vector<FeedFilter> GetFilters() const;
+  const std::vector<FeedFilterPreset>& GetPresets() const;
+  const std::vector<FeedFilter>& GetFilters() const;
   void SetFilters(const std::vector<FeedFilter>& filters);
 
   void Filter(Feed& feed, bool preferences);
