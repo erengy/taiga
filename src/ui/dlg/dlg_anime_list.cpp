@@ -1570,11 +1570,11 @@ void AnimeListDialog::ListView::InitializeColumns(bool reset) {
        LVCFMT_CENTER, L"Average", L"anime_average_rating"})));
   columns.insert(std::make_pair(kColumnAnimeType, ColumnData(
       {kColumnAnimeType, true, i, i++,
-       0, static_cast<unsigned short>(ScaleX(60)), static_cast<unsigned short>(ScaleX(60)),
+       0, static_cast<unsigned short>(ScaleX(65)), static_cast<unsigned short>(ScaleX(65)),
        LVCFMT_CENTER, L"Type", L"anime_type"})));
   columns.insert(std::make_pair(kColumnAnimeSeason, ColumnData(
       {kColumnAnimeSeason, true, i, i++,
-       0, static_cast<unsigned short>(ScaleX(90)), static_cast<unsigned short>(ScaleX(90)),
+       0, static_cast<unsigned short>(ScaleX(95)), static_cast<unsigned short>(ScaleX(95)),
        LVCFMT_RIGHT, L"Season", L"anime_season"})));
   columns.insert(std::make_pair(kColumnUserDateStarted, ColumnData(
       {kColumnUserDateStarted, false, i, i++,
