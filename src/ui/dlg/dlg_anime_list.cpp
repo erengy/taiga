@@ -1372,7 +1372,7 @@ void AnimeListDialog::RefreshList(std::optional<anime::MyStatus> status) {
   // Add items to list
   std::map<anime::MyStatus, int> group_count;
   int group_index = -1;
-  int i = 0;
+  int item_index = 0;
   for (const auto& [anime_id, anime_item] : anime::db.items) {
     if (!anime_item.IsInList())
       continue;
@@ -1391,12 +1391,12 @@ void AnimeListDialog::RefreshList(std::optional<anime::MyStatus> status) {
 
     group_count[anime_item.GetMyStatus()]++;
     group_index = group_view ? static_cast<int>(anime_item.GetMyStatus()) : -1;
-    i = listview.GetItemCount();
+    item_index = listview.GetItemCount();
 
-    listview.InsertItem(i, group_index, -1,
+    listview.InsertItem(item_index, group_index, -1,
                         0, nullptr, LPSTR_TEXTCALLBACK,
                         static_cast<LPARAM>(anime_item.GetId()));
-    RefreshListItemColumns(i, anime_item);
+    RefreshListItemColumns(item_index, anime_item);
   }
 
   auto timer = taiga::timers.timer(taiga::kTimerAnimeList);
@@ -1406,9 +1406,9 @@ void AnimeListDialog::RefreshList(std::optional<anime::MyStatus> status) {
   // Set group headers
   if (group_view) {
     for (const auto status : anime::kMyStatuses) {
-      std::wstring text = ui::TranslateMyStatus(status, false);
-      text += group_count[status] > 0 ? L" ({})"_format(group_count[status]) : L"";
-      listview.SetGroupText(i, text.c_str());
+      const auto text = L"{} ({})"_format(ui::TranslateMyStatus(status, false),
+                                          group_count[status]);
+      listview.SetGroupText(static_cast<int>(status), text.c_str());
     }
   }
 
