@@ -53,7 +53,7 @@ public:
   std::pair<DateFull, DateFull> to_date_range() const;
 
   Name name = Name::Unknown;
-  date::year year;
+  date::year year{0};
 };
 
 }  // namespace anime

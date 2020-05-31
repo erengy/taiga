@@ -144,7 +144,7 @@ Season::Season(const std::string& str) {
 ////////////////////////////////////////////////////////////////////////////////
 
 Season::operator bool() const {
-  return name != UnknownSeason && year.ok();
+  return name != UnknownSeason && static_cast<int>(year);
 }
 
 Season& Season::operator++() {
@@ -171,9 +171,9 @@ Season& Season::operator--() {
 
 int Season::compare(const Season& season) const {
   if (year != season.year) {
-    if (!year.ok())
+    if (!static_cast<int>(year))
       return nstd::cmp::greater;
-    if (!season.year.ok())
+    if (!static_cast<int>(season.year))
       return nstd::cmp::less;
     return year < season.year ? nstd::cmp::less : nstd::cmp::greater;
   }
