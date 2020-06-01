@@ -58,6 +58,7 @@ std::wstring TranslateStatus(const anime::SeriesStatus value) {
 
 std::wstring TranslateType(const anime::SeriesType value) {
   switch (value) {
+    case anime::SeriesType::Unknown: return L"Unknown";
     case anime::SeriesType::Tv: return L"TV";
     case anime::SeriesType::Ova: return L"OVA";
     case anime::SeriesType::Movie: return L"Movie";

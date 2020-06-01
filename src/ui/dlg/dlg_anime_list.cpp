@@ -1217,6 +1217,10 @@ LRESULT AnimeListDialog::OnListCustomDraw(LPARAM lParam) {
               taiga::settings.GetAppListHighlightNewEpisodes())
             pCD->clrText = GetSysColor(COLOR_HIGHLIGHT);
           break;
+        case kColumnAnimeType:
+          if (anime_item->GetType() == anime::SeriesType::Unknown)
+            pCD->clrText = GetSysColor(COLOR_GRAYTEXT);
+          break;
         case kColumnUserRating:
           if (!anime_item->GetMyScore())
             pCD->clrText = GetSysColor(COLOR_GRAYTEXT);
