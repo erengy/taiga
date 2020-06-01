@@ -348,6 +348,7 @@ void OnError(const RequestType type) {
       ui::EnableDialogInput(ui::Dialog::Main, true);
       break;
     case RequestType::GetSeason:
+      ui::OnLibraryGetSeason();
       ui::EnableDialogInput(ui::Dialog::Seasons, true);
       break;
     case RequestType::AddLibraryEntry:
