@@ -82,9 +82,9 @@ BOOL SeasonDialog::OnInitDialog() {
   BYTE fsStyle0 = BTNS_AUTOSIZE;
   BYTE fsStyle1 = BTNS_AUTOSIZE | BTNS_SHOWTEXT;
   BYTE fsStyle2 = BTNS_AUTOSIZE | BTNS_SHOWTEXT | BTNS_WHOLEDROPDOWN;
-  toolbar_.InsertButton(0, ui::kIcon16_Calendar, kCommandSelectSeason, fsState, fsStyle2, 0, L"Select season", L"Select season");
-  toolbar_.InsertButton(1, ui::kIcon16_CalendarPrev, kCommandPreviousSeason, fsState, fsStyle0, 1, nullptr, L"Previous season");
-  toolbar_.InsertButton(2, ui::kIcon16_CalendarNext, kCommandNextSeason, fsState, fsStyle0, 2, nullptr, L"Next season");
+  toolbar_.InsertButton(0, ui::kIcon16_CalendarPrev, kCommandPreviousSeason, fsState, fsStyle0, 0, nullptr, L"Previous season");
+  toolbar_.InsertButton(1, ui::kIcon16_CalendarNext, kCommandNextSeason, fsState, fsStyle0, 1, nullptr, L"Next season");
+  toolbar_.InsertButton(2, ui::kIcon16_Calendar, kCommandSelectSeason, fsState, fsStyle2, 2, L"Select season", L"Select season");
   toolbar_.InsertButton(3, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
   toolbar_.InsertButton(4, ui::kIcon16_Refresh, kCommandRefreshSeason, fsState, fsStyle1, 4, L"Refresh data", L"Download anime details and missing images");
   toolbar_.InsertButton(5, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
@@ -732,7 +732,7 @@ void SeasonDialog::RefreshStatus() {
 }
 
 void SeasonDialog::RefreshToolbar() {
-  toolbar_.SetButtonText(0, anime::season_db.current_season ?
+  toolbar_.SetButtonText(2, anime::season_db.current_season ?
       ui::TranslateSeason(anime::season_db.current_season).c_str() :
       L"Select season");
 
