@@ -32,7 +32,9 @@ FeedSource GetFeedSource(const std::wstring& channel_link) {
     {L"anidex", FeedSource::AniDex},
     {L"animebytes", FeedSource::AnimeBytes},
     {L"minglong", FeedSource::Minglong},
+    {L"nyaa.net", FeedSource::NyaaPantsu},
     {L"nyaa.pantsu", FeedSource::NyaaPantsu},
+    {L"nyaa.pt", FeedSource::NyaaPantsu},
     {L"nyaa.si", FeedSource::NyaaSi},
     {L"tokyotosho", FeedSource::TokyoToshokan},
   };
