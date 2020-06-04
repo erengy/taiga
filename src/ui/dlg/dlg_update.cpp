@@ -93,12 +93,16 @@ BOOL UpdateDialog::OnDestroy() {
 }
 
 void UpdateDialog::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
-  // Paint background
   win::Dc dc = hdc;
+  win::Rect rect;
+
+  if (!lpps)
+    return;
+
+  // Paint background
   dc.FillRect(lpps->rcPaint, ::GetSysColor(COLOR_WINDOW));
 
   // Paint application icon
-  win::Rect rect;
   win::Window label = GetDlgItem(IDC_STATIC_APP_ICON);
   label.GetWindowRect(GetWindowHandle(), &rect);
   label.SetWindowHandle(nullptr);

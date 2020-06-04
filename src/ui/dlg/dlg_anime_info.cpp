@@ -272,6 +272,9 @@ void AnimeDialog::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
   win::Dc dc = hdc;
   win::Rect rect;
 
+  if (!lpps)
+    return;
+
   // Paint background
   rect.Copy(lpps->rcPaint);
   dc.FillRect(rect, ::GetSysColor(COLOR_WINDOW));
