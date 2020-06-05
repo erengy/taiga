@@ -135,7 +135,7 @@ static bool ShellExecute(const std::wstring& verb, const std::wstring& path,
   if (path.empty())
     return false;
 
-  if (path.length() > MAX_PATH)
+  if (path.length() > MAX_PATH && !verb.empty())
     LOGW(L"Path is longer than MAX_PATH: {}", path);
 
   SHELLEXECUTEINFO info = {0};
