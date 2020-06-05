@@ -160,8 +160,17 @@ void Database::AddToList(int anime_id, MyStatus status) {
     return;
 
   if (taiga::GetCurrentUsername().empty()) {
-    ui::ChangeStatusText(
-        L"Please set up your account before adding anime to your list.");
+    switch (sync::GetCurrentServiceId()) {
+      case sync::ServiceId::Kitsu:
+        ui::ChangeStatusText(
+            L"Please set the profile URL for your Kitsu account "
+            L"before adding anime to your list.");
+        break;
+      default:
+        ui::ChangeStatusText(
+            L"Please set up your account before adding anime to your list.");
+        break;
+    }
     return;
   }
 

@@ -656,6 +656,14 @@ void GetLibraryEntries(const int page) {
   if (account.id().empty()) {
     ui::ChangeStatusText(
         L"Kitsu: Cannot get anime list. User ID is unavailable.");
+    sync::OnError(RequestType::GetLibraryEntries);
+    return;
+  }
+  if (Account::username().empty()) {
+    ui::ChangeStatusText(
+        L"Kitsu: Cannot get anime list. "
+        L"Please set the profile URL for your account.");
+    sync::OnError(RequestType::GetLibraryEntries);
     return;
   }
 
