@@ -233,7 +233,9 @@ RatingSystem TranslateRatingSystemFrom(const std::string& value) {
   if (it != table.end())
     return it->second;
 
-  LOGD(L"Invalid value: {}", StrToWstr(value));
+  if (!value.empty())  // Can be empty for logged out users
+    LOGD(L"Invalid value: {}", StrToWstr(value));
+
   return kDefaultRatingSystem;
 }
 
