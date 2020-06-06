@@ -855,7 +855,10 @@ bool OnTwitterTokenEntry(std::wstring& auth_pin) {
 ////////////////////////////////////////////////////////////////////////////////
 
 void OnLogin() {
-  ChangeStatusText(L"Logged in as " + taiga::GetCurrentUserDisplayName());
+  // Can be empty for users logging in for the first time with Kitsu
+  const auto display_name = taiga::GetCurrentUserDisplayName();
+  if (!display_name.empty())
+    ChangeStatusText(L"Logged in as " + display_name);
 
   Menus.UpdateAll();
 
