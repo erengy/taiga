@@ -22,6 +22,7 @@
 #include "taiga/settings_keys.h"
 
 #include "base/file.h"
+#include "base/log.h"
 #include "base/string.h"
 #include "link/discord.h"
 #include "link/mirc.h"
@@ -309,6 +310,9 @@ void Settings::SetSyncActiveService(const sync::ServiceId service_id) {
 
     if (!anime::db.items.empty()) {
       if (ui::OnSettingsServiceChangeConfirm(previous_service_id, service_id)) {
+        LOGW(L"Changing the active service from {} to {}.",
+             sync::GetServiceNameById(previous_service_id),
+             sync::GetServiceNameById(service_id));
         anime::db.SaveList(true);
         anime::db.items.clear();
         anime::db.SaveDatabase();
