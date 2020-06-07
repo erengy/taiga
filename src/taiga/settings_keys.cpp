@@ -308,7 +308,7 @@ void Settings::SetSyncActiveService(const sync::ServiceId service_id) {
     }
 
     if (!anime::db.items.empty()) {
-      if (ui::OnSettingsServiceChangeConfirm(service_id, previous_service_id)) {
+      if (ui::OnSettingsServiceChangeConfirm(previous_service_id, service_id)) {
         anime::db.SaveList(true);
         anime::db.items.clear();
         anime::db.SaveDatabase();
