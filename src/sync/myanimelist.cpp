@@ -47,6 +47,10 @@ namespace sync::myanimelist {
 
 struct Error {
   enum class Type {
+    // 400 Bad Request
+    // {"error":"bad_request","message":"invalid q"}
+    BadRequest,
+
     // 401 Unauthorized
     // WWW-Authenticate: Bearer error="invalid_token",error_description="The access token expired"
     // {"error":"invalid_token"}
@@ -162,6 +166,7 @@ std::optional<Error> HasError(const taiga::http::Response& response) {
   if (Json root; JsonParseString(response.body(), root)) {
     if (root.contains("error")) {
       static const std::map<std::string, Error::Type> known_errors{
+          {"bad_request", Error::Type::BadRequest},
           {"forbidden", Error::Type::Forbidden},
           {"invalid_request", Error::Type::RefreshTokenExpired}};
       const auto it = known_errors.find(JsonReadStr(root, "error"));
