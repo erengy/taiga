@@ -122,6 +122,25 @@ double TranslateSeriesRatingTo(double value) {
   return value * 10.0;
 }
 
+anime::SeriesStatus TranslateSeriesStatusFrom(const std::string& value) {
+  static const std::map<std::string, anime::SeriesStatus> table{
+    {"current", anime::SeriesStatus::Airing},
+    {"finished", anime::SeriesStatus::FinishedAiring},
+    {"tba", anime::SeriesStatus::Unknown},
+    {"unreleased", anime::SeriesStatus::NotYetAired},
+    {"upcoming", anime::SeriesStatus::NotYetAired},
+  };
+
+  const auto it = table.find(value);
+  if (it != table.end())
+    return it->second;
+
+  if (!value.empty())
+    LOGW(L"Invalid value: {}", StrToWstr(value));
+
+  return anime::SeriesStatus::Unknown;
+}
+
 anime::SeriesType TranslateSeriesTypeFrom(const std::string& value) {
   static const std::map<std::string, anime::SeriesType> table{
     {"TV", anime::SeriesType::Tv},

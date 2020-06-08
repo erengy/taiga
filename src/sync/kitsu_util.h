@@ -27,6 +27,7 @@
 namespace anime {
 enum class AgeRating;
 enum class MyStatus;
+enum class SeriesStatus;
 enum class SeriesType;
 class Item;
 }
@@ -39,6 +40,7 @@ std::vector<Rating> GetMyRatings(RatingSystem rating_system);
 anime::AgeRating TranslateAgeRatingFrom(const std::string& value);
 double TranslateSeriesRatingFrom(const std::string& value);
 double TranslateSeriesRatingTo(double value);
+anime::SeriesStatus TranslateSeriesStatusFrom(const std::string& value);
 anime::SeriesType TranslateSeriesTypeFrom(const std::string& value);
 std::wstring TranslateMyDateFrom(const std::string& value);
 std::string TranslateMyDateTo(const std::wstring& value);

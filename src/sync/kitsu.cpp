@@ -261,6 +261,7 @@ void UseSparseFieldsetsForAnime(hypr::Params& params, bool minimal) {
       "posterImage,"
       "slug,"
       "startDate,"
+      "status,"
       "subtype,"
       "titles,"
       // relationships
@@ -328,6 +329,8 @@ int ParseAnimeObject(const Json& json) {
       StrToWstr(JsonReadStr(attributes["posterImage"], "small")));
   anime_item.SetSlug(StrToWstr(JsonReadStr(attributes, "slug")));
   anime_item.SetDateStart(StrToWstr(JsonReadStr(attributes, "startDate")));
+  anime_item.SetAiringStatus(
+      TranslateSeriesStatusFrom(JsonReadStr(attributes, "status")));
   anime_item.SetType(
       TranslateSeriesTypeFrom(JsonReadStr(attributes, "subtype")));
   anime_item.SetSynopsis(
