@@ -55,6 +55,24 @@ std::string TranslateSeasonTo(const std::wstring& value) {
   return WstrToStr(ToUpper_Copy(value));
 }
 
+anime::SeriesStatus TranslateSeriesStatusFrom(const std::string& value) {
+  static const std::map<std::string, anime::SeriesStatus> table{
+    {"FINISHED", anime::SeriesStatus::FinishedAiring},
+    {"RELEASING", anime::SeriesStatus::Airing},
+    {"NOT_YET_RELEASED", anime::SeriesStatus::NotYetAired},
+    {"CANCELLED", anime::SeriesStatus::NotYetAired},
+  };
+
+  const auto it = table.find(value);
+  if (it != table.end())
+    return it->second;
+
+  if (!value.empty())
+    LOGW(L"Invalid value: {}", StrToWstr(value));
+
+  return anime::SeriesStatus::Unknown;
+}
+
 double TranslateSeriesRatingFrom(int value) {
   return static_cast<double>(value) / 10.0;
 }

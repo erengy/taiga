@@ -6,6 +6,7 @@ title {
   userPreferred
 }
 format
+status
 description
 startDate { year month day }
 endDate { year month day }

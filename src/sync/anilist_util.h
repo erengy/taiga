@@ -27,6 +27,7 @@ class Date;
 
 namespace anime {
 enum class MyStatus;
+enum class SeriesStatus;
 enum class SeriesType;
 class Item;
 }
@@ -38,6 +39,7 @@ enum class RatingSystem;
 Date TranslateFuzzyDateFrom(const Json& json);
 Json TranslateFuzzyDateTo(const Date& date);
 std::string TranslateSeasonTo(const std::wstring& value);
+anime::SeriesStatus TranslateSeriesStatusFrom(const std::string& value);
 double TranslateSeriesRatingFrom(int value);
 double TranslateSeriesRatingTo(double value);
 anime::SeriesType TranslateSeriesTypeFrom(const std::string& value);

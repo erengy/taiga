@@ -216,6 +216,8 @@ int ParseMediaObject(const Json& json) {
 
   anime_item.SetTitle(StrToWstr(JsonReadStr(json["title"], "userPreferred")));
   anime_item.SetType(TranslateSeriesTypeFrom(JsonReadStr(json, "format")));
+  anime_item.SetAiringStatus(
+      TranslateSeriesStatusFrom(JsonReadStr(json, "status")));
   anime_item.SetSynopsis(
       anime::NormalizeSynopsis(StrToWstr(JsonReadStr(json, "description"))));
   anime_item.SetDateStart(TranslateFuzzyDateFrom(json["startDate"]));
