@@ -51,6 +51,13 @@ bool IsValidId(int anime_id) {
 ////////////////////////////////////////////////////////////////////////////////
 
 SeriesStatus GetAiringStatus(const Item& item) {
+  // We can trust the active service when it says something happened in the past
+  // (but not the opposite, because the information might be stale). This
+  // handles the case where an anime has finished airing but the dates are
+  // unknown.
+  if (item.GetAiringStatus(false) == SeriesStatus::FinishedAiring)
+    return SeriesStatus::FinishedAiring;
+
   const auto& date_start = item.GetDateStart();
   const auto& date_end = item.GetDateEnd();
 
@@ -85,13 +92,7 @@ bool IsAiredYet(const Item& item) {
 }
 
 bool IsFinishedAiring(const Item& item) {
-  if (item.GetAiringStatus(false) == SeriesStatus::FinishedAiring)
-    return true;
-
-  if (GetAiringStatus(item) == SeriesStatus::FinishedAiring)
-    return true;
-
-  return false;
+  return item.GetAiringStatus() == SeriesStatus::FinishedAiring;
 }
 
 int EstimateDuration(const Item& item) {

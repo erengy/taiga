@@ -159,7 +159,7 @@ void Database::WriteDatabaseNode(XmlNode& database_node) const {
     XML_WS(L"japanese", item.GetJapaneseTitle(), pugi::node_cdata);
     XML_WC(L"synonym", item.GetSynonyms(), pugi::node_cdata);
     XML_WI(L"type", static_cast<int>(item.GetType()));
-    XML_WI(L"status", static_cast<int>(item.GetAiringStatus()));
+    XML_WI(L"status", static_cast<int>(item.GetAiringStatus(false)));
     XML_WI(L"episode_count", item.GetEpisodeCount());
     XML_WI(L"episode_length", item.GetEpisodeLength());
     XML_WD(L"date_start", item.GetDateStart());
