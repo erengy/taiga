@@ -51,31 +51,21 @@ bool IsValidId(int anime_id) {
 ////////////////////////////////////////////////////////////////////////////////
 
 SeriesStatus GetAiringStatus(const Item& item) {
-  auto assume_worst_case = [](Date date) {
-    if (!date.month()) date.set_month(12);
-    if (!date.day()) date.set_day(31);
-    return date;
-  };
+  const auto& date_start = item.GetDateStart();
+  const auto& date_end = item.GetDateEnd();
 
-  const Date now = GetDateJapan();
+  if (date_start.empty() && date_end.empty())
+    return SeriesStatus::Unknown;
 
-  if (!IsValidDate(item.GetDateStart()))
-    return SeriesStatus::NotYetAired;
-  const Date start = assume_worst_case(item.GetDateStart());
-  if (now < start)
-    return SeriesStatus::NotYetAired;
+  const Date today = GetDateJapan();
 
-  // We don't need to check the end date for single-episode anime
-  if (item.GetEpisodeCount() == 1)
+  if (!date_end.empty() && date_end < today)
     return SeriesStatus::FinishedAiring;
 
-  if (!IsValidDate(item.GetDateEnd()))
-    return SeriesStatus::Airing;
-  const Date end = assume_worst_case(item.GetDateEnd());
-  if (now <= end)
+  if (!date_start.empty() && date_start <= today)
     return SeriesStatus::Airing;
 
-  return SeriesStatus::FinishedAiring;
+  return SeriesStatus::NotYetAired;
 }
 
 bool IsAiredYet(const Item& item) {
