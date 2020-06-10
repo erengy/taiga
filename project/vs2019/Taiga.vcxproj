@@ -60,7 +60,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;NOMINMAX;_WINDOWS;_WIN32_WINNT=0x0600;PUGIXML_NO_XPATH;PUGIXML_WCHAR_MODE;FMT_EXCEPTIONS=0;UTF8PROC_STATIC;CURL_STATICLIB;HTTP_ONLY;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)\x\x\%(RelativeDir)</ObjectFileName>
-      <AdditionalIncludeDirectories>..\..\deps\src;..\..\deps\src\anisthesia\include;..\..\deps\src\curl\include;..\..\deps\src\date\include;..\..\deps\src\discord-rpc\include;..\..\deps\src\fmt\include;..\..\deps\src\hypp\include;..\..\deps\src\hypr\include;..\..\deps\src\json\single_include;..\..\deps\src\nstd\include;..\..\deps\src\pugixml\src;..\..\deps\src\random\include;..\..\deps\src\rapidjson\include;..\..\deps\src\semaver\include;..\..\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\deps\src;..\..\deps\src\anisthesia\include;..\..\deps\src\curl\include;..\..\deps\src\date\include;..\..\deps\src\discord-rpc\include;..\..\deps\src\fmt\include;..\..\deps\src\hypp\include;..\..\deps\src\hypr\include;..\..\deps\src\json\single_include;..\..\deps\src\monolog\include;..\..\deps\src\nstd\include;..\..\deps\src\pugixml\src;..\..\deps\src\random\include;..\..\deps\src\rapidjson\include;..\..\deps\src\semaver\include;..\..\src</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -88,7 +88,7 @@
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <ObjectFileName>$(IntDir)\x\x\%(RelativeDir)</ObjectFileName>
-      <AdditionalIncludeDirectories>..\..\deps\src;..\..\deps\src\anisthesia\include;..\..\deps\src\curl\include;..\..\deps\src\date\include;..\..\deps\src\discord-rpc\include;..\..\deps\src\fmt\include;..\..\deps\src\hypp\include;..\..\deps\src\hypr\include;..\..\deps\src\json\single_include;..\..\deps\src\nstd\include;..\..\deps\src\pugixml\src;..\..\deps\src\random\include;..\..\deps\src\rapidjson\include;..\..\deps\src\semaver\include;..\..\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\deps\src;..\..\deps\src\anisthesia\include;..\..\deps\src\curl\include;..\..\deps\src\date\include;..\..\deps\src\discord-rpc\include;..\..\deps\src\fmt\include;..\..\deps\src\hypp\include;..\..\deps\src\hypr\include;..\..\deps\src\json\single_include;..\..\deps\src\monolog\include;..\..\deps\src\nstd\include;..\..\deps\src\pugixml\src;..\..\deps\src\random\include;..\..\deps\src\rapidjson\include;..\..\deps\src\semaver\include;..\..\src</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -131,7 +131,7 @@
     <ClCompile Include="..\..\deps\src\discord-rpc\src\rpc_connection.cpp" />
     <ClCompile Include="..\..\deps\src\discord-rpc\src\serialization.cpp" />
     <ClCompile Include="..\..\deps\src\fmt\src\format.cc" />
-    <ClCompile Include="..\..\deps\src\monolog\monolog.cpp" />
+    <ClCompile Include="..\..\deps\src\monolog\src\monolog.cpp" />
     <ClCompile Include="..\..\deps\src\pugixml\src\pugixml.cpp" />
     <ClCompile Include="..\..\deps\src\utf8proc\utf8proc.c" />
     <ClCompile Include="..\..\deps\src\windows\win\application.cpp" />
@@ -330,7 +330,7 @@
     <ClInclude Include="..\..\deps\src\fmt\include\fmt\chrono.h" />
     <ClInclude Include="..\..\deps\src\fmt\include\fmt\format.h" />
     <ClInclude Include="..\..\deps\src\json\single_include\nlohmann\json.hpp" />
-    <ClInclude Include="..\..\deps\src\monolog\monolog.h" />
+    <ClInclude Include="..\..\deps\src\monolog\include\monolog.hpp" />
     <ClInclude Include="..\..\deps\src\pugixml\src\pugiconfig.hpp" />
     <ClInclude Include="..\..\deps\src\pugixml\src\pugixml.hpp" />
     <ClInclude Include="..\..\deps\src\random\include\effolkronium\random.hpp" />

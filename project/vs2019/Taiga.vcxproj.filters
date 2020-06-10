@@ -238,7 +238,7 @@
     <ClCompile Include="..\..\deps\src\discord-rpc\src\serialization.cpp">
       <Filter>deps\discord-rpc</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\deps\src\monolog\monolog.cpp">
+    <ClCompile Include="..\..\deps\src\monolog\src\monolog.cpp">
       <Filter>deps\monolog</Filter>
     </ClCompile>
     <ClCompile Include="..\..\deps\src\pugixml\src\pugixml.cpp">
@@ -816,7 +816,7 @@
     <ClInclude Include="..\..\deps\src\discord-rpc\src\serialization.h">
       <Filter>deps\discord-rpc</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\deps\src\monolog\monolog.h">
+    <ClInclude Include="..\..\deps\src\monolog\include\monolog.hpp">
       <Filter>deps\monolog</Filter>
     </ClInclude>
     <ClInclude Include="..\..\deps\src\pugixml\src\pugiconfig.hpp">
