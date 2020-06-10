@@ -314,6 +314,9 @@ void FeedConditionDialog::ChooseElement(int element_index) {
       break;
     case track::kFeedFilterElement_User_Status:
       RECREATE_COMBO(CBS_DROPDOWNLIST);
+      value_combo_.AddItem(
+          ui::TranslateMyStatus(anime::MyStatus::NotInList, false).c_str(),
+          static_cast<int>(anime::MyStatus::NotInList));
       for (const auto status : anime::kMyStatuses) {
         value_combo_.AddItem(ui::TranslateMyStatus(status, false).c_str(), static_cast<int>(status));
       }
