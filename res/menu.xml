@@ -184,6 +184,7 @@
 		<item name="MyAnimeList"        action="URL(https://myanimelist.net/anime.php?q=%title%)"/>
 		<item name="Reddit"             action="URL(https://www.reddit.com/search?sort=new&amp;q=subreddit%3Aanime%20title%3A%title%%20episode%20discussion)"/>
 		<item name="Wikipedia"          action="URL(https://en.wikipedia.org/wiki/Special:Search?search=%title%)"/>
+		<item name="YouTube"            action="URL(https://www.youtube.com/results?search_query=%title%)"/>
 		<item type="separator"/>
 		<item name="Custom RSS feed" action="SearchTorrents()"/>
 		<item name="Nyaa.si" action="SearchTorrents(https://nyaa.si/?page=rss&amp;c=1_2&amp;f=0&amp;q=%title%)"/>
