@@ -614,12 +614,19 @@ void ExecuteCommand(const std::wstring& str, WPARAM wParam, LPARAM lParam) {
   //   Searches for anime folder and opens it.
   //   lParam is an anime ID.
   } else if (command == L"OpenFolder") {
-    int anime_id = static_cast<int>(lParam);
-    auto anime_item = anime::db.Find(anime_id);
+    const int anime_id = static_cast<int>(lParam);
+    const auto anime_item = anime::db.Find(anime_id);
     if (!anime_item || !anime_item->IsInList())
       return;
     if (!anime::ValidateFolder(*anime_item))
       ScanAvailableEpisodes(false, anime_item->GetId(), 0);
+    const auto next_episode_path = anime_item->GetNextEpisodePath();
+    if (!next_episode_path.empty()) {
+      const auto anime_folder = anime_item->GetFolder();
+      if (anime_folder.empty() || StartsWith(next_episode_path, anime_folder))
+        if (OpenFolderAndSelectFile(next_episode_path))
+          return;
+    }
     if (anime_item->GetFolder().empty()) {
       if (ui::OnAnimeFolderNotFound()) {
         std::wstring default_path, path;
@@ -634,16 +641,8 @@ void ExecuteCommand(const std::wstring& str, WPARAM wParam, LPARAM lParam) {
         }
       }
     }
-    ui::ClearStatusText();
-    const auto next_episode_path = anime_item->GetNextEpisodePath();
-    const auto anime_folder = anime_item->GetFolder();
-    if (!next_episode_path.empty()) {
-      if (anime_folder.empty() || StartsWith(next_episode_path, anime_folder))
-        if (OpenFolderAndSelectFile(next_episode_path))
-          return;
-    }
-    if (!anime_folder.empty()) {
-      Execute(anime_folder);
+    if (!anime_item->GetFolder().empty()) {
+      Execute(anime_item->GetFolder());
     }
 
   //////////////////////////////////////////////////////////////////////////////
