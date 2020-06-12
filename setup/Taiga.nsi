@@ -126,7 +126,7 @@ Section "!${PRODUCT_NAME}" SECTION_DEFAULT
 
   ; Add files
   SetOutPath "$INSTDIR"
-  File "..\bin\Release\Taiga.exe"
+  File "..\bin\Debug\Taiga.exe"
   SetOutPath "$INSTDIR\data\"
   File /r "..\data\"
   SetOutPath "$INSTDIR\data\db\"
