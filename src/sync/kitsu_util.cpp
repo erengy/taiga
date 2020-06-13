@@ -126,7 +126,7 @@ anime::SeriesStatus TranslateSeriesStatusFrom(const std::string& value) {
   static const std::map<std::string, anime::SeriesStatus> table{
     {"current", anime::SeriesStatus::Airing},
     {"finished", anime::SeriesStatus::FinishedAiring},
-    {"tba", anime::SeriesStatus::Unknown},
+    {"tba", anime::SeriesStatus::NotYetAired},
     {"unreleased", anime::SeriesStatus::NotYetAired},
     {"upcoming", anime::SeriesStatus::NotYetAired},
   };

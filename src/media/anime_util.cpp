@@ -52,17 +52,19 @@ bool IsValidId(int anime_id) {
 
 SeriesStatus GetAiringStatus(const Item& item) {
   // We can trust the active service when it says something happened in the past
-  // (but not the opposite, because the information might be stale). This
-  // handles the case where an anime has finished airing but the dates are
-  // unknown.
+  // (but not the opposite, because the information might be stale).
+  // This is the most common case, and it also handles the rare case where an
+  // anime has finished airing but the dates are completely unknown.
   if (item.GetAiringStatus(false) == SeriesStatus::FinishedAiring)
     return SeriesStatus::FinishedAiring;
 
   const auto& date_start = item.GetDateStart();
   const auto& date_end = item.GetDateEnd();
 
+  // It is now safe to assume that an anime with unknown dates has not yet
+  // aired, considering we have covered the rare case mentioned above.
   if (date_start.empty() && date_end.empty())
-    return SeriesStatus::Unknown;
+    return SeriesStatus::NotYetAired;
 
   const Date today = GetDateJapan();
 
