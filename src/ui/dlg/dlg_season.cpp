@@ -298,10 +298,14 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       // markup text when the control has no items.
       if (list_.GetItemCount() == 0) {
         std::wstring text;
-        if (anime::season_db.items.empty()) {
-          text = L"No season selected. Please choose one from above.";
+        if (!anime::season_db.current_season) {
+          text = L"Please select a season.";
+        } else if (anime::season_db.items.empty()) {
+          text = L"No anime found for {} season."_format(
+              ui::TranslateSeason(anime::season_db.current_season));
         } else {
-          text = L"No matching items for \"" + DlgMain.search_bar.filters.text[kSidebarItemSeasons] + L"\".";
+          text = L"No anime found for \"{}\"."_format(
+              DlgMain.search_bar.filters.text[kSidebarItemSeasons]);
         }
         hdc.EditFont(L"Segoe UI", 9, -1, TRUE);
         hdc.SetBkMode(TRANSPARENT);
