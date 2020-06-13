@@ -297,6 +297,7 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       // LVN_GETEMPTYMARKUP notification is sent only once, so we paint our own
       // markup text when the control has no items.
       if (list_.GetItemCount() == 0) {
+        list_.GetClientRect(&rect);  // nmcd.rc is invalid while drawing a selection box
         std::wstring text;
         if (!anime::season_db.current_season) {
           text = L"Please select a season.";
