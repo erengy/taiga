@@ -81,7 +81,7 @@ Feed ParseDocument(const XmlDocument& document) {
 
     // All elements of an item are optional, however at least one of title or
     // description must be present.
-    if (item.title.empty() || item.description.empty())
+    if (item.title.empty() && item.description.empty())
       continue;
 
     DecodeHtmlEntities(item.title);
