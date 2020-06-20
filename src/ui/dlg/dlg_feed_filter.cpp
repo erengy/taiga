@@ -174,6 +174,8 @@ void FeedFilterDialog::ChoosePage(int index) {
       page_1_.RefreshConditionList();
       page_1_.match_combo.SetCurSel(filter.match);
       page_1_.action_combo.SetCurSel(filter.action);
+      page_1_.option_combo.SetCurSel(filter.option);
+      page_1_.ChangeAction();
       main_instructions_label_.SetText(
           L"Change filter options and add conditions");
       break;
@@ -567,7 +569,15 @@ void FeedFilterDialog::DialogPage1::RefreshConditionList() {
 }
 
 void FeedFilterDialog::DialogPage1::ChangeAction() {
-  bool enabled = action_combo.GetCurSel() == track::kFeedFilterActionDiscard;
+  const bool enabled = [this]() {
+    switch (action_combo.GetCurSel()) {
+      case track::kFeedFilterActionDiscard:
+      case track::kFeedFilterActionPrefer:
+        return true;
+      default:
+        return false;
+    }
+  }();
 
   if (!enabled)
     option_combo.SetCurSel(track::kFeedFilterOptionDefault);
