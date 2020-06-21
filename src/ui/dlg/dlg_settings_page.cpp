@@ -955,18 +955,6 @@ LRESULT SettingsPage::OnNotify(int idCtrl, LPNMHDR pnmh) {
     }
 
     // Text callback
-    case LVN_GETDISPINFO: {
-      NMLVDISPINFO* plvdi = reinterpret_cast<NMLVDISPINFO*>(pnmh);
-      auto anime_item = anime::db.Find(static_cast<int>(plvdi->item.lParam));
-      if (!anime_item)
-        break;
-      switch (plvdi->item.iSubItem) {
-        case 0:  // Anime title
-          plvdi->item.pszText = const_cast<LPWSTR>(anime::GetPreferredTitle(*anime_item).data());
-          break;
-      }
-      break;
-    }
     case TBN_GETINFOTIP: {
       if (pnmh->hwndFrom == GetDlgItem(IDC_TOOLBAR_FEED_FILTER)) {
         win::Toolbar toolbar = GetDlgItem(IDC_TOOLBAR_FEED_FILTER);
