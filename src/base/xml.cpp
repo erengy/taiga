@@ -41,16 +41,17 @@ XmlNode XmlChild(XmlNode& node, const std::wstring_view name) {
 
 std::wstring XmlDump(const XmlNode node) {
   struct xml_string_writer : pugi::xml_writer {
-    std::wstring result;
+    std::string result;
     void write(const void* data, size_t size) override {
-      result.append(static_cast<const pugi::char_t*>(data), size);
+      result.append(static_cast<const char*>(data), size);
     }
   };
 
   xml_string_writer writer;
-  node.print(writer);
+  node.print(writer, PUGIXML_TEXT("\t"), pugi::format_default,
+             pugi::encoding_utf8);
 
-  return std::move(writer.result);
+  return StrToWstr(writer.result);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
