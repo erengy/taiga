@@ -147,6 +147,14 @@ static const std::vector<StreamData> stream_data{
     std::regex("youtube\\.com/watch"),
     std::regex(u8"YouTube|(?:\u25B6 )?(.+) - YouTube"),
   },
+    //Twist.moe
+  {
+    Stream::Twist,
+    L"Twist",
+    L"https://twist.moe",
+    std::regex("twist\.moe/(?:a|anime)/"),
+    std::regex("(.+) - Anime Twist"),
+  },
 };
 
 const std::vector<StreamData>& GetStreamData() {
@@ -181,7 +189,9 @@ bool IsStreamEnabled(const Stream stream) {
       return taiga::settings.GetStreamYahoo();
     case Stream::Youtube:
       return taiga::settings.GetStreamYoutube();
-  }
+    case Stream::Twist:
+      return taiga::settings.GetStreamTwist();
+  }   
   return false;
 }
 
@@ -225,6 +235,9 @@ void EnableStream(const Stream stream, const bool enabled) {
       break;
     case Stream::Youtube:
       taiga::settings.SetStreamYoutube(enabled);
+      break;
+    case Stream::Twist:
+      taiga::settings.SetStreamTwist(enabled);
       break;
   }
 }
