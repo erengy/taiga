@@ -412,7 +412,7 @@ BOOL SettingsPage::OnInitDialog() {
       win::Toolbar toolbar = GetDlgItem(IDC_TOOLBAR_FEED_FILTER);
       toolbar.SetImageList(ui::Theme.GetImageList16().GetHandle(), ScaleX(16), ScaleY(16));
       toolbar.SendMessage(TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_MIXEDBUTTONS);
-      // Add toolbar items
+      // Add toolbar items (see TBN_GETINFOTIP for actual tooltips)
       BYTE fsState1 = TBSTATE_ENABLED;
       BYTE fsState2 = TBSTATE_INDETERMINATE;
       toolbar.InsertButton(0, ui::kIcon16_Plus,      100, fsState1, 0, 0, nullptr, L"Add new filter...");
@@ -957,11 +957,26 @@ LRESULT SettingsPage::OnNotify(int idCtrl, LPNMHDR pnmh) {
     // Text callback
     case TBN_GETINFOTIP: {
       if (pnmh->hwndFrom == GetDlgItem(IDC_TOOLBAR_FEED_FILTER)) {
-        win::Toolbar toolbar = GetDlgItem(IDC_TOOLBAR_FEED_FILTER);
-        NMTBGETINFOTIP* git = reinterpret_cast<NMTBGETINFOTIP*>(pnmh);
-        git->cchTextMax = INFOTIPSIZE;
-        git->pszText = (LPWSTR)(toolbar.GetButtonTooltip(git->lParam));
-        toolbar.SetWindowHandle(nullptr);
+        // These are normally stored in win::Toolbar, but we don't actually have
+        // a persistent object in this case.
+        static const std::vector<std::wstring> tooltips{
+          L"Add new filter...",
+          L"Delete filter",
+          L"",
+          L"Move up",
+          L"Move down",
+          L"",
+          L"Import filters...",
+          L"Export filters...",
+          L"",
+          L"Reset filters",
+        };
+        const auto git = reinterpret_cast<NMTBGETINFOTIP*>(pnmh);
+        const auto index = static_cast<size_t>(git->lParam);
+        if (index < tooltips.size()) {
+          git->cchTextMax = INFOTIPSIZE;
+          git->pszText = const_cast<LPWSTR>(tooltips.at(index).data());
+        }
       }
       break;
     }
