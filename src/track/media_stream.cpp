@@ -155,6 +155,14 @@ static const std::vector<StreamData> stream_data{
     std::regex("twist\.moe/(?:a|anime)/"),
     std::regex("(.+) - Anime Twist"),
   },
+   // Kissanime.ru
+   {
+       Stream::Kissanime,
+       L"Kissanime",
+       L"https://kissanime.ru",
+       std::regex("kissanime\\.ru/Anime/"),
+       std::regex("(.+) - Watch .+ online in high quality"),
+   },
 };
 
 const std::vector<StreamData>& GetStreamData() {
@@ -191,6 +199,8 @@ bool IsStreamEnabled(const Stream stream) {
       return taiga::settings.GetStreamYoutube();
     case Stream::Twist:
       return taiga::settings.GetStreamTwist();
+    case Stream::Kissanime:
+      return taiga::settings.GetStreamKissanime();
   }   
   return false;
 }
@@ -238,6 +248,9 @@ void EnableStream(const Stream stream, const bool enabled) {
       break;
     case Stream::Twist:
       taiga::settings.SetStreamTwist(enabled);
+      break;
+    case Stream::Kissanime:
+      taiga::settings.SetStreamKissanime(enabled);
       break;
   }
 }

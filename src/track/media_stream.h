@@ -39,6 +39,7 @@ enum class Stream {
   Yahoo,
   Youtube,
   Twist,
+  Kissanime,
 };
 
 struct StreamData {

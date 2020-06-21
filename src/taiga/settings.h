@@ -230,6 +230,8 @@ public:
   void SetStreamYoutube(const bool enabled);
   bool GetStreamTwist() const;
   void SetStreamTwist(const bool enabled);
+  bool GetStreamKissanime() const;
+  void SetStreamKissanime(const bool enabled);
 
   // Sharing
   std::wstring GetShareDiscordApplicationId() const;
