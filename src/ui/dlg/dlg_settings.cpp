@@ -35,6 +35,7 @@
 #include "track/monitor.h"
 #include "ui/dlg/dlg_settings.h"
 #include "ui/theme.h"
+#include "ui/translate.h"
 
 namespace ui {
 
@@ -445,19 +446,25 @@ LRESULT SettingsDialog::TreeView::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam
 
 int SettingsDialog::AddTorrentFilterToList(HWND hwnd_list, const track::FeedFilter& filter) {
   win::ListView list = hwnd_list;
-  int index = list.GetItemCount();
-  int group = filter.anime_ids.empty() ? 0 : 1;
 
-  int icon = ui::kIcon16_Funnel;
-  switch (filter.action) {
-    case track::kFeedFilterActionDiscard: icon = ui::kIcon16_FunnelCross; break;
-    case track::kFeedFilterActionSelect:  icon = ui::kIcon16_FunnelTick;  break;
-    case track::kFeedFilterActionPrefer:  icon = ui::kIcon16_FunnelPlus;  break;
-  }
+  const int index = list.GetItemCount();
 
-  // Insert item
-  index = list.InsertItem(index, group, icon, 0, nullptr, filter.name.c_str(),
-                          reinterpret_cast<LPARAM>(&filter));
+  const int icon = [&filter]() {
+    switch (filter.action) {
+      default: return ui::kIcon16_Funnel;
+      case track::kFeedFilterActionDiscard: return ui::kIcon16_FunnelCross;
+      case track::kFeedFilterActionSelect: return ui::kIcon16_FunnelTick;
+      case track::kFeedFilterActionPrefer: return ui::kIcon16_FunnelPlus;
+    }
+  }();
+
+  const std::wstring limits = filter.anime_ids.empty()
+      ? L"All"
+      : L"{} anime"_format(filter.anime_ids.size());
+
+  list.InsertItem(index, -1, icon, 0, nullptr, filter.name.c_str(),
+                  reinterpret_cast<LPARAM>(&filter));
+  list.SetItem(index, 1, limits.c_str());
   list.SetCheckState(index, filter.enabled);
   list.SetWindowHandle(nullptr);
 
@@ -490,10 +497,10 @@ void SettingsDialog::RefreshTorrentFilterList(HWND hwnd_list) {
   win::ListView list = hwnd_list;
   list.DeleteAllItems();
 
-  for (auto it = feed_filters_.begin(); it != feed_filters_.end(); ++it)
-    AddTorrentFilterToList(hwnd_list, *it);
+  for (const auto& feed_filter : feed_filters_) {
+    AddTorrentFilterToList(hwnd_list, feed_filter);
+  }
 
-  list.SetColumnWidth(0, LVSCW_AUTOSIZE_USEHEADER);
   list.SetWindowHandle(nullptr);
 }
 

@@ -397,14 +397,11 @@ BOOL SettingsPage::OnInitDialog() {
       EnableDlgItem(IDC_LIST_TORRENT_FILTER, enable);
       EnableDlgItem(IDC_TOOLBAR_FEED_FILTER, enable);
       win::ListView list = GetDlgItem(IDC_LIST_TORRENT_FILTER);
-      list.EnableGroupView(true);
       list.SetExtendedStyle(LVS_EX_CHECKBOXES | LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_LABELTIP);
       list.SetImageList(ui::Theme.GetImageList16().GetHandle());
       list.SetTheme();
-      list.InsertColumn(0, 0, 0, LVS_ALIGNLEFT, L"Name");
-      list.SetColumnWidth(0, LVSCW_AUTOSIZE_USEHEADER);
-      list.InsertGroup(0, L"General filters", true, false);
-      list.InsertGroup(1, L"Limited filters", true, false);
+      list.InsertColumn(0, ScaleX(400), 0, LVCFMT_LEFT, L"Name");
+      list.InsertColumn(1, ScaleX(100), 0, LVCFMT_RIGHT, L"Applies to");
       parent->feed_filters_ = track::feed_filter_manager.GetFilters();
       parent->RefreshTorrentFilterList(list.GetWindowHandle());
       list.SetWindowHandle(nullptr);
@@ -439,8 +436,8 @@ BOOL SettingsPage::OnInitDialog() {
       win::ListView list = GetDlgItem(IDC_LIST_ADVANCED_SETTINGS);
       list.SetExtendedStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_LABELTIP);
       list.SetTheme();
-      list.InsertColumn(0, ScaleX(350), 0, LVS_ALIGNLEFT, L"Name");
-      list.InsertColumn(1, ScaleX(100), 0, LVS_ALIGNLEFT, L"Value");
+      list.InsertColumn(0, ScaleX(350), 0, LVCFMT_LEFT, L"Name");
+      list.InsertColumn(1, ScaleX(150), 0, LVCFMT_LEFT, L"Value");
       int list_index = 0;
       for (const auto& [key, value] : parent->advanced_settings_) {
         const auto description = GetAdvancedSettingDescription(key);
