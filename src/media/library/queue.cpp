@@ -238,55 +238,29 @@ bool Queue::IsQueued(int anime_id) const {
 
 QueueItem* Queue::FindItem(int anime_id, QueueSearch search_mode) {
   for (auto it = items.rbegin(); it != items.rend(); ++it) {
-    if (it->anime_id == anime_id && it->enabled) {
+    auto& item = *it; 
+    if (item.anime_id == anime_id && item.enabled) {
       switch (search_mode) {
-        // Date
         case QueueSearch::DateStart:
-          if (it->date_start)
-            return &(*it);
-          break;
+          return item.date_start ? &item : nullptr;
         case QueueSearch::DateEnd:
-          if (it->date_finish)
-            return &(*it);
-          break;
-        // Episode
+          return item.date_finish ? &item : nullptr;
         case QueueSearch::Episode:
-          if (it->episode)
-            return &(*it);
-          break;
-        // Notes
+          return item.episode ? &item : nullptr;
         case QueueSearch::Notes:
-          if (it->notes)
-            return &(*it);
-          break;
-        // Rewatched times
+          return item.notes ? &item : nullptr;
         case QueueSearch::RewatchedTimes:
-          if (it->rewatched_times)
-            return &(*it);
-          break;
-        // Rewatching
+          return item.rewatched_times ? &item : nullptr;
         case QueueSearch::Rewatching:
-          if (it->enable_rewatching)
-            return &(*it);
-          break;
-        // Score
+          return item.enable_rewatching ? &item : nullptr;
         case QueueSearch::Score:
-          if (it->score)
-            return &(*it);
-          break;
-        // Status
+          return item.score ? &item : nullptr;
         case QueueSearch::Status:
-          if (it->status)
-            return &(*it);
-          break;
-        // Tags
+          return item.status ? &item : nullptr;
         case QueueSearch::Tags:
-          if (it->tags)
-            return &(*it);
-          break;
-        // Default
+          return item.tags ? &item : nullptr;
         default:
-          return &(*it);
+          return &item;
       }
     }
   }
@@ -303,9 +277,10 @@ QueueItem* Queue::GetCurrentItem() {
 int Queue::GetItemCount() {
   int count = 0;
 
-  for (auto it = items.begin(); it != items.end(); ++it)
+  for (auto it = items.begin(); it != items.end(); ++it) {
     if (it->enabled)
-      count++;
+      ++count;
+  }
 
   return count;
 }
