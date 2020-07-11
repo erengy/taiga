@@ -111,6 +111,16 @@ bool Aggregator::CheckFeed(const std::wstring& source, bool automatic) {
     if (HandleFeedError(host, response)) {
       return;
     }
+
+    switch (response.status_class()) {
+      case hypp::status::k4xx_Client_Error:
+      case hypp::status::k5xx_Server_Error:
+        ui::ChangeStatusText(L"{} returned an error ({} {})"_format(
+            host, response.status_code(), StrToWstr(response.reason_phrase())));
+        ui::EnableDialogInput(ui::Dialog::Torrents, true);
+        return;
+    }
+
     HandleFeedCheck(feed, response.body(), automatic);
   };
 
