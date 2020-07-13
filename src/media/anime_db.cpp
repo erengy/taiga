@@ -92,6 +92,7 @@ void Database::ReadDatabaseNode(XmlNode& database_node) {
     item.SetAiringStatus(static_cast<SeriesStatus>(XmlReadInt(node, L"status")));
     item.SetAgeRating(static_cast<AgeRating>(XmlReadInt(node, L"age_rating")));
     item.SetGenres(XmlReadStr(node, L"genres"));
+    item.SetTags(XmlReadStr(node, L"tags"));
     item.SetProducers(XmlReadStr(node, L"producers"));
     item.SetSynopsis(XmlReadStr(node, L"synopsis"));
     item.SetLastModified(ToTime(XmlReadStr(node, L"modified")));
@@ -167,6 +168,7 @@ void Database::WriteDatabaseNode(XmlNode& database_node) const {
     XML_WS(L"image", item.GetImageUrl(), pugi::node_pcdata);
     XML_WI(L"age_rating", static_cast<int>(item.GetAgeRating()));
     XML_WS(L"genres", Join(item.GetGenres(), L", "), pugi::node_pcdata);
+    XML_WS(L"tags", Join(item.GetTags(), L", "), pugi::node_pcdata);
     XML_WS(L"producers", Join(item.GetProducers(), L", "), pugi::node_pcdata);
     XML_WF(L"score", item.GetScore(), pugi::node_pcdata);
     XML_WI(L"popularity", item.GetPopularity());

@@ -142,8 +142,9 @@ bool Filters::CheckItem(const Item& item, int text_index) const {
   GetAllTitles(item.GetId(), titles);
 
   const auto& genres = item.GetGenres();
+  const auto& tags = item.GetTags();
   const auto& producers = item.GetProducers();
-  const auto& tags = item.GetMyTags();
+  const auto& user_tags = item.GetMyTags();
   const auto& notes = item.GetMyNotes();
 
   std::vector<SearchTerm> search_terms;
@@ -156,7 +157,8 @@ bool Filters::CheckItem(const Item& item, int text_index) const {
       case SearchField::None:
         if (!CheckStrings(titles, term.value) &&
             !CheckStrings(genres, term.value) &&
-            !CheckString(tags, term.value) &&
+            !CheckStrings(tags, term.value) &&
+            !CheckString(user_tags, term.value) &&
             !CheckString(notes, term.value)) {
           return false;
         }
@@ -188,8 +190,10 @@ bool Filters::CheckItem(const Item& item, int text_index) const {
         break;
 
       case SearchField::Tag:
-        if (!CheckString(tags, term.value))
+        if (!CheckStrings(tags, term.value) &&
+            !CheckString(user_tags, term.value)) {
           return false;
+        }
         break;
 
       case SearchField::Note:

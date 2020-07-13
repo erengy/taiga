@@ -238,6 +238,14 @@ int ParseMediaObject(const Json& json) {
   }
   anime_item.SetGenres(genres);
 
+  std::vector<std::wstring> tags;
+  for (const auto& tag : json["tags"]) {
+    const auto name = JsonReadStr(tag, "name");
+    if (!name.empty())
+      tags.push_back(StrToWstr(name));
+  }
+  anime_item.SetTags(tags);
+
   std::vector<std::wstring> synonyms;
   for (const auto& synonym : json["synonyms"]) {
     if (synonym.is_string())

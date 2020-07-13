@@ -129,6 +129,7 @@ struct SeriesInformation {
   Titles titles;
   std::vector<std::wstring> genres;
   std::vector<std::wstring> producers;
+  std::vector<std::wstring> tags;
   int last_aired_episode = 0;
   std::time_t next_episode_time = 0;
 };

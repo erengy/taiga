@@ -58,6 +58,7 @@ public:
   const std::wstring& GetImageUrl() const;
   AgeRating GetAgeRating() const;
   const std::vector<std::wstring>& GetGenres() const;
+  const std::vector<std::wstring>& GetTags() const;
   int GetPopularity() const;
   const std::vector<std::wstring>& GetProducers() const;
   double GetScore() const;
@@ -87,6 +88,8 @@ public:
   void SetAgeRating(AgeRating rating);
   void SetGenres(const std::wstring& genres);
   void SetGenres(const std::vector<std::wstring>& genres);
+  void SetTags(const std::wstring& tags);
+  void SetTags(const std::vector<std::wstring>& tags);
   void SetPopularity(int popularity);
   void SetProducers(const std::wstring& producers);
   void SetProducers(const std::vector<std::wstring>& producers);

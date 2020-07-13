@@ -105,6 +105,10 @@ const std::vector<std::wstring>& Item::GetGenres() const {
   return series_.genres;
 }
 
+const std::vector<std::wstring>& Item::GetTags() const {
+  return series_.tags;
+}
+
 int Item::GetPopularity() const {
   return series_.popularity_rank;
 }
@@ -244,6 +248,18 @@ void Item::SetGenres(const std::wstring& genres) {
 
 void Item::SetGenres(const std::vector<std::wstring>& genres) {
   series_.genres = genres;
+}
+
+void Item::SetTags(const std::wstring& tags) {
+  std::vector<std::wstring> temp;
+  Split(tags, L", ", temp);
+  RemoveEmptyStrings(temp);
+
+  SetTags(temp);
+}
+
+void Item::SetTags(const std::vector<std::wstring>& tags) {
+  series_.tags = tags;
 }
 
 void Item::SetPopularity(int popularity) {
