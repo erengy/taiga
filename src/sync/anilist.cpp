@@ -240,9 +240,11 @@ int ParseMediaObject(const Json& json) {
 
   std::vector<std::wstring> tags;
   for (const auto& tag : json["tags"]) {
-    const auto name = JsonReadStr(tag, "name");
-    if (!name.empty())
-      tags.push_back(StrToWstr(name));
+    if (!JsonReadBool(tag, "isMediaSpoiler")) {
+      const auto name = JsonReadStr(tag, "name");
+      if (!name.empty())
+        tags.push_back(StrToWstr(name));
+    }
   }
   anime_item.SetTags(tags);
 

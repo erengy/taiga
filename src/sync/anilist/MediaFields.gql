@@ -19,6 +19,6 @@ genres
 synonyms
 averageScore
 popularity
-tags { name }
+tags { name isMediaSpoiler }
 studios { edges { node { name } } }
 nextAiringEpisode { airingAt episode }
