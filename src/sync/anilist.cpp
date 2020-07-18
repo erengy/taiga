@@ -340,6 +340,11 @@ bool HasError(const taiga::http::Response& response) {
                 StrToWstr(validation.front().front().get<std::string>());
           }
           if (!error_description.empty()) {
+            if (error_description == L"Invalid token") {
+              error_description =
+                  L"Access token has expired. "
+                  L"Please re-authorize your account via Settings.";
+            }
             LOGE(error_description);
             ui::ChangeStatusText(L"AniList: {}"_format(error_description));
             return true;
