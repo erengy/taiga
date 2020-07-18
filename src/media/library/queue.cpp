@@ -237,33 +237,38 @@ bool Queue::IsQueued(int anime_id) const {
 }
 
 QueueItem* Queue::FindItem(int anime_id, QueueSearch search_mode) {
+  const auto has_value = [&search_mode](const QueueItem& item) {
+    switch (search_mode) {
+      case QueueSearch::DateStart:
+        return item.date_start.has_value();
+      case QueueSearch::DateEnd:
+        return item.date_finish.has_value();
+      case QueueSearch::Episode:
+        return item.episode.has_value();
+      case QueueSearch::Notes:
+        return item.notes.has_value();
+      case QueueSearch::RewatchedTimes:
+        return item.rewatched_times.has_value();
+      case QueueSearch::Rewatching:
+        return item.enable_rewatching.has_value();
+      case QueueSearch::Score:
+        return item.score.has_value();
+      case QueueSearch::Status:
+        return item.status.has_value();
+      case QueueSearch::Tags:
+        return item.tags.has_value();
+      default:
+        return false;
+    }
+  };
+
   for (auto it = items.rbegin(); it != items.rend(); ++it) {
     auto& item = *it; 
-    if (item.anime_id == anime_id && item.enabled) {
-      switch (search_mode) {
-        case QueueSearch::DateStart:
-          return item.date_start ? &item : nullptr;
-        case QueueSearch::DateEnd:
-          return item.date_finish ? &item : nullptr;
-        case QueueSearch::Episode:
-          return item.episode ? &item : nullptr;
-        case QueueSearch::Notes:
-          return item.notes ? &item : nullptr;
-        case QueueSearch::RewatchedTimes:
-          return item.rewatched_times ? &item : nullptr;
-        case QueueSearch::Rewatching:
-          return item.enable_rewatching ? &item : nullptr;
-        case QueueSearch::Score:
-          return item.score ? &item : nullptr;
-        case QueueSearch::Status:
-          return item.status ? &item : nullptr;
-        case QueueSearch::Tags:
-          return item.tags ? &item : nullptr;
-        default:
-          return &item;
-      }
+    if (item.anime_id == anime_id && item.enabled && has_value(item)) {
+      return &item;
     }
   }
+
   return nullptr;
 }
 
