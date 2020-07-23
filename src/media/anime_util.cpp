@@ -612,6 +612,7 @@ std::wstring NormalizeSynopsis(std::wstring str) {
   while (ReplaceString(str, L"\n\n\n", L"\n\n"));
   ReplaceString(str, L"\n", L"\r\n");
 
+  DecodeHtmlEntities(str);
   StripHtmlTags(str);
 
   return str;
