@@ -329,7 +329,6 @@ BOOL SettingsPage::OnInitDialog() {
     // Torrents > Discovery
     case kSettingsPageTorrentsDiscovery: {
       AddComboString(IDC_COMBO_TORRENT_SOURCE, L"https://anidex.info/rss/?cat=1&lang_id=1");
-      AddComboString(IDC_COMBO_TORRENT_SOURCE, L"http://horriblesubs.info/rss.php?res=all");
       AddComboString(IDC_COMBO_TORRENT_SOURCE, L"https://nyaa.net/feed?c=3_5&s=0");
       AddComboString(IDC_COMBO_TORRENT_SOURCE, L"https://nyaa.si/?page=rss&c=1_2&f=0");
       AddComboString(IDC_COMBO_TORRENT_SOURCE, L"http://tracker.minglong.org/rss.xml");
