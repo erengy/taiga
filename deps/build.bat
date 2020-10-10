@@ -54,11 +54,11 @@ cd src\curl\winbuild\
 
 echo Building libcurl for Debug configuration...
 nmake /f Makefile.vc mode=static RTLIBCFG=static VC=%vc% MACHINE=x86 DEBUG=yes
-xcopy /s ..\builds\libcurl-vc%vc%-x86-debug-static-ipv6-sspi-winssl\lib ..\..\..\lib\
+xcopy /s ..\builds\libcurl-vc%vc%-x86-debug-static-ipv6-sspi-schannel\lib ..\..\..\lib\
 
 echo Building libcurl for Release configuration...
 nmake /f Makefile.vc mode=static RTLIBCFG=static VC=%vc% MACHINE=x86
-xcopy /s ..\builds\libcurl-vc%vc%-x86-release-static-ipv6-sspi-winssl\lib ..\..\..\lib\
+xcopy /s ..\builds\libcurl-vc%vc%-x86-release-static-ipv6-sspi-schannel\lib ..\..\..\lib\
 
 cd /D %currentdir%
 
