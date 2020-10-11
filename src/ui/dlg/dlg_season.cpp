@@ -467,11 +467,6 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
           break;
       }
       switch (current_service) {
-        case sync::ServiceId::AniList:
-          DRAWLINE(L"Tags:");
-          break;
-      }
-      switch (current_service) {
         case sync::ServiceId::MyAnimeList:
         case sync::ServiceId::AniList:
           DRAWLINE(L"Producers:");
@@ -491,11 +486,6 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       DRAWLINE(text);
       DRAWLINE(ui::TranslateNumber(anime_item->GetEpisodeCount(), L"Unknown"));
       DRAWLINE(anime_item->GetGenres().empty() ? L"?" : Join(anime_item->GetGenres(), L", "));
-      switch (current_service) {
-        case sync::ServiceId::AniList:
-          DRAWLINE(anime_item->GetTags().empty() ? L"?" : Join(anime_item->GetTags(), L", "));
-          break;
-      }
       switch (current_service) {
         case sync::ServiceId::MyAnimeList:
         case sync::ServiceId::AniList:
@@ -840,9 +830,8 @@ int SeasonDialog::GetLineCount() const {
   switch (sync::GetCurrentServiceId()) {
     default:
     case sync::ServiceId::MyAnimeList:
-      return 6;
     case sync::ServiceId::AniList:
-      return 7;  // has tags
+      return 6;
     case sync::ServiceId::Kitsu:
       return 5;  // missing producers
   }
