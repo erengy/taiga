@@ -41,6 +41,7 @@ enum class SearchField {
   Type,
   Season,
   Year,
+  Rewatch,
 };
 
 enum class SearchOperator {
@@ -74,6 +75,7 @@ SearchTerm GetSearchTerm(const std::wstring& str) {
     {L"type", SearchField::Type},
     {L"season", SearchField::Season},
     {L"year", SearchField::Year},
+    {L"rewatch", SearchField::Rewatch},
   };
 
   static const std::map<std::wstring, SearchOperator> operators{
@@ -217,6 +219,13 @@ bool Filters::CheckItem(const Item& item, int text_index) const {
       case SearchField::Year: {
         const auto year = item.GetDateStart().year();
         if (!CheckNumber(term.op, year, ToInt(term.value)))
+          return false;
+        break;
+      }
+
+      case SearchField::Rewatch: {
+        const auto rewatches = item.GetMyRewatchedTimes();
+        if (!CheckNumber(term.op, rewatches, ToInt(term.value)))
           return false;
         break;
       }
