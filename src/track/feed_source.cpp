@@ -29,6 +29,7 @@ namespace track {
 
 FeedSource GetFeedSource(const std::wstring& channel_link) {
   static const std::map<std::wstring, FeedSource> sources{
+    {L"acgnx", FeedSource::Acgnx},
     {L"anidex", FeedSource::AniDex},
     {L"animebytes", FeedSource::AnimeBytes},
     {L"minglong", FeedSource::Minglong},
@@ -51,13 +52,27 @@ FeedSource GetFeedSource(const std::wstring& channel_link) {
 
 void ParseFeedItemFromSource(const FeedSource source, FeedItem& feed_item) {
   const auto parse_magnet_link = [&feed_item]() {
-    feed_item.magnet_link = InStr(
-        feed_item.description, L"<a href=\"magnet:?", L"\">");
-    if (!feed_item.magnet_link.empty())
-      feed_item.magnet_link = L"magnet:?" + feed_item.magnet_link;
+    if (StartsWith(feed_item.enclosure.url, L"magnet:")) {
+      feed_item.magnet_link = feed_item.enclosure.url;
+    } else {
+      feed_item.magnet_link =
+          InStr(feed_item.description, L"<a href=\"magnet:?", L"\">");
+      if (!feed_item.magnet_link.empty())
+        feed_item.magnet_link = L"magnet:?" + feed_item.magnet_link;
+    }
   };
 
   switch (source) {
+    case FeedSource::Acgnx: {
+      std::vector<std::wstring> parts;
+      Split(feed_item.description, L" | ", parts);
+      if (parts.size() > 2) {
+        feed_item.file_size = ParseSizeString(parts.at(2));
+      }
+      parse_magnet_link();
+      break;
+    }
+
     case FeedSource::AniDex:
       feed_item.file_size = ParseSizeString(
           InStr(feed_item.description, L"Size: ", L" |"));

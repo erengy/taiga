@@ -24,6 +24,7 @@ namespace track {
 
 enum class FeedSource {
   Unknown,
+  Acgnx,
   AniDex,
   AnimeBytes,
   Minglong,
