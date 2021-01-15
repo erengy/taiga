@@ -221,7 +221,15 @@ void MenuList::UpdateExport() {
   if (menu) {
     for (auto& item : menu->items) {
       if (item.action == L"ExportAsMalXml") {
-        item.enabled = sync::GetCurrentServiceId() == sync::ServiceId::MyAnimeList;
+        switch (sync::GetCurrentServiceId()) {
+          case sync::ServiceId::MyAnimeList:
+          case sync::ServiceId::AniList:
+            item.enabled = true;
+            break;
+          default:
+            item.enabled = false;
+            break;
+        }
         break;
       }
     }
