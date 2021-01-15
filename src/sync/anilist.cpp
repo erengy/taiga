@@ -214,6 +214,10 @@ int ParseMediaObject(const Json& json) {
   anime_item.SetId(ToWstr(anime_id), ServiceId::AniList);
   anime_item.SetLastModified(time(nullptr));  // current time
 
+  if (const auto mal_id = JsonReadInt(json, "idMal")) {
+    anime_item.SetId(ToWstr(mal_id), ServiceId::MyAnimeList);
+  }
+
   anime_item.SetTitle(StrToWstr(JsonReadStr(json["title"], "userPreferred")));
   anime_item.SetType(TranslateSeriesTypeFrom(JsonReadStr(json, "format")));
   anime_item.SetAiringStatus(
