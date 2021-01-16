@@ -47,8 +47,9 @@ static hypr::Options GetOptions() {
   // "SSL connect error". See issue #312 for more information.
   options.certificate_revocation = !settings.GetAppConnectionNoRevoke();
 
-  // "20" happens to be the number used by Chrome and Firefox
-  options.max_redirects = 20;
+  // Web browsers set the maximum number of redirects to ~20 (e.g. Firefox's
+  // `network.http.redirection-limit` option), but we do not need that many.
+  options.max_redirects = 5;
 
   // Complete connection within 30 seconds (default is 300 seconds)
   options.timeout = std::chrono::seconds{30};
