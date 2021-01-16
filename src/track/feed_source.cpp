@@ -37,6 +37,7 @@ FeedSource GetFeedSource(const std::wstring& channel_link) {
     {L"nyaa.pantsu", FeedSource::NyaaPantsu},
     {L"nyaa.pt", FeedSource::NyaaPantsu},
     {L"nyaa.si", FeedSource::NyaaSi},
+    {L"subsplease", FeedSource::SubsPlease},
     {L"tokyotosho", FeedSource::TokyoToshokan},
   };
 
@@ -102,6 +103,13 @@ void ParseFeedItemFromSource(const FeedSource source, FeedItem& feed_item) {
         feed_item.leechers = ToInt(elements[L"nyaa:leechers"]);
       if (elements.count(L"nyaa:downloads"))
         feed_item.downloads = ToInt(elements[L"nyaa:downloads"]);
+      break;
+    }
+
+    case FeedSource::SubsPlease: {
+      auto& elements = feed_item.namespace_elements;
+      if (elements.count(L"subsplease:size"))
+        feed_item.file_size = ParseSizeString(elements[L"subsplease:size"]);
       break;
     }
 

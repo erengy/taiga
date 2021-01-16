@@ -333,6 +333,7 @@ BOOL SettingsPage::OnInitDialog() {
       AddComboString(IDC_COMBO_TORRENT_SOURCE, L"https://nyaa.si/?page=rss&c=1_2&f=0");
       AddComboString(IDC_COMBO_TORRENT_SOURCE, L"http://tracker.minglong.org/rss.xml");
       AddComboString(IDC_COMBO_TORRENT_SOURCE, L"https://www.shanaproject.com/feeds/site/");
+      AddComboString(IDC_COMBO_TORRENT_SOURCE, L"https://subsplease.org/rss/?t&r=1080");
       AddComboString(IDC_COMBO_TORRENT_SOURCE, L"https://www.tokyotosho.info/rss.php?filter=1,11&zwnj=0");
       SetDlgItemText(IDC_COMBO_TORRENT_SOURCE, taiga::settings.GetTorrentDiscoverySource().c_str());
       AddComboString(IDC_COMBO_TORRENT_SEARCH, L"https://anidex.info/rss/?cat=1&lang_id=1&q=%title%");
