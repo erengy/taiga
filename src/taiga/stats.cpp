@@ -145,7 +145,7 @@ float Statistics::CalculateScoreDeviation() {
 
     if (item.GetMyScore() > 0) {
       float score = static_cast<float>(item.GetMyScore());
-      sum_squares += pow(score - score_mean, 2);
+      sum_squares += std::powf(score - score_mean, 2.0f);
       items_scored++;
     }
   }
