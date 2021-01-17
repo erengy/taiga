@@ -442,19 +442,25 @@ void Aggregator::HandleFeedDownloadOpen(FeedItem& feed_item,
     const auto download_path = GetTorrentDownloadPath(feed_item.episode_data);
     if (!download_path.empty()) {
       const auto app_filename = GetFileName(app_path);
-      // uTorrent
-      if (InStr(app_filename, L"utorrent", 0, true) > -1) {
-        parameters = LR"(/directory "{}" "{}")"_format(download_path, file);
+
       // Deluge
-      } else if (InStr(app_filename, L"deluge-console", 0, true) > -1) {
+      if (InStr(app_filename, L"deluge-console", 0, true) > -1) {
         parameters = LR"(add -p \"{}\" \"{}\")"_format(download_path, file);
         show_command = SW_HIDE;
+
+      // qBittorrent
+      } else if (InStr(app_filename, L"qbittorrent", 0, true) > -1) {
+        parameters = LR"(--save-path="{}" --skip-dialog=true "{}")"_format(download_path, file);
+
       // Transmission
       } else if (InStr(app_filename, L"transmission-remote", 0, true) > -1) {
         parameters = LR"(-a "{}" -w "{}")"_format(file, download_path);
         show_command = SW_HIDE;
-      } else if (InStr(app_filename, L"qbittorrent", 0, true) > -1) {
-        parameters = LR"(--save-path="{}" --skip-dialog=true "{}")"_format(download_path, file);
+
+      // uTorrent
+      } else if (InStr(app_filename, L"utorrent", 0, true) > -1) {
+        parameters = LR"(/directory "{}" "{}")"_format(download_path, file);
+
       } else {
         LOGD(L"Unknown BitTorrent client: {}", app_path);
       }
