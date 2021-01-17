@@ -443,8 +443,12 @@ void Aggregator::HandleFeedDownloadOpen(FeedItem& feed_item,
     if (!download_path.empty()) {
       const auto app_filename = GetFileName(app_path);
 
+      // aria2
+      if (InStr(app_filename, L"aria2c", 0, true) > -1) {
+        parameters = LR"(--dir="{}" "{}")"_format(download_path, file);
+
       // Deluge
-      if (InStr(app_filename, L"deluge-console", 0, true) > -1) {
+      } else if (InStr(app_filename, L"deluge-console", 0, true) > -1) {
         parameters = LR"(add -p \"{}\" \"{}\")"_format(download_path, file);
         show_command = SW_HIDE;
 
