@@ -107,8 +107,7 @@ enum class AppSettingKey {
   // Sharing
   ShareDiscordApplicationId,
   ShareDiscordEnabled,
-  ShareDiscordFormatDetails,
-  ShareDiscordFormatState,
+  ShareDiscordGroupEnabled,
   ShareDiscordUsernameEnabled,
   ShareHttpEnabled,
   ShareHttpFormat,

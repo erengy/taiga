@@ -234,10 +234,8 @@ public:
   void SetShareDiscordApplicationId(const std::wstring& application_id);
   bool GetShareDiscordEnabled() const;
   void SetShareDiscordEnabled(const bool enabled);
-  std::wstring GetShareDiscordFormatDetails() const;
-  void SetShareDiscordFormatDetails(const std::wstring& format);
-  std::wstring GetShareDiscordFormatState() const;
-  void SetShareDiscordFormatState(const std::wstring& format);
+  bool GetShareDiscordGroupEnabled() const;
+  void SetShareDiscordGroupEnabled(const bool enabled);
   bool GetShareDiscordUsernameEnabled() const;
   void SetShareDiscordUsernameEnabled(const bool enabled);
   bool GetShareHttpEnabled() const;
