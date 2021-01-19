@@ -1591,7 +1591,7 @@ void AnimeListDialog::ListView::InitializeColumns(bool reset) {
   columns.insert(std::make_pair(kColumnUserLastUpdated, ColumnData(
       {kColumnUserLastUpdated, false, i, i++,
        0, static_cast<unsigned short>(ScaleX(100)), static_cast<unsigned short>(ScaleX(85)),
-       LVCFMT_CENTER, L"Last updated", L"user_last_updated"})));
+       LVCFMT_RIGHT, L"Last updated", L"user_last_updated"})));
 
   if (reset) {
     for (const auto& [column_type, _] : columns) {
