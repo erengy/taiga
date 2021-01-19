@@ -425,6 +425,7 @@ int AnimeListDialog::ListView::GetDefaultSortOrder(AnimeListColumn column) {
     case kColumnUserDateCompleted:
     case kColumnUserProgress:
     case kColumnUserRating:
+    case kColumnUserNotes:
       return -1;
     case kColumnAnimeTitle:
     default:
@@ -1475,6 +1476,9 @@ void AnimeListDialog::RefreshListItemColumns(int index, const anime::Item& anime
       case kColumnUserDateCompleted:
         text = ui::TranslateMyDate(anime_item.GetMyDateEnd());
         break;
+      case kColumnUserNotes:
+        text = anime_item.GetMyNotes();
+        break;
     }
     if (!text.empty())
       listview.SetItem(index, column.index, text.c_str());
@@ -1592,6 +1596,12 @@ void AnimeListDialog::ListView::InitializeColumns(bool reset) {
       {kColumnUserLastUpdated, false, i, i++,
        0, static_cast<unsigned short>(ScaleX(100)), static_cast<unsigned short>(ScaleX(85)),
        LVCFMT_CENTER, L"Last updated", L"user_last_updated"})));
+  columns.insert(std::make_pair(kColumnUserNotes, ColumnData(
+      {kColumnUserNotes, false, i, i++,
+       0, static_cast<unsigned short>(ScaleX(100)), static_cast<unsigned short>(ScaleX(85)),
+       LVCFMT_LEFT, L"Notes", L"user_notes"})));
+
+  
 
   if (reset) {
     for (const auto& [column_type, _] : columns) {
@@ -1820,6 +1830,7 @@ AnimeListColumn AnimeListDialog::ListView::TranslateColumnName(const std::wstrin
     {L"user_last_updated", kColumnUserLastUpdated},
     {L"user_progress", kColumnUserProgress},
     {L"user_rating", kColumnUserRating},
+    {L"user_notes", kColumnUserNotes},
   };
 
   const auto it = names.find(name);

@@ -205,6 +205,7 @@
 		<item name="Last updated" action="user_last_updated" checked="1"/>
 		<item name="Progress" action="user_progress" checked="1"/>
 		<item name="Score" action="user_rating" checked="1"/>
+		<item name="Notes" action="user_notes" checked="1"/>
 		<item type="separator"/>
 		<item name="Reset to defaults" action="ResetAnimeListHeaders()"/>
 	</menu>
