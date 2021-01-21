@@ -452,6 +452,10 @@ void Aggregator::HandleFeedDownloadOpen(FeedItem& feed_item,
         parameters = LR"(add -p \"{}\" \"{}\")"_format(download_path, file);
         show_command = SW_HIDE;
 
+      // PicoTorrent
+      } else if (InStr(app_filename, L"picotorrent", 0, true) > -1) {
+        parameters = LR"(--save-path="{}" --silent "{}")"_format(download_path, file);
+
       // qBittorrent
       } else if (InStr(app_filename, L"qbittorrent", 0, true) > -1) {
         parameters = LR"(--save-path="{}" --skip-dialog=true "{}")"_format(download_path, file);
