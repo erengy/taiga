@@ -43,6 +43,7 @@ enum class SearchField {
   Year,
   Rewatch,
   Duration,
+  Debug,
 };
 
 enum class SearchOperator {
@@ -78,6 +79,7 @@ SearchTerm GetSearchTerm(const std::wstring& str) {
     {L"year", SearchField::Year},
     {L"rewatch", SearchField::Rewatch},
     {L"duration", SearchField::Duration},
+    {L"debug", SearchField::Debug},
   };
 
   static const std::map<std::wstring, SearchOperator> operators{
@@ -236,6 +238,23 @@ bool Filters::CheckItem(const Item& item, int text_index) const {
         const auto duration = item.GetEpisodeLength();
         if (!CheckNumber(term.op, duration, ToInt(term.value)))
           return false;
+        break;
+      }
+
+      case SearchField::Debug: {
+        if (term.value == L"watched") {
+          const int eps_watched = item.GetMyLastWatchedEpisode();
+          const int eps_total = item.GetEpisodeCount();
+          if (!anime::IsValidEpisodeNumber(eps_watched, eps_total) ||
+              (eps_watched < eps_total &&
+               item.GetMyStatus() == anime::MyStatus::Completed)) {
+            continue;
+          } else {
+            return false;
+          }
+        } else {
+          return false;
+        }
         break;
       }
     }
