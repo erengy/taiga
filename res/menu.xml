@@ -91,7 +91,8 @@
 	</menu>
 	<!-- Help -->
 	<menu name="Help">
-		<item name="About Taiga" action="About()"/>
+		<item name="About Taiga"   action="About()"/>
+		<item name="Donate"        action="URL(https://taiga.moe/#donate)"/>
 		<item name="Support&#9;F1" action="URL(https://taiga.moe/#support)"/>
 		<item type="separator"/>
 		<item name="Check for updates" action="CheckUpdates()"/>
