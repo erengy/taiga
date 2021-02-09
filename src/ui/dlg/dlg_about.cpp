@@ -150,7 +150,7 @@ BOOL AboutDialog::OnInitDialog() {
   return TRUE;
 }
 
-BOOL AboutDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+INT_PTR AboutDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
   switch (uMsg) {
     case WM_COMMAND: {
       // Icon click
