@@ -67,8 +67,8 @@ int Engine::ScoreTitle(anime::Episode& episode, const std::set<int>& anime_ids,
 }
 
 static double CustomScore(const std::wstring& title, const std::wstring& str) {
-  double length_min = std::min(title.size(), str.size());
-  double length_max = std::max(title.size(), str.size());
+  double length_min = static_cast<double>(std::min(title.size(), str.size()));
+  double length_max = static_cast<double>(std::max(title.size(), str.size()));
   double length_ratio = length_min / length_max;
 
   double score = 0.0;

@@ -98,7 +98,7 @@ int GetTextHeight(HDC hdc) {
 
 int GetTextWidth(HDC hdc, const std::wstring& text) {
   SIZE size = {0};
-  GetTextExtentPoint32(hdc, text.c_str(), text.size(), &size);
+  GetTextExtentPoint32(hdc, text.c_str(), static_cast<int>(text.size()), &size);
   return size.cx;
 }
 
@@ -174,9 +174,10 @@ BOOL DrawProgressBar(HDC hdc, const LPRECT lpRect, DWORD dwColor1, DWORD dwColor
 ////////////////////////////////////////////////////////////////////////////////
 
 COLORREF HexToARGB(const std::wstring& text) {
-  int i = text.length() - 6;
-  if (i < 0)
+  if (text.length() < 6)
     return 0;
+
+  const size_t i = text.length() - 6;
 
   unsigned int r, g, b;
   r = wcstoul(text.substr(i + 0, 2).c_str(), NULL, 16);

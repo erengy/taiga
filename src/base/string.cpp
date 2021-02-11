@@ -126,10 +126,10 @@ int InStr(const wstring& str1, const wstring& str2, int pos,
     auto i = std::search(str1.begin() + pos, str1.end(),
                          str2.begin(), str2.end(),
                          &IsCharsEqual);
-    return (i == str1.end()) ? -1 : i - str1.begin();
+    return (i == str1.end()) ? -1 : static_cast<int>(i - str1.begin());
   } else {
-    size_t i = str1.find(str2, pos);
-    return (i != wstring::npos) ? i : -1;
+    const size_t i = str1.find(str2, pos);
+    return (i != wstring::npos) ? static_cast<int>(i) : -1;
   }
 }
 
@@ -140,7 +140,7 @@ wstring InStr(const wstring& str1, const wstring& str2_left,
   int index_begin = InStr(str1, str2_left);
 
   if (index_begin > -1) {
-    index_begin += str2_left.length();
+    index_begin += static_cast<int>(str2_left.length());
     int index_end = InStr(str1, str2_right, index_begin);
     if (index_end > -1)
       output = str1.substr(index_begin, index_end - index_begin);
@@ -150,8 +150,8 @@ wstring InStr(const wstring& str1, const wstring& str2_left,
 }
 
 int InStrChars(const wstring& str1, const wstring& str2, int pos) {
-  size_t i = str1.find_first_of(str2, pos);
-  return (i != wstring::npos) ? i : -1;
+  const size_t i = str1.find_first_of(str2, pos);
+  return (i != wstring::npos) ? static_cast<int>(i) : -1;
 }
 
 bool IsAlphanumericChar(const wchar_t c) {
@@ -236,8 +236,8 @@ size_t LongestCommonSubsequenceLength(const wstring& str1,
 // Based on Miguel Serrano's Jaro-Winkler distance implementation
 // Licensed under GNU GPLv3 - Copyright (C) 2011 Miguel Serrano
 double JaroWinklerDistance(const wstring& str1, const wstring& str2) {
-  const int len1 = str1.size();
-  const int len2 = str2.size();
+  const int len1 = static_cast<int>(str1.size());
+  const int len2 = static_cast<int>(str2.size());
 
   if (!len1 || !len2)
     return 0.0;

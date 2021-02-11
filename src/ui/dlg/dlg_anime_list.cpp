@@ -1711,10 +1711,11 @@ void AnimeListDialog::ListView::InsertColumns() {
     for (auto& it : columns) {
       auto& column = it.second;
       if (column.visible)
-        order_array.push_back(order_array.size());
+        order_array.push_back(static_cast<int>(order_array.size()));
     }
     std::swap(order_array.at(0), order_array.at(title_index));
-    SetColumnOrderArray(order_array.size(), order_array.data());
+    SetColumnOrderArray(static_cast<int>(order_array.size()),
+                        order_array.data());
   }
 }
 

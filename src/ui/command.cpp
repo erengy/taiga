@@ -253,7 +253,7 @@ void ExecuteCommand(const std::wstring& str, WPARAM wParam, LPARAM lParam) {
   //   wParam is the initial section.
   //   lParam is the initial page.
   } else if (command == L"Settings") {
-    ui::ShowDlgSettings(wParam, lParam);
+    ui::ShowDlgSettings(static_cast<int>(wParam), static_cast<int>(lParam));
 
   // SearchTorrents(source)
   //   Searches torrents from specified source URL.

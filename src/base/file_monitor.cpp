@@ -128,10 +128,10 @@ void DirectoryMonitor::Stop() {
 ////////////////////////////////////////////////////////////////////////////////
 
 bool DirectoryMonitor::ReadDirectoryChanges(DirectoryChangeEntry& entry) {
-  auto result = ::ReadDirectoryChangesW(
+  const auto result = ::ReadDirectoryChangesW(
       entry.directory_handle_,
       entry.buffer_.data(),
-      entry.buffer_.size(),
+      static_cast<DWORD>(entry.buffer_.size()),
       TRUE,  // watch subtree
       FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_DIR_NAME,
       &entry.bytes_returned_,

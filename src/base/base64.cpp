@@ -29,7 +29,7 @@ std::string Base64Decode(const std::string& str) {
     return str;
 
   Base64Coder coder;
-  coder.Decode((BYTE*)str.c_str(), str.size());
+  coder.Decode((BYTE*)str.c_str(), (DWORD)str.size());
 
   return coder.DecodedMessage();
 }
@@ -39,7 +39,7 @@ std::string Base64Encode(const std::string& str) {
     return str;
 
   Base64Coder coder;
-  coder.Encode((BYTE*)str.c_str(), str.size());
+  coder.Encode((BYTE*)str.c_str(), (DWORD)str.size());
 
   return coder.EncodedMessage();
 }

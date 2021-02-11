@@ -550,7 +550,7 @@ bool PageMyInfo::Save() {
   // Score
   win::ComboBox combobox = GetDlgItem(IDC_COMBO_ANIME_SCORE);
   if (!IsAdvancedScoreInput()) {
-    queue_item.score = combobox.GetItemData(combobox.GetCurSel());
+    queue_item.score = static_cast<int>(combobox.GetItemData(combobox.GetCurSel()));
   } else {
     const auto score_text = GetDlgItemText(IDC_EDIT_ANIME_SCORE);
     switch (sync::GetCurrentServiceId()) {

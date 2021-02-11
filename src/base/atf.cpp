@@ -30,7 +30,7 @@ static std::vector<std::wstring> GetFunctionParams(const std::wstring& body) {
   size_t param_begin = 0, param_end = -1;
   do {  // Split by unescaped comma
     do {
-      param_end = InStr(body, L",", param_end + 1);
+      param_end = InStr(body, L",", static_cast<int>(param_end + 1));
     } while (0 < param_end &&
              param_end < body.size() - 1 &&
              body[param_end - 1] == '\\');
@@ -266,7 +266,7 @@ static std::wstring EscapeEntities(const std::wstring& str) {
   size_t entity_pos;
 
   for (size_t pos = 0; pos <= str.length(); ) {
-    entity_pos = InStrChars(str, L"$,()%\\", pos);
+    entity_pos = InStrChars(str, L"$,()%\\", static_cast<int>(pos));
     if (entity_pos != -1) {
       escaped.append(str, pos, entity_pos - pos);
       escaped.append(L"\\");
@@ -343,7 +343,7 @@ static std::wstring ReplaceFunctions(std::wstring str) {
                 str = str.substr(0, pos_func) +
                       str.substr(pos_right + 1, str.length() - (pos_right + 1));
                 str.insert(pos_func, EvaluateFunction(func_name, func_body));
-                i = str.length();
+                i = static_cast<int>(str.length());
               }
               if (open_brackets > 0)
                 open_brackets--;

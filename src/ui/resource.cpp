@@ -46,7 +46,7 @@ void ImageDatabase::Load(const int anime_id, const bool download) {
 
   if (download) {
     if (const auto anime_item = anime::db.Find(anime_id)) {
-      if (!anime::IsValidId(items_[anime_id].data) ||
+      if (!anime::IsValidId(static_cast<int>(items_[anime_id].data)) ||
           is_old_image(*anime_item)) {
         sync::DownloadImage(anime_id, anime_item->GetImageUrl());
       }
@@ -70,7 +70,7 @@ bool ImageDatabase::LoadFile(const int anime_id) {
     items_[anime_id].data = -1;
   }
 
-  return anime::IsValidId(items_[anime_id].data);
+  return anime::IsValidId(static_cast<int>(items_[anime_id].data));
 }
 
 void ImageDatabase::FreeMemory() {
@@ -99,7 +99,8 @@ void ImageDatabase::Clear() {
 
 base::Image* ImageDatabase::GetImage(const int anime_id) {
   if (const auto it = items_.find(anime_id); it != items_.end()) {
-    return anime::IsValidId(it->second.data) ? &it->second : nullptr;
+    return anime::IsValidId(static_cast<int>(it->second.data)) ? &it->second
+                                                               : nullptr;
   }
   return LoadFile(anime_id) ? &items_[anime_id] : nullptr;
 }
