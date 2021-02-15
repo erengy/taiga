@@ -4,6 +4,12 @@
 ; ------------------------------------------------------------------------------
 ; General
 
+; Override via command line
+; e.g. `makensis /DMACHINE=x64 Taiga.nsi`
+!ifndef MACHINE
+  !define MACHINE "x86"
+!endif
+
 ; Configuration
 !define CONFIG_PATH "..\src\taiga\config.h"
 !searchparse /file "${CONFIG_PATH}" `#define TAIGA_APP_MUTEX L"` PRODUCT_MUTEX `"`
@@ -34,7 +40,7 @@ VIProductVersion "${PRODUCT_VERSION}.0"
 ; Main settings
 BrandingText "${PRODUCT_NAME} v${PRODUCT_VERSION}"
 Name "${PRODUCT_NAME}"
-OutFile "..\bin\${PRODUCT_NAME}Setup.exe"
+OutFile "..\bin\${MACHINE}\${PRODUCT_NAME}Setup.exe"
 SetCompressor /SOLID lzma
 Unicode true
 
@@ -126,7 +132,7 @@ Section "!${PRODUCT_NAME}" SECTION_DEFAULT
 
   ; Add files
   SetOutPath "$INSTDIR"
-  File "..\bin\Release\Taiga.exe"
+  File "..\bin\${MACHINE}\Release\Taiga.exe"
   SetOutPath "$INSTDIR\data\"
   File /r "..\data\"
   SetOutPath "$INSTDIR\data\db\"
