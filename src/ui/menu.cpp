@@ -56,7 +56,10 @@ void MenuList::Load() {
 
   for (auto menu : menus.children(L"menu")) {
     const std::wstring name = menu.attribute(L"name").value();
-    menu_list_.Create(name, menu.attribute(L"type").value());
+    const win::MenuType type = menu.attribute(L"type").value() == L"menubar"
+                                   ? win::MenuType::Menu
+                                   : win::MenuType::PopupMenu;
+    menu_list_.Create(name, type);
     for (auto item : menu.children(L"item")) {
       menu_list_.menus[name].CreateItem(
           item.attribute(L"action").value(),
@@ -123,7 +126,7 @@ void MenuList::UpdateAnime(const anime::Item* anime_item) {
   menu = menu_list_.FindMenu(L"RightClick");
   if (menu) {
     for (int i = static_cast<int>(menu->items.size()) - 1; i > 0; i--) {
-      if (menu->items[i].type == win::kMenuItemSeparator) {
+      if (menu->items[i].type == win::MenuItemType::Separator) {
         // Clear items
         menu->items.resize(i + 1);
         // Play episode
@@ -399,7 +402,7 @@ void MenuList::UpdateSeason() {
     auto create_submenu = [this](const std::wstring& name) {
       auto submenu = menu_list_.FindMenu(name.c_str());
       if (!submenu) {
-        menu_list_.Create(name.c_str(), L"");
+        menu_list_.Create(name.c_str(), win::MenuType::PopupMenu);
         submenu = menu_list_.FindMenu(name.c_str());
       }
       return submenu;
