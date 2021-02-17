@@ -165,10 +165,12 @@ void Aggregator::ExamineData(Feed& feed) {
 
     // Update last aired episode number
     if (anime::IsValidId(episode_data.anime_id)) {
-      auto anime_item = anime::db.Find(episode_data.anime_id);
-      if (anime_item) {
-        int episode_number = anime::GetEpisodeHigh(episode_data);
-        anime_item->SetLastAiredEpisodeNumber(episode_number);
+      if (auto anime_item = anime::db.Find(episode_data.anime_id)) {
+        const int episode_number = anime::GetEpisodeHigh(episode_data);
+        if (anime::IsValidEpisodeNumber(episode_number,
+                                        anime_item->GetEpisodeCount())) {
+          anime_item->SetLastAiredEpisodeNumber(episode_number);
+        }
       }
     }
 
