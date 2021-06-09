@@ -73,8 +73,8 @@ static const std::vector<StreamData> stream_data{
     Stream::Funimation,
     L"Funimation",
     L"https://www.funimation.com",
-    std::regex("funimation\\.com/shows/[^/]+/[^/]+/"),
-    std::regex("(?:Watch )?(.+) Anime.* (?:on|-) Funimation"),
+    std::regex("funimation\\.com/.*/shows/[^/]+/[^/]+/"),
+    std::regex("(?:Watch )?(.+) \\| Anime.* \\| Funimation"),
   },
   // HIDIVE
   {
