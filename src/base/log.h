@@ -19,6 +19,7 @@
 #pragma once
 
 #include <fmt/format.h>
+#include <fmt/xchar.h>
 #include <monolog.hpp>
 
 namespace base {

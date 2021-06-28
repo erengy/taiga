@@ -19,5 +19,6 @@
 #pragma once
 
 #include <fmt/format.h>
+#include <fmt/xchar.h>
 
 using namespace fmt::literals;

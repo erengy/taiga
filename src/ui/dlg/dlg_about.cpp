@@ -52,7 +52,7 @@ enum ThirdPartyLibrary {
 static std::wstring GetLibraryVersion(ThirdPartyLibrary library) {
   switch (library) {
     case kDate:
-      return L"3.0.0";
+      return L"3.0.1";
     case kDiscordRpc:
       return L"3.4.0";
     case kFmt:
