@@ -1,0 +1,63 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - develop
+      - master
+      - msbuild
+
+jobs:
+  build:
+    runs-on: windows-latest
+    continue-on-error: ${{ matrix.arch != 'x86' }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        arch:
+        - x86
+        - x64
+        - x64_arm64
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+
+    - name: Add MSBuild to PATH
+      uses: microsoft/setup-msbuild@v1.0.2
+
+    - name: Build dependencies
+      run: deps\build.bat --machine ${{matrix.arch}}
+
+    - name: Build Taiga
+      run: msbuild "project\vs2019\Taiga.sln" /m /p:Configuration=Release /p:Platform=${{matrix.arch}}
+
+    - name: Build installer
+      run: makensis /DMACHINE=${{matrix.arch}} "setup\Taiga.nsi"
+
+    - name: Rename installer executable
+      run: mv bin/${{matrix.arch}}/TaigaSetup.exe bin/${{matrix.arch}}/TaigaSetup_${{matrix.arch}}.exe
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: TaigaSetup_${{matrix.arch}}
+        path: bin/${{matrix.arch}}/TaigaSetup_${{matrix.arch}}.exe
+
+  publish:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+    - name: Download artifacts
+      uses: actions/download-artifact@v2
+
+    - name: Publish release
+      uses: marvinpinto/action-automatic-releases@v1.2.1
+      with:
+        repo_token: "${{secrets.GITHUB_TOKEN}}"
+        automatic_release_tag: latest
+        prerelease: true
+        files: TaigaSetup_*/TaigaSetup_*.exe
