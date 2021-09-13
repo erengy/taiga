@@ -35,6 +35,7 @@ if exist %vswhere% (
 
 :initialize_environment
 echo Initializing environment...
+setlocal
 call %vcvarsall% %machine% || (
   echo Please edit the build script according to your system configuration.
   exit /B 1
@@ -64,6 +65,8 @@ nmake /f Makefile.vc mode=static RTLIBCFG=static VC=%vc% MACHINE=%machine%
 xcopy /s ..\builds\libcurl-vc%vc%-%machine%-release-static-ipv6-sspi-schannel\lib ..\..\..\lib\%machine%\
 
 cd /D %currentdir%
+
+endlocal
 
 echo Done!
 pause
