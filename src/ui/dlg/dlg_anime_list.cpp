@@ -747,8 +747,14 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
     case LVN_ITEMCHANGED: {
       auto lplv = reinterpret_cast<LPNMLISTVIEW>(lParam);
       auto anime_id = static_cast<int>(lplv->lParam);
+      auto selected_count = listview.GetSelectedCount();
       if (lplv->uNewState)
         listview.RefreshItem(lplv->iItem);
+      if (selected_count > 0) {
+        ui::ChangeStatusText(ToWstr(selected_count) + (selected_count == 1 ? L" item" : L" items") + L" selected");
+      } else {
+        ui::ClearStatusText();
+      }
       break;
     }
 
@@ -1424,6 +1430,9 @@ void AnimeListDialog::RefreshList(std::optional<anime::MyStatus> status) {
       current_position = listview.GetItemCount() - 1;
     listview.EnsureVisible(current_position);
   }
+
+  // Clear status bar text
+  ui::ClearStatusText();
 
   // Redraw
   listview.SetRedraw(TRUE);
