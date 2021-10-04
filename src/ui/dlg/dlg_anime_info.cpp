@@ -237,7 +237,7 @@ LRESULT AnimeDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
           } else if (IsEqual(pNMLink->item.szID, L"search")) {
             command = L"SearchAnime(" + CurrentEpisode.anime_title() + L")";
           } else if (IsEqual(pNMLink->item.szUrl, L"score")) {
-            command = L"";
+            command.clear();
             anime::LinkEpisodeToAnime(CurrentEpisode, ToInt(pNMLink->item.szID));
           }
           if (!command.empty())

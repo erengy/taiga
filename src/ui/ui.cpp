@@ -290,7 +290,7 @@ bool OnLibraryEntriesEditTags(const std::vector<int> ids, std::wstring& tags) {
   InputDialog dlg;
   dlg.title = L"Set Tags";
   dlg.info = L"Enter tags for the selected anime, separated by a comma:";
-  dlg.text = value;
+  dlg.text = std::move(value);
   dlg.Show(DlgMain.GetWindowHandle());
 
   if (dlg.result == IDOK) {
@@ -315,7 +315,7 @@ bool OnLibraryEntriesEditNotes(const std::vector<int> ids, std::wstring& notes) 
   InputDialog dlg;
   dlg.title = L"Set Notes";
   dlg.info = L"Enter notes for the selected anime:";
-  dlg.text = value;
+  dlg.text = std::move(value);
   dlg.Show(DlgMain.GetWindowHandle());
 
   if (dlg.result == IDOK) {

@@ -280,7 +280,7 @@ void FeedConditionDialog::ChooseElement(int element_index) {
           case anime::MyStatus::Dropped:
             continue;
           default:
-            title_list.push_back(std::make_pair(id, anime::GetPreferredTitle(item)));
+            title_list.emplace_back(id, anime::GetPreferredTitle(item));
             break;
         }
       }

@@ -43,21 +43,21 @@ void InitializeDialogProperties() {
   if (!dialog_properties.empty())
     return;
 
-  dialog_properties.insert(std::make_pair(
+  dialog_properties.emplace(
       Dialog::About,
-      DialogProperties{IDD_ABOUT, &DlgAbout, Dialog::Main, true}));
-  dialog_properties.insert(std::make_pair(
+      DialogProperties{IDD_ABOUT, &DlgAbout, Dialog::Main, true});
+  dialog_properties.emplace(
       Dialog::AnimeInformation,
-      DialogProperties{IDD_ANIME_INFO, &DlgAnime, Dialog::Main, false}));
-  dialog_properties.insert(std::make_pair(
+      DialogProperties{IDD_ANIME_INFO, &DlgAnime, Dialog::Main, false});
+  dialog_properties.emplace(
       Dialog::Main,
-      DialogProperties{IDD_MAIN, &DlgMain, Dialog::None, false}));
-  dialog_properties.insert(std::make_pair(
+      DialogProperties{IDD_MAIN, &DlgMain, Dialog::None, false});
+  dialog_properties.emplace(
       Dialog::Settings,
-      DialogProperties{IDD_SETTINGS, &DlgSettings, Dialog::Main, true}));
-  dialog_properties.insert(std::make_pair(
+      DialogProperties{IDD_SETTINGS, &DlgSettings, Dialog::Main, true});
+  dialog_properties.emplace(
       Dialog::Update,
-      DialogProperties{IDD_UPDATE, &DlgUpdate, Dialog::Main, true}));
+      DialogProperties{IDD_UPDATE, &DlgUpdate, Dialog::Main, true});
 }
 
 ////////////////////////////////////////////////////////////////////////////////

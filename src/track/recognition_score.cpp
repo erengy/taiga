@@ -137,7 +137,7 @@ int Engine::ScoreTitle(const std::wstring& str, const anime::Episode& episode,
           (0.3 * std::pow(levenshtein[id], 0.8)) +
           (0.2 * std::pow(trigram_result.second, 0.8))) / 2.0) + bonus[id];
     if (score >= 0.3)
-      scores_.push_back(std::make_pair(id, score));
+      scores_.emplace_back(id, score);
   }
 
   // Sort scores in descending order, then limit the results

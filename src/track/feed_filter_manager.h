@@ -32,7 +32,7 @@ namespace track {
 class FeedFilterManager {
 public:
   FeedFilterManager();
-  ~FeedFilterManager() {}
+  ~FeedFilterManager() = default;
 
   void AddPresets(std::vector<FeedFilter>& filters);
   void AddPresets();

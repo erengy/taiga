@@ -1552,46 +1552,46 @@ void AnimeListDialog::ListView::InitializeColumns(bool reset) {
 
   int i = 0;
 
-  columns.insert(std::make_pair(kColumnAnimeStatus, ColumnData(
+  columns.emplace(kColumnAnimeStatus, ColumnData(
       {kColumnAnimeStatus, true, i, i++,
        0, static_cast<unsigned short>(ScaleX(16) + 6), static_cast<unsigned short>(ScaleX(16) + 6),
-       LVCFMT_CENTER, L"", L"anime_status"})));
-  columns.insert(std::make_pair(kColumnAnimeTitle, ColumnData(
+       LVCFMT_CENTER, L"", L"anime_status"}));
+  columns.emplace(kColumnAnimeTitle, ColumnData(
       {kColumnAnimeTitle, true, i, i++,
        0, static_cast<unsigned short>(ScaleX(300)), static_cast<unsigned short>(ScaleX(100)),
-       LVCFMT_LEFT, L"Anime title", L"anime_title"})));
-  columns.insert(std::make_pair(kColumnUserProgress, ColumnData(
+       LVCFMT_LEFT, L"Anime title", L"anime_title"}));
+  columns.emplace(kColumnUserProgress, ColumnData(
       {kColumnUserProgress, true, i, i++,
        0, static_cast<unsigned short>(ScaleX(200)), static_cast<unsigned short>(ScaleX(60)),
-       LVCFMT_CENTER, L"Progress", L"user_progress"})));
-  columns.insert(std::make_pair(kColumnUserRating, ColumnData(
+       LVCFMT_CENTER, L"Progress", L"user_progress"}));
+  columns.emplace(kColumnUserRating, ColumnData(
       {kColumnUserRating, true, i, i++,
        0, static_cast<unsigned short>(ScaleX(50)), static_cast<unsigned short>(ScaleX(50)),
-       LVCFMT_CENTER, L"Score", L"user_rating"})));
-  columns.insert(std::make_pair(kColumnAnimeRating, ColumnData(
+       LVCFMT_CENTER, L"Score", L"user_rating"}));
+  columns.emplace(kColumnAnimeRating, ColumnData(
       {kColumnAnimeRating, false, i, i++,
        0, static_cast<unsigned short>(ScaleX(55)), static_cast<unsigned short>(ScaleX(55)),
-       LVCFMT_CENTER, L"Average", L"anime_average_rating"})));
-  columns.insert(std::make_pair(kColumnAnimeType, ColumnData(
+       LVCFMT_CENTER, L"Average", L"anime_average_rating"}));
+  columns.emplace(kColumnAnimeType, ColumnData(
       {kColumnAnimeType, true, i, i++,
        0, static_cast<unsigned short>(ScaleX(65)), static_cast<unsigned short>(ScaleX(65)),
-       LVCFMT_CENTER, L"Type", L"anime_type"})));
-  columns.insert(std::make_pair(kColumnAnimeSeason, ColumnData(
+       LVCFMT_CENTER, L"Type", L"anime_type"}));
+  columns.emplace(kColumnAnimeSeason, ColumnData(
       {kColumnAnimeSeason, true, i, i++,
        0, static_cast<unsigned short>(ScaleX(95)), static_cast<unsigned short>(ScaleX(95)),
-       LVCFMT_RIGHT, L"Season", L"anime_season"})));
-  columns.insert(std::make_pair(kColumnUserDateStarted, ColumnData(
+       LVCFMT_RIGHT, L"Season", L"anime_season"}));
+  columns.emplace(kColumnUserDateStarted, ColumnData(
       {kColumnUserDateStarted, false, i, i++,
        0, static_cast<unsigned short>(ScaleX(90)), static_cast<unsigned short>(ScaleX(90)),
-       LVCFMT_RIGHT, L"Started", L"user_date_started"})));
-  columns.insert(std::make_pair(kColumnUserDateCompleted, ColumnData(
+       LVCFMT_RIGHT, L"Started", L"user_date_started"}));
+  columns.emplace(kColumnUserDateCompleted, ColumnData(
       {kColumnUserDateCompleted, false, i, i++,
        0, static_cast<unsigned short>(ScaleX(90)), static_cast<unsigned short>(ScaleX(90)),
-       LVCFMT_RIGHT, L"Completed", L"user_date_completed"})));
-  columns.insert(std::make_pair(kColumnUserLastUpdated, ColumnData(
+       LVCFMT_RIGHT, L"Completed", L"user_date_completed"}));
+  columns.emplace(kColumnUserLastUpdated, ColumnData(
       {kColumnUserLastUpdated, false, i, i++,
        0, static_cast<unsigned short>(ScaleX(100)), static_cast<unsigned short>(ScaleX(85)),
-       LVCFMT_RIGHT, L"Last updated", L"user_last_updated"})));
+       LVCFMT_RIGHT, L"Last updated", L"user_last_updated"}));
 
   if (reset) {
     for (const auto& [column_type, _] : columns) {

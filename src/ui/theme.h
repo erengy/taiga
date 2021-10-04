@@ -107,7 +107,7 @@ constexpr COLORREF kColorMainInstruction = RGB(0x00, 0x33, 0x99);
 class ThemeManager {
 public:
   ThemeManager();
-  ~ThemeManager() {}
+  ~ThemeManager() = default;
 
   bool Load();
 
