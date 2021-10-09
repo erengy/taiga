@@ -84,6 +84,17 @@ static const std::vector<StreamData> stream_data{
     std::regex("hidive\\.com/stream/"),
     std::regex("Stream (.+) on HIDIVE"),
   },
+  // Jellyfin Web App
+  {
+    Stream::Jellyfin,
+    L"Jellyfin Web App",
+    L"https://jellyfin.org",
+    std::regex(
+      "^localhost:[0-9]+/web/index.html#!/video|"
+      "^.+/jellyfin/web/index.html#!/video"
+    ),
+    std::regex("Jellyfin|(.+)"),
+  },
   // Plex Web App
   {
     Stream::Plex,
@@ -167,6 +178,8 @@ bool IsStreamEnabled(const Stream stream) {
       return taiga::settings.GetStreamFunimation();
     case Stream::Hidive:
       return taiga::settings.GetStreamHidive();
+    case Stream::Jellyfin:
+      return taiga::settings.GetStreamJellyfin();
     case Stream::Plex:
       return taiga::settings.GetStreamPlex();
     case Stream::Veoh:
@@ -204,6 +217,9 @@ void EnableStream(const Stream stream, const bool enabled) {
       break;
     case Stream::Hidive:
       taiga::settings.SetStreamHidive(enabled);
+      break;
+    case Stream::Jellyfin:
+      taiga::settings.SetStreamJellyfin(enabled);
       break;
     case Stream::Plex:
       taiga::settings.SetStreamPlex(enabled);

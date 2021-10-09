@@ -214,6 +214,8 @@ public:
   void SetStreamFunimation(const bool enabled);
   bool GetStreamHidive() const;
   void SetStreamHidive(const bool enabled);
+  bool GetStreamJellyfin() const;
+  void SetStreamJellyfin(const bool enabled);
   bool GetStreamPlex() const;
   void SetStreamPlex(const bool enabled);
   bool GetStreamVeoh() const;

@@ -168,6 +168,7 @@ void Settings::InitKeyMap() const {
       {AppSettingKey::StreamCrunchyroll, {"recognition/streaming/providers/crunchyroll", true}},
       {AppSettingKey::StreamFunimation, {"recognition/streaming/providers/funimation", true}},
       {AppSettingKey::StreamHidive, {"recognition/streaming/providers/hidive", true}},
+      {AppSettingKey::StreamJellyfin, {"recognition/streaming/providers/jellyfin", true}},
       {AppSettingKey::StreamPlex, {"recognition/streaming/providers/plex", true}},
       {AppSettingKey::StreamVeoh, {"recognition/streaming/providers/veoh", true}},
       {AppSettingKey::StreamViz, {"recognition/streaming/providers/viz", true}},
@@ -886,6 +887,14 @@ bool Settings::GetStreamHidive() const {
 
 void Settings::SetStreamHidive(const bool enabled) {
   set_value(AppSettingKey::StreamHidive, enabled);
+}
+
+bool Settings::GetStreamJellyfin() const {
+  return value<bool>(AppSettingKey::StreamJellyfin);
+}
+
+void Settings::SetStreamJellyfin(const bool enabled) {
+  set_value(AppSettingKey::StreamJellyfin, enabled);
 }
 
 bool Settings::GetStreamPlex() const {
