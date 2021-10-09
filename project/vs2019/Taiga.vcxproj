@@ -153,6 +153,12 @@
     <Manifest>
       <AdditionalManifestFiles>..\..\res\Taiga.manifest</AdditionalManifestFiles>
     </Manifest>
+    <PostBuildEvent>
+      <Command>xcopy ..\..\data $(OutputPath)\data /I /E /Y</Command>
+    </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>if not exist "..\..\deps\lib\$(LibrariesArchitecture)\libcurl_a.lib" ..\..\deps\build.bat --machine=$(LibrariesArchitecture)</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -177,6 +183,12 @@
     <Manifest>
       <AdditionalManifestFiles>..\..\res\Taiga.manifest</AdditionalManifestFiles>
     </Manifest>
+    <PostBuildEvent>
+      <Command>xcopy ..\..\data $(OutputPath)\data /I /E /Y</Command>
+    </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>if not exist "..\..\deps\lib\$(LibrariesArchitecture)\libcurl_a.lib" ..\..\deps\build.bat --machine=$(LibrariesArchitecture)</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
     <ClCompile>
@@ -231,6 +243,12 @@
     <Manifest>
       <AdditionalManifestFiles>..\..\res\Taiga.manifest</AdditionalManifestFiles>
     </Manifest>
+    <PostBuildEvent>
+      <Command>xcopy ..\..\data $(OutputPath)\data /I /E /Y</Command>
+    </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>if not exist "..\..\deps\lib\$(LibrariesArchitecture)\libcurl_a.lib" ..\..\deps\build.bat --machine=$(LibrariesArchitecture)</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -261,6 +279,12 @@
     <Manifest>
       <AdditionalManifestFiles>..\..\res\Taiga.manifest</AdditionalManifestFiles>
     </Manifest>
+    <PostBuildEvent>
+      <Command>xcopy ..\..\data $(OutputPath)\data /I /E /Y</Command>
+    </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>if not exist "..\..\deps\lib\$(LibrariesArchitecture)\libcurl_a.lib" ..\..\deps\build.bat --machine=$(LibrariesArchitecture)</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
     <ClCompile>
