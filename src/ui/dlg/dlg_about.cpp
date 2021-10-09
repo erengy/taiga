@@ -76,7 +76,7 @@ static std::wstring GetLibraryVersion(ThirdPartyLibrary library) {
           (PUGIXML_VERSION % 1000) / 10,
           (PUGIXML_VERSION % 1000) % 10).to_string());
     case kRandom:
-      return L"1.3.0";
+      return L"1.4.0";
     case kRapidJson:
       return StrToWstr(semaver::Version(
           RAPIDJSON_MAJOR_VERSION,
