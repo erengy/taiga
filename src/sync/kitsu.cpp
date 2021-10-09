@@ -282,6 +282,7 @@ void UseSparseFieldsetsForLibraryEntries(hypr::Params& params) {
       // attributes
       "finishedAt,"
       "notes,"
+      "private,"
       "progress,"
       "ratingTwenty,"
       "reconsumeCount,"
@@ -437,6 +438,7 @@ int ParseLibraryObject(const Json& json) {
   anime_item.SetMyLastWatchedEpisode(JsonReadInt(attributes, "progress"));
   anime_item.SetMyScore(
       TranslateMyRatingFrom(JsonReadInt(attributes, "ratingTwenty")));
+  anime_item.SetMyPrivate(JsonReadBool(attributes, "private"));
   anime_item.SetMyRewatchedTimes(JsonReadInt(attributes, "reconsumeCount"));
   anime_item.SetMyRewatching(JsonReadBool(attributes, "reconsuming"));
   anime_item.SetMyDateStart(

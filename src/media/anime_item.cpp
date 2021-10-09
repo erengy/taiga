@@ -340,6 +340,13 @@ MyStatus Item::GetMyStatus(bool check_queue) const {
   return queue_item ? *queue_item->status : my_info_->status;
 }
 
+bool Item::GetMyPrivate() const {
+  if (!my_info_.get())
+    return false;
+
+  return my_info_->is_private;
+}
+
 int Item::GetMyRewatchedTimes(bool check_queue) const {
   if (!my_info_.get())
     return 0;
@@ -438,6 +445,12 @@ void Item::SetMyStatus(MyStatus status) {
   assert(my_info_.get());
 
   my_info_->status = status;
+}
+
+void Item::SetMyPrivate(bool is_private) {
+  assert(my_info_.get());
+
+  my_info_->is_private = is_private;
 }
 
 void Item::SetMyRewatchedTimes(int rewatched_times) {

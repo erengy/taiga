@@ -106,6 +106,7 @@ public:
   int GetMyLastWatchedEpisode(bool check_queue = true) const;
   int GetMyScore(bool check_queue = true) const;
   MyStatus GetMyStatus(bool check_queue = true) const;
+  bool GetMyPrivate() const;
   int GetMyRewatchedTimes(bool check_queue = true) const;
   bool GetMyRewatching(bool check_queue = true) const;
   int GetMyRewatchingEp() const;
@@ -119,6 +120,7 @@ public:
   void SetMyLastWatchedEpisode(int number);
   void SetMyScore(int score);
   void SetMyStatus(MyStatus status);
+  void SetMyPrivate(bool is_private);
   void SetMyRewatchedTimes(int rewatched_times);
   void SetMyRewatching(bool rewatching);
   void SetMyRewatchingEp(int rewatching_ep);

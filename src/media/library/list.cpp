@@ -65,6 +65,7 @@ bool Database::LoadList() {
     anime_item.SetMyDateEnd(XmlReadStr(node, L"date_end"));
     anime_item.SetMyScore(XmlReadInt(node, L"score"));
     anime_item.SetMyStatus(static_cast<MyStatus>(XmlReadInt(node, L"status")));
+    anime_item.SetMyPrivate(XmlReadInt(node, L"private"));
     anime_item.SetMyRewatchedTimes(XmlReadInt(node, L"rewatched_times"));
     anime_item.SetMyRewatching(XmlReadInt(node, L"rewatching"));
     anime_item.SetMyRewatchingEp(XmlReadInt(node, L"rewatching_ep"));
@@ -102,6 +103,7 @@ bool Database::SaveList(bool include_database) const {
       XmlWriteStr(node, L"date_end", item.GetMyDateEnd().to_string());
       XmlWriteInt(node, L"score", item.GetMyScore(false));
       XmlWriteInt(node, L"status", static_cast<int>(item.GetMyStatus(false)));
+      XmlWriteInt(node, L"private", item.GetMyPrivate());
       XmlWriteInt(node, L"rewatched_times", item.GetMyRewatchedTimes());
       XmlWriteInt(node, L"rewatching", item.GetMyRewatching(false));
       XmlWriteInt(node, L"rewatching_ep", item.GetMyRewatchingEp());

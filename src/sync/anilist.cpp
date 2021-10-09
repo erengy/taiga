@@ -296,6 +296,7 @@ int ParseMediaListObject(const Json& json) {
 
   anime_item.SetMyScore(JsonReadInt(json, "score"));
   anime_item.SetMyLastWatchedEpisode(JsonReadInt(json, "progress"));
+  anime_item.SetMyPrivate(JsonReadBool(json, "private"));
   anime_item.SetMyRewatchedTimes(JsonReadInt(json, "repeat"));
   anime_item.SetMyNotes(StrToWstr(JsonReadStr(json, "notes")));
   anime_item.SetMyDateStart(TranslateFuzzyDateFrom(json["startedAt"]));

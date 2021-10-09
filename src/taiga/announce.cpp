@@ -25,6 +25,7 @@
 #include "link/http.h"
 #include "link/mirc.h"
 #include "link/twitter.h"
+#include "media/anime_db.h"
 #include "media/anime_util.h"
 #include "taiga/script.h"
 #include "taiga/settings.h"
@@ -52,6 +53,12 @@ void Announcer::Do(int modes, anime::Episode* episode, bool force) {
 
   if (!episode)
     episode = &CurrentEpisode;
+
+  if (const auto anime_item = anime::db.Find(episode->anime_id)) {
+    if (anime_item->GetMyPrivate()) {
+      return;  // Avoid sharing private anime
+    }
+  }
 
   if (modes & kAnnounceToHttp) {
     if (settings.GetShareHttpEnabled() || force) {
