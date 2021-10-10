@@ -48,8 +48,6 @@ bool Database::LoadList() {
     return false;
   }
 
-  const auto meta_version = XmlReadMetaVersion(document);
-
   auto node_database = document.child(L"database");
   ReadDatabaseNode(node_database);
 
@@ -74,7 +72,8 @@ bool Database::LoadList() {
     anime_item.SetMyLastUpdated(XmlReadStr(node, L"last_updated"));
   }
 
-  HandleListCompatibility(meta_version);
+  const auto xml_version = XmlReadVersionAttr(node_library);
+  HandleListCompatibility(xml_version);
 
   return true;
 }
@@ -85,13 +84,13 @@ bool Database::SaveList(bool include_database) const {
 
   XmlDocument document;
 
-  XmlWriteMetaVersion(document, StrToWstr(taiga::version().to_string()));
-
   if (include_database) {
     WriteDatabaseNode(XmlChild(document, L"database"));
   }
 
   auto node_library = document.append_child(L"library");
+
+  XmlWriteVersionAttr(node_library, StrToWstr(taiga::version().to_string()));
 
   for (const auto& [id, item] : items) {
     if (item.IsInList()) {
