@@ -60,4 +60,6 @@ bool XmlSaveDocumentToFile(
     const pugi::xml_encoding encoding = pugi::xml_encoding::encoding_utf8);
 
 std::wstring XmlReadMetaVersion(const XmlDocument& document);
+std::wstring XmlReadVersionAttr(const XmlNode& node);
 void XmlWriteMetaVersion(XmlDocument& document, const std::wstring_view version);
+void XmlWriteVersionAttr(XmlNode& parent_node, const std::wstring_view version);
