@@ -121,15 +121,15 @@ bool Database::SaveList(bool include_database) const {
 
 // @TODO: Move to util
 int Database::GetItemCount(MyStatus status, bool check_history) {
-  // Get current count
   int count = 0;
-  for (const auto& it : items) {
-    const auto& item = it.second;
+
+  // Get current count
+  for (const auto& [id, item] : items) {
     if (item.GetMyRewatching()) {
       if (status == MyStatus::Watching)
         ++count;
     } else {
-      if (item.GetMyStatus(false) == status)
+      if (status == item.GetMyStatus(false))
         ++count;
     }
   }
@@ -139,12 +139,12 @@ int Database::GetItemCount(MyStatus status, bool check_history) {
     for (const auto& queue_item : library::queue.items) {
       if (queue_item.status ||
           queue_item.mode == library::QueueItemMode::Delete) {
-        if (status == *queue_item.status) {
-          count++;
+        if (queue_item.status && status == *queue_item.status) {
+          ++count;
         } else {
           auto anime_item = Find(queue_item.anime_id);
           if (anime_item && status == anime_item->GetMyStatus(false))
-            count--;
+            --count;
         }
       }
     }
