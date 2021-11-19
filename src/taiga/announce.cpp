@@ -55,7 +55,7 @@ void Announcer::Do(int modes, anime::Episode* episode, bool force) {
     episode = &CurrentEpisode;
 
   if (const auto anime_item = anime::db.Find(episode->anime_id)) {
-    if (anime_item->GetMyPrivate()) {
+    if (!force && anime_item->GetMyPrivate()) {
       return;  // Avoid sharing private anime
     }
   }
