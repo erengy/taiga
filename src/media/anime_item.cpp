@@ -16,6 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <algorithm>
 #include <assert.h>
 
 #include "media/anime_item.h"
@@ -160,7 +161,7 @@ void Item::SetType(SeriesType type) {
 }
 
 void Item::SetEpisodeCount(int number) {
-  series_.episode_count = number;
+  series_.episode_count = std::clamp(number, 0, kMaxEpisodeCount);
 
   // TODO: Call it separately
   if (number >= 0)
@@ -432,7 +433,7 @@ void Item::SetMyId(const std::wstring& id) {
 void Item::SetMyLastWatchedEpisode(int number) {
   assert(my_info_.get());
 
-  my_info_->watched_episodes = number;
+  my_info_->watched_episodes = std::clamp(number, 0, kMaxEpisodeCount);
 }
 
 void Item::SetMyScore(int score) {

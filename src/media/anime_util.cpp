@@ -462,7 +462,7 @@ bool IsAllEpisodesAvailable(const Item& item) {
 }
 
 bool IsValidEpisodeCount(int number) {
-  return number > 0 && number < 1900;
+  return number > 0 && number < kMaxEpisodeCount;
 }
 
 bool IsValidEpisodeNumber(int number, int total) {

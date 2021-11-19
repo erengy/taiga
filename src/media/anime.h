@@ -97,6 +97,7 @@ constexpr std::array<MyStatus, 5> kMyStatuses{
   MyStatus::PlanToWatch,
 };
 
+constexpr int kMaxEpisodeCount = 1900;
 constexpr int kUnknownEpisodeCount = -1;
 constexpr int kUnknownEpisodeLength = -1;
 constexpr double kUnknownScore = 0.0;

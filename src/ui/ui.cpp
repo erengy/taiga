@@ -254,7 +254,7 @@ bool OnLibraryEntriesEditDelete(const std::vector<int> ids) {
 
 int OnLibraryEntriesEditEpisode(const std::vector<int> ids) {
   std::set<int> current;
-  int number_max = 1900;
+  int number_max = anime::kMaxEpisodeCount;
   for (const auto& id : ids) {
     auto anime_item = anime::db.Find(id);
     if (!anime_item)
