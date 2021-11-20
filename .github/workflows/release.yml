@@ -32,7 +32,7 @@ jobs:
       run: deps\build.bat --machine ${{matrix.arch}}
 
     - name: Build Taiga
-      run: msbuild "project\vs2019\Taiga.sln" /m /p:Configuration=Release /p:Platform=${{matrix.arch}}
+      run: msbuild "project\vs2022\Taiga.sln" /m /p:Configuration=Release /p:Platform=${{matrix.arch}}
 
     - name: Build installer
       run: makensis /DMACHINE=${{matrix.arch}} "setup\Taiga.nsi"
