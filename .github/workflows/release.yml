@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: windows-2022
     continue-on-error: ${{ matrix.arch != 'x86' }}
 
     strategy:
