@@ -31,6 +31,15 @@ jobs:
     - name: Build dependencies
       run: deps\build.bat --machine ${{matrix.arch}}
 
+    - name: Put git commit hash in version value
+      run: |
+        (
+            Get-Content -Path src\taiga\config.h
+        ) -Replace (
+            "(?<=#define TAIGA_VERSION_BUILD 0x).*",
+            (git rev-parse --short HEAD)
+        ) | Set-Content -Path src\taiga\config.h
+
     - name: Build Taiga
       run: msbuild "project\vs2022\Taiga.sln" /m /p:Configuration=Release /p:Platform=${{matrix.arch}}
 
