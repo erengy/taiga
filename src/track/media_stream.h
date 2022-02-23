@@ -26,6 +26,7 @@ namespace track::recognition {
 
 enum class Stream {
   Animelab,
+  Animepahe,
   Adn,
   Ann,
   Crunchyroll,

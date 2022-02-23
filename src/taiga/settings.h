@@ -204,6 +204,8 @@ public:
   void SetSyncNotifyFormat(const std::wstring& format);
   bool GetStreamAnimelab() const;
   void SetStreamAnimelab(const bool enabled);
+  bool GetStreamAnimepahe() const;
+  void SetStreamAnimepahe(const bool enabled);
   bool GetStreamAdn() const;
   void SetStreamAdn(const bool enabled);
   bool GetStreamAnn() const;

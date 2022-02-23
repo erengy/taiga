@@ -91,6 +91,7 @@ enum class AppSettingKey {
   SyncNotifyNotRecognized,
   SyncNotifyFormat,
   StreamAnimelab,
+  StreamAnimepahe,
   StreamAdn,
   StreamAnn,
   StreamCrunchyroll,

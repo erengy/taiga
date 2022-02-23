@@ -39,6 +39,14 @@ static const std::vector<StreamData> stream_data{
     std::regex("animelab\\.com/player/"),
     std::regex("AnimeLab - (.+)"),
   },
+  // Animepahe
+  {
+      Stream::Animepahe,
+      L"AnimePahe",
+      L"https://www.animepahe.com",
+      std::regex("animepahe\\.com/play/.*"),
+      std::regex("(.+) :: animepahe"),
+  },
   // Anime Digital Network
   {
     Stream::Adn,
@@ -168,6 +176,8 @@ bool IsStreamEnabled(const Stream stream) {
   switch (stream) {
     case Stream::Animelab:
       return taiga::settings.GetStreamAnimelab();
+    case Stream::Animepahe:
+      return taiga::settings.GetStreamAnimepahe();
     case Stream::Adn:
       return taiga::settings.GetStreamAdn();
     case Stream::Ann:
@@ -202,6 +212,9 @@ void EnableStream(const Stream stream, const bool enabled) {
   switch (stream) {
     case Stream::Animelab:
       taiga::settings.SetStreamAnimelab(enabled);
+      break;
+    case Stream::Animepahe:
+      taiga::settings.SetStreamAnimepahe(enabled);
       break;
     case Stream::Adn:
       taiga::settings.SetStreamAdn(enabled);

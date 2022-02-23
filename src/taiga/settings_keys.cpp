@@ -163,6 +163,7 @@ void Settings::InitKeyMap() const {
       {AppSettingKey::SyncNotifyNotRecognized, {"program/notifications/balloon/notrecognized", true}},
       {AppSettingKey::SyncNotifyFormat, {"program/notifications/balloon/format", std::wstring{kDefaultFormatBalloon}}},
       {AppSettingKey::StreamAnimelab, {"recognition/streaming/providers/animelab", true}},
+      {AppSettingKey::StreamAnimepahe, {"recognition/streaming/providers/animepahe", true}},
       {AppSettingKey::StreamAdn, {"recognition/streaming/providers/adn", true}},
       {AppSettingKey::StreamAnn, {"recognition/streaming/providers/ann", true}},
       {AppSettingKey::StreamCrunchyroll, {"recognition/streaming/providers/crunchyroll", true}},
@@ -847,6 +848,14 @@ bool Settings::GetStreamAnimelab() const {
 
 void Settings::SetStreamAnimelab(const bool enabled) {
   set_value(AppSettingKey::StreamAnimelab, enabled);
+}
+
+bool Settings::GetStreamAnimepahe() const {
+  return value<bool>(AppSettingKey::StreamAnimepahe);
+}
+
+void Settings::SetStreamAnimepahe(const bool enabled) {
+  set_value(AppSettingKey::StreamAnimepahe, enabled);
 }
 
 bool Settings::GetStreamAdn() const {
