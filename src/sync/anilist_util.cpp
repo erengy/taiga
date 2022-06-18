@@ -168,7 +168,7 @@ std::string TranslateMyStatusTo(anime::MyStatus value) {
     case anime::MyStatus::PlanToWatch: return "PLANNING";
   }
 
-  LOGW(L"Invalid value: {}", value);
+  LOGW(L"Invalid value: {}", static_cast<int>(value));
   return "";
 }
 

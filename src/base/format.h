@@ -18,7 +18,23 @@
 
 #pragma once
 
+#include <string_view>
+
 #include <fmt/format.h>
 #include <fmt/xchar.h>
 
-using namespace fmt::literals;
+// `_format` UDL is deprecated. We should eventually move to `fmt::format`
+// and then to `std::format` in C++20.
+// See: https://github.com/fmtlib/fmt/issues/2640
+
+auto operator"" _format(const char* s, size_t n) {
+  return [=](auto&&... args) {
+    return fmt::format(fmt::runtime(std::string_view(s, n)), args...);
+  };
+}
+
+auto operator"" _format(const wchar_t* s, size_t n) {
+  return [=](auto&&... args) {
+    return fmt::format(std::wstring_view(s, n), args...);
+  };
+}

@@ -226,7 +226,7 @@ int GetIndexFromShortcode(const Shortcode type, const std::wstring& shortcode) {
       return index;
   }
 
-  LOGD(L"\"{}\" for type \"{}\" not found.", shortcode, type);
+  LOGD(L"\"{}\" for type \"{}\" not found.", shortcode, static_cast<int>(type));
   return -1;
 }
 
