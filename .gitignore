@@ -3,3 +3,9 @@
 /deps/lib/
 /project/vs*/.vs/
 /project/vs*/*.user
+
+*/bin
+*/obj
+*.csproj.user
+.vs
+*.feature.cs
