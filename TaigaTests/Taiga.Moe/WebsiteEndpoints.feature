@@ -1,8 +1,9 @@
-﻿Feature: Website Endpoints
+﻿@Website
+Feature: Website Endpoints
 
-A short summary of the feature
+Test Website to see if it is available and the download works
 
-@Website
+
 Scenario: Website homepage is online and contains expected text
 	When https://taiga.moe/ is requested
 	Then The response code should be OK
