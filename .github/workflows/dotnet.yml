@@ -7,7 +7,7 @@ on:
     branches: [ "develop" ]
 
 jobs:
-  build:
+  Test-Taiga-Website:
 
     runs-on: ubuntu-latest
 
@@ -18,8 +18,8 @@ jobs:
       with:
         dotnet-version: 6.0.x
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore ./TaigaTests
     - name: Build
       run: dotnet build ./TaigaTests --no-restore
     - name: Test
-      run: dotnet test ./TaigaTests --no-build --verbosity normal
+      run: dotnet test ./TaigaTests --filter:'Category=Website' --no-build --verbosity normal
