@@ -44,6 +44,7 @@ enum class AppSettingKey {
   LibraryFileSizeThreshold,
   LibraryMediaPlayerPath,
   LibraryWatchFolders,
+  LibraryWatchInterval,
 
   // Application
   AppListDoubleClickAction,

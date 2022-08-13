@@ -159,6 +159,10 @@ BOOL SettingsPage::OnInitDialog() {
       }
       list.SetWindowHandle(nullptr);
       CheckDlgButton(IDC_CHECK_FOLDERS_WATCH, taiga::settings.GetLibraryWatchFolders());
+      SendDlgItemMessage(IDC_SPIN_FOLDERS_INTERVAL, UDM_SETRANGE32, 10, 3600);
+      SendDlgItemMessage(IDC_SPIN_FOLDERS_INTERVAL, UDM_SETPOS32, 0, taiga::settings.GetLibraryWatchInterval());
+      EnableDlgItem(IDC_EDIT_FOLDERS_INTERVAL, taiga::settings.GetLibraryWatchFolders());
+      EnableDlgItem(IDC_SPIN_FOLDERS_INTERVAL, taiga::settings.GetLibraryWatchFolders());
       break;
     }
 
@@ -642,6 +646,12 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
         case IDC_CHECK_DETECT_STREAMING_MEDIA: {
           BOOL enable = IsDlgButtonChecked(LOWORD(wParam));
           EnableDlgItem(IDC_LIST_STREAM_PROVIDER, enable);
+          return TRUE;
+        }
+        case IDC_CHECK_FOLDERS_WATCH: {
+          BOOL enable = IsDlgButtonChecked(LOWORD(wParam));
+          EnableDlgItem(IDC_EDIT_FOLDERS_INTERVAL, enable);
+          EnableDlgItem(IDC_SPIN_FOLDERS_INTERVAL, enable);
           return TRUE;
         }
         case IDC_CHECK_HIGHLIGHT: {

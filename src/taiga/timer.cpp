@@ -117,7 +117,7 @@ void TimerManager::Initialize() {
 
 void TimerManager::UpdateEnabledState() {
   // Library
-  timer_library.set_enabled(!settings.GetLibraryWatchFolders());
+  timer_library.set_enabled(settings.GetLibraryWatchFolders());
 
   // Media
   bool media_player_is_running =
@@ -136,6 +136,9 @@ void TimerManager::UpdateEnabledState() {
 }
 
 void TimerManager::UpdateIntervalsFromSettings() {
+  timer_library.set_interval(
+      settings.GetLibraryWatchInterval() * 60);
+
   timer_detection.set_interval(
       std::max(1, settings.GetRecognitionDetectionInterval()));
 

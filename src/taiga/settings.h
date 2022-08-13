@@ -114,6 +114,8 @@ public:
   void SetLibraryMediaPlayerPath(const std::wstring& path);
   bool GetLibraryWatchFolders() const;
   void SetLibraryWatchFolders(const bool enabled);
+  int GetLibraryWatchInterval() const;
+  void SetLibraryWatchInterval(const int minutes);
 
   // Application
   int GetAppListDoubleClickAction() const;

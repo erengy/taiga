@@ -214,6 +214,7 @@ void SettingsDialog::OnOK() {
     }
     taiga::settings.SetLibraryFolders(library_folders);
     taiga::settings.SetLibraryWatchFolders(page->IsDlgButtonChecked(IDC_CHECK_FOLDERS_WATCH));
+    taiga::settings.SetLibraryWatchInterval(static_cast<int>(page->GetDlgItemInt(IDC_EDIT_FOLDERS_INTERVAL)));
     list.SetWindowHandle(nullptr);
   }
 

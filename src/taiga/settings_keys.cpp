@@ -116,6 +116,8 @@ void Settings::InitKeyMap() const {
       {AppSettingKey::LibraryFileSizeThreshold, {"anime/folders/scan/minfilesize", int{kDefaultFileSizeThreshold}}},
       {AppSettingKey::LibraryMediaPlayerPath, {"recognition/mediaplayers/launchpath", std::wstring{}}},
       {AppSettingKey::LibraryWatchFolders, {"anime/folders/watch/enabled", true}},
+      {AppSettingKey::LibraryWatchInterval, {"anime/folders/watch/watchinterval", 30}},
+      // HERE
 
       // Application
       {AppSettingKey::AppListDoubleClickAction, {"program/list/action/doubleclick", ui::kAnimeListActionInfo}},
@@ -469,6 +471,14 @@ bool Settings::GetLibraryWatchFolders() const {
 void Settings::SetLibraryWatchFolders(const bool enabled) {
   set_value(AppSettingKey::LibraryWatchFolders, enabled);
   track::monitor.Enable(enabled);
+}
+
+int Settings::GetLibraryWatchInterval() const {
+  return value<int>(AppSettingKey::LibraryWatchInterval);
+}
+
+void Settings::SetLibraryWatchInterval(const int minutes) {
+  set_value(AppSettingKey::LibraryWatchInterval, minutes);
 }
 
 // Application
