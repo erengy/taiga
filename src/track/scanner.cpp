@@ -251,8 +251,6 @@ void ScanAvailableEpisodesQuick() {
 }
 
 void ScanAvailableEpisodesQuick(int anime_id) {
-  LOGE(L"Scanned.");
-
   using track::scanner;
 
   for (auto it = anime::db.items.rbegin();
