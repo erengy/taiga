@@ -371,7 +371,7 @@ std::wstring GetUrlHost(const std::string_view url) {
 std::wstring to_string(const Error& error, const std::wstring& host) {
   std::wstring message = StrToWstr(error.str());
   TrimRight(message, L" \r\n");
-  message = L"{} ({})"_format(message, error.code);
+  message = L"{} ({})"_format(message, static_cast<int>(error.code));
   if (!host.empty()) {
     switch (error.code) {
       case CURLE_COULDNT_RESOLVE_HOST:
