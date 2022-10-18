@@ -125,7 +125,7 @@ BOOL AboutDialog::OnInitDialog() {
       L"saka, Diablofan, slevir, LordGravewish, rr-, sunjayc, ConnorKrammer, Soinou, Jiyuu, ryban, tollyx,\\line "
       L"pavelxdd, gunt3001, synthtech, cnguy\\line\\par "
       L"\\b Donators:\\b0\\line "
-      L"Farfie, Nydaleclya and other anonymous supporters\\line\\par "
+      L"Farfie, Nydaleclya, WizardTim, Kinzer and other anonymous supporters\\line\\par "
       L"\\b Third-party components:\\b0\\line "
       L"{\\field{\\*\\fldinst{HYPERLINK \"https://github.com/HowardHinnant/date\"}}{\\fldrslt{date " + GetLibraryVersion(kDate) + L"}}}, "
       L"{\\field{\\*\\fldinst{HYPERLINK \"https://github.com/discordapp/discord-rpc\"}}{\\fldrslt{Discord RPC " + GetLibraryVersion(kDiscordRpc) + L"}}}, "
