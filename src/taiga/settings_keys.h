@@ -124,6 +124,7 @@ enum class AppSettingKey {
   ShareTwitterFormat,
   ShareTwitterOauthToken,
   ShareTwitterOauthSecret,
+  ShareTwitterReplyTo,
   ShareTwitterUsername,
 
   // Torrents

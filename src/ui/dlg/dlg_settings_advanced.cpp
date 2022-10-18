@@ -39,6 +39,7 @@ std::vector<AdvancedSetting> GetAdvancedSettingKeys() {
     AdvancedSetting::RecognitionDetectionInterval,
     AdvancedSetting::SyncServiceKitsuPartialLibrary,
     AdvancedSetting::ShareDiscordApplicationId,
+    AdvancedSetting::ShareTwitterReplyTo,
     AdvancedSetting::TorrentFilterArchiveMaxCount,
     AdvancedSetting::TorrentDownloadFileLocation,
     AdvancedSetting::TorrentDownloadUseMagnet,
@@ -78,6 +79,8 @@ std::wstring GetAdvancedSettingDescription(const AdvancedSetting key) {
       return L"Services / Kitsu / Download partial library";
     case AdvancedSetting::ShareDiscordApplicationId:
       return L"Sharing / Discord / Application ID";
+    case AdvancedSetting::ShareTwitterReplyTo:
+      return L"Sharing / Twitter / Reply to status ID";
     case AdvancedSetting::TorrentFilterArchiveMaxCount:
       return L"Torrents / Archive limit";
     case AdvancedSetting::TorrentDownloadFileLocation:
@@ -125,6 +128,8 @@ std::wstring GetAdvancedSettingValue(const AdvancedSetting key) {
       return bool_to_wstr(taiga::settings.GetSyncServiceKitsuPartialLibrary());
     case AdvancedSetting::ShareDiscordApplicationId:
       return taiga::settings.GetShareDiscordApplicationId();
+    case AdvancedSetting::ShareTwitterReplyTo:
+      return taiga::settings.GetShareTwitterReplyTo();
     case AdvancedSetting::TorrentFilterArchiveMaxCount:
       return ToWstr(taiga::settings.GetTorrentFilterArchiveMaxCount());
     case AdvancedSetting::TorrentDownloadFileLocation:
@@ -182,6 +187,9 @@ void SetAdvancedSetting(const AdvancedSetting key, const std::wstring& value) {
       break;
     case AdvancedSetting::ShareDiscordApplicationId:
       taiga::settings.SetShareDiscordApplicationId(value);
+      break;
+    case AdvancedSetting::ShareTwitterReplyTo:
+      taiga::settings.SetShareTwitterReplyTo(value);
       break;
     case AdvancedSetting::TorrentFilterArchiveMaxCount:
       taiga::settings.SetTorrentFilterArchiveMaxCount(ToInt(value));

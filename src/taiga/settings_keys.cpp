@@ -196,6 +196,7 @@ void Settings::InitKeyMap() const {
       {AppSettingKey::ShareTwitterFormat, {"announce/twitter/format", std::wstring{kDefaultFormatTwitter}}},
       {AppSettingKey::ShareTwitterOauthToken, {"announce/twitter/oauth_token", std::wstring{}}},
       {AppSettingKey::ShareTwitterOauthSecret, {"announce/twitter/oauth_secret", std::wstring{}}},
+      {AppSettingKey::ShareTwitterReplyTo, {"announce/twitter/reply_to", std::wstring{}}},
       {AppSettingKey::ShareTwitterUsername, {"announce/twitter/user", std::wstring{}}},
 
       // Torrents
@@ -1104,6 +1105,14 @@ std::wstring Settings::GetShareTwitterOauthSecret() const {
 
 void Settings::SetShareTwitterOauthSecret(const std::wstring& oauth_secret) {
   set_value(AppSettingKey::ShareTwitterOauthSecret, oauth_secret);
+}
+
+std::wstring Settings::GetShareTwitterReplyTo() const {
+  return value<std::wstring>(AppSettingKey::ShareTwitterReplyTo);
+}
+
+void Settings::SetShareTwitterReplyTo(const std::wstring& status_id) {
+  set_value(AppSettingKey::ShareTwitterReplyTo, status_id);
 }
 
 std::wstring Settings::GetShareTwitterUsername() const {

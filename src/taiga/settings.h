@@ -268,6 +268,8 @@ public:
   void SetShareTwitterOauthToken(const std::wstring& oauth_token);
   std::wstring GetShareTwitterOauthSecret() const;
   void SetShareTwitterOauthSecret(const std::wstring& oauth_secret);
+  std::wstring GetShareTwitterReplyTo() const;
+  void SetShareTwitterReplyTo(const std::wstring& status_id);
   std::wstring GetShareTwitterUsername() const;
   void SetShareTwitterUsername(const std::wstring& username);
 
