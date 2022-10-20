@@ -28,8 +28,6 @@ enum class Stream {
   Animelab,
   Adn,
   Ann,
-  Crunchyroll,
-  Funimation,
   Hidive,
   Jellyfin,
   Plex,
