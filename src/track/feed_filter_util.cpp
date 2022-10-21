@@ -70,8 +70,8 @@ std::wstring TranslateElement(const int element) {
     case kFeedFilterElement_Meta_Episodes: return L"Anime episode count";
     case kFeedFilterElement_Meta_Status: return L"Anime airing status";
     case kFeedFilterElement_Meta_Type: return L"Anime type";
+    case kFeedFilterElement_User_Notes: return L"Anime notes";
     case kFeedFilterElement_User_Status: return L"Anime watching status";
-    case kFeedFilterElement_User_Tags: return L"Anime tags";
     case kFeedFilterElement_Episode_Number: return L"Episode number";
     case kFeedFilterElement_Episode_Version: return L"Episode version";
     case kFeedFilterElement_Local_EpisodeAvailable: return L"Episode availability";
@@ -163,8 +163,8 @@ static const std::map<int, std::wstring>& GetShortcodeMap(const Shortcode type) 
       {kFeedFilterElement_Meta_Episodes, L"meta_episodes"},
       {kFeedFilterElement_Meta_DateStart, L"meta_date_start"},
       {kFeedFilterElement_Meta_DateEnd, L"meta_date_end"},
+      {kFeedFilterElement_User_Notes, L"user_tags"},
       {kFeedFilterElement_User_Status, L"user_status"},
-      {kFeedFilterElement_User_Tags, L"user_tags"},
       {kFeedFilterElement_Local_EpisodeAvailable, L"local_episode_available"},
       {kFeedFilterElement_Episode_Title, L"episode_title"},
       {kFeedFilterElement_Episode_Number, L"episode_number"},
