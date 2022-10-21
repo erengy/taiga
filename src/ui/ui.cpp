@@ -278,29 +278,6 @@ int OnLibraryEntriesEditEpisode(const std::vector<int> ids) {
   return -1;
 }
 
-bool OnLibraryEntriesEditTags(const std::vector<int> ids, std::wstring& tags) {
-  std::set<std::wstring> current;
-  for (const auto& id : ids) {
-    auto anime_item = anime::db.Find(id);
-    if (anime_item)
-      current.insert(anime_item->GetMyTags());
-  }
-  std::wstring value = current.size() == 1 ? *current.begin() : L"";
-
-  InputDialog dlg;
-  dlg.title = L"Set Tags";
-  dlg.info = L"Enter tags for the selected anime, separated by a comma:";
-  dlg.text = value;
-  dlg.Show(DlgMain.GetWindowHandle());
-
-  if (dlg.result == IDOK) {
-    tags = dlg.text;
-    return true;
-  }
-
-  return false;
-}
-
 bool OnLibraryEntriesEditNotes(const std::vector<int> ids, std::wstring& notes) {
   std::wstring value;
   for (const auto& id : ids) {

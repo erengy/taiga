@@ -115,7 +115,6 @@ public:
   const Date& GetMyDateStart(bool check_queue = true) const;
   const Date& GetMyDateEnd(bool check_queue = true) const;
   const std::wstring& GetMyLastUpdated() const;
-  const std::wstring& GetMyTags(bool check_queue = true) const;
   const std::wstring& GetMyNotes(bool check_queue = true) const;
 
   void SetMyId(const std::wstring& id);
@@ -131,7 +130,6 @@ public:
   void SetMyDateEnd(const Date& date);
   void SetMyDateEnd(const std::wstring& date);
   void SetMyLastUpdated(const std::wstring& last_updated);
-  void SetMyTags(const std::wstring& tags);
   void SetMyNotes(const std::wstring& notes);
 
   //////////////////////////////////////////////////////////////////////////////

@@ -126,7 +126,7 @@ bool ExportAsMalXml(const std::wstring& path) {
       XmlWriteInt(node, L"my_times_watched", item.GetMyRewatchedTimes());
       XmlWriteStr(node, L"my_rewatch_value", L"");
       XmlWriteInt(node, L"my_downloaded_eps", 0);
-      XmlWriteStr(node, L"my_tags", item.GetMyTags(), pugi::node_cdata);
+      XmlWriteStr(node, L"my_tags", L"");
       XmlWriteInt(node, L"my_rewatching", item.GetMyRewatching());
       XmlWriteInt(node, L"my_rewatching_ep", item.GetMyRewatchingEp());
       XmlWriteInt(node, L"update_on_import", library::queue.IsQueued(item.GetId()));

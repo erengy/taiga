@@ -148,7 +148,6 @@ struct MyInformation {
   Date date_start;
   Date date_finish;
   std::wstring last_updated;
-  std::wstring tags;
   std::wstring notes;
 };
 

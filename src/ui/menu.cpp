@@ -84,32 +84,11 @@ void MenuList::UpdateAnime(const anime::Item* anime_item) {
   if (!anime_item->IsInList())
     return;
 
-  // Edit
-  auto menu = menu_list_.FindMenu(L"Edit");
-  if (menu) {
-    for (auto& item : menu->items) {
-      if (item.action == L"EditTags" ||
-          item.action == L"EditNotes") {
-        switch (sync::GetCurrentServiceId()) {
-          case sync::ServiceId::MyAnimeList:
-            item.name = L"Set &tags...";
-            item.action = L"EditTags";
-            break;
-          case sync::ServiceId::Kitsu:
-          case sync::ServiceId::AniList:
-            item.name = L"Set &notes...";
-            item.action = L"EditNotes";
-            break;
-        }
-      }
-    }
-  }
-
   // Edit > Score
   UpdateScore(anime_item);
 
   // Edit > Status
-  menu = menu_list_.FindMenu(L"EditStatus");
+  auto menu = menu_list_.FindMenu(L"EditStatus");
   if (menu) {
     for (auto& item : menu->items) {
       item.checked = false;

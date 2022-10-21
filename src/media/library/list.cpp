@@ -69,7 +69,6 @@ bool Database::LoadList() {
     anime_item.SetMyRewatchedTimes(XmlReadInt(node, L"rewatched_times"));
     anime_item.SetMyRewatching(XmlReadInt(node, L"rewatching"));
     anime_item.SetMyRewatchingEp(XmlReadInt(node, L"rewatching_ep"));
-    anime_item.SetMyTags(XmlReadStr(node, L"tags"));
     anime_item.SetMyNotes(XmlReadStr(node, L"notes"));
     anime_item.SetMyLastUpdated(XmlReadStr(node, L"last_updated"));
   }
@@ -107,7 +106,6 @@ bool Database::SaveList(bool include_database) const {
       XmlWriteInt(node, L"rewatched_times", item.GetMyRewatchedTimes());
       XmlWriteInt(node, L"rewatching", item.GetMyRewatching(false));
       XmlWriteInt(node, L"rewatching_ep", item.GetMyRewatchingEp());
-      XmlWriteStr(node, L"tags", item.GetMyTags(false));
       XmlWriteStr(node, L"notes", item.GetMyNotes(false));
       XmlWriteStr(node, L"last_updated", item.GetMyLastUpdated());
     }
@@ -247,8 +245,6 @@ void Database::UpdateItem(const library::QueueItem& queue_item) {
     anime_item->SetMyRewatching(*queue_item.enable_rewatching);
   if (queue_item.rewatched_times)
     anime_item->SetMyRewatchedTimes(*queue_item.rewatched_times);
-  if (queue_item.tags)
-    anime_item->SetMyTags(*queue_item.tags);
   if (queue_item.notes)
     anime_item->SetMyNotes(*queue_item.notes);
   if (queue_item.date_start)

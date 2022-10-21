@@ -433,21 +433,10 @@ void PageMyInfo::Refresh(int anime_id) {
   edit.SetWindowHandle(nullptr);
   spin.SetWindowHandle(nullptr);
 
-  // Tags / Notes
-  edit.SetWindowHandle(GetDlgItem(IDC_EDIT_ANIME_TAGS));
-  switch (sync::GetCurrentServiceId()) {
-    case sync::ServiceId::MyAnimeList:
-      SetDlgItemText(IDC_STATIC_TAGSNOTES, L"Tags:");
-      edit.SetCueBannerText(L"Enter tags here, separated by a comma (e.g. tag1, tag2)");
-      edit.SetText(anime_item->GetMyTags());
-      break;
-    case sync::ServiceId::Kitsu:
-    case sync::ServiceId::AniList:
-      SetDlgItemText(IDC_STATIC_TAGSNOTES, L"Notes:");
-      edit.SetCueBannerText(L"Enter your notes about this anime");
-      edit.SetText(anime_item->GetMyNotes());
-      break;
-  }
+  // Notes
+  edit.SetWindowHandle(GetDlgItem(IDC_EDIT_ANIME_NOTES));
+  edit.SetCueBannerText(L"Enter your notes about this anime");
+  edit.SetText(anime_item->GetMyNotes());
   edit.SetWindowHandle(nullptr);
 
   // Dates
@@ -571,16 +560,8 @@ bool PageMyInfo::Save() {
   queue_item.status = static_cast<anime::MyStatus>(
       GetComboSelection(IDC_COMBO_ANIME_STATUS) + 1);
 
-  // Tags / Notes
-  switch (sync::GetCurrentServiceId()) {
-    case sync::ServiceId::MyAnimeList:
-      queue_item.tags = GetDlgItemText(IDC_EDIT_ANIME_TAGS);
-      break;
-    case sync::ServiceId::Kitsu:
-    case sync::ServiceId::AniList:
-      queue_item.notes = GetDlgItemText(IDC_EDIT_ANIME_TAGS);
-      break;
-  }
+  // Notes
+  queue_item.notes = GetDlgItemText(IDC_EDIT_ANIME_NOTES);
 
   // Start date
   if (start_date_changed_) {

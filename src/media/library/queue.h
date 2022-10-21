@@ -39,7 +39,6 @@ enum class QueueSearch {
   Rewatching,
   Score,
   Status,
-  Tags,
 };
 
 enum class QueueItemMode {
@@ -61,7 +60,6 @@ struct QueueItem {
   std::optional<Date> date_finish;
   std::optional<bool> enable_rewatching;
   std::optional<int> rewatched_times;
-  std::optional<std::wstring> tags;
   std::optional<std::wstring> notes;
 };
 

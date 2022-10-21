@@ -207,7 +207,7 @@ void FeedConditionDialog::ChooseElement(int element_index) {
       ADD_OPERATOR(track::kFeedFilterOperator_Equals);
       ADD_OPERATOR(track::kFeedFilterOperator_NotEquals);
       break;
-    case track::kFeedFilterElement_User_Tags:
+    case track::kFeedFilterElement_User_Notes:
     case track::kFeedFilterElement_Episode_Title:
     case track::kFeedFilterElement_Episode_Group:
     case track::kFeedFilterElement_Episode_VideoType:

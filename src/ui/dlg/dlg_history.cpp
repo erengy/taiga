@@ -211,8 +211,6 @@ void HistoryDialog::RefreshList() {
     if (it->status)
       AppendString(details, !it->enable_rewatching || *it->enable_rewatching != true ?
                    L"Status: " + ui::TranslateMyStatus(*it->status, false) : L"Rewatching");
-    if (it->tags)
-      AppendString(details, L"Tags: \"{}\""_format(*it->tags));
     if (it->notes)
       AppendString(details, L"Notes: \"{}\""_format(*it->notes));
     if (it->date_start)

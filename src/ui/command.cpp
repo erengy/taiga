@@ -597,23 +597,6 @@ void ExecuteCommand(const std::wstring& str, WPARAM wParam, LPARAM lParam) {
       library::queue.Add(queue_item);
     }
 
-  // EditTags(tags)
-  //   Changes anime tags.
-  //   Tags must be separated by a comma.
-  //   lParam is a pointer to a vector of anime IDs.
-  } else if (command == L"EditTags") {
-    const auto& anime_ids = *reinterpret_cast<std::vector<int>*>(lParam);
-    std::wstring tags;
-    if (ui::OnLibraryEntriesEditTags(anime_ids, tags)) {
-      for (const auto& anime_id : anime_ids) {
-        library::QueueItem queue_item;
-        queue_item.anime_id = anime_id;
-        queue_item.tags = tags;
-        queue_item.mode = library::QueueItemMode::Update;
-        library::queue.Add(queue_item);
-      }
-    }
-
   // EditNotes(notes)
   //   Changes anime notes.
   //   lParam is a pointer to a vector of anime IDs.

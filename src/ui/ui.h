@@ -80,7 +80,6 @@ void OnLibraryUpdateFailure(int id, const std::wstring& reason, bool not_approve
 
 bool OnLibraryEntriesEditDelete(const std::vector<int> ids);
 int OnLibraryEntriesEditEpisode(const std::vector<int> ids);
-bool OnLibraryEntriesEditTags(const std::vector<int> ids, std::wstring& tags);
 bool OnLibraryEntriesEditNotes(const std::vector<int> ids, std::wstring& notes);
 
 void OnHistoryAddItem(const library::QueueItem& queue_item);

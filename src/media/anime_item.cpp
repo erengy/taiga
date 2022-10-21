@@ -410,16 +410,6 @@ const std::wstring& Item::GetMyLastUpdated() const {
   return my_info_->last_updated;
 }
 
-const std::wstring& Item::GetMyTags(bool check_queue) const {
-  if (!my_info_.get())
-    return EmptyString();
-
-  library::QueueItem* queue_item = check_queue ?
-      SearchQueue(library::QueueSearch::Tags) : nullptr;
-
-  return queue_item ? *queue_item->tags : my_info_->tags;
-}
-
 const std::wstring& Item::GetMyNotes(bool check_queue) const {
   if (!my_info_.get())
     return EmptyString();
@@ -504,12 +494,6 @@ void Item::SetMyLastUpdated(const std::wstring& last_updated) {
   assert(my_info_.get());
 
   my_info_->last_updated = last_updated;
-}
-
-void Item::SetMyTags(const std::wstring& tags) {
-  assert(my_info_.get());
-
-  my_info_->tags = tags;
 }
 
 void Item::SetMyNotes(const std::wstring& notes) {

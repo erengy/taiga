@@ -48,9 +48,6 @@ static void ValidateQueueItem(QueueItem& item, const anime::Item& anime_item) {
   if (item.rewatched_times)
     if (anime_item.GetMyRewatchedTimes() == *item.rewatched_times)
       item.rewatched_times.reset();
-  if (item.tags)
-    if (anime_item.GetMyTags() == *item.tags)
-      item.tags.reset();
   if (item.notes)
     if (anime_item.GetMyNotes() == *item.notes)
       item.notes.reset();
@@ -81,7 +78,6 @@ void Queue::Add(QueueItem& item, bool save) {
           !item.status &&
           !item.enable_rewatching &&
           !item.rewatched_times &&
-          !item.tags &&
           !item.notes &&
           !item.date_start &&
           !item.date_finish)
@@ -107,8 +103,6 @@ void Queue::Add(QueueItem& item, bool save) {
               it->enable_rewatching = *item.enable_rewatching;
             if (item.rewatched_times)
               it->rewatched_times = *item.rewatched_times;
-            if (item.tags)
-              it->tags = *item.tags;
             if (item.notes)
               it->notes = *item.notes;
             if (item.date_start)
@@ -255,8 +249,6 @@ QueueItem* Queue::FindItem(int anime_id, QueueSearch search_mode) {
         return item.score.has_value();
       case QueueSearch::Status:
         return item.status.has_value();
-      case QueueSearch::Tags:
-        return item.tags.has_value();
       default:
         return false;
     }
