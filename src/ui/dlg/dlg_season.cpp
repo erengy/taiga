@@ -165,11 +165,20 @@ void SeasonDialog::OnContextMenu(HWND hwnd, POINT pt) {
           break;
         }
       }
-      ui::Menus.UpdateSeasonList(!is_in_list);
+      bool trailer_available = false;
+      for (const auto& anime_id : anime_ids) {
+        auto anime_item = anime::db.Find(anime_id);
+        if (anime_item && !anime_item->GetTrailerId().empty()) {
+          trailer_available = true;
+          break;
+        }
+      }
+      ui::Menus.UpdateSeasonList(is_in_list, trailer_available);
       const auto command = ui::Menus.Show(DlgMain.GetWindowHandle(), pt.x, pt.y, L"SeasonList");
       bool multi_id = StartsWith(command, L"AddToList") ||
                       StartsWith(command, L"Season_RefreshItemData") ||
-                      StartsWith(command, L"ViewAnimePage");
+                      StartsWith(command, L"ViewAnimePage") ||
+                      StartsWith(command, L"WatchTrailer");
       ExecuteCommand(command, TRUE, multi_id ? reinterpret_cast<LPARAM>(&anime_ids) : anime_id);
       list_.RedrawWindow();
     }

@@ -351,14 +351,16 @@ void MenuList::UpdateSearchList(bool enabled) {
   }
 }
 
-void MenuList::UpdateSeasonList(bool enabled) {
+void MenuList::UpdateSeasonList(bool is_in_list, bool trailer_available) {
   const auto menu = menu_list_.FindMenu(L"SeasonList");
   if (menu) {
-    // Add to list
     for (auto& item : menu->items) {
+      // Add to list
       if (item.submenu == L"AddToList") {
-        item.enabled = enabled;
-        break;
+        item.enabled = !is_in_list;
+      // Watch trailer
+      } else if (item.action == L"WatchTrailer()") {
+        item.enabled = trailer_available;
       }
     }
   }

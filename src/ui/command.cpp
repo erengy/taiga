@@ -171,6 +171,28 @@ void ExecuteCommand(const std::wstring& str, WPARAM wParam, LPARAM lParam) {
       }
     }
 
+  // WatchTrailer
+  //   Opens up YouTube page for trailer video.
+  //   wParam is a BOOL value that defines lParam.
+  //   lParam is an anime ID, or a pointer to a vector of anime IDs.
+  } else if (command == L"WatchTrailer") {
+    const auto view_trailer = [](const int anime_id) {
+      if (auto anime_item = anime::db.Find(anime_id)) {
+        if (!anime_item->GetTrailerId().empty()) {
+          ExecuteLink(L"https://youtu.be/" + anime_item->GetTrailerId());
+        }
+      }
+    };
+    if (!wParam) {
+      const int anime_id = static_cast<int>(lParam);
+      view_trailer(anime_id);
+    } else {
+      const auto& anime_ids = *reinterpret_cast<std::vector<int>*>(lParam);
+      for (const auto anime_id : anime_ids) {
+        view_trailer(anime_id);
+      }
+    }
+
   // ViewUpcomingAnime
   //   Opens up upcoming anime page on MAL.
   } else if (command == L"ViewUpcomingAnime") {

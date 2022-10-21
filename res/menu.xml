@@ -257,6 +257,7 @@
 	<menu name="SeasonList">
 		<item name="Information" action="Info()" default="1"/>
 		<item name="Go to the web page" action="ViewAnimePage()"/>
+		<item name="Watch trailer" action="WatchTrailer()" disabled="1"/>
 		<item type="separator"/>
 		<item name="Refresh data" action="Season_RefreshItemData()"/>
 		<item type="separator"/>
