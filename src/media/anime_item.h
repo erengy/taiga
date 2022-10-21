@@ -63,6 +63,7 @@ public:
   const std::vector<std::wstring>& GetProducers() const;
   double GetScore() const;
   const std::wstring& GetSynopsis() const;
+  const std::wstring& GetTrailerId() const;
   const time_t GetLastModified() const;
   int GetLastAiredEpisodeNumber() const;
   time_t GetNextEpisodeTime() const;
@@ -95,6 +96,7 @@ public:
   void SetProducers(const std::vector<std::wstring>& producers);
   void SetScore(double score);
   void SetSynopsis(const std::wstring& synopsis);
+  void SetTrailerId(const std::wstring& trailer_id);
   void SetLastModified(time_t modified);
   void SetLastAiredEpisodeNumber(int number);
   void SetNextEpisodeTime(const time_t time);

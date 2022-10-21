@@ -43,7 +43,8 @@
 
 namespace sync::myanimelist {
 
-// @TODO: Link to API documentation when available
+// API documentation:
+// https://myanimelist.net/apiconfig/references/api/v2
 
 struct Error {
   enum class Type {

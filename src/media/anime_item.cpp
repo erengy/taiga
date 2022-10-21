@@ -126,6 +126,10 @@ const std::wstring& Item::GetSynopsis() const {
   return series_.synopsis;
 }
 
+const std::wstring& Item::GetTrailerId() const {
+  return series_.trailer_id;
+}
+
 const time_t Item::GetLastModified() const {
   return series_.last_modified;
 }
@@ -285,6 +289,10 @@ void Item::SetScore(double score) {
 
 void Item::SetSynopsis(const std::wstring& synopsis) {
   series_.synopsis = synopsis;
+}
+
+void Item::SetTrailerId(const std::wstring& trailer_id) {
+  series_.trailer_id = trailer_id;
 }
 
 void Item::SetLastModified(time_t modified) {

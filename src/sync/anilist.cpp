@@ -41,7 +41,7 @@
 namespace sync::anilist {
 
 // API documentation:
-// https://anilist.gitbooks.io/anilist-apiv2-docs/
+// https://anilist.gitbook.io/anilist-apiv2-docs/
 // https://anilist.github.io/ApiV2-GraphQL-Docs/
 
 constexpr auto kBaseUrl = "https://graphql.anilist.co";
@@ -234,6 +234,11 @@ int ParseMediaObject(const Json& json) {
   anime_item.SetPopularity(JsonReadInt(json, "popularity"));
 
   ParseMediaTitleObject(json, anime_item);
+
+  const auto& trailer = json["trailer"];
+  const auto trailer_id = StrToWstr(JsonReadStr(trailer, "id"));
+  const auto trailer_site = JsonReadStr(trailer, "site");
+  anime_item.SetTrailerId(trailer_site == "youtube" ? trailer_id : L"");
 
   std::vector<std::wstring> genres;
   for (const auto& genre : json["genres"]) {

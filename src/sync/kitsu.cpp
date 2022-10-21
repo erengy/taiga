@@ -264,6 +264,7 @@ void UseSparseFieldsetsForAnime(hypr::Params& params, bool minimal) {
       "status,"
       "subtype,"
       "titles,"
+      "youtubeVideoId,"
       // relationships
       "animeProductions,"
       "categories";
@@ -336,6 +337,7 @@ int ParseAnimeObject(const Json& json) {
       TranslateSeriesTypeFrom(JsonReadStr(attributes, "subtype")));
   anime_item.SetSynopsis(
       anime::NormalizeSynopsis(StrToWstr(JsonReadStr(attributes, "synopsis"))));
+  anime_item.SetTrailerId(StrToWstr(JsonReadStr(attributes, "youtubeVideoId")));
 
   std::vector<std::wstring> synonyms;
   for (const auto& title : attributes["abbreviatedTitles"]) {

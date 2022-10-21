@@ -127,6 +127,7 @@ struct SeriesInformation {
   std::wstring image_url;
   std::wstring slug;
   std::wstring synopsis;
+  std::wstring trailer_id;
   Titles titles;
   std::vector<std::wstring> genres;
   std::vector<std::wstring> producers;
