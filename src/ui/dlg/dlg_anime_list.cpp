@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2020, Eren Okka
+** Copyright (C) 2010-2021, Eren Okka
 **
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1595,13 +1595,11 @@ void AnimeListDialog::ListView::InitializeColumns(bool reset) {
   columns.insert(std::make_pair(kColumnUserLastUpdated, ColumnData(
       {kColumnUserLastUpdated, false, i, i++,
        0, static_cast<unsigned short>(ScaleX(100)), static_cast<unsigned short>(ScaleX(85)),
-       LVCFMT_CENTER, L"Last updated", L"user_last_updated"})));
+       LVCFMT_RIGHT, L"Last updated", L"user_last_updated"})));
   columns.insert(std::make_pair(kColumnUserNotes, ColumnData(
       {kColumnUserNotes, false, i, i++,
        0, static_cast<unsigned short>(ScaleX(100)), static_cast<unsigned short>(ScaleX(85)),
        LVCFMT_LEFT, L"Notes", L"user_notes"})));
-
-  
 
   if (reset) {
     for (const auto& [column_type, _] : columns) {
@@ -1721,10 +1719,11 @@ void AnimeListDialog::ListView::InsertColumns() {
     for (auto& it : columns) {
       auto& column = it.second;
       if (column.visible)
-        order_array.push_back(order_array.size());
+        order_array.push_back(static_cast<int>(order_array.size()));
     }
     std::swap(order_array.at(0), order_array.at(title_index));
-    SetColumnOrderArray(order_array.size(), order_array.data());
+    SetColumnOrderArray(static_cast<int>(order_array.size()),
+                        order_array.data());
   }
 }
 

@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2020, Eren Okka
+** Copyright (C) 2010-2021, Eren Okka
 **
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,6 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <limits>
 #include <set>
 
 #include <windows/win/error.h>
@@ -34,6 +35,11 @@ struct FileSearchHandleDeleter {
 };
 
 using FileSearchHandle = std::unique_ptr<HANDLE, FileSearchHandleDeleter>;
+
+constexpr uint64_t GetFileSize(const WIN32_FIND_DATA& data) {
+  constexpr auto m = std::numeric_limits<decltype(data.nFileSizeLow)>::max();
+  return (data.nFileSizeHigh * (m + 1ull)) + data.nFileSizeLow;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // @TODO: Use std::filesystem?
@@ -80,7 +86,7 @@ bool FileSearch::Search(const std::wstring& root,
     } else {
       if (options.skip_files)
         continue;
-      if (data.nFileSizeLow < options.min_file_size)
+      if (GetFileSize(data) < options.min_file_size)
         continue;
       if (on_file && on_file({root, data.cFileName, data}))
         return true;

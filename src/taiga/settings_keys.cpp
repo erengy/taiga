@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2020, Eren Okka
+** Copyright (C) 2010-2021, Eren Okka
 **
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -56,11 +56,6 @@ constexpr auto kDefaultExternalLinks =
     L"-\r\n"
     L"Anime Streaming Search Engine|http://because.moe\r\n"
     L"The Fansub Database|https://fansubdb.com";
-constexpr auto kDefaultFormatDiscordDetails =
-    L"%title%";
-constexpr auto kDefaultFormatDiscordState =
-    L"$if(%episode%,Episode %episode%$if(%total%,/%total%) )"
-    L"$if(%group%,by %group%)";
 constexpr auto kDefaultFormatHttp =
     L"user=%user%"
     L"&name=%title%"
@@ -173,6 +168,7 @@ void Settings::InitKeyMap() const {
       {AppSettingKey::StreamCrunchyroll, {"recognition/streaming/providers/crunchyroll", true}},
       {AppSettingKey::StreamFunimation, {"recognition/streaming/providers/funimation", true}},
       {AppSettingKey::StreamHidive, {"recognition/streaming/providers/hidive", true}},
+      {AppSettingKey::StreamJellyfin, {"recognition/streaming/providers/jellyfin", true}},
       {AppSettingKey::StreamPlex, {"recognition/streaming/providers/plex", true}},
       {AppSettingKey::StreamVeoh, {"recognition/streaming/providers/veoh", true}},
       {AppSettingKey::StreamViz, {"recognition/streaming/providers/viz", true}},
@@ -184,8 +180,7 @@ void Settings::InitKeyMap() const {
       // Sharing
       {AppSettingKey::ShareDiscordApplicationId, {"announce/discord/applicationid", std::wstring{link::discord::kApplicationId}}},
       {AppSettingKey::ShareDiscordEnabled, {"announce/discord/enabled", false}},
-      {AppSettingKey::ShareDiscordFormatDetails, {"announce/discord/formatdetails", std::wstring{kDefaultFormatDiscordDetails}}},
-      {AppSettingKey::ShareDiscordFormatState, {"announce/discord/formatstate", std::wstring{kDefaultFormatDiscordState}}},
+      {AppSettingKey::ShareDiscordGroupEnabled, {"announce/discord/groupenabled", true}},
       {AppSettingKey::ShareDiscordUsernameEnabled, {"announce/discord/usernameenabled", true}},
       {AppSettingKey::ShareHttpEnabled, {"announce/http/enabled", false}},
       {AppSettingKey::ShareHttpFormat, {"announce/http/format", std::wstring{kDefaultFormatHttp}}},
@@ -201,6 +196,7 @@ void Settings::InitKeyMap() const {
       {AppSettingKey::ShareTwitterFormat, {"announce/twitter/format", std::wstring{kDefaultFormatTwitter}}},
       {AppSettingKey::ShareTwitterOauthToken, {"announce/twitter/oauth_token", std::wstring{}}},
       {AppSettingKey::ShareTwitterOauthSecret, {"announce/twitter/oauth_secret", std::wstring{}}},
+      {AppSettingKey::ShareTwitterReplyTo, {"announce/twitter/reply_to", std::wstring{}}},
       {AppSettingKey::ShareTwitterUsername, {"announce/twitter/user", std::wstring{}}},
 
       // Torrents
@@ -894,6 +890,14 @@ void Settings::SetStreamHidive(const bool enabled) {
   set_value(AppSettingKey::StreamHidive, enabled);
 }
 
+bool Settings::GetStreamJellyfin() const {
+  return value<bool>(AppSettingKey::StreamJellyfin);
+}
+
+void Settings::SetStreamJellyfin(const bool enabled) {
+  set_value(AppSettingKey::StreamJellyfin, enabled);
+}
+
 bool Settings::GetStreamPlex() const {
   return value<bool>(AppSettingKey::StreamPlex);
 }
@@ -975,20 +979,12 @@ void Settings::SetShareDiscordEnabled(const bool enabled) {
   }
 }
 
-std::wstring Settings::GetShareDiscordFormatDetails() const {
-  return value<std::wstring>(AppSettingKey::ShareDiscordFormatDetails);
+bool Settings::GetShareDiscordGroupEnabled() const {
+  return value<bool>(AppSettingKey::ShareDiscordGroupEnabled);
 }
 
-void Settings::SetShareDiscordFormatDetails(const std::wstring& format) {
-  set_value(AppSettingKey::ShareDiscordFormatDetails, format);
-}
-
-std::wstring Settings::GetShareDiscordFormatState() const {
-  return value<std::wstring>(AppSettingKey::ShareDiscordFormatState);
-}
-
-void Settings::SetShareDiscordFormatState(const std::wstring& format) {
-  set_value(AppSettingKey::ShareDiscordFormatState, format);
+void Settings::SetShareDiscordGroupEnabled(const bool enabled) {
+  set_value(AppSettingKey::ShareDiscordGroupEnabled, enabled);
 }
 
 bool Settings::GetShareDiscordUsernameEnabled() const {
@@ -1109,6 +1105,14 @@ std::wstring Settings::GetShareTwitterOauthSecret() const {
 
 void Settings::SetShareTwitterOauthSecret(const std::wstring& oauth_secret) {
   set_value(AppSettingKey::ShareTwitterOauthSecret, oauth_secret);
+}
+
+std::wstring Settings::GetShareTwitterReplyTo() const {
+  return value<std::wstring>(AppSettingKey::ShareTwitterReplyTo);
+}
+
+void Settings::SetShareTwitterReplyTo(const std::wstring& status_id) {
+  set_value(AppSettingKey::ShareTwitterReplyTo, status_id);
 }
 
 std::wstring Settings::GetShareTwitterUsername() const {

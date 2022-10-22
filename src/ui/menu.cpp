@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2020, Eren Okka
+** Copyright (C) 2010-2021, Eren Okka
 **
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -56,7 +56,10 @@ void MenuList::Load() {
 
   for (auto menu : menus.children(L"menu")) {
     const std::wstring name = menu.attribute(L"name").value();
-    menu_list_.Create(name, menu.attribute(L"type").value());
+    const win::MenuType type = menu.attribute(L"type").value() == L"menubar"
+                                   ? win::MenuType::Menu
+                                   : win::MenuType::PopupMenu;
+    menu_list_.Create(name, type);
     for (auto item : menu.children(L"item")) {
       menu_list_.menus[name].CreateItem(
           item.attribute(L"action").value(),
@@ -81,32 +84,11 @@ void MenuList::UpdateAnime(const anime::Item* anime_item) {
   if (!anime_item->IsInList())
     return;
 
-  // Edit
-  auto menu = menu_list_.FindMenu(L"Edit");
-  if (menu) {
-    for (auto& item : menu->items) {
-      if (item.action == L"EditTags" ||
-          item.action == L"EditNotes") {
-        switch (sync::GetCurrentServiceId()) {
-          case sync::ServiceId::MyAnimeList:
-            item.name = L"Set &tags...";
-            item.action = L"EditTags";
-            break;
-          case sync::ServiceId::Kitsu:
-          case sync::ServiceId::AniList:
-            item.name = L"Set &notes...";
-            item.action = L"EditNotes";
-            break;
-        }
-      }
-    }
-  }
-
   // Edit > Score
   UpdateScore(anime_item);
 
   // Edit > Status
-  menu = menu_list_.FindMenu(L"EditStatus");
+  auto menu = menu_list_.FindMenu(L"EditStatus");
   if (menu) {
     for (auto& item : menu->items) {
       item.checked = false;
@@ -123,7 +105,7 @@ void MenuList::UpdateAnime(const anime::Item* anime_item) {
   menu = menu_list_.FindMenu(L"RightClick");
   if (menu) {
     for (int i = static_cast<int>(menu->items.size()) - 1; i > 0; i--) {
-      if (menu->items[i].type == win::kMenuItemSeparator) {
+      if (menu->items[i].type == win::MenuItemType::Separator) {
         // Clear items
         menu->items.resize(i + 1);
         // Play episode
@@ -221,7 +203,15 @@ void MenuList::UpdateExport() {
   if (menu) {
     for (auto& item : menu->items) {
       if (item.action == L"ExportAsMalXml") {
-        item.enabled = sync::GetCurrentServiceId() == sync::ServiceId::MyAnimeList;
+        switch (sync::GetCurrentServiceId()) {
+          case sync::ServiceId::MyAnimeList:
+          case sync::ServiceId::AniList:
+            item.enabled = true;
+            break;
+          default:
+            item.enabled = false;
+            break;
+        }
         break;
       }
     }
@@ -340,14 +330,16 @@ void MenuList::UpdateSearchList(bool enabled) {
   }
 }
 
-void MenuList::UpdateSeasonList(bool enabled) {
+void MenuList::UpdateSeasonList(bool is_in_list, bool trailer_available) {
   const auto menu = menu_list_.FindMenu(L"SeasonList");
   if (menu) {
-    // Add to list
     for (auto& item : menu->items) {
+      // Add to list
       if (item.submenu == L"AddToList") {
-        item.enabled = enabled;
-        break;
+        item.enabled = !is_in_list;
+      // Watch trailer
+      } else if (item.action == L"WatchTrailer()") {
+        item.enabled = trailer_available;
       }
     }
   }
@@ -391,7 +383,7 @@ void MenuList::UpdateSeason() {
     auto create_submenu = [this](const std::wstring& name) {
       auto submenu = menu_list_.FindMenu(name.c_str());
       if (!submenu) {
-        menu_list_.Create(name.c_str(), L"");
+        menu_list_.Create(name.c_str(), win::MenuType::PopupMenu);
         submenu = menu_list_.FindMenu(name.c_str());
       }
       return submenu;

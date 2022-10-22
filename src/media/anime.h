@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2020, Eren Okka
+** Copyright (C) 2010-2021, Eren Okka
 **
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -97,6 +97,7 @@ constexpr std::array<MyStatus, 5> kMyStatuses{
   MyStatus::PlanToWatch,
 };
 
+constexpr int kMaxEpisodeCount = 1900;
 constexpr int kUnknownEpisodeCount = -1;
 constexpr int kUnknownEpisodeLength = -1;
 constexpr double kUnknownScore = 0.0;
@@ -126,6 +127,7 @@ struct SeriesInformation {
   std::wstring image_url;
   std::wstring slug;
   std::wstring synopsis;
+  std::wstring trailer_id;
   Titles titles;
   std::vector<std::wstring> genres;
   std::vector<std::wstring> producers;
@@ -139,13 +141,13 @@ struct MyInformation {
   int watched_episodes = 0;
   int score = 0;
   MyStatus status = MyStatus::NotInList;
+  bool is_private = false;
   int rewatched_times = 0;
   bool rewatching = false;
   int rewatching_ep = 0;
   Date date_start;
   Date date_finish;
   std::wstring last_updated;
-  std::wstring tags;
   std::wstring notes;
 };
 

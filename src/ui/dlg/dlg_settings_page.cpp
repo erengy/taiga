@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2020, Eren Okka
+** Copyright (C) 2010-2021, Eren Okka
 **
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -297,6 +297,7 @@ BOOL SettingsPage::OnInitDialog() {
     case kSettingsPageSharingDiscord: {
       CheckDlgButton(IDC_CHECK_DISCORD, taiga::settings.GetShareDiscordEnabled());
       CheckDlgButton(IDC_CHECK_DISCORD_USERNAME, taiga::settings.GetShareDiscordUsernameEnabled());
+      CheckDlgButton(IDC_CHECK_DISCORD_GROUP, taiga::settings.GetShareDiscordGroupEnabled());
       break;
     }
     // Sharing > HTTP
@@ -329,11 +330,11 @@ BOOL SettingsPage::OnInitDialog() {
     // Torrents > Discovery
     case kSettingsPageTorrentsDiscovery: {
       AddComboString(IDC_COMBO_TORRENT_SOURCE, L"https://anidex.info/rss/?cat=1&lang_id=1");
-      AddComboString(IDC_COMBO_TORRENT_SOURCE, L"http://horriblesubs.info/rss.php?res=all");
       AddComboString(IDC_COMBO_TORRENT_SOURCE, L"https://nyaa.net/feed?c=3_5&s=0");
       AddComboString(IDC_COMBO_TORRENT_SOURCE, L"https://nyaa.si/?page=rss&c=1_2&f=0");
       AddComboString(IDC_COMBO_TORRENT_SOURCE, L"http://tracker.minglong.org/rss.xml");
       AddComboString(IDC_COMBO_TORRENT_SOURCE, L"https://www.shanaproject.com/feeds/site/");
+      AddComboString(IDC_COMBO_TORRENT_SOURCE, L"https://subsplease.org/rss/?t&r=1080");
       AddComboString(IDC_COMBO_TORRENT_SOURCE, L"https://www.tokyotosho.info/rss.php?filter=1,11&zwnj=0");
       SetDlgItemText(IDC_COMBO_TORRENT_SOURCE, taiga::settings.GetTorrentDiscoverySource().c_str());
       AddComboString(IDC_COMBO_TORRENT_SEARCH, L"https://anidex.info/rss/?cat=1&lang_id=1&q=%title%");

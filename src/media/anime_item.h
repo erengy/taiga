@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2020, Eren Okka
+** Copyright (C) 2010-2021, Eren Okka
 **
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -63,6 +63,7 @@ public:
   const std::vector<std::wstring>& GetProducers() const;
   double GetScore() const;
   const std::wstring& GetSynopsis() const;
+  const std::wstring& GetTrailerId() const;
   const time_t GetLastModified() const;
   int GetLastAiredEpisodeNumber() const;
   time_t GetNextEpisodeTime() const;
@@ -95,6 +96,7 @@ public:
   void SetProducers(const std::vector<std::wstring>& producers);
   void SetScore(double score);
   void SetSynopsis(const std::wstring& synopsis);
+  void SetTrailerId(const std::wstring& trailer_id);
   void SetLastModified(time_t modified);
   void SetLastAiredEpisodeNumber(int number);
   void SetNextEpisodeTime(const time_t time);
@@ -106,19 +108,20 @@ public:
   int GetMyLastWatchedEpisode(bool check_queue = true) const;
   int GetMyScore(bool check_queue = true) const;
   MyStatus GetMyStatus(bool check_queue = true) const;
+  bool GetMyPrivate() const;
   int GetMyRewatchedTimes(bool check_queue = true) const;
   bool GetMyRewatching(bool check_queue = true) const;
   int GetMyRewatchingEp() const;
   const Date& GetMyDateStart(bool check_queue = true) const;
   const Date& GetMyDateEnd(bool check_queue = true) const;
   const std::wstring& GetMyLastUpdated() const;
-  const std::wstring& GetMyTags(bool check_queue = true) const;
   const std::wstring& GetMyNotes(bool check_queue = true) const;
 
   void SetMyId(const std::wstring& id);
   void SetMyLastWatchedEpisode(int number);
   void SetMyScore(int score);
   void SetMyStatus(MyStatus status);
+  void SetMyPrivate(bool is_private);
   void SetMyRewatchedTimes(int rewatched_times);
   void SetMyRewatching(bool rewatching);
   void SetMyRewatchingEp(int rewatching_ep);
@@ -127,7 +130,6 @@ public:
   void SetMyDateEnd(const Date& date);
   void SetMyDateEnd(const std::wstring& date);
   void SetMyLastUpdated(const std::wstring& last_updated);
-  void SetMyTags(const std::wstring& tags);
   void SetMyNotes(const std::wstring& notes);
 
   //////////////////////////////////////////////////////////////////////////////

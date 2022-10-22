@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2020, Eren Okka
+** Copyright (C) 2010-2021, Eren Okka
 **
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -211,8 +211,6 @@ void HistoryDialog::RefreshList() {
     if (it->status)
       AppendString(details, !it->enable_rewatching || *it->enable_rewatching != true ?
                    L"Status: " + ui::TranslateMyStatus(*it->status, false) : L"Rewatching");
-    if (it->tags)
-      AppendString(details, L"Tags: \"{}\""_format(*it->tags));
     if (it->notes)
       AppendString(details, L"Notes: \"{}\""_format(*it->notes));
     if (it->date_start)

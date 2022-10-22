@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2020, Eren Okka
+** Copyright (C) 2010-2021, Eren Okka
 **
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -168,7 +168,7 @@ std::string TranslateMyStatusTo(anime::MyStatus value) {
     case anime::MyStatus::PlanToWatch: return "PLANNING";
   }
 
-  LOGW(L"Invalid value: {}", value);
+  LOGW(L"Invalid value: {}", static_cast<int>(value));
   return "";
 }
 

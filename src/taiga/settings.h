@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2020, Eren Okka
+** Copyright (C) 2010-2021, Eren Okka
 **
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -214,6 +214,8 @@ public:
   void SetStreamFunimation(const bool enabled);
   bool GetStreamHidive() const;
   void SetStreamHidive(const bool enabled);
+  bool GetStreamJellyfin() const;
+  void SetStreamJellyfin(const bool enabled);
   bool GetStreamPlex() const;
   void SetStreamPlex(const bool enabled);
   bool GetStreamVeoh() const;
@@ -234,10 +236,8 @@ public:
   void SetShareDiscordApplicationId(const std::wstring& application_id);
   bool GetShareDiscordEnabled() const;
   void SetShareDiscordEnabled(const bool enabled);
-  std::wstring GetShareDiscordFormatDetails() const;
-  void SetShareDiscordFormatDetails(const std::wstring& format);
-  std::wstring GetShareDiscordFormatState() const;
-  void SetShareDiscordFormatState(const std::wstring& format);
+  bool GetShareDiscordGroupEnabled() const;
+  void SetShareDiscordGroupEnabled(const bool enabled);
   bool GetShareDiscordUsernameEnabled() const;
   void SetShareDiscordUsernameEnabled(const bool enabled);
   bool GetShareHttpEnabled() const;
@@ -268,6 +268,8 @@ public:
   void SetShareTwitterOauthToken(const std::wstring& oauth_token);
   std::wstring GetShareTwitterOauthSecret() const;
   void SetShareTwitterOauthSecret(const std::wstring& oauth_secret);
+  std::wstring GetShareTwitterReplyTo() const;
+  void SetShareTwitterReplyTo(const std::wstring& status_id);
   std::wstring GetShareTwitterUsername() const;
   void SetShareTwitterUsername(const std::wstring& username);
 

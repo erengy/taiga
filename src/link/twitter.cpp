@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2020, Eren Okka
+** Copyright (C) 2010-2021, Eren Okka
 **
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -154,11 +154,16 @@ bool SetStatusText(const std::wstring& status_text) {
                     {}},
       post_parameters));
 
+  const auto in_reply_to_status_id = taiga::settings.GetShareTwitterReplyTo();
+
   taiga::http::Request request;
   request.set_method("POST");
   request.set_target(kTarget);
   request.set_header("Authorization", authorization);
-  request.set_body({{"status", WstrToStr(status_text)}});
+  request.set_body({
+      {"status", WstrToStr(status_text)},
+      {"in_reply_to_status_id", WstrToStr(in_reply_to_status_id)},
+    });
 
   const auto on_transfer = [](const taiga::http::Transfer& transfer) {
     ui::ChangeStatusText(L"Updating Twitter status... ({})"_format(

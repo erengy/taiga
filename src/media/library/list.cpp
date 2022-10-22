@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2020, Eren Okka
+** Copyright (C) 2010-2021, Eren Okka
 **
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -65,10 +65,10 @@ bool Database::LoadList() {
     anime_item.SetMyDateEnd(XmlReadStr(node, L"date_end"));
     anime_item.SetMyScore(XmlReadInt(node, L"score"));
     anime_item.SetMyStatus(static_cast<MyStatus>(XmlReadInt(node, L"status")));
+    anime_item.SetMyPrivate(XmlReadInt(node, L"private"));
     anime_item.SetMyRewatchedTimes(XmlReadInt(node, L"rewatched_times"));
     anime_item.SetMyRewatching(XmlReadInt(node, L"rewatching"));
     anime_item.SetMyRewatchingEp(XmlReadInt(node, L"rewatching_ep"));
-    anime_item.SetMyTags(XmlReadStr(node, L"tags"));
     anime_item.SetMyNotes(XmlReadStr(node, L"notes"));
     anime_item.SetMyLastUpdated(XmlReadStr(node, L"last_updated"));
   }
@@ -102,10 +102,10 @@ bool Database::SaveList(bool include_database) const {
       XmlWriteStr(node, L"date_end", item.GetMyDateEnd().to_string());
       XmlWriteInt(node, L"score", item.GetMyScore(false));
       XmlWriteInt(node, L"status", static_cast<int>(item.GetMyStatus(false)));
+      XmlWriteInt(node, L"private", item.GetMyPrivate());
       XmlWriteInt(node, L"rewatched_times", item.GetMyRewatchedTimes());
       XmlWriteInt(node, L"rewatching", item.GetMyRewatching(false));
       XmlWriteInt(node, L"rewatching_ep", item.GetMyRewatchingEp());
-      XmlWriteStr(node, L"tags", item.GetMyTags(false));
       XmlWriteStr(node, L"notes", item.GetMyNotes(false));
       XmlWriteStr(node, L"last_updated", item.GetMyLastUpdated());
     }
@@ -119,15 +119,15 @@ bool Database::SaveList(bool include_database) const {
 
 // @TODO: Move to util
 int Database::GetItemCount(MyStatus status, bool check_history) {
-  // Get current count
   int count = 0;
-  for (const auto& it : items) {
-    const auto& item = it.second;
+
+  // Get current count
+  for (const auto& [id, item] : items) {
     if (item.GetMyRewatching()) {
       if (status == MyStatus::Watching)
         ++count;
     } else {
-      if (item.GetMyStatus(false) == status)
+      if (status == item.GetMyStatus(false))
         ++count;
     }
   }
@@ -137,12 +137,12 @@ int Database::GetItemCount(MyStatus status, bool check_history) {
     for (const auto& queue_item : library::queue.items) {
       if (queue_item.status ||
           queue_item.mode == library::QueueItemMode::Delete) {
-        if (status == *queue_item.status) {
-          count++;
+        if (queue_item.status && status == *queue_item.status) {
+          ++count;
         } else {
           auto anime_item = Find(queue_item.anime_id);
           if (anime_item && status == anime_item->GetMyStatus(false))
-            count--;
+            --count;
         }
       }
     }
@@ -245,8 +245,6 @@ void Database::UpdateItem(const library::QueueItem& queue_item) {
     anime_item->SetMyRewatching(*queue_item.enable_rewatching);
   if (queue_item.rewatched_times)
     anime_item->SetMyRewatchedTimes(*queue_item.rewatched_times);
-  if (queue_item.tags)
-    anime_item->SetMyTags(*queue_item.tags);
   if (queue_item.notes)
     anime_item->SetMyNotes(*queue_item.notes);
   if (queue_item.date_start)

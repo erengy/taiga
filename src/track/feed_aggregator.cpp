@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2020, Eren Okka
+** Copyright (C) 2010-2021, Eren Okka
 **
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -165,10 +165,12 @@ void Aggregator::ExamineData(Feed& feed) {
 
     // Update last aired episode number
     if (anime::IsValidId(episode_data.anime_id)) {
-      auto anime_item = anime::db.Find(episode_data.anime_id);
-      if (anime_item) {
-        int episode_number = anime::GetEpisodeHigh(episode_data);
-        anime_item->SetLastAiredEpisodeNumber(episode_number);
+      if (auto anime_item = anime::db.Find(episode_data.anime_id)) {
+        const int episode_number = anime::GetEpisodeHigh(episode_data);
+        if (anime::IsValidEpisodeNumber(episode_number,
+                                        anime_item->GetEpisodeCount())) {
+          anime_item->SetLastAiredEpisodeNumber(episode_number);
+        }
       }
     }
 
@@ -442,19 +444,33 @@ void Aggregator::HandleFeedDownloadOpen(FeedItem& feed_item,
     const auto download_path = GetTorrentDownloadPath(feed_item.episode_data);
     if (!download_path.empty()) {
       const auto app_filename = GetFileName(app_path);
-      // uTorrent
-      if (InStr(app_filename, L"utorrent", 0, true) > -1) {
-        parameters = LR"(/directory "{}" "{}")"_format(download_path, file);
+
+      // aria2
+      if (InStr(app_filename, L"aria2c", 0, true) > -1) {
+        parameters = LR"(--dir="{}" "{}")"_format(download_path, file);
+
       // Deluge
       } else if (InStr(app_filename, L"deluge-console", 0, true) > -1) {
         parameters = LR"(add -p \"{}\" \"{}\")"_format(download_path, file);
         show_command = SW_HIDE;
+
+      // PicoTorrent
+      } else if (InStr(app_filename, L"picotorrent", 0, true) > -1) {
+        parameters = LR"(--save-path="{}" --silent "{}")"_format(download_path, file);
+
+      // qBittorrent
+      } else if (InStr(app_filename, L"qbittorrent", 0, true) > -1) {
+        parameters = LR"(--save-path="{}" --skip-dialog=true "{}")"_format(download_path, file);
+
       // Transmission
       } else if (InStr(app_filename, L"transmission-remote", 0, true) > -1) {
         parameters = LR"(-a "{}" -w "{}")"_format(file, download_path);
         show_command = SW_HIDE;
-      } else if (InStr(app_filename, L"qbittorrent", 0, true) > -1) {
-        parameters = LR"(--save-path="{}" --skip-dialog=true "{}")"_format(download_path, file);
+
+      // uTorrent
+      } else if (InStr(app_filename, L"utorrent", 0, true) > -1) {
+        parameters = LR"(/directory "{}" "{}")"_format(download_path, file);
+
       } else {
         LOGD(L"Unknown BitTorrent client: {}", app_path);
       }

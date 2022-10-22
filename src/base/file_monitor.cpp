@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2020, Eren Okka
+** Copyright (C) 2010-2021, Eren Okka
 **
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -128,10 +128,10 @@ void DirectoryMonitor::Stop() {
 ////////////////////////////////////////////////////////////////////////////////
 
 bool DirectoryMonitor::ReadDirectoryChanges(DirectoryChangeEntry& entry) {
-  auto result = ::ReadDirectoryChangesW(
+  const auto result = ::ReadDirectoryChangesW(
       entry.directory_handle_,
       entry.buffer_.data(),
-      entry.buffer_.size(),
+      static_cast<DWORD>(entry.buffer_.size()),
       TRUE,  // watch subtree
       FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_DIR_NAME,
       &entry.bytes_returned_,

@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2020, Eren Okka
+** Copyright (C) 2010-2021, Eren Okka
 **
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -264,8 +264,8 @@ time_t ConvertRfc822(const std::wstring& datetime) {
     tm t = {0};
 
     t.tm_mday = ToInt(m[2].str());
-    t.tm_mon = std::distance(months.begin(),
-        std::find(months.begin(), months.end(), m[3].str()));
+    t.tm_mon = static_cast<int>(std::distance(months.begin(),
+        std::find(months.begin(), months.end(), m[3].str())));
     t.tm_year = ToInt(m[4].str());
     if (t.tm_year > 1900)
       t.tm_year -= 1900;

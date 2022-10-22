@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2020, Eren Okka
+** Copyright (C) 2010-2021, Eren Okka
 **
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -327,6 +327,22 @@ void Engine::ExtendAnimeTitle(anime::Episode& episode) const {
                             L" Season " + ToWstr(anime_season));
   }
 
+  // @TEMP: Handle cases such as "2nd Season Part 2" and "Second Season OVA".
+  // Remove once the issue is handled by Anitomy. See issues #748 and #960 for
+  // more information.
+  if (anime_season > 1) {
+    if (StartsWith(episode.episode_title(), L"Part ")) {
+      episode.set_anime_title(episode.anime_title() + L" " +
+                              episode.episode_title());
+      episode.elements().erase(anitomy::kElementEpisodeTitle);
+    }
+    if (!episode.anime_type().empty() &&
+        !EndsWith(episode.anime_title(), episode.anime_type())) {
+      episode.set_anime_title(episode.anime_title() + L" " +
+                              episode.anime_type());
+    }
+  }
+
   // Some anime share the same title, and they're differentiated by their airing
   // date. We also come across year values in batch releases, where they appear
   // as additional metadata.
@@ -339,8 +355,7 @@ void Engine::ExtendAnimeTitle(anime::Episode& episode) const {
                             L" (" + ToWstr(anime_year) + L")");
   }
 
-  // TEMP: We're going to get rid of this once we're able to redirect fractional
-  // episode numbers.
+  // @TEMP: Remove once we're able to redirect fractional episode numbers.
   if (!episode.elements().empty(anitomy::kElementEpisodeNumber)) {
     const auto episode_number = episode.elements().get(anitomy::kElementEpisodeNumber);
     if (episode_number.find(L'.') != episode_number.npos) {

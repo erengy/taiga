@@ -122,7 +122,7 @@
 #define IDC_EDIT_ANIME_PROGRESS                 1078
 #define IDC_EDIT_ANIME_SCORE                    1079
 #define IDC_EDIT_ANIME_SYNOPSIS                 1080
-#define IDC_EDIT_ANIME_TAGS                     1081
+#define IDC_EDIT_ANIME_NOTES                    1081
 #define IDC_EDIT_ANIME_TITLE                    1082
 #define IDC_EDIT_DELAY                          1083
 #define IDC_EDIT_EXTERNALLINKS                  1084
@@ -216,3 +216,4 @@
 #define IDC_TREE_MAIN                           1174
 #define IDC_TREE_SECTIONS                       1175
 #define IDC_BUTTON_MAL_AUTH                     1176
+#define IDC_CHECK_DISCORD_GROUP                 1177

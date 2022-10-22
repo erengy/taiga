@@ -1,38 +1,41 @@
 @echo off
 
-set vc=%1
-if "%vc%"=="16" (
-  set vcvarsall="%ProgramFiles(x86)%\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars32.bat"
-  goto :initialize_environment
-)
-if "%vc%"=="15" (
-  set vcvarsall="%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars32.bat"
-  goto :initialize_environment
-)
-if "%vc%"=="14" (
-  set vcvarsall="%VS140COMNTOOLS%..\..\VC\vcvarsall.bat"
-  goto :initialize_environment
-)
+set machine=x86
+set vc=16
 
+:read_arguments
+if "%1"=="--help" goto help
+if "%1"=="--machine" set machine=%2
+if "%1"=="--vc" set vc=%2
+shift /1
+shift /1
+if not "%1"=="" goto read_arguments
+goto locate_vs
+
+:help
+echo Usage: %~nx0 [--machine] [--vc]
+echo:
+echo   --machine    Target architecture, such as "x86", "x64" or "x64_arm64".
+echo   --vc         Can be "16" ^(VS2019^). Overriden by vswhere, if available.
+echo:
+echo Example: %~nx0 --machine=x86 --vc=16
+exit /B
+
+:locate_vs
+set vcvarsall="%ProgramFiles%\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat"
 set vswhere="%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe"
 if exist %vswhere% (
   for /f "usebackq delims=" %%i in (`%vswhere% -latest -property installationPath`) do (
-    set vcvarsall="%%i\VC\Auxiliary\Build\vcvars32.bat"
+    set vcvarsall="%%i\VC\Auxiliary\Build\vcvarsall.bat"
   )
   for /f "usebackq delims=." %%i in (`%vswhere% -latest -property installationVersion`) do (
     set vc=%%i
   )
-  goto :initialize_environment
 )
-
-echo Error in script usage. The correct usage is: %~nx0 [version]
-echo [version] can be "16" ^(VS2019^), "15" ^(VS2017^) or "14" ^(VS2015^)
-echo Example: %~nx0 16
-exit /B 1
 
 :initialize_environment
 echo Initializing environment...
-call %vcvarsall% || (
+call %vcvarsall% %machine% || (
   echo Please edit the build script according to your system configuration.
   exit /B 1
 )
@@ -47,18 +50,18 @@ call src\curl\buildconf.bat
 
 if exist src\curl\builds (
   echo Clearing previous libcurl builds...
-  rmdir /s /q src\curl\builds
+  for /d %%G in ("src\curl\builds\libcurl-vc%vc%-%machine%-*") do (rmdir /s /q "%%~G")
 )
 
 cd src\curl\winbuild\
 
-echo Building libcurl for Debug configuration...
-nmake /f Makefile.vc mode=static RTLIBCFG=static VC=%vc% MACHINE=x86 DEBUG=yes
-xcopy /s ..\builds\libcurl-vc%vc%-x86-debug-static-ipv6-sspi-schannel\lib ..\..\..\lib\
+echo Building libcurl for Debug^|%machine% configuration...
+nmake /f Makefile.vc mode=static RTLIBCFG=static VC=%vc% MACHINE=%machine% DEBUG=yes
+xcopy /s ..\builds\libcurl-vc%vc%-%machine%-debug-static-ipv6-sspi-schannel\lib ..\..\..\lib\%machine%\
 
-echo Building libcurl for Release configuration...
-nmake /f Makefile.vc mode=static RTLIBCFG=static VC=%vc% MACHINE=x86
-xcopy /s ..\builds\libcurl-vc%vc%-x86-release-static-ipv6-sspi-schannel\lib ..\..\..\lib\
+echo Building libcurl for Release^|%machine% configuration...
+nmake /f Makefile.vc mode=static RTLIBCFG=static VC=%vc% MACHINE=%machine%
+xcopy /s ..\builds\libcurl-vc%vc%-%machine%-release-static-ipv6-sspi-schannel\lib ..\..\..\lib\%machine%\
 
 cd /D %currentdir%
 

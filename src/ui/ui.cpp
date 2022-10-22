@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2020, Eren Okka
+** Copyright (C) 2010-2021, Eren Okka
 **
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -254,7 +254,7 @@ bool OnLibraryEntriesEditDelete(const std::vector<int> ids) {
 
 int OnLibraryEntriesEditEpisode(const std::vector<int> ids) {
   std::set<int> current;
-  int number_max = 1900;
+  int number_max = anime::kMaxEpisodeCount;
   for (const auto& id : ids) {
     auto anime_item = anime::db.Find(id);
     if (!anime_item)
@@ -276,29 +276,6 @@ int OnLibraryEntriesEditEpisode(const std::vector<int> ids) {
     return ToInt(dlg.text);
 
   return -1;
-}
-
-bool OnLibraryEntriesEditTags(const std::vector<int> ids, std::wstring& tags) {
-  std::set<std::wstring> current;
-  for (const auto& id : ids) {
-    auto anime_item = anime::db.Find(id);
-    if (anime_item)
-      current.insert(anime_item->GetMyTags());
-  }
-  std::wstring value = current.size() == 1 ? *current.begin() : L"";
-
-  InputDialog dlg;
-  dlg.title = L"Set Tags";
-  dlg.info = L"Enter tags for the selected anime, separated by a comma:";
-  dlg.text = value;
-  dlg.Show(DlgMain.GetWindowHandle());
-
-  if (dlg.result == IDOK) {
-    tags = dlg.text;
-    return true;
-  }
-
-  return false;
 }
 
 bool OnLibraryEntriesEditNotes(const std::vector<int> ids, std::wstring& notes) {

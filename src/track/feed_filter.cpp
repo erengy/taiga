@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2020, Eren Okka
+** Copyright (C) 2010-2021, Eren Okka
 **
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -80,11 +80,11 @@ static bool EvaluateCondition(const FeedFilterCondition& condition,
       case kFeedFilterElement_Meta_Type:
         return ToWstr(static_cast<int>(anime ? anime->GetType()
                                              : anime::SeriesType::Unknown));
+      case kFeedFilterElement_User_Notes:
+        return anime ? anime->GetMyNotes() : std::wstring{};
       case kFeedFilterElement_User_Status:
         return ToWstr(static_cast<int>(anime ? anime->GetMyStatus()
                                              : anime::MyStatus::NotInList));
-      case kFeedFilterElement_User_Tags:
-        return anime ? anime->GetMyTags() : std::wstring{};
       case kFeedFilterElement_Episode_Number:
         if (!item.episode_data.episode_number()) {
           return anime ? ToWstr(anime->GetEpisodeCount()) : std::wstring{};

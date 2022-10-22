@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2020, Eren Okka
+** Copyright (C) 2010-2021, Eren Okka
 **
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -171,6 +171,28 @@ void ExecuteCommand(const std::wstring& str, WPARAM wParam, LPARAM lParam) {
       }
     }
 
+  // WatchTrailer
+  //   Opens up YouTube page for trailer video.
+  //   wParam is a BOOL value that defines lParam.
+  //   lParam is an anime ID, or a pointer to a vector of anime IDs.
+  } else if (command == L"WatchTrailer") {
+    const auto view_trailer = [](const int anime_id) {
+      if (auto anime_item = anime::db.Find(anime_id)) {
+        if (!anime_item->GetTrailerId().empty()) {
+          ExecuteLink(L"https://youtu.be/" + anime_item->GetTrailerId());
+        }
+      }
+    };
+    if (!wParam) {
+      const int anime_id = static_cast<int>(lParam);
+      view_trailer(anime_id);
+    } else {
+      const auto& anime_ids = *reinterpret_cast<std::vector<int>*>(lParam);
+      for (const auto anime_id : anime_ids) {
+        view_trailer(anime_id);
+      }
+    }
+
   // ViewUpcomingAnime
   //   Opens up upcoming anime page on MAL.
   } else if (command == L"ViewUpcomingAnime") {
@@ -253,7 +275,7 @@ void ExecuteCommand(const std::wstring& str, WPARAM wParam, LPARAM lParam) {
   //   wParam is the initial section.
   //   lParam is the initial page.
   } else if (command == L"Settings") {
-    ui::ShowDlgSettings(wParam, lParam);
+    ui::ShowDlgSettings(static_cast<int>(wParam), static_cast<int>(lParam));
 
   // SearchTorrents(source)
   //   Searches torrents from specified source URL.
@@ -573,23 +595,6 @@ void ExecuteCommand(const std::wstring& str, WPARAM wParam, LPARAM lParam) {
       queue_item.anime_id = anime_id;
       queue_item.mode = library::QueueItemMode::Update;
       library::queue.Add(queue_item);
-    }
-
-  // EditTags(tags)
-  //   Changes anime tags.
-  //   Tags must be separated by a comma.
-  //   lParam is a pointer to a vector of anime IDs.
-  } else if (command == L"EditTags") {
-    const auto& anime_ids = *reinterpret_cast<std::vector<int>*>(lParam);
-    std::wstring tags;
-    if (ui::OnLibraryEntriesEditTags(anime_ids, tags)) {
-      for (const auto& anime_id : anime_ids) {
-        library::QueueItem queue_item;
-        queue_item.anime_id = anime_id;
-        queue_item.tags = tags;
-        queue_item.mode = library::QueueItemMode::Update;
-        library::queue.Add(queue_item);
-      }
     }
 
   // EditNotes(notes)

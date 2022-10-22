@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2020, Eren Okka
+** Copyright (C) 2010-2021, Eren Okka
 **
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -153,7 +153,7 @@ std::string HmacSha1(const std::string& key_bytes, const std::string& data) {
 
   if (CryptAcquireContext(&hProv, nullptr, nullptr, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT)) {
     if (CryptCreateHash(hProv, CALG_SHA1, 0, 0, &hHash)) {
-      if (CryptHashData(hHash, (BYTE*)key_bytes.c_str(), key_bytes.size(), 0)) {
+      if (CryptHashData(hHash, (BYTE*)key_bytes.c_str(), (DWORD)key_bytes.size(), 0)) {
         const size_t key_size = 1024;
         struct {
           BLOBHEADER hdr;
@@ -164,13 +164,13 @@ std::string HmacSha1(const std::string& key_bytes, const std::string& data) {
         key_blob.hdr.bVersion = CUR_BLOB_VERSION;
         key_blob.hdr.reserved = 0;
         key_blob.hdr.aiKeyAlg = CALG_RC2;
-        key_blob.len = key_bytes.size();
+        key_blob.len = (DWORD)key_bytes.size();
         ZeroMemory(key_blob.key, sizeof(key_blob.key));
         CopyMemory(key_blob.key, key_bytes.c_str(), std::min(key_bytes.size(), key_size));
         if (CryptImportKey(hProv, (BYTE*)&key_blob, sizeof(key_blob), 0, CRYPT_IPSEC_HMAC_KEY, &hKey)) {
           if (CryptCreateHash(hProv, CALG_HMAC, hKey, 0, &hHmac)) {
             if (CryptSetHashParam(hHmac, HP_HMAC_INFO, (BYTE*)&HmacInfo, 0)) {
-              if (CryptHashData(hHmac, (BYTE*)data.c_str(), data.size(), 0)) {
+              if (CryptHashData(hHmac, (BYTE*)data.c_str(), (DWORD)data.size(), 0)) {
                 if (CryptGetHashParam(hHmac, HP_HASHVAL, nullptr, &dwDataLen, 0)) {
                   pbHash = (BYTE*)malloc(dwDataLen);
                   if (pbHash != nullptr) {

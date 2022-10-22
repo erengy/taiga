@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2020, Eren Okka
+** Copyright (C) 2010-2021, Eren Okka
 **
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,8 +31,8 @@ enum FeedFilterElement {
   kFeedFilterElement_Meta_Episodes,
   kFeedFilterElement_Meta_DateStart,
   kFeedFilterElement_Meta_DateEnd,
+  kFeedFilterElement_User_Notes,
   kFeedFilterElement_User_Status,
-  kFeedFilterElement_User_Tags,
   kFeedFilterElement_Local_EpisodeAvailable,
   kFeedFilterElement_Episode_Title,
   kFeedFilterElement_Episode_Number,

@@ -107,7 +107,7 @@ void Base64Coder::Encode(const PBYTE pBuffer, DWORD nBufLen) {
 
 void Base64Coder::Encode(LPCSTR szMessage) {
   if (szMessage != NULL) {
-    Base64Coder::Encode((const PBYTE)szMessage, strlen(szMessage));
+    Base64Coder::Encode((const PBYTE)szMessage, (DWORD)strlen(szMessage));
   }
 }
 
@@ -152,7 +152,7 @@ void Base64Coder::Decode(const PBYTE pBuffer, DWORD dwBufLen) {
 
 void Base64Coder::Decode(LPCSTR szMessage) {
   if (szMessage != NULL) {
-    Base64Coder::Decode((const PBYTE)szMessage, strlen(szMessage));
+    Base64Coder::Decode((const PBYTE)szMessage, (DWORD)strlen(szMessage));
   }
 }
 

@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2020, Eren Okka
+** Copyright (C) 2010-2021, Eren Okka
 **
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@
 #include "link/http.h"
 #include "link/mirc.h"
 #include "link/twitter.h"
+#include "media/anime_db.h"
 #include "media/anime_util.h"
 #include "taiga/script.h"
 #include "taiga/settings.h"
@@ -53,6 +54,12 @@ void Announcer::Do(int modes, anime::Episode* episode, bool force) {
   if (!episode)
     episode = &CurrentEpisode;
 
+  if (const auto anime_item = anime::db.Find(episode->anime_id)) {
+    if (!force && anime_item->GetMyPrivate()) {
+      return;  // Avoid sharing private anime
+    }
+  }
+
   if (modes & kAnnounceToHttp) {
     if (settings.GetShareHttpEnabled() || force) {
       LOGD(L"HTTP");
@@ -68,13 +75,22 @@ void Announcer::Do(int modes, anime::Episode* episode, bool force) {
   if (modes & kAnnounceToDiscord) {
     if (settings.GetShareDiscordEnabled() || force) {
       LOGD(L"Discord");
-      const std::wstring details = LimitText(ReplaceVariables(
-          settings.GetShareDiscordFormatDetails(), *episode, false, force), 64);
-      const std::wstring state = LimitText(ReplaceVariables(
-          settings.GetShareDiscordFormatState(), *episode, false, force), 64);
+
+      std::wstring details = L"%title%";
+      details = ReplaceVariables(details, *episode, false, force);
+      details = LimitText(details, 64);
+
+      std::wstring state =
+          L"$if(%episode%,Episode %episode%$if(%total%,/%total%) )";
+      if (settings.GetShareDiscordGroupEnabled())
+        state += L"$if(%group%,by %group%)";
+      state = ReplaceVariables(state, *episode, false, force);
+      state = LimitText(state, 64);
+
       auto timestamp = std::time(nullptr);
       if (!force)
         timestamp -= settings.GetSyncUpdateDelay();
+
       link::discord::UpdatePresence(WstrToStr(details), WstrToStr(state),
                                     timestamp);
     }

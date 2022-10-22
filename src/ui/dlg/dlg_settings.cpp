@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2020, Eren Okka
+** Copyright (C) 2010-2021, Eren Okka
 **
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -282,6 +282,7 @@ void SettingsDialog::OnOK() {
   if (page->IsWindow()) {
     taiga::settings.SetShareDiscordEnabled(page->IsDlgButtonChecked(IDC_CHECK_DISCORD));
     taiga::settings.SetShareDiscordUsernameEnabled(page->IsDlgButtonChecked(IDC_CHECK_DISCORD_USERNAME));
+    taiga::settings.SetShareDiscordGroupEnabled(page->IsDlgButtonChecked(IDC_CHECK_DISCORD_GROUP));
   }
   // Sharing > HTTP
   page = &pages[kSettingsPageSharingHttp];
@@ -476,6 +477,8 @@ void SettingsDialog::RefreshCache() {
   taiga::stats.CalculateLocalData();
   SettingsPage& page = pages[kSettingsPageAdvancedCache];
 
+  page.SetRedraw(FALSE);
+
   // History
   text = ToWstr(library::history.items.size()) + L" item(s)";
   page.SetDlgItemText(IDC_STATIC_CACHE1, text.c_str());
@@ -491,6 +494,10 @@ void SettingsDialog::RefreshCache() {
   // Torrent history
   text = ToWstr(track::aggregator.archive.Size()) + L" item(s)";
   page.SetDlgItemText(IDC_STATIC_CACHE4, text.c_str());
+
+  page.SetRedraw(TRUE);
+  page.RedrawWindow(nullptr, nullptr,
+                    RDW_ERASE | RDW_FRAME | RDW_INVALIDATE | RDW_ALLCHILDREN);
 }
 
 void SettingsDialog::RefreshTorrentFilterList(HWND hwnd_list) {

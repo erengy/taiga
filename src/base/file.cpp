@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2020, Eren Okka
+** Copyright (C) 2010-2021, Eren Okka
 **
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -347,8 +347,9 @@ std::wstring GetKnownFolderPath(REFKNOWNFOLDERID rfid) {
 std::wstring GetFinalPathNameByHandle(HANDLE handle) {
   std::wstring buffer(MAX_PATH, '\0');
 
-  auto get_final_path_name_by_handle = [&]() {
-    return ::GetFinalPathNameByHandle(handle, &buffer.front(), buffer.size(),
+  const auto get_final_path_name_by_handle = [&]() {
+    return ::GetFinalPathNameByHandle(handle, &buffer.front(),
+                                      static_cast<DWORD>(buffer.size()),
                                       FILE_NAME_NORMALIZED | VOLUME_NAME_DOS);
   };
 
@@ -417,7 +418,8 @@ bool ReadFromFile(const std::wstring& path, std::string& output) {
 
   DWORD bytes_read = 0;
   const BOOL result = ::ReadFile(file_handle.get(), output.data(),
-                                 output.size(), &bytes_read, nullptr);
+                                 static_cast<DWORD>(output.size()),
+                                 &bytes_read, nullptr);
 
   return result != FALSE && bytes_read == output.size();
 }
@@ -451,7 +453,8 @@ bool SaveToFile(const std::string& data, const std::wstring& path,
   if (data.empty())
     return false;
 
-  return SaveToFile((LPCVOID)&data.front(), data.size(), path, take_backup);
+  return SaveToFile((LPCVOID)&data.front(), static_cast<DWORD>(data.size()),
+                    path, take_backup);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

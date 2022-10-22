@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2020, Eren Okka
+** Copyright (C) 2010-2021, Eren Okka
 **
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -109,6 +109,7 @@ void Database::ReadDatabaseNode(XmlNode& database_node) {
     item.SetEpisodeCount(XmlReadInt(node, L"episode_count"));
     item.SetSlug(XmlReadStr(node, L"slug"));
     item.SetImageUrl(XmlReadStr(node, L"image"));
+    item.SetTrailerId(XmlReadStr(node, L"trailer_id"));
     item.SetLastAiredEpisodeNumber(XmlReadInt(node, L"last_aired_episode"));
     item.SetNextEpisodeTime(ToTime(XmlReadStr(node, L"next_episode_time")));
   }
@@ -166,6 +167,7 @@ void Database::WriteDatabaseNode(XmlNode& database_node) const {
     XML_WD(L"date_start", item.GetDateStart());
     XML_WD(L"date_end", item.GetDateEnd());
     XML_WS(L"image", item.GetImageUrl(), pugi::node_pcdata);
+    XML_WS(L"trailer_id", item.GetTrailerId(), pugi::node_pcdata);
     XML_WI(L"age_rating", static_cast<int>(item.GetAgeRating()));
     XML_WS(L"genres", Join(item.GetGenres(), L", "), pugi::node_pcdata);
     XML_WS(L"tags", Join(item.GetTags(), L", "), pugi::node_pcdata);

@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2020, Eren Okka
+** Copyright (C) 2010-2021, Eren Okka
 **
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@
 namespace sync::anilist {
 
 // API documentation:
-// https://anilist.gitbooks.io/anilist-apiv2-docs/
+// https://anilist.gitbook.io/anilist-apiv2-docs/
 // https://anilist.github.io/ApiV2-GraphQL-Docs/
 
 constexpr auto kBaseUrl = "https://graphql.anilist.co";
@@ -214,6 +214,10 @@ int ParseMediaObject(const Json& json) {
   anime_item.SetId(ToWstr(anime_id), ServiceId::AniList);
   anime_item.SetLastModified(time(nullptr));  // current time
 
+  if (const auto mal_id = JsonReadInt(json, "idMal")) {
+    anime_item.SetId(ToWstr(mal_id), ServiceId::MyAnimeList);
+  }
+
   anime_item.SetTitle(StrToWstr(JsonReadStr(json["title"], "userPreferred")));
   anime_item.SetType(TranslateSeriesTypeFrom(JsonReadStr(json, "format")));
   anime_item.SetAiringStatus(
@@ -230,6 +234,11 @@ int ParseMediaObject(const Json& json) {
   anime_item.SetPopularity(JsonReadInt(json, "popularity"));
 
   ParseMediaTitleObject(json, anime_item);
+
+  const auto& trailer = json["trailer"];
+  const auto trailer_id = StrToWstr(JsonReadStr(trailer, "id"));
+  const auto trailer_site = JsonReadStr(trailer, "site");
+  anime_item.SetTrailerId(trailer_site == "youtube" ? trailer_id : L"");
 
   std::vector<std::wstring> genres;
   for (const auto& genre : json["genres"]) {
@@ -292,6 +301,7 @@ int ParseMediaListObject(const Json& json) {
 
   anime_item.SetMyScore(JsonReadInt(json, "score"));
   anime_item.SetMyLastWatchedEpisode(JsonReadInt(json, "progress"));
+  anime_item.SetMyPrivate(JsonReadBool(json, "private"));
   anime_item.SetMyRewatchedTimes(JsonReadInt(json, "repeat"));
   anime_item.SetMyNotes(StrToWstr(JsonReadStr(json, "notes")));
   anime_item.SetMyDateStart(TranslateFuzzyDateFrom(json["startedAt"]));

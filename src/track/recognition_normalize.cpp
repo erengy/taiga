@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2020, Eren Okka
+** Copyright (C) 2010-2021, Eren Okka
 **
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -140,7 +140,7 @@ void Engine::NormalizeUnicode(std::wstring& str) const {
   char* buffer = nullptr;
   std::string temp = WstrToStr(str);
 
-  int length = utf8proc_map(
+  const auto length = utf8proc_map(
       reinterpret_cast<const utf8proc_uint8_t*>(temp.data()), temp.length(),
       reinterpret_cast<utf8proc_uint8_t**>(&buffer),
       static_cast<utf8proc_option_t>(options));

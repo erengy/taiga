@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2020, Eren Okka
+** Copyright (C) 2010-2021, Eren Okka
 **
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ bool UncompressGzippedString(const std::string& input, std::string& output) {
   stream.opaque = NULL;
   stream.total_out = 0;
   stream.next_in = (BYTE*)&input[0];
-  stream.avail_in = input.length();
+  stream.avail_in = (uInt)input.length();
 
   if (inflateInit2(&stream, MAX_WBITS + 32) != Z_OK)
     return false;
@@ -42,7 +42,7 @@ bool UncompressGzippedString(const std::string& input, std::string& output) {
 
   do {
     stream.next_out = (BYTE*)buffer;
-    stream.avail_out = buffer_length;
+    stream.avail_out = (uInt)buffer_length;
     status = inflate(&stream, Z_SYNC_FLUSH);
     if (status == Z_OK || status == Z_STREAM_END) {
       output.append(buffer, stream.total_out - total_length);
@@ -59,7 +59,7 @@ bool UncompressGzippedString(const std::string& input, std::string& output) {
 ////////////////////////////////////////////////////////////////////////////////
 
 bool DeflateString(const std::string& input, std::string& output) {
-  uLong source_length = input.length();
+  uLong source_length = (uLong)input.length();
   uLong destination_length = compressBound(source_length);
 
   output.resize(destination_length);
@@ -75,8 +75,8 @@ bool DeflateString(const std::string& input, std::string& output) {
 
 bool InflateString(const std::string& input, std::string& output,
                    size_t output_length) {
-  uLong source_length = input.length();
-  uLong destination_length = output_length;
+  uLong source_length = (uLong)input.length();
+  uLong destination_length = (uLong)output_length;
 
   output.resize(destination_length);
 

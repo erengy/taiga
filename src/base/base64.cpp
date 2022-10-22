@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2020, Eren Okka
+** Copyright (C) 2010-2021, Eren Okka
 **
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ std::string Base64Decode(const std::string& str) {
     return str;
 
   Base64Coder coder;
-  coder.Decode((BYTE*)str.c_str(), str.size());
+  coder.Decode((BYTE*)str.c_str(), (DWORD)str.size());
 
   return coder.DecodedMessage();
 }
@@ -39,7 +39,7 @@ std::string Base64Encode(const std::string& str) {
     return str;
 
   Base64Coder coder;
-  coder.Encode((BYTE*)str.c_str(), str.size());
+  coder.Encode((BYTE*)str.c_str(), (DWORD)str.size());
 
   return coder.EncodedMessage();
 }

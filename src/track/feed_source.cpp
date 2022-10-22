@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2020, Eren Okka
+** Copyright (C) 2010-2021, Eren Okka
 **
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@ namespace track {
 
 FeedSource GetFeedSource(const std::wstring& channel_link) {
   static const std::map<std::wstring, FeedSource> sources{
+    {L"acgnx", FeedSource::Acgnx},
     {L"anidex", FeedSource::AniDex},
     {L"animebytes", FeedSource::AnimeBytes},
     {L"minglong", FeedSource::Minglong},
@@ -36,6 +37,7 @@ FeedSource GetFeedSource(const std::wstring& channel_link) {
     {L"nyaa.pantsu", FeedSource::NyaaPantsu},
     {L"nyaa.pt", FeedSource::NyaaPantsu},
     {L"nyaa.si", FeedSource::NyaaSi},
+    {L"subsplease", FeedSource::SubsPlease},
     {L"tokyotosho", FeedSource::TokyoToshokan},
   };
 
@@ -51,13 +53,27 @@ FeedSource GetFeedSource(const std::wstring& channel_link) {
 
 void ParseFeedItemFromSource(const FeedSource source, FeedItem& feed_item) {
   const auto parse_magnet_link = [&feed_item]() {
-    feed_item.magnet_link = InStr(
-        feed_item.description, L"<a href=\"magnet:?", L"\">");
-    if (!feed_item.magnet_link.empty())
-      feed_item.magnet_link = L"magnet:?" + feed_item.magnet_link;
+    if (StartsWith(feed_item.enclosure.url, L"magnet:")) {
+      feed_item.magnet_link = feed_item.enclosure.url;
+    } else {
+      feed_item.magnet_link =
+          InStr(feed_item.description, L"<a href=\"magnet:?", L"\">");
+      if (!feed_item.magnet_link.empty())
+        feed_item.magnet_link = L"magnet:?" + feed_item.magnet_link;
+    }
   };
 
   switch (source) {
+    case FeedSource::Acgnx: {
+      std::vector<std::wstring> parts;
+      Split(feed_item.description, L" | ", parts);
+      if (parts.size() > 2) {
+        feed_item.file_size = ParseSizeString(parts.at(2));
+      }
+      parse_magnet_link();
+      break;
+    }
+
     case FeedSource::AniDex:
       feed_item.file_size = ParseSizeString(
           InStr(feed_item.description, L"Size: ", L" |"));
@@ -87,6 +103,13 @@ void ParseFeedItemFromSource(const FeedSource source, FeedItem& feed_item) {
         feed_item.leechers = ToInt(elements[L"nyaa:leechers"]);
       if (elements.count(L"nyaa:downloads"))
         feed_item.downloads = ToInt(elements[L"nyaa:downloads"]);
+      break;
+    }
+
+    case FeedSource::SubsPlease: {
+      auto& elements = feed_item.namespace_elements;
+      if (elements.count(L"subsplease:size"))
+        feed_item.file_size = ParseSizeString(elements[L"subsplease:size"]);
       break;
     }
 

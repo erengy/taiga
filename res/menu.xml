@@ -91,7 +91,8 @@
 	</menu>
 	<!-- Help -->
 	<menu name="Help">
-		<item name="About Taiga" action="About()"/>
+		<item name="About Taiga"   action="About()"/>
+		<item name="Donate"        action="URL(https://taiga.moe/#donate)"/>
 		<item name="Support&#9;F1" action="URL(https://taiga.moe/#support)"/>
 		<item type="separator"/>
 		<item name="Check for updates" action="CheckUpdates()"/>
@@ -136,7 +137,7 @@
 		<item name="Set &amp;episode..."  action="EditEpisode()"/>
 		<item name="Set sco&amp;re"          sub="EditScore"/>
 		<item name="Set &amp;status"         sub="EditStatus"/>
-		<item name="Set &amp;tags..."     action="EditTags"/> <!-- Note: Overwritten -->
+		<item name="Set &amp;notes..."    action="EditNotes"/>
 		<item type="separator"/>
 		<item name="Delete from &amp;list...&#9;Del" action="EditDelete()"/>
 	</menu>
@@ -257,6 +258,7 @@
 	<menu name="SeasonList">
 		<item name="Information" action="Info()" default="1"/>
 		<item name="Go to the web page" action="ViewAnimePage()"/>
+		<item name="Watch trailer" action="WatchTrailer()" disabled="1"/>
 		<item type="separator"/>
 		<item name="Refresh data" action="Season_RefreshItemData()"/>
 		<item type="separator"/>

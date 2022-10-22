@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2020, Eren Okka
+** Copyright (C) 2010-2021, Eren Okka
 **
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -860,6 +860,9 @@ void MainDialog::UpdateTip() {
   if (taiga::app.options.debug_mode)
     tip += L" [debug]";
 
+  if (taiga::app.options.allow_multiple_instances)
+    tip += L" @ " + sync::GetCurrentServiceName();
+  
   if (const auto anime_item = anime::db.Find(CurrentEpisode.anime_id)) {
     tip += L"\nWatching: " + anime::GetPreferredTitle(*anime_item);
 
@@ -880,7 +883,7 @@ void MainDialog::UpdateTitle() {
   const auto display_name = taiga::GetCurrentUserDisplayName();
   if (!display_name.empty())
     title += L" \u2013 " + display_name;
-  if (taiga::app.options.debug_mode)
+  if (taiga::app.options.debug_mode || taiga::app.options.allow_multiple_instances)
     title += L" @ " + sync::GetCurrentServiceName();
 
   if (const auto anime_item = anime::db.Find(CurrentEpisode.anime_id)) {

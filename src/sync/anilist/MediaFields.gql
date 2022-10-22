@@ -1,4 +1,5 @@
 id
+idMal
 title {
   romaji(stylised: true)
   english(stylised: true)
@@ -13,6 +14,7 @@ endDate { year month day }
 episodes
 duration
 countryOfOrigin
+trailer { id site }
 updatedAt
 coverImage { large }
 genres

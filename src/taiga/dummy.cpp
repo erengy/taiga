@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2020, Eren Okka
+** Copyright (C) 2010-2021, Eren Okka
 **
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -45,7 +45,6 @@ void InitializeDummies() {
   dummy_anime.SetMyLastWatchedEpisode(25);
   dummy_anime.SetMyScore(anime::kUserScoreMax);
   dummy_anime.SetMyStatus(anime::MyStatus::Completed);
-  dummy_anime.SetMyTags(L"comedy, romance, drama");
   dummy_anime.SetMyNotes(L"Best series ever!");
 
   dummy_episode.anime_id = 74164;

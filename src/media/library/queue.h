@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2020, Eren Okka
+** Copyright (C) 2010-2021, Eren Okka
 **
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -39,7 +39,6 @@ enum class QueueSearch {
   Rewatching,
   Score,
   Status,
-  Tags,
 };
 
 enum class QueueItemMode {
@@ -61,7 +60,6 @@ struct QueueItem {
   std::optional<Date> date_finish;
   std::optional<bool> enable_rewatching;
   std::optional<int> rewatched_times;
-  std::optional<std::wstring> tags;
   std::optional<std::wstring> notes;
 };
 

@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2020, Eren Okka
+** Copyright (C) 2010-2021, Eren Okka
 **
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -462,7 +462,7 @@ bool IsAllEpisodesAvailable(const Item& item) {
 }
 
 bool IsValidEpisodeCount(int number) {
-  return number > 0 && number < 1900;
+  return number > 0 && number < kMaxEpisodeCount;
 }
 
 bool IsValidEpisodeNumber(int number, int total) {

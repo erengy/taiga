@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2020, Eren Okka
+** Copyright (C) 2010-2021, Eren Okka
 **
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,23 @@
 
 #pragma once
 
-#include <fmt/format.h>
+#include <string_view>
 
-using namespace fmt::literals;
+#include <fmt/format.h>
+#include <fmt/xchar.h>
+
+// `_format` UDL is deprecated. We should eventually move to `fmt::format`
+// and then to `std::format` in C++20.
+// See: https://github.com/fmtlib/fmt/issues/2640
+
+inline auto operator"" _format(const char* s, size_t n) {
+  return [=](auto&&... args) {
+    return fmt::format(fmt::runtime(std::string_view(s, n)), args...);
+  };
+}
+
+inline auto operator"" _format(const wchar_t* s, size_t n) {
+  return [=](auto&&... args) {
+    return fmt::format(std::wstring_view(s, n), args...);
+  };
+}

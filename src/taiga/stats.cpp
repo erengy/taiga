@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2020, Eren Okka
+** Copyright (C) 2010-2021, Eren Okka
 **
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -145,7 +145,7 @@ float Statistics::CalculateScoreDeviation() {
 
     if (item.GetMyScore() > 0) {
       float score = static_cast<float>(item.GetMyScore());
-      sum_squares += pow(score - score_mean, 2);
+      sum_squares += std::powf(score - score_mean, 2.0f);
       items_scored++;
     }
   }

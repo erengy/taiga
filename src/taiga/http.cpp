@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2020, Eren Okka
+** Copyright (C) 2010-2021, Eren Okka
 **
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -47,8 +47,9 @@ static hypr::Options GetOptions() {
   // "SSL connect error". See issue #312 for more information.
   options.certificate_revocation = !settings.GetAppConnectionNoRevoke();
 
-  // "20" happens to be the number used by Chrome and Firefox
-  options.max_redirects = 20;
+  // Web browsers set the maximum number of redirects to ~20 (e.g. Firefox's
+  // `network.http.redirection-limit` option), but we do not need that many.
+  options.max_redirects = 5;
 
   // Complete connection within 30 seconds (default is 300 seconds)
   options.timeout = std::chrono::seconds{30};
@@ -370,7 +371,7 @@ std::wstring GetUrlHost(const std::string_view url) {
 std::wstring to_string(const Error& error, const std::wstring& host) {
   std::wstring message = StrToWstr(error.str());
   TrimRight(message, L" \r\n");
-  message = L"{} ({})"_format(message, error.code);
+  message = L"{} ({})"_format(message, static_cast<int>(error.code));
   if (!host.empty()) {
     switch (error.code) {
       case CURLE_COULDNT_RESOLVE_HOST:

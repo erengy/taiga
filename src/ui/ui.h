@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2020, Eren Okka
+** Copyright (C) 2010-2021, Eren Okka
 **
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -80,7 +80,6 @@ void OnLibraryUpdateFailure(int id, const std::wstring& reason, bool not_approve
 
 bool OnLibraryEntriesEditDelete(const std::vector<int> ids);
 int OnLibraryEntriesEditEpisode(const std::vector<int> ids);
-bool OnLibraryEntriesEditTags(const std::vector<int> ids, std::wstring& tags);
 bool OnLibraryEntriesEditNotes(const std::vector<int> ids, std::wstring& notes);
 
 void OnHistoryAddItem(const library::QueueItem& queue_item);

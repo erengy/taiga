@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2020, Eren Okka
+** Copyright (C) 2010-2021, Eren Okka
 **
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,6 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <algorithm>
 #include <assert.h>
 
 #include "media/anime_item.h"
@@ -125,6 +126,10 @@ const std::wstring& Item::GetSynopsis() const {
   return series_.synopsis;
 }
 
+const std::wstring& Item::GetTrailerId() const {
+  return series_.trailer_id;
+}
+
 const time_t Item::GetLastModified() const {
   return series_.last_modified;
 }
@@ -160,7 +165,7 @@ void Item::SetType(SeriesType type) {
 }
 
 void Item::SetEpisodeCount(int number) {
-  series_.episode_count = number;
+  series_.episode_count = std::clamp(number, 0, kMaxEpisodeCount);
 
   // TODO: Call it separately
   if (number >= 0)
@@ -286,6 +291,10 @@ void Item::SetSynopsis(const std::wstring& synopsis) {
   series_.synopsis = synopsis;
 }
 
+void Item::SetTrailerId(const std::wstring& trailer_id) {
+  series_.trailer_id = trailer_id;
+}
+
 void Item::SetLastModified(time_t modified) {
   series_.last_modified = modified;
 }
@@ -338,6 +347,13 @@ MyStatus Item::GetMyStatus(bool check_queue) const {
       SearchQueue(library::QueueSearch::Status) : nullptr;
 
   return queue_item ? *queue_item->status : my_info_->status;
+}
+
+bool Item::GetMyPrivate() const {
+  if (!my_info_.get())
+    return false;
+
+  return my_info_->is_private;
 }
 
 int Item::GetMyRewatchedTimes(bool check_queue) const {
@@ -394,16 +410,6 @@ const std::wstring& Item::GetMyLastUpdated() const {
   return my_info_->last_updated;
 }
 
-const std::wstring& Item::GetMyTags(bool check_queue) const {
-  if (!my_info_.get())
-    return EmptyString();
-
-  library::QueueItem* queue_item = check_queue ?
-      SearchQueue(library::QueueSearch::Tags) : nullptr;
-
-  return queue_item ? *queue_item->tags : my_info_->tags;
-}
-
 const std::wstring& Item::GetMyNotes(bool check_queue) const {
   if (!my_info_.get())
     return EmptyString();
@@ -425,7 +431,7 @@ void Item::SetMyId(const std::wstring& id) {
 void Item::SetMyLastWatchedEpisode(int number) {
   assert(my_info_.get());
 
-  my_info_->watched_episodes = number;
+  my_info_->watched_episodes = std::clamp(number, 0, kMaxEpisodeCount);
 }
 
 void Item::SetMyScore(int score) {
@@ -438,6 +444,12 @@ void Item::SetMyStatus(MyStatus status) {
   assert(my_info_.get());
 
   my_info_->status = status;
+}
+
+void Item::SetMyPrivate(bool is_private) {
+  assert(my_info_.get());
+
+  my_info_->is_private = is_private;
 }
 
 void Item::SetMyRewatchedTimes(int rewatched_times) {
@@ -482,12 +494,6 @@ void Item::SetMyLastUpdated(const std::wstring& last_updated) {
   assert(my_info_.get());
 
   my_info_->last_updated = last_updated;
-}
-
-void Item::SetMyTags(const std::wstring& tags) {
-  assert(my_info_.get());
-
-  my_info_->tags = tags;
 }
 
 void Item::SetMyNotes(const std::wstring& notes) {

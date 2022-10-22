@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2020, Eren Okka
+** Copyright (C) 2010-2021, Eren Okka
 **
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -55,27 +55,6 @@ static const std::vector<StreamData> stream_data{
     std::regex("animenewsnetwork\\.(?:com|cc)/video/[0-9]+"),
     std::regex("(.+) - Anime News Network"),
   },
-  // Crunchyroll
-  {
-    Stream::Crunchyroll,
-    L"Crunchyroll",
-    L"http://www.crunchyroll.com",
-    std::regex(
-      "crunchyroll\\.[a-z.]+/[^/]+/(?:[^/]+/)?(?:"
-        "episode-[0-9]+.*|"
-        ".*-(?:movie|ona|ova)"
-      ")-[0-9]+"
-    ),
-    std::regex("(.+) - Watch on Crunchyroll"),
-  },
-  // Funimation
-  {
-    Stream::Funimation,
-    L"Funimation",
-    L"https://www.funimation.com",
-    std::regex("funimation\\.com/shows/[^/]+/[^/]+/"),
-    std::regex("(?:Watch )?(.+) Anime.* (?:on|-) Funimation"),
-  },
   // HIDIVE
   {
     Stream::Hidive,
@@ -83,6 +62,17 @@ static const std::vector<StreamData> stream_data{
     L"https://www.hidive.com",
     std::regex("hidive\\.com/stream/"),
     std::regex("Stream (.+) on HIDIVE"),
+  },
+  // Jellyfin Web App
+  {
+    Stream::Jellyfin,
+    L"Jellyfin Web App",
+    L"https://jellyfin.org",
+    std::regex(
+      "^localhost:[0-9]+/web/index.html#!/video|"
+      "^.+/jellyfin/web/index.html#!/video"
+    ),
+    std::regex("Jellyfin|(.+)"),
   },
   // Plex Web App
   {
@@ -161,12 +151,10 @@ bool IsStreamEnabled(const Stream stream) {
       return taiga::settings.GetStreamAdn();
     case Stream::Ann:
       return taiga::settings.GetStreamAnn();
-    case Stream::Crunchyroll:
-      return taiga::settings.GetStreamCrunchyroll();
-    case Stream::Funimation:
-      return taiga::settings.GetStreamFunimation();
     case Stream::Hidive:
       return taiga::settings.GetStreamHidive();
+    case Stream::Jellyfin:
+      return taiga::settings.GetStreamJellyfin();
     case Stream::Plex:
       return taiga::settings.GetStreamPlex();
     case Stream::Veoh:
@@ -196,14 +184,11 @@ void EnableStream(const Stream stream, const bool enabled) {
     case Stream::Ann:
       taiga::settings.SetStreamAnn(enabled);
       break;
-    case Stream::Crunchyroll:
-      taiga::settings.SetStreamCrunchyroll(enabled);
-      break;
-    case Stream::Funimation:
-      taiga::settings.SetStreamFunimation(enabled);
-      break;
     case Stream::Hidive:
       taiga::settings.SetStreamHidive(enabled);
+      break;
+    case Stream::Jellyfin:
+      taiga::settings.SetStreamJellyfin(enabled);
       break;
     case Stream::Plex:
       taiga::settings.SetStreamPlex(enabled);

@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2020, Eren Okka
+** Copyright (C) 2010-2021, Eren Okka
 **
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,6 +43,7 @@ enum class SearchField {
   Year,
   Rewatch,
   Duration,
+  Debug,
 };
 
 enum class SearchOperator {
@@ -78,6 +79,7 @@ SearchTerm GetSearchTerm(const std::wstring& str) {
     {L"year", SearchField::Year},
     {L"rewatch", SearchField::Rewatch},
     {L"duration", SearchField::Duration},
+    {L"debug", SearchField::Debug},
   };
 
   static const std::map<std::wstring, SearchOperator> operators{
@@ -148,7 +150,6 @@ bool Filters::CheckItem(const Item& item, int text_index) const {
   const auto& genres = item.GetGenres();
   const auto& tags = item.GetTags();
   const auto& producers = item.GetProducers();
-  const auto& user_tags = item.GetMyTags();
   const auto& notes = item.GetMyNotes();
 
   std::vector<SearchTerm> search_terms;
@@ -162,7 +163,6 @@ bool Filters::CheckItem(const Item& item, int text_index) const {
         if (!CheckStrings(titles, term.value) &&
             !CheckStrings(genres, term.value) &&
             !CheckStrings(tags, term.value) &&
-            !CheckString(user_tags, term.value) &&
             !CheckString(notes, term.value)) {
           return false;
         }
@@ -194,8 +194,7 @@ bool Filters::CheckItem(const Item& item, int text_index) const {
         break;
 
       case SearchField::Tag:
-        if (!CheckStrings(tags, term.value) &&
-            !CheckString(user_tags, term.value)) {
+        if (!CheckStrings(tags, term.value)) {
           return false;
         }
         break;
@@ -236,6 +235,23 @@ bool Filters::CheckItem(const Item& item, int text_index) const {
         const auto duration = item.GetEpisodeLength();
         if (!CheckNumber(term.op, duration, ToInt(term.value)))
           return false;
+        break;
+      }
+
+      case SearchField::Debug: {
+        if (term.value == L"watched") {
+          const int eps_watched = item.GetMyLastWatchedEpisode();
+          const int eps_total = item.GetEpisodeCount();
+          if (!anime::IsValidEpisodeNumber(eps_watched, eps_total) ||
+              (eps_watched < eps_total &&
+               item.GetMyStatus() == anime::MyStatus::Completed)) {
+            continue;
+          } else {
+            return false;
+          }
+        } else {
+          return false;
+        }
         break;
       }
     }
