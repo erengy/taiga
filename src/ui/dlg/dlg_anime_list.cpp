@@ -425,9 +425,9 @@ int AnimeListDialog::ListView::GetDefaultSortOrder(AnimeListColumn column) {
     case kColumnUserDateCompleted:
     case kColumnUserProgress:
     case kColumnUserRating:
-    case kColumnUserNotes:
       return -1;
     case kColumnAnimeTitle:
+    case kColumnUserNotes:
     default:
       return 1;
   }
@@ -1462,22 +1462,22 @@ void AnimeListDialog::RefreshListItemColumns(int index, const anime::Item& anime
       case kColumnAnimeType:
         text = ui::TranslateType(anime_item.GetType());
         break;
-      case kColumnUserLastUpdated: {
-        time_t time_last_updated = ToTime(anime_item.GetMyLastUpdated());
-        text = GetRelativeTimeString(time_last_updated, true);
-        break;
-      }
-      case kColumnUserRating:
-        text = ui::TranslateMyScore(anime_item.GetMyScore());
-        break;
       case kColumnUserDateStarted:
         text = ui::TranslateMyDate(anime_item.GetMyDateStart());
         break;
       case kColumnUserDateCompleted:
         text = ui::TranslateMyDate(anime_item.GetMyDateEnd());
         break;
+      case kColumnUserLastUpdated: {
+        time_t time_last_updated = ToTime(anime_item.GetMyLastUpdated());
+        text = GetRelativeTimeString(time_last_updated, true);
+        break;
+      }
       case kColumnUserNotes:
         text = anime_item.GetMyNotes();
+        break;
+      case kColumnUserRating:
+        text = ui::TranslateMyScore(anime_item.GetMyScore());
         break;
     }
     if (!text.empty())
@@ -1827,9 +1827,9 @@ AnimeListColumn AnimeListDialog::ListView::TranslateColumnName(const std::wstrin
     {L"user_date_started", kColumnUserDateStarted},
     {L"user_date_completed", kColumnUserDateCompleted},
     {L"user_last_updated", kColumnUserLastUpdated},
+    {L"user_notes", kColumnUserNotes},
     {L"user_progress", kColumnUserProgress},
     {L"user_rating", kColumnUserRating},
-    {L"user_notes", kColumnUserNotes},
   };
 
   const auto it = names.find(name);
