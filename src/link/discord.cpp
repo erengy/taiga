@@ -75,7 +75,7 @@ void ClearPresence() {
 }
 
 void UpdatePresence(const std::string& details, const std::string& state,
-                    const time_t timestamp) {
+                    const std::string& large_image, const time_t timestamp) {
   const std::string small_image_key = WstrToStr(sync::GetCurrentServiceSlug());
 
   const std::string small_image_text =
@@ -88,7 +88,8 @@ void UpdatePresence(const std::string& details, const std::string& state,
   presence.state = state.c_str();
   presence.details = details.c_str();
   presence.startTimestamp = timestamp;
-  presence.largeImageKey = "default";
+  presence.largeImageKey =
+      !large_image.empty() ? large_image.c_str() : "default";
   presence.largeImageText = details.c_str();
   presence.smallImageKey = small_image_key.c_str();
   presence.smallImageText = small_image_text.c_str();
