@@ -330,7 +330,14 @@ void AnimeListDialog::OnContextMenu(HWND hwnd, POINT pt) {
       const auto command = ui::Menus.Show(DlgMain.GetWindowHandle(), pt.x, pt.y, menu_name.c_str());
       if (command == L"EditDelete()")
         parameter = reinterpret_cast<LPARAM>(&anime_ids);
-      ExecuteCommand(command, 0, parameter);
+      if (command == L"InvertSelection") {
+        for (int i = 0; i < listview.GetItemCount(); ++i) {
+          bool selected = ListView_GetItemState(listview.GetWindowHandle(), i, LVIS_SELECTED);
+          listview.SelectItem(i, !selected);
+        }
+      } else {
+        ExecuteCommand(command, 0, parameter);
+      }
     }
 
   } else if (hwnd == listview.GetHeader()) {

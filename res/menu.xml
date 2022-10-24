@@ -139,6 +139,8 @@
 		<item name="Set &amp;status"         sub="EditStatus"/>
 		<item name="Set &amp;notes..."    action="EditNotes"/>
 		<item type="separator"/>
+		<item name="In&amp;vert selection" action="InvertSelection"/>
+		<item type="separator"/>
 		<item name="Delete from &amp;list...&#9;Del" action="EditDelete()"/>
 	</menu>
 	<!-- Date started -->
