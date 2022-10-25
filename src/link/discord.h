@@ -29,6 +29,8 @@ void Shutdown();
 
 void ClearPresence();
 void UpdatePresence(const std::string& details, const std::string& state,
-                    const std::string& large_image, const time_t timestamp);
+                    const std::string& large_image,
+                    const std::string& button_label,
+                    const std::string& button_url, const time_t timestamp);
 
 }  // namespace link::discord

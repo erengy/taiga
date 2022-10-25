@@ -75,7 +75,9 @@ void ClearPresence() {
 }
 
 void UpdatePresence(const std::string& details, const std::string& state,
-                    const std::string& large_image, const time_t timestamp) {
+                    const std::string& large_image,
+                    const std::string& button_label,
+                    const std::string& button_url, const time_t timestamp) {
   const std::string small_image_key = WstrToStr(sync::GetCurrentServiceSlug());
 
   const std::string small_image_text =
@@ -93,6 +95,10 @@ void UpdatePresence(const std::string& details, const std::string& state,
   presence.largeImageText = details.c_str();
   presence.smallImageKey = small_image_key.c_str();
   presence.smallImageText = small_image_text.c_str();
+  if (!button_label.empty() && !button_url.empty()) {
+    presence.buttons[0].label = button_label.c_str();
+    presence.buttons[0].url = button_url.c_str();
+  }
 
   Discord_UpdatePresence(&presence);
   RunCallbacks();
