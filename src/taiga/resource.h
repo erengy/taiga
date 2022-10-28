@@ -217,3 +217,4 @@
 #define IDC_TREE_SECTIONS                       1175
 #define IDC_BUTTON_MAL_AUTH                     1176
 #define IDC_CHECK_DISCORD_GROUP                 1177
+#define IDC_CHECK_DISCORD_TIME                  1178

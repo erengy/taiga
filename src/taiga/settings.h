@@ -238,6 +238,8 @@ public:
   void SetShareDiscordEnabled(const bool enabled);
   bool GetShareDiscordGroupEnabled() const;
   void SetShareDiscordGroupEnabled(const bool enabled);
+  bool GetShareDiscordTimeEnabled() const;
+  void SetShareDiscordTimeEnabled(const bool enabled);
   bool GetShareDiscordUsernameEnabled() const;
   void SetShareDiscordUsernameEnabled(const bool enabled);
   bool GetShareHttpEnabled() const;

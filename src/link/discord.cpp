@@ -89,7 +89,9 @@ void UpdatePresence(const std::string& details, const std::string& state,
   DiscordRichPresence presence = {0};
   presence.state = state.c_str();
   presence.details = details.c_str();
-  presence.startTimestamp = timestamp;
+  if (taiga::settings.GetShareDiscordTimeEnabled()) {
+    presence.startTimestamp = timestamp;
+  }
   presence.largeImageKey =
       !large_image.empty() ? large_image.c_str() : "default";
   presence.largeImageText = details.c_str();
