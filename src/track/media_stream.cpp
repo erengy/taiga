@@ -55,6 +55,14 @@ static const std::vector<StreamData> stream_data{
     std::regex("animenewsnetwork\\.(?:com|cc)/video/[0-9]+"),
     std::regex("(.+) - Anime News Network"),
   },
+  // Bilibili
+  {
+    Stream::Bilibili,
+    L"Bilibili",
+    L"https://www.bilibili.tv/en/anime",
+    std::regex("bilibili.tv/[^/]+/play/[0-9]+"),
+    std::regex("(.+) - Bilibili"),
+  },
   // HIDIVE
   {
     Stream::Hidive,
@@ -151,6 +159,8 @@ bool IsStreamEnabled(const Stream stream) {
       return taiga::settings.GetStreamAdn();
     case Stream::Ann:
       return taiga::settings.GetStreamAnn();
+    case Stream::Bilibili:
+      return taiga::settings.GetStreamBilibili();
     case Stream::Hidive:
       return taiga::settings.GetStreamHidive();
     case Stream::Jellyfin:
@@ -183,6 +193,9 @@ void EnableStream(const Stream stream, const bool enabled) {
       break;
     case Stream::Ann:
       taiga::settings.SetStreamAnn(enabled);
+      break;
+    case Stream::Bilibili:
+      taiga::settings.SetStreamBilibili(enabled);
       break;
     case Stream::Hidive:
       taiga::settings.SetStreamHidive(enabled);

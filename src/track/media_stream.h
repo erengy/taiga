@@ -28,6 +28,7 @@ enum class Stream {
   Animelab,
   Adn,
   Ann,
+  Bilibili,
   Hidive,
   Jellyfin,
   Plex,

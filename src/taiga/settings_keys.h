@@ -93,6 +93,7 @@ enum class AppSettingKey {
   StreamAnimelab,
   StreamAdn,
   StreamAnn,
+  StreamBilibili,
   StreamCrunchyroll,
   StreamFunimation,
   StreamHidive,
