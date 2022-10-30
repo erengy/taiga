@@ -27,6 +27,7 @@ enum class FeedSource {
   Acgnx,
   AniDex,
   AnimeBytes,
+  AnimeTosho,
   Minglong,
   NyaaPantsu,
   NyaaSi,

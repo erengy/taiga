@@ -32,6 +32,7 @@ FeedSource GetFeedSource(const std::wstring& channel_link) {
     {L"acgnx", FeedSource::Acgnx},
     {L"anidex", FeedSource::AniDex},
     {L"animebytes", FeedSource::AnimeBytes},
+    {L"animetosho", FeedSource::AnimeTosho},
     {L"minglong", FeedSource::Minglong},
     {L"nyaa.net", FeedSource::NyaaPantsu},
     {L"nyaa.pantsu", FeedSource::NyaaPantsu},
@@ -79,6 +80,17 @@ void ParseFeedItemFromSource(const FeedSource source, FeedItem& feed_item) {
           InStr(feed_item.description, L"Size: ", L" |"));
       if (InStr(feed_item.description, L" Batch ") > -1)
         feed_item.torrent_category = TorrentCategory::Batch;
+      parse_magnet_link();
+      break;
+
+    case FeedSource::AnimeTosho:
+      if (InStr(feed_item.link, L"/view/") > -1 &&
+          !feed_item.enclosure.url.empty()) {
+        feed_item.link = feed_item.enclosure.url;
+      }
+      feed_item.info_link = feed_item.guid.value;
+      feed_item.file_size = ParseSizeString(
+          InStr(feed_item.description, L"<strong>Total Size</strong>: ", L"<"));
       parse_magnet_link();
       break;
 
