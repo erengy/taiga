@@ -47,15 +47,14 @@
 namespace taiga {
 
 constexpr auto kDefaultExternalLinks =
-    L"Hibari|https://hb.wopian.me\r\n"
-    L"MALgraph|http://graph.anime.plus\r\n"
+    L"MALgraph|https://anime.plus/\r\n"
     L"-\r\n"
-    L"AniChart|http://anichart.net/airing\r\n"
+    L"AniChart|https://anichart.net/airing\r\n"
     L"Monthly.moe|https://www.monthly.moe/weekly\r\n"
-    L"Senpai Anime Charts|http://www.senpai.moe/?mode=calendar\r\n"
+    L"Senpai Anime Charts|https://www.senpai.moe/?mode=calendar\r\n"
     L"-\r\n"
-    L"Anime Streaming Search Engine|http://because.moe\r\n"
-    L"The Fansub Database|https://fansubdb.com";
+    L"Anime Scene Search Engine|https://trace.moe/\r\n"
+    L"Anime Streaming Search Engine|https://because.moe/";
 constexpr auto kDefaultFormatHttp =
     L"user=%user%"
     L"&name=%title%"
