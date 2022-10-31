@@ -123,7 +123,7 @@ BOOL AboutDialog::OnInitDialog() {
       L"erengy (Eren Okka)\\line\\par "
       L"\\b Contributors:\\b0\\line "
       L"saka, Diablofan, slevir, LordGravewish, rr-, sunjayc, ConnorKrammer, Soinou, Jiyuu, ryban, tollyx,\\line "
-      L"pavelxdd, gunt3001, synthtech, cnguy\\line\\par "
+      L"pavelxdd, gunt3001, synthtech, cnguy, CeruleanSky, Xabis, rzumer\\line\\par "
       L"\\b Donators:\\b0\\line "
       L"Farfie, Nydaleclya, WizardTim, Kinzer, MeGaNeKo and other anonymous supporters\\line\\par "
       L"\\b Third-party components:\\b0\\line "
