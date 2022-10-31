@@ -267,8 +267,9 @@ LRESULT SeasonDialog::OnListNotify(LPARAM lParam) {
         }
         if (!anime_item->GetGenres().empty())
           text += L"\n" + Join(anime_item->GetGenres(), L", ");
-        if (!anime_item->GetProducers().empty())
-          text += L"\n" + Join(anime_item->GetProducers(), L", ");
+        const auto producers = anime::GetStudiosAndProducers(*anime_item);
+        if (!producers.empty())
+          text += L"\n" + Join(producers, L", ");
         tooltips_.UpdateText(0, text.c_str());
       }
       break;
@@ -497,9 +498,11 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       DRAWLINE(anime_item->GetGenres().empty() ? L"?" : Join(anime_item->GetGenres(), L", "));
       switch (current_service) {
         case sync::ServiceId::MyAnimeList:
-        case sync::ServiceId::AniList:
-          DRAWLINE(anime_item->GetProducers().empty() ? L"?" : Join(anime_item->GetProducers(), L", "));
+        case sync::ServiceId::AniList: {
+          const auto producers = anime::GetStudiosAndProducers(*anime_item);
+          DRAWLINE(producers.empty() ? L"?" : Join(producers, L", "));
           break;
+        }
       }
       DRAWLINE(ui::TranslateScore(anime_item->GetScore()));
       switch (current_service) {
@@ -664,7 +667,7 @@ void SeasonDialog::RefreshList(bool redraw_only) {
     bool passed_filters = true;
     std::wstring genres = Join(anime_item->GetGenres(), L", ");
     std::wstring tags = Join(anime_item->GetTags(), L", ");
-    std::wstring producers = Join(anime_item->GetProducers(), L", ");
+    std::wstring producers = Join(anime::GetStudiosAndProducers(*anime_item), L", ");
     for (auto j = filters.begin(); passed_filters && j != filters.end(); ++j) {
       if (InStr(genres, *j, 0, true) == -1 &&
           InStr(tags, *j, 0, true) == -1 &&

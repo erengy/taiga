@@ -69,6 +69,7 @@ int EstimateEpisodeCount(const Item& item);
 
 const std::wstring& GetPreferredTitle(const Item& item);
 void GetAllTitles(int anime_id, std::vector<std::wstring>& titles);
+std::vector<std::wstring> GetStudiosAndProducers(const Item& item);
 void GetProgressRatios(const Item& item, float& ratio_aired, float& ratio_watched);
 
 bool IsValidDate(const Date& date);

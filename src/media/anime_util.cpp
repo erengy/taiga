@@ -571,6 +571,13 @@ void GetAllTitles(int anime_id, std::vector<std::wstring>& titles) {
     insert_title(synonym);
 }
 
+std::vector<std::wstring> GetStudiosAndProducers(const Item& item) {
+  std::vector<std::wstring> studios = item.GetStudios();
+  const std::vector<std::wstring> producers = item.GetProducers();
+  studios.insert(studios.end(), producers.begin(), producers.end());
+  return studios;
+}
+
 void GetProgressRatios(const Item& item, float& ratio_aired, float& ratio_watched) {
   ratio_aired = 0.0f;
   ratio_watched = 0.0f;

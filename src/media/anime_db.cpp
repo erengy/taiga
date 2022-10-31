@@ -94,6 +94,7 @@ void Database::ReadDatabaseNode(XmlNode& database_node) {
     item.SetGenres(XmlReadStr(node, L"genres"));
     item.SetTags(XmlReadStr(node, L"tags"));
     item.SetProducers(XmlReadStr(node, L"producers"));
+    item.SetStudios(XmlReadStr(node, L"studios"));
     item.SetSynopsis(XmlReadStr(node, L"synopsis"));
     item.SetLastModified(ToTime(XmlReadStr(node, L"modified")));
     item.SetEnglishTitle(XmlReadStr(node, L"english"));
@@ -172,6 +173,7 @@ void Database::WriteDatabaseNode(XmlNode& database_node) const {
     XML_WS(L"genres", Join(item.GetGenres(), L", "), pugi::node_pcdata);
     XML_WS(L"tags", Join(item.GetTags(), L", "), pugi::node_pcdata);
     XML_WS(L"producers", Join(item.GetProducers(), L", "), pugi::node_pcdata);
+    XML_WS(L"studios", Join(item.GetStudios(), L", "), pugi::node_pcdata);
     XML_WF(L"score", item.GetScore(), pugi::node_pcdata);
     XML_WI(L"popularity", item.GetPopularity());
     XML_WS(L"synopsis", item.GetSynopsis(), pugi::node_cdata);

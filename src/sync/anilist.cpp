@@ -254,12 +254,20 @@ int ParseMediaObject(const Json& json) {
   }
   anime_item.SetSynonyms(synonyms);
 
+  std::vector<std::wstring> producers;
   std::vector<std::wstring> studios;
   for (const auto& edge : json["studios"]["edges"]) {
-    studios.push_back(StrToWstr(JsonReadStr(edge["node"], "name")));
+    const auto name = StrToWstr(JsonReadStr(edge["node"], "name"));
+    if (JsonReadBool(edge, "isMain")) {
+      studios.push_back(name);
+    } else {
+      producers.push_back(name);
+    }
   }
+  RemoveEmptyStrings(producers);
   RemoveEmptyStrings(studios);
-  anime_item.SetProducers(studios);
+  anime_item.SetProducers(producers);
+  anime_item.SetStudios(studios);
 
   const auto& next_airing_episode = json["nextAiringEpisode"];
   if (!next_airing_episode.is_null()) {

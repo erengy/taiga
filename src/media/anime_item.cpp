@@ -118,6 +118,10 @@ const std::vector<std::wstring>& Item::GetProducers() const {
   return series_.producers;
 }
 
+const std::vector<std::wstring>& Item::GetStudios() const {
+  return series_.studios;
+}
+
 double Item::GetScore() const {
   return series_.score;
 }
@@ -281,6 +285,18 @@ void Item::SetProducers(const std::wstring& producers) {
 
 void Item::SetProducers(const std::vector<std::wstring>& producers) {
   series_.producers = producers;
+}
+
+void Item::SetStudios(const std::wstring& studios) {
+  std::vector<std::wstring> temp;
+  Split(studios, L", ", temp);
+  RemoveEmptyStrings(temp);
+
+  SetStudios(temp);
+}
+
+void Item::SetStudios(const std::vector<std::wstring>& studios) {
+  series_.studios = studios;
 }
 
 void Item::SetScore(double score) {

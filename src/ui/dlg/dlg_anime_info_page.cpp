@@ -201,12 +201,13 @@ void PageSeriesInfo::Refresh(int anime_id, bool connect) {
   auto genres = anime_item->GetGenres();
   const auto tags = anime_item->GetTags();
   genres.insert(genres.end(), tags.begin(), tags.end());
+  const auto producers = anime::GetStudiosAndProducers(*anime_item);
   text = ui::TranslateType(anime_item->GetType()) + L"\n" +
          ui::TranslateNumber(anime_item->GetEpisodeCount(), L"Unknown") + L"\n" +
          ui::TranslateStatus(anime_item->GetAiringStatus()) + L"\n" +
          ui::TranslateDateToSeasonString(anime_item->GetDateStart()) + L"\n" +
          (genres.empty() ? L"Unknown" : Join(genres, L", ")) + L"\n" +
-         (anime_item->GetProducers().empty() ? L"Unknown" : Join(anime_item->GetProducers(), L", ")) + L"\n" +
+         (producers.empty() ? L"Unknown" : Join(producers, L", ")) + L"\n" +
          ui::TranslateScore(anime_item->GetScore());
   SetDlgItemText(IDC_STATIC_ANIME_DETAILS, text.c_str());
 

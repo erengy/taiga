@@ -61,6 +61,7 @@ public:
   const std::vector<std::wstring>& GetTags() const;
   int GetPopularity() const;
   const std::vector<std::wstring>& GetProducers() const;
+  const std::vector<std::wstring>& GetStudios() const;
   double GetScore() const;
   const std::wstring& GetSynopsis() const;
   const std::wstring& GetTrailerId() const;
@@ -94,6 +95,8 @@ public:
   void SetPopularity(int popularity);
   void SetProducers(const std::wstring& producers);
   void SetProducers(const std::vector<std::wstring>& producers);
+  void SetStudios(const std::wstring& studios);
+  void SetStudios(const std::vector<std::wstring>& studios);
   void SetScore(double score);
   void SetSynopsis(const std::wstring& synopsis);
   void SetTrailerId(const std::wstring& trailer_id);

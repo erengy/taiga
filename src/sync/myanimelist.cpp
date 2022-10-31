@@ -321,7 +321,8 @@ int ParseAnimeObject(const Json& json) {
     return names;
   };
   anime_item.SetGenres(get_names(json, "genres"));
-  anime_item.SetProducers(get_names(json, "studios"));
+  anime_item.SetProducers(std::vector<std::wstring>{});
+  anime_item.SetStudios(get_names(json, "studios"));
 
   Meow.UpdateTitles(anime_item);
 
