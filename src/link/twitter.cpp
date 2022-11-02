@@ -142,8 +142,11 @@ bool SetStatusText(const std::wstring& status_text) {
     return false;
   previous_status_text = status_text;
 
+  const auto in_reply_to_status_id = taiga::settings.GetShareTwitterReplyTo();
+
   oauth::Parameters post_parameters;
   post_parameters[L"status"] = Url::Encode(status_text);
+  post_parameters[L"in_reply_to_status_id"] = Url::Encode(in_reply_to_status_id);
 
   constexpr auto kTarget = "https://api.twitter.com/1.1/statuses/update.json";
 
@@ -153,8 +156,6 @@ bool SetStatusText(const std::wstring& status_text) {
                     taiga::settings.GetShareTwitterOauthSecret(),
                     {}},
       post_parameters));
-
-  const auto in_reply_to_status_id = taiga::settings.GetShareTwitterReplyTo();
 
   taiga::http::Request request;
   request.set_method("POST");
