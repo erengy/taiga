@@ -59,5 +59,5 @@ bool XmlSaveDocumentToFile(
     const unsigned int flags = pugi::format_default,
     const pugi::xml_encoding encoding = pugi::xml_encoding::encoding_utf8);
 
-std::wstring XmlReadMetaVersion(const XmlDocument& document);
-void XmlWriteMetaVersion(XmlDocument& document, const std::wstring_view version);
+std::wstring XmlReadVersionAttr(const XmlNode& node);
+void XmlWriteVersionAttr(XmlNode& parent_node, const std::wstring_view version);
