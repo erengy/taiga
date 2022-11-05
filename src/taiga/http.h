@@ -47,6 +47,7 @@ namespace util {
 
 std::wstring GetUrlHost(const Uri& uri);
 std::wstring GetUrlHost(const std::string_view url);
+bool IsDdosProtectionEnabled(const Response& response);
 std::wstring to_string(const Error& error, const std::wstring& host);
 std::wstring to_string(const Transfer& transfer);
 

@@ -23,6 +23,8 @@
 
 #include "taiga/http.h"
 
+#include <nstd/string.hpp>
+
 #include "base/file.h"
 #include "base/format.h"
 #include "base/gzip.h"
@@ -367,6 +369,22 @@ std::wstring GetUrlHost(const std::string_view url) {
   }
   return {};
 }
+
+// Check for DDoS protection that requires a JavaScript challenge to be solved
+// (e.g. Cloudflare's "I'm Under Attack" mode)
+bool IsDdosProtectionEnabled(const Response& response) {
+  const std::string server = nstd::tolower_string(response.header("server"));
+
+  switch (response.status_code()) {
+    case hypp::status::k403_Forbidden:
+      return nstd::starts_with(server, "ddos-guard");
+    case hypp::status::k429_Too_Many_Requests:
+    case hypp::status::k503_Service_Unavailable:
+      return nstd::starts_with(server, "cloudflare");
+  }
+
+  return false;
+};
 
 std::wstring to_string(const Error& error, const std::wstring& host) {
   std::wstring message = StrToWstr(error.str());

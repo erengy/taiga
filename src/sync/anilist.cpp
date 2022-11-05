@@ -337,6 +337,16 @@ bool HasError(const taiga::http::Response& response) {
   if (response.status_code() == 200)
     return false;
 
+  if (taiga::http::util::IsDdosProtectionEnabled(response)) {
+    const std::wstring error_description =
+        L"AniList: Cannot connect to server because "
+        L"of DDoS protection (Server: {})"_format(
+            StrToWstr(response.header("server")));
+    LOGE(error_description);
+    ui::ChangeStatusText(error_description);
+    return true;
+  }
+
   if (Json root; JsonParseString(response.body(), root)) {
     if (root.count("errors")) {
       if (const auto& errors = root["errors"]; errors.is_array()) {

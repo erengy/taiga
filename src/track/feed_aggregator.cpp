@@ -20,8 +20,6 @@
 #include <regex>
 #include <set>
 
-#include <nstd/string.hpp>
-
 #include "track/feed_aggregator.h"
 
 #include "base/file.h"
@@ -51,20 +49,7 @@ static bool HandleFeedError(const std::wstring& host,
     return true;
   }
 
-  // Check for DDoS protection that requires a JavaScript challenge to be solved
-  // (e.g. Cloudflare's "I'm Under Attack" mode)
-  const auto ddos_protection_enabled = [&response]() {
-    const std::string server = nstd::tolower_string(response.header("server"));
-    switch (response.status_code()) {
-      case hypp::status::k403_Forbidden:
-        return nstd::starts_with(server, "ddos-guard");
-      case hypp::status::k429_Too_Many_Requests:
-      case hypp::status::k503_Service_Unavailable:
-        return nstd::starts_with(server, "cloudflare");
-    }
-    return false;
-  };
-  if (ddos_protection_enabled()) {
+  if (taiga::http::util::IsDdosProtectionEnabled(response)) {
     ui::ChangeStatusText(
         L"Cannot connect to {} because of DDoS protection (Server: {})"_format(
             host, StrToWstr(response.header("server"))));
