@@ -217,6 +217,26 @@ void SeasonDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+LRESULT SeasonDialog::ListView::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam,
+                                           LPARAM lParam) {
+  switch (uMsg) {
+    // Middle mouse button
+    case WM_MBUTTONDOWN: {
+      const int item_index = HitTest();
+      if (item_index > -1) {
+        SelectAllItems(false);
+        SelectItem(item_index);
+        const int anime_id =
+            static_cast<int>(GetParamFromSelectedListItem(*this));
+        ExecuteCommand(L"ViewAnimePage", false, anime_id);
+      }
+      break;
+    }
+  }
+
+  return WindowProcDefault(hwnd, uMsg, wParam, lParam);
+}
+
 LRESULT SeasonDialog::OnListNotify(LPARAM lParam) {
   LPNMHDR pnmh = reinterpret_cast<LPNMHDR>(lParam);
   switch (pnmh->code) {
