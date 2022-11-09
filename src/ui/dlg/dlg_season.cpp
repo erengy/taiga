@@ -688,11 +688,16 @@ void SeasonDialog::RefreshList(bool redraw_only) {
     std::wstring genres = Join(anime_item->GetGenres(), L", ");
     std::wstring tags = Join(anime_item->GetTags(), L", ");
     std::wstring producers = Join(anime::GetStudiosAndProducers(*anime_item), L", ");
+    std::wstring titles = [i] {
+      std::vector<std::wstring> titles;
+      anime::GetAllTitles(*i, titles);
+      return Join(titles, L", ");
+    }();
     for (auto j = filters.begin(); passed_filters && j != filters.end(); ++j) {
       if (InStr(genres, *j, 0, true) == -1 &&
           InStr(tags, *j, 0, true) == -1 &&
           InStr(producers, *j, 0, true) == -1 &&
-          InStr(anime_item->GetTitle(), *j, 0, true) == -1) {
+          InStr(titles, *j, 0, true) == -1) {
         passed_filters = false;
         break;
       }
