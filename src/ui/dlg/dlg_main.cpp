@@ -150,6 +150,12 @@ void MainDialog::CreateDialogControls() {
   // Create search text
   edit.Attach(GetDlgItem(IDC_EDIT_SEARCH));
   edit.SetCueBannerText(L"Search list");
+  edit.tooltips.Create(edit.GetWindowHandle());
+  edit.tooltips.SetDelayTime(30000, -1, 0);
+  edit.tooltips.SetMaxWidth(
+      ::GetSystemMetrics(SM_CXSCREEN));  // Required for line breaks
+  edit.tooltips.AddTip((UINT)edit.GetWindowHandle(), nullptr, nullptr, nullptr,
+                       true);
   edit.SetMargins(ScaleX(2), ScaleX(16));
   edit.SetParent(toolbar_search.GetWindowHandle());
   win::Rect rcEditWindow; edit.GetWindowRect(&rcEditWindow);
@@ -977,25 +983,59 @@ void MainDialog::Navigation::Refresh(bool add_to_history) {
 
 void MainDialog::Navigation::RefreshSearchText(int previous_page) {
   std::wstring cue_text;
+  std::wstring tip_text;
+  std::wstring service_text = sync::GetCurrentServiceName();
   switch (current_page_) {
     case kSidebarItemAnimeList:
     case kSidebarItemSeasons:
       parent->search_bar.mode = SearchMode::Service;
-      cue_text = L"Filter list or search " + sync::GetCurrentServiceName();
+      cue_text = L"Filter list or search " + service_text;
+      tip_text =
+          L"By default searches titles, genres, tags, notes.\n"
+          "You can use keywords to narrow down search to certain fields.\n"
+          "Certain filters may be slow with large collections.\n\n"
+          "titles:, genres:, tags:, notes:, producer:\n"
+          "searches respective fields, producer searches studio and "
+          "production company\n\n"
+          "If the term has spaces use the keyword twice.\n"
+          "Example\nproducer:Toei producer:Animation genre:action\n"
+          "Finds anime produced by Toei Animation of the action genre.\n\n"
+          "type:\n"
+          "Can be Unknown, TV, OVA, Movie, Special, ONA, Music\n"
+          "season:\n"
+          "Can be Unknown, Winter, Spring, Summer, Fall\n"
+          "id:\n"
+          "The id in the" + service_text + L" database\n"
+          "episodes:\n"
+          "The number of episodes\n"
+          "year:\n"
+          "The year of the anime\n"
+          "rewatch:\n"
+          "How many times the anime has been rewatched\n"
+          "duration:\n"
+          "How many minutes of runtime\n\n"
+          "You can use =, >=, > , <=, < with numbers\n"
+          "Example\n"
+          "year:>=2002 year:<=2015\n"
+          "Finds anime that came out between 2002 and 2015";
       break;
     case kSidebarItemNowPlaying:
     case kSidebarItemHistory:
     case kSidebarItemStats:
     case kSidebarItemSearch:
       parent->search_bar.mode = SearchMode::Service;
-      cue_text = L"Search " + sync::GetCurrentServiceName() + L" for anime";
+      cue_text = L"Search " + service_text + L" for anime";
+      tip_text = L"";
       break;
     case kSidebarItemFeeds:
       parent->search_bar.mode = SearchMode::Feed;
       cue_text = L"Search for torrents";
+      tip_text = L"";
       break;
   }
   parent->edit.SetCueBannerText(cue_text.c_str());
+  parent->edit.tooltips.UpdateText((UINT)parent->edit.GetWindowHandle(),
+                                   tip_text.c_str());
 
   switch (current_page_) {
     case kSidebarItemAnimeList:

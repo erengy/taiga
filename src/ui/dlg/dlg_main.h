@@ -130,6 +130,8 @@ public:
   // Edit control
   class EditSearch : public win::Edit {
     LRESULT WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+  public:
+    win::Tooltip tooltips;
   } edit;
 
   // Cancel button
