@@ -22,6 +22,7 @@
 #include "sync/myanimelist.h"
 
 #include "base/format.h"
+#include "base/html.h"
 #include "base/json.h"
 #include "base/log.h"
 #include "base/string.h"
@@ -348,9 +349,12 @@ void ParseLibraryObject(const Json& json, const int anime_id) {
   anime_item.SetMyDateEnd(
       TranslateDateFrom(StrToWstr(JsonReadStr(json, "finish_date"))));
   anime_item.SetMyRewatchedTimes(JsonReadInt(json, "num_times_rewatched"));
-  anime_item.SetMyNotes(StrToWstr(JsonReadStr(json, "comments")));
   anime_item.SetMyLastUpdated(
       TranslateMyLastUpdatedFrom(JsonReadStr(json, "updated_at")));
+
+  std::wstring notes = StrToWstr(JsonReadStr(json, "comments"));
+  DecodeHtmlEntities(notes);
+  anime_item.SetMyNotes(notes);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
