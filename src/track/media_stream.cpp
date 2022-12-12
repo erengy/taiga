@@ -77,8 +77,9 @@ static const std::vector<StreamData> stream_data{
     L"Jellyfin Web App",
     L"https://jellyfin.org",
     std::regex(
-      "^localhost:[0-9]+/web/index.html#!/video|"
-      "^.+/jellyfin/web/index.html#!/video"
+      "^localhost:\\d+/web/index\\.html#/video|"
+      "^.+/jellyfin/web/index\\.html#/video|"
+      "^\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d+/web/index\\.html#/video"
     ),
     std::regex("Jellyfin|(.+)"),
   },
