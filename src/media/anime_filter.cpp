@@ -43,6 +43,7 @@ enum class SearchField {
   Year,
   Rewatch,
   Duration,
+  Score,
   Debug,
 };
 
@@ -79,6 +80,7 @@ SearchTerm GetSearchTerm(const std::wstring& str) {
     {L"year", SearchField::Year},
     {L"rewatch", SearchField::Rewatch},
     {L"duration", SearchField::Duration},
+    {L"score", SearchField::Score},
     {L"debug", SearchField::Debug},
   };
 
@@ -237,6 +239,13 @@ bool Filters::CheckItem(const Item& item, int text_index) const {
       case SearchField::Duration: {
         const auto duration = item.GetEpisodeLength();
         if (!CheckNumber(term.op, duration, ToInt(term.value)))
+          return false;
+        break;
+      }
+
+      case SearchField::Score: {
+        const auto score = item.GetMyScore();
+        if (!CheckNumber(term.op, score, ToInt(term.value)))
           return false;
         break;
       }
