@@ -375,6 +375,12 @@ void PageMyInfo::Refresh(int anime_id) {
   spin.SetPos32(anime_item->GetMyLastWatchedEpisode());
   spin.SetWindowHandle(nullptr);
 
+  // Times rewatched
+  spin.SetWindowHandle(GetDlgItem(IDC_SPIN_ANIME_REWATCHES));
+  spin.SetRange32(0, 9999);
+  spin.SetPos32(anime_item->GetMyRewatchedTimes());
+  spin.SetWindowHandle(nullptr);
+
   // Rewatching
   CheckDlgButton(IDC_CHECK_ANIME_REWATCH, anime_item->GetMyRewatching());
 
@@ -533,6 +539,9 @@ bool PageMyInfo::Save() {
     MessageBox(msg.c_str(), L"Episodes watched", MB_OK | MB_ICONERROR);
     return false;
   }
+
+  // Times rewatched
+  queue_item.rewatched_times = GetDlgItemInt(IDC_EDIT_ANIME_REWATCHES);
 
   // Rewatching
   queue_item.enable_rewatching = IsDlgButtonChecked(IDC_CHECK_ANIME_REWATCH);

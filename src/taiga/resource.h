@@ -218,3 +218,5 @@
 #define IDC_BUTTON_MAL_AUTH                     1176
 #define IDC_CHECK_DISCORD_GROUP                 1177
 #define IDC_CHECK_DISCORD_TIME                  1178
+#define IDC_EDIT_ANIME_REWATCHES                1179
+#define IDC_SPIN_ANIME_REWATCHES                1180
