@@ -123,8 +123,6 @@ void OnMircDdeConnectionSuccess(const std::vector<std::wstring>& channels, bool 
 void OnMalRequestAccessTokenSuccess();
 void OnMalRequestAccessTokenError(const std::wstring& description);
 
-bool OnTwitterTokenEntry(std::wstring& auth_pin);
-
 void OnLogin();
 
 void OnUpdateAvailable();

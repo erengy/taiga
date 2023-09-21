@@ -435,11 +435,6 @@ void ExecuteCommand(const std::wstring& str, WPARAM wParam, LPARAM lParam) {
   } else if (command == L"AnnounceToMIRC") {
     taiga::announcer.Do(taiga::kAnnounceToMirc, nullptr, ToBool(body));
 
-  // AnnounceToTwitter(force)
-  //   Changes Twitter status.
-  } else if (command == L"AnnounceToTwitter") {
-    taiga::announcer.Do(taiga::kAnnounceToTwitter, nullptr, ToBool(body));
-
   //////////////////////////////////////////////////////////////////////////////
 
   // EditAll([anime_id])

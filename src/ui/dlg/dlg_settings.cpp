@@ -95,7 +95,6 @@ void SettingsDialog::SetCurrentSection(SettingsSections section) {
       tab_.InsertItem(0, L"Discord", kSettingsPageSharingDiscord);
       tab_.InsertItem(1, L"HTTP", kSettingsPageSharingHttp);
       tab_.InsertItem(2, L"mIRC", kSettingsPageSharingMirc);
-      tab_.InsertItem(3, L"Twitter", kSettingsPageSharingTwitter);
       break;
     case kSettingsSectionTorrents:
       tab_.InsertItem(0, L"Discovery", kSettingsPageTorrentsDiscovery);
@@ -300,11 +299,6 @@ void SettingsDialog::OnOK() {
     taiga::settings.SetShareMircMultiServer(page->IsDlgButtonChecked(IDC_CHECK_MIRC_MULTISERVER));
     taiga::settings.SetShareMircUseMeAction(page->IsDlgButtonChecked(IDC_CHECK_MIRC_ACTION));
     taiga::settings.SetShareMircChannels(page->GetDlgItemText(IDC_EDIT_MIRC_CHANNELS));
-  }
-  // Sharing > Twitter
-  page = &pages[kSettingsPageSharingTwitter];
-  if (page->IsWindow()) {
-    taiga::settings.SetShareTwitterEnabled(page->IsDlgButtonChecked(IDC_CHECK_TWITTER));
   }
 
   // Torrents > Discovery
@@ -521,21 +515,6 @@ void SettingsDialog::UpdateTorrentFilterList(HWND hwnd_list) {
   }
 
   list.SetWindowHandle(nullptr);
-}
-
-void SettingsDialog::RefreshTwitterLink() {
-  std::wstring text;
-
-  if (taiga::settings.GetShareTwitterUsername().empty()) {
-    text = L"Taiga is not authorized to post to your Twitter account yet.";
-  } else {
-    text = L"Taiga is authorized to post to this Twitter account: "
-           L"<a href=\"URL(https://twitter.com/{})\">{}</a>"_format(
-             taiga::settings.GetShareTwitterUsername(),
-             taiga::settings.GetShareTwitterUsername());
-  }
-
-  pages[kSettingsPageSharingTwitter].SetDlgItemText(IDC_LINK_TWITTER, text.c_str());
 }
 
 }  // namespace ui

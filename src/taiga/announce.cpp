@@ -24,7 +24,6 @@
 #include "link/discord.h"
 #include "link/http.h"
 #include "link/mirc.h"
-#include "link/twitter.h"
 #include "media/anime_db.h"
 #include "media/anime_util.h"
 #include "sync/anilist_util.h"
@@ -134,15 +133,6 @@ void Announcer::Do(int modes, anime::Episode* episode, bool force) {
                             settings.GetShareMircMultiServer())) {
         ui::OnMircDdeConnectionFail();
       }
-    }
-  }
-
-  if (modes & kAnnounceToTwitter) {
-    if (settings.GetShareTwitterEnabled() || force) {
-      LOGD(L"Twitter");
-      const auto status_text = ReplaceVariables(
-          settings.GetShareTwitterFormat(), *episode, false, force);
-      link::twitter::SetStatusText(status_text);
     }
   }
 }

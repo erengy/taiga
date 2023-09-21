@@ -28,7 +28,6 @@ enum AnnouncerModes {
   kAnnounceToDiscord = 1 << 0,
   kAnnounceToHttp    = 1 << 1,
   kAnnounceToMirc    = 1 << 2,
-  kAnnounceToTwitter = 1 << 3,
 };
 
 class Announcer {

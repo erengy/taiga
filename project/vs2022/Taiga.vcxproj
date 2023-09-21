@@ -394,7 +394,6 @@
     <ClCompile Include="..\..\src\link\discord.cpp" />
     <ClCompile Include="..\..\src\link\http.cpp" />
     <ClCompile Include="..\..\src\link\mirc.cpp" />
-    <ClCompile Include="..\..\src\link\twitter.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />
     <ClCompile Include="..\..\src\media\anime_db.cpp" />
     <ClCompile Include="..\..\src\media\anime_filter.cpp" />
@@ -581,7 +580,6 @@
     <ClInclude Include="..\..\src\link\discord.h" />
     <ClInclude Include="..\..\src\link\http.h" />
     <ClInclude Include="..\..\src\link\mirc.h" />
-    <ClInclude Include="..\..\src\link\twitter.h" />
     <ClInclude Include="..\..\src\media\anime.h" />
     <ClInclude Include="..\..\src\media\anime_db.h" />
     <ClInclude Include="..\..\src\media\anime_filter.h" />

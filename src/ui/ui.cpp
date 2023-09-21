@@ -824,13 +824,6 @@ void OnMalRequestAccessTokenError(const std::wstring& description) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool OnTwitterTokenEntry(std::wstring& auth_pin) {
-  ClearStatusText();
-  return EnterAuthorizationPin(L"Twitter", auth_pin);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
 void OnLogin() {
   // Can be empty for users logging in for the first time with Kitsu
   const auto display_name = taiga::GetCurrentUserDisplayName();

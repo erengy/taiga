@@ -541,9 +541,6 @@
     <ClCompile Include="..\..\src\link\mirc.cpp">
       <Filter>link</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\link\twitter.cpp">
-      <Filter>link</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\link\http.cpp">
       <Filter>link</Filter>
     </ClCompile>
@@ -1084,9 +1081,6 @@
       <Filter>link</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\link\mirc.h">
-      <Filter>link</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\link\twitter.h">
       <Filter>link</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\link\http.h">
