@@ -217,6 +217,26 @@ void SeasonDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+LRESULT SeasonDialog::ListView::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam,
+                                           LPARAM lParam) {
+  switch (uMsg) {
+    // Middle mouse button
+    case WM_MBUTTONDOWN: {
+      const int item_index = HitTest();
+      if (item_index > -1) {
+        SelectAllItems(false);
+        SelectItem(item_index);
+        const int anime_id =
+            static_cast<int>(GetParamFromSelectedListItem(*this));
+        ExecuteCommand(L"ViewAnimePage", false, anime_id);
+      }
+      break;
+    }
+  }
+
+  return WindowProcDefault(hwnd, uMsg, wParam, lParam);
+}
+
 LRESULT SeasonDialog::OnListNotify(LPARAM lParam) {
   LPNMHDR pnmh = reinterpret_cast<LPNMHDR>(lParam);
   switch (pnmh->code) {
@@ -668,11 +688,16 @@ void SeasonDialog::RefreshList(bool redraw_only) {
     std::wstring genres = Join(anime_item->GetGenres(), L", ");
     std::wstring tags = Join(anime_item->GetTags(), L", ");
     std::wstring producers = Join(anime::GetStudiosAndProducers(*anime_item), L", ");
+    std::wstring titles = [i] {
+      std::vector<std::wstring> titles;
+      anime::GetAllTitles(*i, titles);
+      return Join(titles, L", ");
+    }();
     for (auto j = filters.begin(); passed_filters && j != filters.end(); ++j) {
       if (InStr(genres, *j, 0, true) == -1 &&
           InStr(tags, *j, 0, true) == -1 &&
           InStr(producers, *j, 0, true) == -1 &&
-          InStr(anime_item->GetTitle(), *j, 0, true) == -1) {
+          InStr(titles, *j, 0, true) == -1) {
         passed_filters = false;
         break;
       }
