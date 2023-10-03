@@ -76,9 +76,7 @@ static const std::vector<StreamData> stream_data{
     Stream::Jellyfin,
     L"Jellyfin Web App",
     L"https://jellyfin.org",
-    std::regex(
-      "^.+/web/(?:index\\.html)?#!/video"
-    ),
+    std::regex("^.+/web/(?:index\\.html)?#!/video"),
     std::regex("Jellyfin|(.+)"),
   },
   // Plex Web App
