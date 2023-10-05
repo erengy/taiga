@@ -331,7 +331,8 @@ void Engine::ExtendAnimeTitle(anime::Episode& episode) const {
   // Remove once the issue is handled by Anitomy. See issues #748 and #960 for
   // more information.
   if (anime_season > 1) {
-    if (StartsWith(episode.episode_title(), L"Part ")) {
+    if (StartsWith(episode.episode_title(), L"Part ") ||
+        StartsWith(episode.episode_title(), L"Cour ")) {
       episode.set_anime_title(episode.anime_title() + L" " +
                               episode.episode_title());
       episode.elements().erase(anitomy::kElementEpisodeTitle);
