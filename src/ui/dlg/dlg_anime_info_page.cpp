@@ -398,6 +398,8 @@ void PageMyInfo::Refresh(int anime_id) {
   combobox.SetWindowHandle(GetDlgItem(IDC_COMBO_ANIME_SCORE));
   win::Edit edit = GetDlgItem(IDC_EDIT_ANIME_SCORE);
   spin.SetWindowHandle(GetDlgItem(IDC_SPIN_ANIME_SCORE));
+  // Clear the combobox before populating it
+  combobox.SendMessage(CB_RESETCONTENT, 0, 0);
   if (combobox.GetCount() == 0) {
     std::vector<sync::Rating> ratings;
     std::wstring current_rating;
