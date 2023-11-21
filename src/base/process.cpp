@@ -42,7 +42,7 @@ void ActivateWindow(HWND hwnd) {
     ::ShowWindow(hwnd, SW_RESTORE);
   }
 
-  if (!IsWindowVisible(hwnd)) {
+  if (!::IsWindowVisible(hwnd)) {
     WINDOWPLACEMENT wp = {0};
     wp.length = sizeof(WINDOWPLACEMENT);
     ::GetWindowPlacement(hwnd, &wp);
