@@ -620,7 +620,7 @@ void ExecuteCommand(const std::wstring& str, WPARAM wParam, LPARAM lParam) {
       return;
     if (!anime::ValidateFolder(*anime_item))
       ScanAvailableEpisodes(false, anime_item->GetId(), 0);
-    const auto next_episode_path = anime_item->GetNextEpisodePath();
+    const auto& next_episode_path = anime_item->GetNextEpisodePath();
     if (!next_episode_path.empty()) {
       const auto anime_folder = anime_item->GetFolder();
       if (anime_folder.empty() || StartsWith(next_episode_path, anime_folder))
