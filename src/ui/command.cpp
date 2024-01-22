@@ -575,6 +575,10 @@ void ExecuteCommand(const std::wstring& str, WPARAM wParam, LPARAM lParam) {
       auto anime_item = anime::db.Find(anime_id);
       if (!anime_item)
         continue;
+      auto prev_status = anime_item->GetMyStatus();   
+      if (prev_status == anime::MyStatus::Completed) {
+        queue_item.episode = 0;
+      }
       switch (*queue_item.status) {
         case anime::MyStatus::Completed:
           queue_item.episode = anime_item->GetEpisodeCount();
