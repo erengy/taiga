@@ -9,6 +9,7 @@
 
 ## Links
 
+- [Changelog](https://github.com/erengy/taiga/wiki/Changelog)
 - [Contribution guidelines](https://github.com/erengy/taiga/wiki/Guidelines)
 - [How to compile](https://github.com/erengy/taiga/wiki/How-to-Compile)
 - [Latest build](https://taiga.moe/latest.html)
