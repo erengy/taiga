@@ -94,6 +94,14 @@ static const std::vector<StreamData> stream_data{
     ),
     std::regex(u8"Plex|(?:\u25B6 )?(.+)"),
   },
+  // Roku Channel
+  {
+    Stream::RokuChannel,
+    L"Roku Channel",
+    L"https://therokuchannel.roku.com",
+    std::regex("therokuchannel\\.roku\\.com/watch/.+"),
+    std::regex("Watch (.+) Online for Free \\| The Roku Channel \\| Roku")
+  },
   // Veoh
   {
     Stream::Veoh,
@@ -164,6 +172,8 @@ bool IsStreamEnabled(const Stream stream) {
       return taiga::settings.GetStreamJellyfin();
     case Stream::Plex:
       return taiga::settings.GetStreamPlex();
+    case Stream::RokuChannel:
+      return taiga::settings.GetStreamRokuChannel();
     case Stream::Veoh:
       return taiga::settings.GetStreamVeoh();
     case Stream::Viz:
@@ -202,6 +212,9 @@ void EnableStream(const Stream stream, const bool enabled) {
       break;
     case Stream::Plex:
       taiga::settings.SetStreamPlex(enabled);
+      break;
+    case Stream::RokuChannel:
+      taiga::settings.SetStreamRokuChannel(enabled);
       break;
     case Stream::Veoh:
       taiga::settings.SetStreamVeoh(enabled);
@@ -290,6 +303,11 @@ void CleanStreamTitle(const StreamData& stream_data, std::string& title) {
       auto str = StrToWstr(title);
       ReplaceString(str, L" \u00B7 ", L"");
       title = WstrToStr(str);
+      break;
+    }
+    case Stream::RokuChannel: {
+      static const std::regex pattern{" S(\\d+):E(\\d+) "};
+      title = std::regex_replace(title, pattern, " S$1E$2 ");
       break;
     }
     case Stream::Vrv: {

@@ -220,6 +220,8 @@ public:
   void SetStreamJellyfin(const bool enabled);
   bool GetStreamPlex() const;
   void SetStreamPlex(const bool enabled);
+  bool GetStreamRokuChannel() const;
+  void SetStreamRokuChannel(const bool enabled);
   bool GetStreamVeoh() const;
   void SetStreamVeoh(const bool enabled);
   bool GetStreamViz() const;
