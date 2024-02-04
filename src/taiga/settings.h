@@ -222,6 +222,8 @@ public:
   void SetStreamPlex(const bool enabled);
   bool GetStreamRokuChannel() const;
   void SetStreamRokuChannel(const bool enabled);
+  bool GetStreamTubi() const;
+  void SetStreamTubi(const bool enabled);
   bool GetStreamVeoh() const;
   void SetStreamVeoh(const bool enabled);
   bool GetStreamViz() const;

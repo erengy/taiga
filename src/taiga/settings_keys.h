@@ -100,6 +100,7 @@ enum class AppSettingKey {
   StreamJellyfin,
   StreamPlex,
   StreamRokuChannel,
+  StreamTubi,
   StreamVeoh,
   StreamViz,
   StreamVrv,

@@ -171,6 +171,7 @@ void Settings::InitKeyMap() const {
       {AppSettingKey::StreamJellyfin, {"recognition/streaming/providers/jellyfin", true}},
       {AppSettingKey::StreamPlex, {"recognition/streaming/providers/plex", true}},
       {AppSettingKey::StreamRokuChannel, {"recognition/streaming/providers/rokuchannel", true}},
+      {AppSettingKey::StreamTubi, {"recognition/streaming/providers/tubi", true}},
       {AppSettingKey::StreamVeoh, {"recognition/streaming/providers/veoh", true}},
       {AppSettingKey::StreamViz, {"recognition/streaming/providers/viz", true}},
       {AppSettingKey::StreamVrv, {"recognition/streaming/providers/vrv", true}},
@@ -922,6 +923,14 @@ bool Settings::GetStreamRokuChannel() const {
 
 void Settings::SetStreamRokuChannel(const bool enabled) {
   set_value(AppSettingKey::StreamRokuChannel, enabled);
+}
+
+bool Settings::GetStreamTubi() const {
+  return value<bool>(AppSettingKey::StreamTubi);
+}
+
+void Settings::SetStreamTubi(const bool enabled) {
+  set_value(AppSettingKey::StreamTubi, enabled);
 }
 
 bool Settings::GetStreamVeoh() const {

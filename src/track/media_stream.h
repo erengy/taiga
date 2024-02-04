@@ -33,6 +33,7 @@ enum class Stream {
   Jellyfin,
   Plex,
   RokuChannel,
+  Tubi,
   Veoh,
   Viz,
   Vrv,
