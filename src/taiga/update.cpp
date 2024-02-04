@@ -260,10 +260,20 @@ bool UpdateHelper::RunInstaller() {
   if (!latest_item_)
     return false;
 
-  // /S runs the installer silently, /D overrides the default installation
-  // directory. Do not rely on the current directory here, as it isn't
-  // guaranteed to be the same as the module path.
-  std::wstring parameters = L"/S /D=" + GetPathOnly(app.GetModulePath());
+  // `/RUN` is a custom option to restart the application after installation.
+  //
+  // `/S` runs the installer silently.
+  //
+  // `/D` overrides the default installation directory.
+  //
+  //   - It must be the last parameter.
+  //   - It must not contain any quotes, even if the path contains spaces.
+  //   - Only absolute paths are supported.
+  //   - Do not rely on the current directory here, as it is not guaranteed to
+  //     be the same as the module path.
+  //
+  // See: https://nsis.sourceforge.io/Docs/Chapter3.html#installerusage
+  std::wstring parameters = L"/RUN /S /D=" + GetPathOnly(app.GetModulePath());
 
   restart_required_ = Execute(download_path_, parameters);
 
