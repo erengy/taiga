@@ -260,7 +260,13 @@ bool UpdateHelper::RunInstaller() {
   if (!latest_item_)
     return false;
 
-  // `/RUN` is a custom option to restart the application after installation.
+  // Custom options:
+  //
+  // `/NOCLOSE` skips closing application instance.
+  //
+  // `/RUN` restarts the application after installation.
+  //
+  // NSIS options:
   //
   // `/S` runs the installer silently.
   //
@@ -273,7 +279,8 @@ bool UpdateHelper::RunInstaller() {
   //     be the same as the module path.
   //
   // See: https://nsis.sourceforge.io/Docs/Chapter3.html#installerusage
-  std::wstring parameters = L"/RUN /S /D=" + GetPathOnly(app.GetModulePath());
+  std::wstring parameters =
+      L"/NOCLOSE /RUN /S /D=" + GetPathOnly(app.GetModulePath());
 
   restart_required_ = Execute(download_path_, parameters);
 
