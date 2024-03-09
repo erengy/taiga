@@ -121,6 +121,9 @@ anime::SeriesType TranslateSeriesTypeFrom(const std::wstring& value) {
     {L"special", anime::SeriesType::Special},
     {L"ona", anime::SeriesType::Ona},
     {L"music", anime::SeriesType::Music},
+    {L"cm", anime::SeriesType::Special},
+    {L"pv", anime::SeriesType::Special},
+    {L"tv_special", anime::SeriesType::Special},
   };
 
   const auto it = table.find(ToLower_Copy(value));
