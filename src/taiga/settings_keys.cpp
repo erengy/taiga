@@ -78,7 +78,7 @@ constexpr auto kDefaultFormatBalloon =
     L"$if(%group%,by %group%)\\n"
     L"$if(%name%,%name%)";
 constexpr auto kDefaultTorrentAppPath =
-    L"C:\\Program Files\\uTorrent\\uTorrent.exe";
+    L"C:\\Program Files\\qBittorrent\\qbittorrent.exe";
 constexpr auto kDefaultTorrentSearch =
     L"https://nyaa.si/?page=rss&c=1_2&f=0&q=%title%";
 constexpr auto kDefaultTorrentSource =
