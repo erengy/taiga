@@ -63,14 +63,6 @@ static const std::vector<StreamData> stream_data{
     std::regex("bilibili.tv/[^/]+/play/[0-9]+"),
     std::regex("(.+) - Bilibili"),
   },
-  // HIDIVE
-  {
-    Stream::Hidive,
-    L"HIDIVE",
-    L"https://www.hidive.com",
-    std::regex("hidive\\.com/stream/"),
-    std::regex("Stream (.+) on HIDIVE"),
-  },
   // Jellyfin Web App
   {
     Stream::Jellyfin,
@@ -174,8 +166,6 @@ bool IsStreamEnabled(const Stream stream) {
       return taiga::settings.GetStreamAnn();
     case Stream::Bilibili:
       return taiga::settings.GetStreamBilibili();
-    case Stream::Hidive:
-      return taiga::settings.GetStreamHidive();
     case Stream::Jellyfin:
       return taiga::settings.GetStreamJellyfin();
     case Stream::Plex:
@@ -213,9 +203,6 @@ void EnableStream(const Stream stream, const bool enabled) {
       break;
     case Stream::Bilibili:
       taiga::settings.SetStreamBilibili(enabled);
-      break;
-    case Stream::Hidive:
-      taiga::settings.SetStreamHidive(enabled);
       break;
     case Stream::Jellyfin:
       taiga::settings.SetStreamJellyfin(enabled);
@@ -303,13 +290,6 @@ void CleanStreamTitle(const StreamData& stream_data, std::string& title) {
     case Stream::Ann: {
       static const std::regex pattern{" \\((?:s|d)(?:, uncut)?\\)"};
       title = std::regex_replace(title, pattern, "");
-      break;
-    }
-    case Stream::Hidive: {
-      static const std::regex pattern{"(?:(Episode \\d+)|[^ ]+) of (.+)"};
-      std::smatch match;
-      if (std::regex_match(title, match, pattern))
-        title = match.str(2) + (match.length(1) ? " " + match.str(1) : "");
       break;
     }
     case Stream::Plex: {

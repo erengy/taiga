@@ -29,7 +29,6 @@ enum class Stream {
   Adn,
   Ann,
   Bilibili,
-  Hidive,
   Jellyfin,
   Plex,
   RokuChannel,
