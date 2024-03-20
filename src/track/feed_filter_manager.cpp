@@ -193,8 +193,8 @@ void FeedFilterManager::InitializePresets() {
   // Prefer high-resolution files
   add_preset(kFeedFilterActionPrefer, kFeedFilterMatchAny, true, kFeedFilterOptionDefault,
       L"Prefer high-resolution files",
-      L"Prefers 720p files when there are other files of the same episode as well");
-  add_condition(kFeedFilterElement_Episode_VideoResolution, kFeedFilterOperator_Equals, L"720p");
+      L"Prefers 1080p files when there are other files of the same episode as well");
+  add_condition(kFeedFilterElement_Episode_VideoResolution, kFeedFilterOperator_Equals, L"1080p");
 }
 
 bool FeedFilterManager::Import(const std::wstring& input,
