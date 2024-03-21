@@ -34,7 +34,7 @@
 #define TAIGA_VERSION_MINOR 4
 #define TAIGA_VERSION_PATCH 1
 #define TAIGA_VERSION_PRE   ""
-#define TAIGA_VERSION_BUILD 0
+#define TAIGA_VERSION_BUILD 0x0
 
 // Used in version.rc
 #define TAIGA_VERSION_DIGITAL \

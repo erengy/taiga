@@ -1,11 +1,11 @@
 @echo off
 
-set machine=x86
+set vctarget=x86
 set vc=16
 
 :read_arguments
 if "%1"=="--help" goto help
-if "%1"=="--machine" set machine=%2
+if "%1"=="--machine" set vctarget=%2
 if "%1"=="--vc" set vc=%2
 shift /1
 shift /1
@@ -15,7 +15,7 @@ goto locate_vs
 :help
 echo Usage: %~nx0 [--machine] [--vc]
 echo:
-echo   --machine    Target architecture, such as "x86", "x64" or "x64_arm64".
+echo   --machine    Target architecture, such as "x86", "x64" or "arm64".
 echo   --vc         Can be "16" ^(VS2019^). Overriden by vswhere, if available.
 echo:
 echo Example: %~nx0 --machine=x86 --vc=16
@@ -35,7 +35,12 @@ if exist %vswhere% (
 
 :initialize_environment
 echo Initializing environment...
-call %vcvarsall% %machine% || (
+set vchost=%PROCESSOR_ARCHITECTURE%
+if /I %vchost%==amd64 set vchost=x64
+if /I %vctarget%==amd64 set vctarget=x64
+set vcarch=%vctarget%
+if /I not %vchost%==%vcarch% set vcarch=%vchost%_%vcarch%
+call %vcvarsall% %vcarch% || (
   echo Please edit the build script according to your system configuration.
   exit /B 1
 )
@@ -50,18 +55,18 @@ call src\curl\buildconf.bat
 
 if exist src\curl\builds (
   echo Clearing previous libcurl builds...
-  for /d %%G in ("src\curl\builds\libcurl-vc%vc%-%machine%-*") do (rmdir /s /q "%%~G")
+  for /d %%G in ("src\curl\builds\libcurl-vc%vc%-%vctarget%-*") do (rmdir /s /q "%%~G")
 )
 
 cd src\curl\winbuild\
 
-echo Building libcurl for Debug^|%machine% configuration...
-nmake /f Makefile.vc mode=static RTLIBCFG=static VC=%vc% MACHINE=%machine% DEBUG=yes
-xcopy /s ..\builds\libcurl-vc%vc%-%machine%-debug-static-ipv6-sspi-schannel\lib ..\..\..\lib\%machine%\
+echo Building libcurl for Debug^|%vctarget% configuration...
+nmake /f Makefile.vc mode=static RTLIBCFG=static VC=%vc% MACHINE=%vctarget% DEBUG=yes
+xcopy /s ..\builds\libcurl-vc%vc%-%vctarget%-debug-static-ipv6-sspi-schannel\lib ..\..\..\lib\%vctarget%\
 
-echo Building libcurl for Release^|%machine% configuration...
-nmake /f Makefile.vc mode=static RTLIBCFG=static VC=%vc% MACHINE=%machine%
-xcopy /s ..\builds\libcurl-vc%vc%-%machine%-release-static-ipv6-sspi-schannel\lib ..\..\..\lib\%machine%\
+echo Building libcurl for Release^|%vctarget% configuration...
+nmake /f Makefile.vc mode=static RTLIBCFG=static VC=%vc% MACHINE=%vctarget%
+xcopy /s ..\builds\libcurl-vc%vc%-%vctarget%-release-static-ipv6-sspi-schannel\lib ..\..\..\lib\%vctarget%\
 
 cd /D %currentdir%
 
