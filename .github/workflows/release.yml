@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    runs-on: windows-2022
+    runs-on: windows-latest
     continue-on-error: ${{ matrix.arch != 'x86' }}
 
     strategy:
@@ -21,12 +21,12 @@ jobs:
         - arm64
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
       with:
         submodules: recursive
 
     - name: Add MSBuild to PATH
-      uses: microsoft/setup-msbuild@v1.1
+      uses: microsoft/setup-msbuild@v2
 
     - name: Build dependencies
       run: deps\build.bat --machine ${{matrix.arch}}
@@ -50,7 +50,7 @@ jobs:
       run: mv bin/${{matrix.arch}}/TaigaSetup.exe bin/${{matrix.arch}}/TaigaSetup_${{matrix.arch}}.exe
 
     - name: Upload artifacts
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: TaigaSetup_${{matrix.arch}}
         path: bin/${{matrix.arch}}/TaigaSetup_${{matrix.arch}}.exe
@@ -61,7 +61,7 @@ jobs:
 
     steps:
     - name: Download artifacts
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v4
 
     - name: Publish release
       uses: marvinpinto/action-automatic-releases@v1.2.1
