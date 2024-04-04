@@ -22,7 +22,7 @@
 // macros defined here:
 //
 // - /setup/Taiga.nsi
-// - /src/taiga/resource.rc
+// - /src/resources/taiga.rc
 
 // Relative path to avoid RC1015 error with version.rc
 #include "../base/preprocessor.h"
@@ -36,7 +36,7 @@
 #define TAIGA_VERSION_PRE   ""
 #define TAIGA_VERSION_BUILD 0
 
-// Used in version.rc
+// Used in taiga.rc
 #define TAIGA_VERSION_DIGITAL \
     TAIGA_VERSION_MAJOR, \
     TAIGA_VERSION_MINOR, \
