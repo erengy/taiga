@@ -1,5 +1,5 @@
+/.vs/
+/.vscode/
 /bin/
 /build/
 /deps/lib/
-/project/vs*/.vs/
-/project/vs*/*.user
