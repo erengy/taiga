@@ -19,6 +19,11 @@
 #pragma once
 
 #include <QApplication>
+#include <QPointer>
+
+namespace gui {
+class MainWindow;
+}
 
 namespace taiga {
 
@@ -31,6 +36,9 @@ public:
   ~Application() override;
 
   int run() const;
+
+private:
+  QPointer<gui::MainWindow> window_;
 };
 
 }  // namespace taiga

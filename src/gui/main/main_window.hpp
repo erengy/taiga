@@ -16,25 +16,41 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "application.hpp"
+#pragma once
 
-#include "gui/main/main_window.hpp"
+#include <QMainWindow>
 
-namespace taiga {
-
-Application::Application(int argc, char* argv[]) : QApplication(argc, argv) {
-  window_ = new gui::MainWindow();
-  window_->show();
+namespace Ui {
+class MainWindow;
 }
 
-Application::~Application() {
-  if (window_) {
-    window_->hide();
-  }
-}
+namespace gui {
 
-int Application::run() const {
-  return QApplication::exec();
-}
+class MainWindow final : public QMainWindow {
+  Q_OBJECT
+  Q_DISABLE_COPY_MOVE(MainWindow)
 
-}  // namespace taiga
+public:
+  MainWindow();
+  ~MainWindow() = default;
+
+public slots:
+  void addNewFolder();
+  void displayWindow();
+  void setPage(int index);
+  void updateTitle();
+
+private slots:
+  void about();
+  void donate() const;
+  void support() const;
+  void profile() const;
+
+private:
+  void initActions();
+  void initToolbar();
+
+  Ui::MainWindow* ui_ = nullptr;
+};
+
+}  // namespace gui

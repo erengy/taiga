@@ -19,9 +19,12 @@ target_link_libraries(taiga PRIVATE
 	Qt6::Gui
 	Qt6::Widgets
 	taiga-config
+	taiga-gui
 )
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
 	set_target_properties(taiga PROPERTIES OUTPUT_NAME Taiga)
 	set_target_properties(taiga PROPERTIES WIN32_EXECUTABLE ON)
 endif()
+
+add_subdirectory(gui)
