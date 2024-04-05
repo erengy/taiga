@@ -18,43 +18,28 @@
 
 #pragma once
 
-#include <QMainWindow>
+#include <QObject>
 
-namespace Ui {
-class MainWindow;
-}
+class QIcon;
+class QMenu;
+class QSystemTrayIcon;
 
 namespace gui {
 
-class TrayIcon;
-
-class MainWindow final : public QMainWindow {
+class TrayIcon final : public QObject {
   Q_OBJECT
-  Q_DISABLE_COPY_MOVE(MainWindow)
+  Q_DISABLE_COPY_MOVE(TrayIcon)
 
 public:
-  MainWindow();
-  ~MainWindow() = default;
+  TrayIcon(QObject* parent, const QIcon& icon, QMenu* menu);
 
-public slots:
-  void addNewFolder();
-  void displayWindow();
-  void setPage(int index);
-  void updateTitle();
-
-private slots:
-  void about();
-  void donate() const;
-  void support() const;
-  void profile() const;
+signals:
+  void activated();
+  void messageClicked();
 
 private:
-  void initActions();
-  void initToolbar();
-
-  Ui::MainWindow* ui_ = nullptr;
-
-  TrayIcon* m_trayIcon = nullptr;
+  QMenu* m_contextMenu;
+  QSystemTrayIcon* m_icon;
 };
 
 }  // namespace gui
