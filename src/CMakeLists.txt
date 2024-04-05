@@ -3,6 +3,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 add_executable(taiga)
 
 target_sources(taiga PRIVATE
+	taiga/application.cpp
 	main.cpp
 )
 
@@ -14,6 +15,9 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
 endif()
 
 target_link_libraries(taiga PRIVATE
+	Qt6::Core
+	Qt6::Gui
+	Qt6::Widgets
 	taiga-config
 )
 

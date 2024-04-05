@@ -16,9 +16,18 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "taiga/application.hpp"
+#include "application.hpp"
 
-int main(int argc, char* argv[]) {
-  taiga::Application app(argc, argv);
-  return app.run();
+namespace taiga {
+
+Application::Application(int argc, char* argv[]) : QApplication(argc, argv) {
 }
+
+Application::~Application() {
+}
+
+int Application::run() const {
+  return QApplication::exec();
+}
+
+}  // namespace taiga

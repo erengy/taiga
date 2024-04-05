@@ -16,9 +16,21 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "taiga/application.hpp"
+#pragma once
 
-int main(int argc, char* argv[]) {
-  taiga::Application app(argc, argv);
-  return app.run();
-}
+#include <QApplication>
+
+namespace taiga {
+
+class Application final : public QApplication {
+  Q_OBJECT
+  Q_DISABLE_COPY_MOVE(Application)
+
+public:
+  Application(int argc, char* argv[]);
+  ~Application() override;
+
+  int run() const;
+};
+
+}  // namespace taiga
