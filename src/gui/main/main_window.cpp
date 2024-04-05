@@ -25,10 +25,21 @@
 #include "taiga/config.h"
 #include "ui_main_window.h"
 
+#ifdef Q_OS_WINDOWS
+#include "gui/platforms/windows.hpp"
+#endif
+
 namespace gui {
 
 MainWindow::MainWindow() : QMainWindow(), ui_(new Ui::MainWindow) {
   ui_->setupUi(this);
+
+#ifdef Q_OS_WINDOWS
+  const auto hwnd = reinterpret_cast<HWND>(winId());
+  enableMicaBackground(hwnd);
+  enableDarkMode(hwnd);
+  setStyleSheet("QMainWindow { background: transparent; }");
+#endif
 
   updateTitle();
 

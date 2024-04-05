@@ -14,3 +14,8 @@ target_link_libraries(taiga-gui
 	Qt6::Widgets
 	taiga-config
 )
+
+if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
+	target_sources(taiga-gui PRIVATE platforms/windows.cpp)
+	target_link_libraries(taiga-gui Dwmapi.lib)
+endif()
