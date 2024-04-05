@@ -30,10 +30,10 @@
 #define TAIGA_APP_NAME  L"Taiga"
 #define TAIGA_APP_MUTEX L"Taiga-33d5a63c-de90-432f-9a8b-f6f733dab258"
 
-#define TAIGA_VERSION_MAJOR 1
-#define TAIGA_VERSION_MINOR 4
-#define TAIGA_VERSION_PATCH 1
-#define TAIGA_VERSION_PRE   ""
+#define TAIGA_VERSION_MAJOR 2
+#define TAIGA_VERSION_MINOR 0
+#define TAIGA_VERSION_PATCH 0
+#define TAIGA_VERSION_PRE   "alpha"
 #define TAIGA_VERSION_BUILD 0
 
 // Used in taiga.rc
