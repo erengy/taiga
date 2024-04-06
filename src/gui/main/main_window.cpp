@@ -22,6 +22,7 @@
 #include <QFileDialog>
 #include <QtWidgets>
 
+#include "gui/settings/settings_dialog.hpp"
 #include "gui/utils/tray_icon.hpp"
 #include "taiga/config.h"
 #include "ui_main_window.h"
@@ -71,6 +72,7 @@ void MainWindow::initActions() {
 
   connect(ui_->actionAddNewFolder, &QAction::triggered, this, &MainWindow::addNewFolder);
   connect(ui_->actionExit, &QAction::triggered, this, &QWidget::close);
+  connect(ui_->actionSettings, &QAction::triggered, this, [this]() { SettingsDialog::show(this); });
   connect(ui_->actionAbout, &QAction::triggered, this, &MainWindow::about);
   connect(ui_->actionDonate, &QAction::triggered, this, &MainWindow::donate);
   connect(ui_->actionSupport, &QAction::triggered, this, &MainWindow::support);
