@@ -30,8 +30,7 @@ SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::S
   ui_->setupUi(this);
 
 #ifdef Q_OS_WINDOWS
-  enableMicaBackground(reinterpret_cast<HWND>(winId()));
-  setStyleSheet("QDialog { background: transparent; }");
+  enableMicaBackground(this);
 #endif
 
   ui_->treeWidget->expandAll();

@@ -20,6 +20,8 @@
 
 #include <dwmapi.h>
 
+#include <QWidget>
+
 namespace gui {
 
 void enableDarkMode(HWND hwnd) {
@@ -40,6 +42,18 @@ void enableMicaBackground(HWND hwnd) {
   // Use Mica as backdrop material
   const DWM_SYSTEMBACKDROP_TYPE backdrop_type = DWMSBT_MAINWINDOW;
   ::DwmSetWindowAttribute(hwnd, DWMWA_SYSTEMBACKDROP_TYPE, &backdrop_type, sizeof(backdrop_type));
+}
+
+void enableMicaBackground(QWidget* widget) {
+  const auto hwnd = reinterpret_cast<HWND>(widget->winId());
+  enableMicaBackground(hwnd);
+
+  // Make widget background transparent
+  widget->setPalette([widget]() {
+    QPalette palette = widget->palette();
+    palette.setColor(widget->backgroundRole(), Qt::transparent);
+    return palette;
+  }());
 }
 
 }  // namespace gui

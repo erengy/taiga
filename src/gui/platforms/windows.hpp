@@ -20,9 +20,12 @@
 
 #include <windows.h>
 
+class QWidget;
+
 namespace gui {
 
 void enableDarkMode(HWND hwnd);
 void enableMicaBackground(HWND hwnd);
+void enableMicaBackground(QWidget* widget);
 
 }  // namespace gui
