@@ -29,6 +29,7 @@ class MainWindow;
 namespace gui {
 
 class NavigationWidget;
+class NowPlayingWidget;
 class TrayIcon;
 
 enum class MainWindowPage {
@@ -48,6 +49,8 @@ public:
   MainWindow();
   ~MainWindow() = default;
 
+  NowPlayingWidget* nowPlaying() { return m_nowPlayingWidget; }
+
 public slots:
   void addNewFolder();
   void displayWindow();
@@ -64,6 +67,7 @@ private:
   void initActions();
   void initIcons();
   void initNavigation();
+  void initNowPlaying();
   void initStatusbar();
   void initToolbar();
   void initTrayIcon();
@@ -71,6 +75,7 @@ private:
   Ui::MainWindow* ui_ = nullptr;
 
   NavigationWidget* m_navigationWidget = nullptr;
+  NowPlayingWidget* m_nowPlayingWidget = nullptr;
   QLineEdit* m_searchBox = nullptr;
   TrayIcon* m_trayIcon = nullptr;
 };

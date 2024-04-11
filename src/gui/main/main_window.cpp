@@ -23,6 +23,7 @@
 #include <QtWidgets>
 
 #include "gui/main/navigation_widget.hpp"
+#include "gui/main/now_playing_widget.hpp"
 #include "gui/settings/settings_dialog.hpp"
 #include "gui/utils/theme.hpp"
 #include "gui/utils/tray_icon.hpp"
@@ -52,6 +53,7 @@ MainWindow::MainWindow() : QMainWindow(), ui_(new Ui::MainWindow) {
   initToolbar();
   initNavigation();
   initStatusbar();
+  initNowPlaying();
 }
 
 void MainWindow::initActions() {
@@ -111,6 +113,13 @@ void MainWindow::initIcons() {
 void MainWindow::initNavigation() {
   m_navigationWidget = new NavigationWidget(this);
   ui_->splitter->insertWidget(0, m_navigationWidget);
+}
+
+void MainWindow::initNowPlaying() {
+  m_nowPlayingWidget = new NowPlayingWidget(ui_->centralWidget);
+
+  ui_->centralWidget->layout()->addWidget(m_nowPlayingWidget);
+  m_nowPlayingWidget->hide();
 }
 
 void MainWindow::initStatusbar() {

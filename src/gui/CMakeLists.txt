@@ -4,6 +4,7 @@ target_sources(taiga-gui PRIVATE
 	main/main_window.cpp
 	main/navigation_item_delegate.cpp
 	main/navigation_widget.cpp
+	main/now_playing_widget.cpp
 	settings/settings_dialog.cpp
 	utils/svg_icon_engine.cpp
 	utils/theme.cpp
