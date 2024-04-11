@@ -63,6 +63,7 @@ private:
   void initIcons();
   void initNavigation();
   void initToolbar();
+  void initTrayIcon();
 
   Ui::MainWindow* ui_ = nullptr;
 

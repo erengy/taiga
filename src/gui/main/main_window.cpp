@@ -48,25 +48,9 @@ MainWindow::MainWindow() : QMainWindow(), ui_(new Ui::MainWindow) {
 
   initActions();
   initIcons();
+  initTrayIcon();
   initToolbar();
   initNavigation();
-
-  // System tray
-  {
-    auto menu = new QMenu(this);
-    menu->addAction(ui_->actionDisplayWindow);
-    menu->setDefaultAction(ui_->actionDisplayWindow);
-    menu->addSeparator();
-    menu->addAction(ui_->actionSettings);
-    menu->addSeparator();
-    menu->addAction(ui_->actionExit);
-
-    m_trayIcon = new TrayIcon(this, windowIcon(), menu);
-
-    connect(m_trayIcon, &TrayIcon::activated, this, &MainWindow::displayWindow);
-    connect(m_trayIcon, &TrayIcon::messageClicked, this,
-            []() { QMessageBox::information(nullptr, "Taiga", tr("Clicked message")); });
-  }
 }
 
 void MainWindow::initActions() {
@@ -147,6 +131,22 @@ void MainWindow::initToolbar() {
       return menu;
     }());
   }
+}
+
+void MainWindow::initTrayIcon() {
+  auto menu = new QMenu(this);
+  menu->addAction(ui_->actionDisplayWindow);
+  menu->setDefaultAction(ui_->actionDisplayWindow);
+  menu->addSeparator();
+  menu->addAction(ui_->actionSettings);
+  menu->addSeparator();
+  menu->addAction(ui_->actionExit);
+
+  m_trayIcon = new TrayIcon(this, windowIcon(), menu);
+
+  connect(m_trayIcon, &TrayIcon::activated, this, &MainWindow::displayWindow);
+  connect(m_trayIcon, &TrayIcon::messageClicked, this,
+          []() { QMessageBox::information(nullptr, "Taiga", tr("Clicked message")); });
 }
 
 void MainWindow::addNewFolder() {

@@ -7,6 +7,7 @@ target_sources(taiga-gui PRIVATE
 	settings/settings_dialog.cpp
 	utils/svg_icon_engine.cpp
 	utils/theme.cpp
+	utils/tray_icon.cpp
 )
 
 target_sources(taiga-gui PRIVATE
