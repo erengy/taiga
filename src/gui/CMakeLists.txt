@@ -5,6 +5,7 @@ target_sources(taiga-gui PRIVATE
 	main/navigation_item_delegate.cpp
 	main/navigation_widget.cpp
 	settings/settings_dialog.cpp
+	utils/svg_icon_engine.cpp
 )
 
 target_sources(taiga-gui PRIVATE
