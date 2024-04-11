@@ -22,6 +22,7 @@
 #include <QFileDialog>
 #include <QtWidgets>
 
+#include "gui/main/navigation_widget.hpp"
 #include "gui/settings/settings_dialog.hpp"
 #include "gui/utils/tray_icon.hpp"
 #include "taiga/config.h"
@@ -44,6 +45,7 @@ MainWindow::MainWindow() : QMainWindow(), ui_(new Ui::MainWindow) {
 
   initActions();
   initToolbar();
+  initNavigation();
 
   // System tray
   {
@@ -87,6 +89,11 @@ void MainWindow::initActions() {
     });
     loop.exec();
   });
+}
+
+void MainWindow::initNavigation() {
+  m_navigationWidget = new NavigationWidget(this);
+  ui_->splitter->insertWidget(0, m_navigationWidget);
 }
 
 void MainWindow::initToolbar() {

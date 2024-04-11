@@ -18,55 +18,22 @@
 
 #pragma once
 
-#include <QMainWindow>
-
-namespace Ui {
-class MainWindow;
-}
+#include <QPainter>
 
 namespace gui {
 
-class NavigationWidget;
-class TrayIcon;
-
-enum class MainWindowPage {
-  Home,
-  Search,
-  List,
-  History,
-  Library,
-  Torrents,
-};
-
-class MainWindow final : public QMainWindow {
-  Q_OBJECT
-  Q_DISABLE_COPY_MOVE(MainWindow)
-
+class PainterStateSaver {
 public:
-  MainWindow();
-  ~MainWindow() = default;
+  PainterStateSaver(QPainter* painter) : m_painter(painter) {
+    m_painter->save();
+  }
 
-public slots:
-  void addNewFolder();
-  void displayWindow();
-  void setPage(int index);
-  void updateTitle();
-
-private slots:
-  void about();
-  void donate() const;
-  void support() const;
-  void profile() const;
+  ~PainterStateSaver() {
+    m_painter->restore();
+  }
 
 private:
-  void initActions();
-  void initNavigation();
-  void initToolbar();
-
-  Ui::MainWindow* ui_ = nullptr;
-
-  NavigationWidget* m_navigationWidget = nullptr;
-  TrayIcon* m_trayIcon = nullptr;
+  QPainter* m_painter;
 };
 
 }  // namespace gui

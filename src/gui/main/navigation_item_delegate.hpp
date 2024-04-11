@@ -18,55 +18,33 @@
 
 #pragma once
 
-#include <QMainWindow>
-
-namespace Ui {
-class MainWindow;
-}
+#include <QStyledItemDelegate>
 
 namespace gui {
 
-class NavigationWidget;
-class TrayIcon;
-
-enum class MainWindowPage {
-  Home,
-  Search,
-  List,
-  History,
-  Library,
-  Torrents,
+enum class NavigationItemDataRole {
+  PageIndex = Qt::UserRole,
+  HasChildren,
+  IsChild,
+  IsLastChild,
+  IsSeparator,
+  Counter,
 };
 
-class MainWindow final : public QMainWindow {
+class NavigationItemDelegate final : public QStyledItemDelegate {
   Q_OBJECT
-  Q_DISABLE_COPY_MOVE(MainWindow)
+  Q_DISABLE_COPY_MOVE(NavigationItemDelegate)
 
 public:
-  MainWindow();
-  ~MainWindow() = default;
+  NavigationItemDelegate(QObject* parent);
+  ~NavigationItemDelegate() = default;
 
-public slots:
-  void addNewFolder();
-  void displayWindow();
-  void setPage(int index);
-  void updateTitle();
-
-private slots:
-  void about();
-  void donate() const;
-  void support() const;
-  void profile() const;
+  void paint(QPainter*, const QStyleOptionViewItem&, const QModelIndex&) const override;
 
 private:
-  void initActions();
-  void initNavigation();
-  void initToolbar();
-
-  Ui::MainWindow* ui_ = nullptr;
-
-  NavigationWidget* m_navigationWidget = nullptr;
-  TrayIcon* m_trayIcon = nullptr;
+  void paintBranch(QPainter*, QRect, bool) const;
+  void paintCounter(QPainter*, QRect, const int) const;
+  void paintSeparator(QPainter*, const QRect&) const;
 };
 
 }  // namespace gui

@@ -18,55 +18,36 @@
 
 #pragma once
 
-#include <QMainWindow>
-
-namespace Ui {
-class MainWindow;
-}
+#include <QTreeWidget>
 
 namespace gui {
 
-class NavigationWidget;
-class TrayIcon;
+enum class MainWindowPage;
+enum class NavigationItemDataRole;
 
-enum class MainWindowPage {
-  Home,
-  Search,
-  List,
-  History,
-  Library,
-  Torrents,
-};
+class MainWindow;
 
-class MainWindow final : public QMainWindow {
+class NavigationWidget final : public QTreeWidget {
   Q_OBJECT
-  Q_DISABLE_COPY_MOVE(MainWindow)
+  Q_DISABLE_COPY_MOVE(NavigationWidget)
 
 public:
-  MainWindow();
-  ~MainWindow() = default;
+  NavigationWidget(MainWindow* mainWindow);
+  ~NavigationWidget() = default;
 
 public slots:
-  void addNewFolder();
-  void displayWindow();
-  void setPage(int index);
-  void updateTitle();
+  void refresh();
 
-private slots:
-  void about();
-  void donate() const;
-  void support() const;
-  void profile() const;
+protected:
+  void mouseMoveEvent(QMouseEvent* event) override;
 
 private:
-  void initActions();
-  void initNavigation();
-  void initToolbar();
+  QTreeWidgetItem* addItem(const QString& text, const QString& icon, MainWindowPage page);
+  QTreeWidgetItem* addChildItem(QTreeWidgetItem* parent, const QString& text);
+  void addSeparator();
+  void setItemData(QTreeWidgetItem* item, NavigationItemDataRole role, const QVariant& value);
 
-  Ui::MainWindow* ui_ = nullptr;
-
-  NavigationWidget* m_navigationWidget = nullptr;
-  TrayIcon* m_trayIcon = nullptr;
+  MainWindow* m_mainWindow = nullptr;
 };
 
 }  // namespace gui
