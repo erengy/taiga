@@ -186,11 +186,13 @@ void MainWindow::about() {
     version += "-" + pre;
   }
 
-  QString text =
-      tr("<b>Taiga</b> v%1<br><br>This version is a work in progress. For more "
-         "information, visit the <a href=\"https://github.com/erengy/taiga\">GitHub repository</a> "
-         "or the <a href=\"https://discord.gg/yeGNktZ\">Discord server</a>.")
-          .arg(version);
+  const QString text = tr("<b>Taiga</b> v%1<br><br>"
+                          "This version is a work in progress. For more information, visit the "
+                          "<a href=\"%2\">GitHub repository</a> or the "
+                          "<a href=\"%3\">Discord server</a>.")
+                           .arg(version)
+                           .arg("https://github.com/erengy/taiga")
+                           .arg("https://discord.gg/yeGNktZ");
 
   QMessageBox::about(this, tr("About Taiga"), text);
 }
