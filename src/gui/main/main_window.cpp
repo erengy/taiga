@@ -51,6 +51,7 @@ MainWindow::MainWindow() : QMainWindow(), ui_(new Ui::MainWindow) {
   initTrayIcon();
   initToolbar();
   initNavigation();
+  initStatusbar();
 }
 
 void MainWindow::initActions() {
@@ -110,6 +111,12 @@ void MainWindow::initIcons() {
 void MainWindow::initNavigation() {
   m_navigationWidget = new NavigationWidget(this);
   ui_->splitter->insertWidget(0, m_navigationWidget);
+}
+
+void MainWindow::initStatusbar() {
+  ui_->statusbar->setContentsMargins(0, 8, 0, 0);
+
+  ui_->statusbar->showMessage(tr("How are you today?"), 5000);
 }
 
 void MainWindow::initToolbar() {

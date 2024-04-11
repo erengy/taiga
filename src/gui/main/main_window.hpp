@@ -62,6 +62,7 @@ private:
   void initActions();
   void initIcons();
   void initNavigation();
+  void initStatusbar();
   void initToolbar();
   void initTrayIcon();
 
