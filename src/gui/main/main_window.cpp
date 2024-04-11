@@ -38,6 +38,8 @@ namespace gui {
 MainWindow::MainWindow() : QMainWindow(), ui_(new Ui::MainWindow) {
   ui_->setupUi(this);
 
+  ui_->menubar->hide();
+
 #ifdef Q_OS_WINDOWS
   enableMicaBackground(this);
 #endif
