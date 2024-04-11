@@ -3,6 +3,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 add_executable(taiga)
 
 target_sources(taiga PRIVATE
+	resources/icons.qrc
 	taiga/application.cpp
 	main.cpp
 )

@@ -1,0 +1,35 @@
+<RCC>
+  <qresource>
+    <file>icons/account_circle.svg</file>
+    <file>icons/add_box.svg</file>
+    <file>icons/arrow_back.svg</file>
+    <file>icons/arrow_drop_down.svg</file>
+    <file>icons/arrow_forward.svg</file>
+    <file>icons/bar_chart.svg</file>
+    <file>icons/check.svg</file>
+    <file>icons/cloud_download.svg</file>
+    <file>icons/create_new_folder.svg</file>
+    <file>icons/export_notes.svg</file>
+    <file>icons/favorite.svg</file>
+    <file>icons/folder.svg</file>
+    <file>icons/grid_view.svg</file>
+    <file>icons/help.svg</file>
+    <file>icons/history.svg</file>
+    <file>icons/home.svg</file>
+    <file>icons/info.svg</file>
+    <file>icons/list_alt.svg</file>
+    <file>icons/lists.svg</file>
+    <file>icons/logout.svg</file>
+    <file>icons/menu.svg</file>
+    <file>icons/more_horiz.svg</file>
+    <file>icons/pageview.svg</file>
+    <file>icons/rss_feed.svg</file>
+    <file>icons/search.svg</file>
+    <file>icons/settings.svg</file>
+    <file>icons/shuffle.svg</file>
+    <file>icons/skip_next.svg</file>
+    <file>icons/sort.svg</file>
+    <file>icons/sync.svg</file>
+    <file>icons/taiga.png</file>
+  </qresource>
+</RCC>

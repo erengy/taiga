@@ -22,6 +22,7 @@
 
 #include "gui/main/main_window.hpp"
 #include "gui/main/navigation_item_delegate.hpp"
+#include "gui/utils/theme.hpp"
 
 namespace gui {
 
@@ -104,6 +105,7 @@ QTreeWidgetItem* NavigationWidget::addItem(const QString& text, const QString& i
     return font;
   }());
 
+  item->setIcon(0, theme.getIcon(icon));
   item->setSizeHint(0, QSize{0, 32});
   item->setText(0, text);
 
@@ -115,6 +117,7 @@ QTreeWidgetItem* NavigationWidget::addItem(const QString& text, const QString& i
 QTreeWidgetItem* NavigationWidget::addChildItem(QTreeWidgetItem* parent, const QString& text) {
   auto item = new QTreeWidgetItem(parent);
 
+  item->setIcon(0, theme.getIcon("empty"));
   item->setSizeHint(0, QSize{0, 32});
   item->setText(0, text);
 

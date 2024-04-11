@@ -24,6 +24,7 @@
 
 #include "gui/main/navigation_widget.hpp"
 #include "gui/settings/settings_dialog.hpp"
+#include "gui/utils/theme.hpp"
 #include "gui/utils/tray_icon.hpp"
 #include "taiga/config.h"
 #include "ui_main_window.h"
@@ -44,6 +45,7 @@ MainWindow::MainWindow() : QMainWindow(), ui_(new Ui::MainWindow) {
   updateTitle();
 
   initActions();
+  initIcons();
   initToolbar();
   initNavigation();
 
@@ -89,6 +91,34 @@ void MainWindow::initActions() {
     });
     loop.exec();
   });
+}
+
+void MainWindow::initIcons() {
+  setWindowIcon(theme.getIcon("taiga", "png"));
+
+  ui_->menuLibraryFolders->setIcon(theme.getIcon("folder"));
+  ui_->menuExport->setIcon(theme.getIcon("export_notes"));
+  ui_->menuAniList->setIcon(theme.getIcon("brands/anilist", "svg", false));
+  ui_->menuKitsu->setIcon(theme.getIcon("brands/kitsu", "svg", false));
+  ui_->menuMyAnimeList->setIcon(theme.getIcon("brands/myanimelist", "svg", false));
+
+  ui_->actionAddNewFolder->setIcon(theme.getIcon("create_new_folder"));
+  ui_->actionAbout->setIcon(theme.getIcon("info"));
+  ui_->actionBack->setIcon(theme.getIcon("arrow_back"));
+  ui_->actionCheckForUpdates->setIcon(theme.getIcon("cloud_download"));
+  ui_->actionDonate->setIcon(theme.getIcon("favorite"));
+  ui_->actionExit->setIcon(theme.getIcon("logout"));
+  ui_->actionForward->setIcon(theme.getIcon("arrow_forward"));
+  ui_->actionLibraryFolders->setIcon(theme.getIcon("folder"));
+  ui_->actionMenu->setIcon(theme.getIcon("menu"));
+  ui_->actionPlayNextEpisode->setIcon(theme.getIcon("skip_next"));
+  ui_->actionPlayRandomAnime->setIcon(theme.getIcon("shuffle"));
+  ui_->actionProfile->setIcon(theme.getIcon("account_circle"));
+  ui_->actionScanAvailableEpisodes->setIcon(theme.getIcon("pageview"));
+  ui_->actionSettings->setIcon(theme.getIcon("settings"));
+  ui_->actionSupport->setIcon(theme.getIcon("help"));
+  ui_->actionSynchronize->setIcon(theme.getIcon("sync"));
+  ui_->actionStatistics->setIcon(theme.getIcon("poll"));
 }
 
 void MainWindow::initNavigation() {

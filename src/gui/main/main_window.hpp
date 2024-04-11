@@ -60,6 +60,7 @@ private slots:
 
 private:
   void initActions();
+  void initIcons();
   void initNavigation();
   void initToolbar();
 
