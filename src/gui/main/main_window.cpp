@@ -122,6 +122,7 @@ void MainWindow::initStatusbar() {
 void MainWindow::initToolbar() {
   ui_->toolbar->setIconSize(QSize{24, 24});
 
+  // Menu
   {
     const auto button = static_cast<QToolButton*>(ui_->toolbar->widgetForAction(ui_->actionMenu));
     button->setPopupMode(QToolButton::InstantPopup);
@@ -131,12 +132,32 @@ void MainWindow::initToolbar() {
       menu->addAction(ui_->actionToggleSharing);
       menu->addAction(ui_->actionToggleSynchronization);
       menu->addSeparator();
-      menu->addMenu(ui_->menuLibrary);
       menu->addMenu(ui_->menuHelp);
       menu->addSeparator();
       menu->addAction(ui_->actionExit);
       return menu;
     }());
+  }
+
+  // Search box
+  {
+    m_searchBox = new QLineEdit();
+    m_searchBox->setClearButtonEnabled(true);
+    m_searchBox->setFixedWidth(320);
+    m_searchBox->setPlaceholderText(tr("Search"));
+
+    const auto before = ui_->actionSettings;
+    const auto insertSpacer = [this](QAction* before) {
+      ui_->toolbar->insertWidget(before, [this]() {
+        auto spacer = new QWidget(this);
+        spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+        return spacer;
+      }());
+    };
+
+    insertSpacer(before);
+    ui_->toolbar->insertWidget(before, m_searchBox);
+    insertSpacer(before);
   }
 }
 

@@ -20,6 +20,8 @@
 
 #include <QMainWindow>
 
+class QLineEdit;
+
 namespace Ui {
 class MainWindow;
 }
@@ -69,6 +71,7 @@ private:
   Ui::MainWindow* ui_ = nullptr;
 
   NavigationWidget* m_navigationWidget = nullptr;
+  QLineEdit* m_searchBox = nullptr;
   TrayIcon* m_trayIcon = nullptr;
 };
 
