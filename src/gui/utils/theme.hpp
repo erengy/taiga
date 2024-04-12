@@ -40,7 +40,7 @@ public:
 private:
   QString readStylesheet(const QString& name) const;
 
-  QHash<QString, QIcon> icons_;
+  QHash<QString, QIcon> m_icons;
 };
 
 inline Theme theme;

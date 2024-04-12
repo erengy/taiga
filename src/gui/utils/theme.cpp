@@ -30,15 +30,15 @@ Theme::Theme() : QObject() {
 }
 
 const QIcon& Theme::getIcon(const QString& key, const QString& extension, bool useSvgIconEngine) {
-  if (!icons_.contains(key)) {
+  if (!m_icons.contains(key)) {
     if (extension == "svg" && useSvgIconEngine) {
-      icons_[key] = QIcon(new SvgIconEngine(key));
+      m_icons[key] = QIcon(new SvgIconEngine(key));
     } else {
-      icons_[key] = QIcon(u":/icons/%1.%2"_qs.arg(key, extension));
+      m_icons[key] = QIcon(u":/icons/%1.%2"_qs.arg(key, extension));
     }
   }
 
-  return icons_[key];
+  return m_icons[key];
 }
 
 bool Theme::isDark(QApplication* application) const {
