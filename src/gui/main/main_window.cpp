@@ -45,8 +45,6 @@ MainWindow::MainWindow() : QMainWindow(), ui_(new Ui::MainWindow) {
   enableMicaBackground(this);
 #endif
 
-  updateTitle();
-
   initActions();
   initIcons();
   initTrayIcon();
@@ -54,6 +52,9 @@ MainWindow::MainWindow() : QMainWindow(), ui_(new Ui::MainWindow) {
   initNavigation();
   initStatusbar();
   initNowPlaying();
+
+  setPage(MainWindowPage::Home);
+  updateTitle();
 }
 
 void MainWindow::initActions() {
@@ -120,6 +121,34 @@ void MainWindow::initNowPlaying() {
 
   ui_->centralWidget->layout()->addWidget(m_nowPlayingWidget);
   m_nowPlayingWidget->hide();
+}
+
+void MainWindow::initPage(MainWindowPage page) {
+  static QSet<MainWindowPage> initializedPages;
+
+  if (initializedPages.contains(page)) return;
+
+  switch (page) {
+    case MainWindowPage::Home:
+      break;
+
+    case MainWindowPage::Search:
+      break;
+
+    case MainWindowPage::List:
+      break;
+
+    case MainWindowPage::History:
+      break;
+
+    case MainWindowPage::Library:
+      break;
+
+    case MainWindowPage::Torrents:
+      break;
+  }
+
+  initializedPages.insert(page);
 }
 
 void MainWindow::initStatusbar() {
@@ -197,8 +226,9 @@ void MainWindow::addNewFolder() {
   }
 }
 
-void MainWindow::setPage(int index) {
-  ui_->stackedWidget->setCurrentIndex(index);
+void MainWindow::setPage(MainWindowPage page) {
+  initPage(page);
+  ui_->stackedWidget->setCurrentIndex(static_cast<int>(page));
 }
 
 void MainWindow::updateTitle() {

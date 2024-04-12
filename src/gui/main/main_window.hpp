@@ -54,7 +54,7 @@ public:
 public slots:
   void addNewFolder();
   void displayWindow();
-  void setPage(int index);
+  void setPage(MainWindowPage page);
   void updateTitle();
 
 private slots:
@@ -68,6 +68,7 @@ private:
   void initIcons();
   void initNavigation();
   void initNowPlaying();
+  void initPage(MainWindowPage page);
   void initStatusbar();
   void initToolbar();
   void initTrayIcon();
