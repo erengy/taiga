@@ -18,7 +18,6 @@
 
 #include "navigation_item_delegate.hpp"
 
-#include <QApplication>
 #include <QPainter>
 #include <QPainterPath>
 

@@ -22,8 +22,6 @@
 #include <QIcon>
 #include <QObject>
 
-class QApplication;
-
 namespace gui {
 
 class Theme final : public QObject {
@@ -35,7 +33,7 @@ public:
 
   const QIcon& getIcon(const QString& key, const QString& extension = u"svg"_qs,
                        bool useSvgIconEngine = true);
-  bool isDark(QApplication* application) const;
+  bool isDark() const;
 
 private:
   QString readStylesheet(const QString& name) const;

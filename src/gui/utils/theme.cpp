@@ -41,8 +41,8 @@ const QIcon& Theme::getIcon(const QString& key, const QString& extension, bool u
   return m_icons[key];
 }
 
-bool Theme::isDark(QApplication* application) const {
-  return application->styleHints()->colorScheme() == Qt::ColorScheme::Dark;
+bool Theme::isDark() const {
+  return qApp->styleHints()->colorScheme() == Qt::ColorScheme::Dark;
 }
 
 QString Theme::readStylesheet(const QString& name) const {
