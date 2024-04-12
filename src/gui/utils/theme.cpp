@@ -41,6 +41,15 @@ const QIcon& Theme::getIcon(const QString& key, const QString& extension, bool u
   return m_icons[key];
 }
 
+void Theme::initStyle() {
+#ifdef Q_OS_WINDOWS
+  // @TODO: Use QStyleHints::colorSchemeChanged signal to detect changes
+  const QString mainStylesheet = readStylesheet("main");
+  const QString themeStylesheet = readStylesheet(isDark() ? "dark" : "light");
+  qApp->setStyleSheet(mainStylesheet + themeStylesheet);
+#endif
+}
+
 bool Theme::isDark() const {
   return qApp->styleHints()->colorScheme() == Qt::ColorScheme::Dark;
 }

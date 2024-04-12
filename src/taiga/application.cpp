@@ -19,10 +19,13 @@
 #include "application.hpp"
 
 #include "gui/main/main_window.hpp"
+#include "gui/utils/theme.hpp"
 
 namespace taiga {
 
 Application::Application(int argc, char* argv[]) : QApplication(argc, argv) {
+  gui::theme.initStyle();
+
   window_ = new gui::MainWindow();
   window_->show();
 }

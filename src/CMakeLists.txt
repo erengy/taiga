@@ -4,6 +4,7 @@ add_executable(taiga)
 
 target_sources(taiga PRIVATE
 	resources/icons.qrc
+	resources/styles.qrc
 	taiga/application.cpp
 	main.cpp
 )
