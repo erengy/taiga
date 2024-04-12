@@ -62,7 +62,7 @@ void MainWindow::initActions() {
   ui_->actionSynchronize->setToolTip(tr("Synchronize with %1").arg("AniList"));
 
   connect(ui_->actionAddNewFolder, &QAction::triggered, this, &MainWindow::addNewFolder);
-  connect(ui_->actionExit, &QAction::triggered, this, &QWidget::close);
+  connect(ui_->actionExit, &QAction::triggered, this, &QApplication::quit, Qt::QueuedConnection);
   connect(ui_->actionSettings, &QAction::triggered, this, [this]() { SettingsDialog::show(this); });
   connect(ui_->actionAbout, &QAction::triggered, this, &MainWindow::about);
   connect(ui_->actionDonate, &QAction::triggered, this, &MainWindow::donate);
