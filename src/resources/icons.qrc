@@ -6,6 +6,7 @@
     <file>icons/arrow_drop_down.svg</file>
     <file>icons/arrow_forward.svg</file>
     <file>icons/bar_chart.svg</file>
+    <file>icons/check_circle.svg</file>
     <file>icons/check.svg</file>
     <file>icons/cloud_download.svg</file>
     <file>icons/create_new_folder.svg</file>
@@ -30,10 +31,13 @@
     <file>icons/rss_feed.svg</file>
     <file>icons/search.svg</file>
     <file>icons/settings.svg</file>
+    <file>icons/share.svg</file>
     <file>icons/shuffle.svg</file>
     <file>icons/skip_next.svg</file>
     <file>icons/sort.svg</file>
     <file>icons/sync.svg</file>
     <file>icons/taiga.png</file>
+    <file>icons/warning.svg</file>
+    <file>icons/web_asset.svg</file>
   </qresource>
 </RCC>
