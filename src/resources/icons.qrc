@@ -9,6 +9,8 @@
     <file>icons/check.svg</file>
     <file>icons/cloud_download.svg</file>
     <file>icons/create_new_folder.svg</file>
+    <file>icons/delete.svg</file>
+    <file>icons/edit.svg</file>
     <file>icons/export_notes.svg</file>
     <file>icons/favorite.svg</file>
     <file>icons/folder.svg</file>
@@ -22,7 +24,9 @@
     <file>icons/logout.svg</file>
     <file>icons/menu.svg</file>
     <file>icons/more_horiz.svg</file>
+    <file>icons/open_in_new.svg</file>
     <file>icons/pageview.svg</file>
+    <file>icons/play_arrow.svg</file>
     <file>icons/rss_feed.svg</file>
     <file>icons/search.svg</file>
     <file>icons/settings.svg</file>

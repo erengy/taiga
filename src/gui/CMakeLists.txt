@@ -1,6 +1,7 @@
 add_library(taiga-gui STATIC)
 
 target_sources(taiga-gui PRIVATE
+	common/media_menu.cpp
 	main/main_window.cpp
 	main/navigation_item_delegate.cpp
 	main/navigation_widget.cpp
