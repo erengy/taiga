@@ -129,48 +129,9 @@
     </property>
     <addaction name="actionExit"/>
    </widget>
-   <widget class="QMenu" name="menuServices">
+   <widget class="QMenu" name="menuList">
     <property name="title">
-     <string>&amp;Services</string>
-    </property>
-    <widget class="QMenu" name="menuAniList">
-     <property name="title">
-      <string>AniList</string>
-     </property>
-     <addaction name="actionAniListProfile"/>
-     <addaction name="actionAniListStats"/>
-     <addaction name="separator"/>
-     <addaction name="actionAniListTaigaThread"/>
-    </widget>
-    <widget class="QMenu" name="menuKitsu">
-     <property name="title">
-      <string>Kitsu</string>
-     </property>
-     <addaction name="actionKitsuFeed"/>
-     <addaction name="actionKitsuLibrary"/>
-     <addaction name="actionKitsuProfile"/>
-     <addaction name="separator"/>
-     <addaction name="actionKitsuTaigaGroup"/>
-    </widget>
-    <widget class="QMenu" name="menuMyAnimeList">
-     <property name="title">
-      <string>MyAnimeList</string>
-     </property>
-     <addaction name="actionMyAnimeListPanel"/>
-     <addaction name="actionMyAnimeListProfile"/>
-     <addaction name="actionMyAnimeListHistory"/>
-     <addaction name="separator"/>
-     <addaction name="actionMyAnimeListTaigaClub"/>
-    </widget>
-    <addaction name="actionSynchronize"/>
-    <addaction name="separator"/>
-    <addaction name="menuAniList"/>
-    <addaction name="menuKitsu"/>
-    <addaction name="menuMyAnimeList"/>
-   </widget>
-   <widget class="QMenu" name="menuTools">
-    <property name="title">
-     <string>&amp;Tools</string>
+     <string>List</string>
     </property>
     <widget class="QMenu" name="menuExport">
      <property name="title">
@@ -179,19 +140,21 @@
      <addaction name="actionExportListAsMarkdown"/>
      <addaction name="actionExportListAsMyAnimeListXML"/>
     </widget>
+    <addaction name="actionSynchronize"/>
+    <addaction name="separator"/>
+    <addaction name="menuExport"/>
+   </widget>
+   <widget class="QMenu" name="menuTools">
+    <property name="title">
+     <string>&amp;Tools</string>
+    </property>
     <addaction name="actionToggleDetection"/>
     <addaction name="actionToggleSharing"/>
     <addaction name="actionToggleSynchronization"/>
     <addaction name="separator"/>
-    <addaction name="menuExport"/>
-    <addaction name="actionStatistics"/>
+    <addaction name="actionProfile"/>
     <addaction name="separator"/>
     <addaction name="actionSettings"/>
-   </widget>
-   <widget class="QMenu" name="menuView">
-    <property name="title">
-     <string>&amp;View</string>
-    </property>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -221,10 +184,9 @@
     <addaction name="actionPlayRandomAnime"/>
    </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuList"/>
    <addaction name="menuLibrary"/>
-   <addaction name="menuServices"/>
    <addaction name="menuTools"/>
-   <addaction name="menuView"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -282,9 +244,6 @@
    <property name="text">
     <string>E&amp;xit</string>
    </property>
-   <property name="statusTip">
-    <string>Exit the application</string>
-   </property>
    <property name="menuRole">
     <enum>QAction::QuitRole</enum>
    </property>
@@ -312,6 +271,9 @@
    <property name="text">
     <string>Donate</string>
    </property>
+   <property name="statusTip">
+    <string>:3</string>
+   </property>
   </action>
   <action name="actionSupport">
    <property name="text">
@@ -335,46 +297,6 @@
    </property>
    <property name="menuRole">
     <enum>QAction::PreferencesRole</enum>
-   </property>
-  </action>
-  <action name="actionAniListProfile">
-   <property name="text">
-    <string>Profile</string>
-   </property>
-  </action>
-  <action name="actionAniListStats">
-   <property name="text">
-    <string>Stats</string>
-   </property>
-  </action>
-  <action name="actionKitsuFeed">
-   <property name="text">
-    <string>Feed</string>
-   </property>
-  </action>
-  <action name="actionKitsuLibrary">
-   <property name="text">
-    <string>Library</string>
-   </property>
-  </action>
-  <action name="actionKitsuProfile">
-   <property name="text">
-    <string>Profile</string>
-   </property>
-  </action>
-  <action name="actionMyAnimeListPanel">
-   <property name="text">
-    <string>Panel</string>
-   </property>
-  </action>
-  <action name="actionMyAnimeListProfile">
-   <property name="text">
-    <string>Profile</string>
-   </property>
-  </action>
-  <action name="actionMyAnimeListHistory">
-   <property name="text">
-    <string>History</string>
    </property>
   </action>
   <action name="actionLibraryFolders">
@@ -454,26 +376,6 @@
   <action name="actionExportListAsMarkdown">
    <property name="text">
     <string>Export anime list as Markdown...</string>
-   </property>
-  </action>
-  <action name="actionAniListTaigaThread">
-   <property name="text">
-    <string>Taiga thread</string>
-   </property>
-  </action>
-  <action name="actionKitsuTaigaGroup">
-   <property name="text">
-    <string>Taiga group</string>
-   </property>
-  </action>
-  <action name="actionMyAnimeListTaigaClub">
-   <property name="text">
-    <string>Taiga club</string>
-   </property>
-  </action>
-  <action name="actionStatistics">
-   <property name="text">
-    <string>Statistics</string>
    </property>
   </action>
   <action name="actionTest">

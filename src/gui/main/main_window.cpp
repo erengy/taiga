@@ -88,9 +88,6 @@ void MainWindow::initIcons() {
 
   ui_->menuLibraryFolders->setIcon(theme.getIcon("folder"));
   ui_->menuExport->setIcon(theme.getIcon("export_notes"));
-  ui_->menuAniList->setIcon(theme.getIcon("brands/anilist", "svg", false));
-  ui_->menuKitsu->setIcon(theme.getIcon("brands/kitsu", "svg", false));
-  ui_->menuMyAnimeList->setIcon(theme.getIcon("brands/myanimelist", "svg", false));
 
   ui_->actionAddNewFolder->setIcon(theme.getIcon("create_new_folder"));
   ui_->actionAbout->setIcon(theme.getIcon("info"));
@@ -108,7 +105,6 @@ void MainWindow::initIcons() {
   ui_->actionSettings->setIcon(theme.getIcon("settings"));
   ui_->actionSupport->setIcon(theme.getIcon("help"));
   ui_->actionSynchronize->setIcon(theme.getIcon("sync"));
-  ui_->actionStatistics->setIcon(theme.getIcon("poll"));
 }
 
 void MainWindow::initNavigation() {
