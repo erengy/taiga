@@ -77,7 +77,7 @@ void MediaMenu::removeFromList() const {
 
   QList<QString> titles;
   for (const auto& item : m_items) {
-    titles.push_back(u"<li>%1</li>"_qs.arg(QString::fromStdString(item.title)));
+    titles.push_back(u"<li>%1</li>"_qs.arg(QString::fromStdString(item.titles.romaji)));
   }
   msgBox.setInformativeText(u"<ul>%1</ul>"_qs.arg(titles.join("")));
 
@@ -95,7 +95,7 @@ void MediaMenu::removeFromList() const {
 void MediaMenu::searchAniDB() const {
   for (const auto& item : m_items) {
     QUrl url{"https://anidb.net/anime/"};
-    url.setQuery({{"adb.search", QString::fromStdString(item.title)}});
+    url.setQuery({{"adb.search", QString::fromStdString(item.titles.romaji)}});
     QDesktopServices::openUrl(url);
   }
 }
@@ -103,7 +103,7 @@ void MediaMenu::searchAniDB() const {
 void MediaMenu::searchAniList() const {
   for (const auto& item : m_items) {
     QUrl url{"https://anilist.co/search/anime"};
-    url.setQuery({{"search", QString::fromStdString(item.title)}});
+    url.setQuery({{"search", QString::fromStdString(item.titles.romaji)}});
     QDesktopServices::openUrl(url);
   }
 }
@@ -111,7 +111,7 @@ void MediaMenu::searchAniList() const {
 void MediaMenu::searchANN() const {
   for (const auto& item : m_items) {
     QUrl url{"https://www.animenewsnetwork.com/search"};
-    url.setQuery({{"q", QString::fromStdString(item.title)}});
+    url.setQuery({{"q", QString::fromStdString(item.titles.romaji)}});
     QDesktopServices::openUrl(url);
   }
 }
@@ -119,7 +119,7 @@ void MediaMenu::searchANN() const {
 void MediaMenu::searchKitsu() const {
   for (const auto& item : m_items) {
     QUrl url{"https://kitsu.io/anime"};
-    url.setQuery({{"text", QString::fromStdString(item.title)}});
+    url.setQuery({{"text", QString::fromStdString(item.titles.romaji)}});
     QDesktopServices::openUrl(url);
   }
 }
@@ -127,7 +127,7 @@ void MediaMenu::searchKitsu() const {
 void MediaMenu::searchMyAnimeList() const {
   for (const auto& item : m_items) {
     QUrl url{"https://myanimelist.net/anime.php"};
-    url.setQuery({{"q", QString::fromStdString(item.title)}});
+    url.setQuery({{"q", QString::fromStdString(item.titles.romaji)}});
     QDesktopServices::openUrl(url);
   }
 }
@@ -135,7 +135,7 @@ void MediaMenu::searchMyAnimeList() const {
 void MediaMenu::searchReddit() const {
   for (const auto& item : m_items) {
     QUrl url{"https://www.reddit.com/search"};
-    const auto title = QString::fromStdString(item.title);
+    const auto title = QString::fromStdString(item.titles.romaji);
     url.setQuery({
         {"q", u"subreddit:anime title:%1 episode discussion"_qs.arg(title)},
         {"sort", "new"},
@@ -147,7 +147,7 @@ void MediaMenu::searchReddit() const {
 void MediaMenu::searchWikipedia() const {
   for (const auto& item : m_items) {
     QUrl url{"https://en.wikipedia.org/wiki/Special:Search"};
-    url.setQuery({{"search", QString::fromStdString(item.title)}});
+    url.setQuery({{"search", QString::fromStdString(item.titles.romaji)}});
     QDesktopServices::openUrl(url);
   }
 }
@@ -155,7 +155,7 @@ void MediaMenu::searchWikipedia() const {
 void MediaMenu::searchYouTube() const {
   for (const auto& item : m_items) {
     QUrl url{"https://www.youtube.com/results"};
-    url.setQuery({{"search_query", QString::fromStdString(item.title)}});
+    url.setQuery({{"search_query", QString::fromStdString(item.titles.romaji)}});
     QDesktopServices::openUrl(url);
   }
 }
@@ -165,7 +165,7 @@ void MediaMenu::test() const {
 
   QList<QString> titles;
   for (const auto& item : m_items) {
-    titles.push_back(QString::fromStdString(item.title));
+    titles.push_back(QString::fromStdString(item.titles.romaji));
   }
 
   const auto text = u"Action: %1\n\n%2"_qs.arg(action).arg(titles.join("\n"));

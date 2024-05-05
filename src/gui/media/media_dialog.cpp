@@ -58,8 +58,9 @@ void MediaDialog::show(QWidget* parent, const Anime& anime_item) {
 void MediaDialog::setAnime(const Anime& anime_item) {
   m_anime = anime_item;
 
-  setWindowTitle(QString::fromStdString(m_anime.title));
-  ui_->titleLabel->setText(QString::fromStdString(m_anime.title));
+  const auto title = QString::fromStdString(m_anime.titles.romaji);
+  setWindowTitle(title);
+  ui_->titleLabel->setText(title);
 
   loadPosterImage();
   initDetails();
@@ -83,60 +84,60 @@ void MediaDialog::initDetails() const {
 
   const auto get_row_label = [](const QString& text) {
     auto* label = new QLabel(text);
+    label->setOpenExternalLinks(true);
     label->setWordWrap(true);
     return label;
   };
 
+  const auto from_vector = [](const std::vector<std::string>& vector) {
+    QStringList list;
+    for (const auto& str : vector) {
+      list.append(QString::fromStdString(str));
+    }
+    return list.join(", ");
+  };
+
   auto episodesLabel = new QLabel(tr("%1").arg(m_anime.episode_count));
-  episodesLabel->setCursor(QCursor(Qt::CursorShape::WhatsThisCursor));
-  episodesLabel->setToolTip("24 minutes per episode");
+  if (m_anime.episode_length) {
+    episodesLabel->setCursor(QCursor(Qt::CursorShape::WhatsThisCursor));
+    episodesLabel->setToolTip(u"%1 minutes per episode"_qs.arg(m_anime.episode_length));
+  }
 
-  auto seasonLabel = new QLabel(QString::fromStdString(m_anime.season));
+  auto seasonLabel = new QLabel(QString::fromStdString(m_anime.start_date));
   seasonLabel->setCursor(QCursor(Qt::CursorShape::WhatsThisCursor));
-  seasonLabel->setToolTip("Oct 2, 2008 to Mar 26, 2009");
+  seasonLabel->setToolTip(u"%1 to %1"_qs.arg(QString::fromStdString(m_anime.start_date))
+                              .arg(QString::fromStdString(m_anime.end_date)));
 
-  auto producersLabel = new QLabel(
-      "<a href=\"https://anilist.co/anime/4224/Toradora\">Genco</a>, Starchild "
-      "Records, Magic Capsule, NIS America Inc., Yomiuri Advertising, TV Tokyo "
-      "Music, Hanabee Entertainment");
-  producersLabel->setOpenExternalLinks(true);
-  producersLabel->setWordWrap(true);
-
-  ui_->infoLayout->addRow(get_row_title(tr("Synonyms:")),
-                          get_row_label(u"Tiger X Dragon, 龙与虎, Τίγρης και Δράκος"_qs));
-  ui_->infoLayout->addRow(get_row_title(tr("Type:")), get_row_label("TV"));
+  if (!m_anime.titles.synonyms.empty()) {
+    ui_->infoLayout->addRow(get_row_title(tr("Synonyms:")),
+                            get_row_label(from_vector(m_anime.titles.synonyms)));
+  }
+  ui_->infoLayout->addRow(get_row_title(tr("Type:")),
+                          get_row_label(u"%1"_qs.arg(static_cast<int>(m_anime.type))));
   ui_->infoLayout->addRow(get_row_title(tr("Episodes:")), episodesLabel);
-  ui_->infoLayout->addRow(get_row_title(tr("Status:")), get_row_label("Finished airing"));
+  ui_->infoLayout->addRow(get_row_title(tr("Status:")),
+                          get_row_label(u"%1"_qs.arg(static_cast<int>(m_anime.status))));
   ui_->infoLayout->addRow(get_row_title(tr("Season:")), seasonLabel);
-  ui_->infoLayout->addRow(get_row_title(tr("Score:")), get_row_label("78%"));
-  ui_->infoLayout->addRow(get_row_title(tr("Genres:")),
-                          get_row_label("Comedy, Drama, Romance, Slice of Life"));
-  ui_->infoLayout->addRow(get_row_title(tr("Studios:")), get_row_label("J.C. Staff"));
-  ui_->infoLayout->addRow(get_row_title(tr("Producers:")), producersLabel);
-
-  const QString synopsis =
-      "Ryuuji Takasu is a gentle high school student with a love for "
-      "housework; but in contrast to his kind nature, he has an intimidating "
-      "face that often gets him labeled as a delinquent. On the other hand is "
-      "Taiga Aisaka, a small, doll-like student, who is anything but a cute "
-      "and fragile girl. Equipped with a wooden katana and feisty personality, "
-      "Taiga is known throughout the school as the \"Palmtop "
-      "Tiger.\"<br><br>One day, an embarrassing mistake causes the two "
-      "students to cross paths. Ryuuji discovers that Taiga actually has a "
-      "sweet side: she has a crush on the popular vice president, Yuusaku "
-      "Kitamura, who happens to be his best friend. But things only get "
-      "crazier when Ryuuji reveals that he has a crush on Minori "
-      "Kushieda--Taiga's best friend!<br><br><i>Toradora!</i> is a romantic "
-      "comedy that follows this odd duo as they embark on a quest to help each "
-      "other with their respective crushes, forming an unlikely alliance in "
-      "the process.";
+  ui_->infoLayout->addRow(get_row_title(tr("Score:")), get_row_label(u"%1"_qs.arg(m_anime.score)));
+  if (!m_anime.genres.empty()) {
+    ui_->infoLayout->addRow(get_row_title(tr("Genres:")),
+                            get_row_label(from_vector(m_anime.genres)));
+  }
+  if (!m_anime.studios.empty()) {
+    ui_->infoLayout->addRow(get_row_title(tr("Studios:")),
+                            get_row_label(from_vector(m_anime.studios)));
+  }
+  if (!m_anime.producers.empty()) {
+    ui_->infoLayout->addRow(get_row_title(tr("Producers:")),
+                            get_row_label(from_vector(m_anime.producers)));
+  }
 
   ui_->synopsisHeader->setStyleSheet("font-weight: 600;");
 
   ui_->synopsis->document()->setDocumentMargin(0);
   ui_->synopsis->viewport()->setAutoFillBackground(false);
   ui_->synopsis->setContextMenuPolicy(Qt::ContextMenuPolicy::NoContextMenu);
-  ui_->synopsis->setHtml(synopsis);
+  ui_->synopsis->setHtml(QString::fromStdString(m_anime.synopsis));
 }
 
 void MediaDialog::loadPosterImage() {
