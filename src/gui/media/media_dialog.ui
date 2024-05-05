@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>AnimeDialog</class>
- <widget class="QDialog" name="AnimeDialog">
+ <class>MediaDialog</class>
+ <widget class="QDialog" name="MediaDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Anime</string>
+   <string>Media</string>
   </property>
   <property name="sizeGripEnabled">
    <bool>true</bool>
@@ -487,7 +487,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>AnimeDialog</receiver>
+   <receiver>MediaDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -503,7 +503,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>AnimeDialog</receiver>
+   <receiver>MediaDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

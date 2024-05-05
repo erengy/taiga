@@ -16,16 +16,16 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "anime_dialog.hpp"
+#include "media_dialog.hpp"
 
 #include <QImageReader>
 #include <QResizeEvent>
 
-#include "ui_anime_dialog.h"
+#include "ui_media_dialog.h"
 
 namespace gui {
 
-AnimeDialog::AnimeDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::AnimeDialog) {
+MediaDialog::MediaDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::MediaDialog) {
   ui_->setupUi(this);
 
   ui_->titleLabel->setStyleSheet("font-size: 20px; font-weight: 600;");
@@ -38,24 +38,24 @@ AnimeDialog::AnimeDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::AnimeDi
           [this](int state) { ui_->dateCompleted->setEnabled(state == Qt::CheckState::Checked); });
 }
 
-void AnimeDialog::resizeEvent(QResizeEvent* event) {
+void MediaDialog::resizeEvent(QResizeEvent* event) {
   QDialog::resizeEvent(event);
   resizePosterImage();
 }
 
-void AnimeDialog::showEvent(QShowEvent* event) {
+void MediaDialog::showEvent(QShowEvent* event) {
   QDialog::showEvent(event);
   resizePosterImage();
 }
 
-void AnimeDialog::show(QWidget* parent, const Anime& anime_item) {
-  auto* dlg = new AnimeDialog(parent);
+void MediaDialog::show(QWidget* parent, const Anime& anime_item) {
+  auto* dlg = new MediaDialog(parent);
   dlg->setAttribute(Qt::WA_DeleteOnClose);
   dlg->setAnime(anime_item);
   dlg->QDialog::show();
 }
 
-void AnimeDialog::setAnime(const Anime& anime_item) {
+void MediaDialog::setAnime(const Anime& anime_item) {
   m_anime = anime_item;
 
   setWindowTitle(QString::fromStdString(m_anime.title));
@@ -65,7 +65,7 @@ void AnimeDialog::setAnime(const Anime& anime_item) {
   initDetails();
 }
 
-void AnimeDialog::initDetails() const {
+void MediaDialog::initDetails() const {
   while (ui_->infoLayout->rowCount() > 0) {
     ui_->infoLayout->removeRow(0);
   }
@@ -139,7 +139,7 @@ void AnimeDialog::initDetails() const {
   ui_->synopsis->setHtml(synopsis);
 }
 
-void AnimeDialog::loadPosterImage() {
+void MediaDialog::loadPosterImage() {
   QImageReader reader("./data/poster.jpg");
   const QImage image = reader.read();
   if (!image.isNull()) {
@@ -149,7 +149,7 @@ void AnimeDialog::loadPosterImage() {
   }
 }
 
-void AnimeDialog::resizePosterImage() {
+void MediaDialog::resizePosterImage() {
   const int w = m_pixmap.width();
   const int h = m_pixmap.height();
   const auto poster_w = ui_->posterLabel->width();

@@ -27,18 +27,18 @@ class QResizeEvent;
 class QShowEvent;
 
 namespace Ui {
-class AnimeDialog;
+class MediaDialog;
 }
 
 namespace gui {
 
-class AnimeDialog final : public QDialog {
+class MediaDialog final : public QDialog {
   Q_OBJECT
-  Q_DISABLE_COPY_MOVE(AnimeDialog)
+  Q_DISABLE_COPY_MOVE(MediaDialog)
 
 public:
-  AnimeDialog(QWidget* parent);
-  ~AnimeDialog() = default;
+  MediaDialog(QWidget* parent);
+  ~MediaDialog() = default;
 
   void resizeEvent(QResizeEvent* event) override;
   void showEvent(QShowEvent* event) override;
@@ -53,7 +53,7 @@ private:
   void loadPosterImage();
   void resizePosterImage();
 
-  Ui::AnimeDialog* ui_ = nullptr;
+  Ui::MediaDialog* ui_ = nullptr;
 
   Anime m_anime;
   QPixmap m_pixmap;

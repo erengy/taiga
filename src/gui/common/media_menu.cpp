@@ -23,7 +23,7 @@
 #include <QUrl>
 #include <QUrlQuery>
 
-#include "gui/media/anime_dialog.hpp"
+#include "gui/media/media_dialog.hpp"
 #include "gui/utils/theme.hpp"
 
 namespace gui {
@@ -176,7 +176,7 @@ void MediaMenu::test() const {
 void MediaMenu::viewDetails() const {
   if (m_items.empty()) return;
 
-  AnimeDialog::show(nullptr, m_items.front());
+  MediaDialog::show(parentWidget(), m_items.front());
 }
 
 void MediaMenu::addMediaItems() {

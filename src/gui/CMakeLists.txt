@@ -6,7 +6,7 @@ target_sources(taiga-gui PRIVATE
 	main/navigation_item_delegate.cpp
 	main/navigation_widget.cpp
 	main/now_playing_widget.cpp
-	media/anime_dialog.cpp
+	media/media_dialog.cpp
 	settings/settings_dialog.cpp
 	utils/svg_icon_engine.cpp
 	utils/theme.cpp
@@ -15,7 +15,7 @@ target_sources(taiga-gui PRIVATE
 
 target_sources(taiga-gui PRIVATE
 	main/main_window.ui
-	media/anime_dialog.ui
+	media/media_dialog.ui
 	settings/settings_dialog.ui
 )
 
