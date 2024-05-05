@@ -1,12 +1,12 @@
 add_library(taiga-gui STATIC)
 
 target_sources(taiga-gui PRIVATE
-	common/media_menu.cpp
 	main/main_window.cpp
 	main/navigation_item_delegate.cpp
 	main/navigation_widget.cpp
 	main/now_playing_widget.cpp
 	media/media_dialog.cpp
+	media/media_menu.cpp
 	settings/settings_dialog.cpp
 	utils/svg_icon_engine.cpp
 	utils/theme.cpp
