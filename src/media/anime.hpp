@@ -23,8 +23,8 @@
 #include <string>
 #include <vector>
 
-#include "base/time.h"
-#include "sync/service.h"
+// #include "base/time.h"
+// #include "sync/service.h"
 
 namespace anime {
 
@@ -104,41 +104,41 @@ constexpr double kUnknownScore = 0.0;
 constexpr int kUserScoreMax = 100;
 
 struct Titles {
-  std::wstring romaji;
-  std::wstring english;
-  std::wstring japanese;
-  std::vector<std::wstring> synonyms;
+  std::string romaji;
+  std::string english;
+  std::string japanese;
+  std::vector<std::string> synonyms;
 };
 
 struct SeriesInformation {
   int id = AnimeId::ID_UNKNOWN;
-  std::map<sync::ServiceId, std::wstring> uids;
-  sync::ServiceId source = sync::ServiceId::Unknown;
+  // std::map<sync::ServiceId, std::string> uids;
+  // sync::ServiceId source = sync::ServiceId::Unknown;
   std::time_t last_modified = 0;
   int episode_count = kUnknownEpisodeCount;
   int episode_length = kUnknownEpisodeLength;
   AgeRating age_rating = AgeRating::Unknown;
   SeriesStatus status = SeriesStatus::Unknown;
   SeriesType type = SeriesType::Unknown;
-  Date start_date;
-  Date end_date;
+  std::string start_date;  // @TODO
+  std::string end_date;    // @TODO
   float score = 0.0f;
   int popularity_rank = 0;
-  std::wstring image_url;
-  std::wstring slug;
-  std::wstring synopsis;
-  std::wstring trailer_id;
+  std::string image_url;
+  std::string slug;
+  std::string synopsis;
+  std::string trailer_id;
   Titles titles;
-  std::vector<std::wstring> genres;
-  std::vector<std::wstring> producers;
-  std::vector<std::wstring> studios;
-  std::vector<std::wstring> tags;
+  std::vector<std::string> genres;
+  std::vector<std::string> producers;
+  std::vector<std::string> studios;
+  std::vector<std::string> tags;
   int last_aired_episode = 0;
   std::time_t next_episode_time = 0;
 };
 
 struct MyInformation {
-  std::wstring id;
+  std::string id;
   int watched_episodes = 0;
   int score = 0;
   MyStatus status = MyStatus::NotInList;
@@ -146,15 +146,17 @@ struct MyInformation {
   int rewatched_times = 0;
   bool rewatching = false;
   int rewatching_ep = 0;
-  Date date_start;
-  Date date_finish;
-  std::wstring last_updated;
-  std::wstring notes;
+  std::string date_start;   // @TODO
+  std::string date_finish;  // @TODO
+  std::string last_updated;
+  std::string notes;
 };
 
 struct LocalInformation {
   std::vector<bool> available_episodes;
-  std::wstring next_episode_path;
+  std::string next_episode_path;
 };
 
 }  // namespace anime
+
+using Anime = anime::SeriesInformation;
