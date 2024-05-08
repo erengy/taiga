@@ -21,6 +21,7 @@
 #include <QBoxLayout>
 #include <QLabel>
 
+#include "gui/media/media_dialog.hpp"
 #include "gui/utils/theme.hpp"
 
 namespace gui {
@@ -44,6 +45,9 @@ NowPlayingWidget::NowPlayingWidget(QWidget* parent) : QFrame(parent) {
   // Main
   m_mainLabel = new QLabel(this);
   layout->addWidget(m_mainLabel);
+  connect(m_mainLabel, &QLabel::linkActivated, this, [this]() {
+    if (m_anime) MediaDialog::show(this, *m_anime);
+  });
 
   // Timer
   m_timerLabel = new QLabel(this);
@@ -53,18 +57,34 @@ NowPlayingWidget::NowPlayingWidget(QWidget* parent) : QFrame(parent) {
   refresh();
 }
 
+void NowPlayingWidget::reset() {
+  m_anime.reset();
+  refresh();
+}
+
+void NowPlayingWidget::setPlaying(Anime anime) {
+  m_anime = anime;
+  refresh();
+}
+
 void NowPlayingWidget::refresh() {
+  if (!m_anime.has_value()) {
+    m_iconLabel->setToolTip({});
+    m_mainLabel->setText({});
+    m_timerLabel->setText({});
+    return;
+  }
+
   m_iconLabel->setToolTip(
       "<b>Media player:</b> mpv<br>"
       "<b>Episode title:</b> Tiger and Dragon<br>"
       "<b>Group:</b> TaigaSubs<br>"
       "<b>Video:</b> 1080p");
 
-  // @TODO: Go to media details on click
   m_mainLabel->setText(u"Watching <a href=\"#\" style=\"%3\">%1</a> – Episode %2"_qs
-                           .arg("Toradora!")
+                           .arg(QString::fromStdString(m_anime->titles.romaji))
                            .arg("1/25")
-                           .arg("color: inherit; font-weight: 600; text-decoration: none;"));
+                           .arg("font-weight: 600; text-decoration: none;"));
 
   m_timerLabel->setText("List update in 00:00");
 }

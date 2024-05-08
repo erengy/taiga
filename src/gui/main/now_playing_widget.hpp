@@ -20,6 +20,9 @@
 
 #include <QFrame>
 #include <QLabel>
+#include <optional>
+
+#include "media/anime.hpp"
 
 namespace gui {
 
@@ -31,12 +34,17 @@ public:
   NowPlayingWidget(QWidget* parent);
   ~NowPlayingWidget() = default;
 
+  void reset();
+  void setPlaying(Anime anime);
+
 private:
   void refresh();
 
   QLabel* m_iconLabel = nullptr;
   QLabel* m_mainLabel = nullptr;
   QLabel* m_timerLabel = nullptr;
+
+  std::optional<Anime> m_anime;
 };
 
 }  // namespace gui
