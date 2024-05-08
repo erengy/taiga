@@ -53,7 +53,7 @@ MainWindow::MainWindow() : QMainWindow(), ui_(new Ui::MainWindow) {
   initStatusbar();
   initNowPlaying();
 
-  setPage(MainWindowPage::Home);
+  setPage(MainWindowPage::List);
   updateTitle();
 }
 
