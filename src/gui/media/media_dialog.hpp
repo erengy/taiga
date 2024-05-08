@@ -49,7 +49,7 @@ public slots:
   void setAnime(const Anime& anime_item);
 
 private:
-  void initDetails() const;
+  void initDetails();
   void loadPosterImage();
   void resizePosterImage();
 

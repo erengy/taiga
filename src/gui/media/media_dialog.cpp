@@ -66,13 +66,13 @@ void MediaDialog::setAnime(const Anime& anime_item) {
   initDetails();
 }
 
-void MediaDialog::initDetails() const {
+void MediaDialog::initDetails() {
   while (ui_->infoLayout->rowCount() > 0) {
     ui_->infoLayout->removeRow(0);
   }
 
-  const auto get_row_title = [](const QString& text) {
-    auto* label = new QLabel(text);
+  const auto get_row_title = [this](const QString& text) {
+    auto* label = new QLabel(text, this);
     label->setAlignment(Qt::AlignRight | Qt::AlignTop);
     label->setFont([label]() {
       auto font = label->font();
@@ -82,8 +82,8 @@ void MediaDialog::initDetails() const {
     return label;
   };
 
-  const auto get_row_label = [](const QString& text) {
-    auto* label = new QLabel(text);
+  const auto get_row_label = [this](const QString& text) {
+    auto* label = new QLabel(text, this);
     label->setOpenExternalLinks(true);
     label->setWordWrap(true);
     return label;
@@ -97,13 +97,13 @@ void MediaDialog::initDetails() const {
     return list.join(", ");
   };
 
-  auto episodesLabel = new QLabel(tr("%1").arg(m_anime.episode_count));
+  auto episodesLabel = new QLabel(tr("%1").arg(m_anime.episode_count), this);
   if (m_anime.episode_length) {
     episodesLabel->setCursor(QCursor(Qt::CursorShape::WhatsThisCursor));
     episodesLabel->setToolTip(u"%1 minutes per episode"_qs.arg(m_anime.episode_length));
   }
 
-  auto seasonLabel = new QLabel(QString::fromStdString(m_anime.start_date));
+  auto seasonLabel = new QLabel(QString::fromStdString(m_anime.start_date), this);
   seasonLabel->setCursor(QCursor(Qt::CursorShape::WhatsThisCursor));
   seasonLabel->setToolTip(u"%1 to %1"_qs.arg(QString::fromStdString(m_anime.start_date))
                               .arg(QString::fromStdString(m_anime.end_date)));
