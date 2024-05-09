@@ -30,6 +30,7 @@ namespace gui {
 
 class NavigationWidget;
 class NowPlayingWidget;
+class SearchWidget;
 class TrayIcon;
 
 enum class MainWindowPage {
@@ -78,6 +79,7 @@ private:
   NavigationWidget* m_navigationWidget = nullptr;
   NowPlayingWidget* m_nowPlayingWidget = nullptr;
   QLineEdit* m_searchBox = nullptr;
+  SearchWidget* m_searchWidget = nullptr;
   TrayIcon* m_trayIcon = nullptr;
 };
 

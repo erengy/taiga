@@ -7,6 +7,10 @@ target_sources(taiga-gui PRIVATE
 	main/now_playing_widget.cpp
 	media/media_dialog.cpp
 	media/media_menu.cpp
+	search/search_list_item_delegate.cpp
+	search/search_list_model.cpp
+	search/search_list_widget.cpp
+	search/search_widget.cpp
 	settings/settings_dialog.cpp
 	utils/svg_icon_engine.cpp
 	utils/theme.cpp
@@ -16,6 +20,7 @@ target_sources(taiga-gui PRIVATE
 target_sources(taiga-gui PRIVATE
 	main/main_window.ui
 	media/media_dialog.ui
+	search/search_widget.ui
 	settings/settings_dialog.ui
 )
 

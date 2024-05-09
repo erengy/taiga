@@ -24,6 +24,7 @@
 
 #include "gui/main/navigation_widget.hpp"
 #include "gui/main/now_playing_widget.hpp"
+#include "gui/search/search_widget.hpp"
 #include "gui/settings/settings_dialog.hpp"
 #include "gui/utils/theme.hpp"
 #include "gui/utils/tray_icon.hpp"
@@ -128,8 +129,16 @@ void MainWindow::initPage(MainWindowPage page) {
     case MainWindowPage::Home:
       break;
 
-    case MainWindowPage::Search:
+    case MainWindowPage::Search: {
+      const auto layout = new QHBoxLayout(ui_->searchPage);
+      layout->setContentsMargins(0, 0, 0, 0);
+      ui_->searchPage->setLayout(layout);
+
+      m_searchWidget = new SearchWidget(ui_->searchPage);
+      layout->addWidget(m_searchWidget);
+
       break;
+    }
 
     case MainWindowPage::List:
       break;
