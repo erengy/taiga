@@ -20,6 +20,7 @@
 
 #include <QContextMenuEvent>
 
+#include "gui/media/media_dialog.hpp"
 #include "gui/media/media_menu.hpp"
 #include "gui/search/search_list_item_delegate.hpp"
 #include "gui/search/search_list_model.hpp"
@@ -53,6 +54,12 @@ SearchListWidget::SearchListWidget(QWidget* parent)
 
     auto* menu = new MediaMenu(this, items);
     menu->popup();
+  });
+
+  connect(this, &QAbstractItemView::doubleClicked, this, [this](const QModelIndex& index) {
+    const auto selectedItem = m_model->getAnime(index);
+    if (!selectedItem) return;
+    MediaDialog::show(this, *selectedItem);
   });
 }
 
