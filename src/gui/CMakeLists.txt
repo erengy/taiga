@@ -1,6 +1,10 @@
 add_library(taiga-gui STATIC)
 
 target_sources(taiga-gui PRIVATE
+	list/list_item_delegate.cpp
+	list/list_model.cpp
+	list/list_view.cpp
+	list/list_widget.cpp
 	main/main_window.cpp
 	main/navigation_item_delegate.cpp
 	main/navigation_widget.cpp
@@ -18,6 +22,7 @@ target_sources(taiga-gui PRIVATE
 )
 
 target_sources(taiga-gui PRIVATE
+	list/list_widget.ui
 	main/main_window.ui
 	media/media_dialog.ui
 	search/search_widget.ui

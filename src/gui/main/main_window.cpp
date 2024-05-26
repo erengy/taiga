@@ -22,6 +22,7 @@
 #include <QFileDialog>
 #include <QtWidgets>
 
+#include "gui/list/list_widget.hpp"
 #include "gui/main/navigation_widget.hpp"
 #include "gui/main/now_playing_widget.hpp"
 #include "gui/search/search_widget.hpp"
@@ -140,8 +141,16 @@ void MainWindow::initPage(MainWindowPage page) {
       break;
     }
 
-    case MainWindowPage::List:
+    case MainWindowPage::List: {
+      const auto layout = new QHBoxLayout(ui_->listPage);
+      layout->setContentsMargins(0, 0, 0, 0);
+      ui_->listPage->setLayout(layout);
+
+      m_listWidget = new ListWidget(ui_->listPage, this);
+      layout->addWidget(m_listWidget);
+
       break;
+    }
 
     case MainWindowPage::History:
       break;

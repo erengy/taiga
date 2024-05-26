@@ -28,6 +28,7 @@ class MainWindow;
 
 namespace gui {
 
+class ListWidget;
 class NavigationWidget;
 class NowPlayingWidget;
 class SearchWidget;
@@ -76,6 +77,7 @@ private:
 
   Ui::MainWindow* ui_ = nullptr;
 
+  ListWidget* m_listWidget = nullptr;
   NavigationWidget* m_navigationWidget = nullptr;
   NowPlayingWidget* m_nowPlayingWidget = nullptr;
   QLineEdit* m_searchBox = nullptr;
