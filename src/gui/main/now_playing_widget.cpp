@@ -83,7 +83,7 @@ void NowPlayingWidget::refresh() {
 
   m_mainLabel->setText(u"Watching <a href=\"#\" style=\"%3\">%1</a> – Episode %2"_qs
                            .arg(QString::fromStdString(m_anime->titles.romaji))
-                           .arg("1/25")
+                           .arg(u"%1/%2"_qs.arg(1).arg(m_anime->episode_count))
                            .arg("font-weight: 600; text-decoration: none;"));
 
   m_timerLabel->setText("List update in 00:00");
