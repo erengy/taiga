@@ -3,6 +3,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 add_executable(taiga)
 
 target_sources(taiga PRIVATE
+	base/chrono.cpp
 	media/anime_db_2.cpp
 	resources/icons.qrc
 	resources/styles.qrc
