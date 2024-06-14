@@ -80,7 +80,6 @@ void OnLibraryUpdateFailure(int id, const std::wstring& reason, bool not_approve
 
 bool OnLibraryEntriesEditDelete(const std::vector<int> ids);
 int OnLibraryEntriesEditEpisode(const std::vector<int> ids);
-bool OnLibraryEntriesEditTags(const std::vector<int> ids, std::wstring& tags);
 bool OnLibraryEntriesEditNotes(const std::vector<int> ids, std::wstring& notes);
 
 void OnHistoryAddItem(const library::QueueItem& queue_item);
@@ -123,8 +122,6 @@ void OnMircDdeConnectionSuccess(const std::vector<std::wstring>& channels, bool 
 
 void OnMalRequestAccessTokenSuccess();
 void OnMalRequestAccessTokenError(const std::wstring& description);
-
-bool OnTwitterTokenEntry(std::wstring& auth_pin);
 
 void OnLogin();
 

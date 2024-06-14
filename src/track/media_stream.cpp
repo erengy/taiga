@@ -1,20 +1,20 @@
-/*
-** Taiga
-** Copyright (C) 2010-2021, Eren Okka
-**
-** This program is free software: you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation, either version 3 of the License, or
-** (at your option) any later version.
-**
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-** GNU General Public License for more details.
-**
-** You should have received a copy of the GNU General Public License
-** along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+/**
+ * Taiga
+ * Copyright (C) 2010-2024, Eren Okka
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #include <regex>
 #include <set>
@@ -55,44 +55,20 @@ static const std::vector<StreamData> stream_data{
     std::regex("animenewsnetwork\\.(?:com|cc)/video/[0-9]+"),
     std::regex("(.+) - Anime News Network"),
   },
-  // Crunchyroll
+  // Bilibili
   {
-    Stream::Crunchyroll,
-    L"Crunchyroll",
-    L"http://www.crunchyroll.com",
-    std::regex(
-      "crunchyroll\\.[a-z.]+/[^/]+/(?:[^/]+/)?(?:"
-        "episode-[0-9]+.*|"
-        ".*-(?:movie|ona|ova)"
-      ")-[0-9]+"
-    ),
-    std::regex("(.+) - Watch on Crunchyroll"),
-  },
-  // Funimation
-  {
-    Stream::Funimation,
-    L"Funimation",
-    L"https://www.funimation.com",
-    std::regex("funimation\\.com/shows/[^/]+/[^/]+/"),
-    std::regex("(?:Watch )?(.+) Anime.* (?:on|-) Funimation"),
-  },
-  // HIDIVE
-  {
-    Stream::Hidive,
-    L"HIDIVE",
-    L"https://www.hidive.com",
-    std::regex("hidive\\.com/stream/"),
-    std::regex("Stream (.+) on HIDIVE"),
+    Stream::Bilibili,
+    L"Bilibili",
+    L"https://www.bilibili.tv/en/anime",
+    std::regex("bilibili.tv/[^/]+/play/[0-9]+"),
+    std::regex("(.+) - Bilibili"),
   },
   // Jellyfin Web App
   {
     Stream::Jellyfin,
     L"Jellyfin Web App",
     L"https://jellyfin.org",
-    std::regex(
-      "^localhost:[0-9]+/web/index.html#!/video|"
-      "^.+/jellyfin/web/index.html#!/video"
-    ),
+    std::regex("^.+/web/(?:index\\.html)?#!/video"),
     std::regex("Jellyfin|(.+)"),
   },
   // Plex Web App
@@ -109,6 +85,22 @@ static const std::vector<StreamData> stream_data{
       "^[^/]*[a-z0-9-]+\\.[a-z0-9-]+/plex"
     ),
     std::regex(u8"Plex|(?:\u25B6 )?(.+)"),
+  },
+  // Roku Channel
+  {
+    Stream::RokuChannel,
+    L"Roku Channel",
+    L"https://therokuchannel.roku.com",
+    std::regex("therokuchannel\\.roku\\.com/watch/.+"),
+    std::regex("Watch (.+) Online for Free \\| The Roku Channel \\| Roku")
+  },
+  // Tubi
+  {
+    Stream::Tubi,
+    L"Tubi",
+    L"https://tubitv.com",
+    std::regex("tubitv\\.com/tv-shows/.+"),
+    std::regex("Watch (.+) - Free TV Shows \\| Tubi")
   },
   // Veoh
   {
@@ -172,16 +164,16 @@ bool IsStreamEnabled(const Stream stream) {
       return taiga::settings.GetStreamAdn();
     case Stream::Ann:
       return taiga::settings.GetStreamAnn();
-    case Stream::Crunchyroll:
-      return taiga::settings.GetStreamCrunchyroll();
-    case Stream::Funimation:
-      return taiga::settings.GetStreamFunimation();
-    case Stream::Hidive:
-      return taiga::settings.GetStreamHidive();
+    case Stream::Bilibili:
+      return taiga::settings.GetStreamBilibili();
     case Stream::Jellyfin:
       return taiga::settings.GetStreamJellyfin();
     case Stream::Plex:
       return taiga::settings.GetStreamPlex();
+    case Stream::RokuChannel:
+      return taiga::settings.GetStreamRokuChannel();
+    case Stream::Tubi:
+      return taiga::settings.GetStreamTubi();
     case Stream::Veoh:
       return taiga::settings.GetStreamVeoh();
     case Stream::Viz:
@@ -209,20 +201,20 @@ void EnableStream(const Stream stream, const bool enabled) {
     case Stream::Ann:
       taiga::settings.SetStreamAnn(enabled);
       break;
-    case Stream::Crunchyroll:
-      taiga::settings.SetStreamCrunchyroll(enabled);
-      break;
-    case Stream::Funimation:
-      taiga::settings.SetStreamFunimation(enabled);
-      break;
-    case Stream::Hidive:
-      taiga::settings.SetStreamHidive(enabled);
+    case Stream::Bilibili:
+      taiga::settings.SetStreamBilibili(enabled);
       break;
     case Stream::Jellyfin:
       taiga::settings.SetStreamJellyfin(enabled);
       break;
     case Stream::Plex:
       taiga::settings.SetStreamPlex(enabled);
+      break;
+    case Stream::RokuChannel:
+      taiga::settings.SetStreamRokuChannel(enabled);
+      break;
+    case Stream::Tubi:
+      taiga::settings.SetStreamTubi(enabled);
       break;
     case Stream::Veoh:
       taiga::settings.SetStreamVeoh(enabled);
@@ -300,17 +292,16 @@ void CleanStreamTitle(const StreamData& stream_data, std::string& title) {
       title = std::regex_replace(title, pattern, "");
       break;
     }
-    case Stream::Hidive: {
-      static const std::regex pattern{"(?:(Episode \\d+)|[^ ]+) of (.+)"};
-      std::smatch match;
-      if (std::regex_match(title, match, pattern))
-        title = match.str(2) + (match.length(1) ? " " + match.str(1) : "");
-      break;
-    }
     case Stream::Plex: {
       auto str = StrToWstr(title);
       ReplaceString(str, L" \u00B7 ", L"");
       title = WstrToStr(str);
+      break;
+    }
+    case Stream::RokuChannel:
+    case Stream::Tubi: {
+      static const std::regex pattern{" S(\\d+):E(\\d+) "};
+      title = std::regex_replace(title, pattern, " S$1E$2 ");
       break;
     }
     case Stream::Vrv: {

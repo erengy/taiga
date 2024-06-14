@@ -1,20 +1,20 @@
-/*
-** Taiga
-** Copyright (C) 2010-2021, Eren Okka
-**
-** This program is free software: you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation, either version 3 of the License, or
-** (at your option) any later version.
-**
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-** GNU General Public License for more details.
-**
-** You should have received a copy of the GNU General Public License
-** along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+/**
+ * Taiga
+ * Copyright (C) 2010-2024, Eren Okka
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #include <cmath>
 
@@ -260,10 +260,27 @@ bool UpdateHelper::RunInstaller() {
   if (!latest_item_)
     return false;
 
-  // /S runs the installer silently, /D overrides the default installation
-  // directory. Do not rely on the current directory here, as it isn't
-  // guaranteed to be the same as the module path.
-  std::wstring parameters = L"/S /D=" + GetPathOnly(app.GetModulePath());
+  // Custom options:
+  //
+  // `/NOCLOSE` skips closing application instance.
+  //
+  // `/RUN` restarts the application after installation.
+  //
+  // NSIS options:
+  //
+  // `/S` runs the installer silently.
+  //
+  // `/D` overrides the default installation directory.
+  //
+  //   - It must be the last parameter.
+  //   - It must not contain any quotes, even if the path contains spaces.
+  //   - Only absolute paths are supported.
+  //   - Do not rely on the current directory here, as it is not guaranteed to
+  //     be the same as the module path.
+  //
+  // See: https://nsis.sourceforge.io/Docs/Chapter3.html#installerusage
+  std::wstring parameters =
+      L"/NOCLOSE /RUN /S /D=" + GetPathOnly(app.GetModulePath());
 
   restart_required_ = Execute(download_path_, parameters);
 

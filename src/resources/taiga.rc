@@ -1,0 +1,32 @@
+#include <windows.h>
+#include "taiga/config.h"
+
+IDI_MAIN ICON "icons\\taiga.ico"
+
+1 VERSIONINFO
+    FILEVERSION     TAIGA_VERSION_DIGITAL
+    PRODUCTVERSION  TAIGA_VERSION_DIGITAL
+    FILEOS          VOS_NT_WINDOWS32
+    FILETYPE        VFT_APP
+    FILESUBTYPE     VFT2_UNKNOWN
+    FILEFLAGSMASK   0x00000000
+    FILEFLAGS       0x00000000
+{
+    BLOCK "StringFileInfo"
+    {
+        BLOCK "0409FDE9"
+        {
+            VALUE "CompanyName", "erengy"
+            VALUE "FileDescription", "Taiga"
+            VALUE "FileVersion", TAIGA_VERSION_STRING
+            VALUE "InternalName", "Taiga"
+            VALUE "OriginalFilename", "Taiga.exe"
+            VALUE "ProductName", "Taiga"
+            VALUE "ProductVersion", TAIGA_VERSION_STRING
+        }
+    }
+    BLOCK "VarFileInfo"
+    {
+        VALUE "Translation", 0x0409, 0xFDE9
+    }
+}

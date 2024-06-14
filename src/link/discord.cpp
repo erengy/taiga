@@ -1,20 +1,20 @@
-/*
-** Taiga
-** Copyright (C) 2010-2021, Eren Okka
-**
-** This program is free software: you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation, either version 3 of the License, or
-** (at your option) any later version.
-**
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-** GNU General Public License for more details.
-**
-** You should have received a copy of the GNU General Public License
-** along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+/**
+ * Taiga
+ * Copyright (C) 2010-2024, Eren Okka
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #include <discord_rpc.h>
 
@@ -75,7 +75,9 @@ void ClearPresence() {
 }
 
 void UpdatePresence(const std::string& details, const std::string& state,
-                    const time_t timestamp) {
+                    const std::string& large_image,
+                    const std::string& button_label,
+                    const std::string& button_url, const time_t timestamp) {
   const std::string small_image_key = WstrToStr(sync::GetCurrentServiceSlug());
 
   const std::string small_image_text =
@@ -87,11 +89,18 @@ void UpdatePresence(const std::string& details, const std::string& state,
   DiscordRichPresence presence = {0};
   presence.state = state.c_str();
   presence.details = details.c_str();
-  presence.startTimestamp = timestamp;
-  presence.largeImageKey = "default";
+  if (taiga::settings.GetShareDiscordTimeEnabled()) {
+    presence.startTimestamp = timestamp;
+  }
+  presence.largeImageKey =
+      !large_image.empty() ? large_image.c_str() : "default";
   presence.largeImageText = details.c_str();
   presence.smallImageKey = small_image_key.c_str();
   presence.smallImageText = small_image_text.c_str();
+  if (!button_label.empty() && !button_url.empty()) {
+    presence.buttons[0].label = button_label.c_str();
+    presence.buttons[0].url = button_url.c_str();
+  }
 
   Discord_UpdatePresence(&presence);
   RunCallbacks();

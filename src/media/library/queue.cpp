@@ -1,20 +1,20 @@
-/*
-** Taiga
-** Copyright (C) 2010-2021, Eren Okka
-**
-** This program is free software: you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation, either version 3 of the License, or
-** (at your option) any later version.
-**
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-** GNU General Public License for more details.
-**
-** You should have received a copy of the GNU General Public License
-** along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+/**
+ * Taiga
+ * Copyright (C) 2010-2024, Eren Okka
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #include "media/library/queue.h"
 
@@ -48,9 +48,6 @@ static void ValidateQueueItem(QueueItem& item, const anime::Item& anime_item) {
   if (item.rewatched_times)
     if (anime_item.GetMyRewatchedTimes() == *item.rewatched_times)
       item.rewatched_times.reset();
-  if (item.tags)
-    if (anime_item.GetMyTags() == *item.tags)
-      item.tags.reset();
   if (item.notes)
     if (anime_item.GetMyNotes() == *item.notes)
       item.notes.reset();
@@ -81,7 +78,6 @@ void Queue::Add(QueueItem& item, bool save) {
           !item.status &&
           !item.enable_rewatching &&
           !item.rewatched_times &&
-          !item.tags &&
           !item.notes &&
           !item.date_start &&
           !item.date_finish)
@@ -107,8 +103,6 @@ void Queue::Add(QueueItem& item, bool save) {
               it->enable_rewatching = *item.enable_rewatching;
             if (item.rewatched_times)
               it->rewatched_times = *item.rewatched_times;
-            if (item.tags)
-              it->tags = *item.tags;
             if (item.notes)
               it->notes = *item.notes;
             if (item.date_start)
@@ -143,7 +137,7 @@ void Queue::Add(QueueItem& item, bool save) {
       episode.anime_id = anime_item->GetId();
       episode.set_episode_number(*item.episode);
       track::media_players.play_status = track::recognition::PlayStatus::Updated;
-      taiga::announcer.Do(taiga::kAnnounceToHttp | taiga::kAnnounceToTwitter, &episode);
+      taiga::announcer.Do(taiga::kAnnounceToHttp, &episode);
     }
 
     // Check new episode
@@ -255,8 +249,6 @@ QueueItem* Queue::FindItem(int anime_id, QueueSearch search_mode) {
         return item.score.has_value();
       case QueueSearch::Status:
         return item.status.has_value();
-      case QueueSearch::Tags:
-        return item.tags.has_value();
       default:
         return false;
     }

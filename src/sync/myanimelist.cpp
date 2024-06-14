@@ -1,20 +1,20 @@
-/*
-** Taiga
-** Copyright (C) 2010-2021, Eren Okka
-**
-** This program is free software: you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation, either version 3 of the License, or
-** (at your option) any later version.
-**
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-** GNU General Public License for more details.
-**
-** You should have received a copy of the GNU General Public License
-** along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+/**
+ * Taiga
+ * Copyright (C) 2010-2024, Eren Okka
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #include <functional>
 #include <optional>
@@ -22,6 +22,7 @@
 #include "sync/myanimelist.h"
 
 #include "base/format.h"
+#include "base/html.h"
 #include "base/json.h"
 #include "base/log.h"
 #include "base/string.h"
@@ -43,7 +44,8 @@
 
 namespace sync::myanimelist {
 
-// @TODO: Link to API documentation when available
+// API documentation:
+// https://myanimelist.net/apiconfig/references/api/v2
 
 struct Error {
   enum class Type {
@@ -239,7 +241,6 @@ std::wstring GetListStatusFields() {
          L"score,"
          L"start_date,"
          L"status,"
-         L"tags,"
          L"updated_at";
 }
 
@@ -321,7 +322,8 @@ int ParseAnimeObject(const Json& json) {
     return names;
   };
   anime_item.SetGenres(get_names(json, "genres"));
-  anime_item.SetProducers(get_names(json, "studios"));
+  anime_item.SetProducers(std::vector<std::wstring>{});
+  anime_item.SetStudios(get_names(json, "studios"));
 
   Meow.UpdateTitles(anime_item);
 
@@ -347,19 +349,12 @@ void ParseLibraryObject(const Json& json, const int anime_id) {
   anime_item.SetMyDateEnd(
       TranslateDateFrom(StrToWstr(JsonReadStr(json, "finish_date"))));
   anime_item.SetMyRewatchedTimes(JsonReadInt(json, "num_times_rewatched"));
-  anime_item.SetMyNotes(StrToWstr(JsonReadStr(json, "comments")));
   anime_item.SetMyLastUpdated(
       TranslateMyLastUpdatedFrom(JsonReadStr(json, "updated_at")));
 
-  std::vector<std::wstring> tags;
-  if (json.contains("tags") && json["tags"].is_array()) {
-    for (const auto& tag : json["tags"]) {
-      if (tag.is_string()) {
-        tags.push_back(StrToWstr(tag.get<std::string>()));
-      }
-    }
-  }
-  anime_item.SetMyTags(Join(tags, L", "));
+  std::wstring notes = StrToWstr(JsonReadStr(json, "comments"));
+  DecodeHtmlEntities(notes);
+  anime_item.SetMyNotes(notes);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -781,8 +776,6 @@ void UpdateLibraryEntry(const library::QueueItem& queue_item) {
     params.add("is_rewatching", ToStr(*queue_item.enable_rewatching));
   if (queue_item.rewatched_times)
     params.add("num_times_rewatched", ToStr(*queue_item.rewatched_times));
-  if (queue_item.tags)
-    params.add("tags", WstrToStr(*queue_item.tags));
   if (queue_item.notes)
     params.add("comments", WstrToStr(*queue_item.notes));
 

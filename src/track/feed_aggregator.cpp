@@ -1,26 +1,24 @@
-/*
-** Taiga
-** Copyright (C) 2010-2021, Eren Okka
-**
-** This program is free software: you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation, either version 3 of the License, or
-** (at your option) any later version.
-**
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-** GNU General Public License for more details.
-**
-** You should have received a copy of the GNU General Public License
-** along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+/**
+ * Taiga
+ * Copyright (C) 2010-2024, Eren Okka
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #include <algorithm>
 #include <regex>
 #include <set>
-
-#include <nstd/string.hpp>
 
 #include "track/feed_aggregator.h"
 
@@ -51,20 +49,7 @@ static bool HandleFeedError(const std::wstring& host,
     return true;
   }
 
-  // Check for DDoS protection that requires a JavaScript challenge to be solved
-  // (e.g. Cloudflare's "I'm Under Attack" mode)
-  const auto ddos_protection_enabled = [&response]() {
-    const std::string server = nstd::tolower_string(response.header("server"));
-    switch (response.status_code()) {
-      case hypp::status::k403_Forbidden:
-        return nstd::starts_with(server, "ddos-guard");
-      case hypp::status::k429_Too_Many_Requests:
-      case hypp::status::k503_Service_Unavailable:
-        return nstd::starts_with(server, "cloudflare");
-    }
-    return false;
-  };
-  if (ddos_protection_enabled()) {
+  if (taiga::http::util::IsDdosProtectionEnabled(response)) {
     ui::ChangeStatusText(
         L"Cannot connect to {} because of DDoS protection (Server: {})"_format(
             host, StrToWstr(response.header("server"))));

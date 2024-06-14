@@ -330,7 +330,14 @@ void AnimeListDialog::OnContextMenu(HWND hwnd, POINT pt) {
       const auto command = ui::Menus.Show(DlgMain.GetWindowHandle(), pt.x, pt.y, menu_name.c_str());
       if (command == L"EditDelete()")
         parameter = reinterpret_cast<LPARAM>(&anime_ids);
-      ExecuteCommand(command, 0, parameter);
+      if (command == L"InvertSelection") {
+        for (int i = 0; i < listview.GetItemCount(); ++i) {
+          bool selected = ListView_GetItemState(listview.GetWindowHandle(), i, LVIS_SELECTED);
+          listview.SelectItem(i, !selected);
+        }
+      } else {
+        ExecuteCommand(command, 0, parameter);
+      }
     }
 
   } else if (hwnd == listview.GetHeader()) {
@@ -427,6 +434,7 @@ int AnimeListDialog::ListView::GetDefaultSortOrder(AnimeListColumn column) {
     case kColumnUserRating:
       return -1;
     case kColumnAnimeTitle:
+    case kColumnUserNotes:
     default:
       return 1;
   }
@@ -520,13 +528,14 @@ std::wstring GetAvailableEpisodesTooltip(const anime::Item& anime_item) {
     AppendString(text, L"Missing: " + missing_text);
   }
 
-  if (anime_item.GetNextEpisodeTime()) {
-    const auto next_episode_number = anime_item.GetLastAiredEpisodeNumber() + 1;
-    const auto next_episode_time = GetAbsoluteTimeString(anime_item.GetNextEpisodeTime(), "%A %H:%M");
-    AppendString(text, L"Episode #{} airing {}"_format(next_episode_number, next_episode_time), L"\r\n");
-  } else if (!anime::IsFinishedAiring(anime_item) &&
-             eps_aired_estimated > anime_item.GetMyLastWatchedEpisode()) {
-    AppendString(text, L"Aired: #{} (estimated)"_format(eps_aired_estimated), L"\r\n");
+  if (!anime::IsFinishedAiring(anime_item)) {
+    if (anime_item.GetNextEpisodeTime()) {
+      const auto next_episode_number = anime_item.GetLastAiredEpisodeNumber() + 1;
+      const auto next_episode_time = GetAbsoluteTimeString(anime_item.GetNextEpisodeTime(), "%A %H:%M");
+      AppendString(text, L"Episode #{} airing {}"_format(next_episode_number, next_episode_time), L"\r\n");
+    } else if (eps_aired_estimated > anime_item.GetMyLastWatchedEpisode()) {
+      AppendString(text, L"Aired: #{} (estimated)"_format(eps_aired_estimated), L"\r\n");
+    }
   }
 
   return text;
@@ -746,9 +755,15 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
     // Item select
     case LVN_ITEMCHANGED: {
       auto lplv = reinterpret_cast<LPNMLISTVIEW>(lParam);
-      auto anime_id = static_cast<int>(lplv->lParam);
       if (lplv->uNewState)
         listview.RefreshItem(lplv->iItem);
+      const auto selected_count = listview.GetSelectedCount();
+      if (selected_count > 0) {
+        ui::ChangeStatusText(L"{} {} selected"_format(
+            selected_count, selected_count == 1 ? L"item" : L"items"));
+      } else {
+        ui::ClearStatusText();
+      }
       break;
     }
 
@@ -1425,6 +1440,9 @@ void AnimeListDialog::RefreshList(std::optional<anime::MyStatus> status) {
     listview.EnsureVisible(current_position);
   }
 
+  // Clear status bar text, as it might be displaying selected item count
+  ui::ClearStatusText();
+
   // Redraw
   listview.SetRedraw(TRUE);
   listview.RedrawWindow(nullptr, nullptr,
@@ -1461,19 +1479,22 @@ void AnimeListDialog::RefreshListItemColumns(int index, const anime::Item& anime
       case kColumnAnimeType:
         text = ui::TranslateType(anime_item.GetType());
         break;
-      case kColumnUserLastUpdated: {
-        time_t time_last_updated = ToTime(anime_item.GetMyLastUpdated());
-        text = GetRelativeTimeString(time_last_updated, true);
-        break;
-      }
-      case kColumnUserRating:
-        text = ui::TranslateMyScore(anime_item.GetMyScore());
-        break;
       case kColumnUserDateStarted:
         text = ui::TranslateMyDate(anime_item.GetMyDateStart());
         break;
       case kColumnUserDateCompleted:
         text = ui::TranslateMyDate(anime_item.GetMyDateEnd());
+        break;
+      case kColumnUserLastUpdated: {
+        time_t time_last_updated = ToTime(anime_item.GetMyLastUpdated());
+        text = GetRelativeTimeString(time_last_updated, true);
+        break;
+      }
+      case kColumnUserNotes:
+        text = anime_item.GetMyNotes();
+        break;
+      case kColumnUserRating:
+        text = ui::TranslateMyScore(anime_item.GetMyScore());
         break;
     }
     if (!text.empty())
@@ -1592,6 +1613,10 @@ void AnimeListDialog::ListView::InitializeColumns(bool reset) {
       {kColumnUserLastUpdated, false, i, i++,
        0, static_cast<unsigned short>(ScaleX(100)), static_cast<unsigned short>(ScaleX(85)),
        LVCFMT_RIGHT, L"Last updated", L"user_last_updated"})));
+  columns.insert(std::make_pair(kColumnUserNotes, ColumnData(
+      {kColumnUserNotes, false, i, i++,
+       0, static_cast<unsigned short>(ScaleX(100)), static_cast<unsigned short>(ScaleX(85)),
+       LVCFMT_LEFT, L"Notes", L"user_notes"})));
 
   if (reset) {
     for (const auto& [column_type, _] : columns) {
@@ -1819,6 +1844,7 @@ AnimeListColumn AnimeListDialog::ListView::TranslateColumnName(const std::wstrin
     {L"user_date_started", kColumnUserDateStarted},
     {L"user_date_completed", kColumnUserDateCompleted},
     {L"user_last_updated", kColumnUserLastUpdated},
+    {L"user_notes", kColumnUserNotes},
     {L"user_progress", kColumnUserProgress},
     {L"user_rating", kColumnUserRating},
   };

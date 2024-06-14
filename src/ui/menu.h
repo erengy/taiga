@@ -47,7 +47,7 @@ public:
   void UpdateHistoryList(bool enabled = false);
   void UpdateScore(const anime::Item* anime_item);
   void UpdateSearchList(bool enabled = false);
-  void UpdateSeasonList(bool enabled = false);
+  void UpdateSeasonList(bool is_in_list = false, bool trailer_available = false);
   void UpdateTorrentsList(const track::FeedItem& feed_item);
   void UpdateSeason();
   void UpdateServices(bool enabled = true);

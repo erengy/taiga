@@ -22,7 +22,7 @@ echo Example: %~nx0 --machine=x86 --vc=16
 exit /B
 
 :locate_vs
-set vcvarsall="%ProgramFiles(x86)%\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat"
+set vcvarsall="%ProgramFiles%\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat"
 set vswhere="%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe"
 if exist %vswhere% (
   for /f "usebackq delims=" %%i in (`%vswhere% -latest -property installationPath`) do (

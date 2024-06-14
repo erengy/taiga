@@ -14,11 +14,12 @@ endDate { year month day }
 episodes
 duration
 countryOfOrigin
+trailer { id site }
 updatedAt
 coverImage { large }
 genres
 synonyms
 averageScore
 popularity
-studios { edges { node { name } } }
+studios { edges { isMain node { name } } }
 nextAiringEpisode { airingAt episode }

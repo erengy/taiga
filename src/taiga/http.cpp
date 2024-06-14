@@ -1,20 +1,20 @@
-/*
-** Taiga
-** Copyright (C) 2010-2021, Eren Okka
-**
-** This program is free software: you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation, either version 3 of the License, or
-** (at your option) any later version.
-**
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-** GNU General Public License for more details.
-**
-** You should have received a copy of the GNU General Public License
-** along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+/**
+ * Taiga
+ * Copyright (C) 2010-2024, Eren Okka
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #include <atomic>
 #include <list>
@@ -22,6 +22,8 @@
 #include <thread>
 
 #include "taiga/http.h"
+
+#include <nstd/string.hpp>
 
 #include "base/file.h"
 #include "base/format.h"
@@ -368,10 +370,26 @@ std::wstring GetUrlHost(const std::string_view url) {
   return {};
 }
 
+// Check for DDoS protection that requires a JavaScript challenge to be solved
+// (e.g. Cloudflare's "I'm Under Attack" mode)
+bool IsDdosProtectionEnabled(const Response& response) {
+  const std::string server = nstd::tolower_string(response.header("server"));
+
+  switch (response.status_code()) {
+    case hypp::status::k403_Forbidden:
+      return nstd::starts_with(server, "ddos-guard");
+    case hypp::status::k429_Too_Many_Requests:
+    case hypp::status::k503_Service_Unavailable:
+      return nstd::starts_with(server, "cloudflare");
+  }
+
+  return false;
+};
+
 std::wstring to_string(const Error& error, const std::wstring& host) {
   std::wstring message = StrToWstr(error.str());
   TrimRight(message, L" \r\n");
-  message = L"{} ({})"_format(message, error.code);
+  message = L"{} ({})"_format(message, static_cast<int>(error.code));
   if (!host.empty()) {
     switch (error.code) {
       case CURLE_COULDNT_RESOLVE_HOST:

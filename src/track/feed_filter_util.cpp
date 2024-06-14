@@ -1,20 +1,20 @@
-/*
-** Taiga
-** Copyright (C) 2010-2021, Eren Okka
-**
-** This program is free software: you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation, either version 3 of the License, or
-** (at your option) any later version.
-**
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-** GNU General Public License for more details.
-**
-** You should have received a copy of the GNU General Public License
-** along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+/**
+ * Taiga
+ * Copyright (C) 2010-2024, Eren Okka
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #include <map>
 
@@ -70,8 +70,8 @@ std::wstring TranslateElement(const int element) {
     case kFeedFilterElement_Meta_Episodes: return L"Anime episode count";
     case kFeedFilterElement_Meta_Status: return L"Anime airing status";
     case kFeedFilterElement_Meta_Type: return L"Anime type";
+    case kFeedFilterElement_User_Notes: return L"Anime notes";
     case kFeedFilterElement_User_Status: return L"Anime watching status";
-    case kFeedFilterElement_User_Tags: return L"Anime tags";
     case kFeedFilterElement_Episode_Number: return L"Episode number";
     case kFeedFilterElement_Episode_Version: return L"Episode version";
     case kFeedFilterElement_Local_EpisodeAvailable: return L"Episode availability";
@@ -163,8 +163,8 @@ static const std::map<int, std::wstring>& GetShortcodeMap(const Shortcode type) 
       {kFeedFilterElement_Meta_Episodes, L"meta_episodes"},
       {kFeedFilterElement_Meta_DateStart, L"meta_date_start"},
       {kFeedFilterElement_Meta_DateEnd, L"meta_date_end"},
+      {kFeedFilterElement_User_Notes, L"user_tags"},
       {kFeedFilterElement_User_Status, L"user_status"},
-      {kFeedFilterElement_User_Tags, L"user_tags"},
       {kFeedFilterElement_Local_EpisodeAvailable, L"local_episode_available"},
       {kFeedFilterElement_Episode_Title, L"episode_title"},
       {kFeedFilterElement_Episode_Number, L"episode_number"},
@@ -226,7 +226,7 @@ int GetIndexFromShortcode(const Shortcode type, const std::wstring& shortcode) {
       return index;
   }
 
-  LOGD(L"\"{}\" for type \"{}\" not found.", shortcode, type);
+  LOGD(L"\"{}\" for type \"{}\" not found.", shortcode, static_cast<int>(type));
   return -1;
 }
 

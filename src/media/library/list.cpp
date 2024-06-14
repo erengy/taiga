@@ -1,20 +1,20 @@
-/*
-** Taiga
-** Copyright (C) 2010-2021, Eren Okka
-**
-** This program is free software: you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation, either version 3 of the License, or
-** (at your option) any later version.
-**
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-** GNU General Public License for more details.
-**
-** You should have received a copy of the GNU General Public License
-** along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+/**
+ * Taiga
+ * Copyright (C) 2010-2024, Eren Okka
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #include "media/anime_db.h"
 
@@ -69,7 +69,6 @@ bool Database::LoadList() {
     anime_item.SetMyRewatchedTimes(XmlReadInt(node, L"rewatched_times"));
     anime_item.SetMyRewatching(XmlReadInt(node, L"rewatching"));
     anime_item.SetMyRewatchingEp(XmlReadInt(node, L"rewatching_ep"));
-    anime_item.SetMyTags(XmlReadStr(node, L"tags"));
     anime_item.SetMyNotes(XmlReadStr(node, L"notes"));
     anime_item.SetMyLastUpdated(XmlReadStr(node, L"last_updated"));
   }
@@ -107,7 +106,6 @@ bool Database::SaveList(bool include_database) const {
       XmlWriteInt(node, L"rewatched_times", item.GetMyRewatchedTimes());
       XmlWriteInt(node, L"rewatching", item.GetMyRewatching(false));
       XmlWriteInt(node, L"rewatching_ep", item.GetMyRewatchingEp());
-      XmlWriteStr(node, L"tags", item.GetMyTags(false));
       XmlWriteStr(node, L"notes", item.GetMyNotes(false));
       XmlWriteStr(node, L"last_updated", item.GetMyLastUpdated());
     }
@@ -247,8 +245,6 @@ void Database::UpdateItem(const library::QueueItem& queue_item) {
     anime_item->SetMyRewatching(*queue_item.enable_rewatching);
   if (queue_item.rewatched_times)
     anime_item->SetMyRewatchedTimes(*queue_item.rewatched_times);
-  if (queue_item.tags)
-    anime_item->SetMyTags(*queue_item.tags);
   if (queue_item.notes)
     anime_item->SetMyNotes(*queue_item.notes);
   if (queue_item.date_start)

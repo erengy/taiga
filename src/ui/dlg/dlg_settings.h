@@ -59,7 +59,6 @@ public:
   void RefreshCache();
   void RefreshTorrentFilterList(HWND hwnd_list);
   void UpdateTorrentFilterList(HWND hwnd_list);
-  void RefreshTwitterLink();
 
 private:
   class TreeView : public win::TreeView {

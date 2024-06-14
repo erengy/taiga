@@ -28,7 +28,6 @@
 #include "base/log.h"
 #include "base/string.h"
 #include "link/mirc.h"
-#include "link/twitter.h"
 #include "media/anime_db.h"
 #include "media/anime_util.h"
 #include "media/library/history.h"
@@ -87,7 +86,6 @@ void SettingsPage::Create() {
     SETRESOURCEID(kSettingsPageSharingDiscord, IDD_SETTINGS_SHARING_DISCORD);
     SETRESOURCEID(kSettingsPageSharingHttp, IDD_SETTINGS_SHARING_HTTP);
     SETRESOURCEID(kSettingsPageSharingMirc, IDD_SETTINGS_SHARING_MIRC);
-    SETRESOURCEID(kSettingsPageSharingTwitter, IDD_SETTINGS_SHARING_TWITTER);
     SETRESOURCEID(kSettingsPageTorrentsDiscovery, IDD_SETTINGS_TORRENTS_DISCOVERY);
     SETRESOURCEID(kSettingsPageTorrentsDownloads, IDD_SETTINGS_TORRENTS_DOWNLOADS);
     SETRESOURCEID(kSettingsPageTorrentsFilters, IDD_SETTINGS_TORRENTS_FILTERS);
@@ -298,6 +296,7 @@ BOOL SettingsPage::OnInitDialog() {
       CheckDlgButton(IDC_CHECK_DISCORD, taiga::settings.GetShareDiscordEnabled());
       CheckDlgButton(IDC_CHECK_DISCORD_USERNAME, taiga::settings.GetShareDiscordUsernameEnabled());
       CheckDlgButton(IDC_CHECK_DISCORD_GROUP, taiga::settings.GetShareDiscordGroupEnabled());
+      CheckDlgButton(IDC_CHECK_DISCORD_TIME, taiga::settings.GetShareDiscordTimeEnabled());
       break;
     }
     // Sharing > HTTP
@@ -316,12 +315,6 @@ BOOL SettingsPage::OnInitDialog() {
                        IDC_RADIO_MIRC_CHANNEL1 + taiga::settings.GetShareMircMode() - 1);
       SetDlgItemText(IDC_EDIT_MIRC_CHANNELS, taiga::settings.GetShareMircChannels().c_str());
       EnableDlgItem(IDC_EDIT_MIRC_CHANNELS, taiga::settings.GetShareMircMode() == 3);
-      break;
-    }
-    // Sharing > Twitter
-    case kSettingsPageSharingTwitter: {
-      CheckDlgButton(IDC_CHECK_TWITTER, taiga::settings.GetShareTwitterEnabled());
-      parent->RefreshTwitterLink();
       break;
     }
 
@@ -495,10 +488,6 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
           DlgFormat.mode = FormatDialogMode::Mirc;
           DlgFormat.Create(IDD_FORMAT, parent->GetWindowHandle(), true);
           return TRUE;
-        case IDC_BUTTON_FORMAT_TWITTER:
-          DlgFormat.mode = FormatDialogMode::Twitter;
-          DlgFormat.Create(IDD_FORMAT, parent->GetWindowHandle(), true);
-          return TRUE;
 
         ////////////////////////////////////////////////////////////////////////
 
@@ -592,12 +581,6 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
           if (ui::EnterAuthorizationPin(L"MyAnimeList", authorization_code)) {
             sync::myanimelist::RequestAccessToken(authorization_code, code_verifier);
           }
-          return TRUE;
-        }
-
-        // Authorize Twitter
-        case IDC_BUTTON_TWITTER_AUTH: {
-          link::twitter::RequestToken();
           return TRUE;
         }
 
@@ -878,8 +861,7 @@ LRESULT SettingsPage::OnNotify(int idCtrl, LPNMHDR pnmh) {
         // Execute link
         case IDC_LINK_ACCOUNT_ANILIST:
         case IDC_LINK_ACCOUNT_KITSU:
-        case IDC_LINK_ACCOUNT_MAL:
-        case IDC_LINK_TWITTER: {
+        case IDC_LINK_ACCOUNT_MAL: {
           PNMLINK pNMLink = reinterpret_cast<PNMLINK>(pnmh);
           ExecuteCommand(pNMLink->item.szUrl);
           return TRUE;

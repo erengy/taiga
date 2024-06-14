@@ -1,20 +1,20 @@
-/*
-** Taiga
-** Copyright (C) 2010-2021, Eren Okka
-**
-** This program is free software: you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation, either version 3 of the License, or
-** (at your option) any later version.
-**
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-** GNU General Public License for more details.
-**
-** You should have received a copy of the GNU General Public License
-** along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+/**
+ * Taiga
+ * Copyright (C) 2010-2024, Eren Okka
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #include <anitomy/anitomy/anitomy.h>
 #include <anitomy/anitomy/keyword.h>
@@ -331,7 +331,8 @@ void Engine::ExtendAnimeTitle(anime::Episode& episode) const {
   // Remove once the issue is handled by Anitomy. See issues #748 and #960 for
   // more information.
   if (anime_season > 1) {
-    if (StartsWith(episode.episode_title(), L"Part ")) {
+    if (StartsWith(episode.episode_title(), L"Part ") ||
+        StartsWith(episode.episode_title(), L"Cour ")) {
       episode.set_anime_title(episode.anime_title() + L" " +
                               episode.episode_title());
       episode.elements().erase(anitomy::kElementEpisodeTitle);

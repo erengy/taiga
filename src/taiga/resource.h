@@ -35,7 +35,6 @@
 #define IDD_SETTINGS_SHARING_DISCORD            139
 #define IDD_SETTINGS_SHARING_HTTP               140
 #define IDD_SETTINGS_SHARING_MIRC               141
-#define IDD_SETTINGS_SHARING_TWITTER            143
 #define IDD_SETTINGS_TORRENTS_DISCOVERY         144
 #define IDD_SETTINGS_TORRENTS_DOWNLOADS         145
 #define IDD_SETTINGS_TORRENTS_FILTERS           146
@@ -50,12 +49,10 @@
 #define IDC_BUTTON_CANCELSEARCH                 1004
 #define IDC_BUTTON_FORMAT_HTTP                  1005
 #define IDC_BUTTON_FORMAT_MIRC                  1006
-#define IDC_BUTTON_FORMAT_TWITTER               1008
 #define IDC_BUTTON_MIRC_TEST                    1009
 #define IDC_BUTTON_REMOVEFOLDER                 1010
 #define IDC_BUTTON_TORRENT_BROWSE_APP           1011
 #define IDC_BUTTON_TORRENT_BROWSE_FOLDER        1012
-#define IDC_BUTTON_TWITTER_AUTH                 1013
 #define IDC_CHECK_ANIME_ALT                     1014
 #define IDC_CHECK_ANIME_REWATCH                 1015
 #define IDC_CHECK_AUTOSTART                     1016
@@ -92,7 +89,6 @@
 #define IDC_CHECK_TORRENT_AUTOSETFOLDER         1048
 #define IDC_CHECK_TORRENT_AUTOUSEFOLDER         1049
 #define IDC_CHECK_TORRENT_FILTER                1050
-#define IDC_CHECK_TWITTER                       1051
 #define IDC_CHECK_UPDATE_CHECKMP                1052
 #define IDC_CHECK_UPDATE_CONFIRM                1053
 #define IDC_CHECK_UPDATE_RANGE                  1054
@@ -122,7 +118,7 @@
 #define IDC_EDIT_ANIME_PROGRESS                 1078
 #define IDC_EDIT_ANIME_SCORE                    1079
 #define IDC_EDIT_ANIME_SYNOPSIS                 1080
-#define IDC_EDIT_ANIME_TAGS                     1081
+#define IDC_EDIT_ANIME_NOTES                    1081
 #define IDC_EDIT_ANIME_TITLE                    1082
 #define IDC_EDIT_DELAY                          1083
 #define IDC_EDIT_EXTERNALLINKS                  1084
@@ -144,7 +140,6 @@
 #define IDC_LINK_ACCOUNT_MAL                    1101
 #define IDC_LINK_ANIME_FANSUB                   1102
 #define IDC_LINK_NOWPLAYING                     1104
-#define IDC_LINK_TWITTER                        1105
 #define IDC_LIST_ADVANCED_SETTINGS              1106
 #define IDC_LIST_EVENT                          1107
 #define IDC_LIST_FEED_FILTER_ANIME              1108
@@ -217,3 +212,6 @@
 #define IDC_TREE_SECTIONS                       1175
 #define IDC_BUTTON_MAL_AUTH                     1176
 #define IDC_CHECK_DISCORD_GROUP                 1177
+#define IDC_CHECK_DISCORD_TIME                  1178
+#define IDC_EDIT_ANIME_REWATCHES                1179
+#define IDC_SPIN_ANIME_REWATCHES                1180

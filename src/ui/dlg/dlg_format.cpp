@@ -50,10 +50,6 @@ BOOL FormatDialog::OnInitDialog() {
       SetText(L"Edit Format - mIRC");
       rich_edit_.SetText(taiga::settings.GetShareMircFormat().c_str());
       break;
-    case FormatDialogMode::Twitter:
-      SetText(L"Edit Format - Twitter");
-      rich_edit_.SetText(taiga::settings.GetShareTwitterFormat().c_str());
-      break;
     case FormatDialogMode::Balloon:
       SetText(L"Edit Format - Episode Notifications");
       rich_edit_.SetText(taiga::settings.GetSyncNotifyFormat().c_str());
@@ -70,9 +66,6 @@ void FormatDialog::OnOK() {
       break;
     case FormatDialogMode::Mirc:
       taiga::settings.SetShareMircFormat(rich_edit_.GetText());
-      break;
-    case FormatDialogMode::Twitter:
-      taiga::settings.SetShareTwitterFormat(rich_edit_.GetText());
       break;
     case FormatDialogMode::Balloon:
       taiga::settings.SetSyncNotifyFormat(rich_edit_.GetText());
@@ -112,10 +105,6 @@ BOOL FormatDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
         case FormatDialogMode::Mirc:
           value = taiga::settings.GetDefaultValue(
               taiga::AppSettingKey::ShareMircFormat);
-          break;
-        case FormatDialogMode::Twitter:
-          value = taiga::settings.GetDefaultValue(
-              taiga::AppSettingKey::ShareTwitterFormat);
           break;
         case FormatDialogMode::Balloon:
           value = taiga::settings.GetDefaultValue(

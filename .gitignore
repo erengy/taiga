@@ -1,3 +1,5 @@
+/.vs/
+/.vscode/
 /bin/
 /build/
 /deps/lib/

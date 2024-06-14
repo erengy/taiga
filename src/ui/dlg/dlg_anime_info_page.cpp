@@ -201,12 +201,13 @@ void PageSeriesInfo::Refresh(int anime_id, bool connect) {
   auto genres = anime_item->GetGenres();
   const auto tags = anime_item->GetTags();
   genres.insert(genres.end(), tags.begin(), tags.end());
+  const auto producers = anime::GetStudiosAndProducers(*anime_item);
   text = ui::TranslateType(anime_item->GetType()) + L"\n" +
          ui::TranslateNumber(anime_item->GetEpisodeCount(), L"Unknown") + L"\n" +
          ui::TranslateStatus(anime_item->GetAiringStatus()) + L"\n" +
          ui::TranslateDateToSeasonString(anime_item->GetDateStart()) + L"\n" +
          (genres.empty() ? L"Unknown" : Join(genres, L", ")) + L"\n" +
-         (anime_item->GetProducers().empty() ? L"Unknown" : Join(anime_item->GetProducers(), L", ")) + L"\n" +
+         (producers.empty() ? L"Unknown" : Join(producers, L", ")) + L"\n" +
          ui::TranslateScore(anime_item->GetScore());
   SetDlgItemText(IDC_STATIC_ANIME_DETAILS, text.c_str());
 
@@ -374,6 +375,12 @@ void PageMyInfo::Refresh(int anime_id) {
   spin.SetPos32(anime_item->GetMyLastWatchedEpisode());
   spin.SetWindowHandle(nullptr);
 
+  // Times rewatched
+  spin.SetWindowHandle(GetDlgItem(IDC_SPIN_ANIME_REWATCHES));
+  spin.SetRange32(0, 9999);
+  spin.SetPos32(anime_item->GetMyRewatchedTimes());
+  spin.SetWindowHandle(nullptr);
+
   // Rewatching
   CheckDlgButton(IDC_CHECK_ANIME_REWATCH, anime_item->GetMyRewatching());
 
@@ -433,21 +440,10 @@ void PageMyInfo::Refresh(int anime_id) {
   edit.SetWindowHandle(nullptr);
   spin.SetWindowHandle(nullptr);
 
-  // Tags / Notes
-  edit.SetWindowHandle(GetDlgItem(IDC_EDIT_ANIME_TAGS));
-  switch (sync::GetCurrentServiceId()) {
-    case sync::ServiceId::MyAnimeList:
-      SetDlgItemText(IDC_STATIC_TAGSNOTES, L"Tags:");
-      edit.SetCueBannerText(L"Enter tags here, separated by a comma (e.g. tag1, tag2)");
-      edit.SetText(anime_item->GetMyTags());
-      break;
-    case sync::ServiceId::Kitsu:
-    case sync::ServiceId::AniList:
-      SetDlgItemText(IDC_STATIC_TAGSNOTES, L"Notes:");
-      edit.SetCueBannerText(L"Enter your notes about this anime");
-      edit.SetText(anime_item->GetMyNotes());
-      break;
-  }
+  // Notes
+  edit.SetWindowHandle(GetDlgItem(IDC_EDIT_ANIME_NOTES));
+  edit.SetCueBannerText(L"Enter your notes about this anime");
+  edit.SetText(anime_item->GetMyNotes());
   edit.SetWindowHandle(nullptr);
 
   // Dates
@@ -544,6 +540,9 @@ bool PageMyInfo::Save() {
     return false;
   }
 
+  // Times rewatched
+  queue_item.rewatched_times = GetDlgItemInt(IDC_EDIT_ANIME_REWATCHES);
+
   // Rewatching
   queue_item.enable_rewatching = IsDlgButtonChecked(IDC_CHECK_ANIME_REWATCH);
 
@@ -571,16 +570,8 @@ bool PageMyInfo::Save() {
   queue_item.status = static_cast<anime::MyStatus>(
       GetComboSelection(IDC_COMBO_ANIME_STATUS) + 1);
 
-  // Tags / Notes
-  switch (sync::GetCurrentServiceId()) {
-    case sync::ServiceId::MyAnimeList:
-      queue_item.tags = GetDlgItemText(IDC_EDIT_ANIME_TAGS);
-      break;
-    case sync::ServiceId::Kitsu:
-    case sync::ServiceId::AniList:
-      queue_item.notes = GetDlgItemText(IDC_EDIT_ANIME_TAGS);
-      break;
-  }
+  // Notes
+  queue_item.notes = GetDlgItemText(IDC_EDIT_ANIME_NOTES);
 
   // Start date
   if (start_date_changed_) {

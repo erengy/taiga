@@ -1,20 +1,20 @@
-/*
-** Taiga
-** Copyright (C) 2010-2021, Eren Okka
-**
-** This program is free software: you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation, either version 3 of the License, or
-** (at your option) any later version.
-**
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-** GNU General Public License for more details.
-**
-** You should have received a copy of the GNU General Public License
-** along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+/**
+ * Taiga
+ * Copyright (C) 2010-2024, Eren Okka
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #include <nstd/algorithm.hpp>
 
@@ -94,6 +94,7 @@ void Database::ReadDatabaseNode(XmlNode& database_node) {
     item.SetGenres(XmlReadStr(node, L"genres"));
     item.SetTags(XmlReadStr(node, L"tags"));
     item.SetProducers(XmlReadStr(node, L"producers"));
+    item.SetStudios(XmlReadStr(node, L"studios"));
     item.SetSynopsis(XmlReadStr(node, L"synopsis"));
     item.SetLastModified(ToTime(XmlReadStr(node, L"modified")));
     item.SetEnglishTitle(XmlReadStr(node, L"english"));
@@ -109,6 +110,7 @@ void Database::ReadDatabaseNode(XmlNode& database_node) {
     item.SetEpisodeCount(XmlReadInt(node, L"episode_count"));
     item.SetSlug(XmlReadStr(node, L"slug"));
     item.SetImageUrl(XmlReadStr(node, L"image"));
+    item.SetTrailerId(XmlReadStr(node, L"trailer_id"));
     item.SetLastAiredEpisodeNumber(XmlReadInt(node, L"last_aired_episode"));
     item.SetNextEpisodeTime(ToTime(XmlReadStr(node, L"next_episode_time")));
   }
@@ -166,10 +168,12 @@ void Database::WriteDatabaseNode(XmlNode& database_node) const {
     XML_WD(L"date_start", item.GetDateStart());
     XML_WD(L"date_end", item.GetDateEnd());
     XML_WS(L"image", item.GetImageUrl(), pugi::node_pcdata);
+    XML_WS(L"trailer_id", item.GetTrailerId(), pugi::node_pcdata);
     XML_WI(L"age_rating", static_cast<int>(item.GetAgeRating()));
     XML_WS(L"genres", Join(item.GetGenres(), L", "), pugi::node_pcdata);
     XML_WS(L"tags", Join(item.GetTags(), L", "), pugi::node_pcdata);
     XML_WS(L"producers", Join(item.GetProducers(), L", "), pugi::node_pcdata);
+    XML_WS(L"studios", Join(item.GetStudios(), L", "), pugi::node_pcdata);
     XML_WF(L"score", item.GetScore(), pugi::node_pcdata);
     XML_WI(L"popularity", item.GetPopularity());
     XML_WS(L"synopsis", item.GetSynopsis(), pugi::node_cdata);

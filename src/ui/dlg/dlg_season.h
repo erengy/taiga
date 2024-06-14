@@ -68,8 +68,12 @@ public:
 private:
   int GetLineCount() const;
 
+  class ListView : public win::ListView {
+  public:
+    LRESULT WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+  } list_;
+
   win::Window cancel_button_;
-  win::ListView list_;
   win::Rebar rebar_;
   win::Toolbar toolbar_;
   win::Tooltip tooltips_;

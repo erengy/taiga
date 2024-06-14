@@ -84,32 +84,11 @@ void MenuList::UpdateAnime(const anime::Item* anime_item) {
   if (!anime_item->IsInList())
     return;
 
-  // Edit
-  auto menu = menu_list_.FindMenu(L"Edit");
-  if (menu) {
-    for (auto& item : menu->items) {
-      if (item.action == L"EditTags" ||
-          item.action == L"EditNotes") {
-        switch (sync::GetCurrentServiceId()) {
-          case sync::ServiceId::MyAnimeList:
-            item.name = L"Set &tags...";
-            item.action = L"EditTags";
-            break;
-          case sync::ServiceId::Kitsu:
-          case sync::ServiceId::AniList:
-            item.name = L"Set &notes...";
-            item.action = L"EditNotes";
-            break;
-        }
-      }
-    }
-  }
-
   // Edit > Score
   UpdateScore(anime_item);
 
   // Edit > Status
-  menu = menu_list_.FindMenu(L"EditStatus");
+  auto menu = menu_list_.FindMenu(L"EditStatus");
   if (menu) {
     for (auto& item : menu->items) {
       item.checked = false;
@@ -351,14 +330,16 @@ void MenuList::UpdateSearchList(bool enabled) {
   }
 }
 
-void MenuList::UpdateSeasonList(bool enabled) {
+void MenuList::UpdateSeasonList(bool is_in_list, bool trailer_available) {
   const auto menu = menu_list_.FindMenu(L"SeasonList");
   if (menu) {
-    // Add to list
     for (auto& item : menu->items) {
+      // Add to list
       if (item.submenu == L"AddToList") {
-        item.enabled = enabled;
-        break;
+        item.enabled = !is_in_list;
+      // Watch trailer
+      } else if (item.action == L"WatchTrailer()") {
+        item.enabled = trailer_available;
       }
     }
   }

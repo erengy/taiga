@@ -1,20 +1,20 @@
-/*
-** Taiga
-** Copyright (C) 2010-2021, Eren Okka
-**
-** This program is free software: you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation, either version 3 of the License, or
-** (at your option) any later version.
-**
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-** GNU General Public License for more details.
-**
-** You should have received a copy of the GNU General Public License
-** along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+/**
+ * Taiga
+ * Copyright (C) 2010-2024, Eren Okka
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #pragma once
 
@@ -208,6 +208,8 @@ public:
   void SetStreamAdn(const bool enabled);
   bool GetStreamAnn() const;
   void SetStreamAnn(const bool enabled);
+  bool GetStreamBilibili() const;
+  void SetStreamBilibili(const bool enabled);
   bool GetStreamCrunchyroll() const;
   void SetStreamCrunchyroll(const bool enabled);
   bool GetStreamFunimation() const;
@@ -218,6 +220,10 @@ public:
   void SetStreamJellyfin(const bool enabled);
   bool GetStreamPlex() const;
   void SetStreamPlex(const bool enabled);
+  bool GetStreamRokuChannel() const;
+  void SetStreamRokuChannel(const bool enabled);
+  bool GetStreamTubi() const;
+  void SetStreamTubi(const bool enabled);
   bool GetStreamVeoh() const;
   void SetStreamVeoh(const bool enabled);
   bool GetStreamViz() const;
@@ -238,6 +244,8 @@ public:
   void SetShareDiscordEnabled(const bool enabled);
   bool GetShareDiscordGroupEnabled() const;
   void SetShareDiscordGroupEnabled(const bool enabled);
+  bool GetShareDiscordTimeEnabled() const;
+  void SetShareDiscordTimeEnabled(const bool enabled);
   bool GetShareDiscordUsernameEnabled() const;
   void SetShareDiscordUsernameEnabled(const bool enabled);
   bool GetShareHttpEnabled() const;
@@ -268,6 +276,8 @@ public:
   void SetShareTwitterOauthToken(const std::wstring& oauth_token);
   std::wstring GetShareTwitterOauthSecret() const;
   void SetShareTwitterOauthSecret(const std::wstring& oauth_secret);
+  std::wstring GetShareTwitterReplyTo() const;
+  void SetShareTwitterReplyTo(const std::wstring& status_id);
   std::wstring GetShareTwitterUsername() const;
   void SetShareTwitterUsername(const std::wstring& username);
 
