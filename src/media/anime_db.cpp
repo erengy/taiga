@@ -45,12 +45,11 @@ bool Database::LoadDatabase() {
   if (!parse_result)
     return false;
 
-  const auto meta_version = XmlReadMetaVersion(document);
-
   auto database_node = document.child(L"database");
   ReadDatabaseNode(database_node);
 
-  HandleCompatibility(meta_version);
+  const auto xml_version = XmlReadVersionAttr(database_node);
+  HandleCompatibility(xml_version);
 
   return true;
 }
@@ -119,8 +118,9 @@ void Database::ReadDatabaseNode(XmlNode& database_node) {
 bool Database::SaveDatabase() const {
   XmlDocument document;
 
-  XmlWriteMetaVersion(document, StrToWstr(taiga::version().to_string()));
-  WriteDatabaseNode(XmlChild(document, L"database"));
+  auto database_node = XmlChild(document, L"database");
+  XmlWriteVersionAttr(database_node, StrToWstr(taiga::version().to_string()));
+  WriteDatabaseNode(database_node);
 
   const auto path = taiga::GetPath(taiga::Path::DatabaseAnime);
   return XmlSaveDocumentToFile(document, path);

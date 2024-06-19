@@ -64,6 +64,10 @@ std::wstring XmlReadStr(const XmlNode& node, const std::wstring_view name) {
   return node.child_value(name.data());
 }
 
+std::wstring XmlReadAttr(const XmlNode& node, const std::wstring_view name) {
+  return node.attribute(name.data()).value();
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 void XmlWriteInt(XmlNode& node, const std::wstring_view name,
@@ -75,6 +79,11 @@ void XmlWriteStr(XmlNode& node, const std::wstring_view name,
                  const std::wstring_view value, pugi::xml_node_type node_type) {
   node.append_child(name.data())
       .append_child(node_type).set_value(value.data());
+}
+
+void XmlWriteAttr(XmlNode& node, const std::wstring_view name,
+                  const std::wstring_view value) {
+  XmlAttr(node, name).set_value(value.data());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -105,11 +114,10 @@ bool XmlSaveDocumentToFile(const XmlDocument& document,
   return document.save_file(path.data(), indent.data(), flags, encoding);
 }
 
-std::wstring XmlReadMetaVersion(const XmlDocument& document) {
-  return XmlReadStr(document.child(L"meta"), L"version");
+std::wstring XmlReadVersionAttr(const XmlNode& node) {
+  return XmlReadAttr(node, L"version");
 }
 
-void XmlWriteMetaVersion(XmlDocument& document,
-                         const std::wstring_view version) {
-  XmlWriteStr(XmlChild(document, L"meta"), L"version", version);
+void XmlWriteVersionAttr(XmlNode& node, const std::wstring_view version) {
+  XmlWriteAttr(node, L"version", version);
 }
