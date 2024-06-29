@@ -16,197 +16,159 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <regex>
-#include <unordered_map>
+#include "anime_season.hpp"
 
-#include <nstd/string.hpp>
-
-#include "media/anime_season.h"
-
-#include "base/string.h"
-#include "sync/service.h"
+#include <chrono>
 
 namespace anime {
 
-namespace {
+using enum anime::SeasonName;
 
-constexpr auto UnknownSeason = Season::Name::Unknown;
-constexpr auto Winter = Season::Name::Winter;
-constexpr auto Spring = Season::Name::Spring;
-constexpr auto Summer = Season::Name::Summer;
-constexpr auto Fall = Season::Name::Fall;
+namespace season {
 
-bool ShiftedSeasons() {
-  switch (sync::GetCurrentServiceId()) {
-    case sync::ServiceId::MyAnimeList:
-      return false;  // Winter: January, February, March
-    default:
-      return true;  // Winter: December, January, February
+using Month = std::chrono::month;
+
+enum class Order {
+  Default,
+  Shifted,
+};
+
+constexpr SeasonName from_month(const Month month, const Order order) noexcept {
+  auto m = static_cast<unsigned int>(month);
+
+  if (order == Order::Shifted) m = (m + 1) % 12;
+
+  // clang-format off
+  switch (m) {
+    default: return Unknown;
+    case  1: case  2: case  3: return Winter;
+    case  4: case  5: case  6: return Spring;
+    case  7: case  8: case  9: return Summer;
+    case 10: case 11: case 12: return Fall;
   }
+  // clang-format on
 }
 
-Season::Name GetSeasonName(const date::month& month) {
-  if (ShiftedSeasons()) {
-    switch (static_cast<unsigned>(month)) {
-      default: return UnknownSeason;
-      case 12: case  1: case  2: return Winter;
-      case  3: case  4: case  5: return Spring;
-      case  6: case  7: case  8: return Summer;
-      case  9: case 10: case 11: return Fall;
-    }
-  } else {
-    switch (static_cast<unsigned>(month)) {
-      default: return UnknownSeason;
-      case  1: case  2: case  3: return Winter;
-      case  4: case  5: case  6: return Spring;
-      case  7: case  8: case  9: return Summer;
-      case 10: case 11: case 12: return Fall;
-    }
-  }
-}
-
-constexpr Season::Name GetNextSeasonName(const Season::Name name) {
+constexpr SeasonName next(const SeasonName name) noexcept {
+  // clang-format off
   switch (name) {
-    default: return UnknownSeason;
+    default:     return Unknown;
     case Winter: return Spring;
     case Spring: return Summer;
     case Summer: return Fall;
     case Fall:   return Winter;
   }
+  // clang-format on
 }
 
-constexpr Season::Name GetPreviousSeasonName(const Season::Name name) {
+constexpr SeasonName prev(const SeasonName name) noexcept {
+  // clang-format off
   switch (name) {
-    default: return UnknownSeason;
+    default:     return Unknown;
     case Winter: return Fall;
     case Spring: return Winter;
     case Summer: return Spring;
     case Fall:   return Summer;
   }
+  // clang-format on
 }
 
-std::pair<date::month, date::month> GetSeasonRange(const Season::Name name) {
-  if (ShiftedSeasons()) {
+constexpr std::pair<Month, Month> to_months(const SeasonName name, const Order order) noexcept {
+  using namespace std::chrono;
+
+  // clang-format off
+  if (order == Order::Shifted) {
     switch (name) {
-      default: return {};
-      case Winter: return {date::December,  date::February};
-      case Spring: return {date::March,     date::May};
-      case Summer: return {date::June,      date::August};
-      case Fall:   return {date::September, date::November};
+      default:     return {};
+      case Winter: return {December, February};
+      case Spring: return {March, May};
+      case Summer: return {June, August};
+      case Fall:   return {September, November};
     }
   } else {
     switch (name) {
-      default: return {};
-      case Winter: return {date::January, date::March};
-      case Spring: return {date::April,   date::June};
-      case Summer: return {date::July,    date::September};
-      case Fall:   return {date::October, date::December};
+      default:     return {};
+      case Winter: return {January, March};
+      case Spring: return {April, June};
+      case Summer: return {July, September};
+      case Fall:   return {October, December};
     }
   }
+  // clang-format on
 }
 
-}  // namespace
+std::pair<Date, Date> to_date_range(const Season& season, const Order order) noexcept {
+  if (!season) return {};
 
-Season::Season(const Date& date) {
+  const auto months = season::to_months(season.name, order);
+
+  const Date date_first{order == Order::Shifted && season.name == Winter
+                            ? season.year - std::chrono::years{1}
+                            : season.year,
+                        months.first, std::chrono::day{1}};
+
+  const Date date_last =
+      std::chrono::year_month_day_last{season.year, std::chrono::month_day_last(months.second)};
+
+  return {date_first, date_last};
+}
+
+}  // namespace season
+
+////////////////////////////////////////////////////////////////////////////////
+
+Season::Season(SeasonName name, std::chrono::year year) : name{name}, year{year} {}
+
+Season::Season(const Date& date) : Season{FuzzyDate{date}} {}
+
+Season::Season(const FuzzyDate& date) {
+  const bool is_shifted = true;  // @TODO
+
   if (date.month()) {
-    name = GetSeasonName(date::month{date.month()});
+    const auto order = is_shifted ? season::Order::Shifted : season::Order::Default;
+    name = season::from_month(std::chrono::month{date.month()}, order);
   }
 
   if (date.year()) {
-    year = date::year{date.year()};
-    if (ShiftedSeasons() && date.month() &&
-        date::month{date.month()} == date::December) {
+    year = std::chrono::year{date.year()};
+    if (is_shifted && date.month() && std::chrono::month{date.month()} == std::chrono::December) {
       ++year;  // e.g. December 2018 -> Winter 2019
     }
   }
 }
 
-Season::Season(const std::string& str) {
-  static const std::unordered_map<std::string, Season::Name> seasons{
-    {"winter", Winter},
-    {"spring", Spring},
-    {"summer", Summer},
-    {"fall", Fall}
-  };
-
-  static const std::regex pattern{"([A-Za-z]{4,6})[ _](\\d{4})"};
-  std::smatch match_results;
-
-  if (std::regex_match(str, match_results, pattern)) {
-    const auto it = seasons.find(nstd::tolower_string(match_results[1]));
-    if (it != seasons.end()) {
-      name = it->second;
-    }
-    year = date::year{ToInt(match_results[2])};
-  }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
 Season::operator bool() const {
-  return name != UnknownSeason && static_cast<int>(year);
+  return name != Unknown && static_cast<int>(year);
 }
 
 Season& Season::operator++() {
-  name = GetNextSeasonName(name);
-
-  if (name == Winter) {
-    ++year;
-  }
-
+  name = season::next(name);
+  if (name == Winter) ++year;
   return *this;
 }
 
 Season& Season::operator--() {
-  name = GetPreviousSeasonName(name);
-
-  if (name == Fall) {
-    --year;
-  }
-
+  name = season::prev(name);
+  if (name == Fall) --year;
   return *this;
 }
 
-////////////////////////////////////////////////////////////////////////////////
+std::strong_ordering Season::operator<=>(const Season& season) const {
+  using cmp = std::strong_ordering;
 
-int Season::compare(const Season& season) const {
   if (year != season.year) {
-    if (!static_cast<int>(year))
-      return nstd::cmp::greater;
-    if (!static_cast<int>(season.year))
-      return nstd::cmp::less;
-    return year < season.year ? nstd::cmp::less : nstd::cmp::greater;
+    if (!static_cast<int>(year)) return cmp::greater;
+    if (!static_cast<int>(season.year)) return cmp::less;
+    return year < season.year ? cmp::less : cmp::greater;
   }
 
   if (name != season.name) {
-    if (name == UnknownSeason)
-      return nstd::cmp::greater;  // Unknown seasons are in the future
-    if (season.name == UnknownSeason)
-      return nstd::cmp::less;
-    return name < season.name ? nstd::cmp::less : nstd::cmp::greater;
+    if (name == Unknown) return cmp::greater;  // Unknown seasons are in the future
+    if (season.name == Unknown) return cmp::less;
+    return name < season.name ? cmp::less : cmp::greater;
   }
 
-  return nstd::cmp::equal;
-}
-
-std::pair<DateFull, DateFull> Season::to_date_range() const {
-  if (!(*this)) {
-    return {};
-  }
-
-  const auto months = GetSeasonRange(name);
-
-  return {
-    {
-      ShiftedSeasons() && name == Winter ? year - date::years{1} : year,
-      months.first,
-      date::day{1}
-    },
-    date::year_month_day_last{
-      year,
-      date::month_day_last(months.second)
-    }
-  };
+  return cmp::equal;
 }
 
 }  // namespace anime

@@ -18,42 +18,29 @@
 
 #pragma once
 
-#include <array>
-#include <string>
+#include <chrono>
+#include <compare>
 
-#include <nstd/compare.hpp>
-
-#include "base/time.h"
+#include "base/chrono.hpp"
 
 namespace anime {
 
-class Season final : public nstd::Comparable<Season> {
-public:
-  enum class Name {
-    Unknown,
-    Winter,
-    Spring,
-    Summer,
-    Fall
-  };
+enum class SeasonName { Unknown, Winter, Spring, Summer, Fall };
 
+class Season final {
+public:
   Season() = default;
-  explicit Season(Name name, date::year year) : name{name}, year{year} {}
-  explicit Season(const DateFull& date) : Season{Date{date}} {}
+  explicit Season(SeasonName name, std::chrono::year year);
   explicit Season(const Date& date);
-  explicit Season(const std::string& str);
+  explicit Season(const FuzzyDate& date);
 
   operator bool() const;
-
   Season& operator++();
   Season& operator--();
+  std::strong_ordering operator<=>(const Season& season) const;
 
-  int compare(const Season& season) const override;
-
-  std::pair<DateFull, DateFull> to_date_range() const;
-
-  Name name = Name::Unknown;
-  date::year year{0};
+  SeasonName name = SeasonName::Unknown;
+  std::chrono::year year{0};
 };
 
 }  // namespace anime
