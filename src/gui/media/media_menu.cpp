@@ -304,10 +304,11 @@ void MediaMenu::addLibraryItems() {
   if (!isBatch()) {
     // Play
     addMenu([this]() {
-      // @TODO
-      const int last_episode = 6;
+      const auto& item = m_items.front();
+
+      const int total_episodes = item.episode_count;
+      const int last_episode = std::min(6, total_episodes);  // @TODO: Use last watched
       const int next_episode = last_episode + 1;
-      const int total_episodes = 12;
 
       auto menu = new QMenu(tr("Play"), this);
       menu->setIcon(theme.getIcon("play_arrow"));
@@ -315,13 +316,13 @@ void MediaMenu::addLibraryItems() {
       // Play next episode
       if (next_episode < total_episodes) {
         menu->addAction(theme.getIcon("skip_next"), tr("Next episode (#%1)").arg(next_episode),
-                        this, [this]() { playEpisode(next_episode); });
+                        this, [this, next_episode]() { playEpisode(next_episode); });
       }
 
       // Play last episode
       if (last_episode > 0) {
         menu->addAction(tr("Last episode (#%1)").arg(last_episode), this,
-                        [this]() { playEpisode(last_episode); });
+                        [this, last_episode]() { playEpisode(last_episode); });
       }
 
       if (total_episodes > 1) {
@@ -333,7 +334,7 @@ void MediaMenu::addLibraryItems() {
 
         // Play episode
         menu->addSeparator();
-        menu->addMenu([this]() {
+        menu->addMenu([this, total_episodes, last_episode]() {
           auto menu = new QMenu(tr("Episode"), this);
           for (int i = 1; i <= total_episodes; ++i) {
             auto action = new QAction(u"#%1"_qs.arg(i), this);
