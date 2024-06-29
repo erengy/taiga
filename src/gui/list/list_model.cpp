@@ -22,7 +22,9 @@
 #include <QFont>
 #include <QSize>
 
+#include "gui/utils/format.hpp"
 #include "media/anime_db.hpp"
+#include "media/anime_season.hpp"
 
 namespace gui {
 
@@ -53,9 +55,9 @@ QVariant ListModel::data(const QModelIndex& index, int role) const {
         case COLUMN_SCORE:
           return "-";
         case COLUMN_TYPE:
-          return QString::number(static_cast<int>(item.type));
+          return fromType(item.type);
         case COLUMN_SEASON:
-          return QString::fromStdString(item.start_date);
+          return fromSeason(anime::Season(item.start_date));
       }
       break;
 

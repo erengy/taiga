@@ -22,7 +22,6 @@
 
 #include "base/time.h"
 #include "media/anime.h"
-#include "media/anime_season.h"
 
 namespace ui {
 
@@ -32,13 +31,9 @@ std::wstring TranslateMonth(const int month);
 std::wstring TranslateNumber(const int value, const std::wstring& default_char = L"-");
 
 std::wstring TranslateScore(const double value);
-std::wstring TranslateStatus(const anime::SeriesStatus value);
-std::wstring TranslateType(const anime::SeriesType value);
 anime::SeriesType TranslateType(const std::wstring& value);
 
 std::wstring TranslateDateToSeasonString(const Date& date);
-std::wstring TranslateSeasonName(const anime::Season::Name name);
-std::wstring TranslateSeason(const anime::Season& season);
 std::wstring TranslateSeasonToMonths(const anime::Season& season);
 
 std::wstring TranslateMyDate(const Date& value, const std::wstring& default_char = L"-");

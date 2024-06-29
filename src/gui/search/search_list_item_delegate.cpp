@@ -24,6 +24,7 @@
 #include <QPainterPath>
 
 #include "gui/search/search_list_model.hpp"
+#include "gui/utils/format.hpp"
 #include "gui/utils/painter_state_saver.hpp"
 #include "gui/utils/theme.hpp"
 
@@ -100,7 +101,9 @@ void SearchListItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
 
   // Summary
   {
-    const QString summary = u"TV · %1 episodes · %2"_qs.arg(item->episode_count).arg(item->score);
+    const QString summary = u"%1 · %2 episodes · %3"_qs.arg(fromType(item->type))
+                                .arg(item->episode_count)
+                                .arg(formatScore(item->score));
     const QFontMetrics metrics(painter->font());
     QRect summaryRect = rect;
     summaryRect.setHeight(metrics.height());
@@ -117,10 +120,11 @@ void SearchListItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
         "Aired:\n"
         "Genres:\n"
         "Studios:";
-    const QString values =
-        "Jan 7, 2024 to Mar 31, 2024 (Airing)\n"
-        "Action, Adventure, Fantasy\n"
-        "A-1 Pictures";
+    const QString values = u"%1 to %2 (%3)\n%4\n%5"_qs.arg(fromFuzzyDate(item->start_date))
+                               .arg(fromFuzzyDate(item->end_date))
+                               .arg(fromStatus(item->status))
+                               .arg("Action, Adventure, Fantasy")
+                               .arg("A-1 Pictures");
 
     detailsFont.setWeight(QFont::Weight::DemiBold);
     painter->setFont(detailsFont);

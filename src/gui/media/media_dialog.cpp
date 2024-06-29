@@ -21,6 +21,8 @@
 #include <QImageReader>
 #include <QResizeEvent>
 
+#include "gui/utils/format.hpp"
+#include "media/anime_season.hpp"
 #include "ui_media_dialog.h"
 
 namespace gui {
@@ -103,22 +105,20 @@ void MediaDialog::initDetails() {
     episodesLabel->setToolTip(u"%1 minutes per episode"_qs.arg(m_anime.episode_length));
   }
 
-  auto seasonLabel = new QLabel(QString::fromStdString(m_anime.start_date), this);
+  auto seasonLabel = new QLabel(fromSeason(anime::Season(m_anime.start_date)), this);
   seasonLabel->setCursor(QCursor(Qt::CursorShape::WhatsThisCursor));
-  seasonLabel->setToolTip(u"%1 to %1"_qs.arg(QString::fromStdString(m_anime.start_date))
-                              .arg(QString::fromStdString(m_anime.end_date)));
+  seasonLabel->setToolTip(
+      u"%1 to %2"_qs.arg(fromFuzzyDate(m_anime.start_date)).arg(fromFuzzyDate(m_anime.end_date)));
 
   if (!m_anime.titles.synonyms.empty()) {
     ui_->infoLayout->addRow(get_row_title(tr("Synonyms:")),
                             get_row_label(from_vector(m_anime.titles.synonyms)));
   }
-  ui_->infoLayout->addRow(get_row_title(tr("Type:")),
-                          get_row_label(u"%1"_qs.arg(static_cast<int>(m_anime.type))));
+  ui_->infoLayout->addRow(get_row_title(tr("Type:")), get_row_label(fromType(m_anime.type)));
   ui_->infoLayout->addRow(get_row_title(tr("Episodes:")), episodesLabel);
-  ui_->infoLayout->addRow(get_row_title(tr("Status:")),
-                          get_row_label(u"%1"_qs.arg(static_cast<int>(m_anime.status))));
+  ui_->infoLayout->addRow(get_row_title(tr("Status:")), get_row_label(fromStatus(m_anime.status)));
   ui_->infoLayout->addRow(get_row_title(tr("Season:")), seasonLabel);
-  ui_->infoLayout->addRow(get_row_title(tr("Score:")), get_row_label(u"%1"_qs.arg(m_anime.score)));
+  ui_->infoLayout->addRow(get_row_title(tr("Score:")), get_row_label(formatScore(m_anime.score)));
   if (!m_anime.genres.empty()) {
     ui_->infoLayout->addRow(get_row_title(tr("Genres:")),
                             get_row_label(from_vector(m_anime.genres)));

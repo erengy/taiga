@@ -16,6 +16,7 @@ target_sources(taiga-gui PRIVATE
 	search/search_list_widget.cpp
 	search/search_widget.cpp
 	settings/settings_dialog.cpp
+	utils/format.cpp
 	utils/svg_icon_engine.cpp
 	utils/theme.cpp
 	utils/tray_icon.cpp

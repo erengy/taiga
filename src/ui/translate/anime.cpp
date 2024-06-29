@@ -46,29 +46,6 @@ std::wstring TranslateScore(const double value) {
   }
 }
 
-std::wstring TranslateStatus(const anime::SeriesStatus value) {
-  switch (value) {
-    case anime::SeriesStatus::Unknown: return L"Unknown";
-    case anime::SeriesStatus::Airing: return L"Currently airing";
-    case anime::SeriesStatus::FinishedAiring: return L"Finished airing";
-    case anime::SeriesStatus::NotYetAired: return L"Not yet aired";
-    default: return L"";
-  }
-}
-
-std::wstring TranslateType(const anime::SeriesType value) {
-  switch (value) {
-    case anime::SeriesType::Unknown: return L"Unknown";
-    case anime::SeriesType::Tv: return L"TV";
-    case anime::SeriesType::Ova: return L"OVA";
-    case anime::SeriesType::Movie: return L"Movie";
-    case anime::SeriesType::Special: return L"Special";
-    case anime::SeriesType::Ona: return L"ONA";
-    case anime::SeriesType::Music: return L"Music";
-    default: return L"";
-  }
-}
-
 anime::SeriesType TranslateType(const std::wstring& value) {
   static const std::map<std::wstring, anime::SeriesType> types{
       {L"tv", anime::SeriesType::Tv},
@@ -92,22 +69,6 @@ std::wstring TranslateDateToSeasonString(const Date& date) {
     return L"Unknown";
 
   return TranslateSeason(anime::Season(date));
-}
-
-std::wstring TranslateSeasonName(const anime::Season::Name name) {
-  switch (name) {
-    default:
-    case anime::Season::Name::Unknown: return L"Unknown";
-    case anime::Season::Name::Winter: return L"Winter";
-    case anime::Season::Name::Spring: return L"Spring";
-    case anime::Season::Name::Summer: return L"Summer";
-    case anime::Season::Name::Fall: return L"Fall";
-  }
-}
-
-std::wstring TranslateSeason(const anime::Season& season) {
-  return L"{} {}"_format(TranslateSeasonName(season.name),
-                         static_cast<int>(season.year));
 }
 
 std::wstring TranslateSeasonToMonths(const anime::Season& season) {
