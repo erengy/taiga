@@ -26,8 +26,7 @@
 
 namespace gui {
 
-Theme::Theme() : QObject() {
-}
+Theme::Theme() : QObject() {}
 
 const QIcon& Theme::getIcon(const QString& key, const QString& extension, bool useSvgIconEngine) {
   if (!m_icons.contains(key)) {

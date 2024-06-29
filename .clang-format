@@ -5,6 +5,6 @@ Language: Cpp
 BasedOnStyle: Google
 
 AccessModifierOffset: -2
-AllowShortFunctionsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: Empty
 ColumnLimit: 100
 DerivePointerAlignment: false

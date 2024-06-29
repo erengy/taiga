@@ -51,7 +51,9 @@ public:
   MainWindow();
   ~MainWindow() = default;
 
-  NowPlayingWidget* nowPlaying() { return m_nowPlayingWidget; }
+  NowPlayingWidget* nowPlaying() {
+    return m_nowPlayingWidget;
+  }
 
 public slots:
   void addNewFolder();

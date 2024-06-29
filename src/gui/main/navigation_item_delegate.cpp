@@ -27,8 +27,7 @@ namespace gui {
 
 static const auto lineColor = QColor{0, 0, 0, 20};
 
-NavigationItemDelegate::NavigationItemDelegate(QObject* parent) : QStyledItemDelegate(parent) {
-}
+NavigationItemDelegate::NavigationItemDelegate(QObject* parent) : QStyledItemDelegate(parent) {}
 
 void NavigationItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option,
                                    const QModelIndex& index) const {

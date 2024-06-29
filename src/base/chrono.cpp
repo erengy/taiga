@@ -24,12 +24,10 @@
 namespace base {
 
 FuzzyDate::FuzzyDate(std::chrono::year year, std::chrono::month month, std::chrono::day day)
-    : year_{year}, month_{month}, day_{day} {
-}
+    : year_{year}, month_{month}, day_{day} {}
 
 FuzzyDate::FuzzyDate(const Date& date)
-    : year_{date.year()}, month_{date.month()}, day_{date.day()} {
-}
+    : year_{date.year()}, month_{date.month()}, day_{date.day()} {}
 
 FuzzyDate::FuzzyDate(const std::string_view date) {
   static constexpr auto to_unsigned = [](const std::string_view str) {
