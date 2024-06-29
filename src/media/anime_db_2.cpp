@@ -66,9 +66,9 @@ void Database::read() {
       } else if (xml.name() == u"episode_length") {
         anime.episode_length = xml.readElementText().toInt();
       } else if (xml.name() == u"date_start") {
-        anime.start_date = xml.readElementText().toStdString();
+        anime.start_date = FuzzyDate(xml.readElementText().toStdString());
       } else if (xml.name() == u"date_end") {
-        anime.end_date = xml.readElementText().toStdString();
+        anime.end_date = FuzzyDate(xml.readElementText().toStdString());
       } else if (xml.name() == u"image") {
         anime.image_url = xml.readElementText().toStdString();
       } else if (xml.name() == u"trailer_id") {

@@ -23,7 +23,7 @@
 #include <string>
 #include <vector>
 
-// #include "base/time.h"
+#include "base/chrono.hpp"
 // #include "sync/service.h"
 
 namespace anime {
@@ -120,8 +120,8 @@ struct SeriesInformation {
   AgeRating age_rating = AgeRating::Unknown;
   SeriesStatus status = SeriesStatus::Unknown;
   SeriesType type = SeriesType::Unknown;
-  std::string start_date;  // @TODO
-  std::string end_date;    // @TODO
+  FuzzyDate start_date;
+  FuzzyDate end_date;
   float score = 0.0f;
   int popularity_rank = 0;
   std::string image_url;
@@ -146,8 +146,8 @@ struct MyInformation {
   int rewatched_times = 0;
   bool rewatching = false;
   int rewatching_ep = 0;
-  std::string date_start;   // @TODO
-  std::string date_finish;  // @TODO
+  FuzzyDate date_start;
+  FuzzyDate date_finish;
   std::string last_updated;
   std::string notes;
 };
