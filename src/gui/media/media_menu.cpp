@@ -24,7 +24,9 @@
 #include <QUrlQuery>
 
 #include "gui/media/media_dialog.hpp"
+#include "gui/utils/format.hpp"
 #include "gui/utils/theme.hpp"
+#include "media/anime.hpp"
 
 namespace gui {
 
@@ -58,12 +60,12 @@ bool MediaMenu::isNowPlaying() const {
   return false;  // @TODO
 }
 
-void MediaMenu::addToList(const QString& status) const {
-  QMessageBox::information(nullptr, "TODO", u"Status: %1"_qs.arg(status));  // @TODO
+void MediaMenu::addToList(const anime::list::Status status) const {
+  QMessageBox::information(nullptr, "TODO", u"Status: %1"_qs.arg(fromListStatus(status)));  // @TODO
 }
 
-void MediaMenu::editStatus(const QString& status) const {
-  QMessageBox::information(nullptr, "TODO", u"Status: %1"_qs.arg(status));  // @TODO
+void MediaMenu::editStatus(const anime::list::Status status) const {
+  QMessageBox::information(nullptr, "TODO", u"Status: %1"_qs.arg(fromListStatus(status)));  // @TODO
 }
 
 void MediaMenu::playEpisode(int number) const {
@@ -222,21 +224,13 @@ void MediaMenu::addMediaItems() {
 }
 
 void MediaMenu::addListItems() {
-  const QList<QString> statusList{{
-      "Watching",
-      "Completed",
-      "Paused",
-      "Dropped",
-      "Planning",
-  }};
-
   if (isInList()) {
     // Edit
     if (!isBatch()) {
       addAction(theme.getIcon("edit"), tr("Edit"), this, &MediaMenu::viewDetails);
 
     } else {
-      addMenu([this, &statusList]() {
+      addMenu([this]() {
         auto menu = new QMenu(tr("Edit"), this);
         menu->setIcon(theme.getIcon("edit"));
 
@@ -266,10 +260,14 @@ void MediaMenu::addListItems() {
           return menu;
         }());
 
-        menu->addMenu([this, &statusList]() {
+        menu->addMenu([this]() {
           auto menu = new QMenu(tr("Status"), this);
-          for (const auto& status : statusList) {
-            menu->addAction(status, this, [this, status]() { editStatus(status); });
+          for (const auto status : anime::list::kStatuses) {
+            auto action = new QAction(fromListStatus(status), this);
+            action->setCheckable(true);
+            action->setChecked(status == anime::list::Status::Completed);  // @TODO
+            menu->addAction(action);
+            connect(action, &QAction::triggered, this, [this, status]() { editStatus(status); });
           }
           return menu;
         }());
@@ -284,11 +282,11 @@ void MediaMenu::addListItems() {
 
   } else {
     // Add to list
-    addMenu([this, &statusList]() {
+    addMenu([this]() {
       auto menu = new QMenu(tr("Add to list"), this);
       menu->setIcon(theme.getIcon("list_alt"));
-      for (const auto& status : statusList) {
-        menu->addAction(status, this, [this, status]() { addToList(status); });
+      for (const auto& status : anime::list::kStatuses) {
+        menu->addAction(fromListStatus(status), this, [this, status]() { addToList(status); });
       }
       return menu;
     }());

@@ -36,6 +36,12 @@ enum class Type;
 
 class Season;
 
+namespace list {
+
+enum class Status;
+
+}
+
 }  // namespace anime
 
 namespace gui {
@@ -49,5 +55,7 @@ QString fromSeason(const anime::Season season);
 QString fromSeasonName(const anime::SeasonName name);
 QString fromStatus(const anime::Status value);
 QString fromType(const anime::Type value);
+
+QString fromListStatus(const anime::list::Status value);
 
 }  // namespace gui

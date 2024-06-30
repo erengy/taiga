@@ -36,8 +36,8 @@ public:
   void popup();
 
 private slots:
-  void addToList(const QString& status) const;
-  void editStatus(const QString& status) const;
+  void addToList(const anime::list::Status status) const;
+  void editStatus(const anime::list::Status status) const;
   void playEpisode(int number) const;
   void removeFromList() const;
   void searchAniDB() const;

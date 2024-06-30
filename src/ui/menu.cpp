@@ -43,41 +43,6 @@
 
 namespace ui {
 
-void MenuList::Load() {
-  menu_list_.menus.clear();
-
-  std::wstring menu_resource;
-  win::ReadStringFromResource(L"IDR_MENU", L"DATA", menu_resource);
-
-  XmlDocument document;
-  const auto parse_result = document.load_string(menu_resource.data());
-
-  const auto menus = document.child(L"menus");
-
-  for (auto menu : menus.children(L"menu")) {
-    const std::wstring name = menu.attribute(L"name").value();
-    const win::MenuType type = menu.attribute(L"type").value() == L"menubar"
-                                   ? win::MenuType::Menu
-                                   : win::MenuType::PopupMenu;
-    menu_list_.Create(name, type);
-    for (auto item : menu.children(L"item")) {
-      menu_list_.menus[name].CreateItem(
-          item.attribute(L"action").value(),
-          item.attribute(L"name").value(),
-          item.attribute(L"sub").value(),
-          item.attribute(L"checked").as_bool(),
-          item.attribute(L"default").as_bool(),
-          !item.attribute(L"disabled").as_bool(),
-          item.attribute(L"column").as_bool(),
-          item.attribute(L"radio").as_bool());
-    }
-  }
-}
-
-std::wstring MenuList::Show(HWND hwnd, int x, int y, LPCWSTR lpName) {
-  return menu_list_.Show(hwnd, x, y, lpName);
-}
-
 void MenuList::UpdateAnime(const anime::Item* anime_item) {
   if (!anime_item)
     return;
@@ -86,20 +51,6 @@ void MenuList::UpdateAnime(const anime::Item* anime_item) {
 
   // Edit > Score
   UpdateScore(anime_item);
-
-  // Edit > Status
-  auto menu = menu_list_.FindMenu(L"EditStatus");
-  if (menu) {
-    for (auto& item : menu->items) {
-      item.checked = false;
-      item.def = false;
-    }
-    int item_index = static_cast<int>(anime_item->GetMyStatus());
-    if (item_index - 1 < static_cast<int>(menu->items.size())) {
-      menu->items[item_index - 1].checked = true;
-      menu->items[item_index - 1].def = true;
-    }
-  }
 
   // Play
   menu = menu_list_.FindMenu(L"RightClick");
@@ -317,19 +268,6 @@ void MenuList::UpdateScore(const anime::Item* anime_item) {
   }
 }
 
-void MenuList::UpdateSearchList(bool enabled) {
-  const auto menu = menu_list_.FindMenu(L"SearchList");
-  if (menu) {
-    // Add to list
-    for (auto& item : menu->items) {
-      if (item.submenu == L"AddToList") {
-        item.enabled = enabled;
-        break;
-      }
-    }
-  }
-}
-
 void MenuList::UpdateSeasonList(bool is_in_list, bool trailer_available) {
   const auto menu = menu_list_.FindMenu(L"SeasonList");
   if (menu) {
@@ -524,17 +462,6 @@ void MenuList::UpdateView() {
     }
     menu->items.back().checked = !taiga::settings.GetAppOptionHideSidebar();
   }
-}
-
-void MenuList::UpdateAll(const anime::Item* anime_item) {
-  UpdateAnime(anime_item);
-  UpdateAnnounce();
-  UpdateExport();
-  UpdateExternalLinks();
-  UpdateFolders();
-  UpdateTools();
-  UpdateTray();
-  UpdateView();
 }
 
 }  // namespace ui

@@ -39,6 +39,5 @@ std::wstring TranslateSeasonToMonths(const anime::Season& season);
 std::wstring TranslateMyDate(const Date& value, const std::wstring& default_char = L"-");
 std::wstring TranslateMyScore(const int value, const std::wstring& default_char = L"-");
 std::wstring TranslateMyScoreFull(const int value);
-std::wstring TranslateMyStatus(const anime::MyStatus value, bool add_count);
 
 }  // namespace ui

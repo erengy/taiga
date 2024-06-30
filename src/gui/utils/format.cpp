@@ -90,4 +90,20 @@ QString fromType(const anime::Type value) {
   // clang-format on
 }
 
+QString fromListStatus(const anime::list::Status value) {
+  using enum anime::list::Status;
+
+  // clang-format off
+  switch (value) {
+    case NotInList: return "Not in list";
+    case Watching: return "Watching";
+    case Completed: return "Completed";
+    case OnHold: return "Paused";
+    case Dropped: return "Dropped";
+    case PlanToWatch: return "Planning";
+    default: return "";
+  }
+  // clang-format on
+}
+
 }  // namespace gui
