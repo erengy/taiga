@@ -29,6 +29,7 @@
 #include "gui/settings/settings_dialog.hpp"
 #include "gui/utils/theme.hpp"
 #include "gui/utils/tray_icon.hpp"
+#include "taiga/application.hpp"
 #include "taiga/version.hpp"
 #include "ui_main_window.h"
 
@@ -248,9 +249,11 @@ void MainWindow::setPage(MainWindowPage page) {
 void MainWindow::updateTitle() {
   auto title = u"Taiga"_qs;
 
-#ifdef _DEBUG
-  title += u" [debug]"_qs;
-#endif
+  const auto app = static_cast<taiga::Application*>(qApp);
+
+  if (app->isDebug()) {
+    title += u" [debug]"_qs;
+  }
 
   setWindowTitle(title);
 }

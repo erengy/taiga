@@ -18,12 +18,21 @@
 
 #include "application.hpp"
 
+#include <QCommandLineParser>
+
 #include "gui/main/main_window.hpp"
 #include "gui/utils/theme.hpp"
+#include "taiga/version.hpp"
 
 namespace taiga {
 
 Application::Application(int argc, char* argv[]) : QApplication(argc, argv) {
+  setApplicationName("taiga");
+  setApplicationDisplayName("Taiga");
+  setApplicationVersion(QString::fromStdString(taiga::version().to_string()));
+
+  parseCommandLine();
+
   gui::theme.initStyle();
 
   window_ = new gui::MainWindow();
@@ -38,6 +47,34 @@ Application::~Application() {
 
 int Application::run() const {
   return QApplication::exec();
+}
+
+bool Application::isDebug() const {
+  return options_.debug;
+}
+
+bool Application::isVerbose() const {
+  return options_.verbose;
+}
+
+void Application::parseCommandLine() {
+  QCommandLineParser parser;
+
+  parser.addOptions({
+      {"debug", QCoreApplication::translate("main", "Enable debug mode")},
+      {"verbose", QCoreApplication::translate("main", "Enable verbose output")},
+  });
+
+  parser.process(QApplication::arguments());
+
+  // @TODO: Log valid & invalid arguments
+
+#ifdef _DEBUG
+  options_.debug = true;
+#else
+  options_.debug = parser.isSet("debug");
+#endif
+  options_.verbose = parser.isSet("verbose");
 }
 
 }  // namespace taiga

@@ -46,35 +46,6 @@ namespace taiga {
 
 namespace detail {
 
-CommandLineOptions ParseCommandLine() {
-  CommandLineOptions options;
-
-  const auto args = base::ParseCommandLineArgs();
-
-  for (const auto& arg : args) {
-    bool found = false;
-
-    if (arg == L"allowmultipleinstances") {
-      options.allow_multiple_instances = true;
-      found = true;
-    } else if (arg == L"debug") {
-      options.debug_mode = true;
-      found = true;
-    } else if (arg == L"verbose") {
-      options.verbose = true;
-      found = true;
-    }
-
-    if (found) {
-      LOGD(arg);
-    } else {
-      LOGW(L"Invalid argument: {}", arg);
-    }
-  }
-
-  return options;
-}
-
 void LoadData() {
   track::media_players.Load();
 

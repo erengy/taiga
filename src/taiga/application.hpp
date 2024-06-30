@@ -27,6 +27,15 @@ class MainWindow;
 
 namespace taiga {
 
+namespace detail {
+
+struct CommandLineOptions {
+  bool debug = false;
+  bool verbose = false;
+};
+
+}  // namespace detail
+
 class Application final : public QApplication {
   Q_OBJECT
   Q_DISABLE_COPY_MOVE(Application)
@@ -37,7 +46,13 @@ public:
 
   int run() const;
 
+  bool isDebug() const;
+  bool isVerbose() const;
+
 private:
+  void parseCommandLine();
+
+  detail::CommandLineOptions options_;
   QPointer<gui::MainWindow> window_;
 };
 
