@@ -22,10 +22,6 @@
 	path = deps/src/discord-rpc
 	url = https://github.com/erengy/discord-rpc.git
 
-[submodule "fmt"]
-	path = deps/src/fmt
-	url = https://github.com/fmtlib/fmt.git
-
 [submodule "hypp"]
 	path = deps/src/hypp
 	url = https://github.com/erengy/hypp.git
