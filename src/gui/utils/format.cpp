@@ -59,8 +59,8 @@ QString fromSeasonName(const anime::SeasonName name) {
   // clang-format on
 }
 
-QString fromStatus(const anime::SeriesStatus value) {
-  using enum anime::SeriesStatus;
+QString fromStatus(const anime::Status value) {
+  using enum anime::Status;
 
   // clang-format off
   switch (value) {
@@ -73,8 +73,8 @@ QString fromStatus(const anime::SeriesStatus value) {
   // clang-format on
 }
 
-QString fromType(const anime::SeriesType value) {
-  using enum anime::SeriesType;
+QString fromType(const anime::Type value) {
+  using enum anime::Type;
 
   // clang-format off
   switch (value) {

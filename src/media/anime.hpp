@@ -19,7 +19,7 @@
 #pragma once
 
 #include <array>
-#include <map>
+// #include <map>
 #include <string>
 #include <vector>
 
@@ -27,11 +27,6 @@
 // #include "sync/service.h"
 
 namespace anime {
-
-enum AnimeId {
-  ID_NOTINLIST = -1,
-  ID_UNKNOWN = 0
-};
 
 enum class AgeRating {
   Unknown,
@@ -42,14 +37,14 @@ enum class AgeRating {
   R18,
 };
 
-enum class SeriesStatus {
+enum class Status {
   Unknown,
   FinishedAiring,
   Airing,
-  NotYetAired
+  NotYetAired,
 };
 
-enum class SeriesType {
+enum class Type {
   Unknown,
   Tv,
   Ova,
@@ -59,47 +54,31 @@ enum class SeriesType {
   Music,
 };
 
-enum class MyStatus {
-  NotInList,
-  Watching,
-  Completed,
-  OnHold,
-  Dropped,
-  PlanToWatch,
-};
-
 enum class TitleLanguage {
   Romaji,
   English,
   Native,
 };
 
-constexpr std::array<SeriesStatus, 3> kSeriesStatuses{
-  SeriesStatus::FinishedAiring,
-  SeriesStatus::Airing,
-  SeriesStatus::NotYetAired,
+constexpr std::array<Status, 3> kStatuses{
+  Status::FinishedAiring,
+  Status::Airing,
+  Status::NotYetAired,
 };
 
-constexpr std::array<SeriesType, 6> kSeriesTypes{
-  SeriesType::Tv,
-  SeriesType::Ova,
-  SeriesType::Movie,
-  SeriesType::Special,
-  SeriesType::Ona,
-  SeriesType::Music,
-};
-
-constexpr std::array<MyStatus, 5> kMyStatuses{
-  MyStatus::Watching,
-  MyStatus::Completed,
-  MyStatus::OnHold,
-  MyStatus::Dropped,
-  MyStatus::PlanToWatch,
+constexpr std::array<Type, 6> kTypes{
+  Type::Tv,
+  Type::Ova,
+  Type::Movie,
+  Type::Special,
+  Type::Ona,
+  Type::Music,
 };
 
 constexpr int kMaxEpisodeCount = 1900;
 constexpr int kUnknownEpisodeCount = -1;
 constexpr int kUnknownEpisodeLength = -1;
+constexpr int kUnknownId = 0;
 constexpr double kUnknownScore = 0.0;
 constexpr int kUserScoreMax = 100;
 
@@ -110,16 +89,16 @@ struct Titles {
   std::vector<std::string> synonyms;
 };
 
-struct SeriesInformation {
-  int id = AnimeId::ID_UNKNOWN;
+struct Details {
+  int id = kUnknownId;
   // std::map<sync::ServiceId, std::string> uids;
   // sync::ServiceId source = sync::ServiceId::Unknown;
   std::time_t last_modified = 0;
   int episode_count = kUnknownEpisodeCount;
   int episode_length = kUnknownEpisodeLength;
   AgeRating age_rating = AgeRating::Unknown;
-  SeriesStatus status = SeriesStatus::Unknown;
-  SeriesType type = SeriesType::Unknown;
+  Status status = Status::Unknown;
+  Type type = Type::Unknown;
   FuzzyDate start_date;
   FuzzyDate end_date;
   float score = 0.0f;
@@ -137,11 +116,30 @@ struct SeriesInformation {
   std::time_t next_episode_time = 0;
 };
 
-struct MyInformation {
+namespace list {
+
+enum class Status {
+  NotInList,
+  Watching,
+  Completed,
+  OnHold,
+  Dropped,
+  PlanToWatch,
+};
+
+constexpr std::array<Status, 5> kStatuses{
+  Status::Watching,
+  Status::Completed,
+  Status::OnHold,
+  Status::Dropped,
+  Status::PlanToWatch,
+};
+
+struct Entry {
   std::string id;
   int watched_episodes = 0;
   int score = 0;
-  MyStatus status = MyStatus::NotInList;
+  Status status = Status::NotInList;
   bool is_private = false;
   int rewatched_times = 0;
   bool rewatching = false;
@@ -152,11 +150,14 @@ struct MyInformation {
   std::string notes;
 };
 
-struct LocalInformation {
-  std::vector<bool> available_episodes;
-  std::string next_episode_path;
-};
+}  // namespace list
+
+// struct LocalInformation {
+//   std::vector<bool> available_episodes;
+//   std::string next_episode_path;
+// };
 
 }  // namespace anime
 
-using Anime = anime::SeriesInformation;
+using Anime = anime::Details;
+using ListEntry = anime::list::Entry;

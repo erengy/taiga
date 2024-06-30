@@ -31,8 +31,8 @@ class FuzzyDate;
 namespace anime {
 
 enum class SeasonName;
-enum class SeriesStatus;
-enum class SeriesType;
+enum class Status;
+enum class Type;
 
 class Season;
 
@@ -47,7 +47,7 @@ QString fromFuzzyDate(const base::FuzzyDate& date);
 
 QString fromSeason(const anime::Season season);
 QString fromSeasonName(const anime::SeasonName name);
-QString fromStatus(const anime::SeriesStatus value);
-QString fromType(const anime::SeriesType value);
+QString fromStatus(const anime::Status value);
+QString fromType(const anime::Type value);
 
 }  // namespace gui

@@ -58,9 +58,9 @@ void Database::read() {
       } else if (xml.name() == u"synonym") {
         anime.titles.synonyms.push_back(xml.readElementText().toStdString());
       } else if (xml.name() == u"type") {
-        anime.type = static_cast<SeriesType>(xml.readElementText().toInt());
+        anime.type = static_cast<Type>(xml.readElementText().toInt());
       } else if (xml.name() == u"status") {
-        anime.status = static_cast<SeriesStatus>(xml.readElementText().toInt());
+        anime.status = static_cast<Status>(xml.readElementText().toInt());
       } else if (xml.name() == u"episode_count") {
         anime.episode_count = xml.readElementText().toInt();
       } else if (xml.name() == u"episode_length") {
