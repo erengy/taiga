@@ -14,10 +14,6 @@
 	path = deps/src/curl
 	url = https://github.com/curl/curl.git
 
-[submodule "date"]
-	path = deps/src/date
-	url = https://github.com/HowardHinnant/date.git
-
 [submodule "discord-rpc"]
 	path = deps/src/discord-rpc
 	url = https://github.com/erengy/discord-rpc.git
