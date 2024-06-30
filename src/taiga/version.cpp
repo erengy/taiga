@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "taiga/version.h"
+#include "version.hpp"
 
 #include "base/preprocessor.h"
 #include "taiga/config.h"

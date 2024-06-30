@@ -29,7 +29,7 @@
 #include "gui/settings/settings_dialog.hpp"
 #include "gui/utils/theme.hpp"
 #include "gui/utils/tray_icon.hpp"
-#include "taiga/config.h"
+#include "taiga/version.hpp"
 #include "ui_main_window.h"
 
 #ifdef Q_OS_WINDOWS
@@ -261,17 +261,11 @@ void MainWindow::displayWindow() {
 }
 
 void MainWindow::about() {
-  const QVersionNumber versionNumber(TAIGA_VERSION_MAJOR, TAIGA_VERSION_MINOR, TAIGA_VERSION_PATCH);
-  QString version = versionNumber.toString();
-  if (QString pre(TAIGA_VERSION_PRE); !pre.isEmpty()) {
-    version += "-" + pre;
-  }
-
   const QString text = tr("<b>Taiga</b> v%1<br><br>"
                           "This version is a work in progress. For more information, visit the "
                           "<a href=\"%2\">GitHub repository</a> or the "
                           "<a href=\"%3\">Discord server</a>.")
-                           .arg(version)
+                           .arg(QString::fromStdString(taiga::version().to_string()))
                            .arg("https://github.com/erengy/taiga")
                            .arg("https://discord.gg/yeGNktZ");
 

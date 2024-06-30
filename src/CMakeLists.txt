@@ -9,6 +9,7 @@ target_sources(taiga PRIVATE
 	resources/icons.qrc
 	resources/styles.qrc
 	taiga/application.cpp
+	taiga/version.cpp
 	main.cpp
 )
 
@@ -23,6 +24,7 @@ target_link_libraries(taiga PRIVATE
 	Qt6::Core
 	Qt6::Gui
 	Qt6::Widgets
+	semaver
 	taiga-config
 	taiga-gui
 )

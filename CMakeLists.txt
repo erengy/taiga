@@ -16,4 +16,5 @@ qt_standard_project_setup()
 
 include(TaigaConfig)
 
+add_subdirectory(deps)
 add_subdirectory(src)

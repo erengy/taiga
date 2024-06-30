@@ -34,6 +34,7 @@ target_link_libraries(taiga-gui
 	Qt6::Core
 	Qt6::Gui
 	Qt6::Widgets
+	semaver
 	taiga-config
 )
 
