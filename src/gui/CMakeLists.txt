@@ -34,8 +34,8 @@ target_link_libraries(taiga-gui
 	Qt6::Core
 	Qt6::Gui
 	Qt6::Widgets
-	semaver
 	taiga-config
+	taiga-deps
 )
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
