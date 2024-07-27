@@ -2,39 +2,72 @@
   "version": 6,
   "cmakeMinimumRequired": {
     "major": 3,
-    "minor": 21,
+    "minor": 29,
     "patch": 0
   },
+  "include": [
+    "cmake/presets/ninja.json",
+    "cmake/presets/windows.json"
+  ],
   "configurePresets": [
     {
-      "name": "ninja-multi",
-      "displayName": "Ninja Multi-Config",
-      "generator": "Ninja Multi-Config",
-      "binaryDir": "${sourceDir}/build/${presetName}",
-      "architecture": {
-        "value": "x64",
-        "strategy": "external"
-      },
-      "toolset": {
-        "value": "host=x64",
-        "strategy": "external"
-      },
+      "name": "windows-msvc",
+      "inherits": [
+        "ninja",
+        "windows"
+      ],
       "cacheVariables": {
-        "CMAKE_CXX_COMPILER": "cl.exe"
+        "CMAKE_C_COMPILER": "cl",
+        "CMAKE_CXX_COMPILER": "cl"
+      }
+    },
+    {
+      "name": "windows-clang",
+      "inherits": [
+        "ninja",
+        "windows"
+      ],
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "clang++.exe",
+        "CMAKE_CXX_COMPILER": "clang++.exe"
       }
     }
   ],
   "buildPresets": [
     {
-      "name": "ninja-debug",
-      "configurePreset": "ninja-multi",
-      "displayName": "Debug",
+      "name": "windows-msvc",
+      "inherits": [
+        "ninja",
+        "windows"
+      ],
+      "configurePreset": "windows-msvc",
       "configuration": "Debug"
     },
     {
-      "name": "ninja-release",
-      "configurePreset": "ninja-multi",
-      "displayName": "Release",
+      "name": "windows-msvc-release",
+      "inherits": [
+        "ninja",
+        "windows"
+      ],
+      "configurePreset": "windows-msvc",
+      "configuration": "RelWithDebInfo"
+    },
+    {
+      "name": "windows-clang",
+      "inherits": [
+        "ninja",
+        "windows"
+      ],
+      "configurePreset": "windows-clang",
+      "configuration": "Debug"
+    },
+    {
+      "name": "windows-clang-release",
+      "inherits": [
+        "ninja",
+        "windows"
+      ],
+      "configurePreset": "windows-clang",
       "configuration": "RelWithDebInfo"
     }
   ]

@@ -1,0 +1,27 @@
+{
+    "version": 6,
+    "configurePresets": [
+        {
+            "name": "ninja",
+            "hidden": true,
+            "generator": "Ninja Multi-Config",
+            "binaryDir": "${sourceDir}/build/${presetName}"
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "ninja",
+            "hidden": true,
+            "configurePreset": "ninja",
+            "configuration": "Debug"
+        }
+    ],
+    "testPresets": [
+        {
+            "name": "ninja",
+            "hidden": true,
+            "configurePreset": "ninja",
+            "configuration": "Debug"
+        }
+    ]
+}

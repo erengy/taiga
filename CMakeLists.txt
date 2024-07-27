@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.21)
+cmake_minimum_required(VERSION 3.29)
 
 project(Taiga
 	VERSION 2.0.0
