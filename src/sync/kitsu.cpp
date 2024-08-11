@@ -46,7 +46,7 @@ namespace sync::kitsu {
 // API documentation:
 // https://kitsu.docs.apiary.io
 
-constexpr auto kBaseUrl = "https://kitsu.io/api";
+constexpr auto kBaseUrl = "https://kitsu.app/api";
 
 // Kitsu requires use of the JSON API media type: http://jsonapi.org/format/
 constexpr auto kJsonApiMediaType = "application/vnd.api+json";
