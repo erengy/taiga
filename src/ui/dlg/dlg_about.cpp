@@ -142,7 +142,7 @@ BOOL AboutDialog::OnInitDialog() {
       L"\u2022 {\\field{\\*\\fldinst{HYPERLINK \"https://taiga.moe\"}}{\\fldrslt{Home page}}}\\line "
       L"\u2022 {\\field{\\*\\fldinst{HYPERLINK \"https://github.com/erengy/taiga\"}}{\\fldrslt{GitHub repository}}}\\line "
       L"\u2022 {\\field{\\*\\fldinst{HYPERLINK \"https://myanimelist.net/clubs.php?cid=21400\"}}{\\fldrslt{MyAnimeList club}}}\\line "
-      L"\u2022 {\\field{\\*\\fldinst{HYPERLINK \"https://kitsu.io/groups/taiga\"}}{\\fldrslt{Kitsu group}}}\\line "
+      L"\u2022 {\\field{\\*\\fldinst{HYPERLINK \"https://kitsu.app/groups/taiga\"}}{\\fldrslt{Kitsu group}}}\\line "
       L"\u2022 {\\field{\\*\\fldinst{HYPERLINK \"https://anilist.co/forum/thread/2846/1\"}}{\\fldrslt{AniList thread}}}\\line "
       L"\u2022 {\\field{\\*\\fldinst{HYPERLINK \"https://discord.gg/yeGNktZ\"}}{\\fldrslt{Discord server}}}\\line "
       L"\u2022 {\\field{\\*\\fldinst{HYPERLINK \"https://twitter.com/taigaapp\"}}{\\fldrslt{Twitter account}}}"

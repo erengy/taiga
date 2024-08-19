@@ -120,7 +120,7 @@ void MediaMenu::searchANN() const {
 
 void MediaMenu::searchKitsu() const {
   for (const auto& item : m_items) {
-    QUrl url{"https://kitsu.io/anime"};
+    QUrl url{"https://kitsu.app/anime"};
     url.setQuery({{"text", QString::fromStdString(item.titles.romaji)}});
     QDesktopServices::openUrl(url);
   }

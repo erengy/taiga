@@ -261,7 +261,7 @@ RatingSystem TranslateRatingSystemFrom(const std::string& value) {
 ////////////////////////////////////////////////////////////////////////////////
 
 std::wstring GetAnimePage(const anime::Item& anime_item) {
-  return L"https://kitsu.io/anime/{}"_format(anime_item.GetSlug());
+  return L"https://kitsu.app/anime/{}"_format(anime_item.GetSlug());
 }
 
 void ViewAnimePage(int anime_id) {
@@ -270,16 +270,16 @@ void ViewAnimePage(int anime_id) {
 }
 
 void ViewFeed() {
-  ExecuteLink(L"https://kitsu.io");
+  ExecuteLink(L"https://kitsu.app");
 }
 
 void ViewLibrary() {
-  ExecuteLink(L"https://kitsu.io/users/{}/library"_format(
+  ExecuteLink(L"https://kitsu.app/users/{}/library"_format(
       taiga::settings.GetSyncServiceKitsuUsername()));
 }
 
 void ViewProfile() {
-  ExecuteLink(L"https://kitsu.io/users/{}"_format(
+  ExecuteLink(L"https://kitsu.app/users/{}"_format(
       taiga::settings.GetSyncServiceKitsuUsername()));
 }
 
