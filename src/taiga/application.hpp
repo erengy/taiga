@@ -50,6 +50,7 @@ public:
   bool isVerbose() const;
 
 private:
+  void initLogger() const;
   void parseCommandLine();
 
   detail::CommandLineOptions options_;

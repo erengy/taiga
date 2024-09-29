@@ -20,8 +20,10 @@
 
 #include <QCommandLineParser>
 
+#include "base/log.hpp"
 #include "gui/main/main_window.hpp"
 #include "gui/utils/theme.hpp"
+#include "taiga/config.h"
 #include "taiga/version.hpp"
 
 namespace taiga {
@@ -32,6 +34,7 @@ Application::Application(int argc, char* argv[]) : QApplication(argc, argv) {
   setApplicationVersion(QString::fromStdString(taiga::version().to_string()));
 
   parseCommandLine();
+  initLogger();
 
   gui::theme.initStyle();
 
@@ -55,6 +58,19 @@ bool Application::isDebug() const {
 
 bool Application::isVerbose() const {
   return options_.verbose;
+}
+
+void Application::initLogger() const {
+  using monolog::Level;
+
+  const auto path =
+      u"%1/%2.log"_qs.arg(QCoreApplication::applicationDirPath(), TAIGA_APP_NAME).toStdString();
+
+  monolog::log.enable_console_output(false);
+  monolog::log.set_path(path);
+  monolog::log.set_level(options_.debug ? Level::Debug : Level::Warning);
+
+  LOGI("Version {}", taiga::version().to_string());
 }
 
 void Application::parseCommandLine() {
