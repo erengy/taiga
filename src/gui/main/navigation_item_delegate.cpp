@@ -22,10 +22,12 @@
 #include <QPainterPath>
 
 #include "gui/utils/painter_state_saver.hpp"
+#include "gui/utils/theme.hpp"
 
 namespace gui {
 
-static const auto lineColor = QColor{0, 0, 0, 20};
+static const auto lineColorLight = QColor{0, 0, 0, 20};
+static const auto lineColorDark = QColor{255, 255, 255, 20};
 
 NavigationItemDelegate::NavigationItemDelegate(QObject* parent) : QStyledItemDelegate(parent) {}
 
@@ -62,7 +64,7 @@ void NavigationItemDelegate::paintBranch(QPainter* painter, QRect rect, bool isL
 
   painter->setPen([painter]() {
     auto pen = painter->pen();
-    pen.setColor(lineColor);
+    pen.setColor(theme.isDark() ? lineColorDark : lineColorLight);
     return pen;
   }());
 
@@ -102,7 +104,7 @@ void NavigationItemDelegate::paintCounter(QPainter* painter, QRect rect, const i
   path.addRoundedRect(rect, 8, 8);
   painter->setClipPath(path);
 
-  painter->fillRect(rect, lineColor);
+  painter->fillRect(rect, theme.isDark() ? lineColorDark : lineColorLight);
 
   painter->setPen(QColor(0x666666));
   painter->drawText(rect, Qt::AlignHCenter | Qt::AlignVCenter | Qt::TextSingleLine, text);
@@ -113,7 +115,7 @@ void NavigationItemDelegate::paintSeparator(QPainter* painter, const QRect& rect
 
   const int y = rect.center().y();
 
-  painter->setPen(lineColor);
+  painter->setPen(theme.isDark() ? lineColorDark : lineColorLight);
   painter->drawLine(rect.left() + 4, y, rect.right() - 4, y);
 };
 
