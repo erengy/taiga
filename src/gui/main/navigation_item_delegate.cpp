@@ -74,7 +74,7 @@ void NavigationItemDelegate::paintBranch(QPainter* painter, QRect rect, bool isL
     painter->drawLine(center.x(), rect.top(), center.x(), rect.bottom());
   }
 
-  painter->drawLine(center, {rect.right(), center.y()});
+  painter->drawLine(center.x() + painter->pen().width(), center.y(), rect.right(), center.y());
 }
 
 void NavigationItemDelegate::paintCounter(QPainter* painter, QRect rect, const int count) const {
