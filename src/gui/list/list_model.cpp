@@ -30,14 +30,13 @@
 namespace gui {
 
 ListModel::ListModel(QObject* parent) : QAbstractListModel(parent) {
-  anime::Database db;
-  db.read();
-  db.readList();
+  const auto db = anime::readDatabase();
+  const auto entries = anime::readListEntries();
 
   QList<QPair<Anime, ListEntry>> items;
 
-  for (const auto& entry : db.list()) {
-    for (const auto& anime : db.data()) {
+  for (const auto& entry : entries) {
+    for (const auto& anime : db) {
       if (anime.id == entry.anime_id) {
         items.emplace_back(anime, entry);
         break;

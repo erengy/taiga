@@ -23,9 +23,7 @@
 namespace gui {
 
 SearchListModel::SearchListModel(QObject* parent) : QAbstractListModel(parent) {
-  anime::Database db;
-  db.read();
-  setAnime(db.data());
+  setAnime(anime::readDatabase());
 }
 
 int SearchListModel::rowCount(const QModelIndex&) const {

@@ -23,17 +23,17 @@
 
 namespace anime {
 
-void Database::read() {
-  data_.clear();
+QList<Anime> readDatabase() {
+  QList<Anime> data;
 
   QFile file("./data/anime.xml");
 
-  if (!file.open(QIODevice::ReadOnly)) return;
+  if (!file.open(QIODevice::ReadOnly)) return {};
 
   QXmlStreamReader xml(&file);
 
-  if (!xml.readNextStartElement()) return;
-  if (xml.name() != u"database") return;
+  if (!xml.readNextStartElement()) return {};
+  if (xml.name() != u"database") return {};
 
   while (xml.readNextStartElement()) {
     if (xml.name() != u"anime") break;
@@ -102,21 +102,23 @@ void Database::read() {
       }
     }
 
-    data_.emplace_back(anime);
+    data.emplace_back(anime);
   }
+
+  return data;
 }
 
-void Database::readList() {
-  list_.clear();
+QList<ListEntry> readListEntries() {
+  QList<ListEntry> entries;
 
   QFile file("./data/user.xml");
 
-  if (!file.open(QIODevice::ReadOnly)) return;
+  if (!file.open(QIODevice::ReadOnly)) return {};
 
   QXmlStreamReader xml(&file);
 
-  if (!xml.readNextStartElement()) return;
-  if (xml.name() != u"library") return;
+  if (!xml.readNextStartElement()) return {};
+  if (xml.name() != u"library") return {};
 
   while (xml.readNextStartElement()) {
     if (xml.name() != u"anime") break;
@@ -155,8 +157,10 @@ void Database::readList() {
       }
     }
 
-    list_.emplace_back(entry);
+    entries.emplace_back(entry);
   }
+
+  return entries;
 }
 
 }  // namespace anime
