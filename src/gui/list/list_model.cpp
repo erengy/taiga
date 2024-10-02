@@ -22,6 +22,7 @@
 #include <QFont>
 #include <QSize>
 
+#include "gui/list/list_item_delegate.hpp"
 #include "gui/utils/format.hpp"
 #include "media/anime_db.hpp"
 #include "media/anime_season.hpp"
@@ -31,7 +32,20 @@ namespace gui {
 ListModel::ListModel(QObject* parent) : QAbstractListModel(parent) {
   anime::Database db;
   db.read();
-  setAnime(db.data());
+  db.readList();
+
+  QList<QPair<Anime, ListEntry>> items;
+
+  for (const auto& entry : db.list()) {
+    for (const auto& anime : db.data()) {
+      if (anime.id == entry.anime_id) {
+        items.emplace_back(anime, entry);
+        break;
+      }
+    }
+  }
+
+  setData(items);
 }
 
 int ListModel::rowCount(const QModelIndex&) const {
@@ -45,26 +59,26 @@ int ListModel::columnCount(const QModelIndex&) const {
 QVariant ListModel::data(const QModelIndex& index, int role) const {
   if (!index.isValid()) return {};
 
-  const auto& item = m_data.at(index.row());
+  const auto& [anime, entry] = m_data.at(index.row());
 
   switch (role) {
     case Qt::DisplayRole:
       switch (index.column()) {
         case COLUMN_TITLE:
-          return QString::fromStdString(item.titles.romaji);
+          return QString::fromStdString(anime.titles.romaji);
         case COLUMN_SCORE:
-          return "-";
+          return formatListScore(entry.score);
         case COLUMN_TYPE:
-          return fromType(item.type);
+          return fromType(anime.type);
         case COLUMN_SEASON:
-          return fromSeason(anime::Season(item.start_date));
+          return fromSeason(anime::Season(anime.start_date));
       }
       break;
 
     case Qt::ToolTipRole:
       switch (index.column()) {
         case COLUMN_TITLE:
-          return QString::fromStdString(item.titles.romaji);
+          return QString::fromStdString(anime.titles.romaji);
       }
       break;
 
@@ -82,8 +96,11 @@ QVariant ListModel::data(const QModelIndex& index, int role) const {
       break;
     }
 
-    case Qt::UserRole: {
-      return QVariant::fromValue(&item);
+    case static_cast<int>(ListItemDataRole::Anime): {
+      return QVariant::fromValue(&anime);
+    }
+    case static_cast<int>(ListItemDataRole::ListEntry): {
+      return QVariant::fromValue(&entry);
     }
   }
 
@@ -137,10 +154,16 @@ Qt::ItemFlags ListModel::flags(const QModelIndex& index) const {
 std::optional<Anime> ListModel::getAnime(const QModelIndex& index) const {
   if (!index.isValid()) return std::nullopt;
 
-  return m_data.at(index.row());
+  return m_data.at(index.row()).first;
 }
 
-void ListModel::setAnime(const QList<Anime>& items) {
+std::optional<ListEntry> ListModel::getListEntry(const QModelIndex& index) const {
+  if (!index.isValid()) return std::nullopt;
+
+  return m_data.at(index.row()).second;
+}
+
+void ListModel::setData(const QList<QPair<Anime, ListEntry>>& items) {
   beginInsertRows({}, 0, items.size());
   m_data = items;
   endInsertRows();

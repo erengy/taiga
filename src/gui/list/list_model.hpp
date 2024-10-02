@@ -20,6 +20,7 @@
 
 #include <QAbstractListModel>
 #include <QList>
+#include <QPair>
 #include <optional>
 
 #include "media/anime.hpp"
@@ -51,10 +52,11 @@ public:
   Qt::ItemFlags flags(const QModelIndex& index) const override;
 
   std::optional<Anime> getAnime(const QModelIndex& index) const;
-  void setAnime(const QList<Anime>& items);
+  std::optional<ListEntry> getListEntry(const QModelIndex& index) const;
+  void setData(const QList<QPair<Anime, ListEntry>>& items);
 
 private:
-  QList<Anime> m_data;
+  QList<QPair<Anime, ListEntry>> m_data;
 };
 
 }  // namespace gui

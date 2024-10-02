@@ -47,6 +47,7 @@ enum class Status;
 namespace gui {
 
 QString formatScore(const double value);
+QString formatListScore(const int value);
 
 QString fromDate(const base::Date& date);
 QString fromFuzzyDate(const base::FuzzyDate& date);

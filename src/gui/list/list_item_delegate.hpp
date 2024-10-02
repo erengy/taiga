@@ -24,6 +24,11 @@ class QProxyStyle;
 
 namespace gui {
 
+enum class ListItemDataRole {
+  Anime = Qt::UserRole,
+  ListEntry,
+};
+
 class ListItemDelegate final : public QStyledItemDelegate {
   Q_OBJECT
   Q_DISABLE_COPY_MOVE(ListItemDelegate)

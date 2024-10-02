@@ -30,6 +30,10 @@ QString formatScore(const double value) {
   return u"%1%2"_qs.arg(value * 10.0).arg('%');
 }
 
+QString formatListScore(const int value) {
+  return value > 0 ? u"%1"_qs.arg(value / 10.0) : "-";
+}
+
 QString fromDate(const base::Date& date) {
   return QDate(static_cast<int>(date.year()), static_cast<unsigned int>(date.month()),
                static_cast<unsigned int>(date.day()))

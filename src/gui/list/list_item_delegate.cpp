@@ -21,6 +21,7 @@
 #include <QComboBox>
 #include <QPainter>
 #include <QProxyStyle>
+#include <limits>
 
 #include "gui/list/list_model.hpp"
 #include "gui/utils/painter_state_saver.hpp"
@@ -34,7 +35,9 @@ ListItemDelegate::ListItemDelegate(QObject* parent)
 
 void ListItemDelegate::setEditorData(QWidget* editor, const QModelIndex& index) const {
   auto* combobox = static_cast<QComboBox*>(editor);
-  combobox->setCurrentIndex(0);
+  const auto entry =
+      index.data(static_cast<int>(ListItemDataRole::ListEntry)).value<const ListEntry*>();
+  combobox->setCurrentIndex(std::clamp(entry->score / 10, 0, 10));
 }
 
 QWidget* ListItemDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem&,
@@ -76,9 +79,14 @@ void ListItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opti
     case ListModel::COLUMN_PROGRESS: {
       const PainterStateSaver painterStateSaver(painter);
 
-      const auto anime = index.data(Qt::UserRole).value<const Anime*>();
+      const auto anime =
+          index.data(static_cast<int>(ListItemDataRole::Anime)).value<const Anime*>();
+      const auto entry =
+          index.data(static_cast<int>(ListItemDataRole::ListEntry)).value<const ListEntry*>();
+
       const int episodes = anime->episode_count;
-      const int progress = episodes > 0 ? std::clamp(3, 0, episodes) : 3;
+      const int progress = std::clamp(entry->watched_episodes, 0,
+                                      episodes > 0 ? episodes : std::numeric_limits<int>::max());
       const int percent = episodes > 0 ? static_cast<float>(progress) / episodes * 100.0f : 50;
       const auto text =
           tr("%1/%2").arg(progress).arg(episodes > 0 ? QString::number(episodes) : "?");
