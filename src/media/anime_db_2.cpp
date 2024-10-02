@@ -106,4 +106,57 @@ void Database::read() {
   }
 }
 
+void Database::readList() {
+  list_.clear();
+
+  QFile file("./data/user.xml");
+
+  if (!file.open(QIODevice::ReadOnly)) return;
+
+  QXmlStreamReader xml(&file);
+
+  if (!xml.readNextStartElement()) return;
+  if (xml.name() != u"library") return;
+
+  while (xml.readNextStartElement()) {
+    if (xml.name() != u"anime") break;
+
+    ListEntry entry;
+
+    while (xml.readNextStartElement()) {
+      if (xml.name() == u"id") {
+        entry.anime_id = xml.readElementText().toInt();
+      } else if (xml.name() == u"library_id") {
+        entry.id = xml.readElementText().toStdString();
+      } else if (xml.name() == u"progress") {
+        entry.watched_episodes = xml.readElementText().toInt();
+      } else if (xml.name() == u"date_start") {
+        entry.date_start = FuzzyDate(xml.readElementText().toStdString());
+      } else if (xml.name() == u"date_end") {
+        entry.date_finish = FuzzyDate(xml.readElementText().toStdString());
+      } else if (xml.name() == u"score") {
+        entry.score = xml.readElementText().toInt();
+      } else if (xml.name() == u"status") {
+        entry.status = static_cast<list::Status>(xml.readElementText().toInt());
+      } else if (xml.name() == u"private") {
+        entry.is_private = xml.readElementText().toInt();
+      } else if (xml.name() == u"rewatched_times") {
+        entry.rewatched_times = xml.readElementText().toInt();
+      } else if (xml.name() == u"rewatching") {
+        entry.rewatching = xml.readElementText().toInt();
+      } else if (xml.name() == u"rewatching_ep") {
+        entry.rewatching_ep = xml.readElementText().toInt();
+      } else if (xml.name() == u"notes") {
+        entry.notes = xml.readElementText().toStdString();
+      } else if (xml.name() == u"last_updated") {
+        entry.last_updated = xml.readElementText().toStdString();
+      } else {
+        xml.skipCurrentElement();
+      }
+    }
+
+    list_.emplace_back(entry);
+  }
+}
+
 }  // namespace anime

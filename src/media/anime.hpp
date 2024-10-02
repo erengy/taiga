@@ -137,6 +137,7 @@ constexpr std::array<Status, 5> kStatuses{
 
 struct Entry {
   std::string id;
+  int anime_id = kUnknownId;
   int watched_episodes = 0;
   int score = 0;
   Status status = Status::NotInList;

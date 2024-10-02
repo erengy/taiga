@@ -26,14 +26,19 @@ namespace anime {
 
 class Database {
 public:
-  void read();
-
   QList<Anime>& data() {
     return data_;
   };
+  QList<ListEntry>& list() {
+    return list_;
+  };
+
+  void read();
+  void readList();
 
 private:
   QList<Anime> data_;
+  QList<ListEntry> list_;
 };
 
 }  // namespace anime
