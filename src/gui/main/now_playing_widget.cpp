@@ -46,7 +46,7 @@ NowPlayingWidget::NowPlayingWidget(QWidget* parent) : QFrame(parent) {
   m_mainLabel = new QLabel(this);
   layout->addWidget(m_mainLabel);
   connect(m_mainLabel, &QLabel::linkActivated, this, [this]() {
-    if (m_anime) MediaDialog::show(this, *m_anime);
+    if (m_anime) MediaDialog::show(this, *m_anime, {});
   });
 
   // Timer

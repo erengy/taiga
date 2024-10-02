@@ -178,7 +178,7 @@ void MediaMenu::test() const {
 void MediaMenu::viewDetails() const {
   if (m_items.empty()) return;
 
-  MediaDialog::show(parentWidget(), m_items.front());
+  MediaDialog::show(parentWidget(), m_items.front(), {});
 }
 
 void MediaMenu::addMediaItems() {

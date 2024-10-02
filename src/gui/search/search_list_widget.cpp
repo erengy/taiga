@@ -59,7 +59,7 @@ SearchListWidget::SearchListWidget(QWidget* parent)
   connect(this, &QAbstractItemView::doubleClicked, this, [this](const QModelIndex& index) {
     const auto selectedItem = m_model->getAnime(index);
     if (!selectedItem) return;
-    MediaDialog::show(this, *selectedItem);
+    MediaDialog::show(this, *selectedItem, {});
   });
 }
 

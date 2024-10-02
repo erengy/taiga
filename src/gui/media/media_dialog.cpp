@@ -50,15 +50,16 @@ void MediaDialog::showEvent(QShowEvent* event) {
   resizePosterImage();
 }
 
-void MediaDialog::show(QWidget* parent, const Anime& anime_item) {
+void MediaDialog::show(QWidget* parent, const Anime& anime, const std::optional<ListEntry> entry) {
   auto* dlg = new MediaDialog(parent);
   dlg->setAttribute(Qt::WA_DeleteOnClose);
-  dlg->setAnime(anime_item);
+  dlg->setAnime(anime, entry);
   dlg->QDialog::show();
 }
 
-void MediaDialog::setAnime(const Anime& anime_item) {
-  m_anime = anime_item;
+void MediaDialog::setAnime(const Anime& anime, const std::optional<ListEntry> entry) {
+  m_anime = anime;
+  m_entry = entry;
 
   const auto title = QString::fromStdString(m_anime.titles.romaji);
   setWindowTitle(title);
@@ -66,6 +67,7 @@ void MediaDialog::setAnime(const Anime& anime_item) {
 
   loadPosterImage();
   initDetails();
+  initList();
 }
 
 void MediaDialog::initDetails() {
@@ -140,8 +142,72 @@ void MediaDialog::initDetails() {
   ui_->synopsis->setHtml(QString::fromStdString(m_anime.synopsis));
 }
 
+void MediaDialog::initList() {
+  ui_->tabWidget->setTabVisible(1, m_entry.has_value());
+
+  if (!m_entry.has_value()) return;
+
+  // Episodes watched
+  if (m_anime.episode_count > 0) {
+    ui_->spinProgress->setMaximum(m_anime.episode_count);
+  }
+  ui_->spinProgress->setValue(m_entry->watched_episodes);
+
+  // Times rewatched
+  ui_->spinRewatches->setValue(m_entry->rewatched_times);
+
+  // Rewatching
+  ui_->checkRewatching->setChecked(m_entry->rewatching);
+
+  // Status
+  ui_->comboStatus->clear();
+  for (const auto status : anime::list::kStatuses) {
+    ui_->comboStatus->addItem(fromListStatus(status), static_cast<int>(status));
+    if (status == m_entry->status) {
+      ui_->comboStatus->setCurrentIndex(ui_->comboStatus->count() - 1);
+    }
+  }
+
+  // Score
+  if (!ui_->comboScore->count()) {
+    for (int i = 0; i <= 10; ++i) {
+      ui_->comboScore->addItem(tr("%1").arg(i), i);
+    }
+  }
+  ui_->comboScore->setCurrentIndex(m_entry->score / 10);
+
+  const auto fuzzy_to_date = [](const FuzzyDate& date) {
+    return QDate{date.year(), date.month(), date.day()};
+  };
+
+  // Date started
+  ui_->checkDateStarted->setChecked((bool)m_entry->date_start);
+  if (m_anime.start_date) {
+    ui_->dateStarted->setMinimumDate(fuzzy_to_date(m_anime.start_date));
+  }
+  if (m_entry->date_start) {
+    ui_->dateStarted->setDate(fuzzy_to_date(m_entry->date_start));
+  } else if (m_anime.start_date) {
+    ui_->dateStarted->setDate(fuzzy_to_date(m_anime.start_date));
+  }
+
+  // Date completed
+  ui_->checkDateCompleted->setChecked((bool)m_entry->date_finish);
+  if (m_anime.start_date) {
+    ui_->dateCompleted->setMinimumDate(fuzzy_to_date(m_anime.start_date));
+  }
+  if (m_entry->date_finish) {
+    ui_->dateCompleted->setDate(fuzzy_to_date(m_entry->date_finish));
+  } else if (m_anime.end_date) {
+    ui_->dateCompleted->setDate(fuzzy_to_date(m_anime.end_date));
+  }
+
+  // Notes
+  ui_->plainTextEditNotes->setPlainText(QString::fromStdString(m_entry->notes));
+}
+
 void MediaDialog::loadPosterImage() {
-  QImageReader reader("./data/poster.jpg");
+  QImageReader reader(u"./data/cache/image/%1.jpg"_qs.arg(m_anime.id));
   const QImage image = reader.read();
   if (!image.isNull()) {
     m_pixmap = QPixmap::fromImage(image);

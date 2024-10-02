@@ -74,9 +74,10 @@ ListView::ListView(QWidget* parent, MainWindow* mainWindow)
           qOverload<const QModelIndex&>(&QAbstractItemView::edit));
 
   connect(this, &QAbstractItemView::doubleClicked, this, [this](const QModelIndex& index) {
-    const auto selectedItem = m_model->getAnime(index);
-    if (!selectedItem) return;
-    MediaDialog::show(this, *selectedItem);
+    const auto anime = m_model->getAnime(index);
+    if (!anime) return;
+    const auto entry = m_model->getListEntry(index);
+    MediaDialog::show(this, *anime, entry);
   });
 
   connect(selectionModel(), &QItemSelectionModel::selectionChanged, this,

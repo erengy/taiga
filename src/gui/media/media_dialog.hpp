@@ -20,6 +20,7 @@
 
 #include <QDialog>
 #include <QPixmap>
+#include <optional>
 
 #include "media/anime.hpp"
 
@@ -43,19 +44,21 @@ public:
   void resizeEvent(QResizeEvent* event) override;
   void showEvent(QShowEvent* event) override;
 
-  static void show(QWidget* parent, const Anime& anime_item);
+  static void show(QWidget* parent, const Anime& anime, const std::optional<ListEntry> entry);
 
 public slots:
-  void setAnime(const Anime& anime_item);
+  void setAnime(const Anime& anime, const std::optional<ListEntry> entry);
 
 private:
   void initDetails();
+  void initList();
   void loadPosterImage();
   void resizePosterImage();
 
   Ui::MediaDialog* ui_ = nullptr;
 
   Anime m_anime;
+  std::optional<ListEntry> m_entry;
   QPixmap m_pixmap;
 };
 
