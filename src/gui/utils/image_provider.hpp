@@ -18,28 +18,19 @@
 
 #pragma once
 
-#include <QStyledItemDelegate>
+#include <QMap>
+#include <QPixmap>
 
 namespace gui {
 
-class SearchListItemDelegate final : public QStyledItemDelegate {
-  Q_OBJECT
-  Q_DISABLE_COPY_MOVE(SearchListItemDelegate)
-
+class ImageProvider {
 public:
-  SearchListItemDelegate(QObject* parent);
-  ~SearchListItemDelegate() = default;
-
-  void paint(QPainter* painter, const QStyleOptionViewItem& option,
-             const QModelIndex& index) const override;
-
-  QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const override;
-
-protected:
-  void initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const override;
+  const QPixmap& loadPoster(int id);
 
 private:
-  QSize itemSize() const;
+  QMap<int, QPixmap> m_pixmaps;
 };
+
+inline ImageProvider imageProvider;
 
 }  // namespace gui

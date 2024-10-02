@@ -16,30 +16,24 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "image_provider.hpp"
 
-#include <QStyledItemDelegate>
+#include <QImage>
+#include <QImageReader>
 
 namespace gui {
 
-class SearchListItemDelegate final : public QStyledItemDelegate {
-  Q_OBJECT
-  Q_DISABLE_COPY_MOVE(SearchListItemDelegate)
+const QPixmap& ImageProvider::loadPoster(int id) {
+  if (const auto it = m_pixmaps.find(id); it != m_pixmaps.end()) {
+    return it.value();
+  }
 
-public:
-  SearchListItemDelegate(QObject* parent);
-  ~SearchListItemDelegate() = default;
+  QImageReader reader(u"./data/cache/image/%1.jpg"_qs.arg(id));
+  const QImage image = reader.read();
 
-  void paint(QPainter* painter, const QStyleOptionViewItem& option,
-             const QModelIndex& index) const override;
+  m_pixmaps[id] = !image.isNull() ? QPixmap::fromImage(image) : QPixmap{};
 
-  QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const override;
-
-protected:
-  void initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const override;
-
-private:
-  QSize itemSize() const;
-};
+  return m_pixmaps[id];
+}
 
 }  // namespace gui

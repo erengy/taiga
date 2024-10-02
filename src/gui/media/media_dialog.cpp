@@ -18,10 +18,10 @@
 
 #include "media_dialog.hpp"
 
-#include <QImageReader>
 #include <QResizeEvent>
 
 #include "gui/utils/format.hpp"
+#include "gui/utils/image_provider.hpp"
 #include "media/anime_season.hpp"
 #include "ui_media_dialog.h"
 
@@ -207,20 +207,21 @@ void MediaDialog::initList() {
 }
 
 void MediaDialog::loadPosterImage() {
-  QImageReader reader(u"./data/cache/image/%1.jpg"_qs.arg(m_anime.id));
-  const QImage image = reader.read();
-  if (!image.isNull()) {
-    m_pixmap = QPixmap::fromImage(image);
-    ui_->posterLabel->setPixmap(m_pixmap);
-    resizePosterImage();
-  }
+  const auto& posterPixmap = imageProvider.loadPoster(m_anime.id);
+  ui_->posterLabel->setPixmap(posterPixmap);
+  resizePosterImage();
 }
 
 void MediaDialog::resizePosterImage() {
-  const int w = m_pixmap.width();
-  const int h = m_pixmap.height();
-  const auto poster_w = ui_->posterLabel->width();
+  const auto& posterPixmap = ui_->posterLabel->pixmap();
+
+  if (posterPixmap.isNull()) return;
+
+  const int w = posterPixmap.width();
+  const int h = posterPixmap.height();
+  const int poster_w = ui_->posterLabel->width();
   const int height = h * (poster_w / static_cast<float>(w));
+
   ui_->posterLabel->setFixedHeight(height);
 }
 

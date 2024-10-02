@@ -18,25 +18,19 @@
 
 #include "search_list_item_delegate.hpp"
 
-#include <QImageReader>
 #include <QListView>
 #include <QPainter>
 #include <QPainterPath>
 
 #include "gui/search/search_list_model.hpp"
 #include "gui/utils/format.hpp"
+#include "gui/utils/image_provider.hpp"
 #include "gui/utils/painter_state_saver.hpp"
 #include "gui/utils/theme.hpp"
 
 namespace gui {
 
-SearchListItemDelegate::SearchListItemDelegate(QObject* parent) : QStyledItemDelegate(parent) {
-  QImageReader reader("./data/poster.jpg");
-  const QImage image = reader.read();
-  if (!image.isNull()) {
-    m_pixmap = QPixmap::fromImage(image);
-  }
-}
+SearchListItemDelegate::SearchListItemDelegate(QObject* parent) : QStyledItemDelegate(parent) {}
 
 void SearchListItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option,
                                    const QModelIndex& index) const {
@@ -71,7 +65,9 @@ void SearchListItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
     } else {
       painter->fillRect(posterRect, opt.palette.mid());
     }
-    painter->drawPixmap(posterRect, m_pixmap);
+    if (const auto& posterPixmap = imageProvider.loadPoster(item->id); !posterPixmap.isNull()) {
+      painter->drawPixmap(posterRect, posterPixmap);
+    }
 
     rect.adjust(140, 0, 0, 0);
   }

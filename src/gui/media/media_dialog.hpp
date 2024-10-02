@@ -19,7 +19,6 @@
 #pragma once
 
 #include <QDialog>
-#include <QPixmap>
 #include <optional>
 
 #include "media/anime.hpp"
@@ -59,7 +58,6 @@ private:
 
   Anime m_anime;
   std::optional<ListEntry> m_entry;
-  QPixmap m_pixmap;
 };
 
 }  // namespace gui
