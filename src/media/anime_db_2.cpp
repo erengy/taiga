@@ -49,7 +49,9 @@ void Database::read() {
     };
 
     while (xml.readNextStartElement()) {
-      if (xml.name() == u"title") {
+      if (xml.name() == u"id") {
+        anime.id = xml.readElementText().toInt();
+      } else if (xml.name() == u"title") {
         anime.titles.romaji = xml.readElementText().toStdString();
       } else if (xml.name() == u"english") {
         anime.titles.english = xml.readElementText().toStdString();
@@ -73,6 +75,8 @@ void Database::read() {
         anime.image_url = xml.readElementText().toStdString();
       } else if (xml.name() == u"trailer_id") {
         anime.trailer_id = xml.readElementText().toStdString();
+      } else if (xml.name() == u"age_rating") {
+        anime.age_rating = static_cast<AgeRating>(xml.readElementText().toInt());
       } else if (xml.name() == u"genres") {
         anime.genres = to_vector(xml.readElementText().split(", "));
       } else if (xml.name() == u"tags") {
@@ -87,6 +91,12 @@ void Database::read() {
         anime.popularity_rank = xml.readElementText().toInt();
       } else if (xml.name() == u"synopsis") {
         anime.synopsis = xml.readElementText().toStdString();
+      } else if (xml.name() == u"last_aired_episode") {
+        anime.last_aired_episode = xml.readElementText().toInt();
+      } else if (xml.name() == u"next_episode_time") {
+        anime.next_episode_time = xml.readElementText().toInt();
+      } else if (xml.name() == u"modified") {
+        anime.last_modified = xml.readElementText().toInt();
       } else {
         xml.skipCurrentElement();
       }
