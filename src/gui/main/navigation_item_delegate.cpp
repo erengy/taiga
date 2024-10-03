@@ -106,7 +106,7 @@ void NavigationItemDelegate::paintCounter(QPainter* painter, QRect rect, const i
 
   painter->fillRect(rect, theme.isDark() ? lineColorDark : lineColorLight);
 
-  painter->setPen(QColor(0x666666));
+  painter->setPen(QColor(theme.isDark() ? 0x888888 : 0x666666));
   painter->drawText(rect, Qt::AlignHCenter | Qt::AlignVCenter | Qt::TextSingleLine, text);
 }
 
