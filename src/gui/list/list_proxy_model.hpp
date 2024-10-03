@@ -19,8 +19,13 @@
 #pragma once
 
 #include <QSortFilterProxyModel>
+#include <optional>
 
 namespace gui {
+
+struct ListProxyModelFilter {
+  std::optional<int> listStatus;
+};
 
 class ListProxyModel final : public QSortFilterProxyModel {
   Q_OBJECT
@@ -30,8 +35,14 @@ public:
   ListProxyModel(QObject* parent);
   ~ListProxyModel() = default;
 
+  void setListStatusFilter(int status);
+
 protected:
+  bool filterAcceptsRow(int row, const QModelIndex& parent) const override;
   bool lessThan(const QModelIndex& lhs, const QModelIndex& rhs) const override;
+
+private:
+  ListProxyModelFilter m_filter;
 };
 
 }  // namespace gui

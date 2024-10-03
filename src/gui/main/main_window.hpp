@@ -55,6 +55,10 @@ public:
     return m_nowPlayingWidget;
   }
 
+  NavigationWidget* navigation() {
+    return m_navigationWidget;
+  }
+
 public slots:
   void addNewFolder();
   void displayWindow();

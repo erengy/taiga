@@ -25,6 +25,8 @@
 #include "gui/list/list_model.hpp"
 #include "gui/list/list_proxy_model.hpp"
 #include "gui/main/main_window.hpp"
+#include "gui/main/navigation_item_delegate.hpp"
+#include "gui/main/navigation_widget.hpp"
 #include "gui/main/now_playing_widget.hpp"
 #include "gui/media/media_dialog.hpp"
 #include "gui/media/media_menu.hpp"
@@ -70,6 +72,16 @@ ListView::ListView(QWidget* parent, MainWindow* mainWindow)
   header()->setTextElideMode(Qt::ElideRight);
   header()->resizeSection(ListModel::COLUMN_TITLE, 300);
   header()->resizeSection(ListModel::COLUMN_PROGRESS, 150);
+
+  connect(mainWindow->navigation(), &NavigationWidget::currentItemChanged,
+          [this](QTreeWidgetItem* current, QTreeWidgetItem* previous) {
+            if (current) {
+              const int role = static_cast<int>(NavigationItemDataRole::ListStatus);
+              if (const int status = current->data(0, role).toInt()) {
+                m_proxyModel->setListStatusFilter(status);
+              }
+            }
+          });
 
   connect(this, &QWidget::customContextMenuRequested, this, [this]() {
     const auto selectedRows = selectionModel()->selectedRows();

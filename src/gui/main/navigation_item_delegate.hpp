@@ -28,6 +28,7 @@ enum class NavigationItemDataRole {
   IsChild,
   IsLastChild,
   IsSeparator,
+  ListStatus,
   Counter,
 };
 

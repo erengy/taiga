@@ -22,6 +22,17 @@
 #include "gui/list/list_model.hpp"
 #include "media/anime.hpp"
 
+namespace {
+
+QPair<const Anime*, const ListEntry*> getData(const QModelIndex& index) {
+  return {
+      index.data(static_cast<int>(gui::ListItemDataRole::Anime)).value<const Anime*>(),
+      index.data(static_cast<int>(gui::ListItemDataRole::ListEntry)).value<const ListEntry*>(),
+  };
+}
+
+}  // namespace
+
 namespace gui {
 
 ListProxyModel::ListProxyModel(QObject* parent) : QSortFilterProxyModel(parent) {
@@ -31,14 +42,27 @@ ListProxyModel::ListProxyModel(QObject* parent) : QSortFilterProxyModel(parent) 
   setSortRole(Qt::UserRole);
 }
 
-bool ListProxyModel::lessThan(const QModelIndex& lhs, const QModelIndex& rhs) const {
-  const auto get_data = [](const QModelIndex& index) -> QPair<const Anime*, const ListEntry*> {
-    return {index.data(static_cast<int>(ListItemDataRole::Anime)).value<const Anime*>(),
-            index.data(static_cast<int>(ListItemDataRole::ListEntry)).value<const ListEntry*>()};
-  };
+void ListProxyModel::setListStatusFilter(int status) {
+  m_filter.listStatus = status;
+  invalidateRowsFilter();
+}
 
-  const auto [lhs_anime, lhs_entry] = get_data(lhs);
-  const auto [rhs_anime, rhs_entry] = get_data(rhs);
+bool ListProxyModel::filterAcceptsRow(int row, const QModelIndex& parent) const {
+  const auto model = static_cast<ListModel*>(sourceModel());
+  if (!model) return false;
+
+  const auto [anime, entry] = getData(model->index(row, 0, parent));
+
+  if (m_filter.listStatus.has_value()) {
+    if (static_cast<int>(entry->status) != m_filter.listStatus.value()) return false;
+  }
+
+  return QSortFilterProxyModel::filterAcceptsRow(row, parent);
+}
+
+bool ListProxyModel::lessThan(const QModelIndex& lhs, const QModelIndex& rhs) const {
+  const auto [lhs_anime, lhs_entry] = getData(lhs);
+  const auto [rhs_anime, rhs_entry] = getData(rhs);
 
   switch (lhs.column()) {
     case ListModel::COLUMN_TITLE:
