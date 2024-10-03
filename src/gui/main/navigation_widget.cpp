@@ -25,6 +25,7 @@
 #include "gui/utils/format.hpp"
 #include "gui/utils/theme.hpp"
 #include "media/anime.hpp"
+#include "media/anime_db.hpp"
 
 namespace gui {
 
@@ -71,19 +72,21 @@ void NavigationWidget::refresh() {
   listItem->setExpanded(true);
   setItemData(listItem, NavigationItemDataRole::HasChildren, true);
 
-  // @TODO
-  const QList<QPair<anime::list::Status, int>> statusList{
-      {anime::list::Status::Watching, 29},     {anime::list::Status::Completed, 710},
-      {anime::list::Status::OnHold, 44},       {anime::list::Status::Dropped, 34},
-      {anime::list::Status::PlanToWatch, 144},
-  };
-  for (const auto [status, counter] : statusList) {
+  const auto statusCounts = []() {
+    QMap<anime::list::Status, int> statuses;
+    const auto entries = anime::readListEntries();
+    for (const auto& entry : entries) {
+      statuses[entry.status] += 1;
+    }
+    return statuses;
+  }();
+  for (const auto status : anime::list::kStatuses) {
     auto item = addChildItem(listItem, fromListStatus(status));
     setItemData(item, NavigationItemDataRole::PageIndex, static_cast<int>(MainWindowPage::List));
     setItemData(item, NavigationItemDataRole::IsLastChild,
                 status == anime::list::Status::PlanToWatch);
     setItemData(item, NavigationItemDataRole::ListStatus, static_cast<int>(status));
-    setItemData(item, NavigationItemDataRole::Counter, counter);
+    setItemData(item, NavigationItemDataRole::Counter, statusCounts[status]);
   }
 
   addItem("History", "history", MainWindowPage::History);
