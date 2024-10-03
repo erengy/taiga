@@ -42,6 +42,7 @@ const QIcon& Theme::getIcon(const QString& key, const QString& extension, bool u
 
 void Theme::initStyle() {
 #ifdef Q_OS_WINDOWS
+  qApp->setStyle("fusion");
   // @TODO: Use QStyleHints::colorSchemeChanged signal to detect changes
   const QString mainStylesheet = readStylesheet("main");
   const QString themeStylesheet = readStylesheet(isDark() ? "dark" : "light");
