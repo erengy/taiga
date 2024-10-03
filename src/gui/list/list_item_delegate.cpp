@@ -79,6 +79,8 @@ void ListItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opti
     case ListModel::COLUMN_PROGRESS: {
       const PainterStateSaver painterStateSaver(painter);
 
+      QStyledItemDelegate::paint(painter, option, index);
+
       const auto anime =
           index.data(static_cast<int>(ListItemDataRole::Anime)).value<const Anime*>();
       const auto entry =
@@ -106,7 +108,7 @@ void ListItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opti
       styleOption.textVisible = true;
 
       m_proxyStyle->drawControl(QStyle::CE_ProgressBar, &styleOption, painter);
-      break;
+      return;
     }
   }
 
