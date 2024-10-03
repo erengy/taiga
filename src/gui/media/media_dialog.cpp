@@ -32,6 +32,10 @@ MediaDialog::MediaDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::MediaDi
 
   ui_->titleLabel->setStyleSheet("font-size: 20px; font-weight: 600;");
 
+  connect(&imageProvider, &ImageProvider::posterChanged, this, [this](int id) {
+    if (id == m_anime.id) loadPosterImage();
+  });
+
   connect(ui_->splitter, &QSplitter::splitterMoved, this, [this]() { resizePosterImage(); });
 
   connect(ui_->checkDateStarted, &QCheckBox::stateChanged, this,

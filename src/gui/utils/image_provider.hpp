@@ -19,13 +19,23 @@
 #pragma once
 
 #include <QMap>
+#include <QObject>
 #include <QPixmap>
 
 namespace gui {
 
-class ImageProvider {
+class ImageProvider final : public QObject {
+  Q_OBJECT
+  Q_DISABLE_COPY_MOVE(ImageProvider)
+
 public:
+  ImageProvider() = default;
+
   const QPixmap& loadPoster(int id);
+  void reloadPoster(int id);
+
+signals:
+  void posterChanged(int id);
 
 private:
   QMap<int, QPixmap> m_pixmaps;

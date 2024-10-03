@@ -36,4 +36,10 @@ const QPixmap& ImageProvider::loadPoster(int id) {
   return m_pixmaps[id];
 }
 
+void ImageProvider::reloadPoster(int id) {
+  m_pixmaps.remove(id);
+  loadPoster(id);
+  emit posterChanged(id);
+}
+
 }  // namespace gui
