@@ -23,6 +23,7 @@
 
 #include "gui/list/list_item_delegate.hpp"
 #include "gui/list/list_model.hpp"
+#include "gui/list/list_proxy_model.hpp"
 #include "gui/main/main_window.hpp"
 #include "gui/main/now_playing_widget.hpp"
 #include "gui/media/media_dialog.hpp"
@@ -33,11 +34,16 @@
 namespace gui {
 
 ListView::ListView(QWidget* parent, MainWindow* mainWindow)
-    : QTreeView(parent), m_model(new ListModel(this)), m_mainWindow(mainWindow) {
+    : QTreeView(parent),
+      m_model(new ListModel(this)),
+      m_proxyModel(new ListProxyModel(this)),
+      m_mainWindow(mainWindow) {
   setObjectName("animeList");
 
   setItemDelegate(new ListItemDelegate(this));
-  setModel(m_model);
+
+  m_proxyModel->setSourceModel(m_model);
+  setModel(m_proxyModel);
 
   setAllColumnsShowFocus(true);
   setAlternatingRowColors(true);
@@ -71,7 +77,7 @@ ListView::ListView(QWidget* parent, MainWindow* mainWindow)
 
     QList<Anime> items;
     for (auto selectedIndex : selectedRows) {
-      if (const auto item = m_model->getAnime(selectedIndex)) {
+      if (const auto item = m_model->getAnime(m_proxyModel->mapToSource(selectedIndex))) {
         items.push_back(*item);
       }
     }
@@ -84,9 +90,9 @@ ListView::ListView(QWidget* parent, MainWindow* mainWindow)
           qOverload<const QModelIndex&>(&QAbstractItemView::edit));
 
   connect(this, &QAbstractItemView::doubleClicked, this, [this](const QModelIndex& index) {
-    const auto anime = m_model->getAnime(index);
+    const auto anime = m_model->getAnime(m_proxyModel->mapToSource(index));
     if (!anime) return;
-    const auto entry = m_model->getListEntry(index);
+    const auto entry = m_model->getListEntry(m_proxyModel->mapToSource(index));
     MediaDialog::show(this, *anime, entry);
   });
 
@@ -98,7 +104,8 @@ void ListView::selectionChanged(const QItemSelection& selected, const QItemSelec
   QTreeView::selectionChanged(selected, deselected);
 
   if (!selected.empty()) {
-    const auto selectedItem = m_model->getAnime(selected.indexes().first());
+    const auto selectedItem =
+        m_model->getAnime(m_proxyModel->mapToSource(selected.indexes().first()));
     m_mainWindow->nowPlaying()->setPlaying(*selectedItem);
     m_mainWindow->nowPlaying()->show();
   } else if (m_mainWindow && m_mainWindow->nowPlaying()) {

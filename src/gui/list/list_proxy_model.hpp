@@ -18,29 +18,20 @@
 
 #pragma once
 
-#include <QTreeView>
+#include <QSortFilterProxyModel>
 
 namespace gui {
 
-class ListModel;
-class ListProxyModel;
-class MainWindow;
-
-class ListView final : public QTreeView {
+class ListProxyModel final : public QSortFilterProxyModel {
   Q_OBJECT
-  Q_DISABLE_COPY_MOVE(ListView)
+  Q_DISABLE_COPY_MOVE(ListProxyModel)
 
 public:
-  ListView(QWidget* parent, MainWindow* mainWindow);
-  ~ListView() = default;
+  ListProxyModel(QObject* parent);
+  ~ListProxyModel() = default;
 
-protected slots:
-  void selectionChanged(const QItemSelection& selected, const QItemSelection& deselected) override;
-
-private:
-  ListModel* m_model = nullptr;
-  ListProxyModel* m_proxyModel = nullptr;
-  MainWindow* m_mainWindow = nullptr;
+protected:
+  bool lessThan(const QModelIndex& lhs, const QModelIndex& rhs) const override;
 };
 
 }  // namespace gui
