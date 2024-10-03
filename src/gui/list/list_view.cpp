@@ -27,6 +27,7 @@
 #include "gui/main/now_playing_widget.hpp"
 #include "gui/media/media_dialog.hpp"
 #include "gui/media/media_menu.hpp"
+#include "gui/utils/theme.hpp"
 #include "media/anime.hpp"
 
 namespace gui {
@@ -48,6 +49,15 @@ ListView::ListView(QWidget* parent, MainWindow* mainWindow)
   setSelectionMode(QAbstractItemView::SelectionMode::ExtendedSelection);
   setSortingEnabled(true);
   setUniformRowHeights(true);
+
+  if (theme.isDark()) {
+    setPalette([this]() {
+      QPalette palette = this->palette();
+      auto alternateColor = palette.color(QPalette::Base).darker(150);
+      palette.setColor(QPalette::AlternateBase, alternateColor);
+      return palette;
+    }());
+  }
 
   header()->setFirstSectionMovable(true);
   header()->setStretchLastSection(false);

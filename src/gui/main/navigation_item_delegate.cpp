@@ -39,6 +39,8 @@ void NavigationItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
     return;
   }
 
+  QStyledItemDelegate::paint(painter, option, index);
+
   // Branch
   if (index.data(static_cast<int>(NavigationItemDataRole::IsChild)).toBool()) {
     const bool isLastChild =
@@ -50,8 +52,6 @@ void NavigationItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
   if (const int count = index.data(static_cast<int>(NavigationItemDataRole::Counter)).toInt()) {
     paintCounter(painter, option.rect, count);
   }
-
-  QStyledItemDelegate::paint(painter, option, index);
 }
 
 void NavigationItemDelegate::paintBranch(QPainter* painter, QRect rect, bool isLastChild) const {

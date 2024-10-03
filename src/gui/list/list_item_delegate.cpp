@@ -25,6 +25,7 @@
 
 #include "gui/list/list_model.hpp"
 #include "gui/utils/painter_state_saver.hpp"
+#include "gui/utils/theme.hpp"
 
 namespace gui {
 
@@ -71,7 +72,7 @@ void ListItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opti
   // Grid lines
   if (index.column() > 0) {
     const PainterStateSaver painterStateSaver(painter);
-    painter->setPen(QColor{0, 0, 0, 8});
+    painter->setPen(theme.isDark() ? QColor{255, 255, 255, 8} : QColor{0, 0, 0, 8});
     painter->drawLine(option.rect.topLeft(), option.rect.bottomLeft());
   }
 
