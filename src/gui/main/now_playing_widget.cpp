@@ -86,7 +86,7 @@ void NowPlayingWidget::refresh() {
                            .arg(u"%1/%2"_qs.arg(1).arg(m_anime->episode_count))
                            .arg("font-weight: 600; text-decoration: none;"));
 
-  m_timerLabel->setText("List update in 00:00");
+  m_timerLabel->setText("List update in <b style=\"font-weight: 600;\">00:00</b>");
 }
 
 }  // namespace gui
