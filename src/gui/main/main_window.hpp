@@ -59,6 +59,10 @@ public:
     return m_navigationWidget;
   }
 
+  QLineEdit* searchBox() {
+    return m_searchBox;
+  }
+
 public slots:
   void addNewFolder();
   void displayWindow();

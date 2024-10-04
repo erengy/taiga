@@ -19,6 +19,7 @@
 #include "list_view.hpp"
 
 #include <QHeaderView>
+#include <QLineEdit>
 #include <QStatusBar>
 
 #include "gui/list/list_item_delegate.hpp"
@@ -75,7 +76,10 @@ ListView::ListView(QWidget* parent, MainWindow* mainWindow)
   header()->resizeSection(ListModel::COLUMN_TITLE, 300);
   header()->resizeSection(ListModel::COLUMN_PROGRESS, 150);
 
-  connect(mainWindow->navigation(), &NavigationWidget::currentItemChanged,
+  connect(mainWindow->searchBox(), &QLineEdit::textChanged, this,
+          [this](const QString& text) { m_proxyModel->setTextFilter(text); });
+
+  connect(mainWindow->navigation(), &NavigationWidget::currentItemChanged, this,
           [this](QTreeWidgetItem* current, QTreeWidgetItem* previous) {
             if (current) {
               const int role = static_cast<int>(NavigationItemDataRole::ListStatus);

@@ -50,6 +50,11 @@ void ListProxyModel::setListStatusFilter(int status) {
   invalidateRowsFilter();
 }
 
+void ListProxyModel::setTextFilter(const QString& text) {
+  m_filter.text = text;
+  invalidateRowsFilter();
+}
+
 bool ListProxyModel::filterAcceptsRow(int row, const QModelIndex& parent) const {
   const auto model = static_cast<ListModel*>(sourceModel());
   if (!model) return false;
@@ -58,6 +63,9 @@ bool ListProxyModel::filterAcceptsRow(int row, const QModelIndex& parent) const 
 
   if (m_filter.listStatus.has_value()) {
     if (static_cast<int>(entry->status) != m_filter.listStatus.value()) return false;
+  }
+  if (!m_filter.text.isEmpty()) {
+    if (!anime->titles.romaji.contains(m_filter.text.toStdString())) return false;
   }
 
   return QSortFilterProxyModel::filterAcceptsRow(row, parent);

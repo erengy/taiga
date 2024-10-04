@@ -25,6 +25,7 @@ namespace gui {
 
 struct ListProxyModelFilter {
   std::optional<int> listStatus;
+  QString text;
 };
 
 class ListProxyModel final : public QSortFilterProxyModel {
@@ -36,6 +37,7 @@ public:
   ~ListProxyModel() = default;
 
   void setListStatusFilter(int status);
+  void setTextFilter(const QString& text);
 
 protected:
   bool filterAcceptsRow(int row, const QModelIndex& parent) const override;
