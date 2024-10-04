@@ -113,6 +113,15 @@ void SearchListItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
 
   // Details
   {
+    static const auto from_vector = [](const std::vector<std::string>& vector) {
+      if (vector.empty()) return u"?"_qs;
+      QStringList list;
+      for (const auto& str : vector) {
+        list.append(QString::fromStdString(str));
+      }
+      return list.join(", ");
+    };
+
     const QString titles =
         "Aired:\n"
         "Genres:\n"
@@ -120,8 +129,8 @@ void SearchListItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
     const QString values = u"%1 to %2 (%3)\n%4\n%5"_qs.arg(fromFuzzyDate(item->start_date))
                                .arg(fromFuzzyDate(item->end_date))
                                .arg(fromStatus(item->status))
-                               .arg("Action, Adventure, Fantasy")
-                               .arg("A-1 Pictures");
+                               .arg(from_vector(item->genres))
+                               .arg(from_vector(item->studios));
 
     detailsFont.setWeight(QFont::Weight::DemiBold);
     painter->setFont(detailsFont);
