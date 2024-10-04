@@ -18,28 +18,36 @@
 
 #pragma once
 
-#include <QListView>
+#include <QSortFilterProxyModel>
+#include <optional>
 
 namespace gui {
 
-class SearchListModel;
-class SearchListProxyModel;
+struct SearchListProxyModelFilter {
+  std::optional<int> year;
+  std::optional<int> season;
+  std::optional<int> type;
+  std::optional<int> status;
+};
 
-class SearchListWidget final : public QListView {
+class SearchListProxyModel final : public QSortFilterProxyModel {
   Q_OBJECT
-  Q_DISABLE_COPY_MOVE(SearchListWidget)
+  Q_DISABLE_COPY_MOVE(SearchListProxyModel)
 
 public:
-  SearchListWidget(QWidget* parent);
-  ~SearchListWidget() = default;
+  SearchListProxyModel(QObject* parent);
+  ~SearchListProxyModel() = default;
 
-  SearchListProxyModel* proxyModel() {
-    return m_proxyModel;
-  }
+  void setYearFilter(int year);
+  void setSeasonFilter(int season);
+  void setTypeFilter(int type);
+  void setStatusFilter(int status);
+
+protected:
+  bool filterAcceptsRow(int row, const QModelIndex& parent) const override;
 
 private:
-  SearchListModel* m_model = nullptr;
-  SearchListProxyModel* m_proxyModel = nullptr;
+  SearchListProxyModelFilter m_filter;
 };
 
 }  // namespace gui

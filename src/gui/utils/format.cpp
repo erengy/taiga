@@ -68,8 +68,8 @@ QString fromStatus(const anime::Status value) {
   // clang-format off
   switch (value) {
     case Unknown: return "Unknown";
-    case Airing: return "Currently airing";
-    case FinishedAiring: return "Finished airing";
+    case Airing: return "Airing";
+    case FinishedAiring: return "Finished";
     case NotYetAired: return "Not yet aired";
     default: return "";
   }

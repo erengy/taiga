@@ -14,6 +14,7 @@ target_sources(taiga-gui PRIVATE
 	media/media_menu.cpp
 	search/search_list_item_delegate.cpp
 	search/search_list_model.cpp
+	search/search_list_proxy_model.cpp
 	search/search_list_widget.cpp
 	search/search_widget.cpp
 	settings/settings_dialog.cpp

@@ -20,8 +20,12 @@
 
 #include <QToolBar>
 
+#include "gui/search/search_list_proxy_model.hpp"
 #include "gui/search/search_list_widget.hpp"
+#include "gui/utils/format.hpp"
 #include "gui/utils/theme.hpp"
+#include "media/anime.hpp"
+#include "media/anime_season.hpp"
 #include "ui_search_widget.h"
 
 namespace gui {
@@ -31,11 +35,59 @@ SearchWidget::SearchWidget(QWidget* parent)
   ui_->setupUi(this);
 
   // Year
-  ui_->comboYear->clear();
-  ui_->comboYear->addItem(tr("Any year"));
-  ui_->comboYear->insertSeparator(1);
-  for (int year = 2023 + 1; year >= 1940; --year) {
-    ui_->comboYear->addItem(u"%1"_qs.arg(year));
+  {
+    ui_->comboYear->clear();
+    ui_->comboYear->addItem(tr("Unknown"), 0);
+    ui_->comboYear->insertSeparator(1);
+    for (int year = 2023 + 1; year >= 1940; --year) {
+      ui_->comboYear->addItem(u"%1"_qs.arg(year), year);
+    }
+    connect(ui_->comboYear, &QComboBox::currentIndexChanged, this, [this](int index) {
+      const int year = ui_->comboYear->itemData(index).toInt();
+      m_searchListWidget->proxyModel()->setYearFilter(year);
+    });
+  }
+
+  // Season
+  {
+    ui_->comboSeason->clear();
+    const auto seasons = {
+        anime::SeasonName::Winter,
+        anime::SeasonName::Spring,
+        anime::SeasonName::Summer,
+        anime::SeasonName::Fall,
+    };
+    for (const auto season : seasons) {
+      ui_->comboSeason->addItem(fromSeasonName(season), static_cast<int>(season));
+    }
+    connect(ui_->comboSeason, &QComboBox::currentIndexChanged, this, [this](int index) {
+      const int season = ui_->comboSeason->itemData(index).toInt();
+      m_searchListWidget->proxyModel()->setSeasonFilter(season);
+    });
+  }
+
+  // Type
+  {
+    ui_->comboType->clear();
+    for (const auto type : anime::kTypes) {
+      ui_->comboType->addItem(fromType(type), static_cast<int>(type));
+    }
+    connect(ui_->comboType, &QComboBox::currentIndexChanged, this, [this](int index) {
+      const int type = ui_->comboType->itemData(index).toInt();
+      m_searchListWidget->proxyModel()->setTypeFilter(type);
+    });
+  }
+
+  // Status
+  {
+    ui_->comboStatus->clear();
+    for (const auto status : anime::kStatuses) {
+      ui_->comboStatus->addItem(fromStatus(status), static_cast<int>(status));
+    }
+    connect(ui_->comboStatus, &QComboBox::currentIndexChanged, this, [this](int index) {
+      const int status = ui_->comboStatus->itemData(index).toInt();
+      m_searchListWidget->proxyModel()->setStatusFilter(status);
+    });
   }
 
   // Toolbar

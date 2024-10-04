@@ -24,14 +24,19 @@
 #include "gui/media/media_menu.hpp"
 #include "gui/search/search_list_item_delegate.hpp"
 #include "gui/search/search_list_model.hpp"
+#include "gui/search/search_list_proxy_model.hpp"
 #include "media/anime.hpp"
 
 namespace gui {
 
 SearchListWidget::SearchListWidget(QWidget* parent)
-    : QListView(parent), m_model(new SearchListModel(this)) {
+    : QListView(parent),
+      m_model(new SearchListModel(this)),
+      m_proxyModel(new SearchListProxyModel(this)) {
   setItemDelegate(new SearchListItemDelegate(this));
-  setModel(m_model);
+
+  m_proxyModel->setSourceModel(m_model);
+  setModel(m_proxyModel);
 
   setContextMenuPolicy(Qt::CustomContextMenu);
   setFrameShape(QFrame::Shape::NoFrame);
@@ -47,7 +52,7 @@ SearchListWidget::SearchListWidget(QWidget* parent)
 
     QList<Anime> items;
     for (auto selectedIndex : selectedRows) {
-      if (const auto item = m_model->getAnime(selectedIndex)) {
+      if (const auto item = m_model->getAnime(m_proxyModel->mapToSource(selectedIndex))) {
         items.push_back(*item);
       }
     }
@@ -57,7 +62,7 @@ SearchListWidget::SearchListWidget(QWidget* parent)
   });
 
   connect(this, &QAbstractItemView::doubleClicked, this, [this](const QModelIndex& index) {
-    const auto selectedItem = m_model->getAnime(index);
+    const auto selectedItem = m_model->getAnime(m_proxyModel->mapToSource(index));
     if (!selectedItem) return;
     MediaDialog::show(this, *selectedItem, {});
   });

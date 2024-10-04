@@ -55,83 +55,29 @@
      </item>
      <item>
       <widget class="QComboBox" name="comboSeason">
-       <property name="currentIndex">
-        <number>-1</number>
-       </property>
        <property name="placeholderText">
         <string>Season</string>
        </property>
-       <item>
-        <property name="text">
-         <string>Season</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Winter</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Spring</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Summer</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Fall</string>
-        </property>
-       </item>
       </widget>
      </item>
      <item>
       <widget class="QComboBox" name="comboType">
-       <property name="currentIndex">
-        <number>-1</number>
-       </property>
        <property name="placeholderText">
         <string>Type</string>
        </property>
-       <item>
-        <property name="text">
-         <string>TV</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>OVA</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Movie</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Special</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>ONA</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Music</string>
-        </property>
-       </item>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="comboStatus">
+       <property name="placeholderText">
+        <string>Status</string>
+       </property>
       </widget>
      </item>
      <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
-        <enum>Qt::Horizontal</enum>
+        <enum>Qt::Orientation::Horizontal</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
@@ -168,7 +114,7 @@
     <string>Sort</string>
    </property>
    <property name="menuRole">
-    <enum>QAction::NoRole</enum>
+    <enum>QAction::MenuRole::NoRole</enum>
    </property>
   </action>
   <action name="actionView">
@@ -179,7 +125,7 @@
     <string>View</string>
    </property>
    <property name="menuRole">
-    <enum>QAction::NoRole</enum>
+    <enum>QAction::MenuRole::NoRole</enum>
    </property>
   </action>
   <action name="actionMore">
@@ -190,7 +136,7 @@
     <string>More</string>
    </property>
    <property name="menuRole">
-    <enum>QAction::NoRole</enum>
+    <enum>QAction::MenuRole::NoRole</enum>
    </property>
   </action>
  </widget>
