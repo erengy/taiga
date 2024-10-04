@@ -139,6 +139,18 @@ QVariant ListModel::headerData(int section, Qt::Orientation orientation, int rol
       }
       break;
     }
+
+    case Qt::InitialSortOrderRole: {
+      switch (section) {
+        case COLUMN_PROGRESS:
+        case COLUMN_SCORE:
+        case COLUMN_SEASON:
+          return Qt::DescendingOrder;
+        default:
+          return Qt::AscendingOrder;
+      }
+      break;
+    }
   }
 
   return QAbstractListModel::headerData(section, orientation, role);

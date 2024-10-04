@@ -58,6 +58,8 @@ ListView::ListView(QWidget* parent, MainWindow* mainWindow)
   setSortingEnabled(true);
   setUniformRowHeights(true);
 
+  sortByColumn(ListModel::COLUMN_SEASON, Qt::SortOrder::DescendingOrder);
+
   if (theme.isDark()) {
     setPalette([this]() {
       QPalette palette = this->palette();
