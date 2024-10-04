@@ -38,8 +38,11 @@ namespace gui {
 ListProxyModel::ListProxyModel(QObject* parent) : QSortFilterProxyModel(parent) {
   setFilterKeyColumn(ListModel::COLUMN_TITLE);
   setFilterRole(Qt::DisplayRole);
+
   setSortCaseSensitivity(Qt::CaseInsensitive);
   setSortRole(Qt::UserRole);
+
+  setListStatusFilter(static_cast<int>(anime::list::Status::Watching));
 }
 
 void ListProxyModel::setListStatusFilter(int status) {
