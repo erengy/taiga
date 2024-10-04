@@ -36,8 +36,8 @@ void SearchListItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
                                    const QModelIndex& index) const {
   const PainterStateSaver painterStateSaver(painter);
 
-  const auto model = static_cast<const SearchListModel*>(index.model());
-  const auto item = model->getAnime(index);
+  const auto item =
+      index.data(static_cast<int>(SearchListItemDataRole::Anime)).value<const Anime*>();
 
   QStyleOptionViewItem opt = option;
   QRect rect = opt.rect;

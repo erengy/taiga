@@ -18,6 +18,7 @@
 
 #include "search_list_model.hpp"
 
+#include "gui/search/search_list_item_delegate.hpp"
 #include "media/anime_db.hpp"
 
 namespace gui {
@@ -33,11 +34,15 @@ int SearchListModel::rowCount(const QModelIndex&) const {
 QVariant SearchListModel::data(const QModelIndex& index, int role) const {
   if (!index.isValid()) return {};
 
-  const auto item = m_data.value(index.row());
+  const auto& item = m_data.at(index.row());
 
   switch (role) {
     case Qt::ItemDataRole::DisplayRole:
       return QString::fromStdString(item.titles.romaji);
+
+    case static_cast<int>(SearchListItemDataRole::Anime): {
+      return QVariant::fromValue(&item);
+    }
   }
 
   return {};

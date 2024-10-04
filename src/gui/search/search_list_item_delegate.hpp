@@ -22,6 +22,10 @@
 
 namespace gui {
 
+enum class SearchListItemDataRole {
+  Anime = Qt::UserRole,
+};
+
 class SearchListItemDelegate final : public QStyledItemDelegate {
   Q_OBJECT
   Q_DISABLE_COPY_MOVE(SearchListItemDelegate)
