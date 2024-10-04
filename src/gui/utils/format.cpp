@@ -35,13 +35,12 @@ QString formatListScore(const int value) {
 }
 
 QString fromDate(const base::Date& date) {
-  return QDate(static_cast<int>(date.year()), static_cast<unsigned int>(date.month()),
-               static_cast<unsigned int>(date.day()))
-      .toString();
+  return date.ok() ? QDate(date).toString(Qt::RFC2822Date) : u"?"_qs;
 }
 
-QString fromFuzzyDate(const base::FuzzyDate& date) {
-  return QDate(date.year(), date.month(), date.day()).toString();
+QString fromFuzzyDate(const base::FuzzyDate& fuzzyDate) {
+  const QDate date(fuzzyDate.year(), fuzzyDate.month(), fuzzyDate.day());
+  return fuzzyDate ? date.toString(Qt::RFC2822Date) : u"?"_qs;
 }
 
 QString fromSeason(const anime::Season season) {
