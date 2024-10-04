@@ -36,6 +36,7 @@ public:
   ListProxyModel(QObject* parent);
   ~ListProxyModel() = default;
 
+  void removeListStatusFilter();
   void setListStatusFilter(int status);
   void setTextFilter(const QString& text);
 

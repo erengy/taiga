@@ -45,6 +45,11 @@ ListProxyModel::ListProxyModel(QObject* parent) : QSortFilterProxyModel(parent) 
   setListStatusFilter(static_cast<int>(anime::list::Status::Watching));
 }
 
+void ListProxyModel::removeListStatusFilter() {
+  m_filter.listStatus.reset();
+  invalidateRowsFilter();
+}
+
 void ListProxyModel::setListStatusFilter(int status) {
   m_filter.listStatus = status;
   invalidateRowsFilter();

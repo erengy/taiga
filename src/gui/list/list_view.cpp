@@ -81,11 +81,12 @@ ListView::ListView(QWidget* parent, MainWindow* mainWindow)
 
   connect(mainWindow->navigation(), &NavigationWidget::currentItemChanged, this,
           [this](QTreeWidgetItem* current, QTreeWidgetItem* previous) {
-            if (current) {
-              const int role = static_cast<int>(NavigationItemDataRole::ListStatus);
-              if (const int status = current->data(0, role).toInt()) {
-                m_proxyModel->setListStatusFilter(status);
-              }
+            if (!current) return;
+            const int role = static_cast<int>(NavigationItemDataRole::ListStatus);
+            if (const int status = current->data(0, role).toInt()) {
+              m_proxyModel->setListStatusFilter(status);
+            } else {
+              m_proxyModel->removeListStatusFilter();
             }
           });
 
