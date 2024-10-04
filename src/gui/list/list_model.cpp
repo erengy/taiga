@@ -78,6 +78,8 @@ QVariant ListModel::data(const QModelIndex& index, int role) const {
       switch (index.column()) {
         case COLUMN_TITLE:
           return QString::fromStdString(anime.titles.romaji);
+        case COLUMN_SEASON:
+          return fromFuzzyDate(anime.start_date);
       }
       break;
 
