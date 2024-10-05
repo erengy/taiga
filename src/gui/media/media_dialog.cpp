@@ -138,12 +138,16 @@ void MediaDialog::initDetails() {
                             get_row_label(from_vector(m_anime.producers)));
   }
 
+  const auto synopsis = QString::fromStdString(m_anime.synopsis);
+  
   ui_->synopsisHeader->setStyleSheet("font-weight: 600;");
+  ui_->synopsisHeader->setHidden(synopsis.isEmpty());
 
   ui_->synopsis->document()->setDocumentMargin(0);
   ui_->synopsis->viewport()->setAutoFillBackground(false);
   ui_->synopsis->setContextMenuPolicy(Qt::ContextMenuPolicy::NoContextMenu);
-  ui_->synopsis->setHtml(QString::fromStdString(m_anime.synopsis));
+  ui_->synopsis->setHtml(synopsis);
+  ui_->synopsis->setHidden(synopsis.isEmpty());
 }
 
 void MediaDialog::initList() {
