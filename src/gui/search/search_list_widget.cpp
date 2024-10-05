@@ -57,7 +57,7 @@ SearchListWidget::SearchListWidget(QWidget* parent)
       }
     }
 
-    auto* menu = new MediaMenu(this, items);
+    auto* menu = new MediaMenu(this, items, {});
     menu->popup();
   });
 

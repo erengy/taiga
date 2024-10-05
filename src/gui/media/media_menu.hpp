@@ -19,6 +19,7 @@
 #pragma once
 
 #include <QList>
+#include <QMap>
 #include <QMenu>
 
 #include "media/anime.hpp"
@@ -30,7 +31,7 @@ class MediaMenu final : public QMenu {
   Q_DISABLE_COPY_MOVE(MediaMenu)
 
 public:
-  MediaMenu(QWidget* parent, const QList<Anime>& items);
+  MediaMenu(QWidget* parent, const QList<Anime>& items, const QMap<int, ListEntry> entries);
   ~MediaMenu() = default;
 
   void popup();
@@ -62,6 +63,7 @@ private:
   bool isNowPlaying() const;
 
   const QList<Anime> m_items;
+  const QMap<int, ListEntry> m_entries;
 };
 
 }  // namespace gui

@@ -95,13 +95,18 @@ ListView::ListView(QWidget* parent, MainWindow* mainWindow)
     if (selectedRows.isEmpty()) return;
 
     QList<Anime> items;
+    QMap<int, ListEntry> entries;
     for (auto selectedIndex : selectedRows) {
-      if (const auto item = m_model->getAnime(m_proxyModel->mapToSource(selectedIndex))) {
+      const auto index = m_proxyModel->mapToSource(selectedIndex);
+      if (const auto item = m_model->getAnime(index)) {
         items.push_back(*item);
+        if (const auto entry = m_model->getListEntry(index)) {
+          entries[item->id] = *entry;
+        }
       }
     }
 
-    auto* menu = new MediaMenu(this, items);
+    auto* menu = new MediaMenu(this, items, entries);
     menu->popup();
   });
 
