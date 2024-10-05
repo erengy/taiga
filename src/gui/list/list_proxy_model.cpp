@@ -24,11 +24,12 @@
 
 namespace {
 
-QPair<const Anime*, const ListEntry*> getData(const QModelIndex& index) {
-  return {
-      index.data(static_cast<int>(gui::ListItemDataRole::Anime)).value<const Anime*>(),
-      index.data(static_cast<int>(gui::ListItemDataRole::ListEntry)).value<const ListEntry*>(),
-  };
+const Anime* getAnime(const QModelIndex& index) {
+  return index.data(static_cast<int>(gui::ListItemDataRole::Anime)).value<const Anime*>();
+}
+
+const ListEntry* getListEntry(const QModelIndex& index) {
+  return index.data(static_cast<int>(gui::ListItemDataRole::ListEntry)).value<const ListEntry*>();
 }
 
 }  // namespace
@@ -64,10 +65,14 @@ bool ListProxyModel::filterAcceptsRow(int row, const QModelIndex& parent) const 
   const auto model = static_cast<ListModel*>(sourceModel());
   if (!model) return false;
 
-  const auto [anime, entry] = getData(model->index(row, 0, parent));
+  const auto index = model->index(row, 0, parent);
+  const auto anime = getAnime(index);
+  const auto entry = getListEntry(index);
+  if (!anime) return false;
 
   if (m_filter.listStatus.has_value()) {
-    if (static_cast<int>(entry->status) != m_filter.listStatus.value()) return false;
+    const auto status = static_cast<int>(entry ? entry->status : anime::list::Status::NotInList);
+    if (status != m_filter.listStatus.value()) return false;
   }
   if (!m_filter.text.isEmpty()) {
     if (!anime->titles.romaji.contains(m_filter.text.toStdString())) return false;
@@ -77,8 +82,12 @@ bool ListProxyModel::filterAcceptsRow(int row, const QModelIndex& parent) const 
 }
 
 bool ListProxyModel::lessThan(const QModelIndex& lhs, const QModelIndex& rhs) const {
-  const auto [lhs_anime, lhs_entry] = getData(lhs);
-  const auto [rhs_anime, rhs_entry] = getData(rhs);
+  const auto lhs_anime = getAnime(lhs);
+  const auto lhs_entry = getListEntry(lhs);
+  const auto rhs_anime = getAnime(rhs);
+  const auto rhs_entry = getListEntry(rhs);
+
+  if (!lhs_anime || !rhs_anime) return false;
 
   switch (lhs.column()) {
     case ListModel::COLUMN_TITLE:
@@ -86,9 +95,10 @@ bool ListProxyModel::lessThan(const QModelIndex& lhs, const QModelIndex& rhs) co
     case ListModel::COLUMN_TYPE:
       return lhs_anime->type < rhs_anime->type;
     case ListModel::COLUMN_PROGRESS:
-      return lhs_entry->watched_episodes < rhs_entry->watched_episodes;
+      return (lhs_entry ? lhs_entry->watched_episodes : 0) <
+             (rhs_entry ? rhs_entry->watched_episodes : 0);
     case ListModel::COLUMN_SCORE:
-      return lhs_entry->score < rhs_entry->score;
+      return (lhs_entry ? lhs_entry->score : 0) < (rhs_entry ? rhs_entry->score : 0);
     case ListModel::COLUMN_SEASON:
       return lhs_anime->start_date < rhs_anime->start_date;
   }

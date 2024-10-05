@@ -112,7 +112,7 @@ ListView::ListView(QWidget* parent, MainWindow* mainWindow)
     const auto anime = m_model->getAnime(m_proxyModel->mapToSource(index));
     if (!anime) return;
     const auto entry = m_model->getListEntry(m_proxyModel->mapToSource(index));
-    MediaDialog::show(this, *anime, entry);
+    MediaDialog::show(this, *anime, entry ? std::optional<ListEntry>{*entry} : std::nullopt);
   });
 
   connect(selectionModel(), &QItemSelectionModel::selectionChanged, this,

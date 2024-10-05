@@ -33,22 +33,21 @@ ListModel::ListModel(QObject* parent) : QAbstractListModel(parent) {
   const auto db = anime::readDatabase();
   const auto entries = anime::readListEntries();
 
-  QList<QPair<Anime, ListEntry>> items;
+  beginInsertRows({}, 0, db.size());
 
+  for (const auto& anime : db) {
+    m_anime[anime.id] = anime;
+    m_ids.push_back(anime.id);
+  }
   for (const auto& entry : entries) {
-    for (const auto& anime : db) {
-      if (anime.id == entry.anime_id) {
-        items.emplace_back(anime, entry);
-        break;
-      }
-    }
+    m_entries[entry.anime_id] = entry;
   }
 
-  setData(items);
+  endInsertRows();
 }
 
 int ListModel::rowCount(const QModelIndex&) const {
-  return m_data.size();
+  return m_ids.size();
 }
 
 int ListModel::columnCount(const QModelIndex&) const {
@@ -58,28 +57,32 @@ int ListModel::columnCount(const QModelIndex&) const {
 QVariant ListModel::data(const QModelIndex& index, int role) const {
   if (!index.isValid()) return {};
 
-  const auto& [anime, entry] = m_data.at(index.row());
+  const auto anime = getAnime(index);
+  if (!anime) return {};
+
+  const auto entry = getListEntry(index);
 
   switch (role) {
     case Qt::DisplayRole:
       switch (index.column()) {
         case COLUMN_TITLE:
-          return QString::fromStdString(anime.titles.romaji);
+          return QString::fromStdString(anime->titles.romaji);
         case COLUMN_SCORE:
-          return formatListScore(entry.score);
+          if (entry) return formatListScore(entry->score);
+          break;
         case COLUMN_TYPE:
-          return fromType(anime.type);
+          return fromType(anime->type);
         case COLUMN_SEASON:
-          return fromSeason(anime::Season(anime.start_date));
+          return fromSeason(anime::Season(anime->start_date));
       }
       break;
 
     case Qt::ToolTipRole:
       switch (index.column()) {
         case COLUMN_TITLE:
-          return QString::fromStdString(anime.titles.romaji);
+          return QString::fromStdString(anime->titles.romaji);
         case COLUMN_SEASON:
-          return fromFuzzyDate(anime.start_date);
+          return fromFuzzyDate(anime->start_date);
       }
       break;
 
@@ -98,10 +101,10 @@ QVariant ListModel::data(const QModelIndex& index, int role) const {
     }
 
     case static_cast<int>(ListItemDataRole::Anime): {
-      return QVariant::fromValue(&anime);
+      return QVariant::fromValue(anime);
     }
     case static_cast<int>(ListItemDataRole::ListEntry): {
-      return QVariant::fromValue(&entry);
+      return QVariant::fromValue(entry);
     }
   }
 
@@ -164,22 +167,18 @@ Qt::ItemFlags ListModel::flags(const QModelIndex& index) const {
   return QAbstractListModel::flags(index) | Qt::ItemIsEditable;
 }
 
-std::optional<Anime> ListModel::getAnime(const QModelIndex& index) const {
-  if (!index.isValid()) return std::nullopt;
-
-  return m_data.at(index.row()).first;
+const Anime* ListModel::getAnime(const QModelIndex& index) const {
+  if (!index.isValid()) return nullptr;
+  const int id = m_ids.at(index.row());
+  const auto it = m_anime.find(id);
+  return it != m_anime.end() ? &*it : nullptr;
 }
 
-std::optional<ListEntry> ListModel::getListEntry(const QModelIndex& index) const {
-  if (!index.isValid()) return std::nullopt;
-
-  return m_data.at(index.row()).second;
-}
-
-void ListModel::setData(const QList<QPair<Anime, ListEntry>>& items) {
-  beginInsertRows({}, 0, items.size());
-  m_data = items;
-  endInsertRows();
+const ListEntry* ListModel::getListEntry(const QModelIndex& index) const {
+  if (!index.isValid()) return nullptr;
+  const int id = m_ids.at(index.row());
+  const auto it = m_entries.find(id);
+  return it != m_entries.end() ? &*it : nullptr;
 }
 
 }  // namespace gui

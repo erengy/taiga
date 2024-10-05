@@ -35,9 +35,10 @@ ListItemDelegate::ListItemDelegate(QObject* parent)
 }
 
 void ListItemDelegate::setEditorData(QWidget* editor, const QModelIndex& index) const {
-  auto* combobox = static_cast<QComboBox*>(editor);
   const auto entry =
       index.data(static_cast<int>(ListItemDataRole::ListEntry)).value<const ListEntry*>();
+  if (!entry) return;
+  auto* combobox = static_cast<QComboBox*>(editor);
   combobox->setCurrentIndex(std::clamp(entry->score / 10, 0, 10));
 }
 
@@ -86,6 +87,8 @@ void ListItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opti
           index.data(static_cast<int>(ListItemDataRole::Anime)).value<const Anime*>();
       const auto entry =
           index.data(static_cast<int>(ListItemDataRole::ListEntry)).value<const ListEntry*>();
+
+      if (!anime || !entry) return;
 
       const int episodes = anime->episode_count;
       const int progress = std::clamp(entry->watched_episodes, 0,

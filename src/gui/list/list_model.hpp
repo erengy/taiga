@@ -20,8 +20,7 @@
 
 #include <QAbstractListModel>
 #include <QList>
-#include <QPair>
-#include <optional>
+#include <QMap>
 
 #include "media/anime.hpp"
 
@@ -51,12 +50,13 @@ public:
   QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
   Qt::ItemFlags flags(const QModelIndex& index) const override;
 
-  std::optional<Anime> getAnime(const QModelIndex& index) const;
-  std::optional<ListEntry> getListEntry(const QModelIndex& index) const;
-  void setData(const QList<QPair<Anime, ListEntry>>& items);
+  const Anime* getAnime(const QModelIndex& index) const;
+  const ListEntry* getListEntry(const QModelIndex& index) const;
 
 private:
-  QList<QPair<Anime, ListEntry>> m_data;
+  QList<int> m_ids;
+  QMap<int, Anime> m_anime;
+  QMap<int, ListEntry> m_entries;
 };
 
 }  // namespace gui
