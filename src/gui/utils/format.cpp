@@ -37,7 +37,11 @@ QString formatListScore(const int value) {
 }
 
 QString formatDate(const base::Date& date) {
-  return date.ok() ? QDate(date).toString(Qt::RFC2822Date) : u"?"_qs;
+  return date.ok() ? formatDate(QDate(date)) : u"?"_qs;
+}
+
+QString formatDate(const QDate date) {
+  return date.isValid() ? QDate(date).toString(Qt::RFC2822Date) : u"?"_qs;
 }
 
 QString formatFuzzyDate(const base::FuzzyDate& fuzzyDate) {
@@ -63,6 +67,11 @@ QString formatAsRelativeTime(const qint64 time) {
   }();
 
   return timeDiff < 0 ? u"in %1"_qs.arg(str) : u"%1 ago"_qs.arg(str);
+}
+
+QString formatTimestamp(const qint64 time) {
+  const QDateTime datetime = QDateTime::fromSecsSinceEpoch(time);
+  return formatDate(datetime.date());
 }
 
 QString formatSeason(const anime::Season season) {

@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <QDate>
 #include <QString>
 #include <chrono>
 
@@ -50,8 +51,10 @@ QString formatScore(const double value);
 QString formatListScore(const int value);
 
 QString formatDate(const base::Date& date);
+QString formatDate(const QDate date);
 QString formatFuzzyDate(const base::FuzzyDate& date);
 QString formatAsRelativeTime(const qint64 time);
+QString formatTimestamp(const qint64 time);
 
 QString formatSeason(const anime::Season season);
 QString formatSeasonName(const anime::SeasonName name);

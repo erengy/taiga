@@ -91,7 +91,10 @@ QVariant ListModel::data(const QModelIndex& index, int role) const {
         case COLUMN_SEASON:
           return formatFuzzyDate(anime->start_date);
         case COLUMN_LAST_UPDATED:
-          if (entry) return QString::fromStdString(entry->last_updated);  // @TODO: Format as date
+          if (entry) {
+            const auto time = QString::fromStdString(entry->last_updated).toLongLong();
+            return formatTimestamp(time);
+          }
           break;
       }
       break;
