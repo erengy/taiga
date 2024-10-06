@@ -61,7 +61,7 @@ MainWindow::MainWindow() : QMainWindow(), ui_(new Ui::MainWindow) {
 }
 
 void MainWindow::initActions() {
-  ui_->actionProfile->setToolTip(tr("%1 (%2)").arg("erengy").arg("AniList"));
+  ui_->actionProfile->setToolTip(tr("Profile"));
   ui_->actionSynchronize->setToolTip(tr("Synchronize with %1").arg("AniList"));
 
   connect(ui_->actionAddNewFolder, &QAction::triggered, this, &MainWindow::addNewFolder);
