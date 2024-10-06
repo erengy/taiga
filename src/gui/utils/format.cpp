@@ -19,6 +19,8 @@
 #include "format.hpp"
 
 #include <QDate>
+#include <QDateTime>
+#include <cmath>
 
 #include "base/chrono.hpp"
 #include "media/anime.hpp"
@@ -41,6 +43,26 @@ QString fromDate(const base::Date& date) {
 QString fromFuzzyDate(const base::FuzzyDate& fuzzyDate) {
   const QDate date(fuzzyDate.year(), fuzzyDate.month(), fuzzyDate.day());
   return fuzzyDate ? date.toString(Qt::RFC2822Date) : u"?"_qs;
+}
+
+QString formatAsRelativeTime(const qint64 time) {
+  if (!time) return u"Unknown"_qs;
+
+  const QDateTime datetime = QDateTime::fromSecsSinceEpoch(time);
+  const QDateTime now = QDateTime::currentDateTimeUtc();
+  const auto timeDiff = datetime.secsTo(now);
+  const Duration duration(std::chrono::seconds{std::abs(timeDiff)});
+
+  const QString str = [&duration]() {
+    if (duration.seconds() < 90) return u"a moment"_qs;
+    if (duration.minutes() < 45) return u"%1 minute(s)"_qs.arg(std::lround(duration.minutes()));
+    if (duration.hours() < 22) return u"%1 hour(s)"_qs.arg(std::lround(duration.hours()));
+    if (duration.days() < 25) return u"%1 day(s)"_qs.arg(std::lround(duration.days()));
+    if (duration.days() < 345) return u"%1 month(s)"_qs.arg(std::lround(duration.months()));
+    return u"%1 year(s)"_qs.arg(std::lround(duration.years()));
+  }();
+
+  return timeDiff < 0 ? u"in %1"_qs.arg(str) : u"%1 ago"_qs.arg(str);
 }
 
 QString fromSeason(const anime::Season season) {

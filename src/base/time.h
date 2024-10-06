@@ -24,7 +24,6 @@
 #include <windows.h>
 
 std::wstring GetAbsoluteTimeString(time_t unix_time, const char* format = nullptr);
-std::wstring GetRelativeTimeString(time_t unix_time, bool append_suffix);
 
 time_t ConvertIso8601(const std::wstring& datetime);
 time_t ConvertRfc822(const std::wstring& datetime);

@@ -180,48 +180,6 @@ std::wstring GetAbsoluteTimeString(time_t unix_time, const char* format) {
   }
 }
 
-std::wstring GetRelativeTimeString(time_t unix_time, bool append_suffix) {
-  if (!unix_time)
-    return L"Unknown";
-
-  time_t time_diff = time(nullptr) - unix_time;
-  Duration duration(std::abs(time_diff));
-  bool future = time_diff < 0;
-
-  std::wstring str;
-
-  auto str_value = [](const float value,
-                      const std::wstring& singular,
-                      const std::wstring& plural) {
-    long result = std::lround(value);
-    return ToWstr(result) + L" " + (result == 1 ? singular : plural);
-  };
-
-  if (duration.seconds() < 90) {
-    str = L"a moment";
-  } else if (duration.minutes() < 45) {
-    str = str_value(duration.minutes(), L"minute", L"minutes");
-  } else if (duration.hours() < 22) {
-    str = str_value(duration.hours(), L"hour", L"hours");
-  } else if (duration.days() < 25) {
-    str = str_value(duration.days(), L"day", L"days");
-  } else if (duration.days() < 345) {
-    str = str_value(duration.months(), L"month", L"months");
-  } else {
-    str = str_value(duration.years(), L"year", L"years");
-  }
-
-  if (append_suffix) {
-    if (future) {
-      str = L"in " + str;
-    } else {
-      str += L" ago";
-    }
-  }
-
-  return str;
-}
-
 Date GetDate() {
   SYSTEMTIME st;
   ::GetLocalTime(&st);

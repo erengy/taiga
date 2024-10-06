@@ -51,6 +51,7 @@ QString formatListScore(const int value);
 
 QString fromDate(const base::Date& date);
 QString fromFuzzyDate(const base::FuzzyDate& date);
+QString formatAsRelativeTime(const qint64 time);
 
 QString fromSeason(const anime::Season season);
 QString fromSeasonName(const anime::SeasonName name);
