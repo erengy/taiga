@@ -16,24 +16,23 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "search_list_widget.hpp"
+#include "anime_list_view_cards.hpp"
 
 #include <QContextMenuEvent>
 
+#include "gui/common/anime_list_item_delegate_cards.hpp"
 #include "gui/media/media_dialog.hpp"
 #include "gui/media/media_menu.hpp"
 #include "gui/models/anime_list_model.hpp"
 #include "gui/models/anime_list_proxy_model.hpp"
-#include "gui/search/search_list_item_delegate.hpp"
 #include "media/anime.hpp"
 
 namespace gui {
 
-SearchListWidget::SearchListWidget(QWidget* parent)
-    : QListView(parent),
-      m_model(new AnimeListModel(this)),
-      m_proxyModel(new AnimeListProxyModel(this)) {
-  setItemDelegate(new SearchListItemDelegate(this));
+ListViewCards::ListViewCards(QWidget* parent, AnimeListModel* model,
+                             AnimeListProxyModel* proxyModel)
+    : QListView(parent), m_model(model), m_proxyModel(proxyModel) {
+  setItemDelegate(new ListItemDelegateCards(this));
 
   m_proxyModel->setSourceModel(m_model);
   setModel(m_proxyModel);

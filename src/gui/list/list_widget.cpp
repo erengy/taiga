@@ -23,8 +23,8 @@
 #include <QToolBar>
 #include <QToolButton>
 
-#include "gui/list/list_view.hpp"
-#include "gui/list/list_view_cards.hpp"
+#include "gui/common/anime_list_view.hpp"
+#include "gui/common/anime_list_view_cards.hpp"
 #include "gui/models/anime_list_model.hpp"
 #include "gui/models/anime_list_proxy_model.hpp"
 #include "gui/utils/theme.hpp"

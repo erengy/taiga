@@ -20,8 +20,9 @@
 
 #include <QToolBar>
 
+#include "gui/common/anime_list_view_cards.hpp"
+#include "gui/models/anime_list_model.hpp"
 #include "gui/models/anime_list_proxy_model.hpp"
-#include "gui/search/search_list_widget.hpp"
 #include "gui/utils/format.hpp"
 #include "gui/utils/theme.hpp"
 #include "media/anime.hpp"
@@ -30,8 +31,13 @@
 
 namespace gui {
 
-SearchWidget::SearchWidget(QWidget* parent)
-    : QWidget(parent), m_searchListWidget(new SearchListWidget(this)), ui_(new Ui::SearchWidget) {
+SearchWidget::SearchWidget(QWidget* parent, MainWindow* mainWindow)
+    : QWidget(parent),
+      m_model(new AnimeListModel(this)),
+      m_proxyModel(new AnimeListProxyModel(this)),
+      m_listViewCards(new ListViewCards(this, m_model, m_proxyModel)),
+      m_mainWindow(mainWindow),
+      ui_(new Ui::SearchWidget) {
   ui_->setupUi(this);
 
   // Year
@@ -44,7 +50,7 @@ SearchWidget::SearchWidget(QWidget* parent)
     }
     connect(ui_->comboYear, &QComboBox::currentIndexChanged, this, [this](int index) {
       const int year = ui_->comboYear->itemData(index).toInt();
-      m_searchListWidget->proxyModel()->setYearFilter(year);
+      m_proxyModel->setYearFilter(year);
     });
   }
 
@@ -62,7 +68,7 @@ SearchWidget::SearchWidget(QWidget* parent)
     }
     connect(ui_->comboSeason, &QComboBox::currentIndexChanged, this, [this](int index) {
       const int season = ui_->comboSeason->itemData(index).toInt();
-      m_searchListWidget->proxyModel()->setSeasonFilter(season);
+      m_proxyModel->setSeasonFilter(season);
     });
   }
 
@@ -74,7 +80,7 @@ SearchWidget::SearchWidget(QWidget* parent)
     }
     connect(ui_->comboType, &QComboBox::currentIndexChanged, this, [this](int index) {
       const int type = ui_->comboType->itemData(index).toInt();
-      m_searchListWidget->proxyModel()->setTypeFilter(type);
+      m_proxyModel->setTypeFilter(type);
     });
   }
 
@@ -86,7 +92,7 @@ SearchWidget::SearchWidget(QWidget* parent)
     }
     connect(ui_->comboStatus, &QComboBox::currentIndexChanged, this, [this](int index) {
       const int status = ui_->comboStatus->itemData(index).toInt();
-      m_searchListWidget->proxyModel()->setStatusFilter(status);
+      m_proxyModel->setStatusFilter(status);
     });
   }
 
@@ -106,7 +112,7 @@ SearchWidget::SearchWidget(QWidget* parent)
   ui_->editFilter->hide();
 
   // List
-  ui_->verticalLayout->addWidget(m_searchListWidget);
+  ui_->verticalLayout->addWidget(m_listViewCards);
 }
 
 }  // namespace gui

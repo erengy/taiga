@@ -16,13 +16,13 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "list_view.hpp"
+#include "anime_list_view.hpp"
 
 #include <QHeaderView>
 #include <QLineEdit>
 #include <QStatusBar>
 
-#include "gui/list/list_item_delegate.hpp"
+#include "gui/common/anime_list_item_delegate.hpp"
 #include "gui/main/main_window.hpp"
 #include "gui/main/navigation_item_delegate.hpp"
 #include "gui/main/navigation_widget.hpp"

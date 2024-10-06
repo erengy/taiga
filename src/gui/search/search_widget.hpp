@@ -26,19 +26,25 @@ class SearchWidget;
 
 namespace gui {
 
-class SearchListWidget;
+class AnimeListModel;
+class AnimeListProxyModel;
+class ListViewCards;
+class MainWindow;
 
 class SearchWidget final : public QWidget {
   Q_OBJECT
   Q_DISABLE_COPY_MOVE(SearchWidget)
 
 public:
-  SearchWidget(QWidget* parent);
+  SearchWidget(QWidget* parent, MainWindow* mainWindow);
   ~SearchWidget() = default;
 
 private:
   Ui::SearchWidget* ui_ = nullptr;
-  SearchListWidget* m_searchListWidget = nullptr;
+  MainWindow* m_mainWindow = nullptr;
+  AnimeListModel* m_model = nullptr;
+  AnimeListProxyModel* m_proxyModel = nullptr;
+  ListViewCards* m_listViewCards = nullptr;
 };
 
 }  // namespace gui

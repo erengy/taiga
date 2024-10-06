@@ -134,7 +134,7 @@ void MainWindow::initPage(MainWindowPage page) {
       layout->setContentsMargins(0, 0, 0, 0);
       ui_->searchPage->setLayout(layout);
 
-      m_searchWidget = new SearchWidget(ui_->searchPage);
+      m_searchWidget = new SearchWidget(ui_->searchPage, this);
       layout->addWidget(m_searchWidget);
 
       break;

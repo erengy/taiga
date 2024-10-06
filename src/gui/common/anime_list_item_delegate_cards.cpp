@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "list_item_delegate_cards.hpp"
+#include "anime_list_item_delegate_cards.hpp"
 
 #include <QListView>
 #include <QPainter>
