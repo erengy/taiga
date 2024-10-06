@@ -39,7 +39,7 @@
     <item>
      <widget class="QSplitter" name="splitter">
       <property name="orientation">
-       <enum>Qt::Horizontal</enum>
+       <enum>Qt::Orientation::Horizontal</enum>
       </property>
       <property name="handleWidth">
        <number>1</number>
@@ -59,7 +59,7 @@
             <string>TODO: Home</string>
            </property>
            <property name="alignment">
-            <set>Qt::AlignCenter</set>
+            <set>Qt::AlignmentFlag::AlignCenter</set>
            </property>
           </widget>
          </item>
@@ -75,7 +75,7 @@
             <string>TODO: History</string>
            </property>
            <property name="alignment">
-            <set>Qt::AlignCenter</set>
+            <set>Qt::AlignmentFlag::AlignCenter</set>
            </property>
           </widget>
          </item>
@@ -89,7 +89,7 @@
             <string>TODO: Library</string>
            </property>
            <property name="alignment">
-            <set>Qt::AlignCenter</set>
+            <set>Qt::AlignmentFlag::AlignCenter</set>
            </property>
           </widget>
          </item>
@@ -103,7 +103,21 @@
             <string>TODO: Torrents</string>
            </property>
            <property name="alignment">
-            <set>Qt::AlignCenter</set>
+            <set>Qt::AlignmentFlag::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="profilePage">
+        <layout class="QVBoxLayout" name="verticalLayout_8">
+         <item>
+          <widget class="QLabel" name="label_8">
+           <property name="text">
+            <string>TODO: Profile</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignmentFlag::AlignCenter</set>
            </property>
           </widget>
          </item>
@@ -120,7 +134,7 @@
      <x>0</x>
      <y>0</y>
      <width>1024</width>
-     <height>22</height>
+     <height>33</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -198,7 +212,7 @@
     <bool>false</bool>
    </property>
    <property name="allowedAreas">
-    <set>Qt::TopToolBarArea</set>
+    <set>Qt::ToolBarArea::TopToolBarArea</set>
    </property>
    <property name="floatable">
     <bool>false</bool>
@@ -245,7 +259,7 @@
     <string>E&amp;xit</string>
    </property>
    <property name="menuRole">
-    <enum>QAction::QuitRole</enum>
+    <enum>QAction::MenuRole::QuitRole</enum>
    </property>
   </action>
   <action name="actionSynchronize">
@@ -264,7 +278,7 @@
     <string>About Taiga</string>
    </property>
    <property name="menuRole">
-    <enum>QAction::AboutRole</enum>
+    <enum>QAction::MenuRole::AboutRole</enum>
    </property>
   </action>
   <action name="actionDonate">
@@ -296,7 +310,7 @@
     <string>Settings</string>
    </property>
    <property name="menuRole">
-    <enum>QAction::PreferencesRole</enum>
+    <enum>QAction::MenuRole::PreferencesRole</enum>
    </property>
   </action>
   <action name="actionLibraryFolders">
@@ -304,7 +318,7 @@
     <string>Library folders</string>
    </property>
    <property name="menuRole">
-    <enum>QAction::NoRole</enum>
+    <enum>QAction::MenuRole::NoRole</enum>
    </property>
   </action>
   <action name="actionToggleStatusbar">
@@ -318,7 +332,7 @@
     <string>Show statusbar</string>
    </property>
    <property name="menuRole">
-    <enum>QAction::NoRole</enum>
+    <enum>QAction::MenuRole::NoRole</enum>
    </property>
   </action>
   <action name="actionToggleNowPlaying">
@@ -329,7 +343,7 @@
     <string>Show Now Playing</string>
    </property>
    <property name="menuRole">
-    <enum>QAction::NoRole</enum>
+    <enum>QAction::MenuRole::NoRole</enum>
    </property>
   </action>
   <action name="actionToggleDetection">
@@ -391,7 +405,7 @@
     <string>Menu</string>
    </property>
    <property name="menuRole">
-    <enum>QAction::TextHeuristicRole</enum>
+    <enum>QAction::MenuRole::TextHeuristicRole</enum>
    </property>
   </action>
   <action name="actionProfile">
@@ -402,7 +416,7 @@
     <string>Profile</string>
    </property>
    <property name="menuRole">
-    <enum>QAction::TextHeuristicRole</enum>
+    <enum>QAction::MenuRole::TextHeuristicRole</enum>
    </property>
   </action>
   <action name="actionBack">
@@ -413,7 +427,7 @@
     <string>Alt+Left</string>
    </property>
    <property name="menuRole">
-    <enum>QAction::NoRole</enum>
+    <enum>QAction::MenuRole::NoRole</enum>
    </property>
   </action>
   <action name="actionForward">
@@ -424,7 +438,7 @@
     <string>Alt+Right</string>
    </property>
    <property name="menuRole">
-    <enum>QAction::NoRole</enum>
+    <enum>QAction::MenuRole::NoRole</enum>
    </property>
   </action>
   <action name="actionDisplayWindow">
@@ -432,7 +446,7 @@
     <string>&amp;Open Taiga</string>
    </property>
    <property name="menuRole">
-    <enum>QAction::NoRole</enum>
+    <enum>QAction::MenuRole::NoRole</enum>
    </property>
   </action>
  </widget>

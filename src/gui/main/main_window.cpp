@@ -159,6 +159,9 @@ void MainWindow::initPage(MainWindowPage page) {
 
     case MainWindowPage::Torrents:
       break;
+
+    case MainWindowPage::Profile:
+      break;
   }
 
   initializedPages.insert(page);
@@ -281,8 +284,9 @@ void MainWindow::support() const {
   QDesktopServices::openUrl(QUrl("https://taiga.moe/#support"));
 }
 
-void MainWindow::profile() const {
-  QDesktopServices::openUrl(QUrl("https://anilist.co/user/erengy/"));
+void MainWindow::profile() {
+  setPage(MainWindowPage::Profile);
+  m_navigationWidget->setCurrentIndex({});
 }
 
 }  // namespace gui

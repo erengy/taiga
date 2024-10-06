@@ -41,6 +41,7 @@ enum class MainWindowPage {
   History,
   Library,
   Torrents,
+  Profile,
 };
 
 class MainWindow final : public QMainWindow {
@@ -73,7 +74,7 @@ private slots:
   void about();
   void donate() const;
   void support() const;
-  void profile() const;
+  void profile();
 
 private:
   void initActions();
