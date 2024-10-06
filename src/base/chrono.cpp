@@ -23,6 +23,39 @@
 
 namespace base {
 
+Duration::Duration(const std::chrono::seconds seconds) : seconds_(seconds) {}
+
+Duration& Duration::operator=(const std::chrono::seconds seconds) {
+  seconds_ = seconds;
+  return *this;
+}
+
+std::chrono::seconds::rep Duration::seconds() const {
+  return seconds_.count();
+}
+
+std::chrono::minutes::rep Duration::minutes() const {
+  return std::chrono::duration_cast<std::chrono::minutes>(seconds_).count();
+}
+
+std::chrono::hours::rep Duration::hours() const {
+  return std::chrono::duration_cast<std::chrono::hours>(seconds_).count();
+}
+
+std::chrono::days::rep Duration::days() const {
+  return std::chrono::duration_cast<std::chrono::days>(seconds_).count();
+}
+
+std::chrono::months::rep Duration::months() const {
+  return std::chrono::duration_cast<std::chrono::months>(seconds_).count();
+}
+
+std::chrono::years::rep Duration::years() const {
+  return std::chrono::duration_cast<std::chrono::years>(seconds_).count();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 FuzzyDate::FuzzyDate(std::chrono::year year, std::chrono::month month, std::chrono::day day)
     : year_{year}, month_{month}, day_{day} {}
 

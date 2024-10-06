@@ -24,50 +24,6 @@
 #include "base/format.h"
 #include "base/string.h"
 
-Duration::Duration(const seconds_t seconds)
-    : seconds_(seconds) {
-}
-
-Duration::Duration(const std::time_t seconds)
-    : Duration(std::chrono::seconds(seconds)) {
-}
-
-Duration& Duration::operator=(const seconds_t seconds) {
-  seconds_ = seconds;
-  return *this;
-}
-
-Duration& Duration::operator=(const std::time_t seconds) {
-  seconds_ = static_cast<seconds_t>(seconds);
-  return *this;
-}
-
-Duration::seconds_t::rep Duration::seconds() const {
-  return seconds_.count();
-}
-
-Duration::minutes_t::rep Duration::minutes() const {
-  return std::chrono::duration_cast<minutes_t>(seconds_).count();
-}
-
-Duration::hours_t::rep Duration::hours() const {
-  return std::chrono::duration_cast<hours_t>(seconds_).count();
-}
-
-Duration::days_t::rep Duration::days() const {
-  return std::chrono::duration_cast<days_t>(seconds_).count();
-}
-
-Duration::months_t::rep Duration::months() const {
-  return std::chrono::duration_cast<months_t>(seconds_).count();
-}
-
-Duration::years_t::rep Duration::years() const {
-  return std::chrono::duration_cast<years_t>(seconds_).count();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
 static long GetTimeZoneBias() {
   TIME_ZONE_INFORMATION tz_info = {0};
   const auto tz_id = ::GetTimeZoneInformation(&tz_info);

@@ -23,37 +23,6 @@
 #include <string>
 #include <windows.h>
 
-class Duration {
-public:
-  using seconds_t = std::chrono::seconds;
-  using minutes_t = std::chrono::duration
-      <float, std::ratio<60>>;
-  using hours_t = std::chrono::duration
-      <float, std::ratio_multiply<std::ratio<60>, minutes_t::period>>;
-  using days_t = std::chrono::duration
-      <float, std::ratio_multiply<std::ratio<24>, hours_t::period>>;
-  using years_t = std::chrono::duration
-      <float, std::ratio_multiply<std::ratio<146097, 400>, days_t::period>>;
-  using months_t = std::chrono::duration
-      <float, std::ratio_divide<years_t::period, std::ratio<12>>>;
-
-  Duration(const seconds_t seconds);
-  Duration(const std::time_t seconds);
-
-  Duration& operator=(const seconds_t seconds);
-  Duration& operator=(const std::time_t seconds);
-
-  seconds_t::rep seconds() const;
-  minutes_t::rep minutes() const;
-  hours_t::rep hours() const;
-  days_t::rep days() const;
-  months_t::rep months() const;
-  years_t::rep years() const;
-
-private:
-  seconds_t seconds_;
-};
-
 std::wstring GetAbsoluteTimeString(time_t unix_time, const char* format = nullptr);
 std::wstring GetRelativeTimeString(time_t unix_time, bool append_suffix);
 

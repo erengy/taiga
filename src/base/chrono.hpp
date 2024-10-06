@@ -27,6 +27,23 @@ namespace base {
 
 using Date = std::chrono::year_month_day;
 
+class Duration {
+public:
+  explicit Duration(const std::chrono::seconds seconds);
+
+  Duration& operator=(const std::chrono::seconds seconds);
+
+  std::chrono::seconds::rep seconds() const;
+  std::chrono::minutes::rep minutes() const;
+  std::chrono::hours::rep hours() const;
+  std::chrono::days::rep days() const;
+  std::chrono::months::rep months() const;
+  std::chrono::years::rep years() const;
+
+private:
+  std::chrono::seconds seconds_;
+};
+
 class FuzzyDate final {
 public:
   using unsigned_t = unsigned short;
@@ -61,4 +78,5 @@ private:
 }  // namespace base
 
 using base::Date;
+using base::Duration;
 using base::FuzzyDate;
