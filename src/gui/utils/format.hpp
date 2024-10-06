@@ -49,15 +49,15 @@ namespace gui {
 QString formatScore(const double value);
 QString formatListScore(const int value);
 
-QString fromDate(const base::Date& date);
-QString fromFuzzyDate(const base::FuzzyDate& date);
+QString formatDate(const base::Date& date);
+QString formatFuzzyDate(const base::FuzzyDate& date);
 QString formatAsRelativeTime(const qint64 time);
 
-QString fromSeason(const anime::Season season);
-QString fromSeasonName(const anime::SeasonName name);
-QString fromStatus(const anime::Status value);
-QString fromType(const anime::Type value);
+QString formatSeason(const anime::Season season);
+QString formatSeasonName(const anime::SeasonName name);
+QString formatStatus(const anime::Status value);
+QString formatType(const anime::Type value);
 
-QString fromListStatus(const anime::list::Status value);
+QString formatListStatus(const anime::list::Status value);
 
 }  // namespace gui

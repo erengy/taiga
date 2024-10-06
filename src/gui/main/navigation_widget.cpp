@@ -74,7 +74,7 @@ void NavigationWidget::refresh() {
     return statuses;
   }();
   for (const auto status : anime::list::kStatuses) {
-    auto item = addChildItem(listItem, fromListStatus(status));
+    auto item = addChildItem(listItem, formatListStatus(status));
     setItemData(item, NavigationItemDataRole::PageIndex, static_cast<int>(MainWindowPage::List));
     setItemData(item, NavigationItemDataRole::IsLastChild,
                 status == anime::list::Status::PlanToWatch);

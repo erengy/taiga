@@ -36,11 +36,11 @@ QString formatListScore(const int value) {
   return value > 0 ? u"%1"_qs.arg(value / 10.0) : "-";
 }
 
-QString fromDate(const base::Date& date) {
+QString formatDate(const base::Date& date) {
   return date.ok() ? QDate(date).toString(Qt::RFC2822Date) : u"?"_qs;
 }
 
-QString fromFuzzyDate(const base::FuzzyDate& fuzzyDate) {
+QString formatFuzzyDate(const base::FuzzyDate& fuzzyDate) {
   const QDate date(fuzzyDate.year(), fuzzyDate.month(), fuzzyDate.day());
   return fuzzyDate ? date.toString(Qt::RFC2822Date) : u"?"_qs;
 }
@@ -65,11 +65,11 @@ QString formatAsRelativeTime(const qint64 time) {
   return timeDiff < 0 ? u"in %1"_qs.arg(str) : u"%1 ago"_qs.arg(str);
 }
 
-QString fromSeason(const anime::Season season) {
-  return u"%1 %2"_qs.arg(fromSeasonName(season.name)).arg(static_cast<int>(season.year));
+QString formatSeason(const anime::Season season) {
+  return u"%1 %2"_qs.arg(formatSeasonName(season.name)).arg(static_cast<int>(season.year));
 }
 
-QString fromSeasonName(const anime::SeasonName name) {
+QString formatSeasonName(const anime::SeasonName name) {
   using enum anime::SeasonName;
 
   // clang-format off
@@ -84,7 +84,7 @@ QString fromSeasonName(const anime::SeasonName name) {
   // clang-format on
 }
 
-QString fromStatus(const anime::Status value) {
+QString formatStatus(const anime::Status value) {
   using enum anime::Status;
 
   // clang-format off
@@ -98,7 +98,7 @@ QString fromStatus(const anime::Status value) {
   // clang-format on
 }
 
-QString fromType(const anime::Type value) {
+QString formatType(const anime::Type value) {
   using enum anime::Type;
 
   // clang-format off
@@ -115,7 +115,7 @@ QString fromType(const anime::Type value) {
   // clang-format on
 }
 
-QString fromListStatus(const anime::list::Status value) {
+QString formatListStatus(const anime::list::Status value) {
   using enum anime::list::Status;
 
   // clang-format off

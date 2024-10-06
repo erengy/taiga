@@ -58,7 +58,7 @@ SearchWidget::SearchWidget(QWidget* parent)
         anime::SeasonName::Fall,
     };
     for (const auto season : seasons) {
-      ui_->comboSeason->addItem(fromSeasonName(season), static_cast<int>(season));
+      ui_->comboSeason->addItem(formatSeasonName(season), static_cast<int>(season));
     }
     connect(ui_->comboSeason, &QComboBox::currentIndexChanged, this, [this](int index) {
       const int season = ui_->comboSeason->itemData(index).toInt();
@@ -70,7 +70,7 @@ SearchWidget::SearchWidget(QWidget* parent)
   {
     ui_->comboType->clear();
     for (const auto type : anime::kTypes) {
-      ui_->comboType->addItem(fromType(type), static_cast<int>(type));
+      ui_->comboType->addItem(formatType(type), static_cast<int>(type));
     }
     connect(ui_->comboType, &QComboBox::currentIndexChanged, this, [this](int index) {
       const int type = ui_->comboType->itemData(index).toInt();
@@ -82,7 +82,7 @@ SearchWidget::SearchWidget(QWidget* parent)
   {
     ui_->comboStatus->clear();
     for (const auto status : anime::kStatuses) {
-      ui_->comboStatus->addItem(fromStatus(status), static_cast<int>(status));
+      ui_->comboStatus->addItem(formatStatus(status), static_cast<int>(status));
     }
     connect(ui_->comboStatus, &QComboBox::currentIndexChanged, this, [this](int index) {
       const int status = ui_->comboStatus->itemData(index).toInt();

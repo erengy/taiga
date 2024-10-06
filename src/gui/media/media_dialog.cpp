@@ -119,18 +119,18 @@ void MediaDialog::initDetails() {
     episodesLabel->setToolTip(u"%1 minutes per episode"_qs.arg(m_anime.episode_length));
   }
 
-  auto seasonLabel = new QLabel(fromSeason(anime::Season(m_anime.start_date)), this);
+  auto seasonLabel = new QLabel(formatSeason(anime::Season(m_anime.start_date)), this);
   seasonLabel->setCursor(QCursor(Qt::CursorShape::WhatsThisCursor));
   seasonLabel->setToolTip(
-      u"%1 to %2"_qs.arg(fromFuzzyDate(m_anime.start_date)).arg(fromFuzzyDate(m_anime.end_date)));
+      u"%1 to %2"_qs.arg(formatFuzzyDate(m_anime.start_date)).arg(formatFuzzyDate(m_anime.end_date)));
 
   if (!m_anime.titles.synonyms.empty()) {
     ui_->infoLayout->addRow(get_row_title(tr("Synonyms:")),
                             get_row_label(from_vector(m_anime.titles.synonyms)));
   }
-  ui_->infoLayout->addRow(get_row_title(tr("Type:")), get_row_label(fromType(m_anime.type)));
+  ui_->infoLayout->addRow(get_row_title(tr("Type:")), get_row_label(formatType(m_anime.type)));
   ui_->infoLayout->addRow(get_row_title(tr("Episodes:")), episodesLabel);
-  ui_->infoLayout->addRow(get_row_title(tr("Status:")), get_row_label(fromStatus(m_anime.status)));
+  ui_->infoLayout->addRow(get_row_title(tr("Status:")), get_row_label(formatStatus(m_anime.status)));
   ui_->infoLayout->addRow(get_row_title(tr("Season:")), seasonLabel);
   ui_->infoLayout->addRow(get_row_title(tr("Score:")), get_row_label(formatScore(m_anime.score)));
   if (!m_anime.genres.empty()) {
@@ -178,7 +178,7 @@ void MediaDialog::initList() {
   // Status
   ui_->comboStatus->clear();
   for (const auto status : anime::list::kStatuses) {
-    ui_->comboStatus->addItem(fromListStatus(status), static_cast<int>(status));
+    ui_->comboStatus->addItem(formatListStatus(status), static_cast<int>(status));
     if (status == m_entry->status) {
       ui_->comboStatus->setCurrentIndex(ui_->comboStatus->count() - 1);
     }

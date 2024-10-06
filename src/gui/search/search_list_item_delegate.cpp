@@ -98,7 +98,7 @@ void SearchListItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
   // Summary
   {
     const QString summary =
-        u"%1 · %2 episodes · %3"_qs.arg(fromType(item->type))
+        u"%1 · %2 episodes · %3"_qs.arg(formatType(item->type))
             .arg(item->episode_count > 0 ? u"%1"_qs.arg(item->episode_count) : u"?"_qs)
             .arg(formatScore(item->score));
     const QFontMetrics metrics(painter->font());
@@ -126,9 +126,9 @@ void SearchListItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
         "Aired:\n"
         "Genres:\n"
         "Studios:";
-    const QString values = u"%1 to %2 (%3)\n%4\n%5"_qs.arg(fromFuzzyDate(item->start_date))
-                               .arg(fromFuzzyDate(item->end_date))
-                               .arg(fromStatus(item->status))
+    const QString values = u"%1 to %2 (%3)\n%4\n%5"_qs.arg(formatFuzzyDate(item->start_date))
+                               .arg(formatFuzzyDate(item->end_date))
+                               .arg(formatStatus(item->status))
                                .arg(from_vector(item->genres))
                                .arg(from_vector(item->studios));
 

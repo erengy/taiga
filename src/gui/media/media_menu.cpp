@@ -62,11 +62,11 @@ bool MediaMenu::isNowPlaying() const {
 }
 
 void MediaMenu::addToList(const anime::list::Status status) const {
-  QMessageBox::information(nullptr, "TODO", u"Status: %1"_qs.arg(fromListStatus(status)));  // @TODO
+  QMessageBox::information(nullptr, "TODO", u"Status: %1"_qs.arg(formatListStatus(status)));  // @TODO
 }
 
 void MediaMenu::editStatus(const anime::list::Status status) const {
-  QMessageBox::information(nullptr, "TODO", u"Status: %1"_qs.arg(fromListStatus(status)));  // @TODO
+  QMessageBox::information(nullptr, "TODO", u"Status: %1"_qs.arg(formatListStatus(status)));  // @TODO
 }
 
 void MediaMenu::playEpisode(int number) const {
@@ -231,7 +231,7 @@ void MediaMenu::addListItems() {
       auto menu = new QMenu(tr("Add to list"), this);
       menu->setIcon(theme.getIcon("list_alt"));
       for (const auto& status : anime::list::kStatuses) {
-        menu->addAction(fromListStatus(status), this, [this, status]() { addToList(status); });
+        menu->addAction(formatListStatus(status), this, [this, status]() { addToList(status); });
       }
       return menu;
     }());
@@ -277,7 +277,7 @@ void MediaMenu::addListItems() {
       menu->addMenu([this]() {
         auto menu = new QMenu(tr("Status"), this);
         for (const auto status : anime::list::kStatuses) {
-          auto action = new QAction(fromListStatus(status), this);
+          auto action = new QAction(formatListStatus(status), this);
           action->setCheckable(true);
           menu->addAction(action);
           connect(action, &QAction::triggered, this, [this, status]() { editStatus(status); });

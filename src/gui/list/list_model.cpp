@@ -72,9 +72,9 @@ QVariant ListModel::data(const QModelIndex& index, int role) const {
           if (entry) return formatListScore(entry->score);
           break;
         case COLUMN_TYPE:
-          return fromType(anime->type);
+          return formatType(anime->type);
         case COLUMN_SEASON:
-          return fromSeason(anime::Season(anime->start_date));
+          return formatSeason(anime::Season(anime->start_date));
         case COLUMN_LAST_UPDATED:
           if (entry) {
             const auto time = QString::fromStdString(entry->last_updated).toLongLong();
@@ -89,7 +89,7 @@ QVariant ListModel::data(const QModelIndex& index, int role) const {
         case COLUMN_TITLE:
           return QString::fromStdString(anime->titles.romaji);
         case COLUMN_SEASON:
-          return fromFuzzyDate(anime->start_date);
+          return formatFuzzyDate(anime->start_date);
         case COLUMN_LAST_UPDATED:
           if (entry) return QString::fromStdString(entry->last_updated);  // @TODO: Format as date
           break;
