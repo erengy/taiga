@@ -23,10 +23,10 @@
 #include <QToolBar>
 #include <QToolButton>
 
-#include "gui/list/list_model.hpp"
-#include "gui/list/list_proxy_model.hpp"
 #include "gui/list/list_view.hpp"
 #include "gui/list/list_view_cards.hpp"
+#include "gui/models/anime_list_model.hpp"
+#include "gui/models/anime_list_proxy_model.hpp"
 #include "gui/utils/theme.hpp"
 #include "ui_list_widget.h"
 
@@ -34,7 +34,7 @@ namespace {
 
 struct SortMenuItem {
   QString title;
-  gui::ListModel::Column column;
+  gui::AnimeListModel::Column column;
   Qt::SortOrder order;
 };
 
@@ -47,8 +47,8 @@ namespace gui {
 
 ListWidget::ListWidget(QWidget* parent, MainWindow* mainWindow)
     : QWidget(parent),
-      m_model(new ListModel(this)),
-      m_proxyModel(new ListProxyModel(this)),
+      m_model(new AnimeListModel(this)),
+      m_proxyModel(new AnimeListProxyModel(this)),
       m_listView(new ListView(this, m_model, m_proxyModel, mainWindow)),
       m_listViewCards(new ListViewCards(this, m_model, m_proxyModel)),
       m_mainWindow(mainWindow),
@@ -98,12 +98,12 @@ ListWidget::ListWidget(QWidget* parent, MainWindow* mainWindow)
       button->setMenu([this]() {
         auto menu = new QMenu(this);
         static const QList<SortMenuItem> sortMenuItems = {
-            {tr("Title"), gui::ListModel::COLUMN_TITLE, AscendingOrder},
-            {tr("Progress"), gui::ListModel::COLUMN_PROGRESS, DescendingOrder},
-            {tr("Score"), gui::ListModel::COLUMN_SCORE, DescendingOrder},
-            {tr("Type"), gui::ListModel::COLUMN_TYPE, AscendingOrder},
-            {tr("Season"), gui::ListModel::COLUMN_SEASON, DescendingOrder},
-            {tr("Last updated"), gui::ListModel::COLUMN_LAST_UPDATED, DescendingOrder},
+            {tr("Title"), gui::AnimeListModel::COLUMN_TITLE, AscendingOrder},
+            {tr("Progress"), gui::AnimeListModel::COLUMN_PROGRESS, DescendingOrder},
+            {tr("Score"), gui::AnimeListModel::COLUMN_SCORE, DescendingOrder},
+            {tr("Type"), gui::AnimeListModel::COLUMN_TYPE, AscendingOrder},
+            {tr("Season"), gui::AnimeListModel::COLUMN_SEASON, DescendingOrder},
+            {tr("Last updated"), gui::AnimeListModel::COLUMN_LAST_UPDATED, DescendingOrder},
         };
         for (const auto& item : sortMenuItems) {
           menu->addAction(item.title, this,

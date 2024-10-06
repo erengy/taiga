@@ -21,15 +21,16 @@
 #include <QContextMenuEvent>
 
 #include "gui/list/list_item_delegate_cards.hpp"
-#include "gui/list/list_model.hpp"
-#include "gui/list/list_proxy_model.hpp"
 #include "gui/media/media_dialog.hpp"
 #include "gui/media/media_menu.hpp"
+#include "gui/models/anime_list_model.hpp"
+#include "gui/models/anime_list_proxy_model.hpp"
 #include "media/anime.hpp"
 
 namespace gui {
 
-ListViewCards::ListViewCards(QWidget* parent, ListModel* model, ListProxyModel* proxyModel)
+ListViewCards::ListViewCards(QWidget* parent, AnimeListModel* model,
+                             AnimeListProxyModel* proxyModel)
     : QListView(parent), m_model(model), m_proxyModel(proxyModel) {
   setItemDelegate(new ListItemDelegateCards(this));
 

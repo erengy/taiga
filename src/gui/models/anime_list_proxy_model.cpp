@@ -16,27 +16,28 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "list_proxy_model.hpp"
+#include "anime_list_proxy_model.hpp"
 
-#include "gui/list/list_model.hpp"
+#include "gui/models/anime_list_model.hpp"
 #include "media/anime.hpp"
 
 namespace {
 
 const Anime* getAnime(const QModelIndex& index) {
-  return index.data(static_cast<int>(gui::ListItemDataRole::Anime)).value<const Anime*>();
+  return index.data(static_cast<int>(gui::AnimeListItemDataRole::Anime)).value<const Anime*>();
 }
 
 const ListEntry* getListEntry(const QModelIndex& index) {
-  return index.data(static_cast<int>(gui::ListItemDataRole::ListEntry)).value<const ListEntry*>();
+  return index.data(static_cast<int>(gui::AnimeListItemDataRole::ListEntry))
+      .value<const ListEntry*>();
 }
 
 }  // namespace
 
 namespace gui {
 
-ListProxyModel::ListProxyModel(QObject* parent) : QSortFilterProxyModel(parent) {
-  setFilterKeyColumn(ListModel::COLUMN_TITLE);
+AnimeListProxyModel::AnimeListProxyModel(QObject* parent) : QSortFilterProxyModel(parent) {
+  setFilterKeyColumn(AnimeListModel::COLUMN_TITLE);
   setFilterRole(Qt::DisplayRole);
 
   setSortCaseSensitivity(Qt::CaseInsensitive);
@@ -45,23 +46,23 @@ ListProxyModel::ListProxyModel(QObject* parent) : QSortFilterProxyModel(parent) 
   setListStatusFilter(static_cast<int>(anime::list::Status::Watching));
 }
 
-void ListProxyModel::removeListStatusFilter() {
+void AnimeListProxyModel::removeListStatusFilter() {
   m_filter.listStatus.reset();
   invalidateRowsFilter();
 }
 
-void ListProxyModel::setListStatusFilter(int status) {
+void AnimeListProxyModel::setListStatusFilter(int status) {
   m_filter.listStatus = status;
   invalidateRowsFilter();
 }
 
-void ListProxyModel::setTextFilter(const QString& text) {
+void AnimeListProxyModel::setTextFilter(const QString& text) {
   m_filter.text = text;
   invalidateRowsFilter();
 }
 
-bool ListProxyModel::filterAcceptsRow(int row, const QModelIndex& parent) const {
-  const auto model = static_cast<ListModel*>(sourceModel());
+bool AnimeListProxyModel::filterAcceptsRow(int row, const QModelIndex& parent) const {
+  const auto model = static_cast<AnimeListModel*>(sourceModel());
   if (!model) return false;
 
   const auto index = model->index(row, 0, parent);
@@ -80,7 +81,7 @@ bool ListProxyModel::filterAcceptsRow(int row, const QModelIndex& parent) const 
   return QSortFilterProxyModel::filterAcceptsRow(row, parent);
 }
 
-bool ListProxyModel::lessThan(const QModelIndex& lhs, const QModelIndex& rhs) const {
+bool AnimeListProxyModel::lessThan(const QModelIndex& lhs, const QModelIndex& rhs) const {
   const auto lhs_anime = getAnime(lhs);
   const auto lhs_entry = getListEntry(lhs);
   const auto rhs_anime = getAnime(rhs);
@@ -89,18 +90,18 @@ bool ListProxyModel::lessThan(const QModelIndex& lhs, const QModelIndex& rhs) co
   if (!lhs_anime || !rhs_anime) return false;
 
   switch (lhs.column()) {
-    case ListModel::COLUMN_TITLE:
+    case AnimeListModel::COLUMN_TITLE:
       return lhs_anime->titles.romaji < rhs_anime->titles.romaji;
-    case ListModel::COLUMN_TYPE:
+    case AnimeListModel::COLUMN_TYPE:
       return lhs_anime->type < rhs_anime->type;
-    case ListModel::COLUMN_PROGRESS:
+    case AnimeListModel::COLUMN_PROGRESS:
       return (lhs_entry ? lhs_entry->watched_episodes : 0) <
              (rhs_entry ? rhs_entry->watched_episodes : 0);
-    case ListModel::COLUMN_SCORE:
+    case AnimeListModel::COLUMN_SCORE:
       return (lhs_entry ? lhs_entry->score : 0) < (rhs_entry ? rhs_entry->score : 0);
-    case ListModel::COLUMN_SEASON:
+    case AnimeListModel::COLUMN_SEASON:
       return lhs_anime->start_date < rhs_anime->start_date;
-    case ListModel::COLUMN_LAST_UPDATED:
+    case AnimeListModel::COLUMN_LAST_UPDATED:
       return (lhs_entry ? lhs_entry->last_updated : "") <
              (rhs_entry ? rhs_entry->last_updated : "");
   }

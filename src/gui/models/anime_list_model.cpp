@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "list_model.hpp"
+#include "anime_list_model.hpp"
 
 #include <QColor>
 #include <QDateTime>
@@ -29,7 +29,7 @@
 
 namespace gui {
 
-ListModel::ListModel(QObject* parent) : QAbstractListModel(parent) {
+AnimeListModel::AnimeListModel(QObject* parent) : QAbstractListModel(parent) {
   const auto db = anime::readDatabase();
   const auto entries = anime::readListEntries();
 
@@ -46,15 +46,15 @@ ListModel::ListModel(QObject* parent) : QAbstractListModel(parent) {
   endInsertRows();
 }
 
-int ListModel::rowCount(const QModelIndex&) const {
+int AnimeListModel::rowCount(const QModelIndex&) const {
   return m_ids.size();
 }
 
-int ListModel::columnCount(const QModelIndex&) const {
+int AnimeListModel::columnCount(const QModelIndex&) const {
   return NUM_COLUMNS;
 }
 
-QVariant ListModel::data(const QModelIndex& index, int role) const {
+QVariant AnimeListModel::data(const QModelIndex& index, int role) const {
   if (!index.isValid()) return {};
 
   const auto anime = getAnime(index);
@@ -113,10 +113,10 @@ QVariant ListModel::data(const QModelIndex& index, int role) const {
       break;
     }
 
-    case static_cast<int>(ListItemDataRole::Anime): {
+    case static_cast<int>(AnimeListItemDataRole::Anime): {
       return QVariant::fromValue(anime);
     }
-    case static_cast<int>(ListItemDataRole::ListEntry): {
+    case static_cast<int>(AnimeListItemDataRole::ListEntry): {
       return QVariant::fromValue(entry);
     }
   }
@@ -124,11 +124,11 @@ QVariant ListModel::data(const QModelIndex& index, int role) const {
   return {};
 }
 
-bool ListModel::setData(const QModelIndex& index, const QVariant& value, int role) {
+bool AnimeListModel::setData(const QModelIndex& index, const QVariant& value, int role) {
   return false;
 }
 
-QVariant ListModel::headerData(int section, Qt::Orientation orientation, int role) const {
+QVariant AnimeListModel::headerData(int section, Qt::Orientation orientation, int role) const {
   switch (role) {
     case Qt::DisplayRole: {
       switch (section) {
@@ -178,20 +178,20 @@ QVariant ListModel::headerData(int section, Qt::Orientation orientation, int rol
   return QAbstractListModel::headerData(section, orientation, role);
 }
 
-Qt::ItemFlags ListModel::flags(const QModelIndex& index) const {
+Qt::ItemFlags AnimeListModel::flags(const QModelIndex& index) const {
   if (!index.isValid()) return Qt::NoItemFlags;
 
   return QAbstractListModel::flags(index) | Qt::ItemIsEditable;
 }
 
-const Anime* ListModel::getAnime(const QModelIndex& index) const {
+const Anime* AnimeListModel::getAnime(const QModelIndex& index) const {
   if (!index.isValid()) return nullptr;
   const int id = m_ids.at(index.row());
   const auto it = m_anime.find(id);
   return it != m_anime.end() ? &*it : nullptr;
 }
 
-const ListEntry* ListModel::getListEntry(const QModelIndex& index) const {
+const ListEntry* AnimeListModel::getListEntry(const QModelIndex& index) const {
   if (!index.isValid()) return nullptr;
   const int id = m_ids.at(index.row());
   const auto it = m_entries.find(id);

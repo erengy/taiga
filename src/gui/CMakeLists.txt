@@ -3,8 +3,6 @@ add_library(taiga-gui STATIC)
 target_sources(taiga-gui PRIVATE
 	list/list_item_delegate.cpp
 	list/list_item_delegate_cards.cpp
-	list/list_model.cpp
-	list/list_proxy_model.cpp
 	list/list_view.cpp
 	list/list_view_cards.cpp
 	list/list_widget.cpp
@@ -14,6 +12,8 @@ target_sources(taiga-gui PRIVATE
 	main/now_playing_widget.cpp
 	media/media_dialog.cpp
 	media/media_menu.cpp
+	models/anime_list_model.cpp
+	models/anime_list_proxy_model.cpp
 	search/search_list_item_delegate.cpp
 	search/search_list_model.cpp
 	search/search_list_proxy_model.cpp

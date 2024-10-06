@@ -23,20 +23,20 @@
 #include <QStatusBar>
 
 #include "gui/list/list_item_delegate.hpp"
-#include "gui/list/list_model.hpp"
-#include "gui/list/list_proxy_model.hpp"
 #include "gui/main/main_window.hpp"
 #include "gui/main/navigation_item_delegate.hpp"
 #include "gui/main/navigation_widget.hpp"
 #include "gui/main/now_playing_widget.hpp"
 #include "gui/media/media_dialog.hpp"
 #include "gui/media/media_menu.hpp"
+#include "gui/models/anime_list_model.hpp"
+#include "gui/models/anime_list_proxy_model.hpp"
 #include "gui/utils/theme.hpp"
 #include "media/anime.hpp"
 
 namespace gui {
 
-ListView::ListView(QWidget* parent, ListModel* model, ListProxyModel* proxyModel,
+ListView::ListView(QWidget* parent, AnimeListModel* model, AnimeListProxyModel* proxyModel,
                    MainWindow* mainWindow)
     : QTreeView(parent), m_model(model), m_proxyModel(proxyModel), m_mainWindow(mainWindow) {
   setObjectName("animeList");
@@ -57,15 +57,15 @@ ListView::ListView(QWidget* parent, ListModel* model, ListProxyModel* proxyModel
   setSortingEnabled(true);
   setUniformRowHeights(true);
 
-  sortByColumn(ListModel::COLUMN_LAST_UPDATED, Qt::SortOrder::DescendingOrder);
+  sortByColumn(AnimeListModel::COLUMN_LAST_UPDATED, Qt::SortOrder::DescendingOrder);
 
   header()->setFirstSectionMovable(true);
   header()->setStretchLastSection(false);
   header()->setTextElideMode(Qt::ElideRight);
-  header()->resizeSection(ListModel::COLUMN_TITLE, 300);
-  header()->resizeSection(ListModel::COLUMN_PROGRESS, 150);
-  header()->resizeSection(ListModel::COLUMN_SCORE, 75);
-  header()->resizeSection(ListModel::COLUMN_TYPE, 75);
+  header()->resizeSection(AnimeListModel::COLUMN_TITLE, 300);
+  header()->resizeSection(AnimeListModel::COLUMN_PROGRESS, 150);
+  header()->resizeSection(AnimeListModel::COLUMN_SCORE, 75);
+  header()->resizeSection(AnimeListModel::COLUMN_TYPE, 75);
 
   connect(mainWindow->searchBox(), &QLineEdit::textChanged, this,
           [this](const QString& text) { m_proxyModel->setTextFilter(text); });

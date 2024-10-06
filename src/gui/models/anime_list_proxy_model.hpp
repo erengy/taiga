@@ -23,18 +23,18 @@
 
 namespace gui {
 
-struct ListProxyModelFilter {
+struct AnimeListProxyModelFilter {
   std::optional<int> listStatus;
   QString text;
 };
 
-class ListProxyModel final : public QSortFilterProxyModel {
+class AnimeListProxyModel final : public QSortFilterProxyModel {
   Q_OBJECT
-  Q_DISABLE_COPY_MOVE(ListProxyModel)
+  Q_DISABLE_COPY_MOVE(AnimeListProxyModel)
 
 public:
-  ListProxyModel(QObject* parent);
-  ~ListProxyModel() = default;
+  AnimeListProxyModel(QObject* parent);
+  ~AnimeListProxyModel() = default;
 
   void removeListStatusFilter();
   void setListStatusFilter(int status);
@@ -45,7 +45,7 @@ protected:
   bool lessThan(const QModelIndex& lhs, const QModelIndex& rhs) const override;
 
 private:
-  ListProxyModelFilter m_filter;
+  AnimeListProxyModelFilter m_filter;
 };
 
 }  // namespace gui

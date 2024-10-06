@@ -26,8 +26,8 @@ class ListWidget;
 
 namespace gui {
 
-class ListModel;
-class ListProxyModel;
+class AnimeListModel;
+class AnimeListProxyModel;
 class ListView;
 class ListViewCards;
 class MainWindow;
@@ -51,8 +51,8 @@ public:
 private:
   Ui::ListWidget* ui_ = nullptr;
   MainWindow* m_mainWindow = nullptr;
-  ListModel* m_model = nullptr;
-  ListProxyModel* m_proxyModel = nullptr;
+  AnimeListModel* m_model = nullptr;
+  AnimeListProxyModel* m_proxyModel = nullptr;
   ListView* m_listView = nullptr;
   ListViewCards* m_listViewCards = nullptr;
   ListViewMode m_viewMode = ListViewMode::List;

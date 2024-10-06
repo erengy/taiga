@@ -22,7 +22,7 @@
 #include <QPainter>
 #include <QPainterPath>
 
-#include "gui/list/list_model.hpp"
+#include "gui/models/anime_list_model.hpp"
 #include "gui/utils/format.hpp"
 #include "gui/utils/image_provider.hpp"
 #include "gui/utils/painter_state_saver.hpp"
@@ -36,7 +36,8 @@ void ListItemDelegateCards::paint(QPainter* painter, const QStyleOptionViewItem&
                                   const QModelIndex& index) const {
   const PainterStateSaver painterStateSaver(painter);
 
-  const auto item = index.data(static_cast<int>(ListItemDataRole::Anime)).value<const Anime*>();
+  const auto item =
+      index.data(static_cast<int>(AnimeListItemDataRole::Anime)).value<const Anime*>();
 
   QStyleOptionViewItem opt = option;
   QRect rect = opt.rect;

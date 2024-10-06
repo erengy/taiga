@@ -23,7 +23,7 @@
 #include <QProxyStyle>
 #include <limits>
 
-#include "gui/list/list_model.hpp"
+#include "gui/models/anime_list_model.hpp"
 #include "gui/utils/painter_state_saver.hpp"
 #include "gui/utils/theme.hpp"
 
@@ -36,7 +36,7 @@ ListItemDelegate::ListItemDelegate(QObject* parent)
 
 void ListItemDelegate::setEditorData(QWidget* editor, const QModelIndex& index) const {
   const auto entry =
-      index.data(static_cast<int>(ListItemDataRole::ListEntry)).value<const ListEntry*>();
+      index.data(static_cast<int>(AnimeListItemDataRole::ListEntry)).value<const ListEntry*>();
   if (!entry) return;
   auto* combobox = static_cast<QComboBox*>(editor);
   combobox->setCurrentIndex(std::clamp(entry->score / 10, 0, 10));
@@ -44,7 +44,7 @@ void ListItemDelegate::setEditorData(QWidget* editor, const QModelIndex& index) 
 
 QWidget* ListItemDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem&,
                                         const QModelIndex& index) const {
-  if (index.column() != ListModel::COLUMN_SCORE) return nullptr;
+  if (index.column() != AnimeListModel::COLUMN_SCORE) return nullptr;
 
   auto* editor = new QComboBox(parent);
   editor->addItem("-");
@@ -78,15 +78,15 @@ void ListItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opti
   }
 
   switch (index.column()) {
-    case ListModel::COLUMN_PROGRESS: {
+    case AnimeListModel::COLUMN_PROGRESS: {
       const PainterStateSaver painterStateSaver(painter);
 
       QStyledItemDelegate::paint(painter, option, index);
 
       const auto anime =
-          index.data(static_cast<int>(ListItemDataRole::Anime)).value<const Anime*>();
+          index.data(static_cast<int>(AnimeListItemDataRole::Anime)).value<const Anime*>();
       const auto entry =
-          index.data(static_cast<int>(ListItemDataRole::ListEntry)).value<const ListEntry*>();
+          index.data(static_cast<int>(AnimeListItemDataRole::ListEntry)).value<const ListEntry*>();
 
       if (!anime || !entry) return;
 

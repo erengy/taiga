@@ -26,14 +26,14 @@
 
 namespace gui {
 
-enum class ListItemDataRole {
+enum class AnimeListItemDataRole {
   Anime = Qt::UserRole,
   ListEntry,
 };
 
-class ListModel final : public QAbstractListModel {
+class AnimeListModel final : public QAbstractListModel {
   Q_OBJECT
-  Q_DISABLE_COPY_MOVE(ListModel)
+  Q_DISABLE_COPY_MOVE(AnimeListModel)
 
 public:
   enum Column {
@@ -46,8 +46,8 @@ public:
     NUM_COLUMNS
   };
 
-  ListModel(QObject* parent);
-  ~ListModel() = default;
+  AnimeListModel(QObject* parent);
+  ~AnimeListModel() = default;
 
   int rowCount(const QModelIndex& parent = {}) const override;
   int columnCount(const QModelIndex& parent = {}) const override;

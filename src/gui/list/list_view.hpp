@@ -22,8 +22,8 @@
 
 namespace gui {
 
-class ListModel;
-class ListProxyModel;
+class AnimeListModel;
+class AnimeListProxyModel;
 class MainWindow;
 
 class ListView final : public QTreeView {
@@ -31,15 +31,16 @@ class ListView final : public QTreeView {
   Q_DISABLE_COPY_MOVE(ListView)
 
 public:
-  ListView(QWidget* parent, ListModel* model, ListProxyModel* proxyModel, MainWindow* mainWindow);
+  ListView(QWidget* parent, AnimeListModel* model, AnimeListProxyModel* proxyModel,
+           MainWindow* mainWindow);
   ~ListView() = default;
 
 protected slots:
   void selectionChanged(const QItemSelection& selected, const QItemSelection& deselected) override;
 
 private:
-  ListModel* m_model = nullptr;
-  ListProxyModel* m_proxyModel = nullptr;
+  AnimeListModel* m_model = nullptr;
+  AnimeListProxyModel* m_proxyModel = nullptr;
   MainWindow* m_mainWindow = nullptr;
 };
 
