@@ -22,8 +22,8 @@
 
 namespace gui {
 
-class SearchListModel;
-class SearchListProxyModel;
+class AnimeListModel;
+class AnimeListProxyModel;
 
 class SearchListWidget final : public QListView {
   Q_OBJECT
@@ -33,13 +33,13 @@ public:
   SearchListWidget(QWidget* parent);
   ~SearchListWidget() = default;
 
-  SearchListProxyModel* proxyModel() {
+  AnimeListProxyModel* proxyModel() {
     return m_proxyModel;
   }
 
 private:
-  SearchListModel* m_model = nullptr;
-  SearchListProxyModel* m_proxyModel = nullptr;
+  AnimeListModel* m_model = nullptr;
+  AnimeListProxyModel* m_proxyModel = nullptr;
 };
 
 }  // namespace gui

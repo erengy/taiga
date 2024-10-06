@@ -24,6 +24,10 @@
 namespace gui {
 
 struct AnimeListProxyModelFilter {
+  std::optional<int> year;
+  std::optional<int> season;
+  std::optional<int> type;
+  std::optional<int> status;
   std::optional<int> listStatus;
   QString text;
 };
@@ -36,6 +40,10 @@ public:
   AnimeListProxyModel(QObject* parent);
   ~AnimeListProxyModel() = default;
 
+  void setYearFilter(int year);
+  void setSeasonFilter(int season);
+  void setTypeFilter(int type);
+  void setStatusFilter(int status);
   void removeListStatusFilter();
   void setListStatusFilter(int status);
   void setTextFilter(const QString& text);

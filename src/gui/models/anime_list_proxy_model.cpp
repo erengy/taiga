@@ -20,6 +20,7 @@
 
 #include "gui/models/anime_list_model.hpp"
 #include "media/anime.hpp"
+#include "media/anime_season.hpp"
 
 namespace {
 
@@ -42,8 +43,26 @@ AnimeListProxyModel::AnimeListProxyModel(QObject* parent) : QSortFilterProxyMode
 
   setSortCaseSensitivity(Qt::CaseInsensitive);
   setSortRole(Qt::UserRole);
+}
 
-  setListStatusFilter(static_cast<int>(anime::list::Status::Watching));
+void AnimeListProxyModel::setYearFilter(int year) {
+  m_filter.year = year;
+  invalidateRowsFilter();
+}
+
+void AnimeListProxyModel::setSeasonFilter(int season) {
+  m_filter.season = season;
+  invalidateRowsFilter();
+}
+
+void AnimeListProxyModel::setTypeFilter(int type) {
+  m_filter.type = type;
+  invalidateRowsFilter();
+}
+
+void AnimeListProxyModel::setStatusFilter(int status) {
+  m_filter.status = status;
+  invalidateRowsFilter();
 }
 
 void AnimeListProxyModel::removeListStatusFilter() {
@@ -70,6 +89,19 @@ bool AnimeListProxyModel::filterAcceptsRow(int row, const QModelIndex& parent) c
   const auto entry = getListEntry(index);
   if (!anime) return false;
 
+  if (m_filter.year) {
+    if (anime->start_date.year() != *m_filter.year) return false;
+  }
+  if (m_filter.season) {
+    const anime::Season season{anime->start_date};
+    if (static_cast<int>(season.name) != *m_filter.season) return false;
+  }
+  if (m_filter.type) {
+    if (static_cast<int>(anime->type) != *m_filter.type) return false;
+  }
+  if (m_filter.status) {
+    if (static_cast<int>(anime->status) != *m_filter.status) return false;
+  }
   if (m_filter.listStatus.has_value()) {
     const auto status = static_cast<int>(entry ? entry->status : anime::list::Status::NotInList);
     if (status != m_filter.listStatus.value()) return false;

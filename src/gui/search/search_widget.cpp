@@ -20,7 +20,7 @@
 
 #include <QToolBar>
 
-#include "gui/search/search_list_proxy_model.hpp"
+#include "gui/models/anime_list_proxy_model.hpp"
 #include "gui/search/search_list_widget.hpp"
 #include "gui/utils/format.hpp"
 #include "gui/utils/theme.hpp"

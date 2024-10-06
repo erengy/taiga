@@ -22,17 +22,17 @@
 
 #include "gui/media/media_dialog.hpp"
 #include "gui/media/media_menu.hpp"
+#include "gui/models/anime_list_model.hpp"
+#include "gui/models/anime_list_proxy_model.hpp"
 #include "gui/search/search_list_item_delegate.hpp"
-#include "gui/search/search_list_model.hpp"
-#include "gui/search/search_list_proxy_model.hpp"
 #include "media/anime.hpp"
 
 namespace gui {
 
 SearchListWidget::SearchListWidget(QWidget* parent)
     : QListView(parent),
-      m_model(new SearchListModel(this)),
-      m_proxyModel(new SearchListProxyModel(this)) {
+      m_model(new AnimeListModel(this)),
+      m_proxyModel(new AnimeListProxyModel(this)) {
   setItemDelegate(new SearchListItemDelegate(this));
 
   m_proxyModel->setSourceModel(m_model);
