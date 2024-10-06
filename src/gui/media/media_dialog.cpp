@@ -25,10 +25,18 @@
 #include "media/anime_season.hpp"
 #include "ui_media_dialog.h"
 
+#ifdef Q_OS_WINDOWS
+#include "gui/platforms/windows.hpp"
+#endif
+
 namespace gui {
 
 MediaDialog::MediaDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::MediaDialog) {
   ui_->setupUi(this);
+
+#ifdef Q_OS_WINDOWS
+  enableMicaBackground(this);
+#endif
 
   ui_->titleLabel->setStyleSheet("font-size: 20px; font-weight: 600;");
 
@@ -139,7 +147,7 @@ void MediaDialog::initDetails() {
   }
 
   const auto synopsis = QString::fromStdString(m_anime.synopsis);
-  
+
   ui_->synopsisHeader->setStyleSheet("font-weight: 600;");
   ui_->synopsisHeader->setHidden(synopsis.isEmpty());
 
