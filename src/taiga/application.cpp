@@ -32,6 +32,7 @@ Application::Application(int argc, char* argv[]) : QApplication(argc, argv) {
   setApplicationName("taiga");
   setApplicationDisplayName("Taiga");
   setApplicationVersion(QString::fromStdString(taiga::version().to_string()));
+  setWindowIcon(gui::theme.getIcon("taiga", "png"));
 
   parseCommandLine();
   initLogger();

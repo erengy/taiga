@@ -87,8 +87,6 @@ void MainWindow::initActions() {
 }
 
 void MainWindow::initIcons() {
-  setWindowIcon(theme.getIcon("taiga", "png"));
-
   ui_->menuLibraryFolders->setIcon(theme.getIcon("folder"));
   ui_->menuExport->setIcon(theme.getIcon("export_notes"));
 
