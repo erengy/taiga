@@ -98,6 +98,7 @@ ListWidget::ListWidget(QWidget* parent, MainWindow* mainWindow)
             {tr("Score"), gui::ListModel::COLUMN_SCORE, DescendingOrder},
             {tr("Type"), gui::ListModel::COLUMN_TYPE, AscendingOrder},
             {tr("Season"), gui::ListModel::COLUMN_SEASON, DescendingOrder},
+            {tr("Last updated"), gui::ListModel::COLUMN_LAST_UPDATED, DescendingOrder},
         };
         for (const auto& item : sortMenuItems) {
           menu->addAction(item.title, this,

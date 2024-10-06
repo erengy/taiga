@@ -37,6 +37,7 @@ public:
     COLUMN_SCORE,
     COLUMN_TYPE,
     COLUMN_SEASON,
+    COLUMN_LAST_UPDATED,
     NUM_COLUMNS
   };
 

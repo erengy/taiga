@@ -19,6 +19,7 @@
 #include "list_model.hpp"
 
 #include <QColor>
+#include <QDateTime>
 #include <QFont>
 #include <QSize>
 
@@ -74,6 +75,12 @@ QVariant ListModel::data(const QModelIndex& index, int role) const {
           return fromType(anime->type);
         case COLUMN_SEASON:
           return fromSeason(anime::Season(anime->start_date));
+        case COLUMN_LAST_UPDATED:
+          if (entry) {
+            const auto time = QString::fromStdString(entry->last_updated).toLongLong();
+            return formatAsRelativeTime(time);
+          }
+          break;
       }
       break;
 
@@ -83,6 +90,9 @@ QVariant ListModel::data(const QModelIndex& index, int role) const {
           return QString::fromStdString(anime->titles.romaji);
         case COLUMN_SEASON:
           return fromFuzzyDate(anime->start_date);
+        case COLUMN_LAST_UPDATED:
+          if (entry) return QString::fromStdString(entry->last_updated);  // @TODO: Format as date
+          break;
       }
       break;
 
@@ -93,6 +103,7 @@ QVariant ListModel::data(const QModelIndex& index, int role) const {
         case COLUMN_TYPE:
           return QVariant(Qt::AlignCenter | Qt::AlignVCenter);
         case COLUMN_SEASON:
+        case COLUMN_LAST_UPDATED:
           return QVariant(Qt::AlignRight | Qt::AlignVCenter);
         default:
           return {};
@@ -129,6 +140,8 @@ QVariant ListModel::headerData(int section, Qt::Orientation orientation, int rol
           return tr("Type");
         case COLUMN_SEASON:
           return tr("Season");
+        case COLUMN_LAST_UPDATED:
+          return tr("Last updated");
       }
       break;
     }
@@ -140,6 +153,7 @@ QVariant ListModel::headerData(int section, Qt::Orientation orientation, int rol
         case COLUMN_TYPE:
           return QVariant(Qt::AlignCenter | Qt::AlignVCenter);
         case COLUMN_SEASON:
+        case COLUMN_LAST_UPDATED:
           return QVariant(Qt::AlignRight | Qt::AlignVCenter);
       }
       break;
@@ -150,6 +164,7 @@ QVariant ListModel::headerData(int section, Qt::Orientation orientation, int rol
         case COLUMN_PROGRESS:
         case COLUMN_SCORE:
         case COLUMN_SEASON:
+        case COLUMN_LAST_UPDATED:
           return Qt::DescendingOrder;
         default:
           return Qt::AscendingOrder;

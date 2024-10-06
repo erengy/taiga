@@ -59,13 +59,15 @@ ListView::ListView(QWidget* parent, MainWindow* mainWindow)
   setSortingEnabled(true);
   setUniformRowHeights(true);
 
-  sortByColumn(ListModel::COLUMN_SEASON, Qt::SortOrder::DescendingOrder);
+  sortByColumn(ListModel::COLUMN_LAST_UPDATED, Qt::SortOrder::DescendingOrder);
 
   header()->setFirstSectionMovable(true);
   header()->setStretchLastSection(false);
   header()->setTextElideMode(Qt::ElideRight);
   header()->resizeSection(ListModel::COLUMN_TITLE, 300);
   header()->resizeSection(ListModel::COLUMN_PROGRESS, 150);
+  header()->resizeSection(ListModel::COLUMN_SCORE, 75);
+  header()->resizeSection(ListModel::COLUMN_TYPE, 75);
 
   connect(mainWindow->searchBox(), &QLineEdit::textChanged, this,
           [this](const QString& text) { m_proxyModel->setTextFilter(text); });

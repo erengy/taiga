@@ -101,6 +101,9 @@ bool ListProxyModel::lessThan(const QModelIndex& lhs, const QModelIndex& rhs) co
       return (lhs_entry ? lhs_entry->score : 0) < (rhs_entry ? rhs_entry->score : 0);
     case ListModel::COLUMN_SEASON:
       return lhs_anime->start_date < rhs_anime->start_date;
+    case ListModel::COLUMN_LAST_UPDATED:
+      return (lhs_entry ? lhs_entry->last_updated : "") <
+             (rhs_entry ? rhs_entry->last_updated : "");
   }
 
   return false;
