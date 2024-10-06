@@ -26,8 +26,16 @@ class ListWidget;
 
 namespace gui {
 
+class ListModel;
+class ListProxyModel;
 class ListView;
+class ListViewCards;
 class MainWindow;
+
+enum class ListViewMode {
+  List,
+  Cards,
+};
 
 class ListWidget final : public QWidget {
   Q_OBJECT
@@ -37,10 +45,17 @@ public:
   ListWidget(QWidget* parent, MainWindow* mainWindow);
   ~ListWidget() = default;
 
+  ListViewMode viewMode() const;
+  void setViewMode(ListViewMode mode);
+
 private:
   Ui::ListWidget* ui_ = nullptr;
   MainWindow* m_mainWindow = nullptr;
+  ListModel* m_model = nullptr;
+  ListProxyModel* m_proxyModel = nullptr;
   ListView* m_listView = nullptr;
+  ListViewCards* m_listViewCards = nullptr;
+  ListViewMode m_viewMode = ListViewMode::List;
 };
 
 }  // namespace gui

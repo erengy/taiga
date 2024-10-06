@@ -36,11 +36,9 @@
 
 namespace gui {
 
-ListView::ListView(QWidget* parent, MainWindow* mainWindow)
-    : QTreeView(parent),
-      m_model(new ListModel(this)),
-      m_proxyModel(new ListProxyModel(this)),
-      m_mainWindow(mainWindow) {
+ListView::ListView(QWidget* parent, ListModel* model, ListProxyModel* proxyModel,
+                   MainWindow* mainWindow)
+    : QTreeView(parent), m_model(model), m_proxyModel(proxyModel), m_mainWindow(mainWindow) {
   setObjectName("animeList");
 
   setItemDelegate(new ListItemDelegate(this));

@@ -23,7 +23,6 @@
 #include <QFont>
 #include <QSize>
 
-#include "gui/list/list_item_delegate.hpp"
 #include "gui/utils/format.hpp"
 #include "media/anime_db.hpp"
 #include "media/anime_season.hpp"

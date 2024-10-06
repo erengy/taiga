@@ -2,9 +2,11 @@ add_library(taiga-gui STATIC)
 
 target_sources(taiga-gui PRIVATE
 	list/list_item_delegate.cpp
+	list/list_item_delegate_cards.cpp
 	list/list_model.cpp
 	list/list_proxy_model.cpp
 	list/list_view.cpp
+	list/list_view_cards.cpp
 	list/list_widget.cpp
 	main/main_window.cpp
 	main/navigation_item_delegate.cpp

@@ -20,35 +20,26 @@
 
 #include <QStyledItemDelegate>
 
-class QProxyStyle;
-
 namespace gui {
 
-class ListItemDelegate final : public QStyledItemDelegate {
+class ListItemDelegateCards final : public QStyledItemDelegate {
   Q_OBJECT
-  Q_DISABLE_COPY_MOVE(ListItemDelegate)
+  Q_DISABLE_COPY_MOVE(ListItemDelegateCards)
 
 public:
-  ListItemDelegate(QObject* parent);
-  ~ListItemDelegate() = default;
-
-  void setEditorData(QWidget* editor, const QModelIndex& index) const override;
-  QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option,
-                        const QModelIndex& index) const override;
+  ListItemDelegateCards(QObject* parent);
+  ~ListItemDelegateCards() = default;
 
   void paint(QPainter* painter, const QStyleOptionViewItem& option,
              const QModelIndex& index) const override;
 
   QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const override;
 
-public slots:
-  void setModelData(QWidget* editor, QAbstractItemModel* model,
-                    const QModelIndex& index) const override;
-  void updateEditorGeometry(QWidget* editor, const QStyleOptionViewItem& option,
-                            const QModelIndex& index) const override;
+protected:
+  void initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const override;
 
 private:
-  QProxyStyle* m_proxyStyle;
+  QSize itemSize() const;
 };
 
 }  // namespace gui

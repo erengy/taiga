@@ -24,7 +24,9 @@
 #include <QToolButton>
 
 #include "gui/list/list_model.hpp"
+#include "gui/list/list_proxy_model.hpp"
 #include "gui/list/list_view.hpp"
+#include "gui/list/list_view_cards.hpp"
 #include "gui/utils/theme.hpp"
 #include "ui_list_widget.h"
 
@@ -45,7 +47,10 @@ namespace gui {
 
 ListWidget::ListWidget(QWidget* parent, MainWindow* mainWindow)
     : QWidget(parent),
-      m_listView(new ListView(this, mainWindow)),
+      m_model(new ListModel(this)),
+      m_proxyModel(new ListProxyModel(this)),
+      m_listView(new ListView(this, m_model, m_proxyModel, mainWindow)),
+      m_listViewCards(new ListViewCards(this, m_model, m_proxyModel)),
       m_mainWindow(mainWindow),
       ui_(new Ui::ListWidget) {
   ui_->setupUi(this);
@@ -107,10 +112,46 @@ ListWidget::ListWidget(QWidget* parent, MainWindow* mainWindow)
         return menu;
       }());
     }
+
+    {
+      const auto button = static_cast<QToolButton*>(toolbar->widgetForAction(ui_->actionView));
+      button->setPopupMode(QToolButton::InstantPopup);
+      button->setMenu([this]() {
+        auto menu = new QMenu(this);
+        menu->addAction("List", this, [this]() { setViewMode(ListViewMode::List); });
+        menu->addAction("Cards", this, [this]() { setViewMode(ListViewMode::Cards); });
+        return menu;
+      }());
+    }
   }
 
   // List
-  ui_->verticalLayout->addWidget(m_listView);
+  setViewMode(ListViewMode::List);
+}
+
+ListViewMode ListWidget::viewMode() const {
+  return m_viewMode;
+}
+
+void ListWidget::setViewMode(ListViewMode mode) {
+  m_viewMode = mode;
+
+  m_listView->hide();
+  m_listViewCards->hide();
+
+  ui_->verticalLayout->removeWidget(m_listView);
+  ui_->verticalLayout->removeWidget(m_listViewCards);
+
+  switch (mode) {
+    case ListViewMode::List:
+      ui_->verticalLayout->addWidget(m_listView);
+      m_listView->show();
+      break;
+    case ListViewMode::Cards:
+      ui_->verticalLayout->addWidget(m_listViewCards);
+      m_listViewCards->show();
+      break;
+  }
 }
 
 }  // namespace gui

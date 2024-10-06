@@ -18,7 +18,6 @@
 
 #include "list_proxy_model.hpp"
 
-#include "gui/list/list_item_delegate.hpp"
 #include "gui/list/list_model.hpp"
 #include "media/anime.hpp"
 

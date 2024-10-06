@@ -26,6 +26,11 @@
 
 namespace gui {
 
+enum class ListItemDataRole {
+  Anime = Qt::UserRole,
+  ListEntry,
+};
+
 class ListModel final : public QAbstractListModel {
   Q_OBJECT
   Q_DISABLE_COPY_MOVE(ListModel)
