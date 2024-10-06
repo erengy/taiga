@@ -1,0 +1,80 @@
+/*
+References:
+https://doc.qt.io/qt-6/stylesheet-syntax.html
+https://doc.qt.io/qt-6/stylesheet-reference.html
+https://doc.qt.io/qt-6/stylesheet-examples.html
+*/
+
+/* Toolbar */
+
+QMainWindow > QToolBar {
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+  padding: 8px;
+}
+
+QMainWindow > QToolBar QLineEdit {
+  padding: 4px 8px;
+}
+
+QToolButton::menu-indicator {
+  width: 0px;
+}
+
+/* Navigation */
+
+QTreeWidget#navigation {
+  background-color: transparent;
+  outline: none;
+  padding: 16px 8px;
+}
+
+QTreeWidget#navigation::item {
+  background-color: transparent;
+  border-radius: 3px;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+/* List */
+
+QStackedWidget QListView,
+QStackedWidget QTreeView {
+  border-top-width: 1px;
+  border-top-style: solid;
+}
+
+QTreeView#animeList QHeaderView {
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+}
+
+QTreeView#animeList QHeaderView::section {
+  font-weight: 600;
+  height: 32px;
+}
+QTreeView#animeList QHeaderView::section:first {
+  padding-left: 12px;
+}
+
+QTreeView#animeList {
+  selection-background-color: transparent;
+}
+
+QTreeView#animeList::item:first {
+  padding-left: 8px;
+}
+
+/* Now Playing */
+
+#nowPlaying {
+  border-top-width: 1px;
+  border-top-style: solid;
+}
+
+/* Statusbar */
+
+QStatusBar#statusbar {
+  border-top-width: 1px;
+  border-top-style: solid;
+}

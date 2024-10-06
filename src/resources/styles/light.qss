@@ -1,0 +1,73 @@
+/* Toolbar */
+
+QMainWindow > QToolBar {
+  border-bottom-color: rgba(0, 0, 0, 16%);
+}
+
+QMainWindow > #centralWidget > QSplitter {
+  background-color: rgba(255, 255, 255, 30%);
+}
+QMainWindow > #centralWidget > QSplitter::handle {
+  background-color: rgba(0, 0, 0, 16%);
+}
+
+/* Navigation */
+
+QTreeWidget#navigation::item:hover:!selected {
+  background-color: rgba(0, 0, 0, 4%);
+}
+QTreeWidget#navigation::item:active {
+  color: #000;
+}
+QTreeWidget#navigation::item:selected:active {
+  background-color: rgba(0, 0, 0, 8%);
+}
+QTreeWidget#navigation::item:selected:!active {
+  background-color: rgba(0, 0, 0, 6%);
+}
+
+/* List */
+
+QMainWindow QStackedWidget QListView,
+QMainWindow QStackedWidget QTreeView {
+  border-top-color: rgba(0, 0, 0, 16%);
+}
+
+QMainWindow QStackedWidget QAbstractScrollArea {
+  background-color: #fff;
+}
+
+QTreeView#animeList QHeaderView {
+  border-bottom-color: rgba(0, 0, 0, 16%);
+}
+
+QTreeView#animeList::item {
+  background-color: #fff;
+}
+QTreeView#animeList::item:alternate {
+  background-color: rgba(0, 0, 0, 1%);
+}
+QTreeView#animeList::item:hover:!selected {
+  background-color: rgba(0, 0, 0, 4%);
+}
+QTreeView#animeList::item:active {
+  color: #000;
+}
+QTreeView#animeList::item:selected:active {
+  background-color: rgba(0, 0, 0, 8%);
+}
+QTreeView#animeList::item:selected:!active {
+  background-color: rgba(0, 0, 0, 6%);
+}
+
+/* Now Playing */
+
+#nowPlaying {
+  border-top-color: rgba(0, 0, 0, 16%);
+}
+
+/* Statusbar */
+
+QStatusBar {
+  border-top-color: rgba(0, 0, 0, 16%);
+}

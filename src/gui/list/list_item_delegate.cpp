@@ -102,7 +102,10 @@ void ListItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opti
       styleOption.direction = option.direction;
       styleOption.rect = option.rect.adjusted(2, 2, -2, -2);
       styleOption.palette = option.palette;
-      styleOption.palette.setCurrentColorGroup(QPalette::Active);
+      styleOption.palette.setCurrentColorGroup(QPalette::ColorGroup::Active);
+      styleOption.palette.setColor(QPalette::ColorRole::Highlight, theme.isDark()
+                                                                       ? QColor{12, 164, 12, 128}
+                                                                       : QColor{12, 164, 12, 255});
       styleOption.fontMetrics = option.fontMetrics;
       styleOption.maximum = 100;
       styleOption.minimum = 0;

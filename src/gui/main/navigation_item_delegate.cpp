@@ -26,8 +26,8 @@
 
 namespace gui {
 
-static const auto lineColorLight = QColor{0, 0, 0, 20};
-static const auto lineColorDark = QColor{255, 255, 255, 20};
+static const auto lineColorLight = QColor{0, 0, 0, 40};
+static const auto lineColorDark = QColor{255, 255, 255, 40};
 
 NavigationItemDelegate::NavigationItemDelegate(QObject* parent) : QStyledItemDelegate(parent) {}
 
@@ -57,7 +57,7 @@ void NavigationItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
 void NavigationItemDelegate::paintBranch(QPainter* painter, QRect rect, bool isLastChild) const {
   const PainterStateSaver painterStateSaver(painter);
 
-  rect.setLeft(4);
+  rect.setLeft(8);
   rect.setWidth(16);
 
   const QPoint center = rect.center();
@@ -106,7 +106,7 @@ void NavigationItemDelegate::paintCounter(QPainter* painter, QRect rect, const i
 
   painter->fillRect(rect, theme.isDark() ? lineColorDark : lineColorLight);
 
-  painter->setPen(QColor(theme.isDark() ? 0x888888 : 0x666666));
+  painter->setPen(QColor(theme.isDark() ? 0xAAAAAA : 0x666666));
   painter->drawText(rect, Qt::AlignHCenter | Qt::AlignVCenter | Qt::TextSingleLine, text);
 }
 
@@ -116,7 +116,7 @@ void NavigationItemDelegate::paintSeparator(QPainter* painter, const QRect& rect
   const int y = rect.center().y();
 
   painter->setPen(theme.isDark() ? lineColorDark : lineColorLight);
-  painter->drawLine(rect.left() + 4, y, rect.right() - 4, y);
+  painter->drawLine(rect.left() + 8, y, rect.right() - 8, y);
 };
 
 }  // namespace gui

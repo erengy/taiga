@@ -38,13 +38,6 @@ NavigationWidget::NavigationWidget(MainWindow* mainWindow)
   setItemDelegate(new NavigationItemDelegate(this));
   setObjectName("navigation");
 
-  setPalette([this]() {
-    QPalette palette = this->palette();
-    palette.setColor(QPalette::Base, theme.isDark() ? QColor{0, 0, 0, 255 / 100 * 50}
-                                                    : QColor{255, 255, 255, 255 / 100 * 50});
-    return palette;
-  }());
-
   viewport()->setMouseTracking(true);
 
   refresh();

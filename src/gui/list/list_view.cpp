@@ -61,15 +61,6 @@ ListView::ListView(QWidget* parent, MainWindow* mainWindow)
 
   sortByColumn(ListModel::COLUMN_SEASON, Qt::SortOrder::DescendingOrder);
 
-  if (theme.isDark()) {
-    setPalette([this]() {
-      QPalette palette = this->palette();
-      auto alternateColor = palette.color(QPalette::Base).darker(150);
-      palette.setColor(QPalette::AlternateBase, alternateColor);
-      return palette;
-    }());
-  }
-
   header()->setFirstSectionMovable(true);
   header()->setStretchLastSection(false);
   header()->setTextElideMode(Qt::ElideRight);
