@@ -76,6 +76,12 @@ QVariant AnimeListModel::data(const QModelIndex& index, int role) const {
           return formatType(anime->type);
         case COLUMN_SEASON:
           return formatSeason(anime::Season(anime->start_date));
+        case COLUMN_STARTED:
+          if (entry) return formatFuzzyDate(entry->date_start);
+          break;
+        case COLUMN_COMPLETED:
+          if (entry) return formatFuzzyDate(entry->date_finish);
+          break;
         case COLUMN_LAST_UPDATED:
           if (entry) {
             const auto time = QString::fromStdString(entry->last_updated).toLongLong();
@@ -108,6 +114,8 @@ QVariant AnimeListModel::data(const QModelIndex& index, int role) const {
         case COLUMN_TYPE:
           return QVariant(Qt::AlignCenter | Qt::AlignVCenter);
         case COLUMN_SEASON:
+        case COLUMN_STARTED:
+        case COLUMN_COMPLETED:
         case COLUMN_LAST_UPDATED:
           return QVariant(Qt::AlignRight | Qt::AlignVCenter);
         default:
@@ -157,6 +165,10 @@ QVariant AnimeListModel::headerData(int section, Qt::Orientation orientation, in
           return tr("Type");
         case COLUMN_SEASON:
           return tr("Season");
+        case COLUMN_STARTED:
+          return tr("Started");
+        case COLUMN_COMPLETED:
+          return tr("Completed");
         case COLUMN_LAST_UPDATED:
           return tr("Last updated");
       }
@@ -171,6 +183,8 @@ QVariant AnimeListModel::headerData(int section, Qt::Orientation orientation, in
         case COLUMN_TYPE:
           return QVariant(Qt::AlignCenter | Qt::AlignVCenter);
         case COLUMN_SEASON:
+        case COLUMN_STARTED:
+        case COLUMN_COMPLETED:
         case COLUMN_LAST_UPDATED:
           return QVariant(Qt::AlignRight | Qt::AlignVCenter);
       }
@@ -183,6 +197,8 @@ QVariant AnimeListModel::headerData(int section, Qt::Orientation orientation, in
         case COLUMN_SCORE:
         case COLUMN_AVERAGE:
         case COLUMN_SEASON:
+        case COLUMN_STARTED:
+        case COLUMN_COMPLETED:
         case COLUMN_LAST_UPDATED:
           return Qt::DescendingOrder;
         default:

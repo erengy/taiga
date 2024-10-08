@@ -104,6 +104,8 @@ ListWidget::ListWidget(QWidget* parent, MainWindow* mainWindow)
             {tr("Average"), gui::AnimeListModel::COLUMN_AVERAGE, DescendingOrder},
             {tr("Type"), gui::AnimeListModel::COLUMN_TYPE, AscendingOrder},
             {tr("Season"), gui::AnimeListModel::COLUMN_SEASON, DescendingOrder},
+            {tr("Started"), gui::AnimeListModel::COLUMN_STARTED, DescendingOrder},
+            {tr("Completed"), gui::AnimeListModel::COLUMN_COMPLETED, DescendingOrder},
             {tr("Last updated"), gui::AnimeListModel::COLUMN_LAST_UPDATED, DescendingOrder},
         };
         for (const auto& item : sortMenuItems) {

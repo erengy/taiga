@@ -135,6 +135,12 @@ bool AnimeListProxyModel::lessThan(const QModelIndex& lhs, const QModelIndex& rh
       return (lhs_entry ? lhs_entry->score : 0) < (rhs_entry ? rhs_entry->score : 0);
     case AnimeListModel::COLUMN_SEASON:
       return lhs_anime->start_date < rhs_anime->start_date;
+    case AnimeListModel::COLUMN_STARTED:
+      return (lhs_entry ? lhs_entry->date_start : FuzzyDate{}) <
+             (rhs_entry ? rhs_entry->date_start : FuzzyDate{});
+    case AnimeListModel::COLUMN_COMPLETED:
+      return (lhs_entry ? lhs_entry->date_finish : FuzzyDate{}) <
+             (rhs_entry ? rhs_entry->date_finish : FuzzyDate{});
     case AnimeListModel::COLUMN_LAST_UPDATED:
       return (lhs_entry ? lhs_entry->last_updated : "") <
              (rhs_entry ? rhs_entry->last_updated : "");
