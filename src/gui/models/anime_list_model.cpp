@@ -125,6 +125,16 @@ QVariant AnimeListModel::data(const QModelIndex& index, int role) const {
 }
 
 bool AnimeListModel::setData(const QModelIndex& index, const QVariant& value, int role) {
+  if (index.isValid() && role == Qt::EditRole) {
+    if (index.column() == COLUMN_SCORE) {
+      // @TODO: Add to queue instead of directly modifying the entry
+      const int id = m_ids.at(index.row());
+      const auto entry = m_entries.find(id);
+      entry->score = value.toString().toInt();
+      emit dataChanged(index, index, {role});
+      return true;
+    }
+  }
   return false;
 }
 

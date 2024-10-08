@@ -47,10 +47,10 @@ QWidget* ListItemDelegate::createEditor(QWidget* parent, const QStyleOptionViewI
   if (index.column() != AnimeListModel::COLUMN_SCORE) return nullptr;
 
   auto* editor = new QComboBox(parent);
-  editor->addItem("-");
+  editor->addItem("-", 0);
   editor->setItemData(0, Qt::AlignCenter, Qt::TextAlignmentRole);
   for (int i = 1; i <= 10; ++i) {
-    editor->addItem(tr("%1").arg(i));
+    editor->addItem(tr("%1").arg(i), i * 10);
     editor->setItemData(i, Qt::AlignCenter, Qt::TextAlignmentRole);
   }
 
@@ -60,7 +60,7 @@ QWidget* ListItemDelegate::createEditor(QWidget* parent, const QStyleOptionViewI
 void ListItemDelegate::setModelData(QWidget* editor, QAbstractItemModel* model,
                                     const QModelIndex& index) const {
   const auto* combobox = static_cast<QComboBox*>(editor);
-  model->setData(index, combobox->currentText(), Qt::EditRole);
+  model->setData(index, combobox->currentData(), Qt::EditRole);
 }
 
 void ListItemDelegate::updateEditorGeometry(QWidget* editor, const QStyleOptionViewItem& option,
