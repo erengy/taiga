@@ -48,6 +48,7 @@ ListView::ListView(QWidget* parent, AnimeListModel* model, AnimeListProxyModel* 
   header()->setFirstSectionMovable(true);
   header()->setStretchLastSection(false);
   header()->setTextElideMode(Qt::ElideRight);
+  header()->hideSection(AnimeListModel::COLUMN_REWATCHES);
   header()->hideSection(AnimeListModel::COLUMN_AVERAGE);
   header()->hideSection(AnimeListModel::COLUMN_STARTED);
   header()->hideSection(AnimeListModel::COLUMN_COMPLETED);

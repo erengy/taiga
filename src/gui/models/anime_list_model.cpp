@@ -67,6 +67,9 @@ QVariant AnimeListModel::data(const QModelIndex& index, int role) const {
       switch (index.column()) {
         case COLUMN_TITLE:
           return QString::fromStdString(anime->titles.romaji);
+        case COLUMN_REWATCHES:
+          if (entry) return entry->rewatched_times;
+          break;
         case COLUMN_SCORE:
           if (entry) return formatListScore(entry->score);
           break;
@@ -115,6 +118,7 @@ QVariant AnimeListModel::data(const QModelIndex& index, int role) const {
     case Qt::TextAlignmentRole: {
       switch (index.column()) {
         case COLUMN_PROGRESS:
+        case COLUMN_REWATCHES:
         case COLUMN_SCORE:
         case COLUMN_AVERAGE:
         case COLUMN_TYPE:
@@ -163,6 +167,8 @@ QVariant AnimeListModel::headerData(int section, Qt::Orientation orientation, in
           return tr("Title");
         case COLUMN_PROGRESS:
           return tr("Progress");
+        case COLUMN_REWATCHES:
+          return tr("Rewatches");
         case COLUMN_SCORE:
           return tr("Score");
         case COLUMN_AVERAGE:
@@ -186,6 +192,7 @@ QVariant AnimeListModel::headerData(int section, Qt::Orientation orientation, in
     case Qt::TextAlignmentRole: {
       switch (section) {
         case COLUMN_PROGRESS:
+        case COLUMN_REWATCHES:
         case COLUMN_SCORE:
         case COLUMN_AVERAGE:
         case COLUMN_TYPE:
@@ -202,6 +209,7 @@ QVariant AnimeListModel::headerData(int section, Qt::Orientation orientation, in
     case Qt::InitialSortOrderRole: {
       switch (section) {
         case COLUMN_PROGRESS:
+        case COLUMN_REWATCHES:
         case COLUMN_SCORE:
         case COLUMN_AVERAGE:
         case COLUMN_SEASON:

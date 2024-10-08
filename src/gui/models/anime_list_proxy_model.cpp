@@ -131,6 +131,9 @@ bool AnimeListProxyModel::lessThan(const QModelIndex& lhs, const QModelIndex& rh
     case AnimeListModel::COLUMN_PROGRESS:
       return (lhs_entry ? lhs_entry->watched_episodes : 0) <
              (rhs_entry ? rhs_entry->watched_episodes : 0);
+    case AnimeListModel::COLUMN_REWATCHES:
+      return (lhs_entry ? lhs_entry->rewatched_times : 0) <
+             (rhs_entry ? rhs_entry->rewatched_times : 0);
     case AnimeListModel::COLUMN_SCORE:
       return (lhs_entry ? lhs_entry->score : 0) < (rhs_entry ? rhs_entry->score : 0);
     case AnimeListModel::COLUMN_SEASON:

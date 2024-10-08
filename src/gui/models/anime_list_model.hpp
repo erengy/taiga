@@ -39,6 +39,7 @@ public:
   enum Column {
     COLUMN_TITLE,
     COLUMN_PROGRESS,
+    COLUMN_REWATCHES,
     COLUMN_SCORE,
     COLUMN_AVERAGE,
     COLUMN_TYPE,

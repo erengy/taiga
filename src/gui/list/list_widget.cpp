@@ -89,6 +89,7 @@ ListWidget::ListWidget(QWidget* parent, MainWindow* mainWindow)
         static const QList<QPair<AnimeListModel::Column, Qt::SortOrder>> sortMenuItems = {
             {AnimeListModel::COLUMN_TITLE, AscendingOrder},
             {AnimeListModel::COLUMN_PROGRESS, DescendingOrder},
+            {AnimeListModel::COLUMN_REWATCHES, DescendingOrder},
             {AnimeListModel::COLUMN_SCORE, DescendingOrder},
             {AnimeListModel::COLUMN_AVERAGE, DescendingOrder},
             {AnimeListModel::COLUMN_TYPE, AscendingOrder},
