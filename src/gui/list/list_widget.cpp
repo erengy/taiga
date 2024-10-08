@@ -101,6 +101,7 @@ ListWidget::ListWidget(QWidget* parent, MainWindow* mainWindow)
             {tr("Title"), gui::AnimeListModel::COLUMN_TITLE, AscendingOrder},
             {tr("Progress"), gui::AnimeListModel::COLUMN_PROGRESS, DescendingOrder},
             {tr("Score"), gui::AnimeListModel::COLUMN_SCORE, DescendingOrder},
+            {tr("Average"), gui::AnimeListModel::COLUMN_AVERAGE, DescendingOrder},
             {tr("Type"), gui::AnimeListModel::COLUMN_TYPE, AscendingOrder},
             {tr("Season"), gui::AnimeListModel::COLUMN_SEASON, DescendingOrder},
             {tr("Last updated"), gui::AnimeListModel::COLUMN_LAST_UPDATED, DescendingOrder},

@@ -70,6 +70,8 @@ QVariant AnimeListModel::data(const QModelIndex& index, int role) const {
         case COLUMN_SCORE:
           if (entry) return formatListScore(entry->score);
           break;
+        case COLUMN_AVERAGE:
+          return formatScore(anime->score);
         case COLUMN_TYPE:
           return formatType(anime->type);
         case COLUMN_SEASON:
@@ -102,6 +104,7 @@ QVariant AnimeListModel::data(const QModelIndex& index, int role) const {
       switch (index.column()) {
         case COLUMN_PROGRESS:
         case COLUMN_SCORE:
+        case COLUMN_AVERAGE:
         case COLUMN_TYPE:
           return QVariant(Qt::AlignCenter | Qt::AlignVCenter);
         case COLUMN_SEASON:
@@ -148,6 +151,8 @@ QVariant AnimeListModel::headerData(int section, Qt::Orientation orientation, in
           return tr("Progress");
         case COLUMN_SCORE:
           return tr("Score");
+        case COLUMN_AVERAGE:
+          return tr("Average");
         case COLUMN_TYPE:
           return tr("Type");
         case COLUMN_SEASON:
@@ -162,6 +167,7 @@ QVariant AnimeListModel::headerData(int section, Qt::Orientation orientation, in
       switch (section) {
         case COLUMN_PROGRESS:
         case COLUMN_SCORE:
+        case COLUMN_AVERAGE:
         case COLUMN_TYPE:
           return QVariant(Qt::AlignCenter | Qt::AlignVCenter);
         case COLUMN_SEASON:
@@ -175,6 +181,7 @@ QVariant AnimeListModel::headerData(int section, Qt::Orientation orientation, in
       switch (section) {
         case COLUMN_PROGRESS:
         case COLUMN_SCORE:
+        case COLUMN_AVERAGE:
         case COLUMN_SEASON:
         case COLUMN_LAST_UPDATED:
           return Qt::DescendingOrder;

@@ -124,6 +124,8 @@ bool AnimeListProxyModel::lessThan(const QModelIndex& lhs, const QModelIndex& rh
   switch (lhs.column()) {
     case AnimeListModel::COLUMN_TITLE:
       return lhs_anime->titles.romaji < rhs_anime->titles.romaji;
+    case AnimeListModel::COLUMN_AVERAGE:
+      return lhs_anime->score < rhs_anime->score;
     case AnimeListModel::COLUMN_TYPE:
       return lhs_anime->type < rhs_anime->type;
     case AnimeListModel::COLUMN_PROGRESS:
