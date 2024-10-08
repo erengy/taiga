@@ -144,6 +144,8 @@ bool AnimeListProxyModel::lessThan(const QModelIndex& lhs, const QModelIndex& rh
     case AnimeListModel::COLUMN_LAST_UPDATED:
       return (lhs_entry ? lhs_entry->last_updated : "") <
              (rhs_entry ? rhs_entry->last_updated : "");
+    case AnimeListModel::COLUMN_NOTES:
+      return (lhs_entry ? lhs_entry->notes : "") < (rhs_entry ? rhs_entry->notes : "");
   }
 
   return false;

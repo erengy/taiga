@@ -88,6 +88,9 @@ QVariant AnimeListModel::data(const QModelIndex& index, int role) const {
             return formatAsRelativeTime(time);
           }
           break;
+        case COLUMN_NOTES:
+          if (entry) return QString::fromStdString(entry->notes);
+          break;
       }
       break;
 
@@ -102,6 +105,9 @@ QVariant AnimeListModel::data(const QModelIndex& index, int role) const {
             const auto time = QString::fromStdString(entry->last_updated).toLongLong();
             return formatTimestamp(time);
           }
+          break;
+        case COLUMN_NOTES:
+          if (entry) return QString::fromStdString(entry->notes);
           break;
       }
       break;
@@ -171,6 +177,8 @@ QVariant AnimeListModel::headerData(int section, Qt::Orientation orientation, in
           return tr("Completed");
         case COLUMN_LAST_UPDATED:
           return tr("Last updated");
+        case COLUMN_NOTES:
+          return tr("Notes");
       }
       break;
     }

@@ -96,6 +96,7 @@ ListWidget::ListWidget(QWidget* parent, MainWindow* mainWindow)
             {AnimeListModel::COLUMN_STARTED, DescendingOrder},
             {AnimeListModel::COLUMN_COMPLETED, DescendingOrder},
             {AnimeListModel::COLUMN_LAST_UPDATED, DescendingOrder},
+            {AnimeListModel::COLUMN_NOTES, AscendingOrder},
         };
         for (const auto& [column, order] : sortMenuItems) {
           const auto headerData =
