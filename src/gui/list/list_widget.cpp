@@ -50,7 +50,7 @@ ListWidget::ListWidget(QWidget* parent, MainWindow* mainWindow)
       m_model(new AnimeListModel(this)),
       m_proxyModel(new AnimeListProxyModel(this)),
       m_listView(new ListView(this, m_model, m_proxyModel, mainWindow)),
-      m_listViewCards(new ListViewCards(this, m_model, m_proxyModel)),
+      m_listViewCards(new ListViewCards(this, m_model, m_proxyModel, mainWindow)),
       m_mainWindow(mainWindow),
       ui_(new Ui::ListWidget) {
   ui_->setupUi(this);

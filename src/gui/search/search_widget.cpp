@@ -35,7 +35,7 @@ SearchWidget::SearchWidget(QWidget* parent, MainWindow* mainWindow)
     : QWidget(parent),
       m_model(new AnimeListModel(this)),
       m_proxyModel(new AnimeListProxyModel(this)),
-      m_listViewCards(new ListViewCards(this, m_model, m_proxyModel)),
+      m_listViewCards(new ListViewCards(this, m_model, m_proxyModel, mainWindow)),
       m_mainWindow(mainWindow),
       ui_(new Ui::SearchWidget) {
   ui_->setupUi(this);

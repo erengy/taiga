@@ -19,45 +19,31 @@
 #include "anime_list_view.hpp"
 
 #include <QHeaderView>
-#include <QLineEdit>
-#include <QStatusBar>
 
 #include "gui/common/anime_list_item_delegate.hpp"
+#include "gui/common/anime_list_view_base.hpp"
 #include "gui/main/main_window.hpp"
-#include "gui/main/navigation_item_delegate.hpp"
-#include "gui/main/navigation_widget.hpp"
-#include "gui/main/now_playing_widget.hpp"
-#include "gui/media/media_dialog.hpp"
-#include "gui/media/media_menu.hpp"
 #include "gui/models/anime_list_model.hpp"
 #include "gui/models/anime_list_proxy_model.hpp"
-#include "gui/utils/theme.hpp"
-#include "media/anime.hpp"
 
 namespace gui {
 
 ListView::ListView(QWidget* parent, AnimeListModel* model, AnimeListProxyModel* proxyModel,
                    MainWindow* mainWindow)
-    : QTreeView(parent), m_model(model), m_proxyModel(proxyModel), m_mainWindow(mainWindow) {
+    : m_base(new ListViewBase(parent, this, model, proxyModel, mainWindow)) {
   setObjectName("animeList");
 
+  setFrameShape(QFrame::Shape::NoFrame);
+
+  setAlternatingRowColors(true);
   setItemDelegate(new ListItemDelegate(this));
 
-  m_proxyModel->setSourceModel(m_model);
-  setModel(m_proxyModel);
-
   setAllColumnsShowFocus(true);
-  setAlternatingRowColors(true);
-  setContextMenuPolicy(Qt::CustomContextMenu);
   setExpandsOnDoubleClick(false);
-  setFrameShape(QFrame::Shape::NoFrame);
   setItemsExpandable(false);
   setRootIsDecorated(false);
-  setSelectionMode(QAbstractItemView::SelectionMode::ExtendedSelection);
   setSortingEnabled(true);
   setUniformRowHeights(true);
-
-  sortByColumn(AnimeListModel::COLUMN_LAST_UPDATED, Qt::SortOrder::DescendingOrder);
 
   header()->setFirstSectionMovable(true);
   header()->setStretchLastSection(false);
@@ -67,71 +53,10 @@ ListView::ListView(QWidget* parent, AnimeListModel* model, AnimeListProxyModel* 
   header()->resizeSection(AnimeListModel::COLUMN_SCORE, 75);
   header()->resizeSection(AnimeListModel::COLUMN_TYPE, 75);
 
-  connect(mainWindow->searchBox(), &QLineEdit::textChanged, this,
-          [this](const QString& text) { m_proxyModel->setTextFilter(text); });
-
-  connect(mainWindow->navigation(), &NavigationWidget::currentItemChanged, this,
-          [this](QTreeWidgetItem* current, QTreeWidgetItem* previous) {
-            if (!current) return;
-            const int role = static_cast<int>(NavigationItemDataRole::ListStatus);
-            if (const int status = current->data(0, role).toInt()) {
-              m_proxyModel->setListStatusFilter(status);
-            } else {
-              m_proxyModel->removeListStatusFilter();
-            }
-          });
-
-  connect(this, &QWidget::customContextMenuRequested, this, [this]() {
-    const auto selectedRows = selectionModel()->selectedRows();
-    if (selectedRows.isEmpty()) return;
-
-    QList<Anime> items;
-    QMap<int, ListEntry> entries;
-    for (auto selectedIndex : selectedRows) {
-      const auto index = m_proxyModel->mapToSource(selectedIndex);
-      if (const auto item = m_model->getAnime(index)) {
-        items.push_back(*item);
-        if (const auto entry = m_model->getListEntry(index)) {
-          entries[item->id] = *entry;
-        }
-      }
-    }
-
-    auto* menu = new MediaMenu(this, items, entries);
-    menu->popup();
-  });
+  sortByColumn(AnimeListModel::COLUMN_LAST_UPDATED, Qt::SortOrder::DescendingOrder);
 
   connect(this, &QAbstractItemView::clicked, this,
           qOverload<const QModelIndex&>(&QAbstractItemView::edit));
-
-  connect(this, &QAbstractItemView::doubleClicked, this, [this](const QModelIndex& index) {
-    const auto anime = m_model->getAnime(m_proxyModel->mapToSource(index));
-    if (!anime) return;
-    const auto entry = m_model->getListEntry(m_proxyModel->mapToSource(index));
-    MediaDialog::show(this, *anime, entry ? std::optional<ListEntry>{*entry} : std::nullopt);
-  });
-
-  connect(selectionModel(), &QItemSelectionModel::selectionChanged, this,
-          &ListView::selectionChanged);
-}
-
-void ListView::selectionChanged(const QItemSelection& selected, const QItemSelection& deselected) {
-  QTreeView::selectionChanged(selected, deselected);
-
-  if (!selected.empty()) {
-    const auto selectedItem =
-        m_model->getAnime(m_proxyModel->mapToSource(selected.indexes().first()));
-    m_mainWindow->nowPlaying()->setPlaying(*selectedItem);
-    m_mainWindow->nowPlaying()->show();
-  } else if (m_mainWindow && m_mainWindow->nowPlaying()) {
-    m_mainWindow->nowPlaying()->hide();
-  }
-
-  if (const auto n = selectionModel()->selectedRows().size()) {
-    m_mainWindow->statusBar()->showMessage(tr("%n item(s) selected", nullptr, n));
-  } else {
-    m_mainWindow->statusBar()->clearMessage();
-  }
 }
 
 }  // namespace gui

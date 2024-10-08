@@ -24,22 +24,20 @@ namespace gui {
 
 class AnimeListModel;
 class AnimeListProxyModel;
+class ListViewBase;
+class MainWindow;
 
 class ListViewCards final : public QListView {
   Q_OBJECT
   Q_DISABLE_COPY_MOVE(ListViewCards)
 
 public:
-  ListViewCards(QWidget* parent, AnimeListModel* model, AnimeListProxyModel* proxyModel);
+  ListViewCards(QWidget* parent, AnimeListModel* model, AnimeListProxyModel* proxyModel,
+                MainWindow* mainWindow);
   ~ListViewCards() = default;
 
-  AnimeListProxyModel* proxyModel() {
-    return m_proxyModel;
-  }
-
 private:
-  AnimeListModel* m_model = nullptr;
-  AnimeListProxyModel* m_proxyModel = nullptr;
+  ListViewBase* m_base = nullptr;
 };
 
 }  // namespace gui

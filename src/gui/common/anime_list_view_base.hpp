@@ -18,26 +18,39 @@
 
 #pragma once
 
-#include <QTreeView>
+#include <QAbstractItemView>
+#include <QObject>
+#include <QTreeWidget>
 
 namespace gui {
 
 class AnimeListModel;
 class AnimeListProxyModel;
-class ListViewBase;
 class MainWindow;
 
-class ListView final : public QTreeView {
+class ListViewBase final : public QObject {
   Q_OBJECT
-  Q_DISABLE_COPY_MOVE(ListView)
+  Q_DISABLE_COPY_MOVE(ListViewBase)
 
 public:
-  ListView(QWidget* parent, AnimeListModel* model, AnimeListProxyModel* proxyModel,
-           MainWindow* mainWindow);
-  ~ListView() = default;
+  ListViewBase(QWidget* parent, QAbstractItemView* view, AnimeListModel* model,
+               AnimeListProxyModel* proxyModel, MainWindow* mainWindow);
+  ~ListViewBase() = default;
+
+private slots:
+  void filterByListStatus(QTreeWidgetItem* current);
+  void filterByText(const QString& text);
+  void showMediaDialog(const QModelIndex& index);
+  void showMediaMenu();
+  void updateSelectionStatus(const QItemSelection& selected, const QItemSelection& deselected);
 
 private:
-  ListViewBase* m_base = nullptr;
+  QModelIndexList selectedIndexes();
+
+  AnimeListModel* m_model = nullptr;
+  AnimeListProxyModel* m_proxyModel = nullptr;
+  MainWindow* m_mainWindow = nullptr;
+  QAbstractItemView* m_view = nullptr;
 };
 
 }  // namespace gui

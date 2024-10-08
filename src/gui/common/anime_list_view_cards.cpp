@@ -18,53 +18,26 @@
 
 #include "anime_list_view_cards.hpp"
 
-#include <QContextMenuEvent>
-
 #include "gui/common/anime_list_item_delegate_cards.hpp"
-#include "gui/media/media_dialog.hpp"
-#include "gui/media/media_menu.hpp"
+#include "gui/common/anime_list_view_base.hpp"
+#include "gui/main/main_window.hpp"
 #include "gui/models/anime_list_model.hpp"
 #include "gui/models/anime_list_proxy_model.hpp"
-#include "media/anime.hpp"
 
 namespace gui {
 
 ListViewCards::ListViewCards(QWidget* parent, AnimeListModel* model,
-                             AnimeListProxyModel* proxyModel)
-    : QListView(parent), m_model(model), m_proxyModel(proxyModel) {
+                             AnimeListProxyModel* proxyModel, MainWindow* mainWindow)
+    : m_base(new ListViewBase(parent, this, model, proxyModel, mainWindow)) {
+  setFrameShape(QFrame::Shape::NoFrame);
+
   setItemDelegate(new ListItemDelegateCards(this));
 
-  m_proxyModel->setSourceModel(m_model);
-  setModel(m_proxyModel);
-
-  setContextMenuPolicy(Qt::CustomContextMenu);
-  setFrameShape(QFrame::Shape::NoFrame);
   setViewMode(QListView::ViewMode::IconMode);
   setResizeMode(QListView::ResizeMode::Adjust);
   setSpacing(16);
   setUniformItemSizes(true);
   setWordWrap(true);
-
-  connect(this, &QWidget::customContextMenuRequested, this, [this]() {
-    const auto selectedRows = selectionModel()->selectedRows();
-    if (selectedRows.isEmpty()) return;
-
-    QList<Anime> items;
-    for (auto selectedIndex : selectedRows) {
-      if (const auto item = m_model->getAnime(m_proxyModel->mapToSource(selectedIndex))) {
-        items.push_back(*item);
-      }
-    }
-
-    auto* menu = new MediaMenu(this, items, {});
-    menu->popup();
-  });
-
-  connect(this, &QAbstractItemView::doubleClicked, this, [this](const QModelIndex& index) {
-    const auto selectedItem = m_model->getAnime(m_proxyModel->mapToSource(index));
-    if (!selectedItem) return;
-    MediaDialog::show(this, *selectedItem, {});
-  });
 }
 
 }  // namespace gui
