@@ -30,19 +30,6 @@
 #include "gui/utils/theme.hpp"
 #include "ui_list_widget.h"
 
-namespace {
-
-struct SortMenuItem {
-  QString title;
-  gui::AnimeListModel::Column column;
-  Qt::SortOrder order;
-};
-
-using Qt::SortOrder::AscendingOrder;
-using Qt::SortOrder::DescendingOrder;
-
-}  // namespace
-
 namespace gui {
 
 ListWidget::ListWidget(QWidget* parent, MainWindow* mainWindow)
@@ -96,21 +83,25 @@ ListWidget::ListWidget(QWidget* parent, MainWindow* mainWindow)
       const auto button = static_cast<QToolButton*>(toolbar->widgetForAction(ui_->actionSort));
       button->setPopupMode(QToolButton::InstantPopup);
       button->setMenu([this]() {
+        using Qt::SortOrder::AscendingOrder;
+        using Qt::SortOrder::DescendingOrder;
         auto menu = new QMenu(this);
-        static const QList<SortMenuItem> sortMenuItems = {
-            {tr("Title"), gui::AnimeListModel::COLUMN_TITLE, AscendingOrder},
-            {tr("Progress"), gui::AnimeListModel::COLUMN_PROGRESS, DescendingOrder},
-            {tr("Score"), gui::AnimeListModel::COLUMN_SCORE, DescendingOrder},
-            {tr("Average"), gui::AnimeListModel::COLUMN_AVERAGE, DescendingOrder},
-            {tr("Type"), gui::AnimeListModel::COLUMN_TYPE, AscendingOrder},
-            {tr("Season"), gui::AnimeListModel::COLUMN_SEASON, DescendingOrder},
-            {tr("Started"), gui::AnimeListModel::COLUMN_STARTED, DescendingOrder},
-            {tr("Completed"), gui::AnimeListModel::COLUMN_COMPLETED, DescendingOrder},
-            {tr("Last updated"), gui::AnimeListModel::COLUMN_LAST_UPDATED, DescendingOrder},
+        static const QList<QPair<AnimeListModel::Column, Qt::SortOrder>> sortMenuItems = {
+            {AnimeListModel::COLUMN_TITLE, AscendingOrder},
+            {AnimeListModel::COLUMN_PROGRESS, DescendingOrder},
+            {AnimeListModel::COLUMN_SCORE, DescendingOrder},
+            {AnimeListModel::COLUMN_AVERAGE, DescendingOrder},
+            {AnimeListModel::COLUMN_TYPE, AscendingOrder},
+            {AnimeListModel::COLUMN_SEASON, DescendingOrder},
+            {AnimeListModel::COLUMN_STARTED, DescendingOrder},
+            {AnimeListModel::COLUMN_COMPLETED, DescendingOrder},
+            {AnimeListModel::COLUMN_LAST_UPDATED, DescendingOrder},
         };
-        for (const auto& item : sortMenuItems) {
-          menu->addAction(item.title, this,
-                          [this, item]() { m_listView->sortByColumn(item.column, item.order); });
+        for (const auto& [column, order] : sortMenuItems) {
+          const auto headerData =
+              m_model->headerData(column, Qt::Orientation::Horizontal, Qt::DisplayRole);
+          menu->addAction(headerData.toString(), this,
+                          [this, column, order]() { m_listView->sortByColumn(column, order); });
         }
         return menu;
       }());
