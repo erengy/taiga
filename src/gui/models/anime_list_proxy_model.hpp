@@ -40,12 +40,11 @@ public:
   AnimeListProxyModel(QObject* parent);
   ~AnimeListProxyModel() = default;
 
-  void setYearFilter(int year);
-  void setSeasonFilter(int season);
-  void setTypeFilter(int type);
-  void setStatusFilter(int status);
-  void removeListStatusFilter();
-  void setListStatusFilter(int status);
+  void setYearFilter(std::optional<int> year);
+  void setSeasonFilter(std::optional<int> season);
+  void setTypeFilter(std::optional<int> type);
+  void setStatusFilter(std::optional<int> status);
+  void setListStatusFilter(std::optional<int> status);
   void setTextFilter(const QString& text);
 
 protected:

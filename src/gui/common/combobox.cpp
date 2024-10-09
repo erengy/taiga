@@ -16,41 +16,32 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "combobox.hpp"
 
-#include <QWidget>
-
-#include "gui/common/combobox.hpp"
-
-namespace Ui {
-class SearchWidget;
-}
+#include <QKeyEvent>
+#include <QMouseEvent>
 
 namespace gui {
 
-class AnimeListModel;
-class AnimeListProxyModel;
-class ListViewCards;
-class MainWindow;
+ComboBox::ComboBox(QWidget* parent) : QComboBox(parent) {}
 
-class SearchWidget final : public QWidget {
-  Q_OBJECT
-  Q_DISABLE_COPY_MOVE(SearchWidget)
+void ComboBox::keyPressEvent(QKeyEvent* event) {
+  if (event->key() == Qt::Key::Key_Escape) {
+    this->setCurrentIndex(-1);
+    return;
+  }
 
-public:
-  SearchWidget(QWidget* parent, MainWindow* mainWindow);
-  ~SearchWidget() = default;
+  QComboBox::keyPressEvent(event);
+}
 
-private:
-  Ui::SearchWidget* ui_ = nullptr;
-  MainWindow* m_mainWindow = nullptr;
-  AnimeListModel* m_model = nullptr;
-  AnimeListProxyModel* m_proxyModel = nullptr;
-  ComboBox* m_comboYear = nullptr;
-  ComboBox* m_comboSeason = nullptr;
-  ComboBox* m_comboType = nullptr;
-  ComboBox* m_comboStatus = nullptr;
-  ListViewCards* m_listViewCards = nullptr;
-};
+void ComboBox::mousePressEvent(QMouseEvent* event) {
+  if (event->button() == Qt::MouseButton::MiddleButton ||
+      event->button() == Qt::MouseButton::RightButton) {
+    this->setCurrentIndex(-1);
+    return;
+  }
+
+  QComboBox::mousePressEvent(event);
+}
 
 }  // namespace gui

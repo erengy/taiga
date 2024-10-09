@@ -37,26 +37,31 @@ SearchWidget::SearchWidget(QWidget* parent, MainWindow* mainWindow)
       m_proxyModel(new AnimeListProxyModel(this)),
       m_listViewCards(new ListViewCards(this, m_model, m_proxyModel, mainWindow)),
       m_mainWindow(mainWindow),
+      m_comboYear(new ComboBox(this)),
+      m_comboSeason(new ComboBox(this)),
+      m_comboType(new ComboBox(this)),
+      m_comboStatus(new ComboBox(this)),
       ui_(new Ui::SearchWidget) {
   ui_->setupUi(this);
 
+  static const auto filterValue = [](QComboBox* combo, int index) {
+    return index > -1 ? std::optional<int>{combo->itemData(index).toInt()} : std::nullopt;
+  };
+
   // Year
   {
-    ui_->comboYear->clear();
-    ui_->comboYear->addItem(tr("Unknown"), 0);
-    ui_->comboYear->insertSeparator(1);
-    for (int year = 2023 + 1; year >= 1940; --year) {
-      ui_->comboYear->addItem(u"%1"_qs.arg(year), year);
+    m_comboYear->setPlaceholderText("Year");
+    for (int year = QDate::currentDate().year() + 1; year >= 1940; --year) {
+      m_comboYear->addItem(u"%1"_qs.arg(year), year);
     }
-    connect(ui_->comboYear, &QComboBox::currentIndexChanged, this, [this](int index) {
-      const int year = ui_->comboYear->itemData(index).toInt();
-      m_proxyModel->setYearFilter(year);
-    });
+    connect(m_comboYear, &QComboBox::currentIndexChanged, this,
+            [this](int index) { m_proxyModel->setYearFilter(filterValue(m_comboYear, index)); });
+    ui_->toolbarLayout->insertWidget(0, m_comboYear);
   }
 
   // Season
   {
-    ui_->comboSeason->clear();
+    m_comboSeason->setPlaceholderText("Season");
     const auto seasons = {
         anime::SeasonName::Winter,
         anime::SeasonName::Spring,
@@ -64,36 +69,35 @@ SearchWidget::SearchWidget(QWidget* parent, MainWindow* mainWindow)
         anime::SeasonName::Fall,
     };
     for (const auto season : seasons) {
-      ui_->comboSeason->addItem(formatSeasonName(season), static_cast<int>(season));
+      m_comboSeason->addItem(formatSeasonName(season), static_cast<int>(season));
     }
-    connect(ui_->comboSeason, &QComboBox::currentIndexChanged, this, [this](int index) {
-      const int season = ui_->comboSeason->itemData(index).toInt();
-      m_proxyModel->setSeasonFilter(season);
+    connect(m_comboSeason, &QComboBox::currentIndexChanged, this, [this](int index) {
+      m_proxyModel->setSeasonFilter(filterValue(m_comboSeason, index));
     });
+    ui_->toolbarLayout->insertWidget(1, m_comboSeason);
   }
 
   // Type
   {
-    ui_->comboType->clear();
+    m_comboType->setPlaceholderText("Type");
     for (const auto type : anime::kTypes) {
-      ui_->comboType->addItem(formatType(type), static_cast<int>(type));
+      m_comboType->addItem(formatType(type), static_cast<int>(type));
     }
-    connect(ui_->comboType, &QComboBox::currentIndexChanged, this, [this](int index) {
-      const int type = ui_->comboType->itemData(index).toInt();
-      m_proxyModel->setTypeFilter(type);
-    });
+    connect(m_comboType, &QComboBox::currentIndexChanged, this,
+            [this](int index) { m_proxyModel->setTypeFilter(filterValue(m_comboType, index)); });
+    ui_->toolbarLayout->insertWidget(2, m_comboType);
   }
 
   // Status
   {
-    ui_->comboStatus->clear();
+    m_comboStatus->setPlaceholderText("Status");
     for (const auto status : anime::kStatuses) {
-      ui_->comboStatus->addItem(formatStatus(status), static_cast<int>(status));
+      m_comboStatus->addItem(formatStatus(status), static_cast<int>(status));
     }
-    connect(ui_->comboStatus, &QComboBox::currentIndexChanged, this, [this](int index) {
-      const int status = ui_->comboStatus->itemData(index).toInt();
-      m_proxyModel->setStatusFilter(status);
+    connect(m_comboStatus, &QComboBox::currentIndexChanged, this, [this](int index) {
+      m_proxyModel->setStatusFilter(filterValue(m_comboStatus, index));
     });
+    ui_->toolbarLayout->insertWidget(3, m_comboStatus);
   }
 
   // Toolbar
@@ -108,8 +112,6 @@ SearchWidget::SearchWidget(QWidget* parent, MainWindow* mainWindow)
     toolbar->addAction(ui_->actionMore);
     ui_->toolbarLayout->addWidget(toolbar);
   }
-
-  ui_->editFilter->hide();
 
   // List
   ui_->verticalLayout->addWidget(m_listViewCards);

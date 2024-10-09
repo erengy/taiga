@@ -18,39 +18,21 @@
 
 #pragma once
 
-#include <QWidget>
-
-#include "gui/common/combobox.hpp"
-
-namespace Ui {
-class SearchWidget;
-}
+#include <QComboBox>
 
 namespace gui {
 
-class AnimeListModel;
-class AnimeListProxyModel;
-class ListViewCards;
-class MainWindow;
-
-class SearchWidget final : public QWidget {
+class ComboBox : public QComboBox {
   Q_OBJECT
-  Q_DISABLE_COPY_MOVE(SearchWidget)
+  Q_DISABLE_COPY_MOVE(ComboBox)
 
 public:
-  SearchWidget(QWidget* parent, MainWindow* mainWindow);
-  ~SearchWidget() = default;
+  ComboBox(QWidget* parent);
+  ~ComboBox() = default;
 
-private:
-  Ui::SearchWidget* ui_ = nullptr;
-  MainWindow* m_mainWindow = nullptr;
-  AnimeListModel* m_model = nullptr;
-  AnimeListProxyModel* m_proxyModel = nullptr;
-  ComboBox* m_comboYear = nullptr;
-  ComboBox* m_comboSeason = nullptr;
-  ComboBox* m_comboType = nullptr;
-  ComboBox* m_comboStatus = nullptr;
-  ListViewCards* m_listViewCards = nullptr;
+protected:
+  void keyPressEvent(QKeyEvent* event) override;
+  void mousePressEvent(QMouseEvent* event) override;
 };
 
 }  // namespace gui

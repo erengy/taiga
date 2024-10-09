@@ -47,32 +47,27 @@ AnimeListProxyModel::AnimeListProxyModel(QObject* parent) : QSortFilterProxyMode
   setSortRole(Qt::UserRole);
 }
 
-void AnimeListProxyModel::setYearFilter(int year) {
+void AnimeListProxyModel::setYearFilter(std::optional<int> year) {
   m_filter.year = year;
   invalidateRowsFilter();
 }
 
-void AnimeListProxyModel::setSeasonFilter(int season) {
+void AnimeListProxyModel::setSeasonFilter(std::optional<int> season) {
   m_filter.season = season;
   invalidateRowsFilter();
 }
 
-void AnimeListProxyModel::setTypeFilter(int type) {
+void AnimeListProxyModel::setTypeFilter(std::optional<int> type) {
   m_filter.type = type;
   invalidateRowsFilter();
 }
 
-void AnimeListProxyModel::setStatusFilter(int status) {
+void AnimeListProxyModel::setStatusFilter(std::optional<int> status) {
   m_filter.status = status;
   invalidateRowsFilter();
 }
 
-void AnimeListProxyModel::removeListStatusFilter() {
-  m_filter.listStatus.reset();
-  invalidateRowsFilter();
-}
-
-void AnimeListProxyModel::setListStatusFilter(int status) {
+void AnimeListProxyModel::setListStatusFilter(std::optional<int> status) {
   m_filter.listStatus = status;
   invalidateRowsFilter();
 }

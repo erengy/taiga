@@ -47,61 +47,17 @@
       <number>9</number>
      </property>
      <item>
-      <widget class="QComboBox" name="comboYear">
-       <property name="placeholderText">
-        <string>Year</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QComboBox" name="comboSeason">
-       <property name="placeholderText">
-        <string>Season</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QComboBox" name="comboType">
-       <property name="placeholderText">
-        <string>Type</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QComboBox" name="comboStatus">
-       <property name="placeholderText">
-        <string>Status</string>
-       </property>
-      </widget>
-     </item>
-     <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
         <enum>Qt::Orientation::Horizontal</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QLineEdit" name="editFilter">
-       <property name="minimumSize">
-        <size>
-         <width>160</width>
+         <width>0</width>
          <height>0</height>
         </size>
        </property>
-       <property name="placeholderText">
-        <string>Filter</string>
-       </property>
-       <property name="clearButtonEnabled">
-        <bool>true</bool>
-       </property>
-      </widget>
+      </spacer>
      </item>
     </layout>
    </item>

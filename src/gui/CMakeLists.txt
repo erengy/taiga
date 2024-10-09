@@ -6,6 +6,7 @@ target_sources(taiga-gui PRIVATE
 	common/anime_list_view.cpp
 	common/anime_list_view_base.cpp
 	common/anime_list_view_cards.cpp
+	common/combobox.cpp
 	list/list_widget.cpp
 	main/main_window.cpp
 	main/navigation_item_delegate.cpp
