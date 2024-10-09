@@ -62,11 +62,13 @@ bool MediaMenu::isNowPlaying() const {
 }
 
 void MediaMenu::addToList(const anime::list::Status status) const {
-  QMessageBox::information(nullptr, "TODO", u"Status: %1"_qs.arg(formatListStatus(status)));  // @TODO
+  QMessageBox::information(nullptr, "TODO",
+                           u"Status: %1"_qs.arg(formatListStatus(status)));  // @TODO
 }
 
 void MediaMenu::editStatus(const anime::list::Status status) const {
-  QMessageBox::information(nullptr, "TODO", u"Status: %1"_qs.arg(formatListStatus(status)));  // @TODO
+  QMessageBox::information(nullptr, "TODO",
+                           u"Status: %1"_qs.arg(formatListStatus(status)));  // @TODO
 }
 
 void MediaMenu::playEpisode(int number) const {
@@ -179,7 +181,10 @@ void MediaMenu::test() const {
 void MediaMenu::viewDetails() const {
   if (m_items.empty()) return;
 
-  MediaDialog::show(parentWidget(), m_items.front(), {});
+  const auto& anime = m_items.front();
+  const auto entry = getEntry(anime.id);
+
+  MediaDialog::show(parentWidget(), anime, entry ? std::optional<ListEntry>{*entry} : std::nullopt);
 }
 
 void MediaMenu::addMediaItems() {
@@ -301,9 +306,7 @@ void MediaMenu::addLibraryItems() {
   if (isBatch()) return;
 
   const auto& item = m_items.front();
-
-  const auto it = m_entries.find(item.id);
-  const auto entry = it != m_entries.end() ? &*it : nullptr;
+  const auto entry = getEntry(item.id);
 
   // Play
   addMenu([this, &item, entry]() {
@@ -359,6 +362,11 @@ void MediaMenu::addNowPlayingItems() {
   if (isBatch()) return;
 
   addAction(tr("Set as now playing..."), this, &MediaMenu::test);
+}
+
+const ListEntry* MediaMenu::getEntry(int id) const {
+  const auto it = m_entries.find(id);
+  return it != m_entries.end() ? &*it : nullptr;
 }
 
 }  // namespace gui

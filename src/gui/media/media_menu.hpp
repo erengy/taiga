@@ -62,6 +62,8 @@ private:
   bool isInList() const;
   bool isNowPlaying() const;
 
+  const ListEntry* getEntry(int id) const;
+
   const QList<Anime> m_items;
   const QMap<int, ListEntry> m_entries;
 };
