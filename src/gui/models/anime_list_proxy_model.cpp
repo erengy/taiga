@@ -18,6 +18,8 @@
 
 #include "anime_list_proxy_model.hpp"
 
+#include <ranges>
+
 #include "gui/models/anime_list_model.hpp"
 #include "media/anime.hpp"
 #include "media/anime_season.hpp"
@@ -89,25 +91,48 @@ bool AnimeListProxyModel::filterAcceptsRow(int row, const QModelIndex& parent) c
   const auto entry = getListEntry(index);
   if (!anime) return false;
 
+  static const auto contains = [](const std::string& str, const QStringView view) {
+    return QString::fromStdString(str).contains(view, Qt::CaseInsensitive);
+  };
+
+  // Year
   if (m_filter.year) {
     if (anime->start_date.year() != *m_filter.year) return false;
   }
+
+  // Season
   if (m_filter.season) {
     const anime::Season season{anime->start_date};
     if (static_cast<int>(season.name) != *m_filter.season) return false;
   }
+
+  // Type
   if (m_filter.type) {
     if (static_cast<int>(anime->type) != *m_filter.type) return false;
   }
+
+  // Status
   if (m_filter.status) {
     if (static_cast<int>(anime->status) != *m_filter.status) return false;
   }
+
+  // List status
   if (m_filter.listStatus.has_value()) {
     const auto status = static_cast<int>(entry ? entry->status : anime::list::Status::NotInList);
     if (status != m_filter.listStatus.value()) return false;
   }
+
+  // Titles
   if (!m_filter.text.isEmpty()) {
-    if (!anime->titles.romaji.contains(m_filter.text.toStdString())) return false;
+    if (!contains(anime->titles.romaji, m_filter.text) &&
+        !contains(anime->titles.english, m_filter.text) &&
+        !contains(anime->titles.japanese, m_filter.text)) {
+      if (!std::ranges::any_of(anime->titles.synonyms, [this](const std::string& synonym) {
+            return contains(synonym, m_filter.text);
+          })) {
+        return false;
+      }
+    }
   }
 
   return QSortFilterProxyModel::filterAcceptsRow(row, parent);
@@ -124,29 +149,39 @@ bool AnimeListProxyModel::lessThan(const QModelIndex& lhs, const QModelIndex& rh
   switch (lhs.column()) {
     case AnimeListModel::COLUMN_TITLE:
       return lhs_anime->titles.romaji < rhs_anime->titles.romaji;
+
     case AnimeListModel::COLUMN_AVERAGE:
       return lhs_anime->score < rhs_anime->score;
+
     case AnimeListModel::COLUMN_TYPE:
       return lhs_anime->type < rhs_anime->type;
+
     case AnimeListModel::COLUMN_PROGRESS:
       return (lhs_entry ? lhs_entry->watched_episodes : 0) <
              (rhs_entry ? rhs_entry->watched_episodes : 0);
+
     case AnimeListModel::COLUMN_REWATCHES:
       return (lhs_entry ? lhs_entry->rewatched_times : 0) <
              (rhs_entry ? rhs_entry->rewatched_times : 0);
+
     case AnimeListModel::COLUMN_SCORE:
       return (lhs_entry ? lhs_entry->score : 0) < (rhs_entry ? rhs_entry->score : 0);
+
     case AnimeListModel::COLUMN_SEASON:
       return lhs_anime->start_date < rhs_anime->start_date;
+
     case AnimeListModel::COLUMN_STARTED:
       return (lhs_entry ? lhs_entry->date_start : FuzzyDate{}) <
              (rhs_entry ? rhs_entry->date_start : FuzzyDate{});
+
     case AnimeListModel::COLUMN_COMPLETED:
       return (lhs_entry ? lhs_entry->date_finish : FuzzyDate{}) <
              (rhs_entry ? rhs_entry->date_finish : FuzzyDate{});
+
     case AnimeListModel::COLUMN_LAST_UPDATED:
       return (lhs_entry ? lhs_entry->last_updated : "") <
              (rhs_entry ? rhs_entry->last_updated : "");
+
     case AnimeListModel::COLUMN_NOTES:
       return (lhs_entry ? lhs_entry->notes : "") < (rhs_entry ? rhs_entry->notes : "");
   }
