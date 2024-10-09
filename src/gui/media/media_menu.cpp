@@ -22,6 +22,7 @@
 #include <QMessageBox>
 #include <QUrl>
 #include <QUrlQuery>
+#include <ranges>
 
 #include "gui/media/media_dialog.hpp"
 #include "gui/utils/format.hpp"
@@ -165,6 +166,14 @@ void MediaMenu::searchYouTube() const {
   }
 }
 
+void MediaMenu::openYouTubeTrailer() const {
+  for (const auto& item : m_items) {
+    if (item.trailer_id.empty()) continue;
+    QUrl url{u"https://youtu.be/%1"_qs.arg(QString::fromStdString(item.trailer_id))};
+    QDesktopServices::openUrl(url);
+  }
+}
+
 void MediaMenu::test() const {
   const auto action = reinterpret_cast<QAction*>(QObject::sender())->text();
 
@@ -198,7 +207,14 @@ void MediaMenu::addMediaItems() {
     menu->setIcon(theme.getIcon("open_in_new"));
 
     menu->addAction(tr("AniList page"), this, &MediaMenu::test);
-    menu->addAction(tr("YouTube trailer"), this, &MediaMenu::test);
+
+    {
+      const auto action =
+          menu->addAction(tr("YouTube trailer"), this, &MediaMenu::openYouTubeTrailer);
+      const bool hasTrailer = std::ranges::any_of(
+          m_items, [](const Anime& anime) { return !anime.trailer_id.empty(); });
+      if (!hasTrailer) action->setEnabled(false);
+    }
 
     return menu;
   }());
