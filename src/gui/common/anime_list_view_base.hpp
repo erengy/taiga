@@ -37,7 +37,7 @@ public:
                AnimeListProxyModel* proxyModel, MainWindow* mainWindow);
   ~ListViewBase() = default;
 
-private slots:
+public slots:
   void filterByListStatus(QTreeWidgetItem* current);
   void filterByText(const QString& text);
   void showMediaDialog(const QModelIndex& index);

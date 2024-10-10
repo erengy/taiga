@@ -36,6 +36,9 @@ public:
                 MainWindow* mainWindow);
   ~ListViewCards() = default;
 
+protected:
+  void keyPressEvent(QKeyEvent* event) override;
+
 private:
   ListViewBase* m_base = nullptr;
 };

@@ -18,6 +18,8 @@
 
 #include "anime_list_view_cards.hpp"
 
+#include <QKeyEvent>
+
 #include "gui/common/anime_list_item_delegate_cards.hpp"
 #include "gui/common/anime_list_view_base.hpp"
 #include "gui/main/main_window.hpp"
@@ -38,6 +40,18 @@ ListViewCards::ListViewCards(QWidget* parent, AnimeListModel* model,
   setSpacing(16);
   setUniformItemSizes(true);
   setWordWrap(true);
+}
+
+void ListViewCards::keyPressEvent(QKeyEvent* event) {
+  if (event->key() == Qt::Key::Key_Return || event->key() == Qt::Key::Key_Enter) {
+    const auto indexes = selectionModel()->selectedIndexes();
+    for (const auto& index : indexes) {
+      m_base->showMediaDialog(index);
+    }
+    return;
+  }
+
+  QListView::keyPressEvent(event);
 }
 
 }  // namespace gui

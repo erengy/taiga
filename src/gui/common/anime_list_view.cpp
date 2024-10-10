@@ -19,6 +19,7 @@
 #include "anime_list_view.hpp"
 
 #include <QHeaderView>
+#include <QKeyEvent>
 
 #include "gui/common/anime_list_item_delegate.hpp"
 #include "gui/common/anime_list_view_base.hpp"
@@ -66,6 +67,18 @@ ListView::ListView(QWidget* parent, AnimeListModel* model, AnimeListProxyModel* 
 
   connect(this, &QAbstractItemView::clicked, this,
           qOverload<const QModelIndex&>(&QAbstractItemView::edit));
+}
+
+void ListView::keyPressEvent(QKeyEvent* event) {
+  if (event->key() == Qt::Key::Key_Return || event->key() == Qt::Key::Key_Enter) {
+    const auto indexes = selectionModel()->selectedRows();
+    for (const auto& index : indexes) {
+      m_base->showMediaDialog(index);
+    }
+    return;
+  }
+
+  QTreeView::keyPressEvent(event);
 }
 
 }  // namespace gui
