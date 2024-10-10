@@ -18,6 +18,7 @@
 
 #include "list_widget.hpp"
 
+#include <QActionGroup>
 #include <QListView>
 #include <QMenu>
 #include <QToolBar>
@@ -86,6 +87,7 @@ ListWidget::ListWidget(QWidget* parent, MainWindow* mainWindow)
         using Qt::SortOrder::AscendingOrder;
         using Qt::SortOrder::DescendingOrder;
         auto menu = new QMenu(this);
+        auto actionGroup = new QActionGroup(this);
         static const QList<QPair<AnimeListModel::Column, Qt::SortOrder>> sortMenuItems = {
             {AnimeListModel::COLUMN_TITLE, AscendingOrder},
             {AnimeListModel::COLUMN_PROGRESS, DescendingOrder},
@@ -103,8 +105,12 @@ ListWidget::ListWidget(QWidget* parent, MainWindow* mainWindow)
         for (const auto& [column, order] : sortMenuItems) {
           const auto headerData =
               m_model->headerData(column, Qt::Orientation::Horizontal, Qt::DisplayRole);
-          menu->addAction(headerData.toString(), this,
-                          [this, column, order]() { m_listView->sortByColumn(column, order); });
+          const auto action = menu->addAction(headerData.toString(), this, [this, column, order]() {
+            m_listView->sortByColumn(column, order);
+          });
+          action->setCheckable(true);
+          action->setChecked(column == m_proxyModel->sortColumn());
+          actionGroup->addAction(action);
         }
         return menu;
       }());
@@ -115,8 +121,17 @@ ListWidget::ListWidget(QWidget* parent, MainWindow* mainWindow)
       button->setPopupMode(QToolButton::InstantPopup);
       button->setMenu([this]() {
         auto menu = new QMenu(this);
-        menu->addAction("List", this, [this]() { setViewMode(ListViewMode::List); });
-        menu->addAction("Cards", this, [this]() { setViewMode(ListViewMode::Cards); });
+        auto actionGroup = new QActionGroup(this);
+        static const QList<QPair<QString, ListViewMode>> viewMenuItems = {
+            {"List", ListViewMode::List},
+            {"Cards", ListViewMode::Cards},
+        };
+        for (const auto& [text, mode] : viewMenuItems) {
+          const auto action = menu->addAction(text, this, [this, mode]() { setViewMode(mode); });
+          action->setCheckable(true);
+          action->setChecked(mode == m_viewMode);
+          actionGroup->addAction(action);
+        }
         return menu;
       }());
     }
