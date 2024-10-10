@@ -18,9 +18,11 @@
 
 #include "anime_list_model.hpp"
 
+#include <QApplication>
 #include <QColor>
 #include <QDateTime>
 #include <QFont>
+#include <QPalette>
 #include <QSize>
 
 #include "gui/utils/format.hpp"
@@ -130,6 +132,38 @@ QVariant AnimeListModel::data(const QModelIndex& index, int role) const {
           return QVariant(Qt::AlignRight | Qt::AlignVCenter);
         default:
           return {};
+      }
+      break;
+    }
+
+    case Qt::ForegroundRole: {
+      const auto disabledTextColor =
+          qApp->palette().color(QPalette::ColorGroup::Disabled, QPalette::ColorRole::Text);
+      switch (index.column()) {
+        case COLUMN_AVERAGE:
+          if (!anime->score) return disabledTextColor;
+          break;
+        case COLUMN_SEASON:
+          if (!anime->start_date) return disabledTextColor;
+          break;
+        case COLUMN_TYPE:
+          if (anime->type == anime::Type::Unknown) return disabledTextColor;
+          break;
+        case COLUMN_SCORE:
+          if (entry && !entry->score) return disabledTextColor;
+          break;
+        case COLUMN_STARTED:
+          if (entry && !entry->date_start) return disabledTextColor;
+          break;
+        case COLUMN_COMPLETED:
+          if (entry && !entry->date_finish) return disabledTextColor;
+          break;
+        case COLUMN_LAST_UPDATED:
+          if (entry) {
+            const auto time = QString::fromStdString(entry->last_updated).toLongLong();
+            if (!time) return disabledTextColor;
+          }
+          break;
       }
       break;
     }
