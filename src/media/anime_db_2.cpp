@@ -151,7 +151,7 @@ QList<ListEntry> readListEntries() {
       } else if (xml.name() == u"notes") {
         entry.notes = xml.readElementText().toStdString();
       } else if (xml.name() == u"last_updated") {
-        entry.last_updated = xml.readElementText().toStdString();
+        entry.last_updated = xml.readElementText().toLongLong();
       } else {
         xml.skipCurrentElement();
       }

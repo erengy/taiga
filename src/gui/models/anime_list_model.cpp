@@ -88,10 +88,7 @@ QVariant AnimeListModel::data(const QModelIndex& index, int role) const {
           if (entry) return formatFuzzyDate(entry->date_finish);
           break;
         case COLUMN_LAST_UPDATED:
-          if (entry) {
-            const auto time = QString::fromStdString(entry->last_updated).toLongLong();
-            return formatAsRelativeTime(time);
-          }
+          if (entry) return formatAsRelativeTime(entry->last_updated);
           break;
         case COLUMN_NOTES:
           if (entry) return QString::fromStdString(entry->notes);
@@ -106,10 +103,7 @@ QVariant AnimeListModel::data(const QModelIndex& index, int role) const {
         case COLUMN_SEASON:
           return formatFuzzyDate(anime->start_date);
         case COLUMN_LAST_UPDATED:
-          if (entry) {
-            const auto time = QString::fromStdString(entry->last_updated).toLongLong();
-            return formatTimestamp(time);
-          }
+          if (entry) return formatTimestamp(entry->last_updated);
           break;
         case COLUMN_NOTES:
           if (entry) return QString::fromStdString(entry->notes);
@@ -159,10 +153,7 @@ QVariant AnimeListModel::data(const QModelIndex& index, int role) const {
           if (entry && !entry->date_finish) return disabledTextColor;
           break;
         case COLUMN_LAST_UPDATED:
-          if (entry) {
-            const auto time = QString::fromStdString(entry->last_updated).toLongLong();
-            if (!time) return disabledTextColor;
-          }
+          if (entry) if (!entry->last_updated) return disabledTextColor;
           break;
       }
       break;

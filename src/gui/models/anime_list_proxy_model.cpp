@@ -174,8 +174,7 @@ bool AnimeListProxyModel::lessThan(const QModelIndex& lhs, const QModelIndex& rh
              (rhs_entry ? rhs_entry->date_finish : FuzzyDate{});
 
     case AnimeListModel::COLUMN_LAST_UPDATED:
-      return (lhs_entry ? lhs_entry->last_updated : "") <
-             (rhs_entry ? rhs_entry->last_updated : "");
+      return (lhs_entry ? lhs_entry->last_updated : 0) < (rhs_entry ? rhs_entry->last_updated : 0);
 
     case AnimeListModel::COLUMN_NOTES:
       return (lhs_entry ? lhs_entry->notes : "") < (rhs_entry ? rhs_entry->notes : "");
