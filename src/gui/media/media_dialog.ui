@@ -193,6 +193,11 @@
              </item>
              <item>
               <widget class="QLabel" name="synopsisHeader">
+               <property name="font">
+                <font>
+                 <fontweight>DemiBold</fontweight>
+                </font>
+               </property>
                <property name="text">
                 <string>Synopsis:</string>
                </property>

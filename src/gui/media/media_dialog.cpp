@@ -163,7 +163,6 @@ void MediaDialog::initDetails() {
 
   const auto synopsis = QString::fromStdString(m_anime.synopsis);
 
-  ui_->synopsisHeader->setStyleSheet("font-weight: 600;");
   ui_->synopsisHeader->setHidden(synopsis.isEmpty());
 
   ui_->synopsis->document()->setDocumentMargin(0);
