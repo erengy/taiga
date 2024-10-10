@@ -25,12 +25,12 @@ QTreeWidget#navigation::item:selected:!active {
 
 /* List */
 
-QMainWindow QStackedWidget QListView,
-QMainWindow QStackedWidget QTreeView {
+QMainWindow > QWidget > QSplitter > QStackedWidget QListView,
+QMainWindow > QWidget > QSplitter > QStackedWidget QTreeView {
   border-top-color: rgba(255, 255, 255, 16%);
 }
 
-QMainWindow QStackedWidget QAbstractScrollArea {
+QMainWindow > QWidget > QSplitter > QStackedWidget QAbstractScrollArea {
   background-color: #1c1c1c;
 }
 

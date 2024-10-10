@@ -77,7 +77,7 @@ void ListViewBase::showMediaDialog(const QModelIndex& index) {
   const auto anime = m_model->getAnime(mappedIndex);
   if (!anime) return;
   const auto entry = m_model->getListEntry(mappedIndex);
-  MediaDialog::show(m_view, *anime, entry ? std::optional<ListEntry>{*entry} : std::nullopt);
+  MediaDialog::show(m_mainWindow, *anime, entry ? std::optional<ListEntry>{*entry} : std::nullopt);
 }
 
 void ListViewBase::showMediaMenu() {
