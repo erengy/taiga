@@ -28,6 +28,10 @@
 
 namespace gui {
 
+QString formatEpisodeLength(const int minutes) {
+  return minutes > 0 ? u"%1m"_qs.arg(minutes) : "-";
+}
+
 QString formatScore(const double value) {
   return u"%1%2"_qs.arg(value * 10.0).arg('%');
 }

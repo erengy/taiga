@@ -48,6 +48,7 @@ ListView::ListView(QWidget* parent, AnimeListModel* model, AnimeListProxyModel* 
   header()->setFirstSectionMovable(true);
   header()->setStretchLastSection(false);
   header()->setTextElideMode(Qt::ElideRight);
+  header()->hideSection(AnimeListModel::COLUMN_DURATION);
   header()->hideSection(AnimeListModel::COLUMN_REWATCHES);
   header()->hideSection(AnimeListModel::COLUMN_AVERAGE);
   header()->hideSection(AnimeListModel::COLUMN_STARTED);
@@ -55,6 +56,7 @@ ListView::ListView(QWidget* parent, AnimeListModel* model, AnimeListProxyModel* 
   header()->hideSection(AnimeListModel::COLUMN_NOTES);
   header()->resizeSection(AnimeListModel::COLUMN_TITLE, 300);
   header()->resizeSection(AnimeListModel::COLUMN_PROGRESS, 150);
+  header()->resizeSection(AnimeListModel::COLUMN_DURATION, 75);
   header()->resizeSection(AnimeListModel::COLUMN_SCORE, 75);
   header()->resizeSection(AnimeListModel::COLUMN_AVERAGE, 75);
   header()->resizeSection(AnimeListModel::COLUMN_TYPE, 75);
