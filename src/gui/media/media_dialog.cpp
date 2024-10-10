@@ -121,16 +121,22 @@ void MediaDialog::initDetails() {
 
   auto seasonLabel = new QLabel(formatSeason(anime::Season(m_anime.start_date)), this);
   seasonLabel->setCursor(QCursor(Qt::CursorShape::WhatsThisCursor));
-  seasonLabel->setToolTip(
-      u"%1 to %2"_qs.arg(formatFuzzyDate(m_anime.start_date)).arg(formatFuzzyDate(m_anime.end_date)));
+  seasonLabel->setToolTip(u"%1 to %2"_qs.arg(formatFuzzyDate(m_anime.start_date))
+                              .arg(formatFuzzyDate(m_anime.end_date)));
 
-  if (!m_anime.titles.synonyms.empty()) {
-    ui_->infoLayout->addRow(get_row_title(tr("Synonyms:")),
-                            get_row_label(from_vector(m_anime.titles.synonyms)));
+  {
+    std::vector<std::string> titles;
+    if (!m_anime.titles.english.empty()) titles.push_back(m_anime.titles.english);
+    if (!m_anime.titles.japanese.empty()) titles.push_back(m_anime.titles.japanese);
+    if (!m_anime.titles.synonyms.empty()) titles.append_range(m_anime.titles.synonyms);
+    if (!titles.empty()) {
+      ui_->infoLayout->addRow(get_row_title(tr("Titles:")), get_row_label(from_vector(titles)));
+    }
   }
   ui_->infoLayout->addRow(get_row_title(tr("Type:")), get_row_label(formatType(m_anime.type)));
   ui_->infoLayout->addRow(get_row_title(tr("Episodes:")), episodesLabel);
-  ui_->infoLayout->addRow(get_row_title(tr("Status:")), get_row_label(formatStatus(m_anime.status)));
+  ui_->infoLayout->addRow(get_row_title(tr("Status:")),
+                          get_row_label(formatStatus(m_anime.status)));
   ui_->infoLayout->addRow(get_row_title(tr("Season:")), seasonLabel);
   ui_->infoLayout->addRow(get_row_title(tr("Score:")), get_row_label(formatScore(m_anime.score)));
   if (!m_anime.genres.empty()) {
