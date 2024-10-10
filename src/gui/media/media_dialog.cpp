@@ -38,8 +38,6 @@ MediaDialog::MediaDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::MediaDi
   enableMicaBackground(this);
 #endif
 
-  ui_->titleLabel->setStyleSheet("font-size: 20px; font-weight: 600;");
-
   connect(&imageProvider, &ImageProvider::posterChanged, this, [this](int id) {
     if (id == m_anime.id) loadPosterImage();
   });
@@ -73,9 +71,19 @@ void MediaDialog::setAnime(const Anime& anime, const std::optional<ListEntry> en
   m_anime = anime;
   m_entry = entry;
 
-  const auto title = QString::fromStdString(m_anime.titles.romaji);
-  setWindowTitle(title);
-  ui_->titleLabel->setText(title);
+  const auto mainTitle = QString::fromStdString(m_anime.titles.romaji);
+  setWindowTitle(mainTitle);
+  ui_->titleLabel->setText(mainTitle);
+
+  QList<QString> altTitles;
+  static const auto addTitle = [&mainTitle, &altTitles](const QString& title) {
+    if (title.isEmpty() || title == mainTitle) return;
+    altTitles.push_back(title);
+  };
+  addTitle(QString::fromStdString(m_anime.titles.english));
+  addTitle(QString::fromStdString(m_anime.titles.japanese));
+  if (!altTitles.isEmpty()) ui_->altTitlesLabel->setText(altTitles.join(", "));
+  ui_->altTitlesLabel->setHidden(altTitles.isEmpty());
 
   loadPosterImage();
   initDetails();
@@ -124,14 +132,9 @@ void MediaDialog::initDetails() {
   seasonLabel->setToolTip(u"%1 to %2"_qs.arg(formatFuzzyDate(m_anime.start_date))
                               .arg(formatFuzzyDate(m_anime.end_date)));
 
-  {
-    std::vector<std::string> titles;
-    if (!m_anime.titles.english.empty()) titles.push_back(m_anime.titles.english);
-    if (!m_anime.titles.japanese.empty()) titles.push_back(m_anime.titles.japanese);
-    if (!m_anime.titles.synonyms.empty()) titles.append_range(m_anime.titles.synonyms);
-    if (!titles.empty()) {
-      ui_->infoLayout->addRow(get_row_title(tr("Titles:")), get_row_label(from_vector(titles)));
-    }
+  if (!m_anime.titles.synonyms.empty()) {
+    ui_->infoLayout->addRow(get_row_title(tr("Titles:")),
+                            get_row_label(from_vector(m_anime.titles.synonyms)));
   }
   ui_->infoLayout->addRow(get_row_title(tr("Type:")), get_row_label(formatType(m_anime.type)));
   ui_->infoLayout->addRow(get_row_title(tr("Episodes:")), episodesLabel);
