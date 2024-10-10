@@ -40,6 +40,8 @@ MediaDialog::MediaDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::MediaDi
 
   ui_->splitter->setSizes({ui_->posterLabel->minimumWidth(), ui_->posterLabel->minimumWidth() * 4});
 
+  ui_->verticalLayoutRewatching->setAlignment(Qt::AlignBottom);
+
   connect(&imageProvider, &ImageProvider::posterChanged, this, [this](int id) {
     if (id == m_anime.id) loadPosterImage();
   });
