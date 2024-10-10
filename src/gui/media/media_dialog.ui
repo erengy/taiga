@@ -104,6 +104,9 @@
            <fontweight>DemiBold</fontweight>
           </font>
          </property>
+         <property name="contextMenuPolicy">
+          <enum>Qt::ContextMenuPolicy::NoContextMenu</enum>
+         </property>
          <property name="text">
           <string>Title</string>
          </property>
@@ -119,6 +122,9 @@
         <widget class="QLabel" name="altTitlesLabel">
          <property name="enabled">
           <bool>false</bool>
+         </property>
+         <property name="contextMenuPolicy">
+          <enum>Qt::ContextMenuPolicy::NoContextMenu</enum>
          </property>
          <property name="text">
           <string>Alternative titles</string>
