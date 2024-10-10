@@ -52,17 +52,17 @@ QTreeView#animeList QHeaderView {
 QTreeView#animeList QHeaderView::section {
   font-weight: 600;
   height: 32px;
-}
-QTreeView#animeList QHeaderView::section:first {
   padding-left: 12px;
+  padding-right: 12px;
 }
 
 QTreeView#animeList {
   selection-background-color: transparent;
 }
 
-QTreeView#animeList::item:first {
+QTreeView#animeList::item {
   padding-left: 8px;
+  padding-right: 8px;
 }
 
 /* Now Playing */
