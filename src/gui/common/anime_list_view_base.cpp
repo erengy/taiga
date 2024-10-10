@@ -97,7 +97,7 @@ void ListViewBase::showMediaMenu() {
     }
   }
 
-  auto* menu = new MediaMenu(m_view, items, entries);
+  auto* menu = new MediaMenu(m_view, items, entries, m_view->selectionModel());
   menu->popup();
 }
 

@@ -19,6 +19,7 @@
 #include "media_menu.hpp"
 
 #include <QDesktopServices>
+#include <QItemSelectionModel>
 #include <QMessageBox>
 #include <QUrl>
 #include <QUrlQuery>
@@ -31,8 +32,9 @@
 
 namespace gui {
 
-MediaMenu::MediaMenu(QWidget* parent, const QList<Anime>& items, const QMap<int, ListEntry> entries)
-    : QMenu(parent), m_items(items), m_entries(entries) {
+MediaMenu::MediaMenu(QWidget* parent, const QList<Anime>& items, const QMap<int, ListEntry> entries,
+                     QItemSelectionModel* selectionModel)
+    : QMenu(parent), m_items(items), m_entries(entries), m_selectionModel(selectionModel) {
   setAttribute(Qt::WA_DeleteOnClose);
 }
 
@@ -45,7 +47,7 @@ void MediaMenu::popup() {
   addSeparator();
   addLibraryItems();
   addSeparator();
-  addNowPlayingItems();
+  addMetaItems();
 
   QMenu::popup(QCursor::pos());
 }
@@ -373,11 +375,19 @@ void MediaMenu::addLibraryItems() {
   }());
 }
 
-void MediaMenu::addNowPlayingItems() {
-  if (!isNowPlaying()) return;
-  if (isBatch()) return;
+void MediaMenu::addMetaItems() {
+  if (isBatch() && m_selectionModel) {
+    addAction(tr("Invert selection"), this, [this]() {
+      for (int row = 0; row < m_selectionModel->model()->rowCount(); ++row) {
+        const auto index = m_selectionModel->model()->index(row, 0);
+        m_selectionModel->select(index, QItemSelectionModel::Toggle);
+      }
+    });
+  }
 
-  addAction(tr("Set as now playing..."), this, &MediaMenu::test);
+  if (isNowPlaying() && !isBatch()) {
+    addAction(tr("Set as now playing..."), this, &MediaMenu::test);
+  }
 }
 
 const ListEntry* MediaMenu::getEntry(int id) const {

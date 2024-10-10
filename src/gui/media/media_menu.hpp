@@ -24,6 +24,8 @@
 
 #include "media/anime.hpp"
 
+class QItemSelectionModel;
+
 namespace gui {
 
 class MediaMenu final : public QMenu {
@@ -31,7 +33,8 @@ class MediaMenu final : public QMenu {
   Q_DISABLE_COPY_MOVE(MediaMenu)
 
 public:
-  MediaMenu(QWidget* parent, const QList<Anime>& items, const QMap<int, ListEntry> entries);
+  MediaMenu(QWidget* parent, const QList<Anime>& items, const QMap<int, ListEntry> entries,
+            QItemSelectionModel* selectionModel);
   ~MediaMenu() = default;
 
   void popup();
@@ -57,7 +60,7 @@ private:
   void addMediaItems();
   void addListItems();
   void addLibraryItems();
-  void addNowPlayingItems();
+  void addMetaItems();
 
   bool isBatch() const;
   bool isInList() const;
@@ -67,6 +70,7 @@ private:
 
   const QList<Anime> m_items;
   const QMap<int, ListEntry> m_entries;
+  QItemSelectionModel* m_selectionModel = nullptr;
 };
 
 }  // namespace gui
