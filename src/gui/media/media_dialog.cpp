@@ -38,6 +38,8 @@ MediaDialog::MediaDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::MediaDi
   enableMicaBackground(this);
 #endif
 
+  ui_->splitter->setSizes({ui_->posterLabel->minimumWidth(), ui_->posterLabel->minimumWidth() * 4});
+
   connect(&imageProvider, &ImageProvider::posterChanged, this, [this](int id) {
     if (id == m_anime.id) loadPosterImage();
   });
