@@ -229,6 +229,12 @@
                </property>
                <item>
                 <widget class="QLabel" name="labelProgress">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
                  <property name="text">
                   <string>Episodes watched:</string>
                  </property>
@@ -246,6 +252,12 @@
                </property>
                <item>
                 <widget class="QLabel" name="labelRewatches">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
                  <property name="text">
                   <string>Times rewatched:</string>
                  </property>
@@ -263,6 +275,12 @@
                </property>
                <item>
                 <widget class="QLabel" name="labelStatus">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
                  <property name="text">
                   <string>Status:</string>
                  </property>
@@ -280,6 +298,12 @@
                </property>
                <item>
                 <widget class="QLabel" name="labelScore">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
                  <property name="text">
                   <string>Score:</string>
                  </property>
@@ -297,6 +321,12 @@
                </property>
                <item>
                 <widget class="QLabel" name="labelDateStarted">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
                  <property name="text">
                   <string>Date started:</string>
                  </property>
@@ -352,6 +382,12 @@
                </property>
                <item>
                 <widget class="QLabel" name="labelDateCompleted">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
                  <property name="text">
                   <string>Date completed:</string>
                  </property>
@@ -400,8 +436,11 @@
                </item>
                <item>
                 <widget class="QPlainTextEdit" name="plainTextEditNotes">
-                 <property name="sizeAdjustPolicy">
-                  <enum>QAbstractScrollArea::SizeAdjustPolicy::AdjustToContents</enum>
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Expanding">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
                  </property>
                  <property name="tabChangesFocus">
                   <bool>true</bool>
@@ -411,19 +450,6 @@
               </layout>
              </item>
             </layout>
-           </item>
-           <item>
-            <spacer name="verticalSpacer">
-             <property name="orientation">
-              <enum>Qt::Orientation::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>40</height>
-              </size>
-             </property>
-            </spacer>
            </item>
           </layout>
          </widget>
