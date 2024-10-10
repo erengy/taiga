@@ -322,6 +322,9 @@
                    <property name="enabled">
                     <bool>false</bool>
                    </property>
+                   <property name="calendarPopup">
+                    <bool>true</bool>
+                   </property>
                   </widget>
                  </item>
                 </layout>
@@ -389,6 +392,9 @@
                   <widget class="QDateEdit" name="dateCompleted">
                    <property name="enabled">
                     <bool>false</bool>
+                   </property>
+                   <property name="calendarPopup">
+                    <bool>true</bool>
                    </property>
                   </widget>
                  </item>
