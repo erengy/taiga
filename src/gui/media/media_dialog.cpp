@@ -108,6 +108,7 @@ void MediaDialog::initDetails() {
 
   const auto get_row_label = [this](const QString& text) {
     auto* label = new QLabel(text, this);
+    label->setTextInteractionFlags(Qt::TextInteractionFlag::TextSelectableByMouse);
     label->setOpenExternalLinks(true);
     label->setWordWrap(true);
     return label;
