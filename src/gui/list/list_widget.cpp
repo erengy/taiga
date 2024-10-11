@@ -37,8 +37,6 @@ ListWidget::ListWidget(QWidget* parent, MainWindow* mainWindow)
     : QWidget(parent),
       m_model(new AnimeListModel(this)),
       m_proxyModel(new AnimeListProxyModel(this)),
-      m_listView(new ListView(this, m_model, m_proxyModel, mainWindow)),
-      m_listViewCards(new ListViewCards(this, m_model, m_proxyModel, mainWindow)),
       m_mainWindow(mainWindow),
       ui_(new Ui::ListWidget) {
   ui_->setupUi(this);
@@ -147,20 +145,27 @@ ListViewMode ListWidget::viewMode() const {
 }
 
 void ListWidget::setViewMode(ListViewMode mode) {
+  if (m_listView) {
+    ui_->verticalLayout->removeWidget(m_listView);
+    m_listView->deleteLater();
+    m_listView = nullptr;
+  };
+  if (m_listViewCards) {
+    ui_->verticalLayout->removeWidget(m_listViewCards);
+    m_listViewCards->deleteLater();
+    m_listViewCards = nullptr;
+  };
+
   m_viewMode = mode;
-
-  m_listView->hide();
-  m_listViewCards->hide();
-
-  ui_->verticalLayout->removeWidget(m_listView);
-  ui_->verticalLayout->removeWidget(m_listViewCards);
 
   switch (mode) {
     case ListViewMode::List:
+      m_listView = new ListView(this, m_model, m_proxyModel, m_mainWindow);
       ui_->verticalLayout->addWidget(m_listView);
       m_listView->show();
       break;
     case ListViewMode::Cards:
+      m_listViewCards = new ListViewCards(this, m_model, m_proxyModel, m_mainWindow);
       ui_->verticalLayout->addWidget(m_listViewCards);
       m_listViewCards->show();
       break;
