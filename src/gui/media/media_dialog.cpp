@@ -72,6 +72,14 @@ MediaDialog::MediaDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::MediaDi
     }
   });
 
+  connect(ui_->comboStatus, &QComboBox::currentIndexChanged, this, [this](int index) {
+    const int status = ui_->comboStatus->itemData(index).toInt();
+    if (status != static_cast<int>(anime::list::Status::Completed)) return;
+    if (m_entry->status == anime::list::Status::Completed) return;
+    if (m_anime.episode_count < 1) return;
+    ui_->spinProgress->setValue(m_anime.episode_count);
+  });
+
   connect(ui_->checkDateStarted, &QCheckBox::stateChanged, this,
           [this](int state) { ui_->dateStarted->setEnabled(state == Qt::CheckState::Checked); });
   connect(ui_->checkDateCompleted, &QCheckBox::stateChanged, this,
