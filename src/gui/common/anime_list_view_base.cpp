@@ -31,6 +31,7 @@
 #include "gui/media/media_menu.hpp"
 #include "gui/models/anime_list_model.hpp"
 #include "gui/models/anime_list_proxy_model.hpp"
+#include "gui/utils/format.hpp"
 #include "media/anime.hpp"
 
 namespace gui {
@@ -113,8 +114,31 @@ void ListViewBase::updateSelectionStatus(const QItemSelection& selected,
     m_mainWindow->nowPlaying()->hide();
   }
 
-  if (const auto n = selectedIndexes().size()) {
-    m_mainWindow->statusBar()->showMessage(tr("%n item(s) selected", nullptr, n));
+  if (const auto n_selected = selectedIndexes().size()) {
+    int n_episodes = 0;
+    int n_score = 0;
+    double total_score = 0.0;
+    double average_score = 0.0;
+
+    for (const auto index : selectedIndexes()) {
+      const auto anime = m_model->getAnime(m_proxyModel->mapToSource(index));
+      if (!anime) continue;
+      if (anime->episode_count > 0) n_episodes += anime->episode_count;
+      if (anime->score) {
+        ++n_score;
+        total_score += anime->score;
+      }
+    }
+
+    if (n_score) average_score = total_score / n_score;
+
+    const QStringList parts{
+        tr("%n item(s) selected", nullptr, n_selected),
+        tr("%n episode(s)", nullptr, n_episodes),
+        tr("%1 average").arg(formatScore(average_score)),
+    };
+
+    m_mainWindow->statusBar()->showMessage(parts.join(" · "));
   } else {
     m_mainWindow->statusBar()->clearMessage();
   }

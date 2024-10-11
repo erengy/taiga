@@ -33,7 +33,7 @@ QString formatEpisodeLength(const int minutes) {
 }
 
 QString formatScore(const double value) {
-  return u"%1%2"_qs.arg(value * 10.0).arg('%');
+  return u"%1%"_qs.arg(value * 10.0, 0, 'g', 4);
 }
 
 QString formatListScore(const int value) {
