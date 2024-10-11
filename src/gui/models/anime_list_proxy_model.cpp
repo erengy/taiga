@@ -27,12 +27,13 @@
 namespace {
 
 const Anime* getAnime(const QModelIndex& index) {
-  return index.data(static_cast<int>(gui::AnimeListItemDataRole::Anime)).value<const Anime*>();
+  const int role = static_cast<int>(gui::AnimeListItemDataRole::Anime);
+  return index.data(role).value<const Anime*>();
 }
 
 const ListEntry* getListEntry(const QModelIndex& index) {
-  return index.data(static_cast<int>(gui::AnimeListItemDataRole::ListEntry))
-      .value<const ListEntry*>();
+  const int role = static_cast<int>(gui::AnimeListItemDataRole::ListEntry);
+  return index.data(role).value<const ListEntry*>();
 }
 
 }  // namespace
@@ -80,14 +81,19 @@ void AnimeListProxyModel::setTextFilter(const QString& text) {
 bool AnimeListProxyModel::filterAcceptsRow(int row, const QModelIndex& parent) const {
   const auto model = static_cast<AnimeListModel*>(sourceModel());
   if (!model) return false;
-
   const auto index = model->index(row, 0, parent);
   const auto anime = getAnime(index);
-  const auto entry = getListEntry(index);
   if (!anime) return false;
+  const auto entry = getListEntry(index);
 
   static const auto contains = [](const std::string& str, const QStringView view) {
     return QString::fromStdString(str).contains(view, Qt::CaseInsensitive);
+  };
+
+  static const auto list_contains = [](const std::vector<std::string>& list,
+                                       const QStringView view) {
+    return std::ranges::any_of(list,
+                               [view](const std::string& str) { return contains(str, view); });
   };
 
   // Year
@@ -112,34 +118,31 @@ bool AnimeListProxyModel::filterAcceptsRow(int row, const QModelIndex& parent) c
   }
 
   // List status
-  if (m_filter.listStatus.has_value()) {
+  if (m_filter.listStatus) {
     const auto status = static_cast<int>(entry ? entry->status : anime::list::Status::NotInList);
-    if (status != m_filter.listStatus.value()) return false;
+    if (status != *m_filter.listStatus) return false;
   }
 
   // Titles
   if (!m_filter.text.isEmpty()) {
     if (!contains(anime->titles.romaji, m_filter.text) &&
         !contains(anime->titles.english, m_filter.text) &&
-        !contains(anime->titles.japanese, m_filter.text)) {
-      if (!std::ranges::any_of(anime->titles.synonyms, [this](const std::string& synonym) {
-            return contains(synonym, m_filter.text);
-          })) {
-        return false;
-      }
+        !contains(anime->titles.japanese, m_filter.text) &&
+        !list_contains(anime->titles.synonyms, m_filter.text)) {
+      return false;
     }
   }
 
-  return QSortFilterProxyModel::filterAcceptsRow(row, parent);
+  return true;
 }
 
 bool AnimeListProxyModel::lessThan(const QModelIndex& lhs, const QModelIndex& rhs) const {
   const auto lhs_anime = getAnime(lhs);
-  const auto lhs_entry = getListEntry(lhs);
   const auto rhs_anime = getAnime(rhs);
-  const auto rhs_entry = getListEntry(rhs);
-
   if (!lhs_anime || !rhs_anime) return false;
+
+  const auto lhs_entry = getListEntry(lhs);
+  const auto rhs_entry = getListEntry(rhs);
 
   switch (lhs.column()) {
     case AnimeListModel::COLUMN_TITLE:
