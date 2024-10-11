@@ -49,6 +49,7 @@ public slots:
   void setAnime(const Anime& anime, const std::optional<ListEntry> entry);
 
 private:
+  void initTitles();
   void initDetails();
   void initList();
   void loadPosterImage();

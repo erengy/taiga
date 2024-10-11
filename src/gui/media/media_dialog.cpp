@@ -107,6 +107,13 @@ void MediaDialog::setAnime(const Anime& anime, const std::optional<ListEntry> en
   m_anime = anime;
   m_entry = entry;
 
+  loadPosterImage();
+  initTitles();
+  initDetails();
+  initList();
+}
+
+void MediaDialog::initTitles() {
   const auto mainTitle = QString::fromStdString(m_anime.titles.romaji);
   setWindowTitle(mainTitle);
   ui_->titleLabel->setText(mainTitle);
@@ -120,10 +127,6 @@ void MediaDialog::setAnime(const Anime& anime, const std::optional<ListEntry> en
   addTitle(QString::fromStdString(m_anime.titles.japanese));
   if (!altTitles.isEmpty()) ui_->altTitlesLabel->setText(altTitles.join(", "));
   ui_->altTitlesLabel->setHidden(altTitles.isEmpty());
-
-  loadPosterImage();
-  initDetails();
-  initList();
 }
 
 void MediaDialog::initDetails() {
