@@ -36,6 +36,10 @@ public:
            MainWindow* mainWindow);
   ~ListView() = default;
 
+  ListViewBase* baseView() {
+    return m_base;
+  }
+
 protected:
   void keyPressEvent(QKeyEvent* event) override;
 

@@ -25,7 +25,10 @@
 #include <QToolButton>
 
 #include "gui/common/anime_list_view.hpp"
+#include "gui/common/anime_list_view_base.hpp"
 #include "gui/common/anime_list_view_cards.hpp"
+#include "gui/main/main_window.hpp"
+#include "gui/main/navigation_widget.hpp"
 #include "gui/models/anime_list_model.hpp"
 #include "gui/models/anime_list_proxy_model.hpp"
 #include "gui/utils/theme.hpp"
@@ -140,6 +143,18 @@ ListWidget::ListWidget(QWidget* parent, MainWindow* mainWindow)
       .status = static_cast<int>(anime::list::Status::Watching),
   });
   setViewMode(ListViewMode::List);
+
+  connect(mainWindow->navigation(), &NavigationWidget::currentItemChanged, this,
+          [this](QTreeWidgetItem* current) {
+            switch (m_viewMode) {
+              case ListViewMode::List:
+                m_listView->baseView()->filterByListStatus(current);
+                break;
+              case ListViewMode::Cards:
+                m_listViewCards->baseView()->filterByListStatus(current);
+                break;
+            }
+          });
 }
 
 ListViewMode ListWidget::viewMode() const {

@@ -51,9 +51,6 @@ ListViewBase::ListViewBase(QWidget* parent, QAbstractItemView* view, AnimeListMo
 
   connect(mainWindow->searchBox(), &QLineEdit::textChanged, this, &ListViewBase::filterByText);
 
-  connect(mainWindow->navigation(), &NavigationWidget::currentItemChanged, this,
-          &ListViewBase::filterByListStatus);
-
   connect(m_view, &QAbstractItemView::doubleClicked, this, &ListViewBase::showMediaDialog);
 
   connect(m_view, &QWidget::customContextMenuRequested, this, &ListViewBase::showMediaMenu);
