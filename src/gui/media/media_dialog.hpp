@@ -46,6 +46,7 @@ public:
   static void show(QWidget* parent, const Anime& anime, const std::optional<ListEntry> entry);
 
 public slots:
+  void accept() override;
   void setAnime(const Anime& anime, const std::optional<ListEntry> entry);
 
 private:

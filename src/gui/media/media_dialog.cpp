@@ -18,6 +18,7 @@
 
 #include "media_dialog.hpp"
 
+#include <QMessageBox>
 #include <QResizeEvent>
 
 #include "gui/utils/format.hpp"
@@ -281,6 +282,38 @@ void MediaDialog::resizePosterImage() {
   const int height = h * (poster_w / static_cast<float>(w));
 
   ui_->posterLabel->setFixedHeight(height);
+}
+
+void MediaDialog::accept() {
+  const int progress = ui_->spinProgress->value();
+  const int rewatches = ui_->spinRewatches->value();
+  const bool rewatching = ui_->checkRewatching->isChecked();
+  const int status = ui_->comboStatus->currentData().toInt();
+  const int score = ui_->comboScore->currentData().toInt();
+  const auto date_started = ui_->checkDateStarted->isChecked()
+                                ? std::optional<QDate>{ui_->dateStarted->date()}
+                                : std::nullopt;
+  const auto date_completed = ui_->checkDateCompleted->isChecked()
+                                  ? std::optional<QDate>{ui_->dateCompleted->date()}
+                                  : std::nullopt;
+  const auto notes = ui_->plainTextEditNotes->toPlainText();
+
+  // @TEMP
+  const QList<QString> list{
+      u"Progress: %1"_qs.arg(progress),
+      u"Rewatches: %1"_qs.arg(rewatches),
+      u"Rewatching: %1"_qs.arg(rewatching ? "Yes" : "No"),
+      u"Status: %1"_qs.arg(formatListStatus(static_cast<anime::list::Status>(status))),
+      u"Score: %1"_qs.arg(score),
+      u"Date started: %1"_qs.arg(date_started ? formatDate(*date_started) : "-"),
+      u"Date completed: %1"_qs.arg(date_completed ? formatDate(*date_completed) : "-"),
+      u"Notes: %1"_qs.arg(notes),
+  };
+  QMessageBox::information(this, "Media", list.join("\n"));
+
+  // @TODO: Add to queue
+
+  QDialog::accept();
 }
 
 }  // namespace gui
