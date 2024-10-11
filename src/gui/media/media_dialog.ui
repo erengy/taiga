@@ -246,7 +246,11 @@
                 </widget>
                </item>
                <item>
-                <widget class="QSpinBox" name="spinProgress"/>
+                <widget class="QSpinBox" name="spinProgress">
+                 <property name="maximum">
+                  <number>9999</number>
+                 </property>
+                </widget>
                </item>
               </layout>
              </item>
