@@ -112,16 +112,6 @@ void ListViewBase::showMediaMenu() {
 
 void ListViewBase::updateSelectionStatus(const QItemSelection& selected,
                                          const QItemSelection& deselected) {
-  // @TEMP
-  if (!selected.empty()) {
-    const auto selectedItem =
-        m_model->getAnime(m_proxyModel->mapToSource(selected.indexes().first()));
-    m_mainWindow->nowPlaying()->setPlaying(*selectedItem);
-    m_mainWindow->nowPlaying()->show();
-  } else if (m_mainWindow && m_mainWindow->nowPlaying()) {
-    m_mainWindow->nowPlaying()->hide();
-  }
-
   if (const auto n_selected = selectedIndexes().size()) {
     int n_episodes = 0;
     int n_score = 0;
