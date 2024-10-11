@@ -48,6 +48,30 @@ MediaDialog::MediaDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::MediaDi
 
   connect(ui_->splitter, &QSplitter::splitterMoved, this, [this]() { resizePosterImage(); });
 
+  connect(ui_->checkRewatching, &QCheckBox::stateChanged, this, [this](int state) {
+    const bool isChecked = state == Qt::CheckState::Checked;
+    const int progress = ui_->spinProgress->value();
+
+    // Set status
+    const int status =
+        static_cast<int>(isChecked ? anime::list::Status::Watching : m_entry->status);
+    if (const int index = ui_->comboStatus->findData(status); index > -1) {
+      ui_->comboStatus->setCurrentIndex(index);
+    }
+
+    // Reset progress
+    if (isChecked) {
+      if (m_entry->status == anime::list::Status::Completed &&
+          progress == m_entry->watched_episodes) {
+        ui_->spinProgress->setValue(0);
+      }
+    } else {
+      if (progress == 0) {
+        ui_->spinProgress->setValue(m_entry->watched_episodes);
+      }
+    }
+  });
+
   connect(ui_->checkDateStarted, &QCheckBox::stateChanged, this,
           [this](int state) { ui_->dateStarted->setEnabled(state == Qt::CheckState::Checked); });
   connect(ui_->checkDateCompleted, &QCheckBox::stateChanged, this,
