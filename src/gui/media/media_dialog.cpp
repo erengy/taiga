@@ -187,6 +187,9 @@ void MediaDialog::initDetails() {
     ui_->infoLayout->addRow(get_row_title(tr("Genres:")),
                             get_row_label(from_vector(m_anime.genres)));
   }
+  if (!m_anime.tags.empty()) {
+    ui_->infoLayout->addRow(get_row_title(tr("Tags:")), get_row_label(from_vector(m_anime.tags)));
+  }
   if (!m_anime.studios.empty()) {
     ui_->infoLayout->addRow(get_row_title(tr("Studios:")),
                             get_row_label(from_vector(m_anime.studios)));
