@@ -248,27 +248,17 @@ void MediaDialog::initList() {
     return QDate{date.year(), date.month(), date.day()};
   };
 
-  // Date started
-  ui_->checkDateStarted->setChecked((bool)m_entry->date_start);
+  // Date started & completed
+  ui_->checkDateStarted->setChecked(static_cast<bool>(m_entry->date_start));
+  ui_->checkDateCompleted->setChecked(static_cast<bool>(m_entry->date_finish));
   if (m_anime.start_date) {
     ui_->dateStarted->setMinimumDate(fuzzy_to_date(m_anime.start_date));
-  }
-  if (m_entry->date_start) {
-    ui_->dateStarted->setDate(fuzzy_to_date(m_entry->date_start));
-  } else if (m_anime.start_date) {
-    ui_->dateStarted->setDate(fuzzy_to_date(m_anime.start_date));
-  }
-
-  // Date completed
-  ui_->checkDateCompleted->setChecked((bool)m_entry->date_finish);
-  if (m_anime.start_date) {
     ui_->dateCompleted->setMinimumDate(fuzzy_to_date(m_anime.start_date));
   }
-  if (m_entry->date_finish) {
-    ui_->dateCompleted->setDate(fuzzy_to_date(m_entry->date_finish));
-  } else if (m_anime.end_date) {
-    ui_->dateCompleted->setDate(fuzzy_to_date(m_anime.end_date));
-  }
+  ui_->dateStarted->setDate(m_entry->date_start ? fuzzy_to_date(m_entry->date_start)
+                                                : QDate::currentDate());
+  ui_->dateCompleted->setDate(m_entry->date_finish ? fuzzy_to_date(m_entry->date_finish)
+                                                   : QDate::currentDate());
 
   // Notes
   ui_->plainTextEditNotes->setPlainText(QString::fromStdString(m_entry->notes));
