@@ -112,7 +112,7 @@ void MediaDialog::setAnime(const Anime& anime, const std::optional<ListEntry> en
   ui_->titleLabel->setText(mainTitle);
 
   QList<QString> altTitles;
-  static const auto addTitle = [&mainTitle, &altTitles](const QString& title) {
+  const auto addTitle = [&mainTitle, &altTitles](const QString& title) {
     if (title.isEmpty() || title == mainTitle) return;
     altTitles.push_back(title);
   };
