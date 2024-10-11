@@ -136,7 +136,9 @@ ListWidget::ListWidget(QWidget* parent, MainWindow* mainWindow)
   }
 
   // List
-  m_proxyModel->setListStatusFilter(static_cast<int>(anime::list::Status::Watching));
+  m_proxyModel->setListStatusFilter({
+      .status = static_cast<int>(anime::list::Status::Watching),
+  });
   setViewMode(ListViewMode::List);
 }
 

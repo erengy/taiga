@@ -64,9 +64,17 @@ ListViewBase::ListViewBase(QWidget* parent, QAbstractItemView* view, AnimeListMo
 
 void ListViewBase::filterByListStatus(QTreeWidgetItem* current) {
   if (!current) return;
-  const int role = static_cast<int>(NavigationItemDataRole::ListStatus);
-  const int status = current->data(0, role).toInt();
-  m_proxyModel->setListStatusFilter(status ? std::optional<int>{status} : std::nullopt);
+
+  const auto page =
+      current->data(0, static_cast<int>(NavigationItemDataRole::PageIndex)).value<MainWindowPage>();
+  if (page != MainWindowPage::List) return;
+
+  const int status = current->data(0, static_cast<int>(NavigationItemDataRole::ListStatus)).toInt();
+
+  m_proxyModel->setListStatusFilter({
+      .status = status,
+      .anyStatus = !status,
+  });
 }
 
 void ListViewBase::filterByText(const QString& text) {

@@ -68,8 +68,8 @@ void AnimeListProxyModel::setStatusFilter(std::optional<int> status) {
   invalidateRowsFilter();
 }
 
-void AnimeListProxyModel::setListStatusFilter(std::optional<int> status) {
-  m_filter.listStatus = status;
+void AnimeListProxyModel::setListStatusFilter(AnimeListStatusFilter filter) {
+  m_filter.listStatus = filter;
   invalidateRowsFilter();
 }
 
@@ -118,9 +118,13 @@ bool AnimeListProxyModel::filterAcceptsRow(int row, const QModelIndex& parent) c
   }
 
   // List status
-  if (m_filter.listStatus) {
-    const auto status = static_cast<int>(entry ? entry->status : anime::list::Status::NotInList);
-    if (status != *m_filter.listStatus) return false;
+  if (m_filter.listStatus.status) {
+    const auto status = entry ? entry->status : anime::list::Status::NotInList;
+    if (m_filter.listStatus.anyStatus) {
+      if (status == anime::list::Status::NotInList) return false;
+    } else {
+      if (static_cast<int>(status) != *m_filter.listStatus.status) return false;
+    }
   }
 
   // Titles
