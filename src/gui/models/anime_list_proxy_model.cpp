@@ -148,9 +148,14 @@ bool AnimeListProxyModel::lessThan(const QModelIndex& lhs, const QModelIndex& rh
   const auto lhs_entry = getListEntry(lhs);
   const auto rhs_entry = getListEntry(rhs);
 
+  // @TODO: Remove conversion to `QString` once we have our own string functions in place.
+  static const auto compare_strings = [](const std::string& a, const std::string& b) {
+    return QString::fromStdString(a).compare(QString::fromStdString(b), Qt::CaseInsensitive);
+  };
+
   switch (lhs.column()) {
     case AnimeListModel::COLUMN_TITLE:
-      return lhs_anime->titles.romaji < rhs_anime->titles.romaji;
+      return compare_strings(lhs_anime->titles.romaji, rhs_anime->titles.romaji) < 0;
 
     case AnimeListModel::COLUMN_DURATION:
       return lhs_anime->episode_length < rhs_anime->episode_length;
