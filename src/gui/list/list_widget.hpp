@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <QMenu>
 #include <QWidget>
 
 namespace Ui {
@@ -49,6 +50,10 @@ public:
   void setViewMode(ListViewMode mode);
 
 private:
+  void initToolbar();
+  void initSortMenu();
+  void initViewMenu();
+
   Ui::ListWidget* ui_ = nullptr;
   MainWindow* m_mainWindow = nullptr;
   AnimeListModel* m_model = nullptr;
@@ -56,6 +61,8 @@ private:
   ListView* m_listView = nullptr;
   ListViewCards* m_listViewCards = nullptr;
   ListViewMode m_viewMode = ListViewMode::List;
+  QMenu* m_sortMenu = nullptr;
+  QMenu* m_viewMenu = nullptr;
 };
 
 }  // namespace gui

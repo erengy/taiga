@@ -25,7 +25,6 @@
 #include <QToolButton>
 
 #include "gui/common/anime_list_view.hpp"
-#include "gui/common/anime_list_view_base.hpp"
 #include "gui/common/anime_list_view_cards.hpp"
 #include "gui/main/main_window.hpp"
 #include "gui/main/navigation_widget.hpp"
@@ -41,92 +40,19 @@ ListWidget::ListWidget(QWidget* parent, MainWindow* mainWindow)
       m_model(new AnimeListModel(this)),
       m_proxyModel(new AnimeListProxyModel(this)),
       m_mainWindow(mainWindow),
+      m_sortMenu(new QMenu(this)),
+      m_viewMenu(new QMenu(this)),
       ui_(new Ui::ListWidget) {
   ui_->setupUi(this);
-
-  ui_->filterButton->hide();
 
   // @TODO: Use settings from the previous session
   m_proxyModel->sort(AnimeListModel::COLUMN_LAST_UPDATED, Qt::SortOrder::DescendingOrder);
 
-  // List
-  setViewMode(ListViewMode::List);  // must be called before initializing the toolbar
+  initToolbar();
+  setViewMode(ListViewMode::List);
 
-  ui_->editFilter->hide();
-
-  // Toolbar
-  {
-    auto toolbar = new QToolBar(this);
-    toolbar->setIconSize({18, 18});
-    ui_->actionSort->setIcon(theme.getIcon("sort"));
-    ui_->actionView->setIcon(theme.getIcon("grid_view"));
-    ui_->actionMore->setIcon(theme.getIcon("more_horiz"));
-    toolbar->addAction(ui_->actionSort);
-    toolbar->addAction(ui_->actionView);
-    toolbar->addAction(ui_->actionMore);
-    ui_->toolbarLayout->addWidget(toolbar);
-
-    {
-      const auto button = static_cast<QToolButton*>(toolbar->widgetForAction(ui_->actionSort));
-      button->setPopupMode(QToolButton::InstantPopup);
-      button->setMenu([this]() {
-        using Qt::SortOrder::AscendingOrder;
-        using Qt::SortOrder::DescendingOrder;
-        auto menu = new QMenu(this);
-        auto actionGroup = new QActionGroup(this);
-        static const QList<QPair<AnimeListModel::Column, Qt::SortOrder>> sortMenuItems = {
-            {AnimeListModel::COLUMN_TITLE, AscendingOrder},
-            {AnimeListModel::COLUMN_PROGRESS, DescendingOrder},
-            {AnimeListModel::COLUMN_DURATION, DescendingOrder},
-            {AnimeListModel::COLUMN_REWATCHES, DescendingOrder},
-            {AnimeListModel::COLUMN_SCORE, DescendingOrder},
-            {AnimeListModel::COLUMN_AVERAGE, DescendingOrder},
-            {AnimeListModel::COLUMN_TYPE, AscendingOrder},
-            {AnimeListModel::COLUMN_SEASON, DescendingOrder},
-            {AnimeListModel::COLUMN_STARTED, DescendingOrder},
-            {AnimeListModel::COLUMN_COMPLETED, DescendingOrder},
-            {AnimeListModel::COLUMN_LAST_UPDATED, DescendingOrder},
-            {AnimeListModel::COLUMN_NOTES, AscendingOrder},
-        };
-        for (const auto& [column, order] : sortMenuItems) {
-          const auto headerData =
-              m_model->headerData(column, Qt::Orientation::Horizontal, Qt::DisplayRole);
-          const auto action = menu->addAction(headerData.toString(), this, [this, column, order]() {
-            if (m_listView) {
-              // Sorting the proxy model doesn't update the sort indicator on the header.
-              m_listView->sortByColumn(column, order);
-            } else {
-              m_proxyModel->sort(column, order);
-            }
-          });
-          action->setCheckable(true);
-          action->setChecked(column == m_proxyModel->sortColumn());
-          actionGroup->addAction(action);
-        }
-        return menu;
-      }());
-    }
-
-    {
-      const auto button = static_cast<QToolButton*>(toolbar->widgetForAction(ui_->actionView));
-      button->setPopupMode(QToolButton::InstantPopup);
-      button->setMenu([this]() {
-        auto menu = new QMenu(this);
-        auto actionGroup = new QActionGroup(this);
-        static const QList<QPair<QString, ListViewMode>> viewMenuItems = {
-            {"List", ListViewMode::List},
-            {"Cards", ListViewMode::Cards},
-        };
-        for (const auto& [text, mode] : viewMenuItems) {
-          const auto action = menu->addAction(text, this, [this, mode]() { setViewMode(mode); });
-          action->setCheckable(true);
-          action->setChecked(mode == m_viewMode);
-          actionGroup->addAction(action);
-        }
-        return menu;
-      }());
-    }
-  }
+  connect(m_sortMenu, &QMenu::aboutToShow, this, &ListWidget::initSortMenu);
+  connect(m_viewMenu, &QMenu::aboutToShow, this, &ListWidget::initViewMenu);
 
   connect(mainWindow->navigation(), &NavigationWidget::currentListStatusChanged, this,
           [this](anime::list::Status status) {
@@ -161,11 +87,96 @@ void ListWidget::setViewMode(ListViewMode mode) {
       ui_->verticalLayout->addWidget(m_listView);
       m_listView->show();
       break;
+
     case ListViewMode::Cards:
       m_listViewCards = new ListViewCards(this, m_model, m_proxyModel, m_mainWindow);
       ui_->verticalLayout->addWidget(m_listViewCards);
       m_listViewCards->show();
       break;
+  }
+}
+
+void ListWidget::initToolbar() {
+  const auto toolbar = new QToolBar(this);
+
+  toolbar->setIconSize({18, 18});
+
+  ui_->actionSort->setIcon(theme.getIcon("sort"));
+  ui_->actionView->setIcon(theme.getIcon("grid_view"));
+  ui_->actionMore->setIcon(theme.getIcon("more_horiz"));
+
+  toolbar->addAction(ui_->actionSort);
+  toolbar->addAction(ui_->actionView);
+  toolbar->addAction(ui_->actionMore);
+
+  ui_->toolbarLayout->addWidget(toolbar);
+
+  const auto sortButton = static_cast<QToolButton*>(toolbar->widgetForAction(ui_->actionSort));
+  sortButton->setPopupMode(QToolButton::InstantPopup);
+  sortButton->setMenu(m_sortMenu);
+
+  const auto viewButton = static_cast<QToolButton*>(toolbar->widgetForAction(ui_->actionView));
+  viewButton->setPopupMode(QToolButton::InstantPopup);
+  viewButton->setMenu(m_viewMenu);
+}
+
+void ListWidget::initSortMenu() {
+  using Qt::SortOrder::AscendingOrder;
+  using Qt::SortOrder::DescendingOrder;
+
+  static const QList<QPair<AnimeListModel::Column, Qt::SortOrder>> items{
+      {AnimeListModel::COLUMN_TITLE, AscendingOrder},
+      {AnimeListModel::COLUMN_PROGRESS, DescendingOrder},
+      {AnimeListModel::COLUMN_DURATION, DescendingOrder},
+      {AnimeListModel::COLUMN_REWATCHES, DescendingOrder},
+      {AnimeListModel::COLUMN_SCORE, DescendingOrder},
+      {AnimeListModel::COLUMN_AVERAGE, DescendingOrder},
+      {AnimeListModel::COLUMN_TYPE, AscendingOrder},
+      {AnimeListModel::COLUMN_SEASON, DescendingOrder},
+      {AnimeListModel::COLUMN_STARTED, DescendingOrder},
+      {AnimeListModel::COLUMN_COMPLETED, DescendingOrder},
+      {AnimeListModel::COLUMN_LAST_UPDATED, DescendingOrder},
+      {AnimeListModel::COLUMN_NOTES, AscendingOrder},
+  };
+
+  const auto actionGroup = new QActionGroup(this);
+
+  m_sortMenu->clear();
+
+  for (const auto& [column, order] : items) {
+    const auto headerData =
+        m_model->headerData(column, Qt::Orientation::Horizontal, Qt::DisplayRole);
+
+    const auto action = m_sortMenu->addAction(headerData.toString(), this, [this, column, order]() {
+      if (m_listView) {
+        // Sorting the proxy model doesn't update the sort indicator on the header.
+        m_listView->sortByColumn(column, order);
+      } else {
+        m_proxyModel->sort(column, order);
+      }
+    });
+
+    action->setCheckable(true);
+    action->setChecked(column == m_proxyModel->sortColumn());
+    actionGroup->addAction(action);
+  }
+}
+
+void ListWidget::initViewMenu() {
+  static const QList<QPair<QString, ListViewMode>> items{
+      {"List", ListViewMode::List},
+      {"Cards", ListViewMode::Cards},
+  };
+
+  const auto actionGroup = new QActionGroup(this);
+
+  m_viewMenu->clear();
+
+  for (const auto& [text, mode] : items) {
+    const auto action = m_viewMenu->addAction(text, this, [this, mode]() { setViewMode(mode); });
+    action->setCheckable(true);
+    action->setChecked(mode == m_viewMode);
+    actionGroup->addAction(action);
   }
 }
 

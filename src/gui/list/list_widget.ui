@@ -44,16 +44,9 @@
       <number>9</number>
      </property>
      <item>
-      <widget class="QPushButton" name="filterButton">
-       <property name="text">
-        <string>Filter</string>
-       </property>
-      </widget>
-     </item>
-     <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
-        <enum>Qt::Horizontal</enum>
+        <enum>Qt::Orientation::Horizontal</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
@@ -62,22 +55,6 @@
         </size>
        </property>
       </spacer>
-     </item>
-     <item>
-      <widget class="QLineEdit" name="editFilter">
-       <property name="minimumSize">
-        <size>
-         <width>160</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="placeholderText">
-        <string>Filter</string>
-       </property>
-       <property name="clearButtonEnabled">
-        <bool>true</bool>
-       </property>
-      </widget>
      </item>
     </layout>
    </item>
@@ -90,7 +67,7 @@
     <string>View</string>
    </property>
    <property name="menuRole">
-    <enum>QAction::NoRole</enum>
+    <enum>QAction::MenuRole::NoRole</enum>
    </property>
   </action>
   <action name="actionSort">
@@ -101,7 +78,7 @@
     <string>Sort</string>
    </property>
    <property name="menuRole">
-    <enum>QAction::NoRole</enum>
+    <enum>QAction::MenuRole::NoRole</enum>
    </property>
   </action>
   <action name="actionMore">
@@ -112,7 +89,7 @@
     <string>More</string>
    </property>
    <property name="menuRole">
-    <enum>QAction::NoRole</enum>
+    <enum>QAction::MenuRole::NoRole</enum>
    </property>
   </action>
  </widget>
