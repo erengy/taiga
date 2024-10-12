@@ -47,6 +47,8 @@ void MediaMenu::popup() {
   addSeparator();
   addLibraryItems();
   addSeparator();
+  addTorrentsItems();
+  addSeparator();
   addMetaItems();
 
   QMenu::popup(QCursor::pos());
@@ -353,6 +355,13 @@ void MediaMenu::addLibraryItems() {
 
     return menu;
   }());
+}
+
+void MediaMenu::addTorrentsItems() {
+  if (isBatch()) return;
+
+  // Torrents
+  addAction(theme.getIcon("rss_feed"), tr("Torrents"), this, &MediaMenu::test);
 }
 
 void MediaMenu::addMetaItems() {

@@ -59,6 +59,7 @@ private:
   void addMediaItems();
   void addListItems();
   void addLibraryItems();
+  void addTorrentsItems();
   void addMetaItems();
 
   bool isBatch() const;
