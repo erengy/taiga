@@ -98,12 +98,12 @@ bool AnimeListProxyModel::filterAcceptsRow(int row, const QModelIndex& parent) c
 
   // Year
   if (m_filter.year) {
-    if (anime->start_date.year() != *m_filter.year) return false;
+    if (anime->date_started.year() != *m_filter.year) return false;
   }
 
   // Season
   if (m_filter.season) {
-    const anime::Season season{anime->start_date};
+    const anime::Season season{anime->date_started};
     if (static_cast<int>(season.name) != *m_filter.season) return false;
   }
 
@@ -178,15 +178,15 @@ bool AnimeListProxyModel::lessThan(const QModelIndex& lhs, const QModelIndex& rh
       return (lhs_entry ? lhs_entry->score : 0) < (rhs_entry ? rhs_entry->score : 0);
 
     case AnimeListModel::COLUMN_SEASON:
-      return lhs_anime->start_date < rhs_anime->start_date;
+      return lhs_anime->date_started < rhs_anime->date_started;
 
     case AnimeListModel::COLUMN_STARTED:
-      return (lhs_entry ? lhs_entry->date_start : FuzzyDate{}) <
-             (rhs_entry ? rhs_entry->date_start : FuzzyDate{});
+      return (lhs_entry ? lhs_entry->date_started : FuzzyDate{}) <
+             (rhs_entry ? rhs_entry->date_started : FuzzyDate{});
 
     case AnimeListModel::COLUMN_COMPLETED:
-      return (lhs_entry ? lhs_entry->date_finish : FuzzyDate{}) <
-             (rhs_entry ? rhs_entry->date_finish : FuzzyDate{});
+      return (lhs_entry ? lhs_entry->date_completed : FuzzyDate{}) <
+             (rhs_entry ? rhs_entry->date_completed : FuzzyDate{});
 
     case AnimeListModel::COLUMN_LAST_UPDATED:
       return (lhs_entry ? lhs_entry->last_updated : 0) < (rhs_entry ? rhs_entry->last_updated : 0);

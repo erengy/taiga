@@ -126,8 +126,8 @@ void ListItemDelegateCards::paint(QPainter* painter, const QStyleOptionViewItem&
         "Aired:\n"
         "Genres:\n"
         "Studios:";
-    const QString values = u"%1 to %2 (%3)\n%4\n%5"_qs.arg(formatFuzzyDate(item->start_date))
-                               .arg(formatFuzzyDate(item->end_date))
+    const QString values = u"%1 to %2 (%3)\n%4\n%5"_qs.arg(formatFuzzyDate(item->date_started))
+                               .arg(formatFuzzyDate(item->date_finished))
                                .arg(formatStatus(item->status))
                                .arg(from_vector(item->genres))
                                .arg(from_vector(item->studios));

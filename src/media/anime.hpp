@@ -99,8 +99,8 @@ struct Details {
   AgeRating age_rating = AgeRating::Unknown;
   Status status = Status::Unknown;
   Type type = Type::Unknown;
-  FuzzyDate start_date;
-  FuzzyDate end_date;
+  FuzzyDate date_started;
+  FuzzyDate date_finished;
   float score = 0.0f;
   int popularity_rank = 0;
   std::string image_url;
@@ -145,8 +145,8 @@ struct Entry {
   int rewatched_times = 0;
   bool rewatching = false;
   int rewatching_ep = 0;
-  FuzzyDate date_start;
-  FuzzyDate date_finish;
+  FuzzyDate date_started;
+  FuzzyDate date_completed;
   std::time_t last_updated;
   std::string notes;
 };

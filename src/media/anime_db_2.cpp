@@ -68,9 +68,9 @@ QList<Anime> readDatabase() {
       } else if (xml.name() == u"episode_length") {
         anime.episode_length = xml.readElementText().toInt();
       } else if (xml.name() == u"date_start") {
-        anime.start_date = FuzzyDate(xml.readElementText().toStdString());
+        anime.date_started = FuzzyDate(xml.readElementText().toStdString());
       } else if (xml.name() == u"date_end") {
-        anime.end_date = FuzzyDate(xml.readElementText().toStdString());
+        anime.date_finished = FuzzyDate(xml.readElementText().toStdString());
       } else if (xml.name() == u"image") {
         anime.image_url = xml.readElementText().toStdString();
       } else if (xml.name() == u"trailer_id") {
@@ -133,9 +133,9 @@ QList<ListEntry> readListEntries() {
       } else if (xml.name() == u"progress") {
         entry.watched_episodes = xml.readElementText().toInt();
       } else if (xml.name() == u"date_start") {
-        entry.date_start = FuzzyDate(xml.readElementText().toStdString());
+        entry.date_started = FuzzyDate(xml.readElementText().toStdString());
       } else if (xml.name() == u"date_end") {
-        entry.date_finish = FuzzyDate(xml.readElementText().toStdString());
+        entry.date_completed = FuzzyDate(xml.readElementText().toStdString());
       } else if (xml.name() == u"score") {
         entry.score = xml.readElementText().toInt();
       } else if (xml.name() == u"status") {

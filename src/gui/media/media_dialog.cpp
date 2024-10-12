@@ -169,10 +169,10 @@ void MediaDialog::initDetails() {
     episodesLabel->setToolTip(u"%1 minutes per episode"_qs.arg(m_anime.episode_length));
   }
 
-  auto seasonLabel = new QLabel(formatSeason(anime::Season(m_anime.start_date)), this);
+  auto seasonLabel = new QLabel(formatSeason(anime::Season(m_anime.date_started)), this);
   seasonLabel->setCursor(QCursor(Qt::CursorShape::WhatsThisCursor));
-  seasonLabel->setToolTip(u"%1 to %2"_qs.arg(formatFuzzyDate(m_anime.start_date))
-                              .arg(formatFuzzyDate(m_anime.end_date)));
+  seasonLabel->setToolTip(u"%1 to %2"_qs.arg(formatFuzzyDate(m_anime.date_started))
+                              .arg(formatFuzzyDate(m_anime.date_finished)));
 
   if (!m_anime.titles.synonyms.empty()) {
     ui_->infoLayout->addRow(get_row_title(tr("Titles:")),
@@ -250,16 +250,16 @@ void MediaDialog::initList() {
   };
 
   // Date started & completed
-  ui_->checkDateStarted->setChecked(static_cast<bool>(m_entry->date_start));
-  ui_->checkDateCompleted->setChecked(static_cast<bool>(m_entry->date_finish));
-  if (m_anime.start_date) {
-    ui_->dateStarted->setMinimumDate(fuzzy_to_date(m_anime.start_date));
-    ui_->dateCompleted->setMinimumDate(fuzzy_to_date(m_anime.start_date));
+  ui_->checkDateStarted->setChecked(static_cast<bool>(m_entry->date_started));
+  ui_->checkDateCompleted->setChecked(static_cast<bool>(m_entry->date_completed));
+  if (m_anime.date_started) {
+    ui_->dateStarted->setMinimumDate(fuzzy_to_date(m_anime.date_started));
+    ui_->dateCompleted->setMinimumDate(fuzzy_to_date(m_anime.date_started));
   }
-  ui_->dateStarted->setDate(m_entry->date_start ? fuzzy_to_date(m_entry->date_start)
-                                                : QDate::currentDate());
-  ui_->dateCompleted->setDate(m_entry->date_finish ? fuzzy_to_date(m_entry->date_finish)
-                                                   : QDate::currentDate());
+  ui_->dateStarted->setDate(m_entry->date_started ? fuzzy_to_date(m_entry->date_started)
+                                                  : QDate::currentDate());
+  ui_->dateCompleted->setDate(m_entry->date_completed ? fuzzy_to_date(m_entry->date_completed)
+                                                      : QDate::currentDate());
 
   // Notes
   ui_->plainTextEditNotes->setPlainText(QString::fromStdString(m_entry->notes));

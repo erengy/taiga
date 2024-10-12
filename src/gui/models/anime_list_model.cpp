@@ -82,12 +82,12 @@ QVariant AnimeListModel::data(const QModelIndex& index, int role) const {
         case COLUMN_TYPE:
           return formatType(anime->type);
         case COLUMN_SEASON:
-          return formatSeason(anime::Season(anime->start_date));
+          return formatSeason(anime::Season(anime->date_started));
         case COLUMN_STARTED:
-          if (entry) return formatFuzzyDate(entry->date_start);
+          if (entry) return formatFuzzyDate(entry->date_started);
           break;
         case COLUMN_COMPLETED:
-          if (entry) return formatFuzzyDate(entry->date_finish);
+          if (entry) return formatFuzzyDate(entry->date_completed);
           break;
         case COLUMN_LAST_UPDATED:
           if (entry) return formatAsRelativeTime(entry->last_updated);
@@ -103,7 +103,7 @@ QVariant AnimeListModel::data(const QModelIndex& index, int role) const {
         case COLUMN_TITLE:
           return QString::fromStdString(anime->titles.romaji);
         case COLUMN_SEASON:
-          return formatFuzzyDate(anime->start_date);
+          return formatFuzzyDate(anime->date_started);
         case COLUMN_LAST_UPDATED:
           if (entry) return formatTimestamp(entry->last_updated);
           break;
@@ -144,7 +144,7 @@ QVariant AnimeListModel::data(const QModelIndex& index, int role) const {
           if (anime->episode_length < 1) return disabledTextColor;
           break;
         case COLUMN_SEASON:
-          if (!anime->start_date) return disabledTextColor;
+          if (!anime->date_started) return disabledTextColor;
           break;
         case COLUMN_TYPE:
           if (anime->type == anime::Type::Unknown) return disabledTextColor;
@@ -153,10 +153,10 @@ QVariant AnimeListModel::data(const QModelIndex& index, int role) const {
           if (entry && !entry->score) return disabledTextColor;
           break;
         case COLUMN_STARTED:
-          if (entry && !entry->date_start) return disabledTextColor;
+          if (entry && !entry->date_started) return disabledTextColor;
           break;
         case COLUMN_COMPLETED:
-          if (entry && !entry->date_finish) return disabledTextColor;
+          if (entry && !entry->date_completed) return disabledTextColor;
           break;
         case COLUMN_LAST_UPDATED:
           if (entry && !entry->last_updated) return disabledTextColor;
