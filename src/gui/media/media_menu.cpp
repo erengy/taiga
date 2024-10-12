@@ -83,7 +83,7 @@ void MediaMenu::playEpisode(int number) const {
 void MediaMenu::removeFromList() const {
   QMessageBox msgBox;
   msgBox.setIcon(QMessageBox::Icon::Question);
-  msgBox.setText("Do you want to delete selected items from your list?");
+  msgBox.setText("Do you want to remove selected items from your list?");
 
   QList<QString> titles;
   for (const auto& item : m_items) {
@@ -91,13 +91,13 @@ void MediaMenu::removeFromList() const {
   }
   msgBox.setInformativeText(u"<ul>%1</ul>"_qs.arg(titles.join("")));
 
-  auto deleteButton = msgBox.addButton(tr("Delete"), QMessageBox::ButtonRole::DestructiveRole);
+  auto removeButton = msgBox.addButton(tr("Remove"), QMessageBox::ButtonRole::DestructiveRole);
   msgBox.addButton(QMessageBox::Cancel);
   msgBox.setDefaultButton(QMessageBox::Cancel);
 
   msgBox.exec();
 
-  if (msgBox.clickedButton() == reinterpret_cast<QAbstractButton*>(deleteButton)) {
+  if (msgBox.clickedButton() == reinterpret_cast<QAbstractButton*>(removeButton)) {
     // @TODO: Add to queue
   }
 }
@@ -200,7 +200,7 @@ void MediaMenu::viewDetails() const {
 void MediaMenu::addMediaItems() {
   if (!isBatch()) {
     // View details
-    addAction(theme.getIcon("info"), tr("View details"), this, &MediaMenu::viewDetails);
+    addAction(theme.getIcon("info"), tr("Details"), tr("Enter"), this, &MediaMenu::viewDetails);
     // Search
     addAction(theme.getIcon("search"), tr("Search"), this, &MediaMenu::test);
   }
@@ -246,7 +246,7 @@ void MediaMenu::addListItems() {
 
   // Edit
   if (!isBatch()) {
-    addAction(theme.getIcon("edit"), tr("Edit"), this, &MediaMenu::viewDetails);
+    addAction(theme.getIcon("edit"), tr("Edit..."), this, &MediaMenu::viewDetails);
 
   } else {
     addMenu([this]() {
@@ -295,7 +295,7 @@ void MediaMenu::addListItems() {
   }
 
   // Remove from list
-  addAction(theme.getIcon("delete"), tr("Remove from list..."), QKeySequence::Delete, this,
+  addAction(theme.getIcon("delete"), tr("Remove..."), QKeySequence::Delete, this,
             &MediaMenu::removeFromList);
 }
 
