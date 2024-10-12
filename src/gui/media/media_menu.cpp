@@ -162,17 +162,14 @@ void MediaMenu::searchWikipedia() const {
 
 void MediaMenu::searchYouTube() const {
   for (const auto& item : m_items) {
-    QUrl url{"https://www.youtube.com/results"};
-    url.setQuery({{"search_query", QString::fromStdString(item.titles.romaji)}});
-    QDesktopServices::openUrl(url);
-  }
-}
-
-void MediaMenu::openYouTubeTrailer() const {
-  for (const auto& item : m_items) {
-    if (item.trailer_id.empty()) continue;
-    QUrl url{u"https://youtu.be/%1"_qs.arg(QString::fromStdString(item.trailer_id))};
-    QDesktopServices::openUrl(url);
+    if (!item.trailer_id.empty()) {
+      QUrl url{u"https://youtu.be/%1"_qs.arg(QString::fromStdString(item.trailer_id))};
+      QDesktopServices::openUrl(url);
+    } else {
+      QUrl url{"https://www.youtube.com/results"};
+      url.setQuery({{"search_query", QString::fromStdString(item.titles.romaji)}});
+      QDesktopServices::openUrl(url);
+    }
   }
 }
 
@@ -200,31 +197,16 @@ void MediaMenu::viewDetails() const {
 
 void MediaMenu::addMediaItems() {
   if (!isBatch()) {
+    // View details
     addAction(theme.getIcon("info"), tr("View details"), this, &MediaMenu::viewDetails);
+    // Search
+    addAction(theme.getIcon("search"), tr("Search"), this, &MediaMenu::test);
   }
 
   // External
   addMenu([this]() {
     auto menu = new QMenu(tr("External"), this);
     menu->setIcon(theme.getIcon("open_in_new"));
-
-    menu->addAction(tr("AniList page"), this, &MediaMenu::test);
-
-    {
-      const auto action =
-          menu->addAction(tr("YouTube trailer"), this, &MediaMenu::openYouTubeTrailer);
-      const bool hasTrailer = std::ranges::any_of(
-          m_items, [](const Anime& anime) { return !anime.trailer_id.empty(); });
-      if (!hasTrailer) action->setEnabled(false);
-    }
-
-    return menu;
-  }());
-
-  // Search
-  addMenu([this]() {
-    auto menu = new QMenu(tr("Search"), this);
-    menu->setIcon(theme.getIcon("search"));
 
     using slot_t = void (MediaMenu::*)() const;
     const QList<QPair<QString, slot_t>> items = {
@@ -240,8 +222,6 @@ void MediaMenu::addMediaItems() {
     for (const auto [text, slot] : items) {
       menu->addAction(text, this, slot);
     }
-
-    // @TODO: Search torrents
 
     return menu;
   }());
