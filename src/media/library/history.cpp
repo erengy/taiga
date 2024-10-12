@@ -51,12 +51,14 @@ bool History::Load() {
   if (!parse_result)
     return false;
 
-  // Meta
-  const auto meta_version = XmlReadMetaVersion(document);
-  const semaver::Version version(WstrToStr(meta_version));
+  const auto history_node = document.child(L"history");
+
+  // Version handling
+  const auto xml_version = XmlReadVersionAttr(history_node);
+  const semaver::Version version(WstrToStr(xml_version));
 
   // Items
-  auto node_items = document.child(L"history").child(L"items");
+  auto node_items = history_node.child(L"items");
   for (auto item : node_items.children(L"item")) {
     HistoryItem history_item;
     history_item.anime_id = item.attribute(L"anime_id").as_int(anime::ID_NOTINLIST);
@@ -73,7 +75,7 @@ bool History::Load() {
   }
   // Queue events
   ReadQueue(document);
-  HandleCompatibility(meta_version);
+  HandleCompatibility(xml_version);
 
   return true;
 }
@@ -122,11 +124,10 @@ void History::ReadQueue(const XmlDocument& document) {
 
 bool History::Save() {
   XmlDocument document;
-
-  // Write meta
-  XmlWriteMetaVersion(document, StrToWstr(taiga::version().to_string()));
-
   auto node_history = document.append_child(L"history");
+
+  // Write version attribute
+  XmlWriteVersionAttr(node_history, StrToWstr(taiga::version().to_string()));
 
   // Write items
   auto node_items = node_history.append_child(L"items");
