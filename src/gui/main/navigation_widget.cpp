@@ -131,7 +131,7 @@ QTreeWidgetItem* NavigationWidget::addItem(const QString& text, const QString& i
 QTreeWidgetItem* NavigationWidget::addChildItem(QTreeWidgetItem* parent, const QString& text) {
   auto item = new QTreeWidgetItem(parent);
 
-  item->setIcon(0, theme.getIcon("empty"));
+  item->setIcon(0, theme.getIcon("empty"));  // for indentation
   item->setSizeHint(0, QSize{0, 32});
   item->setText(0, text);
 
