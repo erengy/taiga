@@ -107,12 +107,17 @@ void ListViewBase::showMediaMenu() {
   menu->popup();
 }
 
-void ListViewBase::updateSelectionStatus(const QItemSelection& selected,
-                                         const QItemSelection& deselected) {
-  if (const auto n_selected = selectedIndexes().size()) {
-    int n_episodes = 0;
-    int n_score = 0;
-    double total_score = 0.0;
+void ListViewBase::updateSelectionStatus(const QItemSelection& selected, const QItemSelection&) {
+  const auto n_selected = selectedIndexes().size();
+
+  if (!n_selected) {
+    m_mainWindow->statusBar()->clearMessage();
+    return;
+  }
+
+  int n_episodes = 0;
+  int n_score = 0;
+  double total_score = 0.0;
     double average_score = 0.0;
 
     for (const auto index : selectedIndexes()) {
@@ -131,12 +136,9 @@ void ListViewBase::updateSelectionStatus(const QItemSelection& selected,
         tr("%n item(s) selected", nullptr, n_selected),
         tr("%n episode(s)", nullptr, n_episodes),
         tr("%1 average").arg(formatScore(average_score)),
-    };
+  };
 
-    m_mainWindow->statusBar()->showMessage(parts.join(" · "));
-  } else {
-    m_mainWindow->statusBar()->clearMessage();
-  }
+  m_mainWindow->statusBar()->showMessage(parts.join(" · "));
 }
 
 QModelIndexList ListViewBase::selectedIndexes() {
