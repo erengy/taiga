@@ -52,27 +52,6 @@ ListWidget::ListWidget(QWidget* parent, MainWindow* mainWindow)
   // List
   setViewMode(ListViewMode::List);  // must be called before initializing the toolbar
 
-  // Toolbar
-  {
-    auto toolbar = new QToolBar(this);
-    toolbar->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
-    toolbar->setIconSize({18, 18});
-
-    toolbar->addAction("TV");
-    toolbar->addAction("Finished airing");
-    toolbar->addAction("Average > 80%");
-
-    {
-      auto button = new QToolButton(this);
-      button->setToolButtonStyle(Qt::ToolButtonIconOnly);
-      button->setIcon(theme.getIcon("add_box"));
-      button->setText("Add filter");
-      toolbar->addWidget(button);
-    }
-
-    ui_->toolbarLayout->insertWidget(1, toolbar);
-  }
-
   ui_->editFilter->hide();
 
   // Toolbar
