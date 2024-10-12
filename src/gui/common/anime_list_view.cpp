@@ -43,7 +43,6 @@ ListView::ListView(QWidget* parent, AnimeListModel* model, AnimeListProxyModel* 
   setExpandsOnDoubleClick(false);
   setItemsExpandable(false);
   setRootIsDecorated(false);
-  setSortingEnabled(true);
   setUniformRowHeights(true);
 
   header()->setFirstSectionMovable(true);
@@ -63,7 +62,10 @@ ListView::ListView(QWidget* parent, AnimeListModel* model, AnimeListProxyModel* 
   header()->resizeSection(AnimeListModel::COLUMN_TYPE, 75);
   header()->resizeSection(AnimeListModel::COLUMN_LAST_UPDATED, 110);
 
-  sortByColumn(AnimeListModel::COLUMN_LAST_UPDATED, Qt::SortOrder::DescendingOrder);
+  // `sortByColumn` needs to be called before `setSortingEnabled`.
+  // Otherwise the sort column is set to `0`.
+  sortByColumn(proxyModel->sortColumn(), proxyModel->sortOrder());
+  setSortingEnabled(true);
 
   connect(this, &QAbstractItemView::clicked, this,
           qOverload<const QModelIndex&>(&QAbstractItemView::edit));

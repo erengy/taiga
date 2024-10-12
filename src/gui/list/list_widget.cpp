@@ -46,6 +46,12 @@ ListWidget::ListWidget(QWidget* parent, MainWindow* mainWindow)
 
   ui_->filterButton->hide();
 
+  // @TODO: Use settings from the previous session
+  m_proxyModel->sort(AnimeListModel::COLUMN_LAST_UPDATED, Qt::SortOrder::DescendingOrder);
+
+  // List
+  setViewMode(ListViewMode::List);  // must be called before initializing the toolbar
+
   // Toolbar
   {
     auto toolbar = new QToolBar(this);
@@ -107,7 +113,12 @@ ListWidget::ListWidget(QWidget* parent, MainWindow* mainWindow)
           const auto headerData =
               m_model->headerData(column, Qt::Orientation::Horizontal, Qt::DisplayRole);
           const auto action = menu->addAction(headerData.toString(), this, [this, column, order]() {
-            m_listView->sortByColumn(column, order);
+            if (m_listView) {
+              // Sorting the proxy model doesn't update the sort indicator on the header.
+              m_listView->sortByColumn(column, order);
+            } else {
+              m_proxyModel->sort(column, order);
+            }
           });
           action->setCheckable(true);
           action->setChecked(column == m_proxyModel->sortColumn());
@@ -142,7 +153,6 @@ ListWidget::ListWidget(QWidget* parent, MainWindow* mainWindow)
   m_proxyModel->setListStatusFilter({
       .status = static_cast<int>(anime::list::Status::Watching),
   });
-  setViewMode(ListViewMode::List);
 
   connect(mainWindow->navigation(), &NavigationWidget::currentItemChanged, this,
           [this](QTreeWidgetItem* current) {
