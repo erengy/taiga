@@ -45,7 +45,7 @@ SearchWidget::SearchWidget(QWidget* parent, MainWindow* mainWindow)
   ui_->setupUi(this);
 
   // @TODO: Use settings from the previous session
-  m_proxyModel->sort(AnimeListModel::COLUMN_TITLE, Qt::SortOrder::AscendingOrder);
+  m_proxyModel->sort(AnimeListModel::COLUMN_AVERAGE, Qt::SortOrder::DescendingOrder);
   m_proxyModel->setYearFilter(QDate::currentDate().year());
   m_proxyModel->setSeasonFilter(
       static_cast<int>(anime::Season{QDate::currentDate().toStdSysDays()}.name));
