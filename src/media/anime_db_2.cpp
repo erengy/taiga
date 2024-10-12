@@ -17,9 +17,20 @@
  */
 
 #include <QFile>
+#include <QRegularExpression>
 #include <QXmlStreamReader>
 
 #include "anime_db.hpp"
+
+namespace {
+
+// This regex is used to remove the extra root element from v1's XML documents so that they
+// can be read by `QXmlStreamReader` without an "Extra content at end of document" error.
+// See #842 for more information.
+static const QRegularExpression metaElementRegex{"<meta>.+</meta>",
+                                                 QRegularExpression::DotMatchesEverythingOption};
+
+}  // namespace
 
 namespace anime {
 
@@ -30,7 +41,10 @@ QList<Anime> readDatabase() {
 
   if (!file.open(QIODevice::ReadOnly)) return {};
 
-  QXmlStreamReader xml(&file);
+  QString str{file.readAll()};
+  str.remove(metaElementRegex);
+
+  QXmlStreamReader xml(str);
 
   if (!xml.readNextStartElement()) return {};
   if (xml.name() != u"database") return {};
@@ -115,7 +129,10 @@ QList<ListEntry> readListEntries() {
 
   if (!file.open(QIODevice::ReadOnly)) return {};
 
-  QXmlStreamReader xml(&file);
+  QString str{file.readAll()};
+  str.remove(metaElementRegex);
+
+  QXmlStreamReader xml(str);
 
   if (!xml.readNextStartElement()) return {};
   if (xml.name() != u"library") return {};
