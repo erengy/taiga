@@ -38,7 +38,6 @@ public:
   ~ListViewBase() = default;
 
 public slots:
-  void filterByListStatus(QTreeWidgetItem* current);
   void filterByText(const QString& text);
   void showMediaDialog(const QModelIndex& index);
   void showMediaMenu();

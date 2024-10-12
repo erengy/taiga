@@ -149,21 +149,12 @@ ListWidget::ListWidget(QWidget* parent, MainWindow* mainWindow)
     }
   }
 
-  // List
-  m_proxyModel->setListStatusFilter({
-      .status = static_cast<int>(anime::list::Status::Watching),
-  });
-
-  connect(mainWindow->navigation(), &NavigationWidget::currentItemChanged, this,
-          [this](QTreeWidgetItem* current) {
-            switch (m_viewMode) {
-              case ListViewMode::List:
-                m_listView->baseView()->filterByListStatus(current);
-                break;
-              case ListViewMode::Cards:
-                m_listViewCards->baseView()->filterByListStatus(current);
-                break;
-            }
+  connect(mainWindow->navigation(), &NavigationWidget::currentListStatusChanged, this,
+          [this](anime::list::Status status) {
+            m_proxyModel->setListStatusFilter({
+                .status = static_cast<int>(status),
+                .anyStatus = !static_cast<int>(status),
+            });
           });
 }
 

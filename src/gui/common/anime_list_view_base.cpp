@@ -59,21 +59,6 @@ ListViewBase::ListViewBase(QWidget* parent, QAbstractItemView* view, AnimeListMo
           &ListViewBase::updateSelectionStatus);
 }
 
-void ListViewBase::filterByListStatus(QTreeWidgetItem* current) {
-  if (!current) return;
-
-  const auto page =
-      current->data(0, static_cast<int>(NavigationItemDataRole::PageIndex)).value<MainWindowPage>();
-  if (page != MainWindowPage::List) return;
-
-  const int status = current->data(0, static_cast<int>(NavigationItemDataRole::ListStatus)).toInt();
-
-  m_proxyModel->setListStatusFilter({
-      .status = status,
-      .anyStatus = !status,
-  });
-}
-
 void ListViewBase::filterByText(const QString& text) {
   m_proxyModel->setTextFilter(text);
 }
@@ -118,24 +103,24 @@ void ListViewBase::updateSelectionStatus(const QItemSelection& selected, const Q
   int n_episodes = 0;
   int n_score = 0;
   double total_score = 0.0;
-    double average_score = 0.0;
+  double average_score = 0.0;
 
-    for (const auto index : selectedIndexes()) {
-      const auto anime = m_model->getAnime(m_proxyModel->mapToSource(index));
-      if (!anime) continue;
-      if (anime->episode_count > 0) n_episodes += anime->episode_count;
-      if (anime->score) {
-        ++n_score;
-        total_score += anime->score;
-      }
+  for (const auto index : selectedIndexes()) {
+    const auto anime = m_model->getAnime(m_proxyModel->mapToSource(index));
+    if (!anime) continue;
+    if (anime->episode_count > 0) n_episodes += anime->episode_count;
+    if (anime->score) {
+      ++n_score;
+      total_score += anime->score;
     }
+  }
 
-    if (n_score) average_score = total_score / n_score;
+  if (n_score) average_score = total_score / n_score;
 
-    const QStringList parts{
-        tr("%n item(s) selected", nullptr, n_selected),
-        tr("%n episode(s)", nullptr, n_episodes),
-        tr("%1 average").arg(formatScore(average_score)),
+  const QStringList parts{
+      tr("%n item(s) selected", nullptr, n_selected),
+      tr("%n episode(s)", nullptr, n_episodes),
+      tr("%1 average").arg(formatScore(average_score)),
   };
 
   m_mainWindow->statusBar()->showMessage(parts.join(" · "));

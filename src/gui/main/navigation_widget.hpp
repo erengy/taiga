@@ -39,6 +39,8 @@ public:
   NavigationWidget(MainWindow* mainWindow);
   ~NavigationWidget() = default;
 
+  QTreeWidgetItem* findItemByPage(MainWindowPage page) const;
+
 public slots:
   void refresh();
 

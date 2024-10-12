@@ -55,8 +55,6 @@ MainWindow::MainWindow() : QMainWindow(), ui_(new Ui::MainWindow) {
   initNavigation();
   initStatusbar();
   initNowPlaying();
-
-  setPage(MainWindowPage::List);
   updateTitle();
 }
 
@@ -110,6 +108,13 @@ void MainWindow::initIcons() {
 
 void MainWindow::initNavigation() {
   m_navigationWidget = new NavigationWidget(this);
+
+  connect(m_navigationWidget, &NavigationWidget::currentPageChanged, this, &MainWindow::setPage);
+
+  if (const auto item = m_navigationWidget->findItemByPage(MainWindowPage::List)) {
+    m_navigationWidget->setCurrentItem(item);
+  }
+
   ui_->splitter->insertWidget(0, m_navigationWidget);
 }
 

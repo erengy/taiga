@@ -155,4 +155,23 @@ void NavigationWidget::setItemData(QTreeWidgetItem* item, NavigationItemDataRole
   item->setData(0, static_cast<int>(role), value);
 }
 
+QTreeWidgetItem* NavigationWidget::findItemByPage(MainWindowPage page) const {
+  static const auto find = [page](this auto const& find,
+                                  QTreeWidgetItem* item) -> QTreeWidgetItem* {
+    const auto role = static_cast<int>(NavigationItemDataRole::PageIndex);
+    const int data = item->data(0, role).toInt();
+    if (data == static_cast<int>(page)) return item;
+    for (int i = 0; i < item->childCount(); ++i) {
+      if (const auto child = find(item->child(i))) return child;
+    }
+    return nullptr;
+  };
+
+  for (int i = 0; i < topLevelItemCount(); ++i) {
+    if (const auto item = find(topLevelItem(i))) return item;
+  }
+
+  return nullptr;
+}
+
 }  // namespace gui
