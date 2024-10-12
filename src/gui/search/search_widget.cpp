@@ -44,6 +44,13 @@ SearchWidget::SearchWidget(QWidget* parent, MainWindow* mainWindow)
       ui_(new Ui::SearchWidget) {
   ui_->setupUi(this);
 
+  // @TODO: Use settings from the previous session
+  m_proxyModel->sort(AnimeListModel::COLUMN_TITLE, Qt::SortOrder::AscendingOrder);
+  m_proxyModel->setYearFilter(QDate::currentDate().year());
+  m_proxyModel->setSeasonFilter(
+      static_cast<int>(anime::Season{QDate::currentDate().toStdSysDays()}.name));
+  m_proxyModel->setTypeFilter(static_cast<int>(anime::Type::Tv));
+
   static const auto filterValue = [](QComboBox* combo, int index) {
     return index > -1 ? std::optional<int>{combo->itemData(index).toInt()} : std::nullopt;
   };
@@ -53,6 +60,9 @@ SearchWidget::SearchWidget(QWidget* parent, MainWindow* mainWindow)
     m_comboYear->setPlaceholderText("Year");
     for (int year = QDate::currentDate().year() + 1; year >= 1940; --year) {
       m_comboYear->addItem(u"%1"_qs.arg(year), year);
+    }
+    if (m_proxyModel->filters().year) {
+      m_comboYear->setCurrentText(QString::number(*m_proxyModel->filters().year));
     }
     connect(m_comboYear, &QComboBox::currentIndexChanged, this,
             [this](int index) { m_proxyModel->setYearFilter(filterValue(m_comboYear, index)); });
@@ -71,6 +81,10 @@ SearchWidget::SearchWidget(QWidget* parent, MainWindow* mainWindow)
     for (const auto season : seasons) {
       m_comboSeason->addItem(formatSeasonName(season), static_cast<int>(season));
     }
+    if (m_proxyModel->filters().season) {
+      m_comboSeason->setCurrentText(
+          formatSeasonName(static_cast<anime::SeasonName>(*m_proxyModel->filters().season)));
+    }
     connect(m_comboSeason, &QComboBox::currentIndexChanged, this, [this](int index) {
       m_proxyModel->setSeasonFilter(filterValue(m_comboSeason, index));
     });
@@ -83,6 +97,10 @@ SearchWidget::SearchWidget(QWidget* parent, MainWindow* mainWindow)
     for (const auto type : anime::kTypes) {
       m_comboType->addItem(formatType(type), static_cast<int>(type));
     }
+    if (m_proxyModel->filters().type) {
+      m_comboType->setCurrentText(
+          formatType(static_cast<anime::Type>(*m_proxyModel->filters().type)));
+    }
     connect(m_comboType, &QComboBox::currentIndexChanged, this,
             [this](int index) { m_proxyModel->setTypeFilter(filterValue(m_comboType, index)); });
     ui_->toolbarLayout->insertWidget(2, m_comboType);
@@ -93,6 +111,10 @@ SearchWidget::SearchWidget(QWidget* parent, MainWindow* mainWindow)
     m_comboStatus->setPlaceholderText("Status");
     for (const auto status : anime::kStatuses) {
       m_comboStatus->addItem(formatStatus(status), static_cast<int>(status));
+    }
+    if (m_proxyModel->filters().status) {
+      m_comboStatus->setCurrentText(
+          formatStatus(static_cast<anime::Status>(*m_proxyModel->filters().status)));
     }
     connect(m_comboStatus, &QComboBox::currentIndexChanged, this, [this](int index) {
       m_proxyModel->setStatusFilter(filterValue(m_comboStatus, index));
