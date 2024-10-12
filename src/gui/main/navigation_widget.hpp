@@ -20,6 +20,10 @@
 
 #include <QTreeWidget>
 
+namespace anime::list {
+enum class Status;
+}
+
 namespace gui {
 
 enum class MainWindowPage;
@@ -37,6 +41,10 @@ public:
 
 public slots:
   void refresh();
+
+signals:
+  void currentPageChanged(MainWindowPage page);
+  void currentListStatusChanged(anime::list::Status status);
 
 protected:
   void mouseMoveEvent(QMouseEvent* event) override;

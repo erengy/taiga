@@ -31,26 +31,30 @@ namespace gui {
 
 NavigationWidget::NavigationWidget(MainWindow* mainWindow)
     : QTreeWidget(mainWindow), m_mainWindow(mainWindow) {
+  setObjectName("navigation");
   setFixedWidth(200);
   setFrameShape(QFrame::Shape::NoFrame);
+  setItemDelegate(new NavigationItemDelegate(this));
   setHeaderHidden(true);
   setIndentation(0);
-  setItemDelegate(new NavigationItemDelegate(this));
-  setObjectName("navigation");
 
   viewport()->setMouseTracking(true);
 
   refresh();
 
-  connect(this, &QTreeWidget::currentItemChanged,
-          [this](QTreeWidgetItem* current, QTreeWidgetItem* previous) {
-            if (current) {
-              const int role = static_cast<int>(NavigationItemDataRole::PageIndex);
-              const int index = current->data(0, role).toInt();
-              const auto page = static_cast<MainWindowPage>(index);
-              m_mainWindow->setPage(page);
-            }
-          });
+  connect(this, &QTreeWidget::currentItemChanged, this, [this](QTreeWidgetItem* current) {
+    if (!current) return;
+
+    constexpr auto pageIndexRole = static_cast<int>(NavigationItemDataRole::PageIndex);
+    const auto page = current->data(0, pageIndexRole).value<MainWindowPage>();
+    emit currentPageChanged(page);
+
+    if (page != MainWindowPage::List) return;
+
+    constexpr auto statusRole = static_cast<int>(NavigationItemDataRole::ListStatus);
+    const auto status = current->data(0, statusRole).value<anime::list::Status>();
+    emit currentListStatusChanged(status);
+  });
 }
 
 void NavigationWidget::refresh() {
