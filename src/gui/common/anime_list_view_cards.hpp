@@ -42,6 +42,7 @@ public:
 
 protected:
   void keyPressEvent(QKeyEvent* event) override;
+  void wheelEvent(QWheelEvent *event) override;
 
 private:
   ListViewBase* m_base = nullptr;

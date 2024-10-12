@@ -19,6 +19,8 @@
 #include "anime_list_view_cards.hpp"
 
 #include <QKeyEvent>
+#include <QScrollBar>
+#include <QWheelEvent>
 
 #include "gui/common/anime_list_item_delegate_cards.hpp"
 #include "gui/common/anime_list_view_base.hpp"
@@ -52,6 +54,13 @@ void ListViewCards::keyPressEvent(QKeyEvent* event) {
   }
 
   QListView::keyPressEvent(event);
+}
+
+void ListViewCards::wheelEvent(QWheelEvent* event) {
+  const auto action = event->angleDelta().y() > 0 ? QScrollBar::SliderSingleStepSub
+                                                  : QScrollBar::SliderSingleStepAdd;
+  verticalScrollBar()->triggerAction(action);
+  event->accept();
 }
 
 }  // namespace gui
