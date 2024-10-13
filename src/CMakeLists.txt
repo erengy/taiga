@@ -9,6 +9,7 @@ target_sources(taiga PRIVATE
 	resources/icons.qrc
 	resources/styles.qrc
 	taiga/application.cpp
+	taiga/orange.cpp
 	taiga/version.cpp
 	main.cpp
 )

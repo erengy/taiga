@@ -18,23 +18,22 @@
 
 #pragma once
 
-#include <windows/win/thread.h>
+#include <QThread>
 
 namespace taiga {
 
-class Orange : public win::Thread {
+class Orange final : public QThread {
+  Q_OBJECT
+  Q_DISABLE_COPY_MOVE(Orange)
+
 public:
+  Orange(QObject* parent);
   ~Orange();
 
-  void Start();
-  void Stop();
+  static Orange* create(QObject* parent);
 
-  DWORD ThreadProc();
-
-private:
-  bool playing_ = false;
+protected:
+  void run() override;
 };
-
-inline Orange orange;
 
 }  // namespace taiga
