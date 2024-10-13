@@ -163,12 +163,6 @@ void MediaDialog::initDetails() {
     return list.join(", ");
   };
 
-  auto episodesLabel = new QLabel(tr("%1").arg(m_anime.episode_count), this);
-  if (m_anime.episode_length) {
-    episodesLabel->setCursor(QCursor(Qt::CursorShape::WhatsThisCursor));
-    episodesLabel->setToolTip(u"%1 minutes per episode"_qs.arg(m_anime.episode_length));
-  }
-
   auto seasonLabel = new QLabel(formatSeason(anime::Season(m_anime.date_started)), this);
   seasonLabel->setCursor(QCursor(Qt::CursorShape::WhatsThisCursor));
   seasonLabel->setToolTip(u"%1 to %2"_qs.arg(formatFuzzyDate(m_anime.date_started))
@@ -179,7 +173,13 @@ void MediaDialog::initDetails() {
                             get_row_label(from_vector(m_anime.titles.synonyms)));
   }
   ui_->infoLayout->addRow(get_row_title(tr("Type:")), get_row_label(formatType(m_anime.type)));
-  ui_->infoLayout->addRow(get_row_title(tr("Episodes:")), episodesLabel);
+  ui_->infoLayout->addRow(get_row_title(tr("Episodes:")),
+                          get_row_label(QString::number(m_anime.episode_count)));
+  if (m_anime.episode_length > 0 && m_anime.type != anime::Type::Tv) {
+    const auto duration = formatEpisodeLength(m_anime.episode_length);
+    const auto label = m_anime.episode_count == 1 ? duration : u"%1 per episode"_qs.arg(duration);
+    ui_->infoLayout->addRow(get_row_title(tr("Duration:")), get_row_label(label));
+  }
   ui_->infoLayout->addRow(get_row_title(tr("Status:")),
                           get_row_label(formatStatus(m_anime.status)));
   ui_->infoLayout->addRow(get_row_title(tr("Season:")), seasonLabel);
