@@ -19,6 +19,7 @@
 #include "application.hpp"
 
 #include <QCommandLineParser>
+#include <QFileInfo>
 
 #include "base/log.hpp"
 #include "gui/main/main_window.hpp"
@@ -71,7 +72,12 @@ void Application::initLogger() const {
   monolog::log.set_path(path);
   monolog::log.set_level(options_.debug ? Level::Debug : Level::Warning);
 
-  LOGI("Version {}", taiga::version().to_string());
+  const auto last_modified = QFileInfo{QCoreApplication::applicationFilePath()}
+                                 .lastModified()
+                                 .toString(Qt::DateFormat::ISODate)
+                                 .toStdString();
+
+  LOGI("Version {} ({})", taiga::version().to_string(), last_modified);
 }
 
 void Application::parseCommandLine() {

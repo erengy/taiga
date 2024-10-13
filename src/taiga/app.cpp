@@ -71,22 +71,6 @@ App::~App() {
 }
 
 BOOL App::InitInstance() {
-  // Parse command line
-  options = detail::ParseCommandLine();
-#ifdef _DEBUG
-  options.debug_mode = true;
-#endif
-
-  // Initialize logger
-  const auto module_path = GetModulePath();
-  const auto path = AddTrailingSlash(GetPathOnly(module_path));
-  using monolog::Level;
-  monolog::log.enable_console_output(false);
-  monolog::log.set_path(path + TAIGA_APP_NAME L".log");
-  monolog::log.set_level(options.debug_mode ? Level::Debug : Level::Warning);
-  LOGI(L"Version {} ({})", StrToWstr(taiga::version().to_string()),
-       GetFileLastModifiedDate(module_path));
-
   // Check another instance
   if (!options.allow_multiple_instances) {
     if (CheckInstance(TAIGA_APP_MUTEX, L"TaigaMainW")) {
