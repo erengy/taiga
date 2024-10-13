@@ -16,20 +16,13 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "anime_db.hpp"
-#include "compat/anime.hpp"
-#include "compat/settings.hpp"
+#pragma once
 
-namespace anime {
+#include <QMap>
+#include <QString>
 
-QList<Anime> readDatabase() {
-  return compat::v1::read_anime_database("./data/v1/db/anime.xml");
-}
+namespace compat::v1 {
 
-QList<ListEntry> readListEntries() {
-  const auto settings = compat::v1::read_settings("./data/v1/settings.xml");
-  const auto userDir = u"%1@%2"_qs.arg(settings["username"]).arg(settings["service"]);
-  return compat::v1::read_list_entries(u"./data/v1/user/%1/anime.xml"_qs.arg(userDir));
-}
+QMap<QString, QString> read_settings(const QString& path);
 
-}  // namespace anime
+}  // namespace compat::v1

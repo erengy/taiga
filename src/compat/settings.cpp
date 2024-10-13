@@ -16,34 +16,45 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "taiga/settings.h"
+#include "settings.hpp"
 
-#include "base/log.h"
-#include "base/string.h"
-#include "media/anime.h"
-#include "taiga/version.h"
+#include <QFile>
+#include <QXmlStreamReader>
 
-namespace taiga {
+namespace compat::v1 {
 
-bool Settings::HandleCompatibility() {
-  const semaver::Version version = GetMetaVersion();
+QMap<QString, QString> read_settings(const QString& path) {
+  QFile file(path);
 
-  if (version == taiga::version())
-    return false;
+  if (!file.open(QIODevice::ReadOnly)) return {};
 
-  LOGW(L"Upgraded from v{} to v{}", StrToWstr(version.to_string()),
-       StrToWstr(taiga::version().to_string()));
+  QXmlStreamReader xml(&file);
 
-  if (version <= semaver::Version(1, 3, 0)) {
-    // Set title language preference
-    if (GetAppListDisplayEnglishTitles()) {
-      SetAppListTitleLanguagePreference(anime::TitleLanguage::English);
+  if (!xml.readNextStartElement()) return {};
+  if (xml.name() != u"settings") return {};
+
+  QString service;
+  QString username;
+
+  while (xml.readNextStartElement()) {
+    if (xml.name() == u"account") {
+      while (xml.readNextStartElement()) {
+        if (xml.name() == u"update") {
+          service = xml.attributes().value(u"activeservice").toString();
+        } else if (xml.name() == service) {
+          username = xml.attributes().value(u"username").toString();
+        }
+        xml.skipCurrentElement();
+      }
     } else {
-      SetAppListTitleLanguagePreference(anime::TitleLanguage::Romaji);
+      xml.skipCurrentElement();
     }
   }
 
-  return true;
+  return {
+      {"service", service},
+      {"username", username},
+  };
 }
 
-}  // namespace taiga
+}  // namespace compat::v1
