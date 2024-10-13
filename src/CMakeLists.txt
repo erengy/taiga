@@ -4,6 +4,7 @@ add_executable(taiga)
 
 target_sources(taiga PRIVATE
 	base/chrono.cpp
+	compat/anime.cpp
 	media/anime_db_2.cpp
 	media/anime_season.cpp
 	resources/icons.qrc

@@ -16,24 +16,16 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <semaver.hpp>
+#pragma once
 
-#include "media/anime_db.h"
+#include <QList>
+#include <QString>
 
-#include "base/string.h"
+#include "media/anime.hpp"
 
-namespace anime {
+namespace compat::v1 {
 
-void Database::HandleCompatibility(const std::wstring& meta_version) {
-  const semaver::Version version(WstrToStr(meta_version));
-}
+QList<Anime> read_anime_database(const QString& path);
+QList<ListEntry> read_list_entries(const QString& path);
 
-void Database::HandleListCompatibility(const std::wstring& meta_version) {
-  const semaver::Version version(WstrToStr(meta_version));
-  bool need_to_save = false;
-
-  if (need_to_save)
-    SaveList();
-}
-
-}  // namespace anime
+}  // namespace compat::v1
