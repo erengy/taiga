@@ -12,6 +12,7 @@ target_sources(taiga PRIVATE
 	resources/styles.qrc
 	taiga/application.cpp
 	taiga/orange.cpp
+	taiga/path.cpp
 	taiga/version.cpp
 	main.cpp
 )

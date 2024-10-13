@@ -20,33 +20,8 @@
 
 #include <string>
 
-namespace sync {
-enum class ServiceId;
-}
-
 namespace taiga {
 
-enum class Path {
-  Data,
-  Database,
-  DatabaseAnime,
-  DatabaseAnimeRelations,
-  DatabaseImage,
-  Feed,
-  FeedHistory,
-  Media,
-  Settings,
-  Test,
-  TestRecognition,
-  Theme,
-  ThemeCurrent,
-  User,
-  UserHistory,
-  UserLibrary
-};
-
-std::wstring GetUserDirectoryName(const sync::ServiceId service_id);
-std::wstring GetUserDirectoryName();
-std::wstring GetPath(Path path);
+std::string get_data_path();
 
 }  // namespace taiga

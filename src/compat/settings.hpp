@@ -20,9 +20,10 @@
 
 #include <QMap>
 #include <QString>
+#include <string>
 
 namespace compat::v1 {
 
-QMap<QString, QString> read_settings(const QString& path);
+QMap<QString, QString> read_settings(const std::string& path);
 
 }  // namespace compat::v1

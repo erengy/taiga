@@ -16,20 +16,26 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <format>
+
 #include "anime_db.hpp"
 #include "compat/anime.hpp"
 #include "compat/settings.hpp"
+#include "taiga/path.hpp"
 
 namespace anime {
 
 QList<Anime> readDatabase() {
-  return compat::v1::read_anime_database("./data/v1/db/anime.xml");
+  const auto data_path = taiga::get_data_path();
+  return compat::v1::read_anime_database(std::format("{}/v1/db/anime.xml", data_path));
 }
 
 QList<ListEntry> readListEntries() {
-  const auto settings = compat::v1::read_settings("./data/v1/settings.xml");
-  const auto userDir = u"%1@%2"_qs.arg(settings["username"]).arg(settings["service"]);
-  return compat::v1::read_list_entries(u"./data/v1/user/%1/anime.xml"_qs.arg(userDir));
+  const auto data_path = taiga::get_data_path();
+  const auto settings = compat::v1::read_settings(std::format("{}/v1/settings.xml", data_path));
+  return compat::v1::read_list_entries(std::format("{}/v1/user/{}@{}/anime.xml", data_path,
+                                                   settings["username"].toStdString(),
+                                                   settings["service"].toStdString()));
 }
 
 }  // namespace anime

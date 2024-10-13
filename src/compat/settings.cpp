@@ -23,8 +23,8 @@
 
 namespace compat::v1 {
 
-QMap<QString, QString> read_settings(const QString& path) {
-  QFile file(path);
+QMap<QString, QString> read_settings(const std::string& path) {
+  QFile file(QString::fromStdString(path));
 
   if (!file.open(QIODevice::ReadOnly)) return {};
 

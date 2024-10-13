@@ -21,6 +21,8 @@
 #include <QImage>
 #include <QImageReader>
 
+#include "taiga/path.hpp"
+
 namespace gui {
 
 const QPixmap& ImageProvider::loadPoster(int id) {
@@ -28,7 +30,8 @@ const QPixmap& ImageProvider::loadPoster(int id) {
     return it.value();
   }
 
-  QImageReader reader(u"./data/cache/image/%1.jpg"_qs.arg(id));
+  const auto path = QString::fromStdString(taiga::get_data_path());
+  QImageReader reader(u"%1/v1/db/image/%2.jpg"_qs.arg(path).arg(id));
   const QImage image = reader.read();
 
   m_pixmaps[id] = !image.isNull() ? QPixmap::fromImage(image) : QPixmap{};

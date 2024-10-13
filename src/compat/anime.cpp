@@ -34,8 +34,8 @@ static const QRegularExpression metaElementRegex{"<meta>.+</meta>",
 
 namespace compat::v1 {
 
-QList<Anime> read_anime_database(const QString& path) {
-  QFile file(path);
+QList<Anime> read_anime_database(const std::string& path) {
+  QFile file(QString::fromStdString(path));
 
   if (!file.open(QIODevice::ReadOnly)) return {};
 
@@ -122,8 +122,8 @@ QList<Anime> read_anime_database(const QString& path) {
   return data;
 }
 
-QList<ListEntry> read_list_entries(const QString& path) {
-  QFile file(path);
+QList<ListEntry> read_list_entries(const std::string& path) {
+  QFile file(QString::fromStdString(path));
 
   if (!file.open(QIODevice::ReadOnly)) return {};
 
