@@ -65,11 +65,23 @@ void ListItemDelegateCards::paint(QPainter* painter, const QStyleOptionViewItem&
     } else {
       painter->fillRect(posterRect, opt.palette.mid());
     }
-    if (const auto& posterPixmap = imageProvider.loadPoster(item->id); !posterPixmap.isNull()) {
-      const auto scaledSize =
-          posterPixmap.size().scaled(posterRect.size(), Qt::AspectRatioMode::KeepAspectRatio);
-      painter->drawPixmap(posterRect.x(), posterRect.y(), scaledSize.width(), scaledSize.height(),
-                          posterPixmap);
+
+    if (const auto& pixmap = imageProvider.loadPoster(item->id); !pixmap.isNull()) {
+      const auto scaled =
+          pixmap.size().scaled(posterRect.size(), Qt::AspectRatioMode::KeepAspectRatioByExpanding);
+
+      QRect sourceRect{pixmap.rect()};
+      if (scaled.width() > posterRect.width()) {
+        const auto half = (scaled.width() - posterRect.width()) / 2.0f;
+        const auto scale = static_cast<float>(pixmap.width()) / scaled.width();
+        sourceRect.adjust(half * scale, 0, -half * scale, 0);
+      } else {
+        const auto half = (scaled.height() - posterRect.height()) / 2.0f;
+        const auto scale = static_cast<float>(pixmap.height()) / scaled.height();
+        sourceRect.adjust(0, half * scale, 0, -half * scale);
+      }
+
+      painter->drawPixmap(posterRect, pixmap, sourceRect);
     }
 
     rect.adjust(posterRect.width(), 0, 0, 0);
