@@ -48,12 +48,12 @@ LibraryWidget::LibraryWidget(QWidget* parent)
   m_view->header()->setTextElideMode(Qt::ElideRight);
   m_view->header()->hideSection(LibraryModel::COLUMN_TYPE);
   m_view->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
-  m_view->header()->setSectionResizeMode(LibraryModel::COLUMN_TITLE, QHeaderView::Stretch);
+  m_view->header()->setSectionResizeMode(LibraryModel::COLUMN_NAME, QHeaderView::Stretch);
   m_view->header()->setSectionResizeMode(LibraryModel::COLUMN_ANIME, QHeaderView::Stretch);
   m_view->header()->moveSection(LibraryModel::COLUMN_ANIME, 1);
   m_view->header()->moveSection(LibraryModel::COLUMN_EPISODE, 2);
 
-  m_view->sortByColumn(LibraryModel::COLUMN_TITLE, Qt::SortOrder::AscendingOrder);
+  m_view->sortByColumn(LibraryModel::COLUMN_NAME, Qt::SortOrder::AscendingOrder);
   m_view->setSortingEnabled(true);
 
   const auto layout = new QHBoxLayout(this);

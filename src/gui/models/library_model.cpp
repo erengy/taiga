@@ -57,8 +57,8 @@ QVariant LibraryModel::headerData(int section, Qt::Orientation orientation, int 
   switch (role) {
     case Qt::DisplayRole: {
       switch (section) {
-        case COLUMN_TITLE:
-          return tr("Title");
+        case COLUMN_NAME:
+          return tr("Name");
         case COLUMN_SIZE:
           return tr("Size");
         case COLUMN_TYPE:
@@ -75,7 +75,7 @@ QVariant LibraryModel::headerData(int section, Qt::Orientation orientation, int 
 
     case Qt::TextAlignmentRole: {
       switch (section) {
-        case COLUMN_TITLE:
+        case COLUMN_NAME:
         case COLUMN_TYPE:
         case COLUMN_ANIME:
           return QVariant(Qt::AlignLeft | Qt::AlignVCenter);
