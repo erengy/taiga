@@ -193,32 +193,22 @@ bool AnimeListModel::setData(const QModelIndex& index, const QVariant& value, in
 QVariant AnimeListModel::headerData(int section, Qt::Orientation orientation, int role) const {
   switch (role) {
     case Qt::DisplayRole: {
+      // clang-format off
       switch (section) {
-        case COLUMN_TITLE:
-          return tr("Title");
-        case COLUMN_PROGRESS:
-          return tr("Progress");
-        case COLUMN_DURATION:
-          return tr("Duration");
-        case COLUMN_REWATCHES:
-          return tr("Rewatches");
-        case COLUMN_SCORE:
-          return tr("Score");
-        case COLUMN_AVERAGE:
-          return tr("Average");
-        case COLUMN_TYPE:
-          return tr("Type");
-        case COLUMN_SEASON:
-          return tr("Season");
-        case COLUMN_STARTED:
-          return tr("Started");
-        case COLUMN_COMPLETED:
-          return tr("Completed");
-        case COLUMN_LAST_UPDATED:
-          return tr("Last updated");
-        case COLUMN_NOTES:
-          return tr("Notes");
+        case COLUMN_TITLE: return tr("Title");
+        case COLUMN_PROGRESS: return tr("Progress");
+        case COLUMN_DURATION: return tr("Duration");
+        case COLUMN_REWATCHES: return tr("Rewatches");
+        case COLUMN_SCORE: return tr("Score");
+        case COLUMN_AVERAGE: return tr("Average");
+        case COLUMN_TYPE: return tr("Type");
+        case COLUMN_SEASON: return tr("Season");
+        case COLUMN_STARTED: return tr("Started");
+        case COLUMN_COMPLETED: return tr("Completed");
+        case COLUMN_LAST_UPDATED: return tr("Last updated");
+        case COLUMN_NOTES: return tr("Notes");
       }
+      // clang-format on
       break;
     }
 

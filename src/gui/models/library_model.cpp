@@ -75,20 +75,16 @@ QVariant LibraryModel::data(const QModelIndex& index, int role) const {
 QVariant LibraryModel::headerData(int section, Qt::Orientation orientation, int role) const {
   switch (role) {
     case Qt::DisplayRole: {
+      // clang-format off
       switch (section) {
-        case COLUMN_NAME:
-          return tr("Name");
-        case COLUMN_SIZE:
-          return tr("Size");
-        case COLUMN_TYPE:
-          return tr("Type");
-        case COLUMN_ANIME:
-          return tr("Anime");
-        case COLUMN_EPISODE:
-          return tr("Episode");
-        case COLUMN_MODIFIED:
-          return tr("Last modified");
+        case COLUMN_NAME: return tr("Name");
+        case COLUMN_SIZE: return tr("Size");
+        case COLUMN_TYPE: return tr("Type");
+        case COLUMN_ANIME: return tr("Anime");
+        case COLUMN_EPISODE: return tr("Episode");
+        case COLUMN_MODIFIED: return tr("Last modified");
       }
+      // clang-format on
       break;
     }
 
