@@ -22,6 +22,7 @@
 #include <QFileDialog>
 #include <QtWidgets>
 
+#include "gui/library/library_widget.hpp"
 #include "gui/list/list_widget.hpp"
 #include "gui/main/navigation_widget.hpp"
 #include "gui/main/now_playing_widget.hpp"
@@ -159,8 +160,16 @@ void MainWindow::initPage(MainWindowPage page) {
     case MainWindowPage::History:
       break;
 
-    case MainWindowPage::Library:
+    case MainWindowPage::Library: {
+      const auto layout = new QHBoxLayout(ui_->libraryPage);
+      layout->setContentsMargins(0, 0, 0, 0);
+      ui_->libraryPage->setLayout(layout);
+
+      m_libraryWidget = new LibraryWidget(ui_->libraryPage);
+      layout->addWidget(m_libraryWidget);
+
       break;
+    }
 
     case MainWindowPage::Torrents:
       break;

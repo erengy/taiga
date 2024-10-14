@@ -28,6 +28,7 @@ class MainWindow;
 
 namespace gui {
 
+class LibraryWidget;
 class ListWidget;
 class NavigationWidget;
 class NowPlayingWidget;
@@ -88,6 +89,7 @@ private:
 
   Ui::MainWindow* ui_ = nullptr;
 
+  LibraryWidget* m_libraryWidget = nullptr;
   ListWidget* m_listWidget = nullptr;
   NavigationWidget* m_navigationWidget = nullptr;
   NowPlayingWidget* m_nowPlayingWidget = nullptr;

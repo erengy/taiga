@@ -81,20 +81,7 @@
          </item>
         </layout>
        </widget>
-       <widget class="QWidget" name="libraryPage">
-        <layout class="QVBoxLayout" name="verticalLayout_4">
-         <item>
-          <widget class="QLabel" name="label_7">
-           <property name="text">
-            <string>TODO: Library</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignmentFlag::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
+       <widget class="QWidget" name="libraryPage"/>
        <widget class="QWidget" name="torrentsPage">
         <layout class="QVBoxLayout" name="verticalLayout_7">
          <item>

@@ -38,19 +38,24 @@ QTreeView#animeList QHeaderView {
   border-bottom-color: rgba(255, 255, 255, 16%);
 }
 
-QTreeView#animeList::item {
+QTreeView#animeList::item,
+QTreeView#libraryView::item {
   background-color: #1c1c1c;
 }
-QTreeView#animeList::item:alternate {
+QTreeView#animeList::item:alternate,
+QTreeView#libraryView::item:alternate {
   background-color: rgba(255, 255, 255, 1%);
 }
-QTreeView#animeList::item:hover {
+QTreeView#animeList::item:hover,
+QTreeView#libraryView::item:hover {
   background-color: rgba(255, 255, 255, 5%);
 }
-QTreeView#animeList::item:selected:active {
+QTreeView#animeList::item:selected:active,
+QTreeView#libraryView::item:selected:active {
   background-color: rgba(255, 255, 255, 20%);
 }
-QTreeView#animeList::item:selected:!active {
+QTreeView#animeList::item:selected:!active,
+QTreeView#libraryView::item:selected:!active {
   background-color: rgba(255, 255, 255, 10%);
 }
 

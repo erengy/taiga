@@ -49,20 +49,29 @@ QTreeView#animeList QHeaderView {
   border-bottom-style: solid;
 }
 
-QTreeView#animeList QHeaderView::section {
+QTreeView#animeList QHeaderView::section,
+QTreeView#libraryView QHeaderView::section {
   font-weight: 600;
   height: 32px;
   padding-left: 12px;
   padding-right: 12px;
 }
 
-QTreeView#animeList {
+QTreeView#animeList,
+QTreeView#libraryView {
   selection-background-color: transparent;
 }
 
-QTreeView#animeList::item {
+QTreeView#animeList::item,
+QTreeView#libraryView::item {
   padding-left: 8px;
   padding-right: 8px;
+}
+
+/* Library */
+
+QTreeView#libraryView::item {
+  height: 24px;
 }
 
 /* Now Playing */

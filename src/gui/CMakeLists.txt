@@ -7,6 +7,7 @@ target_sources(taiga-gui PRIVATE
 	common/anime_list_view_base.cpp
 	common/anime_list_view_cards.cpp
 	common/combobox.cpp
+	library/library_widget.cpp
 	list/list_widget.cpp
 	main/main_window.cpp
 	main/navigation_item_delegate.cpp
@@ -16,6 +17,7 @@ target_sources(taiga-gui PRIVATE
 	media/media_menu.cpp
 	models/anime_list_model.cpp
 	models/anime_list_proxy_model.cpp
+	models/library_model.cpp
 	search/search_widget.cpp
 	settings/settings_dialog.cpp
 	utils/format.cpp
