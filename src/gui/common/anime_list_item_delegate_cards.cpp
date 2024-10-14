@@ -66,10 +66,13 @@ void ListItemDelegateCards::paint(QPainter* painter, const QStyleOptionViewItem&
       painter->fillRect(posterRect, opt.palette.mid());
     }
     if (const auto& posterPixmap = imageProvider.loadPoster(item->id); !posterPixmap.isNull()) {
-      painter->drawPixmap(posterRect, posterPixmap);
+      const auto scaledSize =
+          posterPixmap.size().scaled(posterRect.size(), Qt::AspectRatioMode::KeepAspectRatio);
+      painter->drawPixmap(posterRect.x(), posterRect.y(), scaledSize.width(), scaledSize.height(),
+                          posterPixmap);
     }
 
-    rect.adjust(140, 0, 0, 0);
+    rect.adjust(posterRect.width(), 0, 0, 0);
   }
 
   auto font = painter->font();
