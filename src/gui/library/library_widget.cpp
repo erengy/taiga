@@ -24,12 +24,14 @@
 #include <QUrl>
 
 #include "gui/models/library_model.hpp"
+#include "taiga/settings.hpp"
 
 namespace gui {
 
 LibraryWidget::LibraryWidget(QWidget* parent)
     : QWidget{parent}, m_model(new LibraryModel(parent)), m_view(new QTreeView(parent)) {
-  const auto rootPath = "C:/Media/Anime";  // @TODO
+  const auto settings = taiga::read_settings();
+  const auto rootPath = settings["library"];
 
   m_model->setRootPath(rootPath);
 

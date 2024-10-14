@@ -35,6 +35,7 @@ QMap<QString, QString> read_settings(const std::string& path) {
 
   QString service;
   QString username;
+  QString library;
 
   while (xml.readNextStartElement()) {
     if (xml.name() == u"account") {
@@ -46,6 +47,18 @@ QMap<QString, QString> read_settings(const std::string& path) {
         }
         xml.skipCurrentElement();
       }
+    } else if (xml.name() == u"anime") {
+      while (xml.readNextStartElement()) {
+        if (xml.name() == u"folders") {
+          while (xml.readNextStartElement()) {
+            if (xml.name() == u"root" && library.isEmpty()) {
+              library = xml.attributes().value(u"folder").toString();
+            }
+            xml.skipCurrentElement();
+          }
+        }
+        xml.skipCurrentElement();
+      }
     } else {
       xml.skipCurrentElement();
     }
@@ -54,6 +67,7 @@ QMap<QString, QString> read_settings(const std::string& path) {
   return {
       {"service", service},
       {"username", username},
+      {"library", library},
   };
 }
 
