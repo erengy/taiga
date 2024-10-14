@@ -16,27 +16,27 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
-
-#include <QTreeView>
-
-#include "gui/common/page_widget.hpp"
+#include "page_widget.hpp"
 
 namespace gui {
 
-class LibraryModel;
+PageWidget::PageWidget(QWidget* parent) : QWidget(parent) {
+  // Main layout
+  auto layout = new QVBoxLayout(this);
+  layout->setContentsMargins(0, 0, 0, 0);
+  layout->setSpacing(0);
+  setLayout(layout);
 
-class LibraryWidget final : public PageWidget {
-  Q_OBJECT
-  Q_DISABLE_COPY_MOVE(LibraryWidget)
+  // Toolbar layout
+  m_toolbarLayout = new QHBoxLayout(this);
+  m_toolbarLayout->setContentsMargins(16, 8, 16, 8);
+  m_toolbarLayout->addStretch();
+  layout->addLayout(m_toolbarLayout);
 
-public:
-  LibraryWidget(QWidget* parent);
-  ~LibraryWidget() = default;
-
-private:
-  LibraryModel* m_model = nullptr;
-  QTreeView* m_view = nullptr;
-};
+  // Toolbar
+  m_toolbar = new QToolBar(this);
+  m_toolbar->setIconSize({18, 18});
+  m_toolbarLayout->addWidget(m_toolbar);
+}
 
 }  // namespace gui

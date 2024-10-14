@@ -27,12 +27,11 @@
 #include "gui/utils/theme.hpp"
 #include "media/anime.hpp"
 #include "media/anime_season.hpp"
-#include "ui_search_widget.h"
 
 namespace gui {
 
 SearchWidget::SearchWidget(QWidget* parent, MainWindow* mainWindow)
-    : QWidget(parent),
+    : PageWidget(parent),
       m_model(new AnimeListModel(this)),
       m_proxyModel(new AnimeListProxyModel(this)),
       m_listViewCards(new ListViewCards(this, m_model, m_proxyModel, mainWindow)),
@@ -40,10 +39,7 @@ SearchWidget::SearchWidget(QWidget* parent, MainWindow* mainWindow)
       m_comboYear(new ComboBox(this)),
       m_comboSeason(new ComboBox(this)),
       m_comboType(new ComboBox(this)),
-      m_comboStatus(new ComboBox(this)),
-      ui_(new Ui::SearchWidget) {
-  ui_->setupUi(this);
-
+      m_comboStatus(new ComboBox(this)) {
   // @TODO: Use settings from the previous session
   m_proxyModel->sort(AnimeListModel::COLUMN_AVERAGE, Qt::SortOrder::DescendingOrder);
   m_proxyModel->setYearFilter(QDate::currentDate().year());
@@ -54,6 +50,10 @@ SearchWidget::SearchWidget(QWidget* parent, MainWindow* mainWindow)
   static const auto filterValue = [](QComboBox* combo, int index) {
     return index > -1 ? std::optional<int>{combo->itemData(index).toInt()} : std::nullopt;
   };
+
+  auto filtersLayout = new QHBoxLayout(this);
+  filtersLayout->setSpacing(4);
+  m_toolbarLayout->insertLayout(0, filtersLayout);
 
   // Year
   {
@@ -66,7 +66,7 @@ SearchWidget::SearchWidget(QWidget* parent, MainWindow* mainWindow)
     }
     connect(m_comboYear, &QComboBox::currentIndexChanged, this,
             [this](int index) { m_proxyModel->setYearFilter(filterValue(m_comboYear, index)); });
-    ui_->toolbarLayout->insertWidget(0, m_comboYear);
+    filtersLayout->addWidget(m_comboYear);
   }
 
   // Season
@@ -88,7 +88,7 @@ SearchWidget::SearchWidget(QWidget* parent, MainWindow* mainWindow)
     connect(m_comboSeason, &QComboBox::currentIndexChanged, this, [this](int index) {
       m_proxyModel->setSeasonFilter(filterValue(m_comboSeason, index));
     });
-    ui_->toolbarLayout->insertWidget(1, m_comboSeason);
+    filtersLayout->addWidget(m_comboSeason);
   }
 
   // Type
@@ -103,7 +103,7 @@ SearchWidget::SearchWidget(QWidget* parent, MainWindow* mainWindow)
     }
     connect(m_comboType, &QComboBox::currentIndexChanged, this,
             [this](int index) { m_proxyModel->setTypeFilter(filterValue(m_comboType, index)); });
-    ui_->toolbarLayout->insertWidget(2, m_comboType);
+    filtersLayout->addWidget(m_comboType);
   }
 
   // Status
@@ -119,24 +119,21 @@ SearchWidget::SearchWidget(QWidget* parent, MainWindow* mainWindow)
     connect(m_comboStatus, &QComboBox::currentIndexChanged, this, [this](int index) {
       m_proxyModel->setStatusFilter(filterValue(m_comboStatus, index));
     });
-    ui_->toolbarLayout->insertWidget(3, m_comboStatus);
+    filtersLayout->addWidget(m_comboStatus);
   }
 
   // Toolbar
   {
-    auto toolbar = new QToolBar(this);
-    toolbar->setIconSize({18, 18});
-    ui_->actionSort->setIcon(theme.getIcon("sort"));
-    ui_->actionView->setIcon(theme.getIcon("grid_view"));
-    ui_->actionMore->setIcon(theme.getIcon("more_horiz"));
-    toolbar->addAction(ui_->actionSort);
-    toolbar->addAction(ui_->actionView);
-    toolbar->addAction(ui_->actionMore);
-    ui_->toolbarLayout->addWidget(toolbar);
+    const auto actionSort = new QAction(theme.getIcon("sort"), tr("Sort"), this);
+    const auto actionView = new QAction(theme.getIcon("grid_view"), tr("View"), this);
+    const auto actionMore = new QAction(theme.getIcon("more_horiz"), tr("More"), this);
+    m_toolbar->addAction(actionSort);
+    m_toolbar->addAction(actionView);
+    m_toolbar->addAction(actionMore);
   }
 
   // List
-  ui_->verticalLayout->addWidget(m_listViewCards);
+  layout()->addWidget(m_listViewCards);
 }
 
 }  // namespace gui

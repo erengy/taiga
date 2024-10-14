@@ -19,11 +19,8 @@
 #pragma once
 
 #include <QMenu>
-#include <QWidget>
 
-namespace Ui {
-class ListWidget;
-}
+#include "gui/common/page_widget.hpp"
 
 namespace gui {
 
@@ -38,7 +35,7 @@ enum class ListViewMode {
   Cards,
 };
 
-class ListWidget final : public QWidget {
+class ListWidget final : public PageWidget {
   Q_OBJECT
   Q_DISABLE_COPY_MOVE(ListWidget)
 
@@ -54,7 +51,6 @@ private:
   void initSortMenu();
   void initViewMenu();
 
-  Ui::ListWidget* ui_ = nullptr;
   MainWindow* m_mainWindow = nullptr;
   AnimeListModel* m_model = nullptr;
   AnimeListProxyModel* m_proxyModel = nullptr;

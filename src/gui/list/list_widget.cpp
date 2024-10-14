@@ -31,20 +31,16 @@
 #include "gui/models/anime_list_model.hpp"
 #include "gui/models/anime_list_proxy_model.hpp"
 #include "gui/utils/theme.hpp"
-#include "ui_list_widget.h"
 
 namespace gui {
 
 ListWidget::ListWidget(QWidget* parent, MainWindow* mainWindow)
-    : QWidget(parent),
+    : PageWidget(parent),
       m_model(new AnimeListModel(this)),
       m_proxyModel(new AnimeListProxyModel(this)),
       m_mainWindow(mainWindow),
       m_sortMenu(new QMenu(this)),
-      m_viewMenu(new QMenu(this)),
-      ui_(new Ui::ListWidget) {
-  ui_->setupUi(this);
-
+      m_viewMenu(new QMenu(this)) {
   // @TODO: Use settings from the previous session
   m_proxyModel->sort(AnimeListModel::COLUMN_LAST_UPDATED, Qt::SortOrder::DescendingOrder);
 
@@ -69,12 +65,12 @@ ListViewMode ListWidget::viewMode() const {
 
 void ListWidget::setViewMode(ListViewMode mode) {
   if (m_listView) {
-    ui_->verticalLayout->removeWidget(m_listView);
+    layout()->removeWidget(m_listView);
     m_listView->deleteLater();
     m_listView = nullptr;
   };
   if (m_listViewCards) {
-    ui_->verticalLayout->removeWidget(m_listViewCards);
+    layout()->removeWidget(m_listViewCards);
     m_listViewCards->deleteLater();
     m_listViewCards = nullptr;
   };
@@ -84,38 +80,32 @@ void ListWidget::setViewMode(ListViewMode mode) {
   switch (mode) {
     case ListViewMode::List:
       m_listView = new ListView(this, m_model, m_proxyModel, m_mainWindow);
-      ui_->verticalLayout->addWidget(m_listView);
+      layout()->addWidget(m_listView);
       m_listView->show();
       break;
 
     case ListViewMode::Cards:
       m_listViewCards = new ListViewCards(this, m_model, m_proxyModel, m_mainWindow);
-      ui_->verticalLayout->addWidget(m_listViewCards);
+      layout()->addWidget(m_listViewCards);
       m_listViewCards->show();
       break;
   }
 }
 
 void ListWidget::initToolbar() {
-  const auto toolbar = new QToolBar(this);
+  const auto actionSort = new QAction(theme.getIcon("sort"), tr("Sort"), this);
+  const auto actionView = new QAction(theme.getIcon("grid_view"), tr("View"), this);
+  const auto actionMore = new QAction(theme.getIcon("more_horiz"), tr("More"), this);
 
-  toolbar->setIconSize({18, 18});
+  m_toolbar->addAction(actionSort);
+  m_toolbar->addAction(actionView);
+  m_toolbar->addAction(actionMore);
 
-  ui_->actionSort->setIcon(theme.getIcon("sort"));
-  ui_->actionView->setIcon(theme.getIcon("grid_view"));
-  ui_->actionMore->setIcon(theme.getIcon("more_horiz"));
-
-  toolbar->addAction(ui_->actionSort);
-  toolbar->addAction(ui_->actionView);
-  toolbar->addAction(ui_->actionMore);
-
-  ui_->toolbarLayout->addWidget(toolbar);
-
-  const auto sortButton = static_cast<QToolButton*>(toolbar->widgetForAction(ui_->actionSort));
+  const auto sortButton = static_cast<QToolButton*>(m_toolbar->widgetForAction(actionSort));
   sortButton->setPopupMode(QToolButton::InstantPopup);
   sortButton->setMenu(m_sortMenu);
 
-  const auto viewButton = static_cast<QToolButton*>(toolbar->widgetForAction(ui_->actionView));
+  const auto viewButton = static_cast<QToolButton*>(m_toolbar->widgetForAction(actionView));
   viewButton->setPopupMode(QToolButton::InstantPopup);
   viewButton->setMenu(m_viewMenu);
 }

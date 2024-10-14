@@ -18,13 +18,8 @@
 
 #pragma once
 
-#include <QWidget>
-
 #include "gui/common/combobox.hpp"
-
-namespace Ui {
-class SearchWidget;
-}
+#include "gui/common/page_widget.hpp"
 
 namespace gui {
 
@@ -33,7 +28,7 @@ class AnimeListProxyModel;
 class ListViewCards;
 class MainWindow;
 
-class SearchWidget final : public QWidget {
+class SearchWidget final : public PageWidget {
   Q_OBJECT
   Q_DISABLE_COPY_MOVE(SearchWidget)
 
@@ -42,7 +37,6 @@ public:
   ~SearchWidget() = default;
 
 private:
-  Ui::SearchWidget* ui_ = nullptr;
   MainWindow* m_mainWindow = nullptr;
   AnimeListModel* m_model = nullptr;
   AnimeListProxyModel* m_proxyModel = nullptr;

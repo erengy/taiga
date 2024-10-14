@@ -18,25 +18,23 @@
 
 #pragma once
 
-#include <QTreeView>
-
-#include "gui/common/page_widget.hpp"
+#include <QLayout>
+#include <QToolBar>
+#include <QWidget>
 
 namespace gui {
 
-class LibraryModel;
-
-class LibraryWidget final : public PageWidget {
+class PageWidget : public QWidget {
   Q_OBJECT
-  Q_DISABLE_COPY_MOVE(LibraryWidget)
+  Q_DISABLE_COPY_MOVE(PageWidget)
 
 public:
-  LibraryWidget(QWidget* parent);
-  ~LibraryWidget() = default;
+  PageWidget(QWidget* parent);
+  ~PageWidget() = default;
 
-private:
-  LibraryModel* m_model = nullptr;
-  QTreeView* m_view = nullptr;
+protected:
+  QHBoxLayout* m_toolbarLayout = nullptr;
+  QToolBar* m_toolbar = nullptr;
 };
 
 }  // namespace gui

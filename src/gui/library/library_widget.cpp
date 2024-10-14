@@ -24,16 +24,21 @@
 #include <QUrl>
 
 #include "gui/models/library_model.hpp"
+#include "gui/utils/theme.hpp"
 #include "taiga/settings.hpp"
 
 namespace gui {
 
 LibraryWidget::LibraryWidget(QWidget* parent)
-    : QWidget{parent}, m_model(new LibraryModel(parent)), m_view(new QTreeView(parent)) {
+    : PageWidget{parent}, m_model(new LibraryModel(parent)), m_view(new QTreeView(parent)) {
   const auto settings = taiga::read_settings();
   const auto rootPath = settings["library"];
 
   m_model->setRootPath(rootPath);
+
+  // Toolbar
+  const auto actionMore = new QAction(theme.getIcon("more_horiz"), tr("More"), this);
+  m_toolbar->addAction(actionMore);
 
   m_view->setObjectName("libraryView");
   m_view->setFrameShape(QFrame::Shape::NoFrame);
@@ -56,11 +61,7 @@ LibraryWidget::LibraryWidget(QWidget* parent)
   m_view->sortByColumn(LibraryModel::COLUMN_NAME, Qt::SortOrder::AscendingOrder);
   m_view->setSortingEnabled(true);
 
-  const auto layout = new QHBoxLayout(this);
-  layout->setContentsMargins(0, 0, 0, 0);
-  this->setLayout(layout);
-
-  layout->addWidget(m_view);
+  layout()->addWidget(m_view);
 
   connect(m_view, &QTreeView::doubleClicked, this, [this](const QModelIndex& index) {
     if (!index.isValid()) return;
