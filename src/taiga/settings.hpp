@@ -16,26 +16,20 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <format>
+#pragma once
 
-#include "anime_db.hpp"
-#include "compat/anime.hpp"
+#include <QMap>
+#include <QString>
+#include <string>
+
+#include "compat/settings.hpp"
 #include "taiga/path.hpp"
-#include "taiga/settings.hpp"
 
-namespace anime {
+namespace taiga {
 
-QList<Anime> readDatabase() {
+inline QMap<QString, QString> read_settings() {
   const auto data_path = taiga::get_data_path();
-  return compat::v1::read_anime_database(std::format("{}/v1/db/anime.xml", data_path));
+  return compat::v1::read_settings(std::format("{}/v1/settings.xml", data_path));
 }
 
-QList<ListEntry> readListEntries() {
-  const auto data_path = taiga::get_data_path();
-  const auto settings = taiga::read_settings();
-  return compat::v1::read_list_entries(std::format("{}/v1/user/{}@{}/anime.xml", data_path,
-                                                   settings["username"].toStdString(),
-                                                   settings["service"].toStdString()));
-}
-
-}  // namespace anime
+}  // namespace taiga
