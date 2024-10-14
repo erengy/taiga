@@ -50,6 +50,8 @@ private:
     QString episode;
   };
 
+  bool isEnabled(const QModelIndex& index) const;
+
   QString getTitle(const QString& path) const;
   QString getEpisode(const QString& path) const;
 
