@@ -29,10 +29,8 @@ target_sources(taiga-gui PRIVATE
 )
 
 target_sources(taiga-gui PRIVATE
-	list/list_widget.ui
 	main/main_window.ui
 	media/media_dialog.ui
-	search/search_widget.ui
 	settings/settings_dialog.ui
 )
 
