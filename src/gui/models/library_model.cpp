@@ -22,14 +22,28 @@ namespace gui {
 
 LibraryModel::LibraryModel(QObject* parent) : QFileSystemModel(parent) {}
 
+int LibraryModel::columnCount(const QModelIndex&) const {
+  return NUM_COLUMNS;
+}
+
 QVariant LibraryModel::data(const QModelIndex& index, int role) const {
   if (!index.isValid()) return {};
 
   switch (role) {
+    case Qt::DisplayRole: {
+      switch (index.column()) {
+        case COLUMN_ANIME:
+        case COLUMN_EPISODE:
+          return "";  // @TODO
+      }
+      break;
+    }
+
     case Qt::TextAlignmentRole: {
       switch (index.column()) {
         case COLUMN_SIZE:
         case COLUMN_MODIFIED:
+        case COLUMN_EPISODE:
           return QVariant(Qt::AlignRight | Qt::AlignVCenter);
       }
       break;
@@ -49,6 +63,10 @@ QVariant LibraryModel::headerData(int section, Qt::Orientation orientation, int 
           return tr("Size");
         case COLUMN_TYPE:
           return tr("Type");
+        case COLUMN_ANIME:
+          return tr("Anime");
+        case COLUMN_EPISODE:
+          return tr("Episode");
         case COLUMN_MODIFIED:
           return tr("Last modified");
       }
@@ -59,9 +77,11 @@ QVariant LibraryModel::headerData(int section, Qt::Orientation orientation, int 
       switch (section) {
         case COLUMN_TITLE:
         case COLUMN_TYPE:
+        case COLUMN_ANIME:
           return QVariant(Qt::AlignLeft | Qt::AlignVCenter);
         case COLUMN_SIZE:
         case COLUMN_MODIFIED:
+        case COLUMN_EPISODE:
           return QVariant(Qt::AlignRight | Qt::AlignVCenter);
       }
       break;

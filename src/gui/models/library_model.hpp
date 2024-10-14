@@ -32,12 +32,15 @@ public:
     COLUMN_SIZE,
     COLUMN_TYPE,
     COLUMN_MODIFIED,
+    COLUMN_ANIME,
+    COLUMN_EPISODE,
     NUM_COLUMNS,
   };
 
   LibraryModel(QObject* parent);
   ~LibraryModel() = default;
 
+  int columnCount(const QModelIndex& parent = {}) const override;
   QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
   QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 };
