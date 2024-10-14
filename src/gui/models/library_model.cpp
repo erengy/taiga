@@ -18,9 +18,14 @@
 
 #include "library_model.hpp"
 
+#include <anitomy.hpp>
+#include <ranges>
+
 namespace gui {
 
-LibraryModel::LibraryModel(QObject* parent) : QFileSystemModel(parent) {}
+LibraryModel::LibraryModel(QObject* parent) : QFileSystemModel(parent) {
+  connect(this, &QFileSystemModel::directoryLoaded, this, &LibraryModel::parseDirectory);
+}
 
 int LibraryModel::columnCount(const QModelIndex&) const {
   return NUM_COLUMNS;
@@ -33,8 +38,9 @@ QVariant LibraryModel::data(const QModelIndex& index, int role) const {
     case Qt::DisplayRole: {
       switch (index.column()) {
         case COLUMN_ANIME:
+          return getTitle(fileName(index));
         case COLUMN_EPISODE:
-          return "";  // @TODO
+          return getEpisode(fileName(index));
       }
       break;
     }
@@ -100,6 +106,47 @@ QVariant LibraryModel::headerData(int section, Qt::Orientation orientation, int 
   }
 
   return QFileSystemModel::headerData(section, orientation, role);
+}
+
+QString LibraryModel::getTitle(const QString& path) const {
+  return m_parsed[path].title;
+}
+
+QString LibraryModel::getEpisode(const QString& path) const {
+  return m_parsed[path].episode;
+}
+
+void LibraryModel::parseDirectory(const QString& path) {
+  const auto parent = index(path);
+
+  if (!parent.isValid()) return;
+
+  for (int i = 0; i < rowCount(parent); ++i) {
+    const auto child = index(i, 0, parent);
+    if (!child.isValid()) continue;
+    const auto info = fileInfo(child);
+    if (!info.isFile()) continue;
+    parseFileName(info.fileName());
+  }
+}
+
+void LibraryModel::parseFileName(const QString& name) {
+  if (m_parsed.contains(name)) return;
+
+  const auto elements = anitomy::parse(name.toStdString());
+
+  const auto find_element = [&elements](anitomy::ElementKind kind) {
+    return std::ranges::find_if(
+        elements, [kind](const anitomy::Element& element) { return element.kind == kind; });
+  };
+
+  const auto title = find_element(anitomy::ElementKind::Title);
+  const auto episode = find_element(anitomy::ElementKind::Episode);
+
+  m_parsed[name] = ParsedData{
+      .title = title != elements.end() ? QString::fromStdString(title->value) : "",
+      .episode = episode != elements.end() ? QString::fromStdString(episode->value) : "",
+  };
 }
 
 }  // namespace gui
