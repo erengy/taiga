@@ -21,6 +21,7 @@
 #include <QListView>
 #include <QPainter>
 #include <QPainterPath>
+#include <QScrollBar>
 
 #include "gui/models/anime_list_model.hpp"
 #include "gui/utils/format.hpp"
@@ -29,6 +30,9 @@
 #include "gui/utils/theme.hpp"
 
 namespace gui {
+
+constexpr int itemHeight = 210;
+constexpr int posterWidth = itemHeight * 2 / 3;
 
 ListItemDelegateCards::ListItemDelegateCards(QObject* parent) : QStyledItemDelegate(parent) {}
 
@@ -58,7 +62,7 @@ void ListItemDelegateCards::paint(QPainter* painter, const QStyleOptionViewItem&
   // Poster
   {
     QRect posterRect = rect;
-    posterRect.setWidth(140);
+    posterRect.setWidth(posterWidth);
 
     if (theme.isDark()) {
       painter->fillRect(posterRect, opt.palette.dark());
@@ -202,20 +206,26 @@ void ListItemDelegateCards::initStyleOption(QStyleOptionViewItem* option,
 }
 
 QSize ListItemDelegateCards::itemSize() const {
+  constexpr int maxColumns = 4;
+  constexpr int maxItemWidth = 360;
+
   const auto parent = reinterpret_cast<QListView*>(this->parent());
-  const auto rect = parent->geometry();
+  const int spacing = parent->spacing();
 
-  constexpr int maxWidth = 360;
-  int columns = 1;
-  if (rect.width() > maxWidth * 2) columns = 2;
-  if (rect.width() > maxWidth * 3) columns = 3;
-  if (rect.width() > maxWidth * 4) columns = 4;
+  const int availableWidth =
+      parent->geometry().width() - ((2 * spacing) + parent->verticalScrollBar()->width());
 
-  constexpr int spacing = 18;
-  const int width = (rect.width() - (spacing * (columns + 2))) / columns;
-  constexpr int height = 210;
+  const int columns = [&]() {
+    for (int i = maxColumns; i >= 1; --i) {
+      if (availableWidth - (i * spacing) > i * maxItemWidth) return i;
+    }
+    return 1;
+  }();
 
-  return QSize(width, height);
+  const int columnsWidth = availableWidth - (columns * spacing);
+  const float itemWidth = columnsWidth / static_cast<float>(columns);
+
+  return QSize(std::floor(itemWidth), itemHeight);
 }
 
 }  // namespace gui
