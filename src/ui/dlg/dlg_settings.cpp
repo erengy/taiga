@@ -283,6 +283,7 @@ void SettingsDialog::OnOK() {
     taiga::settings.SetShareDiscordUsernameEnabled(page->IsDlgButtonChecked(IDC_CHECK_DISCORD_USERNAME));
     taiga::settings.SetShareDiscordGroupEnabled(page->IsDlgButtonChecked(IDC_CHECK_DISCORD_GROUP));
     taiga::settings.SetShareDiscordTimeEnabled(page->IsDlgButtonChecked(IDC_CHECK_DISCORD_TIME));
+    taiga::settings.SetShareDiscordWatchingEnabled(page->IsDlgButtonChecked(IDC_CHECK_DISCORD_WATCHING));
   }
   // Sharing > HTTP
   page = &pages[kSettingsPageSharingHttp];

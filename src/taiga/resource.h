@@ -215,3 +215,4 @@
 #define IDC_CHECK_DISCORD_TIME                  1178
 #define IDC_EDIT_ANIME_REWATCHES                1179
 #define IDC_SPIN_ANIME_REWATCHES                1180
+#define IDC_CHECK_DISCORD_WATCHING              1181

@@ -297,6 +297,7 @@ BOOL SettingsPage::OnInitDialog() {
       CheckDlgButton(IDC_CHECK_DISCORD_USERNAME, taiga::settings.GetShareDiscordUsernameEnabled());
       CheckDlgButton(IDC_CHECK_DISCORD_GROUP, taiga::settings.GetShareDiscordGroupEnabled());
       CheckDlgButton(IDC_CHECK_DISCORD_TIME, taiga::settings.GetShareDiscordTimeEnabled());
+      CheckDlgButton(IDC_CHECK_DISCORD_WATCHING, taiga::settings.GetShareDiscordWatchingEnabled());
       break;
     }
     // Sharing > HTTP

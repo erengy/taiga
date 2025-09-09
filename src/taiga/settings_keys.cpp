@@ -185,6 +185,7 @@ void Settings::InitKeyMap() const {
       {AppSettingKey::ShareDiscordGroupEnabled, {"announce/discord/groupenabled", true}},
       {AppSettingKey::ShareDiscordTimeEnabled, {"announce/discord/timeenabled", true}},
       {AppSettingKey::ShareDiscordUsernameEnabled, {"announce/discord/usernameenabled", true}},
+      {AppSettingKey::ShareDiscordWatchingEnabled, {"announce/discord/watchingenabled", true}},
       {AppSettingKey::ShareHttpEnabled, {"announce/http/enabled", false}},
       {AppSettingKey::ShareHttpFormat, {"announce/http/format", std::wstring{kDefaultFormatHttp}}},
       {AppSettingKey::ShareHttpUrl, {"announce/http/url", std::wstring{}}},
@@ -1028,6 +1029,14 @@ bool Settings::GetShareDiscordUsernameEnabled() const {
 
 void Settings::SetShareDiscordUsernameEnabled(const bool enabled) {
   set_value(AppSettingKey::ShareDiscordUsernameEnabled, enabled);
+}
+
+bool Settings::GetShareDiscordWatchingEnabled() const {
+  return value<bool>(AppSettingKey::ShareDiscordWatchingEnabled);
+}
+
+void Settings::SetShareDiscordWatchingEnabled(const bool enabled) {
+  set_value(AppSettingKey::ShareDiscordWatchingEnabled, enabled);
 }
 
 bool Settings::GetShareHttpEnabled() const {

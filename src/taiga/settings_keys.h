@@ -114,6 +114,7 @@ enum class AppSettingKey {
   ShareDiscordGroupEnabled,
   ShareDiscordTimeEnabled,
   ShareDiscordUsernameEnabled,
+  ShareDiscordWatchingEnabled,
   ShareHttpEnabled,
   ShareHttpFormat,
   ShareHttpUrl,

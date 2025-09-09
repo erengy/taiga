@@ -87,6 +87,10 @@ void UpdatePresence(const std::string& details, const std::string& state,
           : WstrToStr(sync::GetCurrentServiceName());
 
   DiscordRichPresence presence = {0};
+  if (taiga::settings.GetShareDiscordWatchingEnabled()) {
+    presence.type = DiscordActivityType_Watching;
+    presence.status_display_type = DiscordStatusDisplayType_Details;
+  }
   presence.state = state.c_str();
   presence.details = details.c_str();
   if (taiga::settings.GetShareDiscordTimeEnabled()) {

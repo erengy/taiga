@@ -248,6 +248,8 @@ public:
   void SetShareDiscordTimeEnabled(const bool enabled);
   bool GetShareDiscordUsernameEnabled() const;
   void SetShareDiscordUsernameEnabled(const bool enabled);
+  bool GetShareDiscordWatchingEnabled() const;
+  void SetShareDiscordWatchingEnabled(const bool enabled);
   bool GetShareHttpEnabled() const;
   void SetShareHttpEnabled(const bool enabled);
   std::wstring GetShareHttpFormat() const;

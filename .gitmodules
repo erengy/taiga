@@ -20,7 +20,7 @@
 
 [submodule "discord-rpc"]
 	path = deps/src/discord-rpc
-	url = https://github.com/erengy/discord-rpc.git
+	url = https://github.com/ungive/discord-rpc.git
 
 [submodule "fmt"]
 	path = deps/src/fmt

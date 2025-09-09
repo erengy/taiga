@@ -538,11 +538,12 @@ EXSTYLE WS_EX_CONTROLPARENT
 FONT 9, "Segoe UI", 400, 0, 0
 {
     AUTOCHECKBOX    "Update rich presence", IDC_CHECK_DISCORD, 7, 7, 100, 8, 0, WS_EX_LEFT
-    GROUPBOX        "Options", IDC_STATIC, 7, 22, 301, 48, 0, WS_EX_LEFT
+    GROUPBOX        "Options", IDC_STATIC, 7, 22, 301, 60, 0, WS_EX_LEFT
     AUTOCHECKBOX    "Display username in tooltip", IDC_CHECK_DISCORD_USERNAME, 13, 33, 135, 8, 0, WS_EX_LEFT
     AUTOCHECKBOX    "Display episode release group", IDC_CHECK_DISCORD_GROUP, 13, 44, 135, 8, 0, WS_EX_LEFT
     AUTOCHECKBOX    "Display elapsed time", IDC_CHECK_DISCORD_TIME, 13, 55, 135, 8, 0, WS_EX_LEFT
-    LTEXT           "Note: Requires using the Discord desktop client. ""Display current activity as a status message"" option must be enabled, but do not add Taiga as a game. Updates may be delayed for 15 seconds, in addition to the delay time setting at Recognition page.", IDC_STATIC, 7, 77, 301, 26, SS_LEFT, WS_EX_TRANSPARENT
+    AUTOCHECKBOX    "Display current anime in status instead of ""Playing Taiga""", IDC_CHECK_DISCORD_WATCHING, 13, 66, 200, 8, 0, WS_EX_LEFT
+    LTEXT           "Note: Requires using the Discord desktop client. ""Display current activity as a status message"" option must be enabled, but do not add Taiga as a game. Updates may be delayed for 15 seconds, in addition to the delay time setting at Recognition page.", IDC_STATIC, 7, 88, 301, 26, SS_LEFT, WS_EX_TRANSPARENT
 }
 
 
