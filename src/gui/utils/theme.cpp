@@ -19,7 +19,10 @@
 #include "theme.hpp"
 
 #include <QApplication>
+#include <QPalette>
 #include <QStyleHints>
+#include <QTimer>
+#include <QSettings>
 
 #include "base/file.hpp"
 #include "base/string.hpp"
@@ -43,17 +46,81 @@ const QIcon& Theme::getIcon(const QString& key, const QString& extension, bool u
 }
 
 void Theme::initStyle() {
-  qApp->styleHints()->setColorScheme(taiga::settings.appColorScheme());
+  // Only override the system scheme if the user has explicitly chosen one
+  const auto savedScheme = taiga::settings.appColorScheme();
+  if (savedScheme != Qt::ColorScheme::Unknown) {
+    qApp->styleHints()->setColorScheme(savedScheme);
+  }
 
-  connect(qApp->styleHints(), &QStyleHints::colorSchemeChanged, this,
-          [](Qt::ColorScheme scheme) { qApp->styleHints()->setColorScheme(scheme); });
+  // Re-apply style whenever the color scheme changes (system or user)
+  connect(qApp->styleHints(), &QStyleHints::colorSchemeChanged, this, [this](Qt::ColorScheme) {
+    m_icons.clear();
+    applyStyle();
+  });
+
+  // Poll every second as a fallback for system theme changes
+  m_lastScheme = qApp->styleHints()->colorScheme();
+  m_themeTimer = new QTimer(this);
+  connect(m_themeTimer, &QTimer::timeout, this, [this]() {
+    // Read Windows theme directly from registry
+    const QSettings registry(
+        "HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
+        QSettings::NativeFormat);
+    const bool isLightTheme = registry.value("AppsUseLightTheme", 1).toInt() == 1;
+    const auto currentScheme = isLightTheme ? Qt::ColorScheme::Light : Qt::ColorScheme::Dark;
+
+    if (currentScheme != m_lastScheme) {
+      m_lastScheme = currentScheme;
+      qApp->styleHints()->setColorScheme(currentScheme);
+      m_icons.clear();
+      applyStyle();
+    }
+  });
+  m_themeTimer->start(1000);
 
 #ifdef Q_OS_WINDOWS
+  applyStyle();
+#endif
+}
+
+void Theme::applyStyle() {
   qApp->setStyle("fusion");
+
+  if (isDark()) {
+    QPalette darkPalette;
+    darkPalette.setColor(QPalette::Window, QColor(32, 32, 32));
+    darkPalette.setColor(QPalette::WindowText, QColor(255, 255, 255));
+    darkPalette.setColor(QPalette::Base, QColor(28, 28, 28));
+    darkPalette.setColor(QPalette::AlternateBase, QColor(40, 40, 40));
+    darkPalette.setColor(QPalette::Text, QColor(255, 255, 255));
+    darkPalette.setColor(QPalette::Button, QColor(45, 45, 45));
+    darkPalette.setColor(QPalette::ButtonText, QColor(255, 255, 255));
+    darkPalette.setColor(QPalette::Highlight, QColor(42, 130, 218));
+    darkPalette.setColor(QPalette::HighlightedText, QColor(255, 255, 255));
+    darkPalette.setColor(QPalette::ToolTipBase, QColor(45, 45, 45));
+    darkPalette.setColor(QPalette::ToolTipText, QColor(255, 255, 255));
+    darkPalette.setColor(QPalette::PlaceholderText, QColor(180, 180, 180));
+    qApp->setPalette(darkPalette);
+  } else {
+    QPalette lightPalette;
+    lightPalette.setColor(QPalette::Window, QColor(249, 249, 249));
+    lightPalette.setColor(QPalette::WindowText, QColor(0, 0, 0));
+    lightPalette.setColor(QPalette::Base, QColor(255, 255, 255));
+    lightPalette.setColor(QPalette::AlternateBase, QColor(245, 245, 245));
+    lightPalette.setColor(QPalette::Text, QColor(0, 0, 0));
+    lightPalette.setColor(QPalette::Button, QColor(240, 240, 240));
+    lightPalette.setColor(QPalette::ButtonText, QColor(0, 0, 0));
+    lightPalette.setColor(QPalette::Highlight, QColor(0, 120, 215));
+    lightPalette.setColor(QPalette::HighlightedText, QColor(255, 255, 255));
+    lightPalette.setColor(QPalette::ToolTipBase, QColor(255, 255, 255));
+    lightPalette.setColor(QPalette::ToolTipText, QColor(0, 0, 0));
+    lightPalette.setColor(QPalette::PlaceholderText, QColor(120, 120, 120));
+    qApp->setPalette(lightPalette);
+  }
+
   const QString mainStylesheet = readStylesheet("main");
   const QString themeStylesheet = readStylesheet(isDark() ? "dark" : "light");
   qApp->setStyleSheet(mainStylesheet + themeStylesheet);
-#endif
 }
 
 bool Theme::isDark() const {
