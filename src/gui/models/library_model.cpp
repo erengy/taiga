@@ -34,9 +34,8 @@ namespace gui {
 LibraryModel::LibraryModel(QObject* parent) : QFileSystemModel(parent) {
   setNameFilters([]() {
     QStringList filters;
-    for (const auto& [key, keyword] : anitomy::detail::keywords) {
-      if (keyword.kind != anitomy::detail::KeywordKind::FileExtension) continue;
-      filters.emplace_back(u"*.%1"_s.arg(QString::fromStdString(key.data())));
+    for (const auto& extension : anitomy::detail::file_extensions) {
+      filters.emplace_back(u"*.%1"_s.arg(extension));
     }
     return filters;
   }());
