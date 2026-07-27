@@ -25,4 +25,3 @@
 [submodule "utf8proc"]
 	path = deps/utf8proc
 	url = https://github.com/JuliaStrings/utf8proc.git
-
