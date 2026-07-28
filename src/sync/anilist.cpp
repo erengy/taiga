@@ -46,8 +46,8 @@ Service::Service() : sync::Service{} {
 }
 
 Service* Service::instance() {
-  static Service service;
-  return &service;
+  static auto service = new Service();
+  return service;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
