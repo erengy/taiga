@@ -23,33 +23,71 @@
 
 #include "base/settings.hpp"
 
+namespace sync {
+
+namespace anilist {
+enum class RatingSystem;
+}
+
+namespace kitsu {
+enum class RatingSystem;
+}
+
+}  // namespace sync
+
 namespace taiga {
 
-class Accounts final : public base::Settings {
+class Accounts final : public QObject, public base::Settings {
+  Q_OBJECT
+  Q_DISABLE_COPY_MOVE(Accounts)
+
 public:
+  Accounts();
+  ~Accounts() = default;
+
+  bool anilistAuthenticated() const;
+  sync::anilist::RatingSystem anilistRatingSystem() const;
   std::string anilistUsername() const;
   std::string anilistToken() const;
 
+  /*
+  TODO:
+  - kitsu.accessToken
+  - kitsu.displayName
+  - kitsu.lastSynchronized
+  - kitsu.userId
+  */
+  bool kitsuAuthenticated() const;
   std::string kitsuEmail() const;
+  sync::kitsu::RatingSystem kitsuRatingSystem() const;
   std::string kitsuUsername() const;
   std::string kitsuPassword() const;
 
+  bool myanimelistAuthenticated() const;
   std::string myanimelistUsername() const;
   std::string myanimelistAccessToken() const;
   std::string myanimelistRefreshToken() const;
 
+  void setAnilistAuthenticated(bool authenticated);
+  void setAnilistRatingSystem(const std::string& ratingSystem) const;
   void setAnilistUsername(const std::string& username) const;
   void setAnilistToken(const std::string& token) const;
 
+  void setKitsuAuthenticated(bool authenticated);
   void setKitsuEmail(const std::string& email) const;
+  void setKitsuRatingSystem(const std::string& ratingSystem) const;
   void setKitsuUsername(const std::string& username) const;
   void setKitsuPassword(const std::string& password) const;
 
+  void setMyanimelistAuthenticated(bool authenticated);
   void setMyanimelistUsername(const std::string& username) const;
   void setMyanimelistAccessToken(const std::string& accessToken) const;
   void setMyanimelistRefreshToken(const std::string& refreshToken) const;
 
   std::string serviceUsername(const std::string& service) const;
+
+signals:
+  void authenticationChanged(bool authenticated);
 
 private:
   QString fileName() const override;

@@ -49,10 +49,8 @@ enum class RequestType {
   UpdateLibraryEntry,
 };
 
-void AuthenticateUser();
 void GetUser();
 void GetLibraryEntries();
-void GetMetadataById(const int id);
 void GetSeason(const anime::Season season);
 void SearchTitle(const std::wstring& title);
 void Synchronize();

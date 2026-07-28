@@ -51,6 +51,7 @@ ServiceId serviceIdFromSlug(const QString& slug);
 QString serviceName(const ServiceId serviceId);
 QString serviceSlug(const ServiceId serviceId);
 
+void authenticateUser();
 void fetchAnime(const int id);
 
 QString animePageUrl(const int id);

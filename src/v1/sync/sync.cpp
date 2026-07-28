@@ -39,24 +39,6 @@
 
 namespace sync {
 
-void AuthenticateUser() {
-  ui::EnableDialogInput(ui::Dialog::Main, false);
-  ui::ChangeStatusText(L"{}: Authenticating user..."_format(
-      GetCurrentServiceName()));
-
-  switch (GetCurrentServiceId()) {
-    case ServiceId::MyAnimeList:
-      myanimelist::RefreshAccessToken();
-      break;
-    case ServiceId::Kitsu:
-      kitsu::AuthenticateUser();
-      break;
-    case ServiceId::AniList:
-      anilist::AuthenticateUser();
-      break;
-  }
-}
-
 void GetUser() {
   ui::EnableDialogInput(ui::Dialog::Main, false);
   ui::ChangeStatusText(L"{}: Retrieving user information..."_format(
@@ -88,23 +70,6 @@ void GetLibraryEntries() {
       break;
     case ServiceId::AniList:
       anilist::GetLibraryEntries();
-      break;
-  }
-}
-
-void GetMetadataById(const int id) {
-  ui::ChangeStatusText(L"{}: Retrieving anime information..."_format(
-      GetCurrentServiceName()));
-
-  switch (GetCurrentServiceId()) {
-    case ServiceId::MyAnimeList:
-      myanimelist::GetMetadataById(id);
-      break;
-    case ServiceId::Kitsu:
-      kitsu::GetMetadataById(id);
-      break;
-    case ServiceId::AniList:
-      anilist::GetMetadataById(id);
       break;
   }
 }

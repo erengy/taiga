@@ -69,6 +69,20 @@ QString serviceSlug(const ServiceId serviceId) {
   return "taiga";
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
+void authenticateUser() {
+  switch (currentServiceId()) {
+    case ServiceId::MyAnimeList:
+      break;
+    case ServiceId::Kitsu:
+      break;
+    case ServiceId::AniList:
+      anilist::Service::instance()->authenticateUser();
+      break;
+  }
+}
+
 void fetchAnime(const int id) {
   switch (currentServiceId()) {
     case ServiceId::MyAnimeList:
