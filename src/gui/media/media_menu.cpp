@@ -24,6 +24,7 @@
 #include <QMessageBox>
 #include <QUrl>
 #include <QUrlQuery>
+#include <limits>
 #include <ranges>
 
 #include "base/string.hpp"
@@ -409,15 +410,17 @@ void MediaMenu::addLibraryItems() {
 
   // Play
   addMenu([this, &item, entry]() {
-    const int total_episodes = item.episode_count;
-    const int last_episode = entry ? std::min(entry->watched_episodes, total_episodes) : 0;
+    const int total_episodes = std::max(item.episode_count, 0);
+    const int watched_episodes = entry ? entry->watched_episodes : 0;
+    const int max_episodes = total_episodes ? total_episodes : std::numeric_limits<int>::max();
+    const int last_episode = std::min(watched_episodes, max_episodes);
     const int next_episode = last_episode + 1;
 
     auto menu = new QMenu(tr("Play"), this);
     menu->setIcon(theme.getIcon("play_arrow"));
 
     // Play next episode
-    if (next_episode <= total_episodes) {
+    if (next_episode <= max_episodes) {
       menu->addAction(theme.getIcon("skip_next"), tr("Next episode (#%1)").arg(next_episode), this,
                       [this, next_episode]() { playEpisode(next_episode); });
     }
