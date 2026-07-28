@@ -111,6 +111,19 @@ void parseAnimeElement(QXmlStreamReader& xml, const taiga::Settings& settings) {
         }
       }
 
+    } else if (xml.name() == u"items") {
+      while (xml.readNextStartElement()) {
+        if (xml.name() == u"item") {
+          const int id = XML_ATTR_INT(u"id");
+          const auto folder = XML_ATTR_STR(u"folder");
+          const auto title = XML_ATTR_STR(u"title");
+          // @TODO: Store values
+          xml.skipCurrentElement();
+        } else {
+          xml.skipCurrentElement();
+        }
+      }
+
     } else {
       xml.skipCurrentElement();
     }
