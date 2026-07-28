@@ -2,5 +2,6 @@
   <qresource>
     <file>gql/anilist/Media.gql</file>
     <file>gql/anilist/MediaListCollection.gql</file>
+    <file>gql/anilist/MediaSearch.gql</file>
   </qresource>
 </RCC>

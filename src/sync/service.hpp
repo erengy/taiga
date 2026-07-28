@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <QList>
 #include <QNetworkRequestFactory>
 #include <QRestAccessManager>
 #include <QString>
@@ -37,9 +38,15 @@ struct Rating {
 };
 
 class Service : public QObject {
+  Q_OBJECT
+  Q_DISABLE_COPY_MOVE(Service)
+
 public:
   Service();
   ~Service() = default;
+
+signals:
+  void searchCompleted(const QString& query, const QList<int>& ids);
 
 protected:
   QNetworkRequestFactory api_;

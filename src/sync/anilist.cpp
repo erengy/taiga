@@ -116,9 +116,10 @@ void Service::search(const QString& query) {
       {"variables", QJsonObject{{"query", query}}},
   }};
 
-  const auto callback = [this](QRestReply& reply) {
+  const auto callback = [this, query](QRestReply& reply) {
     if (isError(reply)) {
       handleError(reply);
+      emit searchCompleted(query, {});
       return;
     }
 
@@ -131,12 +132,18 @@ void Service::search(const QString& query) {
 
     if (!items) {
       handleError(reply, "Could not parse search results.");
+      emit searchCompleted(query, {});
       return;
     }
 
+    QList<int> ids;
     for (const auto& item : *items) {
-      if (item) anime::db.updateItem(*item);
+      if (!item) continue;
+      anime::db.updateItem(*item);
+      ids.append(item->id);
     }
+
+    emit searchCompleted(query, ids);
   };
 
   manager_.post(api_.createRequest(), data, this, callback);
