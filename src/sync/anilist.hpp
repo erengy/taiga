@@ -33,9 +33,9 @@ public:
   void fetchAnime(const int id);
   void search(const QString& query);
   void fetchListEntries();
-  void addListEntry();
+  void addListEntry(const int id);
   void deleteListEntry(const int id);
-  void updateListEntry();
+  void updateListEntry(const int id);
 
 private:
   QString gql(const QString& name) const;

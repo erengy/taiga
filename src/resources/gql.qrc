@@ -1,7 +1,10 @@
 <RCC>
   <qresource>
+    <file>gql/anilist/DeleteMediaListEntry.gql</file>
     <file>gql/anilist/Media.gql</file>
     <file>gql/anilist/MediaListCollection.gql</file>
     <file>gql/anilist/MediaSearch.gql</file>
+    <file>gql/anilist/SaveMediaListEntry.gql</file>
+    <file>gql/anilist/Viewer.gql</file>
   </qresource>
 </RCC>

@@ -193,8 +193,8 @@ void Service::fetchListEntries() {
   manager_.post(api_.createRequest(), data, this, callback);
 }
 
-void Service::addListEntry() {
-  updateListEntry();
+void Service::addListEntry(const int id) {
+  updateListEntry(id);
 }
 
 void Service::deleteListEntry(const int id) {
@@ -219,8 +219,56 @@ void Service::deleteListEntry(const int id) {
   manager_.post(api_.createRequest(), data, this, callback);
 }
 
-void Service::updateListEntry() {
-  // @TODO
+void Service::updateListEntry(const int id) {
+  const auto listEntry = anime::db.entry(id);
+
+  if (!listEntry) return;
+
+  // @TODO: Use queue item instead
+  QJsonObject variables{
+      {"mediaId", listEntry->anime_id},
+      {"status", listEntry->rewatching ? u"REPEATING"_s : fromListStatus(listEntry->status)},
+      {"scoreRaw", listEntry->score},
+      {"progress", listEntry->watched_episodes},
+      {"repeat", listEntry->rewatched_times},
+      {"notes", QString::fromStdString(listEntry->notes)},
+      {"startedAt", fromFuzzyDate(listEntry->date_started)},
+      {"completedAt", fromFuzzyDate(listEntry->date_completed)},
+  };
+
+  if (listEntry->id != anime::list::kUnknownId) {
+    variables["id"] = listEntry->id;
+  }
+
+  const QJsonDocument data{{
+      {"query", gql("SaveMediaListEntry")},
+      {"variables", variables},
+  }};
+
+  const auto callback = [this](QRestReply& reply) {
+    if (isError(reply)) {
+      handleError(reply);
+      return;
+    }
+
+    const auto entry = reply.readJson().and_then([](const QJsonDocument& json) {
+      return std::make_optional(json["data"]["SaveMediaListEntry"].toObject());
+    });
+
+    if (!entry) {
+      handleError(reply, "Could not parse list entry.");
+      return;
+    }
+
+    if (const auto item = parseMedia((*entry)["media"])) {
+      anime::db.updateItem(*item);
+    }
+    if (const auto listEntry = parseListEntry(*entry)) {
+      anime::db.updateEntry(*listEntry);
+    }
+  };
+
+  manager_.post(api_.createRequest(), data, this, callback);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
