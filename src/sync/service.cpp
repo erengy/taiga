@@ -95,6 +95,18 @@ void fetchAnime(const int id) {
   }
 }
 
+void fetchListEntries() {
+  switch (currentServiceId()) {
+    case ServiceId::MyAnimeList:
+      break;
+    case ServiceId::Kitsu:
+      break;
+    case ServiceId::AniList:
+      anilist::Service::instance()->fetchListEntries();
+      break;
+  }
+}
+
 void synchronize() {
   // @TODO
 }

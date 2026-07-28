@@ -51,6 +51,7 @@ anime::list::Status parseListStatus(const QString& value) {
       {"COMPLETED", Status::Completed},
       {"DROPPED",   Status::Dropped},
       {"PAUSED",    Status::OnHold},
+      {"REPEATING", Status::Watching},
   };
   // clang-format on
   return table.value(value, Status::NotInList);
@@ -157,6 +158,29 @@ std::optional<Anime> parseMedia(const QJsonValue& json) {
   // @TODO: Parse `nextAiringEpisode`
 
   return item;
+}
+
+std::optional<anime::list::Entry> parseListEntry(const QJsonValue& json) {
+  const int animeId = json["media"]["id"].toInt();
+
+  if (!animeId) return std::nullopt;
+
+  const auto status = json["status"].toString();
+
+  return anime::list::Entry{
+      .id = json["id"].toVariant().toLongLong(),
+      .anime_id = animeId,
+      .watched_episodes = json["progress"].toInt(),
+      .score = json["score"].toInt(),
+      .status = parseListStatus(status),
+      .is_private = json["private"].toBool(),
+      .rewatched_times = json["repeat"].toInt(),
+      .rewatching = status == "REPEATING",
+      .date_started = parseFuzzyDate(json["startedAt"]),
+      .date_completed = parseFuzzyDate(json["completedAt"]),
+      .last_updated = static_cast<std::time_t>(json["updatedAt"].toVariant().toLongLong()),
+      .notes = json["notes"].toString().toStdString(),
+  };
 }
 
 }  // namespace sync::anilist

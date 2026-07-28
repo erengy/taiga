@@ -143,7 +143,47 @@ void Service::search(const QString& query) {
 }
 
 void Service::fetchListEntries() {
-  // @TODO
+  const QJsonObject variables{
+      {"userName", QString::fromStdString(taiga::accounts.anilistUsername())},
+  };
+
+  const QJsonDocument data{{
+      {"query", gql("MediaListCollection")},
+      {"variables", variables},
+  }};
+
+  const auto callback = [this](QRestReply& reply) {
+    if (isError(reply)) {
+      handleError(reply);
+      return;
+    }
+
+    const auto lists = reply.readJson().and_then([](const QJsonDocument& json) {
+      const auto value = json["data"]["MediaListCollection"]["lists"];
+      if (!value.isArray()) return std::optional<QJsonArray>{};
+      return std::make_optional(value.toArray());
+    });
+
+    if (!lists) {
+      handleError(reply, "Could not parse anime list.");
+      return;
+    }
+
+    for (const auto& list : *lists) {
+      for (const auto& entryValue : list.toObject()["entries"].toArray()) {
+        const auto entry = entryValue.toObject();
+
+        if (const auto item = parseMedia(entry["media"])) {
+          anime::db.updateItem(*item);
+        }
+        if (const auto listEntry = parseListEntry(entry)) {
+          anime::db.updateEntry(*listEntry);
+        }
+      }
+    }
+  };
+
+  manager_.post(api_.createRequest(), data, this, callback);
 }
 
 void Service::addListEntry() {

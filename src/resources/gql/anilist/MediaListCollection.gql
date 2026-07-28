@@ -2,19 +2,43 @@ query ($userName: String!) {
   MediaListCollection (userName: $userName, type: ANIME) {
     lists {
       entries {
-        ...mediaListFragment
+        id
+        status
+        score(format: POINT_100)
+        progress
+        repeat
+        private
+        notes
+        startedAt { year month day }
+        completedAt { year month day }
+        updatedAt
+        media {
+          id
+          title {
+            romaji(stylised: true)
+            english(stylised: true)
+            native(stylised: true)
+          }
+          format
+          status
+          description
+          startDate { year month day }
+          endDate { year month day }
+          episodes
+          duration
+          countryOfOrigin
+          trailer { id site }
+          updatedAt
+          coverImage { extraLarge }
+          genres
+          synonyms
+          averageScore
+          popularity
+          tags { name isMediaSpoiler }
+          studios { edges { isMain node { name } } }
+          nextAiringEpisode { airingAt episode }
+        }
       }
     }
   }
-}
-
-fragment mediaListFragment on MediaList {
-  {mediaListFields}
-  media {
-    ...mediaFragment
-  }
-}
-
-fragment mediaFragment on Media {
-  {mediaFields}
 }

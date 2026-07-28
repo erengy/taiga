@@ -53,6 +53,7 @@ QString serviceSlug(const ServiceId serviceId);
 
 void authenticateUser();
 void fetchAnime(const int id);
+void fetchListEntries();
 void synchronize();
 
 QString animePageUrl(const int id);
