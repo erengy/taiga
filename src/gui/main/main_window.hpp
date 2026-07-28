@@ -72,6 +72,7 @@ private slots:
   void donate() const;
   void setPage(MainWindowPage page);
   void support() const;
+  void synchronize();
   void profile();
 
 protected:

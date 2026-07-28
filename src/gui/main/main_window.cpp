@@ -107,19 +107,7 @@ void MainWindow::initActions() {
   connect(ui_->actionSupport, &QAction::triggered, this, &MainWindow::support);
   connect(ui_->actionProfile, &QAction::triggered, this, &MainWindow::profile);
   connect(ui_->actionDisplayWindow, &QAction::triggered, this, &MainWindow::displayWindow);
-
-  connect(ui_->actionSynchronize, &QAction::triggered, this, [this]() {
-    setEnabled(false);
-    statusBar()->showMessage(
-        tr("Synchronizing with %1...").arg(sync::serviceName(sync::currentServiceId())));
-    QEventLoop loop;
-    QTimer::singleShot(3000, &loop, [this, &loop]() {
-      setEnabled(true);
-      statusBar()->clearMessage();
-      loop.quit();
-    });
-    loop.exec();
-  });
+  connect(ui_->actionSynchronize, &QAction::triggered, this, &MainWindow::synchronize);
 }
 
 void MainWindow::initIcons() {
@@ -324,6 +312,17 @@ void MainWindow::donate() const {
 
 void MainWindow::support() const {
   QDesktopServices::openUrl(QUrl("https://taiga.moe/#support"));
+}
+
+void MainWindow::synchronize() {
+  setEnabled(false);
+  statusBar()->showMessage(
+      tr("Synchronizing with %1...").arg(sync::serviceName(sync::currentServiceId())));
+
+  sync::synchronize();
+
+  statusBar()->clearMessage();
+  setEnabled(true);
 }
 
 void MainWindow::profile() {

@@ -95,6 +95,12 @@ void fetchAnime(const int id) {
   }
 }
 
+void synchronize() {
+  // @TODO
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 QString animePageUrl(const int id) {
   switch (currentServiceId()) {
     case ServiceId::MyAnimeList:
