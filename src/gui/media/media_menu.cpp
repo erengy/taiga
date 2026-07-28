@@ -417,7 +417,7 @@ void MediaMenu::addLibraryItems() {
     menu->setIcon(theme.getIcon("play_arrow"));
 
     // Play next episode
-    if (next_episode < total_episodes || total_episodes == 1) {
+    if (next_episode <= total_episodes) {
       menu->addAction(theme.getIcon("skip_next"), tr("Next episode (#%1)").arg(next_episode), this,
                       [this, next_episode]() { playEpisode(next_episode); });
     }
