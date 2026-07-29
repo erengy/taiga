@@ -26,6 +26,7 @@
 #include <QString>
 #include <QUrl>
 #include <QUrlQuery>
+#include <algorithm>
 
 #include "base/chrono.hpp"
 #include "media/anime.hpp"
@@ -155,7 +156,10 @@ std::optional<Anime> parseMedia(const QJsonValue& json) {
     }
   }
 
-  // @TODO: Parse `nextAiringEpisode`
+  if (const auto nextAiringEpisode = json["nextAiringEpisode"]; nextAiringEpisode.isObject()) {
+    item.next_episode_time = nextAiringEpisode["airingAt"].toVariant().toLongLong();
+    item.last_aired_episode = std::max(nextAiringEpisode["episode"].toInt() - 1, 0);
+  }
 
   return item;
 }
