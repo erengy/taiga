@@ -24,6 +24,8 @@
 #include <QUrlQuery>
 
 #include "base/chrono.hpp"
+#include "base/file.hpp"
+#include "base/string.hpp"
 #include "media/anime.hpp"
 #include "media/anime_list.hpp"
 #include "media/anime_season.hpp"
@@ -66,6 +68,24 @@ QString fromSeasonName(const anime::SeasonName name) {
   }
   // clang-format on
   return "";
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+QString gql(const QString& name) {
+  const auto readGql = [](const QString& name) {
+    return base::readFile(u":/gql/anilist/%1.gql"_s.arg(name));
+  };
+
+  auto query = readGql(name);
+
+  for (const auto& fragment : {u"MediaFragment"_s, u"MediaListFragment"_s}) {
+    if (query.contains(u"...%1"_s.arg(fragment))) {
+      query += u"\n%1"_s.arg(readGql(fragment));
+    }
+  }
+
+  return query;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

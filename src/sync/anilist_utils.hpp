@@ -42,6 +42,8 @@ QString fromListStatus(const anime::list::Status value);
 float fromScore(float value);
 QString fromSeasonName(const anime::SeasonName name);
 
+QString gql(const QString& name);
+
 std::string animePageUrl(const int id);
 std::string requestTokenUrl();
 

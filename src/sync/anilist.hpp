@@ -36,9 +36,6 @@ public:
   void addListEntry(const int id);
   void deleteListEntry(const int id);
   void updateListEntry(const int id);
-
-private:
-  QString gql(const QString& name) const;
 };
 
 }  // namespace sync::anilist

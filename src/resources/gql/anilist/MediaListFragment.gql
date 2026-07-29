@@ -1,0 +1,12 @@
+fragment MediaListFragment on MediaList {
+  id
+  status
+  score(format: POINT_100)
+  progress
+  repeat
+  private
+  notes
+  startedAt { year month day }
+  completedAt { year month day }
+  updatedAt
+}

@@ -24,7 +24,6 @@
 #include <QRestReply>
 #include <ranges>
 
-#include "base/file.hpp"
 #include "base/string.hpp"
 #include "media/anime_db.hpp"
 #include "sync/anilist_error.hpp"
@@ -269,12 +268,6 @@ void Service::updateListEntry(const int id) {
   };
 
   manager_.post(api_.createRequest(), data, this, callback);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-QString Service::gql(const QString& name) const {
-  return base::readFile(u":/gql/anilist/%1.gql"_s.arg(name));
 }
 
 }  // namespace sync::anilist
