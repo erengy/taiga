@@ -34,6 +34,7 @@
 #include "gui/utils/theme.hpp"
 #include "gui/utils/tray_icon.hpp"
 #include "gui/utils/widgets.hpp"
+#include "sync/anilist.hpp"
 #include "sync/service.hpp"
 #include "taiga/application.hpp"
 #include "taiga/session.hpp"
@@ -197,6 +198,10 @@ void MainWindow::initPage(MainWindowPage page) {
 
 void MainWindow::initStatusbar() {
   ui_->statusbar->setContentsMargins(0, 8, 0, 0);
+
+  // @TODO: Revise once other services are implemented
+  connect(sync::anilist::Service::instance(), &sync::Service::errorOccurred, this,
+          [this](const QString& message) { statusBar()->showMessage(sync::tagMessage(message)); });
 }
 
 void MainWindow::initToolbar() {

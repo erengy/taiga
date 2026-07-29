@@ -63,6 +63,7 @@ ServiceId currentServiceId();
 ServiceId serviceIdFromSlug(const QString& slug);
 QString serviceName(const ServiceId serviceId);
 QString serviceSlug(const ServiceId serviceId);
+QString tagMessage(const QString& message);
 
 void authenticateUser();
 void fetchAnime(const int id);

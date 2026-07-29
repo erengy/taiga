@@ -21,6 +21,7 @@
 #include <QMap>
 
 #include "base/log.hpp"
+#include "base/string.hpp"
 #include "sync/anilist.hpp"
 #include "sync/anilist_utils.hpp"
 #include "sync/kitsu_utils.hpp"
@@ -39,7 +40,7 @@ Service::Service() : QObject{qApp}, manager_{taiga::network()} {
 }
 
 void Service::logError(const QString& message) {
-  LOGE("{}", message.toStdString());
+  LOGE("{}", tagMessage(message).toStdString());
 }
 
 void Service::onAuthenticationCompleted(bool authenticated) {
@@ -96,6 +97,10 @@ QString serviceSlug(const ServiceId serviceId) {
   }
   // clang-format on
   return "taiga";
+}
+
+QString tagMessage(const QString& message) {
+  return u"[%1] %2"_s.arg(serviceName(currentServiceId()), message);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
