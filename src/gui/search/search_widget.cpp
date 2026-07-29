@@ -18,15 +18,19 @@
 
 #include "search_widget.hpp"
 
+#include <QLineEdit>
 #include <QToolBar>
 
 #include "gui/common/anime_list_view_cards.hpp"
+#include "gui/main/main_window.hpp"
 #include "gui/models/anime_list_model.hpp"
 #include "gui/models/anime_list_proxy_model.hpp"
 #include "gui/utils/format.hpp"
 #include "gui/utils/theme.hpp"
 #include "media/anime.hpp"
 #include "media/anime_season.hpp"
+#include "sync/anilist.hpp"
+#include "sync/service.hpp"
 #include "taiga/session.hpp"
 
 namespace gui {
@@ -130,6 +134,19 @@ SearchWidget::SearchWidget(QWidget* parent)
 
   // List
   layout()->addWidget(m_listViewCards);
+
+  // Search
+  connect(mainWindow()->searchBox(), &QLineEdit::returnPressed, this, [this]() {
+    if (!isVisible()) return;
+    sync::search(mainWindow()->searchBox()->text());
+  });
+
+  // @TODO: Revise once other services are implemented
+  connect(sync::anilist::Service::instance(), &sync::Service::searchCompleted, this,
+          [this](const QString& query, const QList<int>& ids) {
+            if (query != mainWindow()->searchBox()->text()) return;
+            m_model->addIds(ids);
+          });
 }
 
 void SearchWidget::saveState() {

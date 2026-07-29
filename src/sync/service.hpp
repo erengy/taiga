@@ -67,6 +67,7 @@ QString serviceSlug(const ServiceId serviceId);
 void authenticateUser();
 void fetchAnime(const int id);
 void fetchListEntries();
+void search(const QString& query);
 void synchronize();
 
 QString animePageUrl(const int id);

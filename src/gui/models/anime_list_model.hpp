@@ -66,6 +66,8 @@ public:
   const Anime* getAnime(const QModelIndex& index) const;
   const ListEntry* getListEntry(const QModelIndex& index) const;
 
+  void addIds(const QList<int>& ids);
+
 private:
   QList<int> m_ids;
 };

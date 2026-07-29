@@ -42,6 +42,25 @@ AnimeListModel::AnimeListModel(QObject* parent) : QAbstractListModel(parent) {
       emit dataChanged(index(row), index(row), {static_cast<int>(AnimeListItemDataRole::Poster)});
     }
   });
+
+  connect(&anime::db, &anime::Database::itemUpdated, this, [this](int id) {
+    if (const auto row = m_ids.indexOf(id); row > -1) {
+      emit dataChanged(index(row, 0), index(row, NUM_COLUMNS - 1));
+    }
+  });
+}
+
+void AnimeListModel::addIds(const QList<int>& ids) {
+  QList<int> newIds;
+  for (const int id : ids) {
+    if (!m_ids.contains(id)) newIds.append(id);
+  }
+  if (newIds.isEmpty()) return;
+
+  const int first = m_ids.size();
+  beginInsertRows({}, first, first + newIds.size() - 1);
+  m_ids.append(newIds);
+  endInsertRows();
 }
 
 int AnimeListModel::rowCount(const QModelIndex&) const {
