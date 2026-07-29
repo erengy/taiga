@@ -32,15 +32,19 @@
 
 namespace sync {
 
-Service::Service() : QObject{qApp}, manager_{taiga::network()} {
+Service::Service(const ServiceId id) : QObject{qApp}, manager_{taiga::network()}, id_{id} {
   api_.setCommonHeaders(taiga::NetworkAccessManager::commonHeaders());
 
   connect(this, &Service::authenticationCompleted, this, &Service::onAuthenticationCompleted);
   connect(this, &Service::errorOccurred, this, &Service::logError);
 }
 
+ServiceId Service::id() const {
+  return id_;
+}
+
 void Service::logError(const QString& message) {
-  LOGE("{}", tagMessage(message).toStdString());
+  LOGE("{}", tagMessage(id_, message).toStdString());
 }
 
 void Service::onAuthenticationCompleted(bool authenticated) {
@@ -99,8 +103,8 @@ QString serviceSlug(const ServiceId serviceId) {
   return "taiga";
 }
 
-QString tagMessage(const QString& message) {
-  return u"[%1] %2"_s.arg(serviceName(currentServiceId()), message);
+QString tagMessage(const ServiceId serviceId, const QString& message) {
+  return u"[%1] %2"_s.arg(serviceName(serviceId), message);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

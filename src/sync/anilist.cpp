@@ -36,7 +36,7 @@
 
 namespace sync::anilist {
 
-Service::Service() : sync::Service{} {
+Service::Service() : sync::Service{ServiceId::AniList} {
   api_.setBaseUrl(QUrl{"https://graphql.anilist.co"});
 
   if (const auto token = taiga::accounts.anilistToken(); !token.empty()) {

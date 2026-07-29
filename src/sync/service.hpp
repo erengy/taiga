@@ -42,8 +42,10 @@ class Service : public QObject {
   Q_DISABLE_COPY_MOVE(Service)
 
 public:
-  Service();
+  Service(const ServiceId id);
   ~Service() = default;
+
+  ServiceId id() const;
 
 signals:
   void authenticationCompleted(bool authenticated);
@@ -54,6 +56,9 @@ protected:
   QNetworkRequestFactory api_;
   QRestAccessManager manager_;
 
+private:
+  ServiceId id_;
+
 private slots:
   void logError(const QString& message);
   void onAuthenticationCompleted(bool authenticated);
@@ -63,7 +68,7 @@ ServiceId currentServiceId();
 ServiceId serviceIdFromSlug(const QString& slug);
 QString serviceName(const ServiceId serviceId);
 QString serviceSlug(const ServiceId serviceId);
-QString tagMessage(const QString& message);
+QString tagMessage(const ServiceId serviceId, const QString& message);
 
 void authenticateUser();
 void fetchAnime(const int id);

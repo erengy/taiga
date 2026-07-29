@@ -201,7 +201,10 @@ void MainWindow::initStatusbar() {
 
   // @TODO: Revise once other services are implemented
   connect(sync::anilist::Service::instance(), &sync::Service::errorOccurred, this,
-          [this](const QString& message) { statusBar()->showMessage(sync::tagMessage(message)); });
+          [this](const QString& message) {
+            const auto service = qobject_cast<sync::Service*>(sender());
+            statusBar()->showMessage(sync::tagMessage(service->id(), message));
+          });
 }
 
 void MainWindow::initToolbar() {
