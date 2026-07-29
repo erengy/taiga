@@ -20,6 +20,7 @@
 
 #include <QMap>
 
+#include "base/log.hpp"
 #include "sync/anilist.hpp"
 #include "sync/anilist_utils.hpp"
 #include "sync/kitsu_utils.hpp"
@@ -31,7 +32,15 @@ namespace sync {
 
 Service::Service() : QObject{qApp}, manager_{taiga::network()} {
   api_.setCommonHeaders(taiga::NetworkAccessManager::commonHeaders());
+
+  connect(this, &Service::errorOccurred, this, &Service::logError);
 }
+
+void Service::logError(const QString& message) {
+  LOGE("{}", message.toStdString());
+}
+
+////////////////////////////////////////////////////////////////////////////////
 
 ServiceId currentServiceId() {
   const auto slug = QString::fromStdString(taiga::settings.service());

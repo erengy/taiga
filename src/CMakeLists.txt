@@ -46,6 +46,8 @@ target_sources(taiga PRIVATE
 
 	sync/anilist.cpp
 	sync/anilist.hpp
+	sync/anilist_error.cpp
+	sync/anilist_error.hpp
 	sync/anilist_parsers.cpp
 	sync/anilist_parsers.hpp
 	sync/anilist_ratings.cpp

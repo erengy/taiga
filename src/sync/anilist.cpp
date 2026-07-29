@@ -25,9 +25,9 @@
 #include <ranges>
 
 #include "base/file.hpp"
-#include "base/log.hpp"
 #include "base/string.hpp"
 #include "media/anime_db.hpp"
+#include "sync/anilist_error.hpp"
 #include "sync/anilist_parsers.hpp"
 #include "sync/anilist_utils.hpp"
 #include "taiga/accounts.hpp"
@@ -59,7 +59,7 @@ void Service::authenticateUser() {
 
   const auto callback = [this](QRestReply& reply) {
     if (isError(reply)) {
-      handleError(reply);
+      handleError(*this, reply);
       taiga::accounts.setAnilistAuthenticated(false);
       return;
     }
@@ -69,7 +69,7 @@ void Service::authenticateUser() {
     });
 
     if (!viewer) {
-      handleError(reply, "Could not parse user object.");
+      handleError(*this, reply, "Could not parse user object.");
       taiga::accounts.setAnilistAuthenticated(false);
       return;
     }
@@ -92,7 +92,7 @@ void Service::fetchAnime(const int id) {
 
   const auto callback = [this](QRestReply& reply) {
     if (isError(reply)) {
-      handleError(reply);
+      handleError(*this, reply);
       return;
     }
 
@@ -100,7 +100,7 @@ void Service::fetchAnime(const int id) {
         [](const QJsonDocument& json) { return parseMedia(json["data"]["Media"]); });
 
     if (!item) {
-      handleError(reply, "Could not parse media object.");
+      handleError(*this, reply, "Could not parse media object.");
       return;
     }
 
@@ -118,7 +118,7 @@ void Service::search(const QString& query) {
 
   const auto callback = [this, query](QRestReply& reply) {
     if (isError(reply)) {
-      handleError(reply);
+      handleError(*this, reply);
       emit searchCompleted(query, {});
       return;
     }
@@ -131,7 +131,7 @@ void Service::search(const QString& query) {
     });
 
     if (!items) {
-      handleError(reply, "Could not parse search results.");
+      handleError(*this, reply, "Could not parse search results.");
       emit searchCompleted(query, {});
       return;
     }
@@ -161,7 +161,7 @@ void Service::fetchListEntries() {
 
   const auto callback = [this](QRestReply& reply) {
     if (isError(reply)) {
-      handleError(reply);
+      handleError(*this, reply);
       return;
     }
 
@@ -172,7 +172,7 @@ void Service::fetchListEntries() {
     });
 
     if (!lists) {
-      handleError(reply, "Could not parse anime list.");
+      handleError(*this, reply, "Could not parse anime list.");
       return;
     }
 
@@ -209,7 +209,7 @@ void Service::deleteListEntry(const int id) {
 
   const auto callback = [this](QRestReply& reply) {
     if (isError(reply) && reply.httpStatus() != 404) {
-      handleError(reply);
+      handleError(*this, reply);
       return;
     }
 
@@ -247,7 +247,7 @@ void Service::updateListEntry(const int id) {
 
   const auto callback = [this](QRestReply& reply) {
     if (isError(reply)) {
-      handleError(reply);
+      handleError(*this, reply);
       return;
     }
 
@@ -256,7 +256,7 @@ void Service::updateListEntry(const int id) {
     });
 
     if (!entry) {
-      handleError(reply, "Could not parse list entry.");
+      handleError(*this, reply, "Could not parse list entry.");
       return;
     }
 
@@ -275,18 +275,6 @@ void Service::updateListEntry(const int id) {
 
 QString Service::gql(const QString& name) const {
   return base::readFile(u":/gql/anilist/%1.gql"_s.arg(name));
-}
-
-bool Service::isError(const QRestReply& reply) const {
-  return !reply.isHttpStatusSuccess() || reply.hasError();
-  // @TODO: Check DDoS protection
-}
-
-void Service::handleError(const QRestReply& reply, const QString& message) const {
-  if (reply.hasError()) LOGE("{}", reply.errorString().toStdString());
-  if (!message.isEmpty()) LOGE("{}", message.toStdString());
-  // @TODO: Parse body for "errors" array
-  // @TODO: Emit signal
 }
 
 }  // namespace sync::anilist

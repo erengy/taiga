@@ -47,10 +47,14 @@ public:
 
 signals:
   void searchCompleted(const QString& query, const QList<int>& ids);
+  void errorOccurred(const QString& message);
 
 protected:
   QNetworkRequestFactory api_;
   QRestAccessManager manager_;
+
+private slots:
+  void logError(const QString& message);
 };
 
 ServiceId currentServiceId();

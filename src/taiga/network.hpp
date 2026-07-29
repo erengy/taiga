@@ -22,6 +22,8 @@
 #include <QHttpHeaders>
 #include <QNetworkAccessManager>
 
+class QRestReply;
+
 namespace taiga {
 
 class NetworkAccessManager final : public QNetworkAccessManager {
@@ -39,5 +41,7 @@ inline NetworkAccessManager* network() {
   static auto manager = new NetworkAccessManager{qApp};
   return manager;
 }
+
+bool isDdosProtectionActive(const QRestReply& reply);
 
 }  // namespace taiga

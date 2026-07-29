@@ -19,6 +19,7 @@
 #include "network.hpp"
 
 #include <QNetworkReply>
+#include <QRestReply>
 
 #include "base/string.hpp"
 #include "taiga/application.hpp"
@@ -52,6 +53,20 @@ QHttpHeaders NetworkAccessManager::commonHeaders() {
   headers.append(QHttpHeaders::WellKnownHeader::UserAgent, userAgentString());
 
   return headers;
+}
+
+bool isDdosProtectionActive(const QRestReply& reply) {
+  const auto server = reply.networkReply()->rawHeader("Server").toLower();
+
+  switch (reply.httpStatus()) {
+    case 403:
+      return server.startsWith("ddos-guard");
+    case 429:
+    case 503:
+      return server.startsWith("cloudflare");
+    default:
+      return false;
+  }
 }
 
 }  // namespace taiga

@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,27 +18,17 @@
 
 #pragma once
 
-#include "sync/service.hpp"
+#include <QString>
+
+class QRestReply;
+
+namespace sync {
+class Service;
+}
 
 namespace sync::anilist {
 
-class Service final : public sync::Service {
-public:
-  Service();
-  ~Service() = default;
-
-  static Service* instance();
-
-  void authenticateUser();
-  void fetchAnime(const int id);
-  void search(const QString& query);
-  void fetchListEntries();
-  void addListEntry(const int id);
-  void deleteListEntry(const int id);
-  void updateListEntry(const int id);
-
-private:
-  QString gql(const QString& name) const;
-};
+bool isError(const QRestReply& reply);
+void handleError(sync::Service& service, QRestReply& reply, const QString& message = {});
 
 }  // namespace sync::anilist
