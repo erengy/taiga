@@ -25,6 +25,7 @@
 #include "sync/anilist_utils.hpp"
 #include "sync/kitsu_utils.hpp"
 #include "sync/myanimelist_utils.hpp"
+#include "taiga/accounts.hpp"
 #include "taiga/network.hpp"
 #include "taiga/settings.hpp"
 
@@ -33,11 +34,30 @@ namespace sync {
 Service::Service() : QObject{qApp}, manager_{taiga::network()} {
   api_.setCommonHeaders(taiga::NetworkAccessManager::commonHeaders());
 
+  connect(this, &Service::authenticationCompleted, this, &Service::onAuthenticationCompleted);
   connect(this, &Service::errorOccurred, this, &Service::logError);
 }
 
 void Service::logError(const QString& message) {
   LOGE("{}", message.toStdString());
+}
+
+void Service::onAuthenticationCompleted(bool authenticated) {
+  switch (currentServiceId()) {
+    case ServiceId::MyAnimeList:
+      taiga::accounts.setMyanimelistAuthenticated(authenticated);
+      break;
+    case ServiceId::Kitsu:
+      taiga::accounts.setKitsuAuthenticated(authenticated);
+      break;
+    case ServiceId::AniList:
+      taiga::accounts.setAnilistAuthenticated(authenticated);
+      break;
+  }
+
+  if (authenticated) {
+    synchronize();
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -117,7 +137,28 @@ void fetchListEntries() {
 }
 
 void synchronize() {
-  // @TODO
+  switch (currentServiceId()) {
+    case ServiceId::MyAnimeList:
+      break;
+
+    case ServiceId::Kitsu:
+      break;
+
+    case ServiceId::AniList:
+      if (!taiga::accounts.anilistAuthenticated()) {
+        if (!taiga::accounts.anilistToken().empty()) {
+          authenticateUser();
+        } else if (!taiga::accounts.anilistUsername().empty()) {
+          // Allow downloading the list without authentication
+          fetchListEntries();
+        }
+        return;
+      }
+
+      // @TODO: Process the update queue when available
+      fetchListEntries();
+      break;
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

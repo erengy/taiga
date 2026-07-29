@@ -59,7 +59,7 @@ void Service::authenticateUser() {
   const auto callback = [this](QRestReply& reply) {
     if (isError(reply)) {
       handleError(*this, reply);
-      taiga::accounts.setAnilistAuthenticated(false);
+      emit authenticationCompleted(false);
       return;
     }
 
@@ -69,7 +69,7 @@ void Service::authenticateUser() {
 
     if (!viewer) {
       handleError(*this, reply, "Could not parse user object.");
-      taiga::accounts.setAnilistAuthenticated(false);
+      emit authenticationCompleted(false);
       return;
     }
 
@@ -77,7 +77,7 @@ void Service::authenticateUser() {
     taiga::accounts.setAnilistRatingSystem(
         (*viewer)["mediaListOptions"]["scoreFormat"].toString().toStdString());
 
-    taiga::accounts.setAnilistAuthenticated(true);
+    emit authenticationCompleted(true);
   };
 
   manager_.post(api_.createRequest(), data, this, callback);

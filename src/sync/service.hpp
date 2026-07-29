@@ -46,6 +46,7 @@ public:
   ~Service() = default;
 
 signals:
+  void authenticationCompleted(bool authenticated);
   void searchCompleted(const QString& query, const QList<int>& ids);
   void errorOccurred(const QString& message);
 
@@ -55,6 +56,7 @@ protected:
 
 private slots:
   void logError(const QString& message);
+  void onAuthenticationCompleted(bool authenticated);
 };
 
 ServiceId currentServiceId();
