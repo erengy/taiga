@@ -469,10 +469,11 @@ void MediaMenu::addTorrentsItems() {
 void MediaMenu::addMetaItems() {
   if (isBatch() && m_selectionModel) {
     addAction(tr("Invert selection"), this, [this]() {
-      for (int row = 0; row < m_selectionModel->model()->rowCount(); ++row) {
-        const auto index = m_selectionModel->model()->index(row, 0);
-        m_selectionModel->select(index, QItemSelectionModel::Toggle);
-      }
+      const auto* model = m_selectionModel->model();
+      if (model->rowCount() == 0) return;
+      const QItemSelection all(model->index(0, 0),
+                               model->index(model->rowCount() - 1, model->columnCount() - 1));
+      m_selectionModel->select(all, QItemSelectionModel::Toggle | QItemSelectionModel::Rows);
     });
   }
 
