@@ -38,7 +38,7 @@
 namespace taiga {
 
 Application::Application(int argc, char* argv[])
-    : QApplication(argc, argv), shared_memory_("Taiga") {
+    : QApplication(argc, argv), shared_memory_(TAIGA_APP_NAME) {
   setApplicationName("taiga");
   setApplicationDisplayName("Taiga");
   setApplicationVersion(QString::fromStdString(taiga::version().to_string()));
@@ -73,7 +73,7 @@ int Application::run() {
   }
 
   connect(&local_server_, &QLocalServer::newConnection, this, &Application::onNewConnection);
-  local_server_.listen("Taiga");
+  local_server_.listen(TAIGA_APP_NAME);
 
   taiga::settings.init();
   anime::db.init();
@@ -113,7 +113,7 @@ bool Application::hasPreviousInstance() {
 
 void Application::activatePreviousInstance() {
   QLocalSocket socket;
-  socket.connectToServer("Taiga");
+  socket.connectToServer(TAIGA_APP_NAME);
   socket.waitForConnected(1000);
 }
 
