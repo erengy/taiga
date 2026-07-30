@@ -53,6 +53,7 @@ private slots:
   void editStatus(const anime::list::Status status) const;
   void openFolder() const;
   void playEpisode(int number) const;
+  void refresh() const;
   void removeFromList() const;
   void search() const;
   void searchAniDB() const;

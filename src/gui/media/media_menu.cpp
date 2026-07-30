@@ -145,6 +145,12 @@ void MediaMenu::playEpisode(int number) const {
                            tr("Could not find %1 #%2.").arg(item.titles.romaji).arg(number));
 }
 
+void MediaMenu::refresh() const {
+  for (const auto& item : m_items) {
+    sync::fetchAnime(item.id);
+  }
+}
+
 void MediaMenu::removeFromList() const {
   QMessageBox msgBox;
   msgBox.setIcon(QMessageBox::Icon::Question);
@@ -306,8 +312,16 @@ void MediaMenu::addMediaItems() {
   if (!isBatch()) {
     // View details
     addAction(theme.getIcon("info"), tr("Details"), tr("Enter"), this, &MediaMenu::viewDetails);
-    // Search
-    addAction(theme.getIcon("search"), tr("Search"), this, &MediaMenu::search);
+
+    if (m_context != MediaMenuContext::Search) {
+      // Search
+      addAction(theme.getIcon("search"), tr("Search"), this, &MediaMenu::search);
+    }
+  }
+
+  if (m_context == MediaMenuContext::Search) {
+    // Refresh
+    addAction(theme.getIcon("sync"), tr("Refresh"), this, &MediaMenu::refresh);
   }
 
   // External
