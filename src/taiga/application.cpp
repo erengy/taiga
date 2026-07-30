@@ -20,6 +20,7 @@
 
 #include <QDir>
 #include <QFileInfo>
+#include <QLocalSocket>
 #include <QTranslator>
 #include <format>
 
@@ -66,10 +67,13 @@ int Application::run() {
   }
 
   if (hasPreviousInstance()) {
-    // @TODO: Activate previous instance
+    activatePreviousInstance();
     LOGD("Another instance of Taiga is running.");
     return 0;
   }
+
+  connect(&local_server_, &QLocalServer::newConnection, this, &Application::onNewConnection);
+  local_server_.listen("Taiga");
 
   taiga::settings.init();
   anime::db.init();
@@ -107,6 +111,12 @@ bool Application::hasPreviousInstance() {
   return !shared_memory_.create(1);
 }
 
+void Application::activatePreviousInstance() {
+  QLocalSocket socket;
+  socket.connectToServer("Taiga");
+  socket.waitForConnected(1000);
+}
+
 void Application::initLogger() const {
   using monolog::Level;
 
@@ -119,6 +129,15 @@ void Application::initLogger() const {
   monolog::log.enable_console_output(false);
   monolog::log.set_path(path);
   monolog::log.set_level(options_.debug ? Level::Debug : Level::Warning);
+}
+
+void Application::onNewConnection() {
+  while (auto socket = local_server_.nextPendingConnection()) {
+    socket->deleteLater();
+  }
+  if (window_) {
+    window_->displayWindow();
+  }
 }
 
 void Application::parseCommandLine() {
