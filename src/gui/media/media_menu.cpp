@@ -18,7 +18,9 @@
 
 #include "media_menu.hpp"
 
+#include <QClipboard>
 #include <QDesktopServices>
+#include <QGuiApplication>
 #include <QInputDialog>
 #include <QItemSelectionModel>
 #include <QMessageBox>
@@ -83,6 +85,22 @@ bool MediaMenu::isNowPlaying() const {
 void MediaMenu::addToList(const anime::list::Status status) const {
   QMessageBox::information(nullptr, "TODO",
                            u"Status: %1"_s.arg(formatListStatus(status)));  // @TODO
+}
+
+void MediaMenu::copyLinks() const {
+  QList<QString> links;
+  for (const auto& item : m_items) {
+    links.push_back(sync::animePageUrl(item.id));
+  }
+  QGuiApplication::clipboard()->setText(links.join("\n"));
+}
+
+void MediaMenu::copyTitles() const {
+  QList<QString> titles;
+  for (const auto& item : m_items) {
+    titles.push_back(QString::fromStdString(item.titles.romaji));
+  }
+  QGuiApplication::clipboard()->setText(titles.join("\n"));
 }
 
 void MediaMenu::editEpisode() const {
@@ -485,6 +503,14 @@ void MediaMenu::addTorrentsItems() {
 }
 
 void MediaMenu::addMetaItems() {
+  addMenu([this]() {
+    auto menu = new QMenu(tr("Copy"), this);
+    menu->setIcon(theme.getIcon("content_copy"));
+    menu->addAction(isBatch() ? tr("Titles") : tr("Title"), this, &MediaMenu::copyTitles);
+    menu->addAction(isBatch() ? tr("Links") : tr("Link"), this, &MediaMenu::copyLinks);
+    return menu;
+  }());
+
   if (isBatch() && m_selectionModel) {
     addAction(tr("Invert selection"), this, [this]() {
       const auto* model = m_selectionModel->model();
