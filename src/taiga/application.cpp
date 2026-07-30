@@ -23,6 +23,7 @@
 #include <QLocalSocket>
 #include <QTimer>
 #include <QTranslator>
+#include <chrono>
 #include <format>
 
 #include "base/log.hpp"
@@ -96,7 +97,7 @@ int Application::run() {
   // Delay showing the window to avoid a white flash.
   window_->setWindowOpacity(0.0);
   window_->show();
-  QTimer::singleShot(50, window_, [this]() {
+  QTimer::singleShot(std::chrono::milliseconds(50), window_, [this]() {
     if (window_) {
       window_->setWindowOpacity(1.0);
     }
@@ -127,7 +128,7 @@ bool Application::hasPreviousInstance() {
 void Application::activatePreviousInstance() {
   QLocalSocket socket;
   socket.connectToServer(TAIGA_APP_NAME);
-  socket.waitForConnected(1000);
+  socket.waitForConnected(std::chrono::milliseconds(1000).count());
 }
 
 void Application::initLogger() const {
