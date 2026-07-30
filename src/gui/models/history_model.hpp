@@ -19,9 +19,12 @@
 #pragma once
 
 #include <QAbstractListModel>
-#include <QList>
 
 namespace gui {
+
+enum class HistoryItemDataRole {
+  HistoryItem = Qt::UserRole,
+};
 
 class HistoryModel final : public QAbstractListModel {
   Q_OBJECT

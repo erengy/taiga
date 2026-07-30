@@ -25,32 +25,35 @@
 
 #include "gui/main/main_window.hpp"
 #include "gui/models/history_model.hpp"
+#include "gui/models/history_proxy_model.hpp"
 #include "gui/utils/theme.hpp"
 #include "taiga/settings.hpp"
 
 namespace gui {
 
 HistoryWidget::HistoryWidget(QWidget* parent)
-    : PageWidget{parent}, m_model(new HistoryModel(parent)), m_view(new QTreeView(parent)) {
+    : PageWidget{parent},
+      m_model(new HistoryModel(parent)),
+      m_proxyModel(new HistoryProxyModel(parent)),
+      m_view(new QTreeView(parent)) {
+  m_proxyModel->setSourceModel(m_model);
+  m_proxyModel->sort(HistoryModel::COLUMN_MODIFIED, Qt::SortOrder::DescendingOrder);
+
   m_view->setObjectName("historyView");
   m_view->setFrameShape(QFrame::Shape::NoFrame);
-  m_view->setModel(m_model);
+  m_view->setModel(m_proxyModel);
   m_view->setAlternatingRowColors(true);
   m_view->setAllColumnsShowFocus(true);
   m_view->setContextMenuPolicy(Qt::CustomContextMenu);
   m_view->setRootIsDecorated(false);
   m_view->setUniformRowHeights(true);
 
-  m_view->header()->setSectionsClickable(false);
   m_view->header()->setSectionsMovable(false);
   m_view->header()->setStretchLastSection(false);
   m_view->header()->setTextElideMode(Qt::ElideRight);
   m_view->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
   m_view->header()->setSectionResizeMode(HistoryModel::COLUMN_TITLE, QHeaderView::Stretch);
   m_view->header()->setSectionResizeMode(HistoryModel::COLUMN_DETAILS, QHeaderView::Stretch);
-
-  m_view->sortByColumn(HistoryModel::COLUMN_MODIFIED, Qt::SortOrder::DescendingOrder);
-  m_view->setSortingEnabled(true);
 
   layout()->addWidget(m_view);
 

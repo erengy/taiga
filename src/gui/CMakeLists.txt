@@ -57,6 +57,8 @@ target_sources(taiga-gui PRIVATE
 	models/anime_list_proxy_model.hpp
 	models/history_model.cpp
 	models/history_model.hpp
+	models/history_proxy_model.cpp
+	models/history_proxy_model.hpp
 	models/library_model.cpp
 	models/library_model.hpp
 

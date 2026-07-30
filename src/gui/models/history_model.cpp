@@ -18,17 +18,8 @@
 
 #include "history_model.hpp"
 
-#include <QApplication>
-#include <QPalette>
-#include <anitomy.hpp>
-#include <anitomy/detail/keyword.hpp>  // don't try this at home
-#include <ranges>
-
-#include "base/string.hpp"
 #include "media/anime_db.hpp"
 #include "media/anime_history.hpp"
-#include "track/episode.hpp"
-#include "track/recognition.hpp"
 
 namespace gui {
 
@@ -45,9 +36,10 @@ int HistoryModel::columnCount(const QModelIndex&) const {
 QVariant HistoryModel::data(const QModelIndex& index, int role) const {
   if (!index.isValid()) return {};
 
+  const auto& historyItem = anime::history.items().at(index.row());
+
   switch (role) {
     case Qt::DisplayRole: {
-      const auto& historyItem = anime::history.items().at(index.row());
       const auto item = anime::db.item(historyItem.anime_id);
       switch (index.column()) {
         case COLUMN_TITLE:
@@ -68,6 +60,9 @@ QVariant HistoryModel::data(const QModelIndex& index, int role) const {
       }
       break;
     }
+
+    case static_cast<int>(HistoryItemDataRole::HistoryItem):
+      return QVariant::fromValue(&historyItem);
   }
 
   return {};

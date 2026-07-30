@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2025, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,29 +18,20 @@
 
 #pragma once
 
-#include <QTreeView>
-
-#include "gui/common/page_widget.hpp"
+#include <QSortFilterProxyModel>
 
 namespace gui {
 
-class HistoryModel;
-class HistoryProxyModel;
-
-class HistoryWidget final : public PageWidget {
+class HistoryProxyModel final : public QSortFilterProxyModel {
   Q_OBJECT
-  Q_DISABLE_COPY_MOVE(HistoryWidget)
+  Q_DISABLE_COPY_MOVE(HistoryProxyModel)
 
 public:
-  HistoryWidget(QWidget* parent);
-  ~HistoryWidget() = default;
+  HistoryProxyModel(QObject* parent);
+  ~HistoryProxyModel() = default;
 
-private:
-  void showContextMenu() const;
-
-  HistoryModel* m_model = nullptr;
-  HistoryProxyModel* m_proxyModel = nullptr;
-  QTreeView* m_view = nullptr;
+protected:
+  bool lessThan(const QModelIndex& lhs, const QModelIndex& rhs) const override;
 };
 
 }  // namespace gui
