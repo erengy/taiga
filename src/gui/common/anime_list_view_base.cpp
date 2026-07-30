@@ -39,8 +39,8 @@
 namespace gui {
 
 ListViewBase::ListViewBase(QWidget* parent, QAbstractItemView* view, AnimeListModel* model,
-                           AnimeListProxyModel* proxyModel)
-    : QObject(parent), m_view(view), m_model(model), m_proxyModel(proxyModel) {
+                           AnimeListProxyModel* proxyModel, MediaMenuContext context)
+    : QObject(parent), m_view(view), m_model(model), m_proxyModel(proxyModel), m_context(context) {
   m_view->setContextMenuPolicy(Qt::CustomContextMenu);
   m_view->setSelectionMode(QAbstractItemView::SelectionMode::ExtendedSelection);
 
@@ -94,7 +94,7 @@ void ListViewBase::showMediaMenu() {
     }
   }
 
-  auto* menu = new MediaMenu(m_view, items, entries, m_view->selectionModel());
+  auto* menu = new MediaMenu(m_view, items, entries, m_view->selectionModel(), m_context);
   menu->popup();
 }
 

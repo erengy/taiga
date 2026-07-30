@@ -32,6 +32,7 @@
 #include "gui/common/anime_list_view_cards.hpp"
 #include "gui/main/main_window.hpp"
 #include "gui/main/navigation_widget.hpp"
+#include "gui/media/media_menu.hpp"
 #include "gui/models/anime_list_model.hpp"
 #include "gui/models/anime_list_proxy_model.hpp"
 #include "gui/utils/theme.hpp"
@@ -85,13 +86,13 @@ void ListWidget::setViewMode(ListViewMode mode) {
 
   switch (mode) {
     case ListViewMode::List:
-      m_listView = new ListView(this, m_model, m_proxyModel);
+      m_listView = new ListView(this, m_model, m_proxyModel, MediaMenuContext::List);
       layout()->addWidget(m_listView);
       m_listView->show();
       break;
 
     case ListViewMode::Cards:
-      m_listViewCards = new ListViewCards(this, m_model, m_proxyModel);
+      m_listViewCards = new ListViewCards(this, m_model, m_proxyModel, MediaMenuContext::List);
       layout()->addWidget(m_listViewCards);
       m_listViewCards->show();
       break;

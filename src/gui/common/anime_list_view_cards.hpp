@@ -22,6 +22,8 @@
 
 namespace gui {
 
+enum class MediaMenuContext;
+
 class AnimeListModel;
 class AnimeListProxyModel;
 class ListViewBase;
@@ -31,7 +33,8 @@ class ListViewCards final : public QListView {
   Q_DISABLE_COPY_MOVE(ListViewCards)
 
 public:
-  ListViewCards(QWidget* parent, AnimeListModel* model, AnimeListProxyModel* proxyModel);
+  ListViewCards(QWidget* parent, AnimeListModel* model, AnimeListProxyModel* proxyModel,
+                MediaMenuContext context);
   ~ListViewCards() = default;
 
   ListViewBase* baseView() {

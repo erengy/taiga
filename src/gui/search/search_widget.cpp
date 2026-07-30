@@ -23,6 +23,7 @@
 
 #include "gui/common/anime_list_view_cards.hpp"
 #include "gui/main/main_window.hpp"
+#include "gui/media/media_menu.hpp"
 #include "gui/models/anime_list_model.hpp"
 #include "gui/models/anime_list_proxy_model.hpp"
 #include "gui/utils/format.hpp"
@@ -39,7 +40,7 @@ SearchWidget::SearchWidget(QWidget* parent)
     : PageWidget(parent),
       m_model(new AnimeListModel(this)),
       m_proxyModel(new AnimeListProxyModel(this)),
-      m_listViewCards(new ListViewCards(this, m_model, m_proxyModel)),
+      m_listViewCards(new ListViewCards(this, m_model, m_proxyModel, MediaMenuContext::Search)),
       m_comboYear(new ComboBox(this)),
       m_comboSeason(new ComboBox(this)),
       m_comboType(new ComboBox(this)),

@@ -30,8 +30,9 @@
 
 namespace gui {
 
-ListView::ListView(QWidget* parent, AnimeListModel* model, AnimeListProxyModel* proxyModel)
-    : m_base(new ListViewBase(parent, this, model, proxyModel)) {
+ListView::ListView(QWidget* parent, AnimeListModel* model, AnimeListProxyModel* proxyModel,
+                   MediaMenuContext context)
+    : m_base(new ListViewBase(parent, this, model, proxyModel, context)) {
   setObjectName("animeList");
 
   setFrameShape(QFrame::Shape::NoFrame);

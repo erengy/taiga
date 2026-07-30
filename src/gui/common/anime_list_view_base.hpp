@@ -24,6 +24,8 @@
 
 namespace gui {
 
+enum class MediaMenuContext;
+
 class AnimeListModel;
 class AnimeListProxyModel;
 
@@ -38,7 +40,7 @@ class ListViewBase final : public QObject {
 
 public:
   ListViewBase(QWidget* parent, QAbstractItemView* view, AnimeListModel* model,
-               AnimeListProxyModel* proxyModel);
+               AnimeListProxyModel* proxyModel, MediaMenuContext context);
   ~ListViewBase() = default;
 
 public slots:
@@ -54,6 +56,7 @@ private:
   AnimeListModel* m_model = nullptr;
   AnimeListProxyModel* m_proxyModel = nullptr;
   QAbstractItemView* m_view = nullptr;
+  const MediaMenuContext m_context;
 };
 
 }  // namespace gui

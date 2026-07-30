@@ -43,8 +43,12 @@
 namespace gui {
 
 MediaMenu::MediaMenu(QWidget* parent, const QList<Anime>& items, const QMap<int, ListEntry> entries,
-                     QItemSelectionModel* selectionModel)
-    : QMenu(parent), m_items(items), m_entries(entries), m_selectionModel(selectionModel) {
+                     QItemSelectionModel* selectionModel, MediaMenuContext context)
+    : QMenu(parent),
+      m_items(items),
+      m_entries(entries),
+      m_selectionModel(selectionModel),
+      m_context(context) {
   setAttribute(Qt::WA_DeleteOnClose);
 }
 
