@@ -21,6 +21,7 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QLocalSocket>
+#include <QTimer>
 #include <QTranslator>
 #include <format>
 
@@ -90,7 +91,19 @@ int Application::run() {
 
   window_ = new gui::MainWindow();
   window_->init();
+
+#ifdef Q_OS_WINDOWS
+  // Delay showing the window to avoid a white flash.
+  window_->setWindowOpacity(0.0);
   window_->show();
+  QTimer::singleShot(50, window_, [this]() {
+    if (window_) {
+      window_->setWindowOpacity(1.0);
+    }
+  });
+#else
+  window_->show();
+#endif
 
   return QApplication::exec();
 }
