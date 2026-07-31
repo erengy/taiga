@@ -19,26 +19,46 @@
 #pragma once
 
 #include <QList>
-#include <array>
-#include <string>
-
-#include "base/chrono.hpp"
+#include <QSqlQuery>
+#include <ctime>
 
 namespace anime {
 
 struct HistoryItem {
   int anime_id = 0;
   int episode = 0;
-  std::string time;
+  std::time_t time = 0;
 };
 
-class History {
+class History final : public QObject {
+  Q_OBJECT
+  Q_DISABLE_COPY_MOVE(History)
+
 public:
+  History();
+  ~History() = default;
+
   void init();
+
+  void add(const int animeId, const int episode, const std::time_t time);
+  void clear();
 
   const QList<HistoryItem>& items() const;
 
+signals:
+  void changed();
+
 private:
+  QString sql(const QString& name) const;
+
+  void createTable();
+  void readItems();
+
+  void bindItemToQuery(const HistoryItem& item, QSqlQuery& q) const;
+  HistoryItem itemFromQuery(const QSqlQuery& q) const;
+
+  void migrateFromV1();
+
   QList<HistoryItem> items_;
 };
 

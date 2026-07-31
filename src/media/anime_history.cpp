@@ -18,8 +18,11 @@
 
 #include "anime_history.hpp"
 
+#include <QSqlDatabase>
 #include <format>
 
+#include "base/file.hpp"
+#include "base/string.hpp"
 #include "compat/history.hpp"
 #include "taiga/accounts.hpp"
 #include "taiga/path.hpp"
@@ -27,18 +30,132 @@
 
 namespace anime {
 
+History::History() : QObject{} {}
+
 void History::init() {
+  auto db = QSqlDatabase::database();
+  if (!db.open()) return;
+
+  const bool tableExists = db.tables().contains("history");
+
+  db.close();
+
+  if (!tableExists) {
+    createTable();
+    migrateFromV1();
+    return;
+  }
+
+  readItems();
+}
+
+void History::add(const int animeId, const int episode, const std::time_t time) {
+  auto db = QSqlDatabase::database();
+  if (!db.open()) return;
+
+  QSqlQuery q{db};
+  if (q.prepare(sql("insertHistory"))) {
+    q.bindValue(":anime_id", animeId);
+    q.bindValue(":episode", episode);
+    q.bindValue(":time", static_cast<qlonglong>(time));
+    q.exec();
+  }
+
+  db.close();
+
+  items_.append(HistoryItem{
+      .anime_id = animeId,
+      .episode = episode,
+      .time = time,
+  });
+
+  emit changed();
+}
+
+void History::clear() {
+  auto db = QSqlDatabase::database();
+  if (db.open()) {
+    QSqlQuery q{db};
+    q.exec("DELETE FROM history");
+    db.close();
+  }
+
+  items_.clear();
+
+  emit changed();
+}
+
+const QList<HistoryItem>& History::items() const {
+  return items_;
+}
+
+QString History::sql(const QString& name) const {
+  return base::readFile(u":/sql/%1.sql"_s.arg(name));
+}
+
+void History::createTable() {
+  auto db = QSqlDatabase::database();
+  if (!db.open()) return;
+
+  if (!db.tables().contains("history")) {
+    QSqlQuery q{db};
+    q.exec(sql("createHistory"));
+  }
+
+  db.close();
+}
+
+void History::readItems() {
+  auto db = QSqlDatabase::database();
+  if (!db.open()) return;
+
+  QSqlQuery q{db};
+  if (q.exec("SELECT * FROM history ORDER BY id ASC")) {
+    while (q.next()) {
+      items_.append(itemFromQuery(q));
+    }
+  }
+
+  db.close();
+}
+
+void History::bindItemToQuery(const HistoryItem& item, QSqlQuery& q) const {
+  q.bindValue(":anime_id", item.anime_id);
+  q.bindValue(":episode", item.episode);
+  q.bindValue(":time", static_cast<qlonglong>(item.time));
+}
+
+HistoryItem History::itemFromQuery(const QSqlQuery& q) const {
+  return {
+      .anime_id = q.value("anime_id").toInt(),
+      .episode = q.value("episode").toInt(),
+      .time = static_cast<std::time_t>(q.value("time").toLongLong()),
+  };
+}
+
+void History::migrateFromV1() {
+  auto db = QSqlDatabase::database();
+  if (!db.open()) return;
+
+  QSqlQuery q{db};
+  if (!q.prepare(sql("insertHistory"))) return;
+
   const auto path = []() {
     const auto service = taiga::settings.service();
     return std::format("{}/v1/user/{}@{}/history.xml", taiga::get_data_path(),
                        taiga::accounts.serviceUsername(service), service);
   }();
 
-  items_ = compat::v1::readHistory(path);
-}
+  db.transaction();
 
-const QList<HistoryItem>& History::items() const {
-  return items_;
+  for (const auto& item : compat::v1::readHistory(path)) {
+    items_.append(item);
+    bindItemToQuery(item, q);
+    q.exec();
+  }
+
+  db.commit();
+  db.close();
 }
 
 }  // namespace anime

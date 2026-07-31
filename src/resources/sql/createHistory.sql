@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS history(
+  id INTEGER PRIMARY KEY,
+  anime_id INTEGER NOT NULL,
+  episode INTEGER NOT NULL,
+  time INTEGER NOT NULL,
+  FOREIGN KEY (anime_id) REFERENCES anime (id)
+);

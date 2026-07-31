@@ -18,14 +18,15 @@
 
 #include "history.hpp"
 
+#include <QDateTime>
+
 #include "base/log.hpp"
+#include "base/string.hpp"
 #include "base/xml.hpp"
 #include "compat/common.hpp"
 #include "media/anime_history.hpp"
 
 #define XML_ATTR(name) xml.attributes().value(name)
-#define XML_ATTR_INT(name) XML_ATTR(name).toInt()
-#define XML_ATTR_STR(name) XML_ATTR(name).toString().toStdString()
 
 namespace compat::v1 {
 
@@ -65,12 +66,17 @@ QList<anime::HistoryItem> readHistory(const std::string& path) {
 }
 
 void parseItems(QXmlStreamReader& xml, QList<anime::HistoryItem>& items) {
+  const auto parseTime = [](const QString& value) {
+    const auto datetime = QDateTime::fromString(value, u"yyyy-MM-dd HH:mm:ss"_s);
+    return datetime.isValid() ? static_cast<std::time_t>(datetime.toSecsSinceEpoch()) : 0;
+  };
+
   while (xml.readNextStartElement()) {
     if (xml.name() == u"item") {
       items.emplace_back(anime::HistoryItem{
-        .anime_id = XML_ATTR_INT(u"anime_id"),
-        .episode = XML_ATTR_INT(u"episode"),
-        .time = XML_ATTR_STR(u"time"),
+          .anime_id = XML_ATTR(u"anime_id").toInt(),
+          .episode = XML_ATTR(u"episode").toInt(),
+          .time = parseTime(XML_ATTR(u"time").toString()),
       });
       xml.skipCurrentElement();
 

@@ -18,6 +18,7 @@
 
 #include "history_model.hpp"
 
+#include "gui/utils/format.hpp"
 #include "media/anime_db.hpp"
 #include "media/anime_history.hpp"
 
@@ -48,7 +49,15 @@ QVariant HistoryModel::data(const QModelIndex& index, int role) const {
         case COLUMN_DETAILS:
           return tr("Episode: %1").arg(historyItem.episode);
         case COLUMN_MODIFIED:
-          return QString::fromStdString(historyItem.time);
+          return formatAsRelativeTime(historyItem.time, "-");
+      }
+      break;
+    }
+
+    case Qt::ToolTipRole: {
+      switch (index.column()) {
+        case COLUMN_MODIFIED:
+          return formatTimestamp(historyItem.time);
       }
       break;
     }
