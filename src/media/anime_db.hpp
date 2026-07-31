@@ -45,10 +45,12 @@ public:
 
   void updateItem(const Anime& item);
   void updateEntry(const ListEntry& entry);
+  void deleteEntry(const int animeId);
 
 signals:
   void itemUpdated(const int id);
   void entryUpdated(const int id);
+  void entryDeleted(const int id);
 
 private:
   QString fileName() const;

@@ -101,6 +101,21 @@ void Database::updateEntry(const ListEntry& entry) {
   emit entryUpdated(entry.anime_id);
 }
 
+void Database::deleteEntry(const int animeId) {
+  if (!db_.open()) return;
+
+  QSqlQuery q{db_};
+  q.prepare("DELETE FROM anime_list WHERE media_id = :media_id");
+  q.bindValue(":media_id", animeId);
+  q.exec();
+
+  db_.close();
+
+  entries_.remove(animeId);
+
+  emit entryDeleted(animeId);
+}
+
 QString Database::fileName() const {
   return u"%1/media.sqlite"_s.arg(QString::fromStdString(taiga::get_data_path()));
 }
