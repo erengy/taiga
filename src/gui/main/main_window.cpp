@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,6 +38,7 @@
 #include "sync/service.hpp"
 #include "taiga/application.hpp"
 #include "taiga/session.hpp"
+#include "taiga/settings.hpp"
 #include "ui_main_window.h"
 
 #ifdef Q_OS_WINDOWS
@@ -109,6 +110,10 @@ void MainWindow::initActions() {
   connect(ui_->actionProfile, &QAction::triggered, this, &MainWindow::profile);
   connect(ui_->actionDisplayWindow, &QAction::triggered, this, &MainWindow::displayWindow);
   connect(ui_->actionSynchronize, &QAction::triggered, this, &MainWindow::synchronize);
+
+  ui_->actionToggleSynchronization->setChecked(taiga::settings.syncEnabled());
+  connect(ui_->actionToggleSynchronization, &QAction::toggled, this,
+          [](const bool checked) { taiga::settings.setSyncEnabled(checked); });
 }
 
 void MainWindow::initIcons() {
