@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <QMenu>
+
 #include "gui/common/anime_list_view_base.hpp"
 #include "gui/common/combobox.hpp"
 #include "gui/common/page_widget.hpp"
@@ -26,6 +28,7 @@ namespace gui {
 
 class AnimeListModel;
 class AnimeListProxyModel;
+class ListView;
 class ListViewCards;
 
 class SearchWidget final : public PageWidget {
@@ -39,14 +42,19 @@ public:
   void saveState();
 
 private:
+  void initViewMenu();
+  void setViewMode(ListViewMode mode);
+
   AnimeListModel* m_model = nullptr;
   AnimeListProxyModel* m_proxyModel = nullptr;
   ComboBox* m_comboYear = nullptr;
   ComboBox* m_comboSeason = nullptr;
   ComboBox* m_comboType = nullptr;
   ComboBox* m_comboStatus = nullptr;
+  ListView* m_listView = nullptr;
   ListViewCards* m_listViewCards = nullptr;
   ListViewMode m_viewMode = ListViewMode::Cards;
+  QMenu* m_viewMenu = nullptr;
 };
 
 }  // namespace gui

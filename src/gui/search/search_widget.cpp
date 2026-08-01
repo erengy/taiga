@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,9 +18,12 @@
 
 #include "search_widget.hpp"
 
+#include <QActionGroup>
 #include <QLineEdit>
 #include <QToolBar>
+#include <QToolButton>
 
+#include "gui/common/anime_list_view.hpp"
 #include "gui/common/anime_list_view_cards.hpp"
 #include "gui/main/main_window.hpp"
 #include "gui/media/media_menu.hpp"
@@ -40,11 +43,11 @@ SearchWidget::SearchWidget(QWidget* parent)
     : PageWidget(parent),
       m_model(new AnimeListModel(this)),
       m_proxyModel(new AnimeListProxyModel(this)),
-      m_listViewCards(new ListViewCards(this, m_model, m_proxyModel, MediaMenuContext::Search)),
       m_comboYear(new ComboBox(this)),
       m_comboSeason(new ComboBox(this)),
       m_comboType(new ComboBox(this)),
-      m_comboStatus(new ComboBox(this)) {
+      m_comboStatus(new ComboBox(this)),
+      m_viewMenu(new QMenu(this)) {
   m_proxyModel->sort(taiga::session.searchListSortColumn(), taiga::session.searchListSortOrder());
   m_proxyModel->setFilters(taiga::session.searchListFilters());
 
@@ -131,10 +134,16 @@ SearchWidget::SearchWidget(QWidget* parent)
     m_toolbar->addAction(actionSort);
     m_toolbar->addAction(actionView);
     m_toolbar->addAction(actionMore);
+
+    const auto viewButton = static_cast<QToolButton*>(m_toolbar->widgetForAction(actionView));
+    viewButton->setPopupMode(QToolButton::InstantPopup);
+    viewButton->setMenu(m_viewMenu);
   }
 
+  connect(m_viewMenu, &QMenu::aboutToShow, this, &SearchWidget::initViewMenu);
+
   // List
-  layout()->addWidget(m_listViewCards);
+  setViewMode(taiga::session.searchListViewMode());
 
   // Search
   connect(mainWindow()->searchBox(), &QLineEdit::returnPressed, this, [this]() {
@@ -155,6 +164,53 @@ void SearchWidget::saveState() {
   taiga::session.setSearchListSortColumn(m_proxyModel->sortColumn());
   taiga::session.setSearchListSortOrder(m_proxyModel->sortOrder());
   taiga::session.setSearchListViewMode(m_viewMode);
+}
+
+void SearchWidget::initViewMenu() {
+  static const QList<QPair<QString, ListViewMode>> items{
+      {"List", ListViewMode::List},
+      {"Cards", ListViewMode::Cards},
+  };
+
+  const auto actionGroup = new QActionGroup(this);
+
+  m_viewMenu->clear();
+
+  for (const auto& [text, mode] : items) {
+    const auto action = m_viewMenu->addAction(text, this, [this, mode]() { setViewMode(mode); });
+    action->setCheckable(true);
+    action->setChecked(mode == m_viewMode);
+    actionGroup->addAction(action);
+  }
+}
+
+void SearchWidget::setViewMode(ListViewMode mode) {
+  if (m_listView) {
+    layout()->removeWidget(m_listView);
+    m_listView->deleteLater();
+    m_listView = nullptr;
+  }
+  if (m_listViewCards) {
+    layout()->removeWidget(m_listViewCards);
+    m_listViewCards->deleteLater();
+    m_listViewCards = nullptr;
+  }
+
+  m_viewMode = mode;
+
+  switch (mode) {
+    case ListViewMode::List:
+      m_listView = new ListView(this, m_model, m_proxyModel, MediaMenuContext::Search);
+      layout()->addWidget(m_listView);
+      m_listView->show();
+      break;
+
+    case ListViewMode::Cards:
+      m_listViewCards = new ListViewCards(this, m_model, m_proxyModel, MediaMenuContext::Search);
+      layout()->addWidget(m_listViewCards);
+      m_listViewCards->show();
+      break;
+  }
 }
 
 }  // namespace gui
