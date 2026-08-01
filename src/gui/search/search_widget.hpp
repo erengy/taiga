@@ -42,6 +42,7 @@ public:
   void saveState();
 
 private:
+  void initSortMenu();
   void initViewMenu();
   void setViewMode(ListViewMode mode);
 
@@ -54,6 +55,7 @@ private:
   ListView* m_listView = nullptr;
   ListViewCards* m_listViewCards = nullptr;
   ListViewMode m_viewMode = ListViewMode::Cards;
+  QMenu* m_sortMenu = nullptr;
   QMenu* m_viewMenu = nullptr;
 };
 

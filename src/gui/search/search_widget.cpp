@@ -47,6 +47,7 @@ SearchWidget::SearchWidget(QWidget* parent)
       m_comboSeason(new ComboBox(this)),
       m_comboType(new ComboBox(this)),
       m_comboStatus(new ComboBox(this)),
+      m_sortMenu(new QMenu(this)),
       m_viewMenu(new QMenu(this)) {
   m_proxyModel->sort(taiga::session.searchListSortColumn(), taiga::session.searchListSortOrder());
   m_proxyModel->setFilters(taiga::session.searchListFilters());
@@ -135,11 +136,16 @@ SearchWidget::SearchWidget(QWidget* parent)
     m_toolbar->addAction(actionView);
     m_toolbar->addAction(actionMore);
 
+    const auto sortButton = static_cast<QToolButton*>(m_toolbar->widgetForAction(actionSort));
+    sortButton->setPopupMode(QToolButton::InstantPopup);
+    sortButton->setMenu(m_sortMenu);
+
     const auto viewButton = static_cast<QToolButton*>(m_toolbar->widgetForAction(actionView));
     viewButton->setPopupMode(QToolButton::InstantPopup);
     viewButton->setMenu(m_viewMenu);
   }
 
+  connect(m_sortMenu, &QMenu::aboutToShow, this, &SearchWidget::initSortMenu);
   connect(m_viewMenu, &QMenu::aboutToShow, this, &SearchWidget::initViewMenu);
 
   // List
@@ -164,6 +170,42 @@ void SearchWidget::saveState() {
   taiga::session.setSearchListSortColumn(m_proxyModel->sortColumn());
   taiga::session.setSearchListSortOrder(m_proxyModel->sortOrder());
   taiga::session.setSearchListViewMode(m_viewMode);
+}
+
+void SearchWidget::initSortMenu() {
+  using Qt::SortOrder::AscendingOrder;
+  using Qt::SortOrder::DescendingOrder;
+
+  static const QList<QPair<AnimeListModel::Column, Qt::SortOrder>> items{
+      {AnimeListModel::COLUMN_TITLE, AscendingOrder},
+      {AnimeListModel::COLUMN_DURATION, DescendingOrder},
+      {AnimeListModel::COLUMN_AVERAGE, DescendingOrder},
+      {AnimeListModel::COLUMN_TYPE, AscendingOrder},
+      {AnimeListModel::COLUMN_SEASON, DescendingOrder},
+      {AnimeListModel::COLUMN_STARTED, DescendingOrder},
+  };
+
+  const auto actionGroup = new QActionGroup(this);
+
+  m_sortMenu->clear();
+
+  for (const auto& [column, order] : items) {
+    const auto headerData =
+        m_model->headerData(column, Qt::Orientation::Horizontal, Qt::DisplayRole);
+
+    const auto action = m_sortMenu->addAction(headerData.toString(), this, [this, column, order]() {
+      if (m_listView) {
+        // Sorting the proxy model doesn't update the sort indicator on the header.
+        m_listView->sortByColumn(column, order);
+      } else {
+        m_proxyModel->sort(column, order);
+      }
+    });
+
+    action->setCheckable(true);
+    action->setChecked(column == m_proxyModel->sortColumn());
+    actionGroup->addAction(action);
+  }
 }
 
 void SearchWidget::initViewMenu() {
