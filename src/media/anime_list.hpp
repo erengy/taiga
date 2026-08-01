@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <QFlags>
 #include <array>
 #include <string>
 
@@ -47,6 +48,18 @@ constexpr std::array<Status, 5> kStatuses{
 constexpr int kUnknownId = 0;
 constexpr int kScoreMax = 100;
 
+enum class Field {
+  Episode = 1 << 0,
+  Score = 1 << 1,
+  Status = 1 << 2,
+  Rewatching = 1 << 3,
+  RewatchedTimes = 1 << 4,
+  DateStarted = 1 << 5,
+  DateCompleted = 1 << 6,
+  Notes = 1 << 7,
+};
+Q_DECLARE_FLAGS(Fields, Field)
+
 struct Entry {
   int64_t id = kUnknownId;
   int anime_id = kUnknownId;
@@ -65,5 +78,7 @@ struct Entry {
 };
 
 }  // namespace anime::list
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(anime::list::Fields)
 
 using ListEntry = anime::list::Entry;
