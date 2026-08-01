@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 #include "widgets.hpp"
 
 #include <QGuiApplication>
+#include <QMessageBox>
 #include <QScreen>
 
 namespace gui {
@@ -29,5 +30,22 @@ void centerWidgetToScreen(QWidget* widget) {
   if (!screen) return;
   widget->move(screen->availableGeometry().center() - QRect{{}, widget->frameSize()}.center());
 };
+
+bool confirm(QWidget* parent, const QString& text, const QString& informativeText,
+             const QString& confirmButtonText) {
+  QMessageBox msgBox(parent);
+  msgBox.setIcon(QMessageBox::Icon::Question);
+  msgBox.setText(text);
+  msgBox.setInformativeText(informativeText);
+
+  const auto confirmButton =
+      msgBox.addButton(confirmButtonText, QMessageBox::ButtonRole::DestructiveRole);
+  msgBox.addButton(QMessageBox::Cancel);
+  msgBox.setDefaultButton(QMessageBox::Cancel);
+
+  msgBox.exec();
+
+  return msgBox.clickedButton() == reinterpret_cast<QAbstractButton*>(confirmButton);
+}
 
 }  // namespace gui

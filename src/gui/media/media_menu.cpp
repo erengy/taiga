@@ -34,6 +34,7 @@
 #include "gui/media/media_dialog.hpp"
 #include "gui/utils/format.hpp"
 #include "gui/utils/theme.hpp"
+#include "gui/utils/widgets.hpp"
 #include "media/anime.hpp"
 #include "media/anime_list.hpp"
 #include "media/anime_list_utils.hpp"
@@ -171,23 +172,13 @@ void MediaMenu::refresh() const {
 }
 
 void MediaMenu::removeFromList() const {
-  QMessageBox msgBox;
-  msgBox.setIcon(QMessageBox::Icon::Question);
-  msgBox.setText("Do you want to remove selected items from your list?");
-
   QList<QString> titles;
   for (const auto& item : m_items) {
     titles.push_back(u"<li>%1</li>"_s.arg(QString::fromStdString(item.titles.romaji)));
   }
-  msgBox.setInformativeText(u"<ul>%1</ul>"_s.arg(titles.join("")));
 
-  auto removeButton = msgBox.addButton(tr("Remove"), QMessageBox::ButtonRole::DestructiveRole);
-  msgBox.addButton(QMessageBox::Cancel);
-  msgBox.setDefaultButton(QMessageBox::Cancel);
-
-  msgBox.exec();
-
-  if (msgBox.clickedButton() == reinterpret_cast<QAbstractButton*>(removeButton)) {
+  if (confirm(parentWidget(), tr("Do you want to remove selected items from your list?"),
+              u"<ul>%1</ul>"_s.arg(titles.join("")), tr("Remove"))) {
     for (const auto& item : m_items) {
       anime::list::remove(item.id);
     }
