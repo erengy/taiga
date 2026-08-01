@@ -65,6 +65,8 @@ target_sources(taiga PRIVATE
 	sync/myanimelist_parsers.hpp
 	sync/myanimelist_utils.cpp
 	sync/myanimelist_utils.hpp
+	sync/queue.cpp
+	sync/queue.hpp
 	sync/service.cpp
 	sync/service.hpp
 

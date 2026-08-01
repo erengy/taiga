@@ -1,29 +1,15 @@
-INSERT INTO
+INSERT OR REPLACE INTO
   queue(
-    enabled,
     anime_id,
-    mode,
+    dirty,
     time,
-    episode,
-    score,
-    status,
-    date_started,
-    date_completed,
-    rewatching,
-    rewatched_times,
-    notes
+    retry_count,
+    last_error
   )
   VALUES(
-    :enabled,
     :anime_id,
-    :mode,
+    :dirty,
     :time,
-    :episode,
-    :score,
-    :status,
-    :date_started,
-    :date_completed,
-    :rewatching,
-    :rewatched_times,
-    :notes
+    :retry_count,
+    :last_error
   )

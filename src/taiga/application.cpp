@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,6 +31,7 @@
 #include "gui/utils/theme.hpp"
 #include "media/anime_db.hpp"
 #include "media/anime_history.hpp"
+#include "sync/queue.hpp"
 #include "taiga/config.h"
 #include "taiga/path.hpp"
 #include "taiga/settings.hpp"
@@ -80,6 +81,7 @@ int Application::run() {
   taiga::settings.init();
   anime::db.init();
   anime::history.init();
+  sync::queue.init();
   track::media::detection()->init();
 
   gui::theme.initStyle();

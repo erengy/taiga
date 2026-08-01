@@ -1,16 +1,8 @@
 CREATE TABLE IF NOT EXISTS queue(
-  id INTEGER PRIMARY KEY,
-  enabled INTEGER NOT NULL DEFAULT 1,
-  anime_id INTEGER NOT NULL,
-  mode INTEGER NOT NULL,
+  anime_id INTEGER PRIMARY KEY,
+  dirty INTEGER NOT NULL,
   time INTEGER NOT NULL,
-  episode INTEGER,
-  score INTEGER,
-  status INTEGER,
-  date_started TEXT,
-  date_completed TEXT,
-  rewatching INTEGER,
-  rewatched_times INTEGER,
-  notes TEXT,
+  retry_count INTEGER NOT NULL DEFAULT 0,
+  last_error TEXT,
   FOREIGN KEY (anime_id) REFERENCES anime (id)
 );
