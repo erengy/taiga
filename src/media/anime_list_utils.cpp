@@ -22,6 +22,7 @@
 
 #include "media/anime.hpp"
 #include "media/anime_db.hpp"
+#include "media/anime_history.hpp"
 #include "media/anime_list.hpp"
 
 namespace anime::list {
@@ -34,8 +35,15 @@ float getProgressRatio(const Details* item, const Entry* entry) {
 }
 
 void save(Entry entry) {
+  const auto previous = db.entry(entry.anime_id);
+  const bool episodeChanged = !previous || previous->watched_episodes != entry.watched_episodes;
+
   entry.last_updated = std::time(nullptr);
   db.updateEntry(entry);
+
+  if (episodeChanged && entry.watched_episodes > 0) {
+    history.add(entry.anime_id, entry.watched_episodes, entry.last_updated);
+  }
 }
 
 }  // namespace anime::list
