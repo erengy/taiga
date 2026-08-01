@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2025, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,16 +18,24 @@
 
 #include "anime_list_utils.hpp"
 
+#include <ctime>
+
 #include "media/anime.hpp"
+#include "media/anime_db.hpp"
 #include "media/anime_list.hpp"
 
 namespace anime::list {
 
 float getProgressRatio(const Details* item, const Entry* entry) {
-    const auto progress = (entry ? entry->watched_episodes : 0);
-    const auto total = (item ? item->episode_count : 0);
-    if (!total) return 0.8f;
-    return std::min(progress / static_cast<float>(total), 1.0f);
+  const auto progress = (entry ? entry->watched_episodes : 0);
+  const auto total = (item ? item->episode_count : 0);
+  if (!total) return 0.8f;
+  return std::min(progress / static_cast<float>(total), 1.0f);
+}
+
+void save(Entry entry) {
+  entry.last_updated = std::time(nullptr);
+  db.updateEntry(entry);
 }
 
 }  // namespace anime::list

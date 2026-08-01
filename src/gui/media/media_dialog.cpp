@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@
 #include "gui/utils/image_provider.hpp"
 #include "gui/utils/widgets.hpp"
 #include "media/anime_db.hpp"
+#include "media/anime_list_utils.hpp"
 #include "media/anime_season.hpp"
 #include "media/anime_utils.hpp"
 #include "sync/service.hpp"
@@ -350,10 +351,8 @@ void MediaDialog::accept() {
                                 ? FuzzyDate{ui_->dateCompleted->date().toStdSysDays()}
                                 : FuzzyDate{};
   m_entry->notes = ui_->plainTextEditNotes->toPlainText().toStdString();
-  m_entry->last_updated = QDateTime::currentSecsSinceEpoch();
 
-  // @TODO: Add to queue instead
-  anime::db.updateEntry(*m_entry);
+  anime::list::save(*m_entry);
 
   QDialog::accept();
 }

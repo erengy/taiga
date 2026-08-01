@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@
 #include "gui/utils/format.hpp"
 #include "gui/utils/image_provider.hpp"
 #include "media/anime_db.hpp"
+#include "media/anime_list_utils.hpp"
 #include "media/anime_season.hpp"
 
 namespace gui {
@@ -194,11 +195,15 @@ QVariant AnimeListModel::data(const QModelIndex& index, int role) const {
   return {};
 }
 
-bool AnimeListModel::setData(const QModelIndex& index, const QVariant&, int role) {
+bool AnimeListModel::setData(const QModelIndex& index, const QVariant& value, int role) {
   if (index.isValid() && role == Qt::EditRole) {
     if (index.column() == COLUMN_SCORE) {
-      // const int id = m_ids.at(index.row());
-      // @TODO: Add to queue
+      const int id = m_ids.at(index.row());
+      if (const auto entry = anime::db.entry(id)) {
+        auto updated = *entry;
+        updated.score = value.toInt();
+        anime::list::save(updated);
+      }
       return true;
     }
   }
