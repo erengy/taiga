@@ -21,6 +21,7 @@
 #include <QList>
 #include <QSqlQuery>
 #include <ctime>
+#include <optional>
 #include <string>
 
 #include "media/anime_list.hpp"
@@ -49,6 +50,9 @@ public:
   void pushDelete(const int animeId);
   void pop(const int animeId);
 
+  void process();
+  void complete(const bool success, const QString& error = {});
+
   const QueueItem* currentItem() const;
   int count() const;
   bool hasItem(const int animeId) const;
@@ -74,6 +78,7 @@ private:
   QueueItem itemFromQuery(const QSqlQuery& q) const;
 
   QList<QueueItem> items_;
+  std::optional<int> processing_;
 };
 
 inline Queue queue;

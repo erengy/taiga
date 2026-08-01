@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@
 #include "sync/anilist_error.hpp"
 #include "sync/anilist_parsers.hpp"
 #include "sync/anilist_utils.hpp"
+#include "sync/queue.hpp"
 #include "taiga/accounts.hpp"
 
 // AniList API documentation:
@@ -192,8 +193,8 @@ void Service::fetchListEntries() {
   manager_.post(api_.createRequest(), data, this, callback);
 }
 
-void Service::addListEntry(const int id) {
-  updateListEntry(id);
+void Service::addListEntry(const int id, const anime::list::Fields dirty) {
+  updateListEntry(id, dirty);
 }
 
 void Service::deleteListEntry(const int id) {
@@ -206,37 +207,46 @@ void Service::deleteListEntry(const int id) {
       {"variables", QJsonObject{{"id", listEntry->id}}},
   }};
 
-  const auto callback = [this](QRestReply& reply) {
+  const auto callback = [this, id](QRestReply& reply) {
     if (isError(reply) && reply.httpStatus() != 404) {
       handleError(*this, reply);
+      sync::queue.complete(false, "Failed to delete list entry.");
       return;
     }
 
-    // @TODO: anime::db.deleteEntry(id);
+    anime::db.deleteEntry(id);
+    sync::queue.complete(true);
   };
 
   manager_.post(api_.createRequest(), data, this, callback);
 }
 
-void Service::updateListEntry(const int id) {
+void Service::updateListEntry(const int id, const anime::list::Fields dirty) {
   const auto listEntry = anime::db.entry(id);
 
   if (!listEntry) return;
 
-  // @TODO: Use queue item instead
   QJsonObject variables{
       {"mediaId", listEntry->anime_id},
-      {"status", listEntry->rewatching ? u"REPEATING"_s : fromListStatus(listEntry->status)},
-      {"scoreRaw", listEntry->score},
-      {"progress", listEntry->watched_episodes},
-      {"repeat", listEntry->rewatched_times},
-      {"notes", QString::fromStdString(listEntry->notes)},
-      {"startedAt", fromFuzzyDate(listEntry->date_started)},
-      {"completedAt", fromFuzzyDate(listEntry->date_completed)},
   };
 
   if (listEntry->id != anime::list::kUnknownId) {
     variables["id"] = listEntry->id;
+  }
+
+  using anime::list::Field;
+
+  if (dirty & (Field::Status | Field::Rewatching)) {
+    variables["status"] =
+        listEntry->rewatching ? u"REPEATING"_s : fromListStatus(listEntry->status);
+  }
+  if (dirty & Field::Score) variables["scoreRaw"] = listEntry->score;
+  if (dirty & Field::Episode) variables["progress"] = listEntry->watched_episodes;
+  if (dirty & Field::RewatchedTimes) variables["repeat"] = listEntry->rewatched_times;
+  if (dirty & Field::Notes) variables["notes"] = QString::fromStdString(listEntry->notes);
+  if (dirty & Field::DateStarted) variables["startedAt"] = fromFuzzyDate(listEntry->date_started);
+  if (dirty & Field::DateCompleted) {
+    variables["completedAt"] = fromFuzzyDate(listEntry->date_completed);
   }
 
   const QJsonDocument data{{
@@ -247,6 +257,7 @@ void Service::updateListEntry(const int id) {
   const auto callback = [this](QRestReply& reply) {
     if (isError(reply)) {
       handleError(*this, reply);
+      sync::queue.complete(false, "Failed to update list entry.");
       return;
     }
 
@@ -256,6 +267,7 @@ void Service::updateListEntry(const int id) {
 
     if (!entry) {
       handleError(*this, reply, "Could not parse list entry.");
+      sync::queue.complete(false, "Could not parse list entry.");
       return;
     }
 
@@ -265,6 +277,8 @@ void Service::updateListEntry(const int id) {
     if (const auto listEntry = parseListEntry(*entry)) {
       anime::db.updateEntry(*listEntry);
     }
+
+    sync::queue.complete(true);
   };
 
   manager_.post(api_.createRequest(), data, this, callback);

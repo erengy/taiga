@@ -23,6 +23,8 @@
 #include <QRestAccessManager>
 #include <QString>
 
+#include "media/anime_list.hpp"
+
 namespace sync {
 
 enum class ServiceId {
@@ -75,6 +77,10 @@ void fetchAnime(const int id);
 void fetchListEntries();
 void search(const QString& query);
 void synchronize();
+
+void addListEntry(const int id, const anime::list::Fields dirty);
+void updateListEntry(const int id, const anime::list::Fields dirty);
+void deleteListEntry(const int id);
 
 bool isUserAuthenticated();
 

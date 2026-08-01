@@ -26,6 +26,7 @@
 #include "sync/anilist_utils.hpp"
 #include "sync/kitsu_utils.hpp"
 #include "sync/myanimelist_utils.hpp"
+#include "sync/queue.hpp"
 #include "taiga/accounts.hpp"
 #include "taiga/network.hpp"
 #include "taiga/settings.hpp"
@@ -176,8 +177,47 @@ void synchronize() {
         return;
       }
 
-      // @TODO: Process the update queue when available
-      fetchListEntries();
+      if (queue.count() > 0) {
+        queue.process();
+      } else {
+        fetchListEntries();
+      }
+      break;
+  }
+}
+
+void addListEntry(const int id, const anime::list::Fields dirty) {
+  switch (currentServiceId()) {
+    case ServiceId::MyAnimeList:
+      break;
+    case ServiceId::Kitsu:
+      break;
+    case ServiceId::AniList:
+      anilist::Service::instance()->addListEntry(id, dirty);
+      break;
+  }
+}
+
+void updateListEntry(const int id, const anime::list::Fields dirty) {
+  switch (currentServiceId()) {
+    case ServiceId::MyAnimeList:
+      break;
+    case ServiceId::Kitsu:
+      break;
+    case ServiceId::AniList:
+      anilist::Service::instance()->updateListEntry(id, dirty);
+      break;
+  }
+}
+
+void deleteListEntry(const int id) {
+  switch (currentServiceId()) {
+    case ServiceId::MyAnimeList:
+      break;
+    case ServiceId::Kitsu:
+      break;
+    case ServiceId::AniList:
+      anilist::Service::instance()->deleteListEntry(id);
       break;
   }
 }

@@ -23,6 +23,8 @@
 
 #include "base/file.hpp"
 #include "base/string.hpp"
+#include "media/anime_db.hpp"
+#include "sync/service.hpp"
 
 namespace sync {
 
@@ -66,6 +68,55 @@ void Queue::pop(const int animeId) {
   deleteItem(animeId);
 
   emit changed();
+}
+
+void Queue::process() {
+  if (processing_ || items_.isEmpty()) return;
+
+  const auto item = currentItem();
+  if (!item) return;
+
+  const auto entry = anime::db.entry(item->anime_id);
+  if (!entry) {
+    pop(item->anime_id);
+    process();
+    return;
+  }
+
+  if (!isUserAuthenticated()) {
+    authenticateUser();
+    return;
+  }
+
+  processing_ = item->anime_id;
+
+  if (entry->pending_delete) {
+    deleteListEntry(item->anime_id);
+  } else if (entry->id == anime::list::kUnknownId) {
+    addListEntry(item->anime_id, item->dirty);
+  } else {
+    updateListEntry(item->anime_id, item->dirty);
+  }
+}
+
+void Queue::complete(const bool success, const QString& error) {
+  if (!processing_) return;
+
+  const int animeId = *processing_;
+  processing_.reset();
+
+  if (success) {
+    pop(animeId);
+    process();
+    return;
+  }
+
+  const auto it = findItem(animeId);
+  if (it != items_.end()) {
+    it->retry_count++;
+    it->last_error = error.toStdString();
+    persistItem(*it);
+  }
 }
 
 const QueueItem* Queue::currentItem() const {
