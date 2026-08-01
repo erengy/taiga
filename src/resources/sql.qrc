@@ -4,8 +4,11 @@
     <file>sql/createAnimeList.sql</file>
     <file>sql/createHistory.sql</file>
     <file>sql/createMeta.sql</file>
+    <file>sql/createQueue.sql</file>
     <file>sql/insertAnime.sql</file>
     <file>sql/insertAnimeList.sql</file>
     <file>sql/insertHistory.sql</file>
+    <file>sql/insertQueue.sql</file>
+    <file>sql/updateQueue.sql</file>
   </qresource>
 </RCC>
