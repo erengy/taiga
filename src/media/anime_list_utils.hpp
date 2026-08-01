@@ -29,5 +29,6 @@ struct Entry;
 float getProgressRatio(const Details* item, const Entry* entry);
 
 void save(Entry entry);
+void remove(const int animeId);
 
 }  // namespace anime::list

@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,6 +36,7 @@
 #include "gui/utils/theme.hpp"
 #include "media/anime.hpp"
 #include "media/anime_list.hpp"
+#include "media/anime_list_utils.hpp"
 #include "media/anime_utils.hpp"
 #include "sync/service.hpp"
 #include "taiga/settings.hpp"
@@ -187,7 +188,9 @@ void MediaMenu::removeFromList() const {
   msgBox.exec();
 
   if (msgBox.clickedButton() == reinterpret_cast<QAbstractButton*>(removeButton)) {
-    // @TODO: Add to queue
+    for (const auto& item : m_items) {
+      anime::list::remove(item.id);
+    }
   }
 }
 

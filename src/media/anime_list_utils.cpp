@@ -46,4 +46,15 @@ void save(Entry entry) {
   }
 }
 
+void remove(const int animeId) {
+  const auto entry = db.entry(animeId);
+  if (!entry) return;
+
+  auto updated = *entry;
+  updated.pending_delete = true;
+  updated.last_updated = std::time(nullptr);
+
+  db.updateEntry(updated);
+}
+
 }  // namespace anime::list
