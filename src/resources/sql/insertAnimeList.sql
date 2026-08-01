@@ -12,7 +12,8 @@ INSERT OR REPLACE INTO
     rewatching,
     rewatching_ep,
     notes,
-    last_updated
+    last_updated,
+    pending_delete
   )
   VALUES(
     :id,
@@ -27,5 +28,6 @@ INSERT OR REPLACE INTO
     :rewatching,
     :rewatching_ep,
     :notes,
-    :last_updated
+    :last_updated,
+    :pending_delete
   )

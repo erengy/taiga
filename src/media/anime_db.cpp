@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -239,6 +239,7 @@ void Database::bindEntryToQuery(const ListEntry& entry, QSqlQuery& q) const {
   q.bindValue(":rewatching_ep", entry.rewatching_ep);
   q.bindValue(":notes", QString::fromStdString(entry.notes));
   q.bindValue(":last_updated", QString::number(entry.last_updated));
+  q.bindValue(":pending_delete", entry.pending_delete);
 }
 
 Anime Database::itemFromQuery(const QSqlQuery& q) const {
@@ -290,6 +291,7 @@ ListEntry Database::entryFromQuery(const QSqlQuery& q) const {
       .date_completed = FuzzyDate(q.value("date_end").toString().toStdString()),
       .last_updated = q.value("last_updated").toInt(),
       .notes = q.value("notes").toString().toStdString(),
+      .pending_delete = q.value("pending_delete").toBool(),
   };
 }
 

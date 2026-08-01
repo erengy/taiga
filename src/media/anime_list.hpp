@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -61,6 +61,7 @@ struct Entry {
   FuzzyDate date_completed;
   std::time_t last_updated;
   std::string notes;
+  bool pending_delete = false;
 };
 
 }  // namespace anime::list

@@ -12,5 +12,6 @@ CREATE TABLE IF NOT EXISTS anime_list(
   rewatching_ep INTEGER,
   notes TEXT,
   last_updated TEXT,
+  pending_delete INTEGER NOT NULL DEFAULT 0,
   FOREIGN KEY (media_id) REFERENCES media (id)
 );
