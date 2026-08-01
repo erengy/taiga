@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@
 #include "media/anime.hpp"
 #include "media/anime_db.hpp"
 #include "media/anime_list.hpp"
+#include "sync/queue.hpp"
 
 namespace gui {
 
@@ -55,6 +56,8 @@ NavigationWidget::NavigationWidget(QWidget* parent) : QTreeWidget(parent) {
     const auto status = current->data(0, statusRole).value<anime::list::Status>();
     emit currentListStatusChanged(status);
   });
+
+  connect(&sync::queue, &sync::Queue::changed, this, &NavigationWidget::refresh);
 }
 
 void NavigationWidget::refresh() {
@@ -85,7 +88,9 @@ void NavigationWidget::refresh() {
     setItemData(item, NavigationItemDataRole::Counter, statusCounts[status]);
   }
 
-  addItem("History", "history", MainWindowPage::History);
+  auto historyItem = addItem("History", "history", MainWindowPage::History);
+  setItemData(historyItem, NavigationItemDataRole::Counter, sync::queue.count());
+
   addSeparator();
   addItem("Library", "folder", MainWindowPage::Library);
   addItem("Torrents", "rss_feed", MainWindowPage::Torrents);
