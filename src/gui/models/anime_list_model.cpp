@@ -44,11 +44,15 @@ AnimeListModel::AnimeListModel(QObject* parent) : QAbstractListModel(parent) {
     }
   });
 
-  connect(&anime::db, &anime::Database::itemUpdated, this, [this](int id) {
+  const auto refreshRow = [this](int id) {
     if (const auto row = m_ids.indexOf(id); row > -1) {
       emit dataChanged(index(row, 0), index(row, NUM_COLUMNS - 1));
     }
-  });
+  };
+
+  connect(&anime::db, &anime::Database::itemUpdated, this, refreshRow);
+  connect(&anime::db, &anime::Database::entryUpdated, this, refreshRow);
+  connect(&anime::db, &anime::Database::entryDeleted, this, refreshRow);
 }
 
 void AnimeListModel::addIds(const QList<int>& ids) {
