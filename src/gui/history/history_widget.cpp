@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2025, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,9 +24,12 @@
 #include <QUrl>
 
 #include "gui/main/main_window.hpp"
+#include "gui/media/media_dialog.hpp"
 #include "gui/models/history_model.hpp"
 #include "gui/models/history_proxy_model.hpp"
 #include "gui/utils/theme.hpp"
+#include "media/anime_db.hpp"
+#include "media/anime_history.hpp"
 #include "taiga/settings.hpp"
 
 namespace gui {
@@ -58,6 +61,7 @@ HistoryWidget::HistoryWidget(QWidget* parent)
   layout()->addWidget(m_view);
 
   connect(m_view, &QWidget::customContextMenuRequested, this, &HistoryWidget::showContextMenu);
+  connect(m_view, &QTreeView::doubleClicked, this, &HistoryWidget::showMediaDialog);
 }
 
 void HistoryWidget::showContextMenu() const {
@@ -66,6 +70,19 @@ void HistoryWidget::showContextMenu() const {
   if (!index.isValid()) return;
 
   // @TODO
+}
+
+void HistoryWidget::showMediaDialog(const QModelIndex& index) const {
+  const int role = static_cast<int>(HistoryItemDataRole::HistoryItem);
+  const auto historyItem = index.data(role).value<const anime::HistoryItem*>();
+  if (!historyItem) return;
+
+  const auto item = anime::db.item(historyItem->anime_id);
+  if (!item) return;
+
+  const auto entry = anime::db.entry(historyItem->anime_id);
+  MediaDialog::show(mainWindow(), MediaDialogPage::Details, *item,
+                    entry ? std::optional<ListEntry>{*entry} : std::nullopt);
 }
 
 }  // namespace gui
