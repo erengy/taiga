@@ -24,6 +24,7 @@
 #include "media/anime_db.hpp"
 #include "media/anime_history.hpp"
 #include "media/anime_list.hpp"
+#include "sync/queue.hpp"
 
 namespace anime::list {
 
@@ -36,13 +37,28 @@ float getProgressRatio(const Details* item, const Entry* entry) {
 
 void save(Entry entry) {
   const auto previous = db.entry(entry.anime_id);
-  const bool episodeChanged = !previous || previous->watched_episodes != entry.watched_episodes;
+  const Entry baseline = previous ? *previous : Entry{.anime_id = entry.anime_id};
 
+  Fields dirty;
+  if (baseline.watched_episodes != entry.watched_episodes) dirty |= Field::Episode;
+  if (baseline.score != entry.score) dirty |= Field::Score;
+  if (baseline.status != entry.status) dirty |= Field::Status;
+  if (baseline.rewatching != entry.rewatching) dirty |= Field::Rewatching;
+  if (baseline.rewatched_times != entry.rewatched_times) dirty |= Field::RewatchedTimes;
+  if (baseline.date_started != entry.date_started) dirty |= Field::DateStarted;
+  if (baseline.date_completed != entry.date_completed) dirty |= Field::DateCompleted;
+  if (baseline.notes != entry.notes) dirty |= Field::Notes;
+
+  entry.pending_delete = false;
   entry.last_updated = std::time(nullptr);
   db.updateEntry(entry);
 
-  if (episodeChanged && entry.watched_episodes > 0) {
+  if ((dirty & Field::Episode) && entry.watched_episodes > 0) {
     history.add(entry.anime_id, entry.watched_episodes, entry.last_updated);
+  }
+
+  if (dirty) {
+    sync::queue.push(entry.anime_id, dirty);
   }
 }
 
@@ -55,6 +71,8 @@ void remove(const int animeId) {
   updated.last_updated = std::time(nullptr);
 
   db.updateEntry(updated);
+
+  sync::queue.pushDelete(animeId);
 }
 
 }  // namespace anime::list
