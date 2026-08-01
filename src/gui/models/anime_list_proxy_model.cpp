@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -139,7 +139,8 @@ bool AnimeListProxyModel::filterAcceptsRow(int row, const QModelIndex& parent) c
 
   // List status
   if (m_filter.listStatus.status) {
-    const auto status = entry ? entry->status : anime::list::Status::NotInList;
+    auto status = anime::list::Status::NotInList;
+    if (entry && !entry->pending_delete) status = entry->status;
     if (m_filter.listStatus.anyStatus) {
       if (status == anime::list::Status::NotInList) return false;
     } else {
