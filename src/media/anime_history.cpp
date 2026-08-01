@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2025, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -54,16 +54,19 @@ void History::add(const int animeId, const int episode, const std::time_t time) 
   if (!db.open()) return;
 
   QSqlQuery q{db};
+  int id = 0;
   if (q.prepare(sql("insertHistory"))) {
     q.bindValue(":anime_id", animeId);
     q.bindValue(":episode", episode);
     q.bindValue(":time", static_cast<qlonglong>(time));
     q.exec();
+    id = q.lastInsertId().toInt();
   }
 
   db.close();
 
   items_.append(HistoryItem{
+      .id = id,
       .anime_id = animeId,
       .episode = episode,
       .time = time,
@@ -127,6 +130,7 @@ void History::bindItemToQuery(const HistoryItem& item, QSqlQuery& q) const {
 
 HistoryItem History::itemFromQuery(const QSqlQuery& q) const {
   return {
+      .id = q.value("id").toInt(),
       .anime_id = q.value("anime_id").toInt(),
       .episode = q.value("episode").toInt(),
       .time = static_cast<std::time_t>(q.value("time").toLongLong()),
@@ -148,10 +152,11 @@ void History::migrateFromV1() {
 
   db.transaction();
 
-  for (const auto& item : compat::v1::readHistory(path)) {
-    items_.append(item);
+  for (auto item : compat::v1::readHistory(path)) {
     bindItemToQuery(item, q);
     q.exec();
+    item.id = q.lastInsertId().toInt();
+    items_.append(item);
   }
 
   db.commit();
