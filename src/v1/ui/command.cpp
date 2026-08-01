@@ -56,6 +56,21 @@
 
 namespace ui {
 
+static std::pair<std::wstring, std::wstring> ParseCommand(std::wstring command) {
+  std::wstring body;
+
+  const size_t pos = command.find('(');
+  if (pos != command.npos) {
+    body = command.substr(pos + 1, command.find_last_of(')') - (pos + 1));
+    command.resize(pos);
+  }
+
+  Trim(command);
+  Trim(body);
+
+  return {command, body};
+}
+
 void ExecuteCommand(const std::wstring& str, WPARAM wParam, LPARAM lParam) {
   LOGD(str);
 
@@ -63,6 +78,19 @@ void ExecuteCommand(const std::wstring& str, WPARAM wParam, LPARAM lParam) {
 
   if (command.empty())
     return;
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Taiga
+
+  // CheckUpdates()
+  //   Checks for a new version of the program.
+  if (command == L"CheckUpdates") {
+    ui::ShowDialog(ui::Dialog::Update);
+
+  // Exit(), Quit()
+  //   Exits from Taiga.
+  } else if (command == L"Exit" || command == L"Quit") {
+    ui::DlgMain.Destroy();
 
   //////////////////////////////////////////////////////////////////////////////
   // Export
@@ -99,6 +127,11 @@ void ExecuteCommand(const std::wstring& str, WPARAM wParam, LPARAM lParam) {
 
   //////////////////////////////////////////////////////////////////////////////
   // Services
+
+  // Synchronize()
+  //   Synchronizes local and remote lists.
+  } else if (command == L"Synchronize") {
+    sync::Synchronize();
 
   // SearchAnime()
   //   wParam is a BOOL value that defines local search.
@@ -137,6 +170,147 @@ void ExecuteCommand(const std::wstring& str, WPARAM wParam, LPARAM lParam) {
         view_anime_page(anime_id);
       }
     }
+
+  // WatchTrailer
+  //   Opens up YouTube page for trailer video.
+  //   wParam is a BOOL value that defines lParam.
+  //   lParam is an anime ID, or a pointer to a vector of anime IDs.
+  } else if (command == L"WatchTrailer") {
+    const auto view_trailer = [](const int anime_id) {
+      if (auto anime_item = anime::db.Find(anime_id)) {
+        if (!anime_item->GetTrailerId().empty()) {
+          ExecuteLink(L"https://youtu.be/" + anime_item->GetTrailerId());
+        }
+      }
+    };
+    if (!wParam) {
+      const int anime_id = static_cast<int>(lParam);
+      view_trailer(anime_id);
+    } else {
+      const auto& anime_ids = *reinterpret_cast<std::vector<int>*>(lParam);
+      for (const auto anime_id : anime_ids) {
+        view_trailer(anime_id);
+      }
+    }
+
+  // ViewUpcomingAnime
+  //   Opens up upcoming anime page on MAL.
+  } else if (command == L"ViewUpcomingAnime") {
+    switch (sync::GetCurrentServiceId()) {
+      case sync::ServiceId::MyAnimeList:
+        sync::myanimelist::ViewUpcomingAnime();
+        break;
+    }
+
+  // MalViewPanel()
+  // MalViewProfile()
+  // MalViewHistory()
+  //   Opens up MyAnimeList user pages.
+  } else if (command == L"MalViewPanel") {
+    sync::myanimelist::ViewPanel();
+  } else if (command == L"MalViewProfile") {
+    sync::myanimelist::ViewProfile();
+  } else if (command == L"MalViewHistory") {
+    sync::myanimelist::ViewHistory();
+
+  // KitsuViewFeed()
+  // KitsuViewLibrary()
+  // KitsuViewProfile()
+  //   Opens up Kitsu user pages.
+  } else if (command == L"KitsuViewFeed") {
+    sync::kitsu::ViewFeed();
+  } else if (command == L"KitsuViewLibrary") {
+    sync::kitsu::ViewLibrary();
+  } else if (command == L"KitsuViewProfile") {
+    sync::kitsu::ViewProfile();
+
+  // AniListViewProfile()
+  // AniListViewStats()
+  //   Opens up AniList user pages.
+  } else if (command == L"AniListViewProfile") {
+    sync::anilist::ViewProfile();
+  } else if (command == L"AniListViewStats") {
+    sync::anilist::ViewStats();
+
+  //////////////////////////////////////////////////////////////////////////////
+
+  // Execute(path)
+  //   Executes a file or folder.
+  } else if (command == L"Execute") {
+    Execute(body);
+
+  // URL(address)
+  //   Opens a web page.
+  //   lParam is an anime ID.
+  } else if (command == L"URL") {
+    int anime_id = static_cast<int>(lParam);
+    auto anime_item = anime::db.Find(anime_id);
+    if (anime_item) {
+      std::wstring title = anime_item->GetTitle();
+      ReplaceString(body, L"%title%", Url::Encode(title));
+    }
+    ExecuteLink(body);
+
+  //////////////////////////////////////////////////////////////////////////////
+  // UI
+
+  // About()
+  //   Shows about window.
+  } else if (command == L"About") {
+    ui::ShowDialog(ui::Dialog::About);
+
+  // Info([anime_id])
+  //   Shows anime information window.
+  //   lParam is an anime ID.
+  } else if (command == L"Info") {
+    int anime_id = body.empty() ? static_cast<int>(lParam) : ToInt(body);
+    ui::ShowDlgAnimeInfo(anime_id);
+
+  // MainDialog()
+  } else if (command == L"MainDialog") {
+    ui::ShowDialog(ui::Dialog::Main);
+
+  // Settings()
+  //   Shows settings window.
+  //   wParam is the initial section.
+  //   lParam is the initial page.
+  } else if (command == L"Settings") {
+    ui::ShowDlgSettings(static_cast<int>(wParam), static_cast<int>(lParam));
+
+  // SearchTorrents(source)
+  //   Searches torrents from specified source URL.
+  //   lParam is an anime ID.
+  } else if (command == L"SearchTorrents") {
+    int anime_id = static_cast<int>(lParam);
+    if (body.empty())
+      body = taiga::settings.GetTorrentDiscoverySearchUrl();
+    ui::DlgTorrent.Search(body, anime_id);
+
+  // ToggleSidebar()
+  } else if (command == L"ToggleSidebar") {
+    const bool hide_sidebar = !taiga::settings.GetAppOptionHideSidebar();
+    taiga::settings.SetAppOptionHideSidebar(hide_sidebar);
+    ui::DlgMain.treeview.Show(!hide_sidebar);
+    ui::DlgMain.UpdateControlPositions();
+    ui::Menus.UpdateView();
+
+  // TorrentAddFilter()
+  //   Shows add new filter window.
+  //   wParam is a BOOL value that represents modal status.
+  //   lParam is the handle of the parent window.
+  } else if (command == L"TorrentAddFilter") {
+    if (!ui::DlgFeedFilter.IsWindow()) {
+      ui::DlgFeedFilter.Create(IDD_FEED_FILTER,
+          reinterpret_cast<HWND>(lParam), wParam != FALSE);
+    } else {
+      ActivateWindow(ui::DlgFeedFilter.GetWindowHandle());
+    }
+
+  // ViewContent(page)
+  //   Selects a page from sidebar.
+  } else if (command == L"ViewContent") {
+    int page = ToInt(body);
+    ui::DlgMain.navigation.SetCurrentPage(page);
 
   //////////////////////////////////////////////////////////////////////////////
   // Library
@@ -242,6 +416,24 @@ void ExecuteCommand(const std::wstring& str, WPARAM wParam, LPARAM lParam) {
     } else {
       ui::ChangeStatusText(L"Automatic synchronization is now disabled.");
     }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Sharing
+
+  // AnnounceToDiscord(force)
+  //   Updates rich presence.
+  } else if (command == L"AnnounceToDiscord") {
+    taiga::announcer.Do(taiga::kAnnounceToDiscord, nullptr, ToBool(body));
+
+  // AnnounceToHTTP(force)
+  //   Sends an HTTP request.
+  } else if (command == L"AnnounceToHTTP") {
+    taiga::announcer.Do(taiga::kAnnounceToHttp, nullptr, ToBool(body));
+
+  // AnnounceToMIRC(force)
+  //   Sends message to specified channels in mIRC.
+  } else if (command == L"AnnounceToMIRC") {
+    taiga::announcer.Do(taiga::kAnnounceToMirc, nullptr, ToBool(body));
 
   //////////////////////////////////////////////////////////////////////////////
 
@@ -455,6 +647,21 @@ void ExecuteCommand(const std::wstring& str, WPARAM wParam, LPARAM lParam) {
 
   //////////////////////////////////////////////////////////////////////////////
 
+  // PlayEpisode(value)
+  //   Searches for an episode of an anime and plays it.
+  //   lParam is an anime ID.
+  } else if (command == L"PlayEpisode") {
+    int number = ToInt(body);
+    int anime_id = static_cast<int>(lParam);
+    track::PlayEpisode(anime_id, number);
+
+  // PlayLast()
+  //   Searches for the last watched episode of an anime and plays it.
+  //   lParam is an anime ID.
+  } else if (command == L"PlayLast") {
+    int anime_id = static_cast<int>(lParam);
+    track::PlayLastEpisode(anime_id);
+
   // PlayNext([anime_id])
   //   Searches for the next episode of an anime and plays it.
   //   lParam is an anime ID.
@@ -465,6 +672,24 @@ void ExecuteCommand(const std::wstring& str, WPARAM wParam, LPARAM lParam) {
     } else {
       track::PlayNextEpisodeOfLastWatchedAnime();
     }
+
+  // PlayRandom()
+  //   Searches for a random episode of an anime and plays it.
+  //   lParam is an anime ID.
+  } else if (command == L"PlayRandom") {
+    int anime_id = body.empty() ? static_cast<int>(lParam) : ToInt(body);
+    track::PlayRandomEpisode(anime_id);
+
+  // PlayRandomAnime()
+  //   Searches for a random episode of a random anime and plays it.
+  } else if (command == L"PlayRandomAnime") {
+    track::PlayRandomAnime();
+
+  // StartNewRewatch()
+  //   Sets status to Currently Watching and plays first episode.
+  } else if (command == L"StartNewRewatch") {
+    int anime_id = static_cast<int>(lParam);
+    anime::StartNewRewatch(anime_id);
 
   //////////////////////////////////////////////////////////////////////////////
 
@@ -479,6 +704,34 @@ void ExecuteCommand(const std::wstring& str, WPARAM wParam, LPARAM lParam) {
     } else {
       ui::OnLibraryGetSeason();
     }
+
+  // Season_GroupBy(group)
+  //   Groups season data.
+  } else if (command == L"Season_GroupBy") {
+    taiga::settings.SetAppSeasonsGroupBy(ToInt(body));
+    ui::DlgSeason.RefreshList();
+    ui::DlgSeason.RefreshToolbar();
+
+  // Season_SortBy(sort)
+  //   Sorts season data.
+  } else if (command == L"Season_SortBy") {
+    taiga::settings.SetAppSeasonsSortBy(ToInt(body));
+    ui::DlgSeason.RefreshList();
+    ui::DlgSeason.RefreshToolbar();
+
+  // Season_RefreshItemData()
+  //   Refreshes an individual season item data.
+  //   lParam is a pointer to a vector of anime IDs.
+  } else if (command == L"Season_RefreshItemData") {
+    const auto& anime_ids = *reinterpret_cast<std::vector<int>*>(lParam);
+    ui::DlgSeason.RefreshData(anime_ids);
+
+  // Season_ViewAs(mode)
+  //   Changes view mode.
+  } else if (command == L"Season_ViewAs") {
+    ui::DlgSeason.SetViewMode(ToInt(body));
+    ui::DlgSeason.RefreshList();
+    ui::DlgSeason.RefreshToolbar();
 
   // Unknown
   } else {

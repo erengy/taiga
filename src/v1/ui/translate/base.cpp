@@ -61,4 +61,9 @@ std::wstring TranslateMonth(const int month) {
   return months[std::clamp(month - 1, 0, 11)];
 }
 
+std::wstring TranslateNumber(const int value,
+                             const std::wstring& default_char) {
+  return value > 0 ? ToWstr(value) : default_char;
+}
+
 }  // namespace ui

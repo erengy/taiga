@@ -1,20 +1,20 @@
-/**
- * Taiga
- * Copyright (C) 2010-2024, Eren Okka
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
- */
+/*
+** Taiga
+** Copyright (C) 2010-2021, Eren Okka
+**
+** This program is free software: you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation, either version 3 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #include <windows/win/string.h>
 
@@ -40,11 +40,64 @@
 
 namespace sync::anilist {
 
+// API documentation:
+// https://anilist.gitbook.io/anilist-apiv2-docs/
+// https://anilist.github.io/ApiV2-GraphQL-Docs/
+
+constexpr auto kBaseUrl = "https://graphql.anilist.co";
 constexpr auto kRepeatingMediaListStatus = "REPEATING";
+
+namespace gql {
+
+constexpr auto kAuthenticateUser = L"IDR_ANILIST_VIEWER";
+constexpr auto kDeleteLibraryEntry = L"IDR_ANILIST_DELETEMEDIALISTENTRY";
+constexpr auto kGetLibraryEntries = L"IDR_ANILIST_MEDIALISTCOLLECTION";
+constexpr auto kGetMetadataById = L"IDR_ANILIST_MEDIA";
+constexpr auto kGetSeason = L"IDR_ANILIST_MEDIASEASON";
+constexpr auto kMediaFields = L"IDR_ANILIST_MEDIAFIELDS";
+constexpr auto kMediaListFields = L"IDR_ANILIST_MEDIALISTFIELDS";
+constexpr auto kSearchTitle = L"IDR_ANILIST_MEDIASEARCH";
+constexpr auto kUpdateLibraryEntry = L"IDR_ANILIST_SAVEMEDIALISTENTRY";
+
+}  // namespace gql
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool authenticated_ = false;
+class Account {
+public:
+  static std::string username() {
+    return WstrToStr(taiga::settings.GetSyncServiceAniListUsername());
+  }
+  static void set_username(const std::string& username) {
+    return taiga::settings.SetSyncServiceAniListUsername(StrToWstr(username));
+  }
+
+  static std::string access_token() {
+    return WstrToStr(taiga::settings.GetSyncServiceAniListToken());
+  }
+  static void set_access_token(const std::string& token) {
+    taiga::settings.SetSyncServiceAniListToken(StrToWstr(token));
+  }
+
+  static std::string rating_system() {
+    return WstrToStr(taiga::settings.GetSyncServiceAniListRatingSystem());
+  }
+  static void set_rating_system(const std::string& rating_system) {
+    taiga::settings.SetSyncServiceAniListRatingSystem(StrToWstr(rating_system));
+  }
+
+  bool authenticated() const {
+    return authenticated_;
+  }
+  void set_authenticated(const bool authenticated) {
+    authenticated_ = authenticated;
+  }
+
+private:
+  bool authenticated_ = false;
+};
+
+static Account account;
 
 bool IsUserAuthenticated() {
   return account.authenticated();
@@ -55,6 +108,180 @@ void InvalidateUserAuthentication() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+
+taiga::http::Request BuildRequest() {
+  taiga::http::Request request;
+
+  request.set_method("POST");
+  request.set_target(kBaseUrl);
+  request.set_headers({
+      {"Accept", "application/json"},
+      {"Accept-Charset", "utf-8"},
+      {"Accept-Encoding", "gzip"},
+      {"Content-Type", "application/json"}});
+
+  const auto access_token = Account::access_token();
+  if (!access_token.empty()) {
+    request.set_header("Authorization", "Bearer {}"_format(access_token));
+  }
+
+  return request;
+}
+
+std::string GetGraphQlQuery(const std::wstring_view gql) {
+  const auto get_query = [](const std::wstring_view gql) {
+    std::wstring query;
+    win::ReadStringFromResource(gql.data(), L"DATA", query);
+    return query;
+  };
+
+  std::wstring query = get_query(gql);
+
+  ReplaceString(query, L"{mediaFields}", get_query(L"IDR_ANILIST_MEDIAFIELDS"));
+  ReplaceString(query, L"{mediaListFields}",
+                get_query(L"IDR_ANILIST_MEDIALISTFIELDS"));
+
+  EraseChars(query, L"\r");
+  ReplaceChar(query, '\n', ' ');
+  while (ReplaceString(query, L"  ", L" "));
+  Trim(query);
+
+  return WstrToStr(query);
+}
+
+hypr::Body BuildRequestBody(const std::wstring_view gql,
+                            const Json& variables) {
+  const Json json{
+    {"query", GetGraphQlQuery(gql)},
+    {"variables", variables}
+  };
+
+  return hypr::Body{json.dump()};
+}
+
+void ParseMediaTitleObject(const Json& json, anime::Item& anime_item) {
+  enum class TitleLanguage {
+    Romaji,
+    English,
+    Native,
+  };
+
+  static const std::map<std::string, TitleLanguage> title_languages{
+    {"romaji", TitleLanguage::Romaji},
+    {"english", TitleLanguage::English},
+    {"native", TitleLanguage::Native},
+  };
+
+  const auto& titles = json["title"];
+  const auto origin = StrToWstr(JsonReadStr(json, "countryOfOrigin"));
+
+  for (auto it = titles.begin(); it != titles.end(); ++it) {
+    auto language = title_languages.find(it.key());
+    if (language == title_languages.end() || !it->is_string())
+      continue;
+
+    const auto title = StrToWstr(it.value());
+
+    switch (language->second) {
+      case TitleLanguage::Romaji:
+        anime_item.SetTitle(title);
+        break;
+      case TitleLanguage::English:
+        anime_item.SetEnglishTitle(title);
+        break;
+      case TitleLanguage::Native:
+        if (IsEqual(origin, L"JP")) {
+          anime_item.SetJapaneseTitle(title);
+        } else if (!origin.empty()) {
+          anime_item.InsertSynonym(title);
+        }
+        break;
+    }
+  }
+}
+
+int ParseMediaObject(const Json& json) {
+  const auto anime_id = JsonReadInt(json, "id");
+
+  if (!anime_id) {
+    LOGW(L"Could not parse anime object:\n{}", StrToWstr(json.dump()));
+    return anime::ID_UNKNOWN;
+  }
+
+  auto& anime_item = anime::db.items[anime_id];
+
+  anime_item.SetSource(ServiceId::AniList);
+  anime_item.SetId(ToWstr(anime_id), ServiceId::AniList);
+  anime_item.SetLastModified(time(nullptr));  // current time
+
+  if (const auto mal_id = JsonReadInt(json, "idMal")) {
+    anime_item.SetId(ToWstr(mal_id), ServiceId::MyAnimeList);
+  }
+
+  anime_item.SetTitle(StrToWstr(JsonReadStr(json["title"], "userPreferred")));
+  anime_item.SetType(TranslateSeriesTypeFrom(JsonReadStr(json, "format")));
+  anime_item.SetAiringStatus(
+      TranslateSeriesStatusFrom(JsonReadStr(json, "status")));
+  anime_item.SetSynopsis(
+      anime::NormalizeSynopsis(StrToWstr(JsonReadStr(json, "description"))));
+  anime_item.SetDateStart(TranslateFuzzyDateFrom(json["startDate"]));
+  anime_item.SetDateEnd(TranslateFuzzyDateFrom(json["endDate"]));
+  anime_item.SetEpisodeCount(JsonReadInt(json, "episodes"));
+  anime_item.SetEpisodeLength(JsonReadInt(json, "duration"));
+  anime_item.SetImageUrl(StrToWstr(JsonReadStr(json["coverImage"], "large")));
+  anime_item.SetScore(
+      TranslateSeriesRatingFrom(JsonReadInt(json, "averageScore")));
+  anime_item.SetPopularity(JsonReadInt(json, "popularity"));
+
+  ParseMediaTitleObject(json, anime_item);
+
+  const auto& trailer = json["trailer"];
+  const auto trailer_id = StrToWstr(JsonReadStr(trailer, "id"));
+  const auto trailer_site = JsonReadStr(trailer, "site");
+  anime_item.SetTrailerId(trailer_site == "youtube" ? trailer_id : L"");
+
+  std::vector<std::wstring> genres;
+  for (const auto& genre : json["genres"]) {
+    if (genre.is_string())
+      genres.push_back(StrToWstr(genre));
+  }
+  anime_item.SetGenres(genres);
+
+  std::vector<std::wstring> synonyms;
+  for (const auto& synonym : json["synonyms"]) {
+    if (synonym.is_string())
+      synonyms.push_back(StrToWstr(synonym));
+  }
+  anime_item.SetSynonyms(synonyms);
+
+  std::vector<std::wstring> producers;
+  std::vector<std::wstring> studios;
+  for (const auto& edge : json["studios"]["edges"]) {
+    const auto name = StrToWstr(JsonReadStr(edge["node"], "name"));
+    if (JsonReadBool(edge, "isMain")) {
+      studios.push_back(name);
+    } else {
+      producers.push_back(name);
+    }
+  }
+  RemoveEmptyStrings(producers);
+  RemoveEmptyStrings(studios);
+  anime_item.SetProducers(producers);
+  anime_item.SetStudios(studios);
+
+  const auto& next_airing_episode = json["nextAiringEpisode"];
+  if (!next_airing_episode.is_null()) {
+    anime_item.SetNextEpisodeTime(JsonReadInt(next_airing_episode, "airingAt"));
+    const int episode_number = JsonReadInt(next_airing_episode, "episode");
+    if (episode_number > 0) {
+      anime_item.SetLastAiredEpisodeNumber(episode_number - 1);
+    }
+  }
+
+  Meow.UpdateTitles(anime_item);
+
+  return anime_id;
+}
 
 int ParseMediaListObject(const Json& json) {
   const auto anime_id = JsonReadInt(json["media"], "id");

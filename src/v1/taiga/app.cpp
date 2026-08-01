@@ -1,20 +1,20 @@
-/**
- * Taiga
- * Copyright (C) 2010-2024, Eren Okka
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
- */
+/*
+** Taiga
+** Copyright (C) 2010-2021, Eren Okka
+**
+** This program is free software: you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation, either version 3 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #include <windows/win/taskbar.h>
 
@@ -46,6 +46,35 @@ namespace taiga {
 
 namespace detail {
 
+CommandLineOptions ParseCommandLine() {
+  CommandLineOptions options;
+
+  const auto args = base::ParseCommandLineArgs();
+
+  for (const auto& arg : args) {
+    bool found = false;
+
+    if (arg == L"allowmultipleinstances") {
+      options.allow_multiple_instances = true;
+      found = true;
+    } else if (arg == L"debug") {
+      options.debug_mode = true;
+      found = true;
+    } else if (arg == L"verbose") {
+      options.verbose = true;
+      found = true;
+    }
+
+    if (found) {
+      LOGD(arg);
+    } else {
+      LOGW(L"Invalid argument: {}", arg);
+    }
+  }
+
+  return options;
+}
+
 void LoadData() {
   track::media_players.Load();
 
@@ -71,6 +100,22 @@ App::~App() {
 }
 
 BOOL App::InitInstance() {
+  // Parse command line
+  options = detail::ParseCommandLine();
+#ifdef _DEBUG
+  options.debug_mode = true;
+#endif
+
+  // Initialize logger
+  const auto module_path = GetModulePath();
+  const auto path = AddTrailingSlash(GetPathOnly(module_path));
+  using monolog::Level;
+  monolog::log.enable_console_output(false);
+  monolog::log.set_path(path + TAIGA_APP_NAME L".log");
+  monolog::log.set_level(options.debug_mode ? Level::Debug : Level::Warning);
+  LOGI(L"Version {} ({})", StrToWstr(taiga::version().to_string()),
+       GetFileLastModifiedDate(module_path));
+
   // Check another instance
   if (!options.allow_multiple_instances) {
     if (CheckInstance(TAIGA_APP_MUTEX, L"TaigaMainW")) {

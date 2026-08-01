@@ -1,20 +1,20 @@
-/**
- * Taiga
- * Copyright (C) 2010-2024, Eren Okka
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
- */
+/*
+** Taiga
+** Copyright (C) 2010-2021, Eren Okka
+**
+** This program is free software: you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation, either version 3 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #include "media/anime_db.h"
 
@@ -30,6 +30,92 @@
 #include "ui/ui.h"
 
 namespace anime {
+
+bool Database::LoadList() {
+  ClearUserData();
+
+  if (taiga::GetCurrentUsername().empty())
+    return false;
+
+  XmlDocument document;
+  const auto path = taiga::GetPath(taiga::Path::UserLibrary);
+  const auto parse_result = XmlLoadFileToDocument(document, path);
+
+  if (!parse_result) {
+    if (parse_result.status != pugi::status_file_not_found) {
+      ui::DisplayErrorMessage(L"Could not read anime list.", path);
+    }
+    return false;
+  }
+
+  const auto meta_version = XmlReadMetaVersion(document);
+
+  auto node_database = document.child(L"database");
+  ReadDatabaseNode(node_database);
+
+  auto node_library = document.child(L"library");
+  for (auto node : node_library.children(L"anime")) {
+    const auto id = XmlReadInt(node, L"id");
+    auto& anime_item = items[id];
+
+    anime_item.AddtoUserList();
+    anime_item.SetMyId(XmlReadStr(node, L"library_id"));
+    anime_item.SetMyLastWatchedEpisode(XmlReadInt(node, L"progress"));
+    anime_item.SetMyDateStart(XmlReadStr(node, L"date_start"));
+    anime_item.SetMyDateEnd(XmlReadStr(node, L"date_end"));
+    anime_item.SetMyScore(XmlReadInt(node, L"score"));
+    anime_item.SetMyStatus(static_cast<MyStatus>(XmlReadInt(node, L"status")));
+    anime_item.SetMyPrivate(XmlReadInt(node, L"private"));
+    anime_item.SetMyRewatchedTimes(XmlReadInt(node, L"rewatched_times"));
+    anime_item.SetMyRewatching(XmlReadInt(node, L"rewatching"));
+    anime_item.SetMyRewatchingEp(XmlReadInt(node, L"rewatching_ep"));
+    anime_item.SetMyNotes(XmlReadStr(node, L"notes"));
+    anime_item.SetMyLastUpdated(XmlReadStr(node, L"last_updated"));
+  }
+
+  HandleListCompatibility(meta_version);
+
+  return true;
+}
+
+bool Database::SaveList(bool include_database) const {
+  if (items.empty())
+    return false;
+
+  XmlDocument document;
+
+  XmlWriteMetaVersion(document, StrToWstr(taiga::version().to_string()));
+
+  if (include_database) {
+    WriteDatabaseNode(XmlChild(document, L"database"));
+  }
+
+  auto node_library = document.append_child(L"library");
+
+  for (const auto& [id, item] : items) {
+    if (item.IsInList()) {
+      auto node = node_library.append_child(L"anime");
+      XmlWriteInt(node, L"id", item.GetId());
+      XmlWriteStr(node, L"library_id", item.GetMyId());
+      XmlWriteInt(node, L"progress", item.GetMyLastWatchedEpisode(false));
+      XmlWriteStr(node, L"date_start", item.GetMyDateStart().to_string());
+      XmlWriteStr(node, L"date_end", item.GetMyDateEnd().to_string());
+      XmlWriteInt(node, L"score", item.GetMyScore(false));
+      XmlWriteInt(node, L"status", static_cast<int>(item.GetMyStatus(false)));
+      XmlWriteInt(node, L"private", item.GetMyPrivate());
+      XmlWriteInt(node, L"rewatched_times", item.GetMyRewatchedTimes());
+      XmlWriteInt(node, L"rewatching", item.GetMyRewatching(false));
+      XmlWriteInt(node, L"rewatching_ep", item.GetMyRewatchingEp());
+      XmlWriteStr(node, L"notes", item.GetMyNotes(false));
+      XmlWriteStr(node, L"last_updated", item.GetMyLastUpdated());
+    }
+  }
+
+  const auto path = taiga::GetPath(taiga::Path::UserLibrary);
+  return XmlSaveDocumentToFile(document, path);
+}
+
+////////////////////////////////////////////////////////////////////////////////
 
 // @TODO: Move to util
 int Database::GetItemCount(MyStatus status, bool check_history) {

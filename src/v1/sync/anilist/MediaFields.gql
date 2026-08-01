@@ -1,0 +1,25 @@
+id
+idMal
+title {
+  romaji(stylised: true)
+  english(stylised: true)
+  native(stylised: true)
+  userPreferred
+}
+format
+status
+description
+startDate { year month day }
+endDate { year month day }
+episodes
+duration
+countryOfOrigin
+trailer { id site }
+updatedAt
+coverImage { large }
+genres
+synonyms
+averageScore
+popularity
+studios { edges { isMain node { name } } }
+nextAiringEpisode { airingAt episode }

@@ -1,20 +1,20 @@
-/**
- * Taiga
- * Copyright (C) 2010-2024, Eren Okka
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
- */
+/*
+** Taiga
+** Copyright (C) 2010-2021, Eren Okka
+**
+** This program is free software: you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation, either version 3 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #pragma once
 
@@ -268,6 +268,18 @@ public:
   void SetShareMircFormat(const std::wstring& format);
   std::wstring GetShareMircService() const;
   void SetShareMircService(const std::wstring& service);
+  bool GetShareTwitterEnabled() const;
+  void SetShareTwitterEnabled(const bool enabled);
+  std::wstring GetShareTwitterFormat() const;
+  void SetShareTwitterFormat(const std::wstring& format);
+  std::wstring GetShareTwitterOauthToken() const;
+  void SetShareTwitterOauthToken(const std::wstring& oauth_token);
+  std::wstring GetShareTwitterOauthSecret() const;
+  void SetShareTwitterOauthSecret(const std::wstring& oauth_secret);
+  std::wstring GetShareTwitterReplyTo() const;
+  void SetShareTwitterReplyTo(const std::wstring& status_id);
+  std::wstring GetShareTwitterUsername() const;
+  void SetShareTwitterUsername(const std::wstring& username);
 
   // Torrents
   std::wstring GetTorrentDiscoverySource() const;

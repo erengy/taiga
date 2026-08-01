@@ -1,20 +1,20 @@
-/**
- * Taiga
- * Copyright (C) 2010-2024, Eren Okka
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
- */
+/*
+** Taiga
+** Copyright (C) 2010-2021, Eren Okka
+**
+** This program is free software: you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation, either version 3 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #include <cmath>
 #include <regex>
@@ -23,6 +23,166 @@
 
 #include "base/format.h"
 #include "base/string.h"
+
+Date::Date()
+    : Date(0, 0, 0) {
+}
+
+Date::Date(const std::wstring& date)
+    : Date(0, 0, 0) {
+  // Convert from YYYY-MM-DD
+  if (date.length() >= 10) {
+    set_year(ToInt(date.substr(0, 4)));
+    set_month(ToInt(date.substr(5, 2)));
+    set_day(ToInt(date.substr(8, 2)));
+  }
+}
+
+Date::Date(const DateFull& date)
+    : year_(date.year()), month_(date.month()), day_(date.day()) {
+}
+
+Date::Date(const SYSTEMTIME& st)
+    : year_(st.wYear), month_(st.wMonth), day_(st.wDay) {
+}
+
+Date::Date(date::year year, date::month month, date::day day)
+    : year_(year), month_(month), day_(day) {
+}
+
+Date::Date(unsigned short year, unsigned short month, unsigned short day)
+    : year_(year), month_(month), day_(day) {
+}
+
+Date& Date::operator=(const Date& date) {
+  year_ = date.year_;
+  month_ = date.month_;
+  day_ = date.day_;
+
+  return *this;
+}
+
+int Date::operator-(const Date& date) const {
+  const auto days = date::sys_days{static_cast<DateFull>(*this)} -
+                    date::sys_days{static_cast<DateFull>(date)};
+  return days.count();
+}
+
+Date::operator bool() const {
+  return year() && month() && day();
+}
+
+Date::operator SYSTEMTIME() const {
+  SYSTEMTIME st = {0};
+  st.wYear = static_cast<WORD>(year());
+  st.wMonth = static_cast<WORD>(month());
+  st.wDay = static_cast<WORD>(day());
+
+  return st;
+}
+
+Date::operator DateFull() const {
+  return DateFull{year_, month_, day_};
+}
+
+bool Date::empty() const {
+  return !year() && !month() && !day();
+}
+
+// YYYY-MM-DD
+std::wstring Date::to_string() const {
+  return L"{:0>4}-{:0>2}-{:0>2}"_format(year(), month(), day());
+}
+
+unsigned short Date::year() const {
+  return static_cast<int>(year_);
+}
+
+unsigned short Date::month() const {
+  return static_cast<unsigned>(month_);
+}
+
+unsigned short Date::day() const {
+  return static_cast<unsigned>(day_);
+}
+
+void Date::set_year(unsigned short year) {
+  year_ = date::year{year};
+}
+
+void Date::set_month(unsigned short month) {
+  month_ = date::month{month};
+}
+
+void Date::set_day(unsigned short day) {
+  day_ = date::day{day};
+}
+
+template <typename T>
+int FuzzyCompareDate(const T& lhs, const T& rhs) {
+  if (!lhs) return nstd::cmp::greater;
+  if (!rhs) return nstd::cmp::less;
+  return lhs < rhs ? nstd::cmp::less : nstd::cmp::greater;
+}
+
+int Date::compare(const Date& date) const {
+  if (year() != date.year()) {
+    return FuzzyCompareDate(year(), date.year());
+  }
+  if (month() != date.month()) {
+    return FuzzyCompareDate(month(), date.month());
+  }
+  if (day() != date.day()) {
+    return FuzzyCompareDate(day(), date.day());
+  }
+  return nstd::cmp::equal;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+Duration::Duration(const seconds_t seconds)
+    : seconds_(seconds) {
+}
+
+Duration::Duration(const std::time_t seconds)
+    : Duration(std::chrono::seconds(seconds)) {
+}
+
+Duration& Duration::operator=(const seconds_t seconds) {
+  seconds_ = seconds;
+  return *this;
+}
+
+Duration& Duration::operator=(const std::time_t seconds) {
+  seconds_ = static_cast<seconds_t>(seconds);
+  return *this;
+}
+
+Duration::seconds_t::rep Duration::seconds() const {
+  return seconds_.count();
+}
+
+Duration::minutes_t::rep Duration::minutes() const {
+  return std::chrono::duration_cast<minutes_t>(seconds_).count();
+}
+
+Duration::hours_t::rep Duration::hours() const {
+  return std::chrono::duration_cast<hours_t>(seconds_).count();
+}
+
+Duration::days_t::rep Duration::days() const {
+  return std::chrono::duration_cast<days_t>(seconds_).count();
+}
+
+Duration::months_t::rep Duration::months() const {
+  return std::chrono::duration_cast<months_t>(seconds_).count();
+}
+
+Duration::years_t::rep Duration::years() const {
+  return std::chrono::duration_cast<years_t>(seconds_).count();
+}
+
+////////////////////////////////////////////////////////////////////////////////
 
 static long GetTimeZoneBias() {
   TIME_ZONE_INFORMATION tz_info = {0};
@@ -178,6 +338,48 @@ std::wstring GetAbsoluteTimeString(time_t unix_time, const char* format) {
   } else {
     return strftime("%d %B");  // 01 January
   }
+}
+
+std::wstring GetRelativeTimeString(time_t unix_time, bool append_suffix) {
+  if (!unix_time)
+    return L"Unknown";
+
+  time_t time_diff = time(nullptr) - unix_time;
+  Duration duration(std::abs(time_diff));
+  bool future = time_diff < 0;
+
+  std::wstring str;
+
+  auto str_value = [](const float value,
+                      const std::wstring& singular,
+                      const std::wstring& plural) {
+    long result = std::lround(value);
+    return ToWstr(result) + L" " + (result == 1 ? singular : plural);
+  };
+
+  if (duration.seconds() < 90) {
+    str = L"a moment";
+  } else if (duration.minutes() < 45) {
+    str = str_value(duration.minutes(), L"minute", L"minutes");
+  } else if (duration.hours() < 22) {
+    str = str_value(duration.hours(), L"hour", L"hours");
+  } else if (duration.days() < 25) {
+    str = str_value(duration.days(), L"day", L"days");
+  } else if (duration.days() < 345) {
+    str = str_value(duration.months(), L"month", L"months");
+  } else {
+    str = str_value(duration.years(), L"year", L"years");
+  }
+
+  if (append_suffix) {
+    if (future) {
+      str = L"in " + str;
+    } else {
+      str += L" ago";
+    }
+  }
+
+  return str;
 }
 
 Date GetDate() {

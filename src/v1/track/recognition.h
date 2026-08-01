@@ -1,20 +1,20 @@
-/**
- * Taiga
- * Copyright (C) 2010-2024, Eren Okka
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
- */
+/*
+** Taiga
+** Copyright (C) 2010-2021, Eren Okka
+**
+** This program is free software: you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation, either version 3 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #pragma once
 
@@ -72,6 +72,13 @@ public:
   bool SearchEpisodeRedirection(int id, const std::pair<int, int>& range, int& destination_id, std::pair<int, int>& destination_range) const;
 
 private:
+  enum NormalizationType {
+    kNormalizeMinimal,
+    kNormalizeForTrigrams,
+    kNormalizeForLookup,
+    kNormalizeFull,
+  };
+
   bool ValidateOptions(anime::Episode& episode, int anime_id, const MatchOptions& match_options, bool redirect) const;
   bool ValidateOptions(anime::Episode& episode, const anime::Item& anime_item, const MatchOptions& match_options, bool redirect) const;
   bool ValidateEpisodeNumber(anime::Episode& episode, const anime::Item& anime_item, const MatchOptions& match_options, bool redirect) const;
@@ -82,6 +89,15 @@ private:
 
   int ScoreTitle(anime::Episode& episode, const std::set<int>& anime_ids, const MatchOptions& match_options);
   int ScoreTitle(const std::wstring& str, const anime::Episode& episode, const scores_t& trigram_results);
+
+  void Normalize(std::wstring& title, int type, bool normalized_before) const;
+  void NormalizeUnicode(std::wstring& str) const;
+  void ErasePunctuation(std::wstring& str, int type, bool modified_tail) const;
+  void EraseUnnecessary(std::wstring& str) const;
+  void ConvertOrdinalNumbers(std::wstring& str) const;
+  void ConvertRomanNumbers(std::wstring& str) const;
+  void ConvertSeasonNumbers(std::wstring& str) const;
+  void Transliterate(std::wstring& str) const;
 
   struct Titles {
     using container_t = std::map<std::wstring, std::set<int>>;
