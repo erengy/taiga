@@ -40,9 +40,13 @@ public:
   ~HistoryWidget() = default;
 
 private:
+  void initToolbar();
+
   void showContextMenu() const;
   void showMediaDialog(const QModelIndex& index) const;
   void removeItem(const QModelIndex& index) const;
+  void clearHistory() const;
+  void clearQueue() const;
 
   const anime::HistoryItem* getHistoryItem(const QModelIndex& index) const;
 

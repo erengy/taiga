@@ -23,6 +23,7 @@
 #include <QLayout>
 #include <QMenu>
 #include <QMessageBox>
+#include <QToolButton>
 #include <QUrl>
 
 #include "gui/main/main_window.hpp"
@@ -32,6 +33,8 @@
 #include "gui/utils/theme.hpp"
 #include "media/anime_db.hpp"
 #include "media/anime_history.hpp"
+#include "sync/queue.hpp"
+#include "sync/service.hpp"
 #include "taiga/settings.hpp"
 
 namespace gui {
@@ -62,8 +65,23 @@ HistoryWidget::HistoryWidget(QWidget* parent)
 
   layout()->addWidget(m_view);
 
+  initToolbar();
+
   connect(m_view, &QWidget::customContextMenuRequested, this, &HistoryWidget::showContextMenu);
   connect(m_view, &QTreeView::doubleClicked, this, &HistoryWidget::showMediaDialog);
+}
+
+void HistoryWidget::initToolbar() {
+  const auto actionMore = new QAction(theme.getIcon("more_horiz"), tr("More"), this);
+  m_toolbar->addAction(actionMore);
+
+  auto* menu = new QMenu(this);
+  menu->addAction(tr("Clear history..."), this, &HistoryWidget::clearHistory);
+  menu->addAction(tr("Clear queue..."), this, &HistoryWidget::clearQueue);
+
+  const auto moreButton = static_cast<QToolButton*>(m_toolbar->widgetForAction(actionMore));
+  moreButton->setPopupMode(QToolButton::InstantPopup);
+  moreButton->setMenu(menu);
 }
 
 void HistoryWidget::showContextMenu() const {
@@ -114,6 +132,41 @@ void HistoryWidget::removeItem(const QModelIndex& index) const {
 
   if (msgBox.clickedButton() == reinterpret_cast<QAbstractButton*>(removeButton)) {
     anime::history.remove(historyItem->id);
+  }
+}
+
+void HistoryWidget::clearHistory() const {
+  QMessageBox msgBox;
+  msgBox.setIcon(QMessageBox::Icon::Question);
+  msgBox.setText(tr("Do you want to clear your history?"));
+  msgBox.setInformativeText(tr("All entries will be permanently removed."));
+
+  auto clearButton = msgBox.addButton(tr("Clear"), QMessageBox::ButtonRole::DestructiveRole);
+  msgBox.addButton(QMessageBox::Cancel);
+  msgBox.setDefaultButton(QMessageBox::Cancel);
+
+  msgBox.exec();
+
+  if (msgBox.clickedButton() == reinterpret_cast<QAbstractButton*>(clearButton)) {
+    anime::history.clear();
+  }
+}
+
+void HistoryWidget::clearQueue() const {
+  QMessageBox msgBox;
+  msgBox.setIcon(QMessageBox::Icon::Question);
+  msgBox.setText(tr("Do you want to clear the sync queue?"));
+  msgBox.setInformativeText(tr("Any changes not yet synchronized with %1 will be discarded.")
+                                .arg(sync::serviceName(sync::currentServiceId())));
+
+  auto clearButton = msgBox.addButton(tr("Clear"), QMessageBox::ButtonRole::DestructiveRole);
+  msgBox.addButton(QMessageBox::Cancel);
+  msgBox.setDefaultButton(QMessageBox::Cancel);
+
+  msgBox.exec();
+
+  if (msgBox.clickedButton() == reinterpret_cast<QAbstractButton*>(clearButton)) {
+    sync::queue.clear();
   }
 }
 
