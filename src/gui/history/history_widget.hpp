@@ -22,6 +22,10 @@
 
 #include "gui/common/page_widget.hpp"
 
+namespace anime {
+struct HistoryItem;
+}
+
 namespace gui {
 
 class HistoryModel;
@@ -38,6 +42,9 @@ public:
 private:
   void showContextMenu() const;
   void showMediaDialog(const QModelIndex& index) const;
+  void removeItem(const QModelIndex& index) const;
+
+  const anime::HistoryItem* getHistoryItem(const QModelIndex& index) const;
 
   HistoryModel* m_model = nullptr;
   HistoryProxyModel* m_proxyModel = nullptr;

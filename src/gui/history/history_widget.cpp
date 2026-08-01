@@ -21,6 +21,8 @@
 #include <QDesktopServices>
 #include <QHeaderView>
 #include <QLayout>
+#include <QMenu>
+#include <QMessageBox>
 #include <QUrl>
 
 #include "gui/main/main_window.hpp"
@@ -69,12 +71,19 @@ void HistoryWidget::showContextMenu() const {
 
   if (!index.isValid()) return;
 
-  // @TODO
+  auto* menu = new QMenu(m_view);
+  menu->setAttribute(Qt::WA_DeleteOnClose);
+
+  menu->addAction(theme.getIcon("info"), tr("Details"), this,
+                  [this, index]() { showMediaDialog(index); });
+  menu->addAction(theme.getIcon("delete"), tr("Remove..."), this,
+                  [this, index]() { removeItem(index); });
+
+  menu->popup(QCursor::pos());
 }
 
 void HistoryWidget::showMediaDialog(const QModelIndex& index) const {
-  const int role = static_cast<int>(HistoryItemDataRole::HistoryItem);
-  const auto historyItem = index.data(role).value<const anime::HistoryItem*>();
+  const auto historyItem = getHistoryItem(index);
   if (!historyItem) return;
 
   const auto item = anime::db.item(historyItem->anime_id);
@@ -83,6 +92,34 @@ void HistoryWidget::showMediaDialog(const QModelIndex& index) const {
   const auto entry = anime::db.entry(historyItem->anime_id);
   MediaDialog::show(mainWindow(), MediaDialogPage::Details, *item,
                     entry ? std::optional<ListEntry>{*entry} : std::nullopt);
+}
+
+void HistoryWidget::removeItem(const QModelIndex& index) const {
+  const auto historyItem = getHistoryItem(index);
+  if (!historyItem) return;
+
+  const auto item = anime::db.item(historyItem->anime_id);
+  const auto title = item ? QString::fromStdString(item->titles.romaji) : tr("Unknown");
+
+  QMessageBox msgBox;
+  msgBox.setIcon(QMessageBox::Icon::Question);
+  msgBox.setText(tr("Do you want to remove this entry from history?"));
+  msgBox.setInformativeText(tr("%1 - Episode %2").arg(title).arg(historyItem->episode));
+
+  auto removeButton = msgBox.addButton(tr("Remove"), QMessageBox::ButtonRole::DestructiveRole);
+  msgBox.addButton(QMessageBox::Cancel);
+  msgBox.setDefaultButton(QMessageBox::Cancel);
+
+  msgBox.exec();
+
+  if (msgBox.clickedButton() == reinterpret_cast<QAbstractButton*>(removeButton)) {
+    anime::history.remove(historyItem->id);
+  }
+}
+
+const anime::HistoryItem* HistoryWidget::getHistoryItem(const QModelIndex& index) const {
+  const int role = static_cast<int>(HistoryItemDataRole::HistoryItem);
+  return index.data(role).value<const anime::HistoryItem*>();
 }
 
 }  // namespace gui

@@ -42,6 +42,7 @@ public:
   void init();
 
   void add(const int animeId, const int episode, const std::time_t time);
+  void remove(const int id);
   void clear();
 
   const QList<HistoryItem>& items() const;

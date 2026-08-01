@@ -19,6 +19,7 @@
 #include "anime_history.hpp"
 
 #include <QSqlDatabase>
+#include <algorithm>
 #include <format>
 
 #include "base/file.hpp"
@@ -71,6 +72,22 @@ void History::add(const int animeId, const int episode, const std::time_t time) 
       .episode = episode,
       .time = time,
   });
+
+  emit changed();
+}
+
+void History::remove(const int id) {
+  auto db = QSqlDatabase::database();
+  if (db.open()) {
+    QSqlQuery q{db};
+    q.prepare("DELETE FROM history WHERE id = :id");
+    q.bindValue(":id", id);
+    q.exec();
+    db.close();
+  }
+
+  const auto it = std::ranges::find(items_, id, &HistoryItem::id);
+  if (it != items_.end()) items_.erase(it);
 
   emit changed();
 }
