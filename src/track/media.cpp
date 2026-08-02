@@ -92,7 +92,7 @@ void Detection::poll() {
   const auto animeId = track::recognition::identify(episode);
   episode.setAnimeId(animeId);
 
-  if (!currentEpisode_ || currentEpisode_->animeId() != animeId) {
+  if (hasEpisodeChanged(episode)) {
     currentEpisode_ = episode;
     emit currentEpisodeChanged(episode);
   }
@@ -107,6 +107,14 @@ void Detection::reset() {
     currentEpisode_.reset();
     emit currentEpisodeChanged(std::nullopt);
   }
+}
+
+bool Detection::hasEpisodeChanged(const Episode& episode) const {
+  if (!currentEpisode_) return true;
+  if (currentEpisode_->animeId() != episode.animeId()) return true;
+
+  return currentEpisode_->elements(anitomy::ElementKind::Episode) !=
+         episode.elements(anitomy::ElementKind::Episode);
 }
 
 }  // namespace track::media

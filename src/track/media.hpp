@@ -52,6 +52,8 @@ private:
   void poll();
   void reset();
 
+  bool hasEpisodeChanged(const Episode& episode) const;
+
   std::optional<Episode> currentEpisode_;
   std::optional<media_t> currentMedia_;
   std::optional<player_t> currentPlayer_;
