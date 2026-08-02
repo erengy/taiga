@@ -92,6 +92,8 @@ target_sources(taiga PRIVATE
 	track/episode.hpp
 	track/media.cpp
 	track/media.hpp
+	track/media_player.cpp
+	track/media_player.hpp
 	track/play.cpp
 	track/play.hpp
 	track/recognition.cpp

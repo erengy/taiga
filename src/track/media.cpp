@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2025, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,10 +18,10 @@
 
 #include "media.hpp"
 
-#include "base/file.hpp"
 #include "media/anime_db.hpp"
 #include "taiga/settings.hpp"
 #include "track/episode.hpp"
+#include "track/media_player.hpp"
 #include "track/recognition.hpp"
 
 namespace track::media {
@@ -44,13 +44,7 @@ const std::optional<Detection::player_t> Detection::getCurrentPlayer() const {
 }
 
 bool Detection::init() {
-  const auto file = base::readFile(":/players.anisthesia");
-
-  if (file.isEmpty()) {
-    return false;
-  }
-
-  if (!anisthesia::ParsePlayersData(file.toStdString(), players_)) {
+  if (!parsePlayersData(players_)) {
     return false;
   }
 
@@ -64,15 +58,7 @@ bool Detection::init() {
 
 void Detection::poll() {
 #ifdef Q_OS_WINDOWS
-  if (players_.empty()) return;
-
-  // @TODO: Enable web browser detection
-  std::vector<player_t> players;
-  for (const auto player : players_) {
-    if (player.type != anisthesia::PlayerType::WebBrowser) {
-      players.emplace_back(player);
-    }
-  }
+  const auto players = getEnabledPlayers(players_);
 
   static const auto media_proc = [](const anisthesia::MediaInfo&) {
     return true;  // Accept all media
