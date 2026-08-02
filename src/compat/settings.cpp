@@ -27,6 +27,7 @@
 #include "taiga/settings.hpp"
 
 #define XML_ATTR(name) xml.attributes().value(name)
+#define XML_ATTR_BOOL(name) (XML_ATTR(name) == u"true")
 #define XML_ATTR_INT(name) XML_ATTR(name).toInt()
 #define XML_ATTR_STR(name) XML_ATTR(name).toString().toStdString()
 
@@ -134,7 +135,22 @@ void parseAnimeElement(QXmlStreamReader& xml, const taiga::Settings& settings) {
 
 void parseRecognitionElement(QXmlStreamReader& xml, const taiga::Settings& settings) {
   while (xml.readNextStartElement()) {
-    if (xml.name() == u"general") {
+    if (xml.name() == u"mediaplayers") {
+      std::vector<std::string> disabledPlayers;
+      while (xml.readNextStartElement()) {
+        if (xml.name() == u"player") {
+          if (!XML_ATTR_BOOL(u"enabled")) {
+            disabledPlayers.push_back(XML_ATTR_STR(u"name"));
+          }
+          xml.skipCurrentElement();
+        } else {
+          xml.skipCurrentElement();
+        }
+      }
+      settings.setDisabledMediaPlayers(disabledPlayers);
+      xml.skipCurrentElement();
+
+    } else if (xml.name() == u"general") {
       const auto seconds = std::chrono::seconds{XML_ATTR_INT(u"detectioninterval")};
       settings.setMediaDetectionInterval(seconds);
       xml.skipCurrentElement();

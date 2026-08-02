@@ -18,9 +18,25 @@
 
 #include "media_player.hpp"
 
+#include <algorithm>
+
 #include "base/file.hpp"
+#include "base/string.hpp"
+#include "taiga/settings.hpp"
 
 namespace track::media {
+
+namespace {
+
+bool isDisabled(const Player& player) {
+  const auto disabledPlayers = taiga::settings.disabledMediaPlayers();
+
+  return std::ranges::any_of(disabledPlayers, [&player](const std::string& name) {
+    return compareStrings(player.name, name, Qt::CaseInsensitive) == 0;
+  });
+}
+
+}  // namespace
 
 bool parsePlayersData(std::vector<Player>& players) {
   const auto file = base::readFile(":/players.anisthesia");
@@ -36,12 +52,12 @@ bool parsePlayersData(std::vector<Player>& players) {
 std::vector<Player> getEnabledPlayers(const std::vector<Player>& players) {
   std::vector<Player> enabledPlayers;
 
-  // @TODO: Enable web browser detection
-  // @TODO: Check taiga::settings
   for (const auto player : players) {
-    if (player.type != anisthesia::PlayerType::WebBrowser) {
-      enabledPlayers.emplace_back(player);
-    }
+    // @TODO: Enable web browser detection
+    if (player.type == anisthesia::PlayerType::WebBrowser) continue;
+    if (isDisabled(player)) continue;
+
+    enabledPlayers.emplace_back(player);
   }
 
   return enabledPlayers;

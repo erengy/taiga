@@ -31,12 +31,14 @@ public:
   void init() const;
 
   Qt::ColorScheme appColorScheme() const;
+  std::vector<std::string> disabledMediaPlayers() const;
   std::string service() const;
   std::vector<std::string> libraryFolders() const;
   std::chrono::milliseconds mediaDetectionInterval() const;
   bool syncEnabled() const;
 
   void setAppColorScheme(const Qt::ColorScheme scheme) const;
+  void setDisabledMediaPlayers(std::vector<std::string> players) const;
   void setService(const std::string& service) const;
   void setLibraryFolders(std::vector<std::string> folders) const;
   void setMediaDetectionInterval(const std::chrono::milliseconds interval) const;
