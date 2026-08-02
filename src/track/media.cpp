@@ -66,12 +66,7 @@ void Detection::poll() {
 
   std::vector<anisthesia::win::Result> results;
   if (!anisthesia::win::GetResults(players, media_proc, results)) {
-    currentPlayer_.reset();
-    currentMedia_.reset();
-    if (currentEpisode_) {
-      currentEpisode_.reset();
-      emit currentEpisodeChanged(std::nullopt);
-    }
+    reset();
     return;
   }
 
@@ -96,6 +91,16 @@ void Detection::poll() {
     emit currentEpisodeChanged(episode);
   }
 #endif
+}
+
+void Detection::reset() {
+  currentPlayer_.reset();
+  currentMedia_.reset();
+
+  if (currentEpisode_) {
+    currentEpisode_.reset();
+    emit currentEpisodeChanged(std::nullopt);
+  }
 }
 
 }  // namespace track::media

@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2025, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,10 +21,9 @@
 #include <QApplication>
 #include <QObject>
 #include <QTimer>
+#include <anisthesia.hpp>
 #include <optional>
 #include <vector>
-
-#include <anisthesia.hpp>
 
 #include "track/episode.hpp"
 
@@ -35,28 +34,30 @@ class Detection final : public QObject {
   Q_DISABLE_COPY_MOVE(Detection)
 
 public:
-    using media_t = anisthesia::Media;
-    using player_t = anisthesia::Player;
+  using media_t = anisthesia::Media;
+  using player_t = anisthesia::Player;
 
-	Detection(QObject* parent);
+  Detection(QObject* parent);
 
-	const std::optional<Episode> getCurrentEpisode() const;
-	const std::optional<media_t> getCurrentMedia() const;
-	const std::optional<player_t> getCurrentPlayer() const;
+  const std::optional<Episode> getCurrentEpisode() const;
+  const std::optional<media_t> getCurrentMedia() const;
+  const std::optional<player_t> getCurrentPlayer() const;
 
-	bool init();
-	void poll();
+  bool init();
 
 signals:
-	void currentEpisodeChanged(std::optional<Episode> media) const;
+  void currentEpisodeChanged(std::optional<Episode> media) const;
 
 private:
-	std::optional<Episode> currentEpisode_;
-	std::optional<media_t> currentMedia_;
-	std::optional<player_t> currentPlayer_;
-	std::vector<player_t> players_;
+  void poll();
+  void reset();
 
-	QTimer* pollTimer_;
+  std::optional<Episode> currentEpisode_;
+  std::optional<media_t> currentMedia_;
+  std::optional<player_t> currentPlayer_;
+  std::vector<player_t> players_;
+
+  QTimer* pollTimer_;
 };
 
 inline Detection* detection() {
