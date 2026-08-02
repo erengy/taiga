@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ namespace compat::v1 {
 // See #842 for more information.
 inline void removeMetaElement(QString& str) {
   static const QRegularExpression meta_element_regex{
-      "<meta>.+</meta>", QRegularExpression::DotMatchesEverythingOption};
+      "<meta>.+?</meta>", QRegularExpression::DotMatchesEverythingOption};
   str.remove(meta_element_regex);
 }
 
