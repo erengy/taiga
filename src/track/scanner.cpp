@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2025, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,12 +19,24 @@
 #include "scanner.hpp"
 
 #include <QDirIterator>
+#include <algorithm>
 #include <optional>
+#include <ranges>
 
 #include "track/episode.hpp"
 #include "track/recognition.hpp"
 
 namespace track {
+
+static bool containsEpisodeNumber(const Episode& episode, const int episode_number) {
+  const auto numbers = episode.elements(anitomy::ElementKind::Episode);
+  if (numbers.empty()) return false;
+
+  const auto toInt = [](const std::string& value) { return QString::fromStdString(value).toInt(); };
+  const auto [low, high] = std::ranges::minmax(numbers | std::views::transform(toInt));
+
+  return low <= episode_number && episode_number <= high;
+}
 
 std::optional<QString> findEpisode(const QString& path, const int anime_id,
                                    const int episode_number) {
@@ -37,10 +49,7 @@ std::optional<QString> findEpisode(const QString& path, const int anime_id,
 
     auto episode = recognition::parseFileInfo(info);
 
-    if (QString::fromStdString(episode.element(anitomy::ElementKind::Episode)).toInt() !=
-        episode_number) {
-      continue;
-    }
+    if (!containsEpisodeNumber(episode, episode_number)) continue;
 
     if (track::recognition::identify(episode) != anime_id) continue;
 

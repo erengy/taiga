@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2025, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -56,6 +56,14 @@ std::string Episode::element(const anitomy::ElementKind kind, const std::string 
   if (it != elements_.end()) return it->value;
   return placeholder;
 };
+
+std::vector<std::string> Episode::elements(const anitomy::ElementKind kind) const {
+  const auto is_kind = [kind](const anitomy::Element& element) { return element.kind == kind; };
+  const auto to_value = [](const anitomy::Element& element) { return element.value; };
+
+  return elements_ | std::views::filter(is_kind) | std::views::transform(to_value) |
+         std::ranges::to<std::vector>();
+}
 
 void Episode::addElement(const anitomy::ElementKind kind, const std::string& value) {
   elements_.emplace_back(anitomy::Element{.kind = kind, .value = value});

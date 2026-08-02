@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2025, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -82,20 +82,34 @@ bool isValidMatch(const int id, const Episode& episode) {
   if (!item) return false;
 
   const auto is_valid_episode_number = [&episode, &item]() {
-    const auto number = episode.element(anitomy::ElementKind::Episode);
-
-    if (number.empty()) {
-      if (item->episode_count == 1)
-        return true;  // single-episode anime can do without an episode number
-
-      const auto extension = episode.element(anitomy::ElementKind::FileExtension);
-      if (extension.empty()) return true;  // batch release
+    if (item->episode_count < 1) {
+      return true;  // episode count is unknown, so anything goes
     }
 
-    const int value = QString::fromStdString(number).toInt();
+    const auto numbers = episode.elements(anitomy::ElementKind::Episode);
+
+    if (numbers.empty()) {
+      if (item->episode_count == 1) {
+        return true;  // single-episode anime can do without an episode number
+      }
+
+      const auto extension = episode.element(anitomy::ElementKind::FileExtension);
+      if (extension.empty()) {
+        return true;  // batch release
+      }
+
+      return false;  // no episode number to check against
+    }
+
+    // @TODO: This truncates decimal episode numbers (e.g. "07.5")
+    const auto toInt = [](const std::string& value) {
+      return QString::fromStdString(value).toInt();
+    };
+    const int value = std::ranges::max(numbers | std::views::transform(toInt));
+
     if (value <= item->episode_count) return true;  // in range
 
-    if (item->episode_count < 1) return true;  // episode count is unknown, so anything goes
+    // @TODO: Attempt episode redirection via deps/anime-relations
 
     return false;  // out of range
   };
