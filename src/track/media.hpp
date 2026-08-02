@@ -57,6 +57,7 @@ private:
   std::optional<Episode> currentEpisode_;
   std::optional<media_t> currentMedia_;
   std::optional<player_t> currentPlayer_;
+  void* currentWindowHandle_ = nullptr;
   std::vector<player_t> players_;
 
   QTimer* pollTimer_;

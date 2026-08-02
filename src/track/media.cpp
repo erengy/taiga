@@ -18,6 +18,8 @@
 
 #include "media.hpp"
 
+#include <algorithm>
+
 #include "media/anime_db.hpp"
 #include "taiga/settings.hpp"
 #include "track/episode.hpp"
@@ -70,8 +72,14 @@ void Detection::poll() {
     return;
   }
 
-  currentPlayer_ = results.front().player;
-  currentMedia_ = results.front().media.front();
+  const auto resultIt = std::ranges::find_if(results, [this](const anisthesia::win::Result& r) {
+    return r.window.handle == currentWindowHandle_;
+  });
+  const auto& result = resultIt != results.end() ? *resultIt : results.front();
+
+  currentPlayer_ = result.player;
+  currentMedia_ = result.media.front();
+  currentWindowHandle_ = result.window.handle;
 
   const auto mediaInfo = currentMedia_->information.front();
   auto episode = [&mediaInfo]() {
@@ -102,6 +110,7 @@ void Detection::poll() {
 void Detection::reset() {
   currentPlayer_.reset();
   currentMedia_.reset();
+  currentWindowHandle_ = nullptr;
 
   if (currentEpisode_) {
     currentEpisode_.reset();
