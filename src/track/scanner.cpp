@@ -49,6 +49,8 @@ std::optional<QString> findEpisode(const QString& path, const int anime_id,
 
     auto episode = recognition::parseFileInfo(info);
 
+    if (!recognition::isVideoFile(episode)) continue;
+
     if (!containsEpisodeNumber(episode, episode_number)) continue;
 
     if (track::recognition::identify(episode) != anime_id) continue;

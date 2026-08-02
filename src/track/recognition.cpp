@@ -76,4 +76,10 @@ int identify(Episode& episode) {
   return anime::kUnknownId;
 }
 
+bool isVideoFile(const Episode& episode) {
+  // This relies on Anitomy tagging `FileExtension` only for video
+  // container extensions.
+  return episode.contains(anitomy::ElementKind::FileExtension);
+}
+
 }  // namespace track::recognition

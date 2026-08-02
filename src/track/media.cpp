@@ -83,6 +83,12 @@ void Detection::poll() {
     }
   }();
 
+  if (mediaInfo.type == anisthesia::MediaInfoType::File &&
+      !track::recognition::isVideoFile(episode)) {
+    reset();
+    return;
+  }
+
   const auto animeId = track::recognition::identify(episode);
   episode.setAnimeId(animeId);
 

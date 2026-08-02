@@ -33,4 +33,6 @@ Episode parseFileInfo(const QFileInfo& info, const anitomy::Options options = {}
 
 int identify(Episode& episode);
 
+bool isVideoFile(const Episode& episode);
+
 }  // namespace track::recognition
