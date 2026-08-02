@@ -64,7 +64,7 @@ QString formatAsRelativeTime(const qint64 time, QString placeholder = "Unknown")
 QString formatDuration(base::Duration duration);
 QString formatTimestamp(const qint64 time);
 
-QString formatSeason(const anime::Season season);
+QString formatSeason(const anime::Season season, QString placeholder = "Unknown");
 QString formatSeasonName(const anime::SeasonName name);
 QString formatStatus(const anime::Status value);
 QString formatType(const anime::Type value);

@@ -117,7 +117,7 @@ Season::Season(const FuzzyDate& date) {
 }
 
 Season::operator bool() const {
-  return name != Unknown && static_cast<int>(year);
+  return has_name() && has_year();
 }
 
 Season& Season::operator++() {
@@ -148,6 +148,14 @@ std::strong_ordering Season::operator<=>(const Season& season) const {
   }
 
   return cmp::equal;
+}
+
+bool Season::has_name() const {
+  return name != Unknown;
+}
+
+bool Season::has_year() const {
+  return static_cast<int>(year);
 }
 
 }  // namespace anime

@@ -128,8 +128,13 @@ QString formatTimestamp(const qint64 time) {
   return formatDate(datetime.date());
 }
 
-QString formatSeason(const anime::Season season) {
-  return u"%1 %2"_s.arg(formatSeasonName(season.name)).arg(static_cast<int>(season.year));
+QString formatSeason(const anime::Season season, QString placeholder) {
+  if (!season.has_name() && !season.has_year()) return placeholder;
+  if (!season.has_name()) {
+    return u"%1"_s.arg(static_cast<int>(season.year));
+  } else {
+    return u"%1 %2"_s.arg(formatSeasonName(season.name)).arg(static_cast<int>(season.year));
+  }
 }
 
 QString formatSeasonName(const anime::SeasonName name) {
