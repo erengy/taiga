@@ -34,44 +34,22 @@ namespace track::recognition {
 
 namespace {
 
-anime::Type toAnimeType(const std::string& value) {
-  // This table is supposed to match Anitomy's keywords for `KeywordKind::Type`.
-  static const std::vector<std::pair<std::string, anime::Type>> types{
-      {"tv", anime::Type::Tv},
-      {"movie", anime::Type::Movie},
-      {"gekijouban", anime::Type::Movie},
-      {"oad", anime::Type::Ova},
-      {"oav", anime::Type::Ova},
-      {"ova", anime::Type::Ova},
-      {"ona", anime::Type::Ona},
-      {"sp", anime::Type::Special},
-      {"special", anime::Type::Special},
-      {"specials", anime::Type::Special},
+bool isValidEpisodeType(const Episode& episode) {
+  const auto values = episode.elements(anitomy::ElementKind::Type);
+
+  const auto isEpisodeTypeKeyword = [](const std::string& value) {
+    // Matches Anitomy's keywords for `KeywordKind::EpisodeType`.
+    // @TODO: Remove strings if Anitomy exposes `ElementKind::EpisodeType`.
+    static const std::vector<std::string> keywords{
+        "op", "opening", "ncop", "ed", "ending", "nced", "preview", "pv",
+    };
+
+    return std::ranges::any_of(keywords, [&value](const std::string& keyword) {
+      return compareStrings(value, keyword, Qt::CaseInsensitive) == 0;
+    });
   };
 
-  const auto it = std::ranges::find_if(types, [&value](const auto& type) {
-    return compareStrings(value, type.first, Qt::CaseInsensitive) == 0;
-  });
-
-  return it != types.end() ? it->second : anime::Type::Unknown;
-}
-
-bool isValidAnimeType(const Episode& episode, const anime::Details& item) {
-  if (item.type == anime::Type::Unknown) {
-    return true;  // anime's type is unknown
-  }
-
-  const auto value = episode.element(anitomy::ElementKind::Type);
-  if (value.empty()) {
-    return true;  // nothing parsed to validate
-  }
-
-  const auto type = toAnimeType(value);
-  if (type == anime::Type::Unknown) {
-    return true;  // not a recognized type keyword
-  }
-
-  return type == item.type;
+  return std::ranges::none_of(values, isEpisodeTypeKeyword);
 }
 
 bool isValidEpisodeNumber(const Episode& episode, const anime::Details& item) {
@@ -112,7 +90,7 @@ bool isValidMatch(const int id, const Episode& episode) {
 
   if (!item) return false;
 
-  if (!isValidAnimeType(episode, *item)) return false;
+  if (!isValidEpisodeType(episode)) return false;
 
   if (!isValidEpisodeNumber(episode, *item)) return false;
 
