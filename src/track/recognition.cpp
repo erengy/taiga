@@ -48,9 +48,12 @@ Episode parseFileInfo(const QFileInfo& info, const anitomy::Options options) {
   Episode episode = track::recognition::parse(fileName, options);
 
   if (!episode.contains(anitomy::ElementKind::Title)) {
-    const auto title = findTitleFromPath(info);
-    if (!title.empty()) {
-      episode.addElement(anitomy::ElementKind::Title, title);
+    const auto parsed = parseParentDirectories(info);
+    if (!parsed.title.empty()) {
+      episode.addElement(anitomy::ElementKind::Title, parsed.title);
+    }
+    if (!parsed.season.empty() && !episode.contains(anitomy::ElementKind::Season)) {
+      episode.addElement(anitomy::ElementKind::Season, parsed.season);
     }
   }
 

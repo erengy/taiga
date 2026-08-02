@@ -32,6 +32,11 @@ namespace track::recognition {
 
 namespace {
 
+struct DirectoryInfo {
+  std::string name;
+  std::string season;
+};
+
 bool isTitle(const anitomy::Element& element) {
   return element.kind == anitomy::ElementKind::Title;
 }
@@ -64,10 +69,21 @@ bool isInvalidDirectoryName(const std::string& name) {
   return name.empty() || isKnownInvalidName(name) || isKeywordOnly(name);
 }
 
-std::string findDirectoryName(const QFileInfo& info) {
-  QDir dir = info.dir();
+std::string findSeasonNumber(const std::string& name) {
+  const auto elements = anitomy::parse(name);
 
+  const auto it = std::ranges::find_if(elements, [](const anitomy::Element& element) {
+    return element.kind == anitomy::ElementKind::Season;
+  });
+
+  return it != elements.end() ? it->value : std::string{};
+}
+
+DirectoryInfo parseDirectory(const QFileInfo& info) {
   constexpr int maxDepth = 2;
+
+  QDir dir = info.dir();
+  std::string season;
 
   for (int depth = 0; depth < maxDepth; ++depth) {
     const auto name = dir.dirName().toStdString();
@@ -76,7 +92,11 @@ std::string findDirectoryName(const QFileInfo& info) {
     // an anime folder.
     if (isLibraryFolder(dir) || name.contains(':')) break;
 
-    if (!isInvalidDirectoryName(name)) return name;
+    if (!isInvalidDirectoryName(name)) return {name, season};
+
+    // Record and skip season-only folder (e.g. "Season 2").
+    if (season.empty()) season = findSeasonNumber(name);
+
     if (!dir.cdUp()) break;
   }
 
@@ -102,11 +122,11 @@ std::string extractTitle(const std::string& directoryName) {
 
 }  // namespace
 
-std::string findTitleFromPath(const QFileInfo& info) {
-  const auto directoryName = findDirectoryName(info);
-  if (directoryName.empty()) return {};
+PathInfo parseParentDirectories(const QFileInfo& info) {
+  const auto dirInfo = parseDirectory(info);
+  if (dirInfo.name.empty()) return {};
 
-  return extractTitle(directoryName);
+  return {extractTitle(dirInfo.name), dirInfo.season};
 }
 
 }  // namespace track::recognition

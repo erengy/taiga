@@ -24,6 +24,11 @@ class QFileInfo;
 
 namespace track::recognition {
 
-std::string findTitleFromPath(const QFileInfo& info);
+struct PathInfo {
+  std::string title;
+  std::string season;
+};
+
+PathInfo parseParentDirectories(const QFileInfo& info);
 
 }  // namespace track::recognition
