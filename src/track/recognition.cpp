@@ -18,7 +18,6 @@
 
 #include "recognition.hpp"
 
-#include <QDir>
 #include <QFileInfo>
 #include <algorithm>
 #include <anitomy.hpp>
@@ -29,6 +28,7 @@
 #include "track/episode.hpp"
 #include "track/recognition_cache.hpp"
 #include "track/recognition_normalize.hpp"
+#include "track/recognition_path.hpp"
 #include "track/recognition_validate.hpp"
 
 namespace track::recognition {
@@ -48,8 +48,10 @@ Episode parseFileInfo(const QFileInfo& info, const anitomy::Options options) {
   Episode episode = track::recognition::parse(fileName, options);
 
   if (!episode.contains(anitomy::ElementKind::Title)) {
-    const auto dirName = info.dir().dirName().toStdString();
-    episode.addElement(anitomy::ElementKind::Title, dirName);
+    const auto title = findTitleFromPath(info);
+    if (!title.empty()) {
+      episode.addElement(anitomy::ElementKind::Title, title);
+    }
   }
 
   return episode;
