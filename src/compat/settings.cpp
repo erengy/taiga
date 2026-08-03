@@ -152,7 +152,6 @@ void parseRecognitionElement(QXmlStreamReader& xml, const taiga::Settings& setti
         }
       }
       settings.setDisabledMediaPlayers(disabledPlayers);
-      xml.skipCurrentElement();
 
     } else if (xml.name() == u"general") {
       const auto seconds = std::chrono::seconds{XML_ATTR_INT(u"detectioninterval")};
