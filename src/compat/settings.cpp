@@ -23,6 +23,7 @@
 
 #include "base/log.hpp"
 #include "base/xml.hpp"
+#include "compat/common.hpp"
 #include "media/anime.hpp"
 #include "taiga/accounts.hpp"
 #include "taiga/settings.hpp"
@@ -43,7 +44,7 @@ void readSettings(const std::string& path, const taiga::Settings& settings,
                   const taiga::Accounts& accounts) {
   base::XmlFileReader xml;
 
-  if (!xml.open(QString::fromStdString(path))) {
+  if (!xml.open(QString::fromStdString(path), removeInvalidCharacterReferences)) {
     LOGE("{}", xml.file().errorString().toStdString());
     return;
   }

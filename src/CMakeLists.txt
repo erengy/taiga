@@ -21,6 +21,7 @@ target_sources(taiga PRIVATE
 
 	compat/anime.cpp
 	compat/anime.hpp
+	compat/common.cpp
 	compat/common.hpp
 	compat/history.cpp
 	compat/history.hpp

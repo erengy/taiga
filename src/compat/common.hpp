@@ -18,17 +18,17 @@
 
 #pragma once
 
-#include <QRegularExpression>
+class QString;
 
 namespace compat::v1 {
 
-// This regex is used to remove the extra root element from v1's XML documents so that they
-// can be read by `QXmlStreamReader` without an "Extra content at end of document" error.
-// See #842 for more information.
-inline void removeMetaElement(QString& str) {
-  static const QRegularExpression meta_element_regex{
-      "<meta>.+?</meta>", QRegularExpression::DotMatchesEverythingOption};
-  str.remove(meta_element_regex);
-}
+// Removes the extra root element from v1's XML documents so that they can be read by
+// `QXmlStreamReader` without an "Extra content at end of document" error.
+// See issue #842 for more information.
+void removeMetaElement(QString& str);
+
+// Removes numeric references to control characters that XML 1.0 disallows (e.g. `&#03;` for mIRC's
+// color-code prefix), which make `QXmlStreamReader` fail with "Invalid character reference".
+void removeInvalidCharacterReferences(QString& str);
 
 }  // namespace compat::v1
