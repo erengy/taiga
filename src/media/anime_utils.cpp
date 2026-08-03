@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@
 
 #include "base/chrono.hpp"
 #include "media/anime.hpp"
+#include "taiga/settings.hpp"
 
 namespace {
 
@@ -167,6 +168,20 @@ bool isStale(const Details& item) {
 
   if (airingStatus(item) == Status::FinishedAiring) return duration.weeks() >= 1;
   return duration.hours() >= 1;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+const std::string& preferredTitle(const Details& item) {
+  switch (taiga::settings.titleLanguage()) {
+    default:
+    case TitleLanguage::Romaji:
+      return item.titles.romaji;
+    case TitleLanguage::English:
+      return !item.titles.english.empty() ? item.titles.english : item.titles.romaji;
+    case TitleLanguage::Native:
+      return !item.titles.japanese.empty() ? item.titles.japanese : item.titles.romaji;
+  }
 }
 
 }  // namespace anime

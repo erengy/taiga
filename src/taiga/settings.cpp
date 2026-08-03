@@ -84,6 +84,20 @@ bool Settings::syncEnabled() const {
   return value("sync.enabled", true).toBool();
 }
 
+anime::TitleLanguage Settings::titleLanguage() const {
+  if (!titleLanguageCache_) {
+    const auto language = value("library.titleLanguage", u"romaji"_s).toString();
+    if (language == u"english") {
+      titleLanguageCache_ = anime::TitleLanguage::English;
+    } else if (language == u"native") {
+      titleLanguageCache_ = anime::TitleLanguage::Native;
+    } else {
+      titleLanguageCache_ = anime::TitleLanguage::Romaji;
+    }
+  }
+  return *titleLanguageCache_;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 void Settings::setAppColorScheme(const Qt::ColorScheme scheme) const {
@@ -116,6 +130,22 @@ void Settings::setMediaDetectionInterval(const std::chrono::milliseconds interva
 
 void Settings::setSyncEnabled(const bool enabled) const {
   setValue("sync.enabled", enabled);
+}
+
+void Settings::setTitleLanguage(const anime::TitleLanguage language) const {
+  const auto slug = [language]() -> std::string {
+    switch (language) {
+      default:
+      case anime::TitleLanguage::Romaji:
+        return "romaji";
+      case anime::TitleLanguage::English:
+        return "english";
+      case anime::TitleLanguage::Native:
+        return "native";
+    }
+  }();
+  setValue("library.titleLanguage", slug);
+  titleLanguageCache_ = language;
 }
 
 }  // namespace taiga

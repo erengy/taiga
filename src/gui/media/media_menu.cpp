@@ -100,7 +100,7 @@ void MediaMenu::copyLinks() const {
 void MediaMenu::copyTitles() const {
   QList<QString> titles;
   for (const auto& item : m_items) {
-    titles.push_back(QString::fromStdString(item.titles.romaji));
+    titles.push_back(QString::fromStdString(anime::preferredTitle(item)));
   }
   QGuiApplication::clipboard()->setText(titles.join("\n"));
 }
@@ -151,7 +151,7 @@ void MediaMenu::openFolder() const {
   }
 
   QMessageBox::information(nullptr, tr("Open Folder"),
-                           tr("Could not find folder for %1.").arg(item.titles.romaji));
+                           tr("Could not find folder for %1.").arg(anime::preferredTitle(item)));
 }
 
 void MediaMenu::playEpisode(int number) const {
@@ -161,8 +161,9 @@ void MediaMenu::playEpisode(int number) const {
     return;
   }
 
-  QMessageBox::information(nullptr, tr("Play Episode"),
-                           tr("Could not find %1 #%2.").arg(item.titles.romaji).arg(number));
+  QMessageBox::information(
+      nullptr, tr("Play Episode"),
+      tr("Could not find %1 #%2.").arg(anime::preferredTitle(item)).arg(number));
 }
 
 void MediaMenu::refresh() const {
@@ -174,7 +175,7 @@ void MediaMenu::refresh() const {
 void MediaMenu::removeFromList() const {
   QList<QString> titles;
   for (const auto& item : m_items) {
-    titles.push_back(u"<li>%1</li>"_s.arg(QString::fromStdString(item.titles.romaji)));
+    titles.push_back(u"<li>%1</li>"_s.arg(QString::fromStdString(anime::preferredTitle(item))));
   }
 
   if (confirm(parentWidget(), tr("Do you want to remove selected items from your list?"),
@@ -188,13 +189,13 @@ void MediaMenu::removeFromList() const {
 void MediaMenu::search() const {
   const auto& item = m_items.front();
   mainWindow()->navigateTo(MainWindowPage::Search);
-  mainWindow()->searchBox()->setText(QString::fromStdString(item.titles.romaji));
+  mainWindow()->searchBox()->setText(QString::fromStdString(anime::preferredTitle(item)));
 }
 
 void MediaMenu::searchAniDB() const {
   for (const auto& item : m_items) {
     QUrl url{"https://anidb.net/anime/"};
-    url.setQuery({{"adb.search", QString::fromStdString(item.titles.romaji)}});
+    url.setQuery({{"adb.search", QString::fromStdString(anime::preferredTitle(item))}});
     QDesktopServices::openUrl(url);
   }
 }
@@ -206,7 +207,7 @@ void MediaMenu::searchAniList() const {
       QDesktopServices::openUrl(url);
     } else {
       QUrl url{"https://anilist.co/search/anime"};
-      QUrlQuery query{{"search", QString::fromStdString(item.titles.romaji)}};
+      QUrlQuery query{{"search", QString::fromStdString(anime::preferredTitle(item))}};
       if (anime::isNsfw(item)) query.addQueryItem("adult", "true");
       url.setQuery(query);
       QDesktopServices::openUrl(url);
@@ -217,7 +218,7 @@ void MediaMenu::searchAniList() const {
 void MediaMenu::searchANN() const {
   for (const auto& item : m_items) {
     QUrl url{"https://www.animenewsnetwork.com/search"};
-    url.setQuery({{"q", QString::fromStdString(item.titles.romaji)}});
+    url.setQuery({{"q", QString::fromStdString(anime::preferredTitle(item))}});
     QDesktopServices::openUrl(url);
   }
 }
@@ -229,7 +230,7 @@ void MediaMenu::searchKitsu() const {
       QDesktopServices::openUrl(url);
     } else {
       QUrl url{"https://kitsu.app/anime"};
-      url.setQuery({{"text", QString::fromStdString(item.titles.romaji)}});
+      url.setQuery({{"text", QString::fromStdString(anime::preferredTitle(item))}});
       QDesktopServices::openUrl(url);
     }
   }
@@ -242,7 +243,7 @@ void MediaMenu::searchMyAnimeList() const {
       QDesktopServices::openUrl(url);
     } else {
       QUrl url{"https://myanimelist.net/anime.php"};
-      url.setQuery({{"q", QString::fromStdString(item.titles.romaji)}});
+      url.setQuery({{"q", QString::fromStdString(anime::preferredTitle(item))}});
       QDesktopServices::openUrl(url);
     }
   }
@@ -251,7 +252,7 @@ void MediaMenu::searchMyAnimeList() const {
 void MediaMenu::searchReddit() const {
   for (const auto& item : m_items) {
     QUrl url{"https://www.reddit.com/search"};
-    const auto title = QString::fromStdString(item.titles.romaji);
+    const auto title = QString::fromStdString(anime::preferredTitle(item));
     url.setQuery({
         {"q", u"subreddit:anime title:%1 episode discussion"_s.arg(title)},
         {"sort", "new"},
@@ -263,7 +264,7 @@ void MediaMenu::searchReddit() const {
 void MediaMenu::searchWikipedia() const {
   for (const auto& item : m_items) {
     QUrl url{"https://en.wikipedia.org/wiki/Special:Search"};
-    url.setQuery({{"search", QString::fromStdString(item.titles.romaji)}});
+    url.setQuery({{"search", QString::fromStdString(anime::preferredTitle(item))}});
     QDesktopServices::openUrl(url);
   }
 }
@@ -275,7 +276,7 @@ void MediaMenu::searchYouTube() const {
       QDesktopServices::openUrl(url);
     } else {
       QUrl url{"https://www.youtube.com/results"};
-      url.setQuery({{"search_query", QString::fromStdString(item.titles.romaji)}});
+      url.setQuery({{"search_query", QString::fromStdString(anime::preferredTitle(item))}});
       QDesktopServices::openUrl(url);
     }
   }
@@ -284,7 +285,7 @@ void MediaMenu::searchYouTube() const {
 void MediaMenu::torrents() const {
   const auto& item = m_items.front();
   mainWindow()->navigateTo(MainWindowPage::Torrents);
-  mainWindow()->searchBox()->setText(QString::fromStdString(item.titles.romaji));
+  mainWindow()->searchBox()->setText(QString::fromStdString(anime::preferredTitle(item)));
 }
 
 void MediaMenu::test() const {
@@ -292,7 +293,7 @@ void MediaMenu::test() const {
 
   QList<QString> titles;
   for (const auto& item : m_items) {
-    titles.push_back(QString::fromStdString(item.titles.romaji));
+    titles.push_back(QString::fromStdString(anime::preferredTitle(item)));
   }
 
   const auto text = u"Action: %1\n\n%2"_s.arg(action).arg(titles.join("\n"));

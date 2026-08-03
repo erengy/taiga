@@ -19,10 +19,12 @@
 #pragma once
 
 #include <chrono>
+#include <optional>
 #include <string>
 #include <vector>
 
 #include "base/settings.hpp"
+#include "media/anime.hpp"
 
 namespace taiga {
 
@@ -36,6 +38,7 @@ public:
   std::vector<std::string> libraryFolders() const;
   std::chrono::milliseconds mediaDetectionInterval() const;
   bool syncEnabled() const;
+  anime::TitleLanguage titleLanguage() const;
 
   void setAppColorScheme(const Qt::ColorScheme scheme) const;
   void setDisabledMediaPlayers(std::vector<std::string> players) const;
@@ -43,9 +46,12 @@ public:
   void setLibraryFolders(std::vector<std::string> folders) const;
   void setMediaDetectionInterval(const std::chrono::milliseconds interval) const;
   void setSyncEnabled(const bool enabled) const;
+  void setTitleLanguage(const anime::TitleLanguage language) const;
 
 private:
   QString fileName() const override;
+
+  mutable std::optional<anime::TitleLanguage> titleLanguageCache_;
 };
 
 inline Settings settings;

@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@
 
 #include "base/log.hpp"
 #include "base/xml.hpp"
+#include "media/anime.hpp"
 #include "taiga/accounts.hpp"
 #include "taiga/settings.hpp"
 
@@ -35,6 +36,7 @@ namespace compat::v1 {
 
 void parseAccountElement(QXmlStreamReader&, const taiga::Settings&, const taiga::Accounts&);
 void parseAnimeElement(QXmlStreamReader&, const taiga::Settings&);
+void parseProgramElement(QXmlStreamReader&, const taiga::Settings&);
 void parseRecognitionElement(QXmlStreamReader&, const taiga::Settings&);
 
 void readSettings(const std::string& path, const taiga::Settings& settings,
@@ -57,8 +59,10 @@ void readSettings(const std::string& path, const taiga::Settings& settings,
       parseAnimeElement(xml, settings);
     } else if (xml.name() == u"recognition") {
       parseRecognitionElement(xml, settings);
+    } else if (xml.name() == u"program") {
+      parseProgramElement(xml, settings);
     } else {
-      // @TODO: program, announce, rss
+      // @TODO: announce, rss
       xml.skipCurrentElement();
     }
   }
@@ -154,6 +158,31 @@ void parseRecognitionElement(QXmlStreamReader& xml, const taiga::Settings& setti
       const auto seconds = std::chrono::seconds{XML_ATTR_INT(u"detectioninterval")};
       settings.setMediaDetectionInterval(seconds);
       xml.skipCurrentElement();
+
+    } else {
+      xml.skipCurrentElement();
+    }
+  }
+}
+
+void parseProgramElement(QXmlStreamReader& xml, const taiga::Settings& settings) {
+  while (xml.readNextStartElement()) {
+    if (xml.name() == u"list") {
+      while (xml.readNextStartElement()) {
+        if (xml.name() == u"action") {
+          const auto titleLanguage = XML_ATTR_STR(u"titlelang");
+          if (titleLanguage == "english") {
+            settings.setTitleLanguage(anime::TitleLanguage::English);
+          } else if (titleLanguage == "native") {
+            settings.setTitleLanguage(anime::TitleLanguage::Native);
+          } else {
+            settings.setTitleLanguage(anime::TitleLanguage::Romaji);
+          }
+          xml.skipCurrentElement();
+        } else {
+          xml.skipCurrentElement();
+        }
+      }
 
     } else {
       xml.skipCurrentElement();

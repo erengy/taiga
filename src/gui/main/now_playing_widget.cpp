@@ -27,6 +27,7 @@
 #include "gui/utils/format.hpp"
 #include "gui/utils/theme.hpp"
 #include "media/anime_db.hpp"
+#include "media/anime_utils.hpp"
 #include "track/episode.hpp"
 #include "track/media.hpp"
 
@@ -118,7 +119,7 @@ void NowPlayingWidget::refresh() {
   m_iconLabel->setPixmap(theme.getIcon(iconName).pixmap(QSize(16, 16)));
 
   const auto title =
-      m_anime ? m_anime->titles.romaji : m_episode->element(anitomy::ElementKind::Title);
+      m_anime ? anime::preferredTitle(*m_anime) : m_episode->element(anitomy::ElementKind::Title);
   const auto episodeNumber = m_episode->element(anitomy::ElementKind::Episode, "1");
   const auto episodeCount = formatNumber(m_anime ? m_anime->episode_count : 0, "?");
 

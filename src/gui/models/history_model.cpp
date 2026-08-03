@@ -21,6 +21,7 @@
 #include "gui/utils/format.hpp"
 #include "media/anime_db.hpp"
 #include "media/anime_history.hpp"
+#include "media/anime_utils.hpp"
 
 namespace gui {
 
@@ -49,7 +50,7 @@ QVariant HistoryModel::data(const QModelIndex& index, int role) const {
       const auto item = anime::db.item(historyItem.anime_id);
       switch (index.column()) {
         case COLUMN_TITLE:
-          if (item) return QString::fromStdString(item->titles.romaji);
+          if (item) return QString::fromStdString(anime::preferredTitle(*item));
           return {};
         case COLUMN_DETAILS:
           return tr("Episode: %1").arg(historyItem.episode);

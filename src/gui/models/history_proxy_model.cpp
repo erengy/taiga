@@ -22,6 +22,7 @@
 #include "gui/models/history_model.hpp"
 #include "media/anime_db.hpp"
 #include "media/anime_history.hpp"
+#include "media/anime_utils.hpp"
 
 namespace {
 
@@ -45,8 +46,8 @@ bool HistoryProxyModel::lessThan(const QModelIndex& lhs, const QModelIndex& rhs)
     case HistoryModel::COLUMN_TITLE: {
       const auto lhsAnime = anime::db.item(lhsItem->anime_id);
       const auto rhsAnime = anime::db.item(rhsItem->anime_id);
-      const auto lhsTitle = lhsAnime ? lhsAnime->titles.romaji : std::string{};
-      const auto rhsTitle = rhsAnime ? rhsAnime->titles.romaji : std::string{};
+      const auto lhsTitle = lhsAnime ? anime::preferredTitle(*lhsAnime) : std::string{};
+      const auto rhsTitle = rhsAnime ? anime::preferredTitle(*rhsAnime) : std::string{};
       return compareStrings(lhsTitle, rhsTitle, Qt::CaseInsensitive) < 0;
     }
 

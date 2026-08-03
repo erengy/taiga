@@ -30,6 +30,7 @@
 #include "media/anime_db.hpp"
 #include "media/anime_list_utils.hpp"
 #include "media/anime_season.hpp"
+#include "media/anime_utils.hpp"
 
 namespace gui {
 
@@ -88,7 +89,7 @@ QVariant AnimeListModel::data(const QModelIndex& index, int role) const {
     case Qt::DisplayRole:
       switch (index.column()) {
         case COLUMN_TITLE:
-          return QString::fromStdString(anime->titles.romaji);
+          return QString::fromStdString(anime::preferredTitle(*anime));
         case COLUMN_DURATION:
           return formatEpisodeLength(anime->episode_length);
         case COLUMN_REWATCHES:
@@ -121,7 +122,7 @@ QVariant AnimeListModel::data(const QModelIndex& index, int role) const {
     case Qt::ToolTipRole:
       switch (index.column()) {
         case COLUMN_TITLE:
-          return QString::fromStdString(anime->titles.romaji);
+          return QString::fromStdString(anime::preferredTitle(*anime));
         case COLUMN_SEASON:
           return formatFuzzyDate(anime->date_started);
         case COLUMN_LAST_UPDATED:

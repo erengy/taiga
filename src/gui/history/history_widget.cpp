@@ -33,6 +33,7 @@
 #include "gui/utils/widgets.hpp"
 #include "media/anime_db.hpp"
 #include "media/anime_history.hpp"
+#include "media/anime_utils.hpp"
 #include "sync/queue.hpp"
 #include "sync/service.hpp"
 #include "taiga/settings.hpp"
@@ -117,7 +118,7 @@ void HistoryWidget::removeItem(const QModelIndex& index) const {
   if (!historyItem) return;
 
   const auto item = anime::db.item(historyItem->anime_id);
-  const auto title = item ? QString::fromStdString(item->titles.romaji) : tr("Unknown");
+  const auto title = item ? QString::fromStdString(anime::preferredTitle(*item)) : tr("Unknown");
 
   if (confirm(nullptr, tr("Do you want to remove this entry from history?"),
               tr("%1 - Episode %2").arg(title).arg(historyItem->episode), tr("Remove"))) {
