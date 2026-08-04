@@ -20,22 +20,13 @@
 
 #include <string>
 
+#include "media/anime.hpp"
+
 namespace anime {
 
-enum class Status;
-struct Details;
-
-Status airingStatus(const Details& item);
-bool isAiredYet(const Details& item);
-bool isFinishedAiring(const Details& item);
-
-int estimateEpisodeCount(const Details& item, const int lastKnownEpisode);
-int estimateEpisodeLength(const Details& item);
-int estimateLastAiredEpisodeNumber(const Details& item);
-
-bool isNsfw(const Details& item);
-bool isStale(const Details& item);
-
-std::string preferredTitle(const Details& item);
+struct Settings {
+  int id = kUnknownId;
+  std::string display_title;
+};
 
 }  // namespace anime

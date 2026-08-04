@@ -51,6 +51,7 @@ void Database::init() {
 
   readItems();
   readEntries();
+  readSettings();
 }
 
 const Anime* Database::item(const int id) const {
@@ -61,6 +62,11 @@ const Anime* Database::item(const int id) const {
 const ListEntry* Database::entry(const int id) const {
   const auto it = entries_.find(id);
   return it != entries_.end() ? &(*it) : nullptr;
+}
+
+const Settings* Database::settings(const int id) const {
+  const auto it = settings_.find(id);
+  return it != settings_.end() ? &(*it) : nullptr;
 }
 
 const QMap<int, Anime>& Database::items() const {
@@ -99,6 +105,21 @@ void Database::updateEntry(const ListEntry& entry) {
   entries_[entry.anime_id] = entry;
 
   emit entryUpdated(entry.anime_id);
+}
+
+void Database::updateSettings(const Settings& settings) {
+  if (!db_.open()) return;
+
+  QSqlQuery q{db_};
+  q.prepare(sql("insertAnimeSettings"));
+  bindSettingsToQuery(settings, q);
+  q.exec();
+
+  db_.close();
+
+  settings_[settings.id] = settings;
+
+  emit itemUpdated(settings.id);
 }
 
 void Database::deleteEntry(const int animeId) {
@@ -150,6 +171,11 @@ void Database::createTables() {
     q.exec(sql("createAnimeList"));
   }
 
+  if (!tables.contains("anime_settings")) {
+    QSqlQuery q{db_};
+    q.exec(sql("createAnimeSettings"));
+  }
+
   db_.commit();
   db_.close();
 }
@@ -198,6 +224,24 @@ void Database::readEntries() {
   db_.close();
 }
 
+void Database::readSettings() {
+  if (!db_.open()) return;
+
+  QSqlQuery q{db_};
+
+  if (!q.exec("SELECT * FROM anime_settings")) {
+    db_.close();
+    return;
+  }
+
+  while (q.next()) {
+    const int id = q.value("id").toInt();
+    settings_[id] = settingsFromQuery(q);
+  }
+
+  db_.close();
+}
+
 void Database::bindItemToQuery(const Anime& item, QSqlQuery& q) const {
   q.bindValue(":id", item.id);
   q.bindValue(":title", QString::fromStdString(item.titles.romaji));
@@ -240,6 +284,11 @@ void Database::bindEntryToQuery(const ListEntry& entry, QSqlQuery& q) const {
   q.bindValue(":notes", QString::fromStdString(entry.notes));
   q.bindValue(":last_updated", QString::number(entry.last_updated));
   q.bindValue(":pending_delete", entry.pending_delete);
+}
+
+void Database::bindSettingsToQuery(const Settings& settings, QSqlQuery& q) const {
+  q.bindValue(":id", settings.id);
+  q.bindValue(":display_title", QString::fromStdString(settings.display_title));
 }
 
 Anime Database::itemFromQuery(const QSqlQuery& q) const {
@@ -292,6 +341,13 @@ ListEntry Database::entryFromQuery(const QSqlQuery& q) const {
       .last_updated = q.value("last_updated").toInt(),
       .notes = q.value("notes").toString().toStdString(),
       .pending_delete = q.value("pending_delete").toBool(),
+  };
+}
+
+Settings Database::settingsFromQuery(const QSqlQuery& q) const {
+  return {
+      .id = q.value("id").toInt(),
+      .display_title = q.value("display_title").toString().toStdString(),
   };
 }
 

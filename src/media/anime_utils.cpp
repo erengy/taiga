@@ -24,6 +24,7 @@
 
 #include "base/chrono.hpp"
 #include "media/anime.hpp"
+#include "media/anime_db.hpp"
 #include "taiga/settings.hpp"
 
 namespace {
@@ -172,7 +173,11 @@ bool isStale(const Details& item) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-const std::string& preferredTitle(const Details& item) {
+std::string preferredTitle(const Details& item) {
+  if (const auto* settings = db.settings(item.id); settings && !settings->display_title.empty()) {
+    return settings->display_title;
+  }
+
   switch (taiga::settings.titleLanguage()) {
     default:
     case TitleLanguage::Romaji:

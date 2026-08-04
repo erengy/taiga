@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@
 
 #include "media/anime.hpp"
 #include "media/anime_list.hpp"
+#include "media/anime_settings.hpp"
 
 namespace anime {
 
@@ -39,6 +40,7 @@ public:
 
   const Anime* item(const int id) const;
   const ListEntry* entry(const int id) const;
+  const Settings* settings(const int id) const;
 
   const QMap<int, Anime>& items() const;
   const QMap<int, ListEntry>& entries() const;
@@ -46,6 +48,7 @@ public:
   void updateItem(const Anime& item);
   void updateEntry(const ListEntry& entry);
   void deleteEntry(const int animeId);
+  void updateSettings(const Settings& settings);
 
 signals:
   void itemUpdated(const int id);
@@ -61,12 +64,15 @@ private:
 
   void readItems();
   void readEntries();
+  void readSettings();
 
   void bindItemToQuery(const Anime& item, QSqlQuery& q) const;
   void bindEntryToQuery(const ListEntry& entry, QSqlQuery& q) const;
+  void bindSettingsToQuery(const Settings& settings, QSqlQuery& q) const;
 
   Anime itemFromQuery(const QSqlQuery& q) const;
   ListEntry entryFromQuery(const QSqlQuery& q) const;
+  Settings settingsFromQuery(const QSqlQuery& q) const;
 
   void migrateItemsFromV1();
   void migrateListEntriesFromV1();
@@ -75,6 +81,7 @@ private:
 
   QMap<int, Anime> items_;
   QMap<int, ListEntry> entries_;
+  QMap<int, Settings> settings_;
 };
 
 inline Database db;
