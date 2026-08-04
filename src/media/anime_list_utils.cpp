@@ -49,6 +49,8 @@ void save(Entry entry) {
   if (baseline.date_completed != entry.date_completed) dirty |= Field::DateCompleted;
   if (baseline.notes != entry.notes) dirty |= Field::Notes;
 
+  if (!dirty) return;
+
   entry.pending_delete = false;
   entry.last_updated = std::time(nullptr);
   db.updateEntry(entry);
@@ -57,9 +59,7 @@ void save(Entry entry) {
     history.add(entry.anime_id, entry.watched_episodes, entry.last_updated);
   }
 
-  if (dirty) {
-    sync::queue.push(entry.anime_id, dirty);
-  }
+  sync::queue.push(entry.anime_id, dirty);
 }
 
 void remove(const int animeId) {
