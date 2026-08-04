@@ -23,6 +23,7 @@
 
 #include "media/anime.hpp"
 #include "media/anime_list.hpp"
+#include "media/anime_settings.hpp"
 
 class QResizeEvent;
 class QShowEvent;
@@ -63,6 +64,7 @@ private:
   void initTitles();
   void initDetails();
   void initList();
+  void initSettings();
   void loadPosterImage();
   void resizePosterImage();
 
@@ -70,6 +72,7 @@ private:
 
   Anime m_anime;
   std::optional<ListEntry> m_entry;
+  anime::Settings m_settings;
 };
 
 }  // namespace gui

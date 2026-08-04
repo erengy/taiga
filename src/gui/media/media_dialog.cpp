@@ -70,6 +70,7 @@ MediaDialog::MediaDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::MediaDi
     m_anime = *anime::db.item(id);
     initTitles();
     initDetails();
+    initSettings();
   });
 
   connect(&anime::db, &anime::Database::entryUpdated, this, [this](const int id) {
@@ -173,6 +174,7 @@ void MediaDialog::setAnime(const Anime& anime) {
   initTitles();
   initDetails();
   initList();
+  initSettings();
 
   if (anime::isStale(anime)) {
     sync::fetchAnime(anime.id);
@@ -325,6 +327,32 @@ void MediaDialog::initList() {
   ui_->plainTextEditNotes->setPlainText(QString::fromStdString(m_entry->notes));
 }
 
+void MediaDialog::initSettings() {
+  const auto settings = anime::db.settings(m_anime.id);
+  m_settings = settings ? *settings : anime::Settings{.id = m_anime.id};
+
+  ui_->comboDisplayTitle->clear();
+
+  QList<QString> candidates;
+  const auto addCandidate = [&candidates](const QString& title) {
+    if (!title.isEmpty() && !candidates.contains(title)) {
+      candidates.push_back(title);
+    }
+  };
+  addCandidate(QString::fromStdString(m_anime.titles.romaji));
+  addCandidate(QString::fromStdString(m_anime.titles.english));
+  addCandidate(QString::fromStdString(m_anime.titles.japanese));
+  for (const auto& synonym : m_anime.titles.synonyms) {
+    addCandidate(QString::fromStdString(synonym));
+  }
+  addCandidate(QString::fromStdString(m_settings.display_title));
+  ui_->comboDisplayTitle->addItems(candidates);
+
+  ui_->comboDisplayTitle->setCurrentText(QString::fromStdString(m_settings.display_title));
+  ui_->comboDisplayTitle->lineEdit()->setPlaceholderText(
+      QString::fromStdString(anime::preferredTitle(m_anime)));
+}
+
 void MediaDialog::loadPosterImage() {
   const auto posterPixmap = imageProvider.loadPoster(m_anime.id);
   ui_->posterLabel->setPixmap(*posterPixmap);
@@ -349,22 +377,25 @@ void MediaDialog::resizePosterImage() {
 }
 
 void MediaDialog::accept() {
-  if (!m_entry) return;
-
-  m_entry->watched_episodes = ui_->spinProgress->value();
-  m_entry->rewatched_times = ui_->spinRewatches->value();
-  m_entry->rewatching = ui_->checkRewatching->isChecked();
-  m_entry->status = ui_->comboStatus->currentData().value<anime::list::Status>();
-  m_entry->score = ui_->comboScore->currentData().toInt();
-  m_entry->date_started = ui_->checkDateStarted->isChecked()
-                              ? FuzzyDate{ui_->dateStarted->date().toStdSysDays()}
-                              : FuzzyDate{};
-  m_entry->date_completed = ui_->checkDateCompleted->isChecked()
-                                ? FuzzyDate{ui_->dateCompleted->date().toStdSysDays()}
+  if (m_entry) {
+    m_entry->watched_episodes = ui_->spinProgress->value();
+    m_entry->rewatched_times = ui_->spinRewatches->value();
+    m_entry->rewatching = ui_->checkRewatching->isChecked();
+    m_entry->status = ui_->comboStatus->currentData().value<anime::list::Status>();
+    m_entry->score = ui_->comboScore->currentData().toInt();
+    m_entry->date_started = ui_->checkDateStarted->isChecked()
+                                ? FuzzyDate{ui_->dateStarted->date().toStdSysDays()}
                                 : FuzzyDate{};
-  m_entry->notes = ui_->plainTextEditNotes->toPlainText().toStdString();
+    m_entry->date_completed = ui_->checkDateCompleted->isChecked()
+                                  ? FuzzyDate{ui_->dateCompleted->date().toStdSysDays()}
+                                  : FuzzyDate{};
+    m_entry->notes = ui_->plainTextEditNotes->toPlainText().toStdString();
 
-  anime::list::save(*m_entry);
+    anime::list::save(*m_entry);
+  }
+
+  m_settings.display_title = ui_->comboDisplayTitle->currentText().trimmed().toStdString();
+  anime::db.updateSettings(m_settings);
 
   QDialog::accept();
 }

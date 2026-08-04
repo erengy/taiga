@@ -468,25 +468,76 @@
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_14">
               <item>
-               <widget class="QLineEdit" name="lineEdit_3">
-                <property name="text">
-                 <string>Display (#132)</string>
+               <layout class="QVBoxLayout" name="verticalLayout_16">
+                <property name="spacing">
+                 <number>3</number>
                 </property>
-               </widget>
+                <item>
+                 <widget class="QLabel" name="labelDisplayTitle">
+                  <property name="text">
+                   <string>Display:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QComboBox" name="comboDisplayTitle">
+                  <property name="editable">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
               </item>
               <item>
-               <widget class="QLineEdit" name="lineEdit">
-                <property name="text">
-                 <string>Recognition</string>
+               <layout class="QVBoxLayout" name="verticalLayout_17">
+                <property name="spacing">
+                 <number>3</number>
                 </property>
-               </widget>
+                <item>
+                 <widget class="QLabel" name="labelRecognitionTitle">
+                  <property name="text">
+                   <string>Recognition:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPlainTextEdit" name="recognitionTitle">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>16777215</width>
+                    <height>48</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
               </item>
               <item>
-               <widget class="QLineEdit" name="lineEdit_4">
-                <property name="text">
-                 <string>Torrent search</string>
+               <layout class="QVBoxLayout" name="verticalLayout_18">
+                <property name="spacing">
+                 <number>3</number>
                 </property>
-               </widget>
+                <item>
+                 <widget class="QLabel" name="labelTorrentTitle">
+                  <property name="text">
+                   <string>Torrent search:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLineEdit" name="torrentTitle">
+                  <property name="text">
+                   <string/>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
               </item>
              </layout>
             </widget>
@@ -500,7 +551,7 @@
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_3">
                 <item>
-                 <widget class="QLineEdit" name="lineEdit_2">
+                 <widget class="QLineEdit" name="libraryFolder">
                   <property name="text">
                    <string>Folder</string>
                   </property>
