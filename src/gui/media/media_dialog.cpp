@@ -148,18 +148,16 @@ void MediaDialog::showEvent(QShowEvent* event) {
   resizePosterImage();
 }
 
-void MediaDialog::show(QWidget* parent, MediaDialogPage page, const Anime& anime,
-                       const std::optional<ListEntry> entry) {
+void MediaDialog::show(QWidget* parent, MediaDialogPage page, const Anime& anime) {
   auto* dlg = new MediaDialog(parent);
   dlg->setAttribute(Qt::WA_DeleteOnClose);
-  dlg->setAnime(anime, entry);
+  dlg->setAnime(anime);
   dlg->ui_->tabWidget->setCurrentIndex(static_cast<int>(page));
   dlg->QDialog::show();
 }
 
-void MediaDialog::setAnime(const Anime& anime, const std::optional<ListEntry> entry) {
+void MediaDialog::setAnime(const Anime& anime) {
   m_anime = anime;
-  m_entry = entry;
 
   loadPosterImage();
   initTitles();
@@ -261,6 +259,9 @@ void MediaDialog::initDetails() {
 }
 
 void MediaDialog::initList() {
+  const auto entry = anime::db.entry(m_anime.id);
+  m_entry = entry ? std::optional<ListEntry>{*entry} : std::nullopt;
+
   ui_->tabWidget->setTabVisible(1, m_entry.has_value());
 
   if (!m_entry.has_value()) return;

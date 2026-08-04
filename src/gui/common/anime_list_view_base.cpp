@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -72,9 +72,7 @@ void ListViewBase::showMediaDialog(const QModelIndex& index) {
   const auto mappedIndex = m_proxyModel->mapToSource(index);
   const auto anime = m_model->getAnime(mappedIndex);
   if (!anime) return;
-  const auto entry = m_model->getListEntry(mappedIndex);
-  MediaDialog::show(mainWindow(), MediaDialogPage::Details, *anime,
-                    entry ? std::optional<ListEntry>{*entry} : std::nullopt);
+  MediaDialog::show(mainWindow(), MediaDialogPage::Details, *anime);
 }
 
 void ListViewBase::showMediaMenu() {

@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2025, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -63,12 +63,9 @@ void LibraryMenu::rename() const {
 
 void LibraryMenu::viewDetails() const {
   const auto item = anime::db.item(m_anime_id);
-  const auto entry = anime::db.entry(m_anime_id);
-
   if (!item) return;
 
-  MediaDialog::show(parentWidget(), MediaDialogPage::Details, *item,
-                    entry ? std::optional<ListEntry>{*entry} : std::nullopt);
+  MediaDialog::show(parentWidget(), MediaDialogPage::Details, *item);
 }
 
 }  // namespace gui

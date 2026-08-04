@@ -305,20 +305,14 @@ void MediaMenu::viewDetails() const {
   if (m_items.empty()) return;
 
   const auto& anime = m_items.front();
-  const auto entry = getEntry(anime.id);
-
-  MediaDialog::show(parentWidget(), MediaDialogPage::Details, anime,
-                    entry ? std::optional<ListEntry>{*entry} : std::nullopt);
+  MediaDialog::show(parentWidget(), MediaDialogPage::Details, anime);
 }
 
 void MediaMenu::edit() const {
   if (m_items.empty()) return;
 
   const auto& anime = m_items.front();
-  const auto entry = getEntry(anime.id);
-
-  MediaDialog::show(parentWidget(), MediaDialogPage::List, anime,
-                    entry ? std::optional<ListEntry>{*entry} : std::nullopt);
+  MediaDialog::show(parentWidget(), MediaDialogPage::List, anime);
 }
 
 void MediaMenu::addMediaItems() {

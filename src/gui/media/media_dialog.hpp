@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -47,12 +47,11 @@ public:
   MediaDialog(QWidget* parent);
   ~MediaDialog() = default;
 
-  static void show(QWidget* parent, MediaDialogPage page, const Anime& anime,
-                   const std::optional<ListEntry> entry);
+  static void show(QWidget* parent, MediaDialogPage page, const Anime& anime);
 
 public slots:
   void accept() override;
-  void setAnime(const Anime& anime, const std::optional<ListEntry> entry);
+  void setAnime(const Anime& anime);
 
 protected:
   void closeEvent(QCloseEvent* event) override;

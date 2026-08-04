@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -53,7 +53,7 @@ NowPlayingWidget::NowPlayingWidget(QWidget* parent) : QFrame(parent) {
   m_mainLabel = new QLabel(this);
   layout->addWidget(m_mainLabel);
   connect(m_mainLabel, &QLabel::linkActivated, this, [this]() {
-    if (m_anime) MediaDialog::show(this, MediaDialogPage::Details, *m_anime, {});
+    if (m_anime) MediaDialog::show(this, MediaDialogPage::Details, *m_anime);
   });
 
   // Timer

@@ -108,9 +108,7 @@ void HistoryWidget::showMediaDialog(const QModelIndex& index) const {
   const auto item = anime::db.item(historyItem->anime_id);
   if (!item) return;
 
-  const auto entry = anime::db.entry(historyItem->anime_id);
-  MediaDialog::show(mainWindow(), MediaDialogPage::Details, *item,
-                    entry ? std::optional<ListEntry>{*entry} : std::nullopt);
+  MediaDialog::show(mainWindow(), MediaDialogPage::Details, *item);
 }
 
 void HistoryWidget::removeItem(const QModelIndex& index) const {
