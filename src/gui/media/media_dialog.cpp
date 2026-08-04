@@ -72,6 +72,16 @@ MediaDialog::MediaDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::MediaDi
     initDetails();
   });
 
+  connect(&anime::db, &anime::Database::entryUpdated, this, [this](const int id) {
+    if (id != m_anime.id) return;
+    initList();
+  });
+
+  connect(&anime::db, &anime::Database::entryDeleted, this, [this](const int id) {
+    if (id != m_anime.id) return;
+    initList();
+  });
+
   connect(ui_->posterLabel, &ClickableLabel::clicked, this, [this](Qt::MouseButton button) {
     if (button == Qt::MouseButton::LeftButton) {
       QUrl url{sync::animePageUrl(m_anime.id)};
