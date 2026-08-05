@@ -52,6 +52,7 @@ private:
   ComboBox* m_comboSeason = nullptr;
   ComboBox* m_comboType = nullptr;
   ComboBox* m_comboStatus = nullptr;
+  ComboBox* m_comboListStatus = nullptr;
   ListView* m_listView = nullptr;
   ListViewCards* m_listViewCards = nullptr;
   ListViewMode m_viewMode = ListViewMode::Cards;

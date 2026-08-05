@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -82,6 +82,9 @@ gui::AnimeListProxyModelFilter Session::searchListFilters() const {
         .season = optionalInt(json["season"]),
         .type   = optionalInt(json["type"]),
         .status = optionalInt(json["status"]),
+        .listStatus = {
+            .status = optionalInt(json["listStatus"]),
+        },
     };
   }
   // clang-format on
@@ -128,13 +131,16 @@ void Session::setMediaDialogSplitterState(const QByteArray& state) const {
 
 void Session::setSearchListFilters(const gui::AnimeListProxyModelFilter& filters) const {
   // clang-format off
-  const QJsonObject object{
+  QJsonObject object{
       {"year",   filters.year   ? *filters.year   : QJsonValue{}},
       {"season", filters.season ? *filters.season : QJsonValue{}},
       {"type",   filters.type   ? *filters.type   : QJsonValue{}},
       {"status", filters.status ? *filters.status : QJsonValue{}},
   };
   // clang-format on
+  if (filters.listStatus.status) {
+    object["listStatus"] = *filters.listStatus.status;
+  }
   setValue("searchList.filters",
            QJsonDocument{object}.toJson(QJsonDocument::Compact).toBase64().toStdString());
 }

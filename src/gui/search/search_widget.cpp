@@ -47,6 +47,7 @@ SearchWidget::SearchWidget(QWidget* parent)
       m_comboSeason(new ComboBox(this)),
       m_comboType(new ComboBox(this)),
       m_comboStatus(new ComboBox(this)),
+      m_comboListStatus(new ComboBox(this)),
       m_sortMenu(new QMenu(this)),
       m_viewMenu(new QMenu(this)) {
   m_proxyModel->sort(taiga::session.searchListSortColumn(), taiga::session.searchListSortOrder());
@@ -125,6 +126,24 @@ SearchWidget::SearchWidget(QWidget* parent)
       m_proxyModel->setStatusFilter(filterValue(m_comboStatus, index));
     });
     filtersLayout->addWidget(m_comboStatus);
+  }
+
+  // List status
+  {
+    m_comboListStatus->setPlaceholderText("List status");
+    for (const auto status : anime::list::kStatuses) {
+      m_comboListStatus->addItem(formatListStatus(status), static_cast<int>(status));
+    }
+    if (m_proxyModel->filters().listStatus.status) {
+      m_comboListStatus->setCurrentText(formatListStatus(
+          static_cast<anime::list::Status>(*m_proxyModel->filters().listStatus.status)));
+    }
+    connect(m_comboListStatus, &QComboBox::currentIndexChanged, this, [this](int index) {
+      m_proxyModel->setListStatusFilter({
+          .status = filterValue(m_comboListStatus, index),
+      });
+    });
+    filtersLayout->addWidget(m_comboListStatus);
   }
 
   // Toolbar
