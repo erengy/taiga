@@ -31,7 +31,7 @@ public:
 
   void authenticateUser();
   void fetchAnime(const int id);
-  void search(const SearchParams& params);
+  void search(const SearchParams& params, const int page = 1);
   void fetchListEntries();
   void addListEntry(const int id, const anime::list::Fields dirty);
   void deleteListEntry(const int id);

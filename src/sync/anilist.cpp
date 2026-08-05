@@ -110,21 +110,32 @@ void Service::fetchAnime(const int id) {
   manager_.post(api_.createRequest(), data, this, callback);
 }
 
-void Service::search(const SearchParams& params) {
+void Service::search(const SearchParams& params, const int page) {
+  QJsonObject variables{{"page", page}};
+  if (!params.text.isEmpty()) variables["query"] = params.text;
+  if (params.season) variables["season"] = fromSeasonName(*params.season);
+  if (params.year) variables["seasonYear"] = *params.year;
+  if (params.type) variables["format"] = fromType(*params.type);
+  if (params.status) variables["status"] = fromStatus(*params.status);
+
   const QJsonDocument data{{
       {"query", gql("MediaSearch")},
-      {"variables", QJsonObject{{"query", params.text}}},
+      {"variables", variables},
   }};
 
-  const auto callback = [this, params](QRestReply& reply) {
+  const auto callback = [this, params, page](QRestReply& reply) {
     if (isError(reply)) {
       handleError(*this, reply);
       emit searchCompleted(params, {});
       return;
     }
 
-    const auto items = reply.readJson().and_then([](const QJsonDocument& json) {
-      const auto value = json["data"]["Page"]["media"];
+    const auto pageObject = reply.readJson().and_then([](const QJsonDocument& json) {
+      return std::make_optional(json["data"]["Page"].toObject());
+    });
+
+    const auto items = pageObject.and_then([](const QJsonObject& page) {
+      const auto value = page["media"];
       if (!value.isArray()) return std::optional<QList<std::optional<Anime>>>{};
       return std::make_optional(value.toArray() | std::views::transform(parseMedia) |
                                 std::ranges::to<QList>());
@@ -144,6 +155,10 @@ void Service::search(const SearchParams& params) {
     }
 
     emit searchCompleted(params, ids);
+
+    if ((*pageObject)["pageInfo"]["hasNextPage"].toBool()) {
+      search(params, page + 1);
+    }
   };
 
   manager_.post(api_.createRequest(), data, this, callback);
