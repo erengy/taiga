@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,9 +22,9 @@
 #include <QObject>
 #include <QTreeWidget>
 
-namespace gui {
+#include "gui/common/anime_list_context.hpp"
 
-enum class MediaMenuContext;
+namespace gui {
 
 class AnimeListModel;
 class AnimeListProxyModel;
@@ -40,7 +40,7 @@ class ListViewBase final : public QObject {
 
 public:
   ListViewBase(QWidget* parent, QAbstractItemView* view, AnimeListModel* model,
-               AnimeListProxyModel* proxyModel, MediaMenuContext context);
+               AnimeListProxyModel* proxyModel, AnimeListContext context);
   ~ListViewBase() = default;
 
 public slots:
@@ -56,7 +56,7 @@ private:
   AnimeListModel* m_model = nullptr;
   AnimeListProxyModel* m_proxyModel = nullptr;
   QAbstractItemView* m_view = nullptr;
-  const MediaMenuContext m_context;
+  const AnimeListContext m_context;
 };
 
 }  // namespace gui

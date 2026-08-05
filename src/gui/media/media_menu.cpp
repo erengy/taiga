@@ -47,7 +47,7 @@
 namespace gui {
 
 MediaMenu::MediaMenu(QWidget* parent, const QList<Anime>& items, const QMap<int, ListEntry> entries,
-                     QItemSelectionModel* selectionModel, MediaMenuContext context)
+                     QItemSelectionModel* selectionModel, AnimeListContext context)
     : QMenu(parent),
       m_items(items),
       m_entries(entries),
@@ -320,13 +320,13 @@ void MediaMenu::addMediaItems() {
     // View details
     addAction(theme.getIcon("info"), tr("Details"), tr("Enter"), this, &MediaMenu::viewDetails);
 
-    if (m_context != MediaMenuContext::Search) {
+    if (m_context != AnimeListContext::Search) {
       // Search
       addAction(theme.getIcon("search"), tr("Search"), this, &MediaMenu::search);
     }
   }
 
-  if (m_context == MediaMenuContext::Search) {
+  if (m_context == AnimeListContext::Search) {
     // Refresh
     addAction(theme.getIcon("sync"), tr("Refresh"), this, &MediaMenu::refresh);
   }

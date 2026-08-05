@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@
 namespace gui {
 
 ListView::ListView(QWidget* parent, AnimeListModel* model, AnimeListProxyModel* proxyModel,
-                   MediaMenuContext context)
+                   AnimeListContext context)
     : m_base(new ListViewBase(parent, this, model, proxyModel, context)) {
   setObjectName("animeList");
 

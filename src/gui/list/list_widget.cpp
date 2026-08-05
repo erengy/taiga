@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,11 +28,11 @@
 #include <format>
 
 #include "base/string.hpp"
+#include "gui/common/anime_list_context.hpp"
 #include "gui/common/anime_list_view.hpp"
 #include "gui/common/anime_list_view_cards.hpp"
 #include "gui/main/main_window.hpp"
 #include "gui/main/navigation_widget.hpp"
-#include "gui/media/media_menu.hpp"
 #include "gui/models/anime_list_model.hpp"
 #include "gui/models/anime_list_proxy_model.hpp"
 #include "gui/utils/theme.hpp"
@@ -86,13 +86,13 @@ void ListWidget::setViewMode(ListViewMode mode) {
 
   switch (mode) {
     case ListViewMode::List:
-      m_listView = new ListView(this, m_model, m_proxyModel, MediaMenuContext::List);
+      m_listView = new ListView(this, m_model, m_proxyModel, AnimeListContext::List);
       layout()->addWidget(m_listView);
       m_listView->show();
       break;
 
     case ListViewMode::Cards:
-      m_listViewCards = new ListViewCards(this, m_model, m_proxyModel, MediaMenuContext::List);
+      m_listViewCards = new ListViewCards(this, m_model, m_proxyModel, AnimeListContext::List);
       layout()->addWidget(m_listViewCards);
       m_listViewCards->show();
       break;

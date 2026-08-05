@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@
 #include <QMap>
 #include <QMenu>
 
+#include "gui/common/anime_list_context.hpp"
 #include "media/anime.hpp"
 #include "media/anime_list.hpp"
 
@@ -29,18 +30,13 @@ class QItemSelectionModel;
 
 namespace gui {
 
-enum class MediaMenuContext {
-  List,
-  Search,
-};
-
 class MediaMenu final : public QMenu {
   Q_OBJECT
   Q_DISABLE_COPY_MOVE(MediaMenu)
 
 public:
   MediaMenu(QWidget* parent, const QList<Anime>& items, const QMap<int, ListEntry> entries,
-            QItemSelectionModel* selectionModel, MediaMenuContext context);
+            QItemSelectionModel* selectionModel, AnimeListContext context);
   ~MediaMenu() = default;
 
   void popup();
@@ -86,7 +82,7 @@ private:
   const QList<Anime> m_items;
   const QMap<int, ListEntry> m_entries;
   QItemSelectionModel* m_selectionModel = nullptr;
-  const MediaMenuContext m_context;
+  const AnimeListContext m_context;
 };
 
 }  // namespace gui
