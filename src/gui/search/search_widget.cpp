@@ -70,8 +70,10 @@ SearchWidget::SearchWidget(QWidget* parent)
     if (m_proxyModel->filters().year) {
       m_comboYear->setCurrentText(QString::number(*m_proxyModel->filters().year));
     }
-    connect(m_comboYear, &QComboBox::currentIndexChanged, this,
-            [this](int index) { m_proxyModel->setYearFilter(filterValue(m_comboYear, index)); });
+    connect(m_comboYear, &QComboBox::currentIndexChanged, this, [this](int index) {
+      m_proxyModel->setYearFilter(filterValue(m_comboYear, index));
+      performSearch();
+    });
     filtersLayout->addWidget(m_comboYear);
   }
 
@@ -93,6 +95,7 @@ SearchWidget::SearchWidget(QWidget* parent)
     }
     connect(m_comboSeason, &QComboBox::currentIndexChanged, this, [this](int index) {
       m_proxyModel->setSeasonFilter(filterValue(m_comboSeason, index));
+      performSearch();
     });
     filtersLayout->addWidget(m_comboSeason);
   }
@@ -107,8 +110,10 @@ SearchWidget::SearchWidget(QWidget* parent)
       m_comboType->setCurrentText(
           formatType(static_cast<anime::Type>(*m_proxyModel->filters().type)));
     }
-    connect(m_comboType, &QComboBox::currentIndexChanged, this,
-            [this](int index) { m_proxyModel->setTypeFilter(filterValue(m_comboType, index)); });
+    connect(m_comboType, &QComboBox::currentIndexChanged, this, [this](int index) {
+      m_proxyModel->setTypeFilter(filterValue(m_comboType, index));
+      performSearch();
+    });
     filtersLayout->addWidget(m_comboType);
   }
 
@@ -124,6 +129,7 @@ SearchWidget::SearchWidget(QWidget* parent)
     }
     connect(m_comboStatus, &QComboBox::currentIndexChanged, this, [this](int index) {
       m_proxyModel->setStatusFilter(filterValue(m_comboStatus, index));
+      performSearch();
     });
     filtersLayout->addWidget(m_comboStatus);
   }
@@ -171,15 +177,13 @@ SearchWidget::SearchWidget(QWidget* parent)
   setViewMode(taiga::session.searchListViewMode());
 
   // Search
-  connect(mainWindow()->searchBox(), &QLineEdit::returnPressed, this, [this]() {
-    if (!isVisible()) return;
-    sync::search({.text = mainWindow()->searchBox()->text()});
-  });
+  connect(mainWindow()->searchBox(), &QLineEdit::returnPressed, this,
+          [this]() { performSearch(); });
 
   // @TODO: Revise once other services are implemented
   connect(sync::anilist::Service::instance(), &sync::Service::searchCompleted, this,
           [this](const sync::SearchParams& params, const QList<int>& ids) {
-            if (params.text != mainWindow()->searchBox()->text()) return;
+            if (params != currentSearchParams()) return;
             m_model->addIds(ids);
           });
 }
@@ -272,6 +276,33 @@ void SearchWidget::setViewMode(ListViewMode mode) {
       m_listViewCards->show();
       break;
   }
+}
+
+sync::SearchParams SearchWidget::currentSearchParams() const {
+  const auto& filters = m_proxyModel->filters();
+
+  return {
+      .text = mainWindow()->searchBox()->text(),
+      .year = filters.year,
+      .season = filters.season ? std::make_optional(static_cast<anime::SeasonName>(*filters.season))
+                               : std::nullopt,
+      .type =
+          filters.type ? std::make_optional(static_cast<anime::Type>(*filters.type)) : std::nullopt,
+      .status = filters.status ? std::make_optional(static_cast<anime::Status>(*filters.status))
+                               : std::nullopt,
+  };
+}
+
+void SearchWidget::performSearch() {
+  if (!isVisible()) return;
+
+  const auto params = currentSearchParams();
+
+  if (params.text.isEmpty() && !params.year && !params.season && !params.type && !params.status) {
+    return;
+  }
+
+  sync::search(params);
 }
 
 }  // namespace gui

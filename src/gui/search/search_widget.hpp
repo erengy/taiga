@@ -24,6 +24,10 @@
 #include "gui/common/combobox.hpp"
 #include "gui/common/page_widget.hpp"
 
+namespace sync {
+struct SearchParams;
+}
+
 namespace gui {
 
 class AnimeListModel;
@@ -45,6 +49,9 @@ private:
   void initSortMenu();
   void initViewMenu();
   void setViewMode(ListViewMode mode);
+
+  sync::SearchParams currentSearchParams() const;
+  void performSearch();
 
   AnimeListModel* m_model = nullptr;
   AnimeListProxyModel* m_proxyModel = nullptr;
