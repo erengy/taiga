@@ -19,6 +19,7 @@
 #include "anime_list_view_cards.hpp"
 
 #include <QKeyEvent>
+#include <QMouseEvent>
 #include <QScrollBar>
 #include <QWheelEvent>
 
@@ -54,6 +55,19 @@ void ListViewCards::keyPressEvent(QKeyEvent* event) {
   }
 
   QListView::keyPressEvent(event);
+}
+
+void ListViewCards::mousePressEvent(QMouseEvent* event) {
+  if (event->button() == Qt::MouseButton::MiddleButton) {
+    const QModelIndex index = indexAt(event->pos());
+    if (index.isValid()) {
+      setCurrentIndex(index);
+      m_base->playNextEpisode(index);
+      return;
+    }
+  }
+
+  QListView::mousePressEvent(event);
 }
 
 void ListViewCards::paintEvent(QPaintEvent* event) {
