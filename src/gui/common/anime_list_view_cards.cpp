@@ -62,7 +62,11 @@ void ListViewCards::mousePressEvent(QMouseEvent* event) {
     const QModelIndex index = indexAt(event->pos());
     if (index.isValid()) {
       setCurrentIndex(index);
-      m_base->playNextEpisode(index);
+      if (m_base->context() == AnimeListContext::Search) {
+        m_base->openAnimePage(index);
+      } else {
+        m_base->playNextEpisode(index);
+      }
       return;
     }
   }

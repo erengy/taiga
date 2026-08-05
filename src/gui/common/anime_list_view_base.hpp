@@ -43,8 +43,13 @@ public:
                AnimeListProxyModel* proxyModel, AnimeListContext context);
   ~ListViewBase() = default;
 
+  AnimeListContext context() const {
+    return m_context;
+  }
+
 public slots:
   void filterByText(const QString& text);
+  void openAnimePage(const QModelIndex& index);
   void playNextEpisode(const QModelIndex& index);
   void showMediaDialog(const QModelIndex& index);
   void showMediaMenu();
