@@ -70,6 +70,33 @@ QString fromSeasonName(const anime::SeasonName name) {
   return "";
 }
 
+QString fromStatus(const anime::Status value) {
+  // clang-format off
+  switch (value) {
+    case anime::Status::Unknown: return "";
+    case anime::Status::FinishedAiring: return "FINISHED";
+    case anime::Status::Airing: return "RELEASING";
+    case anime::Status::NotYetAired: return "NOT_YET_RELEASED";
+  }
+  // clang-format on
+  return "";
+}
+
+QString fromType(const anime::Type value) {
+  // clang-format off
+  switch (value) {
+    case anime::Type::Unknown: return "";
+    case anime::Type::Tv: return "TV";
+    case anime::Type::Ova: return "OVA";
+    case anime::Type::Movie: return "MOVIE";
+    case anime::Type::Special: return "SPECIAL";
+    case anime::Type::Ona: return "ONA";
+    case anime::Type::Music: return "MUSIC";
+  }
+  // clang-format on
+  return "";
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 QString gql(const QString& name) {

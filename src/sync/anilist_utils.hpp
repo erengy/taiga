@@ -29,6 +29,8 @@ class FuzzyDate;
 
 namespace anime {
 enum class SeasonName;
+enum class Status;
+enum class Type;
 }
 
 namespace anime::list {
@@ -41,6 +43,8 @@ QJsonObject fromFuzzyDate(const base::FuzzyDate& date);
 QString fromListStatus(const anime::list::Status value);
 float fromScore(float value);
 QString fromSeasonName(const anime::SeasonName name);
+QString fromStatus(const anime::Status value);
+QString fromType(const anime::Type value);
 
 QString gql(const QString& name);
 

@@ -1,6 +1,6 @@
-query ($query: String, $season: MediaSeason, $seasonYear: Int, $page: Int) {
+query ($query: String, $season: MediaSeason, $seasonYear: Int, $format: MediaFormat, $status: MediaStatus, $page: Int) {
   Page(page: $page) {
-    media(search: $query, season: $season, seasonYear: $seasonYear, type: ANIME, sort: START_DATE) {
+    media(search: $query, season: $season, seasonYear: $seasonYear, format: $format, status: $status, type: ANIME, sort: START_DATE) {
       ...MediaFragment
     }
     pageInfo {
