@@ -51,10 +51,15 @@ ListView::ListView(QWidget* parent, AnimeListModel* model, AnimeListProxyModel* 
   header()->setTextElideMode(Qt::ElideRight);
   header()->hideSection(AnimeListModel::COLUMN_DURATION);
   header()->hideSection(AnimeListModel::COLUMN_REWATCHES);
-  header()->hideSection(AnimeListModel::COLUMN_AVERAGE);
   header()->hideSection(AnimeListModel::COLUMN_STARTED);
   header()->hideSection(AnimeListModel::COLUMN_COMPLETED);
   header()->hideSection(AnimeListModel::COLUMN_NOTES);
+  if (context == AnimeListContext::Search) {
+    header()->hideSection(AnimeListModel::COLUMN_SCORE);
+    header()->hideSection(AnimeListModel::COLUMN_LAST_UPDATED);
+  } else {
+    header()->hideSection(AnimeListModel::COLUMN_AVERAGE);
+  }
   header()->resizeSection(AnimeListModel::COLUMN_TITLE, 295);
   header()->resizeSection(AnimeListModel::COLUMN_PROGRESS, 150);
   header()->resizeSection(AnimeListModel::COLUMN_DURATION, 75);
