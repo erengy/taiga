@@ -110,16 +110,16 @@ void Service::fetchAnime(const int id) {
   manager_.post(api_.createRequest(), data, this, callback);
 }
 
-void Service::search(const QString& query) {
+void Service::search(const SearchParams& params) {
   const QJsonDocument data{{
       {"query", gql("MediaSearch")},
-      {"variables", QJsonObject{{"query", query}}},
+      {"variables", QJsonObject{{"query", params.text}}},
   }};
 
-  const auto callback = [this, query](QRestReply& reply) {
+  const auto callback = [this, params](QRestReply& reply) {
     if (isError(reply)) {
       handleError(*this, reply);
-      emit searchCompleted(query, {});
+      emit searchCompleted(params, {});
       return;
     }
 
@@ -132,7 +132,7 @@ void Service::search(const QString& query) {
 
     if (!items) {
       handleError(*this, reply, "Could not parse search results.");
-      emit searchCompleted(query, {});
+      emit searchCompleted(params, {});
       return;
     }
 
@@ -143,7 +143,7 @@ void Service::search(const QString& query) {
       ids.append(item->id);
     }
 
-    emit searchCompleted(query, ids);
+    emit searchCompleted(params, ids);
   };
 
   manager_.post(api_.createRequest(), data, this, callback);

@@ -22,8 +22,11 @@
 #include <QNetworkRequestFactory>
 #include <QRestAccessManager>
 #include <QString>
+#include <optional>
 
+#include "media/anime.hpp"
 #include "media/anime_list.hpp"
+#include "media/anime_season.hpp"
 
 namespace sync {
 
@@ -39,6 +42,16 @@ struct Rating {
   QString text;
 };
 
+struct SearchParams {
+  QString text;
+  std::optional<int> year;
+  std::optional<anime::SeasonName> season;
+  std::optional<anime::Type> type;
+  std::optional<anime::Status> status;
+
+  bool operator==(const SearchParams&) const = default;
+};
+
 class Service : public QObject {
   Q_OBJECT
   Q_DISABLE_COPY_MOVE(Service)
@@ -51,7 +64,7 @@ public:
 
 signals:
   void authenticationCompleted(bool authenticated);
-  void searchCompleted(const QString& query, const QList<int>& ids);
+  void searchCompleted(const SearchParams& params, const QList<int>& ids);
   void errorOccurred(const QString& message);
 
 protected:
@@ -75,7 +88,7 @@ QString tagMessage(const ServiceId serviceId, const QString& message);
 void authenticateUser();
 void fetchAnime(const int id);
 void fetchListEntries();
-void search(const QString& query);
+void search(const SearchParams& params);
 void synchronize();
 
 void addListEntry(const int id, const anime::list::Fields dirty);

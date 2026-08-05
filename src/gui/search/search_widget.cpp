@@ -173,13 +173,13 @@ SearchWidget::SearchWidget(QWidget* parent)
   // Search
   connect(mainWindow()->searchBox(), &QLineEdit::returnPressed, this, [this]() {
     if (!isVisible()) return;
-    sync::search(mainWindow()->searchBox()->text());
+    sync::search({.text = mainWindow()->searchBox()->text()});
   });
 
   // @TODO: Revise once other services are implemented
   connect(sync::anilist::Service::instance(), &sync::Service::searchCompleted, this,
-          [this](const QString& query, const QList<int>& ids) {
-            if (query != mainWindow()->searchBox()->text()) return;
+          [this](const sync::SearchParams& params, const QList<int>& ids) {
+            if (params.text != mainWindow()->searchBox()->text()) return;
             m_model->addIds(ids);
           });
 }

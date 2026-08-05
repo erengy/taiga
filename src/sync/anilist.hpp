@@ -31,7 +31,7 @@ public:
 
   void authenticateUser();
   void fetchAnime(const int id);
-  void search(const QString& query);
+  void search(const SearchParams& params);
   void fetchListEntries();
   void addListEntry(const int id, const anime::list::Fields dirty);
   void deleteListEntry(const int id);

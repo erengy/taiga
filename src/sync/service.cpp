@@ -146,14 +146,14 @@ void fetchListEntries() {
   }
 }
 
-void search(const QString& query) {
+void search(const SearchParams& params) {
   switch (currentServiceId()) {
     case ServiceId::MyAnimeList:
       break;
     case ServiceId::Kitsu:
       break;
     case ServiceId::AniList:
-      anilist::Service::instance()->search(query);
+      anilist::Service::instance()->search(params);
       break;
   }
 }
