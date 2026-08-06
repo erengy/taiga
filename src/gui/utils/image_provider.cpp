@@ -18,7 +18,9 @@
 
 #include "image_provider.hpp"
 
+#include <QDir>
 #include <QFile>
+#include <QFileInfo>
 #include <QImage>
 #include <QImageReader>
 #include <QNetworkRequest>
@@ -53,6 +55,7 @@ void ImageProvider::fetchPoster(const int id) {
     }
 
     QFile file{fileName(id)};
+    QDir().mkpath(QFileInfo(file).path());
     if (!file.open(QIODevice::WriteOnly)) return;
     file.write(reply.readBody());
     reloadPoster(id);
