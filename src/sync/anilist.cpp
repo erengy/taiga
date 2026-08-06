@@ -156,7 +156,9 @@ void Service::search(const SearchParams& params, const int page) {
 
     emit searchCompleted(params, ids);
 
-    if ((*pageObject)["pageInfo"]["hasNextPage"].toBool()) {
+    // Auto-paginate only for season browsing.
+    const bool seasonScoped = params.season.has_value() && params.year.has_value();
+    if (seasonScoped && (*pageObject)["pageInfo"]["hasNextPage"].toBool()) {
       search(params, page + 1);
     }
   };
