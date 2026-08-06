@@ -37,6 +37,21 @@
 #include "sync/service.hpp"
 #include "taiga/session.hpp"
 
+namespace {
+
+std::optional<sync::SearchSort> toSearchSort(gui::AnimeListModel::Column column) {
+  switch (column) {
+    case gui::AnimeListModel::COLUMN_TITLE: return sync::SearchSort::Title;
+    case gui::AnimeListModel::COLUMN_DURATION: return sync::SearchSort::Duration;
+    case gui::AnimeListModel::COLUMN_AVERAGE: return sync::SearchSort::Score;
+    case gui::AnimeListModel::COLUMN_TYPE: return sync::SearchSort::Type;
+    case gui::AnimeListModel::COLUMN_SEASON: return sync::SearchSort::StartDate;
+    default: return std::nullopt;
+  }
+}
+
+}  // namespace
+
 namespace gui {
 
 SearchWidget::SearchWidget(QWidget* parent)
@@ -290,6 +305,8 @@ sync::SearchParams SearchWidget::currentSearchParams() const {
           filters.type ? std::make_optional(static_cast<anime::Type>(*filters.type)) : std::nullopt,
       .status = filters.status ? std::make_optional(static_cast<anime::Status>(*filters.status))
                                : std::nullopt,
+      .sort = toSearchSort(static_cast<AnimeListModel::Column>(m_proxyModel->sortColumn())),
+      .sortOrder = m_proxyModel->sortOrder(),
   };
 }
 

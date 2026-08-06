@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@
 #include "media/anime.hpp"
 #include "media/anime_list.hpp"
 #include "media/anime_season.hpp"
+#include "sync/search_params.hpp"
 
 namespace sync::anilist {
 
@@ -55,6 +56,25 @@ QString fromListStatus(const anime::list::Status value) {
 
 float fromScore(float value) {
   return value * 10.0f;
+}
+
+QString fromSearchParams(const SearchParams params) {
+  if (!params.text.isEmpty()) return "SEARCH_MATCH";
+
+  if (params.sort) {
+    const auto descending = params.sortOrder == Qt::SortOrder::DescendingOrder;
+    // clang-format off
+    switch (*params.sort) {
+      case SearchSort::Title: return descending ? "TITLE_ROMAJI_DESC" : "TITLE_ROMAJI";
+      case SearchSort::Duration: return descending ? "DURATION_DESC" : "DURATION";
+      case SearchSort::Score: return descending ? "SCORE_DESC" : "SCORE";
+      case SearchSort::Type: return descending ? "FORMAT_DESC" : "FORMAT";
+      case SearchSort::StartDate: return descending ? "START_DATE_DESC" : "START_DATE";
+    }
+    // clang-format on
+  }
+
+  return "START_DATE";
 }
 
 QString fromSeasonName(const anime::SeasonName name) {

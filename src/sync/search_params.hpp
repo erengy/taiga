@@ -19,41 +19,31 @@
 #pragma once
 
 #include <QString>
-#include <string>
+#include <optional>
 
-class QJsonObject;
-
-namespace base {
-class FuzzyDate;
-}
-
-namespace anime {
-enum class SeasonName;
-enum class Status;
-enum class Type;
-}
-
-namespace anime::list {
-enum class Status;
-}
+#include "media/anime.hpp"
+#include "media/anime_season.hpp"
 
 namespace sync {
-struct SearchParams;
-}
 
-namespace sync::anilist {
+enum class SearchSort {
+  Title,
+  Duration,
+  Score,
+  Type,
+  StartDate,
+};
 
-QJsonObject fromFuzzyDate(const base::FuzzyDate& date);
-QString fromListStatus(const anime::list::Status value);
-float fromScore(float value);
-QString fromSearchParams(const SearchParams params);
-QString fromSeasonName(const anime::SeasonName name);
-QString fromStatus(const anime::Status value);
-QString fromType(const anime::Type value);
+struct SearchParams {
+  QString text;
+  std::optional<int> year;
+  std::optional<anime::SeasonName> season;
+  std::optional<anime::Type> type;
+  std::optional<anime::Status> status;
+  std::optional<SearchSort> sort;
+  Qt::SortOrder sortOrder = Qt::SortOrder::AscendingOrder;
 
-QString gql(const QString& name);
+  bool operator==(const SearchParams&) const = default;
+};
 
-std::string animePageUrl(const int id);
-std::string requestTokenUrl();
-
-}  // namespace sync::anilist
+}  // namespace sync

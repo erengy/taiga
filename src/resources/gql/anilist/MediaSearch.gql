@@ -4,6 +4,7 @@ query (
   $seasonYear: Int
   $format: MediaFormat
   $status: MediaStatus
+  $sort: [MediaSort]
   $page: Int
 ) {
   Page(page: $page) {
@@ -14,7 +15,7 @@ query (
       format: $format
       status: $status
       type: ANIME
-      sort: START_DATE
+      sort: $sort
     ) {
       ...MediaFragment
     }

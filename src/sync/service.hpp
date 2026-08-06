@@ -22,11 +22,9 @@
 #include <QNetworkRequestFactory>
 #include <QRestAccessManager>
 #include <QString>
-#include <optional>
 
-#include "media/anime.hpp"
 #include "media/anime_list.hpp"
-#include "media/anime_season.hpp"
+#include "sync/search_params.hpp"
 
 namespace sync {
 
@@ -40,16 +38,6 @@ enum class ServiceId {
 struct Rating {
   int value = 0;
   QString text;
-};
-
-struct SearchParams {
-  QString text;
-  std::optional<int> year;
-  std::optional<anime::SeasonName> season;
-  std::optional<anime::Type> type;
-  std::optional<anime::Status> status;
-
-  bool operator==(const SearchParams&) const = default;
 };
 
 class Service : public QObject {

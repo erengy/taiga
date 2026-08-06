@@ -117,6 +117,7 @@ void Service::search(const SearchParams& params, const int page) {
   if (params.year) variables["seasonYear"] = *params.year;
   if (params.type) variables["format"] = fromType(*params.type);
   if (params.status) variables["status"] = fromStatus(*params.status);
+  variables["sort"] = QJsonArray{fromSearchParams(params)};
 
   const QJsonDocument data{{
       {"query", gql("MediaSearch")},
