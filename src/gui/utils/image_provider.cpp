@@ -41,6 +41,17 @@ void ImageProvider::fetchPoster(const int id) {
   const auto url = QString::fromStdString(item->image_url);
 
   m_manager.get(QNetworkRequest{url}, this, [this, id](QRestReply& reply) {
+    if (!reply.isHttpStatusSuccess() || reply.hasError()) {
+      if (reply.httpStatus() == 404) {
+        if (const auto item = anime::db.item(id)) {
+          auto updatedItem = *item;
+          updatedItem.image_url.clear();
+          anime::db.updateItem(updatedItem);
+        }
+      }
+      return;
+    }
+
     QFile file{fileName(id)};
     if (!file.open(QIODevice::WriteOnly)) return;
     file.write(reply.readBody());
