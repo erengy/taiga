@@ -8,19 +8,45 @@ fragment MediaFragment on Media {
   format
   status
   description
-  startDate { year month day }
-  endDate { year month day }
+  startDate {
+    year
+    month
+    day
+  }
+  endDate {
+    year
+    month
+    day
+  }
   episodes
   duration
   countryOfOrigin
-  trailer { id site }
+  trailer {
+    id
+    site
+  }
   updatedAt
-  coverImage { extraLarge }
+  coverImage {
+    extraLarge
+  }
   genres
   synonyms
   averageScore
   popularity
-  tags { name isMediaSpoiler }
-  studios { edges { isMain node { name } } }
-  nextAiringEpisode { airingAt episode }
+  tags {
+    name
+    isMediaSpoiler
+  }
+  studios {
+    edges {
+      isMain
+      node {
+        name
+      }
+    }
+  }
+  nextAiringEpisode {
+    airingAt
+    episode
+  }
 }

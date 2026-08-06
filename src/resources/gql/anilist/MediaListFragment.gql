@@ -6,7 +6,15 @@ fragment MediaListFragment on MediaList {
   repeat
   private
   notes
-  startedAt { year month day }
-  completedAt { year month day }
+  startedAt {
+    year
+    month
+    day
+  }
+  completedAt {
+    year
+    month
+    day
+  }
   updatedAt
 }

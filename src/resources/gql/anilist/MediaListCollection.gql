@@ -1,5 +1,5 @@
 query ($userName: String!) {
-  MediaListCollection (userName: $userName, type: ANIME) {
+  MediaListCollection(userName: $userName, type: ANIME) {
     lists {
       entries {
         ...MediaListFragment
