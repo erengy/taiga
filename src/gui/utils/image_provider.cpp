@@ -18,6 +18,7 @@
 
 #include "image_provider.hpp"
 
+#include <QDateTime>
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
@@ -31,6 +32,7 @@
 
 #include "base/string.hpp"
 #include "media/anime_db.hpp"
+#include "media/anime_utils.hpp"
 #include "sync/service.hpp"
 #include "taiga/network.hpp"
 #include "taiga/path.hpp"
@@ -39,14 +41,20 @@ namespace gui {
 
 ImageProvider::ImageProvider() : m_manager(taiga::network(), this) {}
 
-void ImageProvider::fetchPoster(const int id) {
+void ImageProvider::fetchPoster(const int id, const bool revalidate) {
   const auto item = anime::db.item(id);
 
   if (!item || item->image_url.empty()) return;
 
-  const auto url = QString::fromStdString(item->image_url);
+  QNetworkRequest request{QString::fromStdString(item->image_url)};
 
-  m_manager.get(QNetworkRequest{url}, this, [this, id](QRestReply& reply) {
+  if (revalidate) {
+    if (const QFileInfo file{fileName(id)}; file.exists()) {
+      request.setHeader(QNetworkRequest::IfModifiedSinceHeader, file.lastModified());
+    }
+  }
+
+  m_manager.get(request, this, [this, id](QRestReply& reply) {
     if (!reply.isHttpStatusSuccess() || reply.hasError()) {
       if (reply.httpStatus() == 404) {
         if (const auto item = anime::db.item(id)) {
@@ -85,7 +93,11 @@ QPixmap ImageProvider::loadPoster(const int id) {
     const QImage image = watcher->result();
     m_pixmaps[id] = !image.isNull() ? QPixmap::fromImage(image) : QPixmap{};
 
-    if (image.isNull()) fetchPoster(id);
+    if (image.isNull()) {
+      fetchPoster(id);
+    } else if (isStale(id)) {
+      fetchPoster(id, true);
+    }
 
     emit posterChanged(id);
   });
@@ -112,6 +124,21 @@ QString ImageProvider::fileName(const int id) const {
   }
 
   return u"%1/cache/%2/media/%3.%4"_s.arg(path).arg(service).arg(id).arg(extension);
+}
+
+bool ImageProvider::isStale(const int id) const {
+  constexpr int kStaleDays = 7;
+
+  const auto item = anime::db.item(id);
+
+  if (!item) return false;
+
+  if (anime::airingStatus(*item) == anime::Status::FinishedAiring) {
+    return false;
+  }
+
+  const QFileInfo file{fileName(id)};
+  return file.lastModified().daysTo(QDateTime::currentDateTime()) >= kStaleDays;
 }
 
 }  // namespace gui

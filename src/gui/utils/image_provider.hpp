@@ -33,7 +33,7 @@ class ImageProvider final : public QObject {
 public:
   ImageProvider();
 
-  void fetchPoster(const int id);
+  void fetchPoster(const int id, const bool revalidate = false);
   QPixmap loadPoster(const int id);
   void reloadPoster(const int id);
 
@@ -42,6 +42,7 @@ signals:
 
 private:
   QString fileName(const int id) const;
+  bool isStale(const int id) const;
 
   QRestAccessManager m_manager;
   QMap<int, QPixmap> m_pixmaps;
