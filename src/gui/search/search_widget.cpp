@@ -238,6 +238,11 @@ void SearchWidget::initSortMenu() {
       } else {
         m_proxyModel->sort(column, order);
       }
+
+      const auto params = currentSearchParams();
+      if (!(params.season && params.year)) {
+        performSearch();
+      }
     });
 
     action->setCheckable(true);
