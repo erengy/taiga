@@ -21,11 +21,13 @@
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
+#include <QFutureWatcher>
 #include <QImage>
 #include <QImageReader>
 #include <QNetworkRequest>
 #include <QRestReply>
 #include <QUrl>
+#include <QtConcurrentRun>
 
 #include "base/string.hpp"
 #include "media/anime_db.hpp"
@@ -69,21 +71,32 @@ QPixmap ImageProvider::loadPoster(const int id) {
     return it.value();
   }
 
-  QImageReader reader(fileName(id));
-  const QImage image = reader.read();
+  m_pixmaps[id] = QPixmap{};
 
-  const auto pixmap = !image.isNull() ? QPixmap::fromImage(image) : QPixmap{};
-  m_pixmaps[id] = pixmap;
+  const auto future = QtConcurrent::run([fileName = fileName(id)] {
+    QImageReader reader(fileName);
+    return reader.read();
+  });
 
-  if (image.isNull()) fetchPoster(id);
+  const auto watcher = new QFutureWatcher<QImage>(this);
+  connect(watcher, &QFutureWatcherBase::finished, this, [this, id, watcher]() {
+    watcher->deleteLater();
 
-  return pixmap;
+    const QImage image = watcher->result();
+    m_pixmaps[id] = !image.isNull() ? QPixmap::fromImage(image) : QPixmap{};
+
+    if (image.isNull()) fetchPoster(id);
+
+    emit posterChanged(id);
+  });
+  watcher->setFuture(future);
+
+  return QPixmap{};
 }
 
 void ImageProvider::reloadPoster(const int id) {
   m_pixmaps.remove(id);
   loadPoster(id);
-  emit posterChanged(id);
 }
 
 QString ImageProvider::fileName(const int id) const {
