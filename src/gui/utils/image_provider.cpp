@@ -25,6 +25,7 @@
 #include <QImageReader>
 #include <QNetworkRequest>
 #include <QRestReply>
+#include <QUrl>
 
 #include "base/string.hpp"
 #include "media/anime_db.hpp"
@@ -89,8 +90,15 @@ QString ImageProvider::fileName(const int id) const {
   const auto path = QString::fromStdString(taiga::get_data_path());
   const auto service = sync::serviceSlug(sync::currentServiceId());
 
-  // @TODO: Support other formats (#1191)
-  return u"%1/cache/%2/media/%3.jpg"_s.arg(path).arg(service).arg(id);
+  auto extension = u"jpg"_s;
+  if (const auto item = anime::db.item(id); item && !item->image_url.empty()) {
+    const QUrl url{QString::fromStdString(item->image_url)};
+    if (const auto suffix = QFileInfo(url.path()).suffix(); !suffix.isEmpty()) {
+      extension = suffix;
+    }
+  }
+
+  return u"%1/cache/%2/media/%3.%4"_s.arg(path).arg(service).arg(id).arg(extension);
 }
 
 }  // namespace gui
