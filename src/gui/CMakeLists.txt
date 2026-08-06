@@ -86,6 +86,7 @@ target_sources(taiga-gui PRIVATE
 )
 
 target_link_libraries(taiga-gui
+	Qt6::Concurrent
 	Qt6::Core
 	Qt6::Gui
 	Qt6::Network
