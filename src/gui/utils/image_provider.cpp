@@ -28,6 +28,7 @@
 
 #include "base/string.hpp"
 #include "media/anime_db.hpp"
+#include "sync/service.hpp"
 #include "taiga/network.hpp"
 #include "taiga/path.hpp"
 
@@ -86,7 +87,10 @@ void ImageProvider::reloadPoster(const int id) {
 
 QString ImageProvider::fileName(const int id) const {
   const auto path = QString::fromStdString(taiga::get_data_path());
-  return u"%1/v1/db/image/%2.jpg"_s.arg(path).arg(id);  // @TODO: Support other formats (#1191)
+  const auto service = sync::serviceSlug(sync::currentServiceId());
+
+  // @TODO: Support other formats (#1191)
+  return u"%1/cache/%2/media/%3.jpg"_s.arg(path).arg(service).arg(id);
 }
 
 }  // namespace gui
