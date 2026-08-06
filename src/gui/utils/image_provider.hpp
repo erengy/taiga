@@ -34,7 +34,7 @@ public:
   ImageProvider();
 
   void fetchPoster(const int id);
-  const QPixmap* loadPoster(const int id);
+  QPixmap loadPoster(const int id);
   void reloadPoster(const int id);
 
 signals:

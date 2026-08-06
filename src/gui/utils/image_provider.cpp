@@ -59,19 +59,20 @@ void ImageProvider::fetchPoster(const int id) {
   });
 }
 
-const QPixmap* ImageProvider::loadPoster(const int id) {
+QPixmap ImageProvider::loadPoster(const int id) {
   if (const auto it = m_pixmaps.find(id); it != m_pixmaps.end()) {
-    return &it.value();
+    return it.value();
   }
 
   QImageReader reader(fileName(id));
   const QImage image = reader.read();
 
-  m_pixmaps[id] = !image.isNull() ? QPixmap::fromImage(image) : QPixmap{};
+  const auto pixmap = !image.isNull() ? QPixmap::fromImage(image) : QPixmap{};
+  m_pixmaps[id] = pixmap;
 
   if (image.isNull()) fetchPoster(id);
 
-  return &m_pixmaps[id];
+  return pixmap;
 }
 
 void ImageProvider::reloadPoster(const int id) {
