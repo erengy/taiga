@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 #include <QMap>
 #include <QObject>
 #include <QPixmap>
+#include <QRestAccessManager>
 #include <QString>
 
 namespace gui {
@@ -30,7 +31,7 @@ class ImageProvider final : public QObject {
   Q_DISABLE_COPY_MOVE(ImageProvider)
 
 public:
-  ImageProvider() = default;
+  ImageProvider();
 
   void fetchPoster(const int id);
   const QPixmap* loadPoster(const int id);
@@ -42,6 +43,7 @@ signals:
 private:
   QString fileName(const int id) const;
 
+  QRestAccessManager m_manager;
   QMap<int, QPixmap> m_pixmaps;
 };
 

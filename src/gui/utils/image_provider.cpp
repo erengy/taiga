@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,8 +21,8 @@
 #include <QFile>
 #include <QImage>
 #include <QImageReader>
-#include <QNetworkReply>
 #include <QNetworkRequest>
+#include <QRestReply>
 
 #include "base/string.hpp"
 #include "media/anime_db.hpp"
@@ -31,18 +31,19 @@
 
 namespace gui {
 
+ImageProvider::ImageProvider() : m_manager(taiga::network(), this) {}
+
 void ImageProvider::fetchPoster(const int id) {
   const auto item = anime::db.item(id);
 
   if (!item || item->image_url.empty()) return;
 
   const auto url = QString::fromStdString(item->image_url);
-  const auto reply = taiga::network()->get(QNetworkRequest{url});
 
-  connect(reply, &QNetworkReply::finished, this, [this, id, reply]() {
+  m_manager.get(QNetworkRequest{url}, this, [this, id](QRestReply& reply) {
     QFile file{fileName(id)};
     if (!file.open(QIODevice::WriteOnly)) return;
-    file.write(reply->readAll());
+    file.write(reply.readBody());
     reloadPoster(id);
   });
 }
