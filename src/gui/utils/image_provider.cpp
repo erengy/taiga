@@ -76,10 +76,13 @@ void ImageProvider::fetchPoster(const int id, const bool revalidate) {
 
 QPixmap ImageProvider::loadPoster(const int id) {
   if (const auto it = m_pixmaps.find(id); it != m_pixmaps.end()) {
-    return it.value();
+    if (!it.value().isNull() || !canRetry(id)) {
+      return it.value();
+    }
   }
 
   m_pixmaps[id] = QPixmap{};
+  m_retryAfter.remove(id);
 
   const auto future = QtConcurrent::run([fileName = fileName(id)] {
     QImageReader reader(fileName);
@@ -94,6 +97,7 @@ QPixmap ImageProvider::loadPoster(const int id) {
     m_pixmaps[id] = !image.isNull() ? QPixmap::fromImage(image) : QPixmap{};
 
     if (image.isNull()) {
+      retryAfter(id);
       fetchPoster(id);
     } else if (isStale(id)) {
       fetchPoster(id, true);
@@ -139,6 +143,16 @@ bool ImageProvider::isStale(const int id) const {
 
   const QFileInfo file{fileName(id)};
   return file.lastModified().daysTo(QDateTime::currentDateTime()) >= kStaleDays;
+}
+
+bool ImageProvider::canRetry(const int id) const {
+  const auto it = m_retryAfter.find(id);
+  return it == m_retryAfter.end() || QDateTime::currentDateTime() >= it.value();
+}
+
+void ImageProvider::retryAfter(const int id) {
+  constexpr int kRetryCooldownSecs = 60;
+  m_retryAfter[id] = QDateTime::currentDateTime().addSecs(kRetryCooldownSecs);
 }
 
 }  // namespace gui

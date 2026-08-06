@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <QDateTime>
 #include <QMap>
 #include <QObject>
 #include <QPixmap>
@@ -43,9 +44,12 @@ signals:
 private:
   QString fileName(const int id) const;
   bool isStale(const int id) const;
+  bool canRetry(const int id) const;
+  void retryAfter(const int id);
 
   QRestAccessManager m_manager;
   QMap<int, QPixmap> m_pixmaps;
+  QMap<int, QDateTime> m_retryAfter;
 };
 
 inline ImageProvider imageProvider;
