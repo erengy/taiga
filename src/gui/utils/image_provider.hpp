@@ -23,6 +23,7 @@
 #include <QObject>
 #include <QPixmap>
 #include <QRestAccessManager>
+#include <QSet>
 #include <QString>
 
 namespace gui {
@@ -48,7 +49,7 @@ private:
   void retryAfter(const int id);
 
   QRestAccessManager m_manager;
-  QMap<int, QPixmap> m_pixmaps;
+  QSet<int> m_loading;
   QMap<int, QDateTime> m_retryAfter;
 };
 

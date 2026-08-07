@@ -26,6 +26,7 @@
 #include <QImage>
 #include <QImageReader>
 #include <QNetworkRequest>
+#include <QPixmapCache>
 #include <QRestReply>
 #include <QUrl>
 #include <QtConcurrentRun>
@@ -39,7 +40,19 @@
 
 namespace gui {
 
-ImageProvider::ImageProvider() : m_manager(taiga::network(), this) {}
+namespace {
+
+constexpr int kPixmapCacheLimitKb = 200 * 1024;  // 200MB
+
+QString cacheKey(const int id) {
+  return u"poster/%1"_s.arg(id);
+}
+
+}  // namespace
+
+ImageProvider::ImageProvider() : m_manager(taiga::network(), this) {
+  QPixmapCache::setCacheLimit(kPixmapCacheLimitKb);
+}
 
 void ImageProvider::fetchPoster(const int id, const bool revalidate) {
   const auto item = anime::db.item(id);
@@ -75,14 +88,15 @@ void ImageProvider::fetchPoster(const int id, const bool revalidate) {
 }
 
 QPixmap ImageProvider::loadPoster(const int id) {
-  if (const auto it = m_pixmaps.find(id); it != m_pixmaps.end()) {
-    if (!it.value().isNull() || !canRetry(id)) {
-      return it.value();
-    }
+  if (QPixmap pixmap; QPixmapCache::find(cacheKey(id), &pixmap)) {
+    return pixmap;
   }
 
-  m_pixmaps[id] = QPixmap{};
-  m_retryAfter.remove(id);
+  if (m_loading.contains(id) || !canRetry(id)) {
+    return QPixmap{};
+  }
+
+  m_loading.insert(id);
 
   const auto future = QtConcurrent::run([fileName = fileName(id)] {
     QImageReader reader(fileName);
@@ -92,15 +106,16 @@ QPixmap ImageProvider::loadPoster(const int id) {
   const auto watcher = new QFutureWatcher<QImage>(this);
   connect(watcher, &QFutureWatcherBase::finished, this, [this, id, watcher]() {
     watcher->deleteLater();
+    m_loading.remove(id);
 
     const QImage image = watcher->result();
-    m_pixmaps[id] = !image.isNull() ? QPixmap::fromImage(image) : QPixmap{};
 
     if (image.isNull()) {
       retryAfter(id);
       fetchPoster(id);
-    } else if (isStale(id)) {
-      fetchPoster(id, true);
+    } else {
+      QPixmapCache::insert(cacheKey(id), QPixmap::fromImage(image));
+      if (isStale(id)) fetchPoster(id, true);
     }
 
     emit posterChanged(id);
@@ -111,7 +126,7 @@ QPixmap ImageProvider::loadPoster(const int id) {
 }
 
 void ImageProvider::reloadPoster(const int id) {
-  m_pixmaps.remove(id);
+  QPixmapCache::remove(cacheKey(id));
   loadPoster(id);
 }
 
