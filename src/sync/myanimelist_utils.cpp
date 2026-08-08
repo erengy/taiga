@@ -137,6 +137,10 @@ QString listStatusFields() {
          "updated_at"_s;
 }
 
+QByteArray formUrlEncode(const QUrlQuery& query) {
+  return query.toString(QUrl::FullyEncoded).toUtf8();
+}
+
 std::optional<int> pagingOffset(const QJsonObject& paging, const QString& key) {
   const QUrlQuery query{QUrl{paging[key].toString()}};
 

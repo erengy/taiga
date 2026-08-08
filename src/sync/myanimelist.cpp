@@ -45,10 +45,6 @@ constexpr int kLibraryPageLimit = 1000;
 constexpr int kSearchPageLimit = 100;
 constexpr int kSeasonPageLimit = 500;
 
-QByteArray formUrlEncode(const QUrlQuery& query) {
-  return query.toString(QUrl::FullyEncoded).toUtf8();
-}
-
 }  // namespace
 
 Service::Service() : sync::Service{ServiceId::MyAnimeList} {
@@ -65,120 +61,6 @@ Service* Service::instance() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-
-bool Service::retryOnTokenExpiry(QRestReply& reply, std::function<void()> retry) {
-  if (!isTokenExpired(reply)) return false;
-  refreshAccessToken(std::move(retry));
-  return true;
-}
-
-void Service::requestAccessToken(const QString& authorizationCode, const QString& codeVerifier) {
-  QNetworkRequest request{QUrl{kTokenUrl}};
-  request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
-
-  const QUrlQuery body{{
-      {"client_id", kClientId},
-      {"grant_type", "authorization_code"},
-      {"code", authorizationCode},
-      {"redirect_uri", kRedirectUrl},
-      {"code_verifier", codeVerifier},
-  }};
-
-  const auto callback = [this](QRestReply& reply) {
-    if (isError(reply)) {
-      handleError(*this, reply);
-      emit authenticationCompleted(false);
-      return;
-    }
-
-    const auto json = reply.readJson();
-    if (!json) {
-      handleError(*this, reply, "Could not parse authentication data.");
-      emit authenticationCompleted(false);
-      return;
-    }
-
-    const auto root = json->object();
-    const auto accessToken = root["access_token"].toString();
-    taiga::accounts.setMyanimelistAccessToken(accessToken.toStdString());
-    taiga::accounts.setMyanimelistRefreshToken(root["refresh_token"].toString().toStdString());
-    api_.setBearerToken(accessToken.toUtf8());
-
-    authenticateUser();
-  };
-
-  manager_.post(request, formUrlEncode(body), this, callback);
-}
-
-void Service::refreshAccessToken(std::function<void()> onSuccess) {
-  const auto refreshToken = taiga::accounts.myanimelistRefreshToken();
-
-  if (refreshToken.empty()) {
-    emit errorOccurred("Refresh token is unavailable.");
-    emit authenticationCompleted(false);
-    return;
-  }
-
-  QNetworkRequest request{QUrl{kTokenUrl}};
-  request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
-
-  const QUrlQuery body{{
-      {"client_id", kClientId},
-      {"grant_type", "refresh_token"},
-      {"refresh_token", QString::fromStdString(refreshToken)},
-  }};
-
-  const auto callback = [this, onSuccess](QRestReply& reply) {
-    if (isError(reply)) {
-      handleError(*this, reply);
-      emit authenticationCompleted(false);
-      return;
-    }
-
-    const auto json = reply.readJson();
-    if (!json) {
-      handleError(*this, reply, "Could not parse authentication data.");
-      emit authenticationCompleted(false);
-      return;
-    }
-
-    const auto root = json->object();
-    const auto accessToken = root["access_token"].toString();
-    taiga::accounts.setMyanimelistAccessToken(accessToken.toStdString());
-    taiga::accounts.setMyanimelistRefreshToken(root["refresh_token"].toString().toStdString());
-    api_.setBearerToken(accessToken.toUtf8());
-
-    if (onSuccess) onSuccess();
-  };
-
-  manager_.post(request, formUrlEncode(body), this, callback);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-void Service::authenticateUser() {
-  const auto callback = [this](QRestReply& reply) {
-    if (isError(reply)) {
-      if (retryOnTokenExpiry(reply, [this] { authenticateUser(); })) return;
-      handleError(*this, reply);
-      emit authenticationCompleted(false);
-      return;
-    }
-
-    const auto json = reply.readJson();
-    if (!json) {
-      handleError(*this, reply, "Could not parse user object.");
-      emit authenticationCompleted(false);
-      return;
-    }
-
-    taiga::accounts.setMyanimelistUsername(json->object()["name"].toString().toStdString());
-
-    emit authenticationCompleted(true);
-  };
-
-  manager_.get(api_.createRequest(u"/users/@me"_s), this, callback);
-}
 
 void Service::fetchAnime(const int id) {
   const QUrlQuery query{{"fields", animeFields()}};
