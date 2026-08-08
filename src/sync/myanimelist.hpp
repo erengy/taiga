@@ -41,6 +41,7 @@ public:
   void authenticateUser();
   void requestAccessToken(const QString& authorizationCode, const QString& codeVerifier);
   void fetchAnime(const int id);
+  void search(const SearchParams& params, const int offset = 0);
   void fetchListEntries(const int offset = 0);
 
 private:

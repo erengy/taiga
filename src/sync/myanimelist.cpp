@@ -27,6 +27,7 @@
 
 #include "base/string.hpp"
 #include "media/anime_db.hpp"
+#include "media/anime_season.hpp"
 #include "sync/myanimelist_error.hpp"
 #include "sync/myanimelist_parsers.hpp"
 #include "sync/myanimelist_utils.hpp"
@@ -40,6 +41,8 @@ namespace sync::myanimelist {
 namespace {
 
 constexpr int kLibraryPageLimit = 1000;
+constexpr int kSearchPageLimit = 100;
+constexpr int kSeasonPageLimit = 500;
 
 QByteArray formUrlEncode(const QUrlQuery& query) {
   return query.toString(QUrl::FullyEncoded).toUtf8();
@@ -198,6 +201,62 @@ void Service::fetchAnime(const int id) {
   };
 
   manager_.get(api_.createRequest(u"/anime/%1"_s.arg(id), query), this, callback);
+}
+
+void Service::search(const SearchParams& params, const int offset) {
+  const bool seasonScoped = params.season.has_value() && params.year.has_value();
+
+  QString path;
+  QUrlQuery query;
+
+  if (seasonScoped) {
+    path = u"/anime/season/%1/%2"_s.arg(*params.year).arg(fromSeasonName(*params.season));
+    query.addQueryItem(u"limit"_s, QString::number(kSeasonPageLimit));
+  } else {
+    path = u"/anime"_s;
+    query.addQueryItem(u"q"_s, params.text);
+    query.addQueryItem(u"limit"_s, QString::number(kSearchPageLimit));
+  }
+  query.addQueryItem(u"offset"_s, QString::number(offset));
+  query.addQueryItem(u"nsfw"_s, u"true"_s);
+  query.addQueryItem(u"fields"_s, animeFields());
+
+  const auto callback = [this, params, offset, seasonScoped](QRestReply& reply) {
+    if (isError(reply)) {
+      if (retryOnTokenExpiry(reply, [this, params, offset] { search(params, offset); })) return;
+      handleError(*this, reply);
+      emit searchCompleted(params, {});
+      return;
+    }
+
+    const auto json = reply.readJson();
+    if (!json) {
+      handleError(*this, reply, "Could not parse search results.");
+      emit searchCompleted(params, {});
+      return;
+    }
+
+    const auto root = json->object();
+
+    QList<int> ids;
+    for (const auto& value : root["data"].toArray()) {
+      if (const auto item = parseAnime(value.toObject()["node"])) {
+        anime::db.updateItem(*item);
+        ids.append(item->id);
+      }
+    }
+
+    emit searchCompleted(params, ids);
+
+    // Auto-paginate only for season browsing.
+    if (seasonScoped) {
+      if (const auto nextOffset = pagingOffset(root["paging"].toObject(), u"next"_s)) {
+        search(params, *nextOffset);
+      }
+    }
+  };
+
+  manager_.get(api_.createRequest(path, query), this, callback);
 }
 
 void Service::fetchListEntries(const int offset) {

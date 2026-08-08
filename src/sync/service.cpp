@@ -153,6 +153,7 @@ void fetchListEntries() {
 void search(const SearchParams& params) {
   switch (currentServiceId()) {
     case ServiceId::MyAnimeList:
+      myanimelist::Service::instance()->search(params);
       break;
     case ServiceId::Kitsu:
       break;
