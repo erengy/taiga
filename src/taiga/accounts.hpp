@@ -50,16 +50,13 @@ public:
   std::string anilistUsername() const;
   std::string anilistToken() const;
 
-  /*
-  TODO:
-  - kitsu.accessToken
-  - kitsu.displayName
-  - kitsu.lastSynchronized
-  - kitsu.userId
-  */
   bool kitsuAuthenticated() const;
+  std::string kitsuAccessToken() const;
+  std::string kitsuDisplayName() const;
   std::string kitsuEmail() const;
   sync::kitsu::RatingSystem kitsuRatingSystem() const;
+  std::string kitsuRefreshToken() const;
+  std::string kitsuUserId() const;
   std::string kitsuUsername() const;
   std::string kitsuPassword() const;
 
@@ -74,8 +71,12 @@ public:
   void setAnilistToken(const std::string& token) const;
 
   void setKitsuAuthenticated(bool authenticated);
+  void setKitsuAccessToken(const std::string& accessToken) const;
+  void setKitsuDisplayName(const std::string& displayName) const;
   void setKitsuEmail(const std::string& email) const;
   void setKitsuRatingSystem(const std::string& ratingSystem) const;
+  void setKitsuRefreshToken(const std::string& refreshToken) const;
+  void setKitsuUserId(const std::string& userId) const;
   void setKitsuUsername(const std::string& username) const;
   void setKitsuPassword(const std::string& password) const;
 

@@ -24,6 +24,7 @@
 #include "base/string.hpp"
 #include "sync/anilist.hpp"
 #include "sync/anilist_utils.hpp"
+#include "sync/kitsu.hpp"
 #include "sync/kitsu_utils.hpp"
 #include "sync/myanimelist.hpp"
 #include "sync/myanimelist_utils.hpp"
@@ -117,6 +118,7 @@ void authenticateUser() {
       myanimelist::Service::instance()->authenticateUser();
       break;
     case ServiceId::Kitsu:
+      kitsu::Service::instance()->authenticateUser();
       break;
     case ServiceId::AniList:
       anilist::Service::instance()->authenticateUser();

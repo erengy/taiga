@@ -54,6 +54,14 @@ bool Accounts::kitsuAuthenticated() const {
   return value("kitsu.authenticated").toBool();
 }
 
+std::string Accounts::kitsuAccessToken() const {
+  return value("kitsu.accessToken").toString().toStdString();
+}
+
+std::string Accounts::kitsuDisplayName() const {
+  return value("kitsu.displayName").toString().toStdString();
+}
+
 std::string Accounts::kitsuEmail() const {
   return value("kitsu.email").toString().toStdString();
 }
@@ -61,6 +69,14 @@ std::string Accounts::kitsuEmail() const {
 sync::kitsu::RatingSystem Accounts::kitsuRatingSystem() const {
   const auto ratingSystem = value("kitsu.ratingSystem").toString();
   return sync::kitsu::parseRatingSystem(ratingSystem);
+}
+
+std::string Accounts::kitsuRefreshToken() const {
+  return value("kitsu.refreshToken").toString().toStdString();
+}
+
+std::string Accounts::kitsuUserId() const {
+  return value("kitsu.userId").toString().toStdString();
 }
 
 std::string Accounts::kitsuUsername() const {
@@ -111,12 +127,28 @@ void Accounts::setKitsuAuthenticated(bool authenticated) {
   emit authenticationChanged(authenticated);
 }
 
+void Accounts::setKitsuAccessToken(const std::string& accessToken) const {
+  setValue("kitsu.accessToken", accessToken);
+}
+
+void Accounts::setKitsuDisplayName(const std::string& displayName) const {
+  setValue("kitsu.displayName", displayName);
+}
+
 void Accounts::setKitsuEmail(const std::string& email) const {
   setValue("kitsu.email", email);
 }
 
 void Accounts::setKitsuRatingSystem(const std::string& ratingSystem) const {
   setValue("kitsu.ratingSystem", ratingSystem);
+}
+
+void Accounts::setKitsuRefreshToken(const std::string& refreshToken) const {
+  setValue("kitsu.refreshToken", refreshToken);
+}
+
+void Accounts::setKitsuUserId(const std::string& userId) const {
+  setValue("kitsu.userId", userId);
 }
 
 void Accounts::setKitsuUsername(const std::string& username) const {
