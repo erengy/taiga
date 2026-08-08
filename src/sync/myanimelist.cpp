@@ -31,6 +31,7 @@
 #include "sync/myanimelist_error.hpp"
 #include "sync/myanimelist_parsers.hpp"
 #include "sync/myanimelist_utils.hpp"
+#include "sync/queue.hpp"
 #include "taiga/accounts.hpp"
 
 // MyAnimeList API documentation:
@@ -304,6 +305,88 @@ void Service::fetchListEntries(const int offset) {
   };
 
   manager_.get(api_.createRequest(path, query), this, callback);
+}
+
+void Service::addListEntry(const int id, const anime::list::Fields dirty) {
+  updateListEntry(id, dirty);
+}
+
+void Service::deleteListEntry(const int id) {
+  const auto callback = [this, id](QRestReply& reply) {
+    if (isError(reply) && reply.httpStatus() != 404) {
+      if (retryOnTokenExpiry(reply, [this, id] { deleteListEntry(id); })) return;
+      handleError(*this, reply);
+      sync::queue.complete(false, "Failed to delete list entry.");
+      return;
+    }
+
+    anime::db.deleteEntry(id);
+    sync::queue.complete(true);
+  };
+
+  manager_.deleteResource(api_.createRequest(u"/anime/%1/my_list_status"_s.arg(id)), this,
+                          callback);
+}
+
+void Service::updateListEntry(const int id, const anime::list::Fields dirty) {
+  const auto listEntry = anime::db.entry(id);
+
+  if (!listEntry) return;
+
+  using anime::list::Field;
+
+  QUrlQuery body;
+  if (dirty & Field::Episode) {
+    body.addQueryItem(u"num_watched_episodes"_s, QString::number(listEntry->watched_episodes));
+  }
+  if (dirty & (Field::Status | Field::Rewatching)) {
+    body.addQueryItem(u"status"_s, fromListStatus(listEntry->status));
+    body.addQueryItem(u"is_rewatching"_s, listEntry->rewatching ? u"true"_s : u"false"_s);
+  }
+  if (dirty & Field::Score) {
+    body.addQueryItem(u"score"_s, QString::number(fromListScore(listEntry->score)));
+  }
+  if (dirty & Field::RewatchedTimes) {
+    body.addQueryItem(u"num_times_rewatched"_s, QString::number(listEntry->rewatched_times));
+  }
+  if (dirty & Field::DateStarted) {
+    body.addQueryItem(u"start_date"_s, QString::fromStdString(listEntry->date_started.to_string()));
+  }
+  if (dirty & Field::DateCompleted) {
+    body.addQueryItem(u"finish_date"_s,
+                      QString::fromStdString(listEntry->date_completed.to_string()));
+  }
+  if (dirty & Field::Notes) {
+    body.addQueryItem(u"comments"_s, QString::fromStdString(listEntry->notes));
+  }
+
+  auto request = api_.createRequest(u"/anime/%1/my_list_status"_s.arg(id));
+  request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
+
+  const auto callback = [this, id, dirty](QRestReply& reply) {
+    if (isError(reply)) {
+      if (retryOnTokenExpiry(reply, [this, id, dirty] { updateListEntry(id, dirty); })) return;
+      handleError(*this, reply,
+                  reply.httpStatus() == 404 ? u"Anime list entry does not exist."_s : QString{});
+      sync::queue.complete(false, "Failed to update list entry.");
+      return;
+    }
+
+    const auto json = reply.readJson();
+    if (!json) {
+      handleError(*this, reply, "Could not parse list entry.");
+      sync::queue.complete(false, "Could not parse list entry.");
+      return;
+    }
+
+    if (const auto entry = parseListEntry(json->object(), id)) {
+      anime::db.updateEntry(*entry);
+    }
+
+    sync::queue.complete(true);
+  };
+
+  manager_.patch(request, formUrlEncode(body), this, callback);
 }
 
 }  // namespace sync::myanimelist

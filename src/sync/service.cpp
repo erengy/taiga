@@ -203,6 +203,7 @@ void synchronize() {
 void addListEntry(const int id, const anime::list::Fields dirty) {
   switch (currentServiceId()) {
     case ServiceId::MyAnimeList:
+      myanimelist::Service::instance()->addListEntry(id, dirty);
       break;
     case ServiceId::Kitsu:
       break;
@@ -215,6 +216,7 @@ void addListEntry(const int id, const anime::list::Fields dirty) {
 void updateListEntry(const int id, const anime::list::Fields dirty) {
   switch (currentServiceId()) {
     case ServiceId::MyAnimeList:
+      myanimelist::Service::instance()->updateListEntry(id, dirty);
       break;
     case ServiceId::Kitsu:
       break;
@@ -227,6 +229,7 @@ void updateListEntry(const int id, const anime::list::Fields dirty) {
 void deleteListEntry(const int id) {
   switch (currentServiceId()) {
     case ServiceId::MyAnimeList:
+      myanimelist::Service::instance()->deleteListEntry(id);
       break;
     case ServiceId::Kitsu:
       break;
