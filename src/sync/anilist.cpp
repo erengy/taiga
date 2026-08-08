@@ -52,38 +52,6 @@ Service* Service::instance() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void Service::authenticateUser() {
-  const QJsonDocument data{QJsonObject{
-      {"query", gql("Viewer")},
-  }};
-
-  const auto callback = [this](QRestReply& reply) {
-    if (isError(reply)) {
-      handleError(*this, reply);
-      emit authenticationCompleted(false);
-      return;
-    }
-
-    const auto viewer = reply.readJson().and_then([](const QJsonDocument& json) {
-      return std::make_optional(json["data"]["Viewer"].toObject());
-    });
-
-    if (!viewer) {
-      handleError(*this, reply, "Could not parse user object.");
-      emit authenticationCompleted(false);
-      return;
-    }
-
-    taiga::accounts.setAnilistUsername((*viewer)["name"].toString().toStdString());
-    taiga::accounts.setAnilistRatingSystem(
-        (*viewer)["mediaListOptions"]["scoreFormat"].toString().toStdString());
-
-    emit authenticationCompleted(true);
-  };
-
-  manager_.post(api_.createRequest(), data, this, callback);
-}
-
 void Service::fetchAnime(const int id) {
   const QJsonDocument data{{
       {"query", gql("Media")},
