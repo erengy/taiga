@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,13 +19,26 @@
 #include "kitsu_parsers.hpp"
 
 #include <QDateTime>
+#include <QJsonArray>
+#include <QJsonObject>
+#include <QJsonValue>
 #include <QMap>
 
+#include "base/chrono.hpp"
 #include "media/anime.hpp"
 #include "media/anime_list.hpp"
+#include "sync/kitsu_ratings.hpp"
 #include "sync/service.hpp"
 
 namespace sync::kitsu {
+
+namespace {
+
+FuzzyDate parseDate(const QString& value) {
+  return value.size() >= 10 ? FuzzyDate(value.first(10).toStdString()) : FuzzyDate{};
+}
+
+}  // namespace
 
 anime::AgeRating parseAgeRating(const QString& value) {
   static const QMap<QString, anime::AgeRating> table{
@@ -37,12 +50,12 @@ anime::AgeRating parseAgeRating(const QString& value) {
   return table.value(value.toUpper(), anime::AgeRating::Unknown);
 }
 
-double parseScore(const QString& value) {
-  return value.toDouble() / 10.0;
+float parseScore(const QString& value) {
+  return value.toFloat() / 10.0f;
 }
 
-double fromScore(const double value) {
-  return value * 10.0;
+float fromScore(float value) {
+  return value * 10.0f;
 }
 
 anime::Status parseStatus(const QString& value) {
@@ -108,6 +121,83 @@ QString fromListStatus(const anime::list::Status value) {
   }
   // clang-format on
   return "";
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+std::optional<anime::Details> parseAnime(const QJsonValue& data, const QJsonArray& included) {
+  const int id = data["id"].toVariant().toInt();
+
+  if (!id) return std::nullopt;
+
+  const auto attributes = data["attributes"].toObject();
+  const auto titles = attributes["titles"].toObject();
+
+  anime::Details item{
+      .id = id,
+      .last_modified = QDateTime::currentSecsSinceEpoch(),
+      .episode_count = attributes["episodeCount"].toInt(),
+      .episode_length = attributes["episodeLength"].toInt(),
+      .age_rating = parseAgeRating(attributes["ageRating"].toString()),
+      .status = parseStatus(attributes["status"].toString()),
+      .type = parseType(attributes["subtype"].toString()),
+      .date_started = parseDate(attributes["startDate"].toString()),
+      .date_finished = parseDate(attributes["endDate"].toString()),
+      .score = parseScore(attributes["averageRating"].toVariant().toString()),
+      .popularity_rank = attributes["popularityRank"].toInt(),
+      .image_url = attributes["posterImage"]["small"].toString().toStdString(),
+      .slug = attributes["slug"].toString().toStdString(),
+      .synopsis = attributes["synopsis"].toString().toStdString(),
+      .trailer_id = attributes["youtubeVideoId"].toString().toStdString(),
+      .titles{
+          .romaji = titles["en_jp"].toString().toStdString(),
+          .english = titles["en"].toString().toStdString(),
+          .japanese = titles["ja_jp"].toString().toStdString(),
+      },
+  };
+
+  if (item.titles.romaji.empty()) {
+    item.titles.romaji = attributes["canonicalTitle"].toString().toStdString();
+  }
+
+  for (const auto& value : attributes["abbreviatedTitles"].toArray()) {
+    if (auto synonym = value.toString().toStdString(); !synonym.empty()) {
+      item.titles.synonyms.push_back(std::move(synonym));
+    }
+  }
+
+  for (const auto& value : included) {
+    const auto resource = value.toObject();
+    const auto type = resource["type"].toString();
+    if (type == "categories") {
+      item.genres.push_back(resource["attributes"]["title"].toString().toStdString());
+    } else if (type == "producers") {
+      item.producers.push_back(resource["attributes"]["name"].toString().toStdString());
+    }
+  }
+
+  return item;
+}
+
+std::optional<anime::list::Entry> parseListEntry(const QJsonValue& json, const int animeId) {
+  if (!animeId) return std::nullopt;
+
+  const auto attributes = json["attributes"].toObject();
+
+  return anime::list::Entry{
+      .id = json["id"].toVariant().toLongLong(),
+      .anime_id = animeId,
+      .watched_episodes = attributes["progress"].toInt(),
+      .score = parseListScore(attributes["ratingTwenty"].toInt()),
+      .status = parseListStatus(attributes["status"].toString()),
+      .is_private = attributes["private"].toBool(),
+      .rewatched_times = attributes["reconsumeCount"].toInt(),
+      .rewatching = attributes["reconsuming"].toBool(),
+      .date_started = parseDate(parseListDate(attributes["startedAt"].toString())),
+      .date_completed = parseDate(parseListDate(attributes["finishedAt"].toString())),
+      .last_updated = parseListLastUpdated(attributes["updatedAt"].toString()),
+      .notes = attributes["notes"].toString().toStdString(),
+  };
 }
 
 }  // namespace sync::kitsu
