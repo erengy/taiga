@@ -19,7 +19,16 @@
 #include "kitsu.hpp"
 
 #include <QHttpHeaders>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QRestReply>
+#include <QUrlQuery>
 
+#include "base/string.hpp"
+#include "media/anime_db.hpp"
+#include "sync/kitsu_error.hpp"
+#include "sync/kitsu_parsers.hpp"
 #include "taiga/accounts.hpp"
 
 // Kitsu API documentation:
@@ -42,6 +51,38 @@ Service::Service() : sync::Service{ServiceId::Kitsu} {
 Service* Service::instance() {
   static auto service = new Service();
   return service;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void Service::fetchAnime(const int id) {
+  const QUrlQuery query{{"include", "categories,animeProductions,animeProductions.producer"}};
+
+  const auto callback = [this, id](QRestReply& reply) {
+    if (isError(reply)) {
+      if (retryOnTokenExpiry(reply, [this, id] { fetchAnime(id); })) return;
+      handleError(*this, reply);
+      return;
+    }
+
+    const auto json = reply.readJson();
+    if (!json) {
+      handleError(*this, reply, "Could not parse anime object.");
+      return;
+    }
+
+    const auto root = json->object();
+    const auto item = parseAnime(root["data"], root["included"].toArray());
+
+    if (!item) {
+      handleError(*this, reply, "Could not parse anime object.");
+      return;
+    }
+
+    anime::db.updateItem(*item);
+  };
+
+  manager_.get(api_.createRequest(u"/anime/%1"_s.arg(id), query), this, callback);
 }
 
 }  // namespace sync::kitsu

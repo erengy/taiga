@@ -132,6 +132,7 @@ void fetchAnime(const int id) {
       myanimelist::Service::instance()->fetchAnime(id);
       break;
     case ServiceId::Kitsu:
+      kitsu::Service::instance()->fetchAnime(id);
       break;
     case ServiceId::AniList:
       anilist::Service::instance()->fetchAnime(id);

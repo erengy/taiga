@@ -55,6 +55,7 @@ public:
   static Service* instance();
 
   void authenticateUser();
+  void fetchAnime(const int id);
 
 private:
   void resolveUser(std::function<void()> onSuccess = nullptr);
