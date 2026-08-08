@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,9 @@
 #pragma once
 
 #include <QString>
+#include <optional>
+
+class QJsonValue;
 
 namespace base {
 class FuzzyDate;
@@ -28,11 +31,13 @@ namespace anime {
 enum class AgeRating;
 enum class Status;
 enum class Type;
+struct Details;
 }  // namespace anime
 
 namespace anime::list {
 enum class Status;
-}
+struct Entry;
+}  // namespace anime::list
 
 namespace sync::myanimelist {
 
@@ -44,5 +49,8 @@ anime::Type parseType(const QString& value);
 std::time_t parseListLastUpdated(const QString& value);
 int parseListScore(int value);
 anime::list::Status parseListStatus(const QString& value);
+
+std::optional<anime::Details> parseAnime(const QJsonValue& json);
+std::optional<anime::list::Entry> parseListEntry(const QJsonValue& json, const int animeId);
 
 }  // namespace sync::myanimelist

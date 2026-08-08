@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,9 @@
 #include "myanimelist_parsers.hpp"
 
 #include <QDateTime>
+#include <QJsonArray>
+#include <QJsonObject>
+#include <QJsonValue>
 #include <QMap>
 
 #include "base/chrono.hpp"
@@ -105,6 +108,71 @@ anime::list::Status parseListStatus(const QString& value) {
       {"plan_to_watch", Status::PlanToWatch},
   };
   return table.value(value.toLower(), Status::NotInList);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+std::optional<anime::Details> parseAnime(const QJsonValue& json) {
+  const int id = json["id"].toInt();
+
+  if (!id) return std::nullopt;
+
+  const auto alternativeTitles = json["alternative_titles"].toObject();
+
+  anime::Details item{
+      .id = id,
+      .last_modified = QDateTime::currentSecsSinceEpoch(),
+      .episode_count = json["num_episodes"].toInt(),
+      .episode_length = parseEpisodeLength(json["average_episode_duration"].toInt()),
+      .age_rating = parseAgeRating(json["rating"].toString()),
+      .status = parseStatus(json["status"].toString()),
+      .type = parseType(json["media_type"].toString()),
+      .date_started = parseFuzzyDate(json["start_date"].toString()),
+      .date_finished = parseFuzzyDate(json["end_date"].toString()),
+      .score = static_cast<float>(json["mean"].toDouble()),
+      .popularity_rank = json["popularity"].toInt(),
+      .image_url = json["main_picture"]["medium"].toString().toStdString(),
+      .synopsis = json["synopsis"].toString().toStdString(),
+      .titles{
+          .romaji = json["title"].toString().toStdString(),
+          .english = alternativeTitles["en"].toString().toStdString(),
+          .japanese = alternativeTitles["ja"].toString().toStdString(),
+      },
+  };
+
+  for (const auto& value : alternativeTitles["synonyms"].toArray()) {
+    auto synonym = value.toString().toStdString();
+    if (!synonym.empty()) item.titles.synonyms.emplace_back(synonym);
+  }
+
+  for (const auto& value : json["genres"].toArray()) {
+    auto name = value.toObject()["name"].toString().toStdString();
+    if (!name.empty()) item.genres.emplace_back(name);
+  }
+
+  for (const auto& value : json["studios"].toArray()) {
+    auto name = value.toObject()["name"].toString().toStdString();
+    if (!name.empty()) item.studios.emplace_back(name);
+  }
+
+  return item;
+}
+
+std::optional<anime::list::Entry> parseListEntry(const QJsonValue& json, const int animeId) {
+  if (!animeId) return std::nullopt;
+
+  return anime::list::Entry{
+      .anime_id = animeId,
+      .watched_episodes = json["num_episodes_watched"].toInt(),
+      .score = parseListScore(json["score"].toInt()),
+      .status = parseListStatus(json["status"].toString()),
+      .rewatched_times = json["num_times_rewatched"].toInt(),
+      .rewatching = json["is_rewatching"].toBool(),
+      .date_started = parseFuzzyDate(json["start_date"].toString()),
+      .date_completed = parseFuzzyDate(json["finish_date"].toString()),
+      .last_updated = parseListLastUpdated(json["updated_at"].toString()),
+      .notes = json["comments"].toString().toStdString(),
+  };
 }
 
 }  // namespace sync::myanimelist
