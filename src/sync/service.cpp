@@ -127,6 +127,7 @@ void authenticateUser() {
 void fetchAnime(const int id) {
   switch (currentServiceId()) {
     case ServiceId::MyAnimeList:
+      myanimelist::Service::instance()->fetchAnime(id);
       break;
     case ServiceId::Kitsu:
       break;

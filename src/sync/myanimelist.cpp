@@ -25,7 +25,10 @@
 #include <QUrlQuery>
 
 #include "base/string.hpp"
+#include "media/anime_db.hpp"
 #include "sync/myanimelist_error.hpp"
+#include "sync/myanimelist_parsers.hpp"
+#include "sync/myanimelist_utils.hpp"
 #include "taiga/accounts.hpp"
 
 // MyAnimeList API documentation:
@@ -168,6 +171,30 @@ void Service::authenticateUser() {
   };
 
   manager_.get(api_.createRequest(u"/users/@me"_s), this, callback);
+}
+
+void Service::fetchAnime(const int id) {
+  const QUrlQuery query{{"fields", animeFields()}};
+
+  const auto callback = [this, id](QRestReply& reply) {
+    if (isError(reply)) {
+      if (retryOnTokenExpiry(reply, [this, id] { fetchAnime(id); })) return;
+      handleError(*this, reply);
+      return;
+    }
+
+    const auto item = reply.readJson().and_then(
+        [](const QJsonDocument& json) { return parseAnime(json.object()); });
+
+    if (!item) {
+      handleError(*this, reply, "Could not parse anime object.");
+      return;
+    }
+
+    anime::db.updateItem(*item);
+  };
+
+  manager_.get(api_.createRequest(u"/anime/%1"_s.arg(id), query), this, callback);
 }
 
 }  // namespace sync::myanimelist

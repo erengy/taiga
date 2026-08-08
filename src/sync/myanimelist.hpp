@@ -40,6 +40,7 @@ public:
 
   void authenticateUser();
   void requestAccessToken(const QString& authorizationCode, const QString& codeVerifier);
+  void fetchAnime(const int id);
 
 private:
   void refreshAccessToken(std::function<void()> onSuccess);
