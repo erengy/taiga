@@ -41,6 +41,7 @@ public:
   void authenticateUser();
   void requestAccessToken(const QString& authorizationCode, const QString& codeVerifier);
   void fetchAnime(const int id);
+  void fetchListEntries(const int offset = 0);
 
 private:
   void refreshAccessToken(std::function<void()> onSuccess);

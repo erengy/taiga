@@ -18,6 +18,7 @@
 
 #include "myanimelist.hpp"
 
+#include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QNetworkRequest>
@@ -37,6 +38,8 @@
 namespace sync::myanimelist {
 
 namespace {
+
+constexpr int kLibraryPageLimit = 1000;
 
 QByteArray formUrlEncode(const QUrlQuery& query) {
   return query.toString(QUrl::FullyEncoded).toUtf8();
@@ -195,6 +198,53 @@ void Service::fetchAnime(const int id) {
   };
 
   manager_.get(api_.createRequest(u"/anime/%1"_s.arg(id), query), this, callback);
+}
+
+void Service::fetchListEntries(const int offset) {
+  const auto username = QString::fromStdString(taiga::accounts.myanimelistUsername());
+  const auto path = u"/users/%1/animelist"_s.arg(username);
+
+  const QUrlQuery query{
+      {"limit", QString::number(kLibraryPageLimit)},
+      {"offset", QString::number(offset)},
+      {"nsfw", "true"},
+      {"fields", u"%1,list_status{%2}"_s.arg(animeFields(), listStatusFields())},
+  };
+
+  const auto callback = [this, offset](QRestReply& reply) {
+    if (isError(reply)) {
+      if (retryOnTokenExpiry(reply, [this, offset] { fetchListEntries(offset); })) return;
+      handleError(*this, reply);
+      return;
+    }
+
+    const auto json = reply.readJson();
+    if (!json) {
+      handleError(*this, reply, "Could not parse anime list.");
+      return;
+    }
+
+    const auto root = json->object();
+
+    for (const auto& value : root["data"].toArray()) {
+      const auto entryValue = value.toObject();
+
+      const auto item = parseAnime(entryValue["node"]);
+      if (!item) continue;
+
+      anime::db.updateItem(*item);
+
+      if (const auto entry = parseListEntry(entryValue["list_status"], item->id)) {
+        anime::db.updateEntry(*entry);
+      }
+    }
+
+    if (const auto nextOffset = pagingOffset(root["paging"].toObject(), u"next"_s)) {
+      fetchListEntries(*nextOffset);
+    }
+  };
+
+  manager_.get(api_.createRequest(path, query), this, callback);
 }
 
 }  // namespace sync::myanimelist

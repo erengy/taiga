@@ -140,6 +140,7 @@ void fetchAnime(const int id) {
 void fetchListEntries() {
   switch (currentServiceId()) {
     case ServiceId::MyAnimeList:
+      myanimelist::Service::instance()->fetchListEntries();
       break;
     case ServiceId::Kitsu:
       break;
@@ -164,6 +165,15 @@ void search(const SearchParams& params) {
 void synchronize() {
   switch (currentServiceId()) {
     case ServiceId::MyAnimeList:
+      if (!taiga::accounts.myanimelistAuthenticated()) {
+        if (!taiga::accounts.myanimelistAccessToken().empty()) {
+          authenticateUser();
+        } else if (!taiga::accounts.myanimelistUsername().empty()) {
+          // Allow downloading the list without authentication
+          fetchListEntries();
+        }
+        return;
+      }
       break;
 
     case ServiceId::Kitsu:
@@ -179,13 +189,13 @@ void synchronize() {
         }
         return;
       }
-
-      if (queue.count() > 0) {
-        queue.process();
-      } else {
-        fetchListEntries();
-      }
       break;
+  }
+
+  if (queue.count() > 0) {
+    queue.process();
+  } else {
+    fetchListEntries();
   }
 }
 
