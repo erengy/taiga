@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang xml:lang>
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>authorization</title>
+  <style>
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+</head>
+<body>
+<h1 id="myanimelist-authorization">MyAnimeList authorization</h1>
+<h2 id="table-of-contents">Table of contents</h2>
+<ul>
+<li><a href="#overview">Overview</a>
+<ul>
+<li><a href="#under-development">Under development</a></li>
+</ul></li>
+<li><a href="#client-registration">Client registration</a></li>
+<li><a href="#obtaining-oauth-20-access-tokens">Obtaining OAuth 2.0 access tokens</a>
+<ul>
+<li><a href="#step-1-generate-a-code-verifier-and-challenge">Step 1: Generate a code verifier and challenge</a></li>
+<li><a href="#step-2-client-requests-oauth-20-authentication">Step 2: Client requests OAuth 2.0 authentication</a></li>
+<li><a href="#step-3-myanimelist-authenticates-user">Step 3: MyAnimeList authenticates user</a></li>
+<li><a href="#step-4-user-authorizes-the-client-on-myanimelist">Step 4: User authorizes the client on MyAnimeList</a></li>
+<li><a href="#step-5-myanimelist-redirects-back-to-the-client">Step 5: MyAnimeList redirects back to the client</a></li>
+<li><a href="#step-6-exchange-authorization-code-for-refresh-and-access-tokens">Step 6: Exchange authorization code for refresh and access tokens</a>
+<ul>
+<li><a href="#scheme-1-the-http-basic-authentication">Scheme 1: The HTTP Basic authentication</a></li>
+<li><a href="#scheme-2-including-the-client-credentials-in-the-request-body">Scheme 2: Including the client credentials in the request-body</a></li>
+<li><a href="#parameter-description-of-access-token-requests">Parameter description of access token requests</a></li>
+<li><a href="#response-to-token-requests">Response to token requests</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#refreshing-an-access-token">Refreshing an access token</a>
+<ul>
+<li><a href="#parameter-description-of-refresh-token-requests">Parameter description of refresh token requests</a></li>
+</ul></li>
+<li><a href="#call-myanimelist-api">Call MyAnimeList API</a></li>
+</ul>
+<h2 id="overview">Overview</h2>
+<p><a href="https://tools.ietf.org/html/rfc6749">OAuth2.0</a> is supported.</p>
+<p>Currently supported grant:</p>
+<ul>
+<li>Authorization Code Grant<br />
+with <a href="https://tools.ietf.org/html/rfc7636">PKCE</a></li>
+</ul>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Access Token lifetime</td>
+<td>One hour.</td>
+</tr>
+<tr class="even">
+<td>Access Token data length</td>
+<td>Normally this value is around 1,000 bytes long.</td>
+</tr>
+<tr class="odd">
+<td>Refresh Token lifetime</td>
+<td>One month.</td>
+</tr>
+<tr class="even">
+<td>Refresh Token data length</td>
+<td>Normally this value is around 1,000 bytes long.</td>
+</tr>
+<tr class="odd">
+<td>client_id data length</td>
+<td>32 bytes.</td>
+</tr>
+<tr class="even">
+<td>client_secret data length</td>
+<td>64 bytes.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="client-registration">Client registration</h2>
+<p>First you need to register your application in MAL’s system and get a client_id and a client secret.<br />
+Please register from <a href>this form</a>.</p>
+<h2 id="obtaining-oauth-2.0-access-tokens">Obtaining OAuth 2.0 access tokens</h2>
+<h3 id="step-1-generate-a-code-verifier-and-challenge">Step 1: Generate a code verifier and challenge</h3>
+<p>MyAnimeList supports <a href="https://tools.ietf.org/html/rfc7636">PKCE</a> to prevent authorization code interception attacks, mainly native apps.<br />
+In accordance with the procedures in <a href="https://tools.ietf.org/html/rfc7636#section-4.1">Section 4.1</a> and <a href="https://tools.ietf.org/html/rfc7636#section-4.2">Section 4.2</a>, generate <code>code_verifier</code> and <code>code_challenge</code>.<br />
+A unique code verifier must be generated for every authorization request.</p>
+<p>NOTE: Currently, only the <code>plain</code> method is supported.</p>
+<h3 id="step-2-client-requests-oauth-2.0-authentication">Step 2: Client requests OAuth 2.0 authentication</h3>
+<pre><code>GET https://myanimelist.net/v1/oauth2/authorize?
+response_type=code
+&amp;client_id=YOUR_CLIENT_ID
+&amp;state=YOUR_STATE
+&amp;redirect_uri=YOUR_REDIRECT_URI
+&amp;code_challenge=YOUR_PKCE_CODE_CHALLENGE
+&amp;code_challenge_method=plain 
+HTTP/1.1
+Host: YOUR_HOST_URL</code></pre>
+<table>
+<colgroup>
+<col style="width: 50%"></col>
+<col style="width: 50%"></col>
+</colgroup>
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>response_type</code></td>
+<td>REQUIRED. Value MUST be set to “code”.</td>
+</tr>
+<tr class="even">
+<td><code>client_id</code></td>
+<td>REQUIRED.</td>
+</tr>
+<tr class="odd">
+<td><code>state</code></td>
+<td>RECOMMENDED. <a href="https://tools.ietf.org/html/rfc6749#section-4.1.1">OAuth 2.0 state</a></td>
+</tr>
+<tr class="even">
+<td><code>redirect_uri</code></td>
+<td>OPTIONAL. If you registered only one redirection URI in advance, you can omit this parameter. If you set this, the value must exactly match one of your pre-registered URIs.</td>
+</tr>
+<tr class="odd">
+<td><code>code_challenge</code></td>
+<td>REQUIRED. A minimum length of 43 characters and a maximum length of 128 characters. <a href="https://tools.ietf.org/html/rfc7636">See the details for the PKCE code_challenge</a>.</td>
+</tr>
+<tr class="even">
+<td><code>code_challenge_method</code></td>
+<td>OPTIONAL. Defaults to <code>plain</code> if not present in the request. Currently, only the <code>plain</code> method is supported.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="step-3-myanimelist-authenticates-user">Step 3: MyAnimeList authenticates user</h3>
+<p>MyAnimeList authenticates the user.</p>
+<h3 id="step-4-user-authorizes-the-client-on-myanimelist">Step 4: User authorizes the client on MyAnimeList</h3>
+<p>The user authorizes the client on MyAnimeList.</p>
+<h3 id="step-5-myanimelist-redirects-back-to-the-client">Step 5: MyAnimeList redirects back to the client</h3>
+<p>MyAnimeList authorization server redirects back to YOUR_REDIRECT_URI.</p>
+<pre><code>HTTP/1.1 302 Found
+Location: YOUR_REDIRECT_URI?code=AUTHORIZATION_CODE
+&amp;state=YOUR_STATE</code></pre>
+<table>
+<colgroup>
+<col style="width: 50%"></col>
+<col style="width: 50%"></col>
+</colgroup>
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>code</code></td>
+<td>The authorization code returned from the initial request. Normally, this value is nearly 1,000 bytes long.</td>
+</tr>
+<tr class="even">
+<td><code>state</code></td>
+<td>The state value you send the request with.</td>
+</tr>
+</tbody>
+</table>
+<p>The client should verify the <code>state</code>.</p>
+<h3 id="step-6-exchange-authorization-code-for-refresh-and-access-tokens">Step 6: Exchange authorization code for refresh and access tokens</h3>
+<p>In this step, you exchange the client authorization code you get in the previous step for refresh and access tokens. Also, your clients are authenticated by the authorization server. MyAnimeList supports two schemes to authenticate clients. The form of access token request varies depending on which scheme you use.</p>
+<h4 id="scheme-1-the-http-basic-authentication">Scheme 1: the HTTP Basic authentication</h4>
+<p>MyAnimeList supports the HTTP Basic authentication scheme as defined in <a href="https://tools.ietf.org/html/rfc2617">RFC2617</a> to authenticate with the authorization server.<br />
+<code>client_id</code> is used as the username; <code>client_secret</code> is used as the password.<br />
+(If your client doesn’t have a client secret, <code>client_secret</code> will be an empty.)</p>
+<pre><code>POST https://myanimelist.net/v1/oauth2/token HTTP/1.1
+Host: server.example.com
+Authorization: Basic exampleEXAMPLEeXaMpLeExAmPlE
+Content-Type: application/x-www-form-urlencoded
+
+client_id=YOUR_CLIENT_ID
+&amp;grant_type=authorization_code
+&amp;code=AUTHORIZATION_CODE
+&amp;redirect_uri=YOUR_REDIRECT_URI
+&amp;code_verifier=YOUR_PKCE_CODE_VERIFIER</code></pre>
+<h4 id="scheme-2-including-the-client-credentials-in-the-request-body">Scheme 2: including the client credentials in the request-body</h4>
+<p>Also, MyAnimeList supports the authentication scheme which includes the client credentials in the request-body.<br />
+In this case, the access token request has the following form:</p>
+<pre><code>POST https://myanimelist.net/v1/oauth2/token HTTP/1.1
+Host: server.example.com
+Content-Type: application/x-www-form-urlencoded
+
+client_id=YOUR_CLIENT_ID
+&amp;client_secret=YOUR_CLIENT_SECRET
+&amp;grant_type=authorization_code
+&amp;code=AUTHORIZATION_CODE
+&amp;redirect_uri=YOUR_REDIRECT_URI
+&amp;code_verifier=YOUR_PKCE_CODE_VERIFIER</code></pre>
+<h4 id="parameter-description-of-access-token-requests">Parameter description of access token requests</h4>
+<table>
+<colgroup>
+<col style="width: 50%"></col>
+<col style="width: 50%"></col>
+</colgroup>
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>client_id</code></td>
+<td>OPTIONAL in Scheme 1; REQUIRED in Scheme 2.</td>
+</tr>
+<tr class="even">
+<td><code>client_secret</code></td>
+<td>MUST NOT BE INCLUDED in Scheme 1; REQUIRED, if your client has client secret in Scheme 2.</td>
+</tr>
+<tr class="odd">
+<td><code>grant_type</code></td>
+<td>REQUIRED. Value MUST be set to “authorization_code”.</td>
+</tr>
+<tr class="even">
+<td><code>code</code></td>
+<td>REQUIRED. The authorization code you got in the previous step.</td>
+</tr>
+<tr class="odd">
+<td><code>redirect_uri</code></td>
+<td>OPTIONAL. The value of this parameter must be identical to one that is included the previous authorization request. You can omit this parameter only when you registered only one redirection URI in advance and you didn’t add the <code>redirect_uri</code> parameter to the authorization request you sent in <a href="#step-2-client-requests-oauth-20-authentication">the previous step</a>.</td>
+</tr>
+<tr class="even">
+<td><code>code_verifier</code></td>
+<td>REQUIRED. A minimum length of 43 characters and a maximum length of 128 characters. <a href="https://tools.ietf.org/html/rfc7636">See the detail of PKCE code_challenge</a>.</td>
+</tr>
+</tbody>
+</table>
+<h4 id="response-to-token-requests">Response to token requests</h4>
+<div class="sourceCode" id="cb5"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb5-1"><a href="#cb5-1"></a></span>
+<span id="cb5-2"><a href="#cb5-2"></a><span class="fu">{</span></span>
+<span id="cb5-3"><a href="#cb5-3"></a>  <span class="dt">&quot;token_type&quot;</span><span class="fu">:</span> <span class="st">&quot;Bearer&quot;</span><span class="fu">,</span></span>
+<span id="cb5-4"><a href="#cb5-4"></a>  <span class="dt">&quot;expires_in&quot;</span><span class="fu">:</span> <span class="dv">2415600</span><span class="fu">,</span></span>
+<span id="cb5-5"><a href="#cb5-5"></a>  <span class="dt">&quot;access_token&quot;</span><span class="fu">:</span> <span class="st">&quot;ACCESS_TOKEN&quot;</span><span class="fu">,</span></span>
+<span id="cb5-6"><a href="#cb5-6"></a>  <span class="dt">&quot;refresh_token&quot;</span><span class="fu">:</span> <span class="st">&quot;REFRESH_TOKEN&quot;</span></span>
+<span id="cb5-7"><a href="#cb5-7"></a><span class="fu">}</span></span></code></pre></div>
+<h2 id="refreshing-an-access-token">Refreshing an access token</h2>
+<p>When you use an access token that is expired, you receive the following response:</p>
+<pre><code>HTTP/1.1 401 Unauthorized
+WWW-Authenticate: Bearer error=&quot;invalid_token&quot;,error_description=&quot;The access token expired&quot;
+
+{
+&quot;error&quot;: &quot;invalid_token&quot;
+}</code></pre>
+<p>In this case, you can get a new access token by using a refresh token.</p>
+<p>This is an example of the refresh token request:</p>
+<pre><code>POST https://myanimelist.net/v1/oauth2/token HTTP/1.1
+Host: server.example.com
+Authorization: Basic exampleEXAMPLEeXaMpLeExAmPlE
+Content-Type: application/x-www-form-urlencoded
+
+&amp;grant_type=refresh_token
+&amp;refresh_token=YOUR_REFRESH_TOKEN</code></pre>
+<p>Client authentication is required in this request. How to authenticate your client is completely the same as in <a href="#step-6-exchange-authorization-code-for-refresh-and-access-tokens">the above Step 6</a>.<br />
+(The request example written above is the one that uses <a href="#scheme-1-the-http-basic-authentication">Scheme 1</a>. )</p>
+<p>If the request is valid, you will receive a response that is completely the same as <a href="#response-to-token-requests">the one described above</a>.<br />
+The expiration date of the new token you receive is <em>one month</em> from when you receive it.</p>
+<h3 id="parameter-description-of-refresh-token-requests">Parameter description of refresh token requests</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>grant_type</code></td>
+<td>REQUIRED. Value MUST be set to “refresh_token”.</td>
+</tr>
+<tr class="even">
+<td><code>refresh_token</code></td>
+<td>REQUIRED. A refresh token you’ve already obtained.</td>
+</tr>
+</tbody>
+</table>
+<p>You can still use an old refresh token after obtaining a new one until it expires. However, it’s highly recommended that you discard the old one once you successfully obtain the new one.</p>
+<p>You can refresh an access token anytime, but once a new one is issued, the old one is revoked automatically.</p>
+<h2 id="call-myanimelist-api">Call MyAnimeList API</h2>
+<!-- [MyAnimeList API](https://myanimelist.github.io/mal-api-docs/) -->
+<p>Example:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1"></a><span class="ex">curl</span> <span class="st">&#39;https://api.myanimelist.net/v0.20/anime/17074/my_list_status&#39;</span> \</span>
+<span id="cb8-2"><a href="#cb8-2"></a>-X PUT \</span>
+<span id="cb8-3"><a href="#cb8-3"></a>-d status=completed \</span>
+<span id="cb8-4"><a href="#cb8-4"></a>-d score=8 \</span>
+<span id="cb8-5"><a href="#cb8-5"></a>-d num_watched_episodes=3 \</span>
+<span id="cb8-6"><a href="#cb8-6"></a>-H <span class="st">&#39;Authorization: Bearer ACCESS_TOKEN&#39;</span></span></code></pre></div>
+</body>
+</html>
