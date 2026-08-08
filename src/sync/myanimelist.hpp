@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,9 +18,32 @@
 
 #pragma once
 
+#include <functional>
+
+#include "sync/service.hpp"
+
+class QRestReply;
+
 namespace sync::myanimelist {
 
 constexpr auto kClientId = "f6e398095cf7525360276786ec4407bc";
 constexpr auto kRedirectUrl = "https://taiga.moe/api/myanimelist/auth";
+constexpr auto kApiUrl = "https://api.myanimelist.net/v2";
+constexpr auto kTokenUrl = "https://myanimelist.net/v1/oauth2/token";
+
+class Service final : public sync::Service {
+public:
+  Service();
+  ~Service() = default;
+
+  static Service* instance();
+
+  void authenticateUser();
+  void requestAccessToken(const QString& authorizationCode, const QString& codeVerifier);
+
+private:
+  void refreshAccessToken(std::function<void()> onSuccess);
+  bool retryOnTokenExpiry(QRestReply& reply, std::function<void()> retry);
+};
 
 }  // namespace sync::myanimelist

@@ -25,6 +25,7 @@
 #include "sync/anilist.hpp"
 #include "sync/anilist_utils.hpp"
 #include "sync/kitsu_utils.hpp"
+#include "sync/myanimelist.hpp"
 #include "sync/myanimelist_utils.hpp"
 #include "sync/queue.hpp"
 #include "taiga/accounts.hpp"
@@ -113,6 +114,7 @@ QString tagMessage(const ServiceId serviceId, const QString& message) {
 void authenticateUser() {
   switch (currentServiceId()) {
     case ServiceId::MyAnimeList:
+      myanimelist::Service::instance()->authenticateUser();
       break;
     case ServiceId::Kitsu:
       break;

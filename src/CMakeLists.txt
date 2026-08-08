@@ -62,6 +62,7 @@ target_sources(taiga PRIVATE
 	sync/kitsu_ratings.hpp
 	sync/kitsu_utils.cpp
 	sync/kitsu_utils.hpp
+	sync/myanimelist.cpp
 	sync/myanimelist.hpp
 	sync/myanimelist_error.cpp
 	sync/myanimelist_error.hpp
