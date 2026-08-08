@@ -28,7 +28,13 @@
 class QJsonObject;
 class QUrlQuery;
 
+namespace anime {
+enum class SeasonName;
+}
+
 namespace sync::kitsu {
+
+QString fromSeasonName(const anime::SeasonName name);
 
 QJsonObject buildLibraryEntryObject(const anime::list::Entry& entry,
                                     const anime::list::Fields dirty, const QString& userId);

@@ -41,6 +41,10 @@ namespace {
 
 constexpr int kLibraryPageLimit = 500;
 
+// Kitsu's JSON:API configuration sets a maximum page size of 20 on this resource. Asking for
+// more results returns an error: "Limit exceeds maximum page size of 20."
+constexpr int kSearchPageLimit = 20;
+
 }  // namespace
 
 Service::Service() : sync::Service{ServiceId::Kitsu} {
@@ -143,6 +147,61 @@ void Service::fetchListEntries(const int offset) {
   };
 
   manager_.get(api_.createRequest(u"/library-entries"_s, query), this, callback);
+}
+
+void Service::search(const SearchParams& params, const int offset) {
+  const bool seasonScoped = params.season.has_value() && params.year.has_value();
+
+  QUrlQuery query;
+
+  if (seasonScoped) {
+    query.addQueryItem(u"filter[season]"_s, fromSeasonName(*params.season));
+    query.addQueryItem(u"filter[season_year]"_s, QString::number(*params.year));
+    // We don't actually need the results to be sorted, but without this parameter we get
+    // inconsistent ordering and duplicate objects across pages.
+    query.addQueryItem(u"sort"_s, u"-user_count"_s);
+  } else {
+    query.addQueryItem(u"filter[text]"_s, params.text);
+  }
+  query.addQueryItem(u"page[offset]"_s, QString::number(offset));
+  query.addQueryItem(u"page[limit]"_s, QString::number(kSearchPageLimit));
+
+  const auto callback = [this, params, offset, seasonScoped](QRestReply& reply) {
+    if (isError(reply)) {
+      if (retryOnTokenExpiry(reply, [this, params, offset] { search(params, offset); })) return;
+      handleError(*this, reply);
+      emit searchCompleted(params, {});
+      return;
+    }
+
+    const auto json = reply.readJson();
+    if (!json) {
+      handleError(*this, reply, "Could not parse search results.");
+      emit searchCompleted(params, {});
+      return;
+    }
+
+    const auto root = json->object();
+
+    QList<int> ids;
+    for (const auto& value : root["data"].toArray()) {
+      if (const auto item = parseAnime(value)) {
+        anime::db.updateItem(*item);
+        ids.append(item->id);
+      }
+    }
+
+    emit searchCompleted(params, ids);
+
+    // Auto-paginate only for season browsing.
+    if (seasonScoped) {
+      if (const auto nextOffset = pagingOffset(root["links"].toObject(), u"next"_s)) {
+        search(params, *nextOffset);
+      }
+    }
+  };
+
+  manager_.get(api_.createRequest(u"/anime"_s, query), this, callback);
 }
 
 }  // namespace sync::kitsu

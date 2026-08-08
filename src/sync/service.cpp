@@ -160,6 +160,7 @@ void search(const SearchParams& params) {
       myanimelist::Service::instance()->search(params);
       break;
     case ServiceId::Kitsu:
+      kitsu::Service::instance()->search(params);
       break;
     case ServiceId::AniList:
       anilist::Service::instance()->search(params);

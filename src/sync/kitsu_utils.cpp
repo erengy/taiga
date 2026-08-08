@@ -25,10 +25,26 @@
 #include <format>
 
 #include "base/string.hpp"
+#include "media/anime_season.hpp"
 #include "sync/kitsu_parsers.hpp"
 #include "sync/kitsu_ratings.hpp"
 
 namespace sync::kitsu {
+
+QString fromSeasonName(const anime::SeasonName name) {
+  // clang-format off
+  switch (name) {
+    case anime::SeasonName::Unknown: return "";
+    case anime::SeasonName::Winter: return "winter";
+    case anime::SeasonName::Spring: return "spring";
+    case anime::SeasonName::Summer: return "summer";
+    case anime::SeasonName::Fall: return "fall";
+  }
+  // clang-format on
+  return "";
+}
+
+////////////////////////////////////////////////////////////////////////////////
 
 QJsonObject buildLibraryEntryObject(const anime::list::Entry& entry,
                                     const anime::list::Fields dirty, const QString& userId) {
