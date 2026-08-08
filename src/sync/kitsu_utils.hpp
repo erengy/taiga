@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,9 +18,22 @@
 
 #pragma once
 
+#include <QByteArray>
+#include <QString>
+#include <optional>
 #include <string>
 
+#include "media/anime_list.hpp"
+
+class QJsonObject;
+class QUrlQuery;
+
 namespace sync::kitsu {
+
+QJsonObject buildLibraryEntryObject(const anime::list::Entry& entry,
+                                    const anime::list::Fields dirty, const QString& userId);
+QByteArray formUrlEncode(const QUrlQuery& query);
+std::optional<int> pagingOffset(const QJsonObject& links, const QString& key);
 
 std::string animePageUrl(const int id);
 
