@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,14 @@
 
 #include <QList>
 #include <QString>
+#include <optional>
 #include <string>
+
+class QJsonObject;
+
+namespace anime {
+enum class SeasonName;
+}
 
 namespace anime::list {
 enum class Status;
@@ -34,9 +41,14 @@ namespace sync::myanimelist {
 
 int fromListScore(int value);
 QString fromListStatus(const anime::list::Status value);
+QString fromSeasonName(const anime::SeasonName name);
 
 QList<sync::Rating> ratingList();
 QString formatRating(const int value);
+
+QString animeFields();
+QString listStatusFields();
+std::optional<int> pagingOffset(const QJsonObject& paging, const QString& key);
 
 std::string animePageUrl(const int id);
 std::string authorizationCodeUrl(std::string& codeVerifier);
