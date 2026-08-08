@@ -56,6 +56,7 @@ public:
 
   void authenticateUser();
   void fetchAnime(const int id);
+  void fetchListEntries(const int offset = 0);
 
 private:
   void resolveUser(std::function<void()> onSuccess = nullptr);

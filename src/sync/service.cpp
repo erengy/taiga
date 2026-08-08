@@ -146,6 +146,7 @@ void fetchListEntries() {
       myanimelist::Service::instance()->fetchListEntries();
       break;
     case ServiceId::Kitsu:
+      kitsu::Service::instance()->fetchListEntries();
       break;
     case ServiceId::AniList:
       anilist::Service::instance()->fetchListEntries();
@@ -181,6 +182,15 @@ void synchronize() {
       break;
 
     case ServiceId::Kitsu:
+      if (!taiga::accounts.kitsuAuthenticated()) {
+        if (!taiga::accounts.kitsuAccessToken().empty()) {
+          authenticateUser();
+        } else if (!taiga::accounts.kitsuUsername().empty()) {
+          // Allow downloading the list without authentication
+          fetchListEntries();
+        }
+        return;
+      }
       break;
 
     case ServiceId::AniList:
