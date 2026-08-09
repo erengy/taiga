@@ -33,8 +33,7 @@ namespace sync::kitsu {
 
 namespace {
 
-std::optional<QString> parseErrorMessage(QRestReply& reply) {
-  const auto json = reply.readJson();
+std::optional<QString> parseErrorMessage(const std::optional<QJsonDocument>& json) {
   if (!json) return std::nullopt;
 
   const auto root = json->object();
@@ -71,6 +70,11 @@ bool isTokenExpired(const QRestReply& reply) {
 }
 
 void handleError(sync::Service& service, QRestReply& reply, const QString& message) {
+  handleError(service, reply, reply.readJson(), message);
+}
+
+void handleError(sync::Service& service, QRestReply& reply,
+                 const std::optional<QJsonDocument>& json, const QString& message) {
   if (taiga::isDdosProtectionActive(reply)) {
     const auto server = QString::fromUtf8(reply.networkReply()->rawHeader("Server"));
     const auto description =
@@ -79,7 +83,7 @@ void handleError(sync::Service& service, QRestReply& reply, const QString& messa
     return;
   }
 
-  if (const auto description = parseErrorMessage(reply)) {
+  if (const auto description = parseErrorMessage(json)) {
     emit service.errorOccurred(*description);
     return;
   }

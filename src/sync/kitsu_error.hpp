@@ -18,7 +18,9 @@
 
 #pragma once
 
+#include <QJsonDocument>
 #include <QString>
+#include <optional>
 
 class QRestReply;
 
@@ -32,5 +34,10 @@ bool isError(const QRestReply& reply);
 bool isTokenExpired(const QRestReply& reply);
 
 void handleError(sync::Service& service, QRestReply& reply, const QString& message = {});
+
+// Use this overload when the reply body has already been consumed via `QRestReply::readJson()`,
+// which can only be read once.
+void handleError(sync::Service& service, QRestReply& reply,
+                 const std::optional<QJsonDocument>& json, const QString& message = {});
 
 }  // namespace sync::kitsu

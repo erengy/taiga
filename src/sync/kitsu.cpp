@@ -236,10 +236,11 @@ void Service::addListEntry(const int id, const anime::list::Fields dirty) {
                                             QString::fromStdString(taiga::accounts.kitsuUserId()));
 
   const auto callback = [this, id, dirty](QRestReply& reply) {
+    const auto json = reply.readJson();
+
     // Kitsu returns 422 if the anime is already in the user's list. Treat this as a
     // successful (idempotent) add rather than an error.
     if (reply.httpStatus() == 422) {
-      const auto json = reply.readJson();
       const auto errors = json ? json->object()["errors"].toArray() : QJsonArray{};
       const bool duplicate = std::ranges::any_of(errors, [](const QJsonValue& value) {
         return value["detail"].toString().contains(u"has already been taken"_s);
@@ -252,12 +253,11 @@ void Service::addListEntry(const int id, const anime::list::Fields dirty) {
 
     if (isError(reply)) {
       if (retryOnTokenExpiry(reply, [this, id, dirty] { addListEntry(id, dirty); })) return;
-      handleError(*this, reply);
+      handleError(*this, reply, json);
       sync::queue.complete(false, "Failed to add list entry.");
       return;
     }
 
-    const auto json = reply.readJson();
     if (const auto entry =
             json ? parseListEntry(json->object()["data"].toObject(), id) : std::nullopt) {
       anime::db.updateEntry(*entry);
