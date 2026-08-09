@@ -55,6 +55,7 @@ signals:
   void authenticationCompleted(bool authenticated);
   void searchCompleted(const SearchParams& params, const QList<int>& ids);
   void listEntriesFetched();
+  void transferProgress(const qint64 current, const qint64 total);
   void errorOccurred(const QString& message);
 
 protected:

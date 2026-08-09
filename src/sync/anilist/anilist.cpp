@@ -21,6 +21,7 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QNetworkReply>
 #include <QRestReply>
 #include <QSet>
 #include <ranges>
@@ -191,7 +192,9 @@ void Service::fetchListEntries() {
     emit listEntriesFetched();
   };
 
-  manager_.post(api_.createRequest(), data, this, callback);
+  const auto reply = manager_.post(api_.createRequest(), data, this, callback);
+
+  connect(reply, &QNetworkReply::downloadProgress, this, &Service::transferProgress);
 }
 
 void Service::addListEntry(const int id, const anime::list::Fields dirty) {

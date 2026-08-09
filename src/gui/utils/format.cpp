@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 #include <QCoreApplication>
 #include <QDate>
 #include <QDateTime>
+#include <QLocale>
 #include <cmath>
 #include <format>
 
@@ -126,6 +127,13 @@ QString formatDuration(Duration duration) {
 QString formatTimestamp(const qint64 time) {
   const QDateTime datetime = QDateTime::fromSecsSinceEpoch(time);
   return formatDate(datetime.date());
+}
+
+QString formatTransferProgress(const qint64 current, const qint64 total) {
+  if (total > 0) {
+    return u"%1%"_s.arg(static_cast<int>(100.0 * current / total));  // e.g. "45%"
+  }
+  return QLocale::system().formattedDataSize(current, 1);  // e.g. "1.2 MiB"
 }
 
 QString formatSeason(const anime::Season season, QString placeholder) {

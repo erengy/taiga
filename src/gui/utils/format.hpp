@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -63,6 +63,7 @@ QString formatFuzzyDateRange(const base::FuzzyDate& from, const base::FuzzyDate&
 QString formatAsRelativeTime(const qint64 time, QString placeholder = "Unknown");
 QString formatDuration(base::Duration duration);
 QString formatTimestamp(const qint64 time);
+QString formatTransferProgress(const qint64 current, const qint64 total);
 
 QString formatSeason(const anime::Season season, QString placeholder = "Unknown");
 QString formatSeasonName(const anime::SeasonName name);

@@ -31,6 +31,7 @@
 #include "gui/main/now_playing_widget.hpp"
 #include "gui/search/search_widget.hpp"
 #include "gui/settings/settings_dialog.hpp"
+#include "gui/utils/format.hpp"
 #include "gui/utils/theme.hpp"
 #include "gui/utils/tray_icon.hpp"
 #include "gui/utils/widgets.hpp"
@@ -222,6 +223,12 @@ void MainWindow::initStatusbar() {
       statusBar()->showMessage(sync::tagMessage(sender_service->id(), message));
       setEnabled(true);
     });
+    connect(service, &sync::Service::transferProgress, this,
+            [this](const qint64 current, const qint64 total) {
+              statusBar()->showMessage(tr("Synchronizing with %1... (%2)")
+                                           .arg(sync::serviceName(sync::currentServiceId()))
+                                           .arg(gui::formatTransferProgress(current, total)));
+            });
   }
 
   connect(&sync::queue, &sync::Queue::changed, this, [this]() {
