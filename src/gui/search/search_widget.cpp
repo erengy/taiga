@@ -34,12 +34,15 @@
 #include "media/anime.hpp"
 #include "media/anime_season.hpp"
 #include "sync/anilist.hpp"
+#include "sync/kitsu.hpp"
+#include "sync/myanimelist.hpp"
 #include "sync/service.hpp"
 #include "taiga/session.hpp"
 
 namespace {
 
 std::optional<sync::SearchSort> toSearchSort(gui::AnimeListModel::Column column) {
+  // clang-format off
   switch (column) {
     case gui::AnimeListModel::COLUMN_TITLE: return sync::SearchSort::Title;
     case gui::AnimeListModel::COLUMN_DURATION: return sync::SearchSort::Duration;
@@ -48,6 +51,7 @@ std::optional<sync::SearchSort> toSearchSort(gui::AnimeListModel::Column column)
     case gui::AnimeListModel::COLUMN_SEASON: return sync::SearchSort::StartDate;
     default: return std::nullopt;
   }
+  // clang-format on
 }
 
 }  // namespace
@@ -195,12 +199,18 @@ SearchWidget::SearchWidget(QWidget* parent)
   connect(mainWindow()->searchBox(), &QLineEdit::returnPressed, this,
           [this]() { performSearch(); });
 
-  // @TODO: Revise once other services are implemented
-  connect(sync::anilist::Service::instance(), &sync::Service::searchCompleted, this,
-          [this](const sync::SearchParams& params, const QList<int>& ids) {
-            if (params != currentSearchParams()) return;
-            m_model->addIds(ids);
-          });
+  const QList<sync::Service*> services{
+      sync::anilist::Service::instance(),
+      sync::kitsu::Service::instance(),
+      sync::myanimelist::Service::instance(),
+  };
+  for (auto* service : services) {
+    connect(service, &sync::Service::searchCompleted, this,
+            [this](const sync::SearchParams& params, const QList<int>& ids) {
+              if (params != currentSearchParams()) return;
+              m_model->addIds(ids);
+            });
+  }
 }
 
 void SearchWidget::saveState() {
