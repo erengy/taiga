@@ -30,11 +30,20 @@ class QUrlQuery;
 
 namespace anime {
 enum class SeasonName;
+enum class Status;
+enum class Type;
+}  // namespace anime
+
+namespace sync {
+struct SearchParams;
 }
 
 namespace sync::kitsu {
 
+QString fromSearchParams(const SearchParams& params);
 QString fromSeasonName(const anime::SeasonName name);
+QString fromStatus(const anime::Status value);
+QString fromType(const anime::Type value);
 
 QJsonObject buildLibraryEntryObject(const anime::list::Entry& entry,
                                     const anime::list::Fields dirty, const QString& userId);

@@ -161,24 +161,31 @@ void Service::fetchListEntries(const int offset) {
 }
 
 void Service::search(const SearchParams& params, const int offset) {
-  const bool seasonScoped = params.season.has_value() && params.year.has_value();
-
   QUrlQuery query;
 
-  if (seasonScoped) {
-    query.addQueryItem(u"filter[season]"_s, fromSeasonName(*params.season));
-    query.addQueryItem(u"filter[season_year]"_s, QString::number(*params.year));
-    // We don't actually need the results to be sorted, but without this parameter we get
-    // inconsistent ordering and duplicate objects across pages.
-    query.addQueryItem(u"sort"_s, u"-user_count"_s);
-  } else {
+  if (!params.text.isEmpty()) {
     query.addQueryItem(u"filter[text]"_s, params.text);
+  }
+  if (params.season) {
+    query.addQueryItem(u"filter[season]"_s, fromSeasonName(*params.season));
+  }
+  if (params.year) {
+    query.addQueryItem(u"filter[season_year]"_s, QString::number(*params.year));
+  }
+  if (params.type) {
+    query.addQueryItem(u"filter[subtype]"_s, fromType(*params.type));
+  }
+  if (params.status) {
+    query.addQueryItem(u"filter[status]"_s, fromStatus(*params.status));
+  }
+  if (const auto sort = fromSearchParams(params); !sort.isEmpty()) {
+    query.addQueryItem(u"sort"_s, sort);
   }
   query.addQueryItem(u"page[offset]"_s, QString::number(offset));
   query.addQueryItem(u"page[limit]"_s, QString::number(kSearchPageLimit));
   query.addQueryItem(u"fields[anime]"_s, animeFields());
 
-  const auto callback = [this, params, offset, seasonScoped](QRestReply& reply) {
+  const auto callback = [this, params, offset](QRestReply& reply) {
     if (isError(reply)) {
       if (retryOnTokenExpiry(reply, [this, params, offset] { search(params, offset); })) return;
       handleError(*this, reply);
@@ -206,6 +213,7 @@ void Service::search(const SearchParams& params, const int offset) {
     emit searchCompleted(params, ids);
 
     // Auto-paginate only for season browsing.
+    const bool seasonScoped = params.season.has_value() && params.year.has_value();
     if (seasonScoped) {
       if (const auto nextOffset = pagingOffset(root["links"].toObject(), u"next"_s)) {
         search(params, *nextOffset);

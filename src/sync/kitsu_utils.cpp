@@ -25,11 +25,35 @@
 #include <format>
 
 #include "base/string.hpp"
+#include "media/anime.hpp"
 #include "media/anime_season.hpp"
 #include "sync/kitsu_parsers.hpp"
 #include "sync/kitsu_ratings.hpp"
+#include "sync/search_params.hpp"
 
 namespace sync::kitsu {
+
+QString fromSearchParams(const SearchParams& params) {
+  // Text search already returns results in relevance order.
+  if (!params.text.isEmpty()) return {};
+
+  if (params.sort) {
+    const auto prefix = params.sortOrder == Qt::SortOrder::DescendingOrder ? u"-"_s : QString{};
+    // clang-format off
+    switch (*params.sort) {
+      case SearchSort::Title: return prefix + u"canonicalTitle"_s;
+      case SearchSort::Duration: return prefix + u"episodeLength"_s;
+      case SearchSort::Score: return prefix + u"averageRating"_s;
+      case SearchSort::Type: return prefix + u"subtype"_s;
+      case SearchSort::StartDate: return prefix + u"startDate"_s;
+    }
+    // clang-format on
+  }
+
+  // Without an explicit sort, season browsing returns inconsistent ordering
+  // and duplicate objects across pages.
+  return u"-user_count"_s;
+}
 
 QString fromSeasonName(const anime::SeasonName name) {
   // clang-format off
@@ -39,6 +63,33 @@ QString fromSeasonName(const anime::SeasonName name) {
     case anime::SeasonName::Spring: return "spring";
     case anime::SeasonName::Summer: return "summer";
     case anime::SeasonName::Fall: return "fall";
+  }
+  // clang-format on
+  return "";
+}
+
+QString fromStatus(const anime::Status value) {
+  // clang-format off
+  switch (value) {
+    case anime::Status::Unknown: return "";
+    case anime::Status::Airing: return "current";
+    case anime::Status::FinishedAiring: return "finished";
+    case anime::Status::NotYetAired: return "tba,unreleased,upcoming";
+  }
+  // clang-format on
+  return "";
+}
+
+QString fromType(const anime::Type value) {
+  // clang-format off
+  switch (value) {
+    case anime::Type::Unknown: return "";
+    case anime::Type::Tv: return "TV";
+    case anime::Type::Ova: return "OVA";
+    case anime::Type::Movie: return "movie";
+    case anime::Type::Special: return "special";
+    case anime::Type::Ona: return "ONA";
+    case anime::Type::Music: return "music";
   }
   // clang-format on
   return "";
