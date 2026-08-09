@@ -27,6 +27,9 @@
 #include "media/anime.hpp"
 #include "media/anime_db.hpp"
 #include "media/anime_list.hpp"
+#include "sync/anilist/anilist.hpp"
+#include "sync/kitsu/kitsu.hpp"
+#include "sync/myanimelist/myanimelist.hpp"
 #include "sync/queue.hpp"
 
 namespace gui {
@@ -58,6 +61,15 @@ NavigationWidget::NavigationWidget(QWidget* parent) : QTreeWidget(parent) {
   });
 
   connect(&sync::queue, &sync::Queue::changed, this, &NavigationWidget::refresh);
+
+  const QList<sync::Service*> services{
+      sync::anilist::Service::instance(),
+      sync::kitsu::Service::instance(),
+      sync::myanimelist::Service::instance(),
+  };
+  for (auto* service : services) {
+    connect(service, &sync::Service::listEntriesFetched, this, &NavigationWidget::refresh);
+  }
 }
 
 void NavigationWidget::refresh() {
