@@ -212,6 +212,8 @@ void MainWindow::initStatusbar() {
       sync::myanimelist::Service::instance(),
   };
   for (auto* service : services) {
+    connect(service, &sync::Service::listEntriesFetched, this,
+            [this]() { statusBar()->clearMessage(); });
     connect(service, &sync::Service::errorOccurred, this, [this](const QString& message) {
       const auto sender_service = qobject_cast<sync::Service*>(sender());
       statusBar()->showMessage(sync::tagMessage(sender_service->id(), message));
@@ -341,7 +343,6 @@ void MainWindow::synchronize() {
 
   sync::synchronize();
 
-  statusBar()->clearMessage();
   setEnabled(true);
 }
 

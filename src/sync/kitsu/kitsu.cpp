@@ -164,6 +164,7 @@ void Service::fetchListEntries(const int offset, QSet<int> fetchedIds) {
       fetchListEntries(*nextOffset, fetchedIds);
     } else {
       sync::pruneMissingEntries(fetchedIds);
+      emit listEntriesFetched();
     }
   };
 

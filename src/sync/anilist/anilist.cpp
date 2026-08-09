@@ -184,6 +184,7 @@ void Service::fetchListEntries() {
     }
 
     sync::pruneMissingEntries(fetchedIds);
+    emit listEntriesFetched();
   };
 
   manager_.post(api_.createRequest(), data, this, callback);

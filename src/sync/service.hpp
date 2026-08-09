@@ -54,6 +54,7 @@ public:
 signals:
   void authenticationCompleted(bool authenticated);
   void searchCompleted(const SearchParams& params, const QList<int>& ids);
+  void listEntriesFetched();
   void errorOccurred(const QString& message);
 
 protected:
