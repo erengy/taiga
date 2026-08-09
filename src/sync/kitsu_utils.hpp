@@ -41,6 +41,12 @@ QJsonObject buildLibraryEntryObject(const anime::list::Entry& entry,
 QByteArray formUrlEncode(const QUrlQuery& query);
 std::optional<int> pagingOffset(const QJsonObject& links, const QString& key);
 
+// Sparse fieldsets
+// https://jsonapi.org/format/#fetching-sparse-fieldsets
+QString animeFields(const bool minimal = false);
+QString libraryEntryFields();
+QString userFields();
+
 std::string animePageUrl(const int id);
 
 }  // namespace sync::kitsu

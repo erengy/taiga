@@ -132,10 +132,11 @@ void Service::refreshAccessToken(std::function<void()> onSuccess) {
 void Service::resolveUser(std::function<void()> onSuccess) {
   const bool authenticated = !taiga::accounts.kitsuAccessToken().empty();
 
-  const QUrlQuery query =
+  QUrlQuery query =
       authenticated
           ? QUrlQuery{{u"filter[self]"_s, u"true"_s}}
           : QUrlQuery{{u"filter[slug]"_s, QString::fromStdString(taiga::accounts.kitsuUsername())}};
+  query.addQueryItem(u"fields[users]"_s, userFields());
 
   const auto callback = [this, authenticated, onSuccess](QRestReply& reply) {
     if (isError(reply)) {

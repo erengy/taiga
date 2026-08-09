@@ -70,7 +70,13 @@ Service* Service::instance() {
 ////////////////////////////////////////////////////////////////////////////////
 
 void Service::fetchAnime(const int id) {
-  const QUrlQuery query{{"include", "categories,animeProductions,animeProductions.producer"}};
+  const QUrlQuery query{{
+      {"include", "categories,animeProductions,animeProductions.producer"},
+      {"fields[anime]", animeFields()},
+      {"fields[animeProductions]", "producer"},
+      {"fields[categories]", "title"},
+      {"fields[producers]", "name"},
+  }};
 
   const auto callback = [this, id](QRestReply& reply) {
     if (isError(reply)) {
@@ -113,6 +119,8 @@ void Service::fetchListEntries(const int offset) {
       {"include", "anime"},
       {"page[offset]", QString::number(offset)},
       {"page[limit]", QString::number(kLibraryPageLimit)},
+      {"fields[anime]", animeFields(true)},
+      {"fields[libraryEntries]", libraryEntryFields()},
   }};
 
   const auto callback = [this, offset](QRestReply& reply) {
@@ -168,6 +176,7 @@ void Service::search(const SearchParams& params, const int offset) {
   }
   query.addQueryItem(u"page[offset]"_s, QString::number(offset));
   query.addQueryItem(u"page[limit]"_s, QString::number(kSearchPageLimit));
+  query.addQueryItem(u"fields[anime]"_s, animeFields());
 
   const auto callback = [this, params, offset, seasonScoped](QRestReply& reply) {
     if (isError(reply)) {
@@ -211,7 +220,8 @@ void Service::addListEntry(const int id, const anime::list::Fields dirty) {
   const auto listEntry = anime::db.entry(id);
   if (!listEntry) return;
 
-  auto request = api_.createRequest(u"/library-entries"_s);
+  const QUrlQuery query{{"fields[libraryEntries]", libraryEntryFields()}};
+  auto request = api_.createRequest(u"/library-entries"_s, query);
   request.setHeader(QNetworkRequest::ContentTypeHeader, kJsonApiMediaType);
 
   const auto body = buildLibraryEntryObject(*listEntry, dirty,
@@ -255,7 +265,8 @@ void Service::updateListEntry(const int id, const anime::list::Fields dirty) {
   const auto listEntry = anime::db.entry(id);
   if (!listEntry) return;
 
-  auto request = api_.createRequest(u"/library-entries/%1"_s.arg(listEntry->id));
+  const QUrlQuery query{{"fields[libraryEntries]", libraryEntryFields()}};
+  auto request = api_.createRequest(u"/library-entries/%1"_s.arg(listEntry->id), query);
   request.setHeader(QNetworkRequest::ContentTypeHeader, kJsonApiMediaType);
 
   const auto body = buildLibraryEntryObject(*listEntry, dirty,

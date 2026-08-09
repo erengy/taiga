@@ -127,6 +127,57 @@ std::optional<int> pagingOffset(const QJsonObject& links, const QString& key) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+QString animeFields(const bool minimal) {
+  auto fields =
+      // attributes
+      u"abbreviatedTitles,"
+      "ageRating,"
+      "averageRating,"
+      "canonicalTitle,"
+      "endDate,"
+      "episodeCount,"
+      "episodeLength,"
+      "popularityRank,"
+      "posterImage,"
+      "slug,"
+      "startDate,"
+      "status,"
+      "subtype,"
+      "titles,"
+      "youtubeVideoId,"
+      // relationships
+      "animeProductions,"
+      "categories"_s;
+
+  if (!minimal) fields += u",synopsis"_s;
+
+  return fields;
+}
+
+QString libraryEntryFields() {
+  return
+      // attributes
+      u"finishedAt,"
+      "notes,"
+      "private,"
+      "progress,"
+      "ratingTwenty,"
+      "reconsumeCount,"
+      "reconsuming,"
+      "startedAt,"
+      "status,"
+      "updatedAt,"
+      // relationships
+      "anime"_s;
+}
+
+QString userFields() {
+  return u"email,"
+         "name,"
+         "ratingSystem,"
+         "slug"_s;
+}
+
 std::string animePageUrl(const int id) {
   return std::format("https://kitsu.app/anime/{}", id);
 }
