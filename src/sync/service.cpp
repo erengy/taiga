@@ -220,6 +220,7 @@ void addListEntry(const int id, const anime::list::Fields dirty) {
       myanimelist::Service::instance()->addListEntry(id, dirty);
       break;
     case ServiceId::Kitsu:
+      kitsu::Service::instance()->addListEntry(id, dirty);
       break;
     case ServiceId::AniList:
       anilist::Service::instance()->addListEntry(id, dirty);
@@ -233,6 +234,7 @@ void updateListEntry(const int id, const anime::list::Fields dirty) {
       myanimelist::Service::instance()->updateListEntry(id, dirty);
       break;
     case ServiceId::Kitsu:
+      kitsu::Service::instance()->updateListEntry(id, dirty);
       break;
     case ServiceId::AniList:
       anilist::Service::instance()->updateListEntry(id, dirty);
@@ -246,6 +248,7 @@ void deleteListEntry(const int id) {
       myanimelist::Service::instance()->deleteListEntry(id);
       break;
     case ServiceId::Kitsu:
+      kitsu::Service::instance()->deleteListEntry(id);
       break;
     case ServiceId::AniList:
       anilist::Service::instance()->deleteListEntry(id);

@@ -22,14 +22,17 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QNetworkRequest>
 #include <QRestReply>
 #include <QUrlQuery>
+#include <ranges>
 
 #include "base/string.hpp"
 #include "media/anime_db.hpp"
 #include "sync/kitsu_error.hpp"
 #include "sync/kitsu_parsers.hpp"
 #include "sync/kitsu_utils.hpp"
+#include "sync/queue.hpp"
 #include "taiga/accounts.hpp"
 
 // Kitsu API documentation:
@@ -202,6 +205,101 @@ void Service::search(const SearchParams& params, const int offset) {
   };
 
   manager_.get(api_.createRequest(u"/anime"_s, query), this, callback);
+}
+
+void Service::addListEntry(const int id, const anime::list::Fields dirty) {
+  const auto listEntry = anime::db.entry(id);
+  if (!listEntry) return;
+
+  auto request = api_.createRequest(u"/library-entries"_s);
+  request.setHeader(QNetworkRequest::ContentTypeHeader, kJsonApiMediaType);
+
+  const auto body = buildLibraryEntryObject(*listEntry, dirty,
+                                            QString::fromStdString(taiga::accounts.kitsuUserId()));
+
+  const auto callback = [this, id, dirty](QRestReply& reply) {
+    // Kitsu returns 422 if the anime is already in the user's list. Treat this as a
+    // successful (idempotent) add rather than an error.
+    if (reply.httpStatus() == 422) {
+      const auto json = reply.readJson();
+      const auto errors = json ? json->object()["errors"].toArray() : QJsonArray{};
+      const bool duplicate = std::ranges::any_of(errors, [](const QJsonValue& value) {
+        return value["detail"].toString().contains(u"has already been taken"_s);
+      });
+      if (duplicate) {
+        sync::queue.complete(true);
+        return;
+      }
+    }
+
+    if (isError(reply)) {
+      if (retryOnTokenExpiry(reply, [this, id, dirty] { addListEntry(id, dirty); })) return;
+      handleError(*this, reply);
+      sync::queue.complete(false, "Failed to add list entry.");
+      return;
+    }
+
+    const auto json = reply.readJson();
+    if (const auto entry =
+            json ? parseListEntry(json->object()["data"].toObject(), id) : std::nullopt) {
+      anime::db.updateEntry(*entry);
+    }
+
+    sync::queue.complete(true);
+  };
+
+  manager_.post(request, QJsonDocument(body).toJson(QJsonDocument::Compact), this, callback);
+}
+
+void Service::updateListEntry(const int id, const anime::list::Fields dirty) {
+  const auto listEntry = anime::db.entry(id);
+  if (!listEntry) return;
+
+  auto request = api_.createRequest(u"/library-entries/%1"_s.arg(listEntry->id));
+  request.setHeader(QNetworkRequest::ContentTypeHeader, kJsonApiMediaType);
+
+  const auto body = buildLibraryEntryObject(*listEntry, dirty,
+                                            QString::fromStdString(taiga::accounts.kitsuUserId()));
+
+  const auto callback = [this, id, dirty](QRestReply& reply) {
+    if (isError(reply)) {
+      if (retryOnTokenExpiry(reply, [this, id, dirty] { updateListEntry(id, dirty); })) return;
+      handleError(*this, reply,
+                  reply.httpStatus() == 404 ? u"Anime list entry does not exist."_s : QString{});
+      sync::queue.complete(false, "Failed to update list entry.");
+      return;
+    }
+
+    const auto json = reply.readJson();
+    if (const auto entry =
+            json ? parseListEntry(json->object()["data"].toObject(), id) : std::nullopt) {
+      anime::db.updateEntry(*entry);
+    }
+
+    sync::queue.complete(true);
+  };
+
+  manager_.patch(request, QJsonDocument(body).toJson(QJsonDocument::Compact), this, callback);
+}
+
+void Service::deleteListEntry(const int id) {
+  const auto listEntry = anime::db.entry(id);
+  if (!listEntry) return;
+
+  const auto callback = [this, id](QRestReply& reply) {
+    if (isError(reply) && reply.httpStatus() != 404) {
+      if (retryOnTokenExpiry(reply, [this, id] { deleteListEntry(id); })) return;
+      handleError(*this, reply);
+      sync::queue.complete(false, "Failed to delete list entry.");
+      return;
+    }
+
+    anime::db.deleteEntry(id);
+    sync::queue.complete(true);
+  };
+
+  manager_.deleteResource(api_.createRequest(u"/library-entries/%1"_s.arg(listEntry->id)), this,
+                          callback);
 }
 
 }  // namespace sync::kitsu

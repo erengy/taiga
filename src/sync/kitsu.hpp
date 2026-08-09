@@ -58,6 +58,9 @@ public:
   void fetchAnime(const int id);
   void fetchListEntries(const int offset = 0);
   void search(const SearchParams& params, const int offset = 0);
+  void addListEntry(const int id, const anime::list::Fields dirty);
+  void updateListEntry(const int id, const anime::list::Fields dirty);
+  void deleteListEntry(const int id);
 
 private:
   void resolveUser(std::function<void()> onSuccess = nullptr);
