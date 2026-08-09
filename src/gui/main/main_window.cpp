@@ -37,6 +37,7 @@
 #include "sync/anilist/anilist.hpp"
 #include "sync/kitsu/kitsu.hpp"
 #include "sync/myanimelist/myanimelist.hpp"
+#include "sync/queue.hpp"
 #include "sync/service.hpp"
 #include "taiga/application.hpp"
 #include "taiga/session.hpp"
@@ -219,6 +220,10 @@ void MainWindow::initStatusbar() {
       statusBar()->showMessage(sync::tagMessage(sender_service->id(), message));
     });
   }
+
+  connect(&sync::queue, &sync::Queue::changed, this, [this]() {
+    if (sync::queue.count() == 0) statusBar()->clearMessage();
+  });
 }
 
 void MainWindow::initToolbar() {
