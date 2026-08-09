@@ -105,11 +105,11 @@ void Service::fetchAnime(const int id) {
   manager_.get(api_.createRequest(u"/anime/%1"_s.arg(id), query), this, callback);
 }
 
-void Service::fetchListEntries(const int offset) {
+void Service::fetchListEntries(const int offset, QSet<int> fetchedIds) {
   // Library entries are filtered by numeric user ID rather than username, so it must be
   // resolved first.
   if (taiga::accounts.kitsuUserId().empty()) {
-    resolveUser([this, offset] { fetchListEntries(offset); });
+    resolveUser([this, offset, fetchedIds] { fetchListEntries(offset, fetchedIds); });
     return;
   }
 
@@ -123,9 +123,12 @@ void Service::fetchListEntries(const int offset) {
       {"fields[libraryEntries]", libraryEntryFields()},
   }};
 
-  const auto callback = [this, offset](QRestReply& reply) {
+  const auto callback = [this, offset, fetchedIds](QRestReply& reply) mutable {
     if (isError(reply)) {
-      if (retryOnTokenExpiry(reply, [this, offset] { fetchListEntries(offset); })) return;
+      if (retryOnTokenExpiry(
+              reply, [this, offset, fetchedIds] { fetchListEntries(offset, fetchedIds); })) {
+        return;
+      }
       handleError(*this, reply);
       return;
     }
@@ -149,11 +152,14 @@ void Service::fetchListEntries(const int offset) {
       const auto animeId = entryObject["relationships"]["anime"]["data"]["id"].toVariant().toInt();
       if (const auto entry = parseListEntry(entryObject, animeId)) {
         anime::db.updateEntry(*entry);
+        fetchedIds.insert(animeId);
       }
     }
 
     if (const auto nextOffset = pagingOffset(root["links"].toObject(), u"next"_s)) {
-      fetchListEntries(*nextOffset);
+      fetchListEntries(*nextOffset, fetchedIds);
+    } else {
+      sync::pruneMissingEntries(fetchedIds);
     }
   };
 

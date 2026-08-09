@@ -142,7 +142,7 @@ void Service::search(const SearchParams& params, const int offset) {
   manager_.get(api_.createRequest(path, query), this, callback);
 }
 
-void Service::fetchListEntries(const int offset) {
+void Service::fetchListEntries(const int offset, QSet<int> fetchedIds) {
   const auto username = QString::fromStdString(taiga::accounts.myanimelistUsername());
   const auto path = u"/users/%1/animelist"_s.arg(username);
 
@@ -153,9 +153,12 @@ void Service::fetchListEntries(const int offset) {
       {"fields", u"%1,list_status{%2}"_s.arg(animeFields(), listStatusFields())},
   };
 
-  const auto callback = [this, offset](QRestReply& reply) {
+  const auto callback = [this, offset, fetchedIds](QRestReply& reply) mutable {
     if (isError(reply)) {
-      if (retryOnTokenExpiry(reply, [this, offset] { fetchListEntries(offset); })) return;
+      if (retryOnTokenExpiry(
+              reply, [this, offset, fetchedIds] { fetchListEntries(offset, fetchedIds); })) {
+        return;
+      }
       handleError(*this, reply);
       return;
     }
@@ -178,11 +181,14 @@ void Service::fetchListEntries(const int offset) {
 
       if (const auto entry = parseListEntry(entryValue["list_status"], item->id)) {
         anime::db.updateEntry(*entry);
+        fetchedIds.insert(item->id);
       }
     }
 
     if (const auto nextOffset = pagingOffset(root["paging"].toObject(), u"next"_s)) {
-      fetchListEntries(*nextOffset);
+      fetchListEntries(*nextOffset, fetchedIds);
+    } else {
+      sync::pruneMissingEntries(fetchedIds);
     }
   };
 

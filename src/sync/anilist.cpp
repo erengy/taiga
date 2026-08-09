@@ -22,6 +22,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QRestReply>
+#include <QSet>
 #include <ranges>
 
 #include "base/string.hpp"
@@ -162,6 +163,8 @@ void Service::fetchListEntries() {
       return;
     }
 
+    QSet<int> fetchedIds;
+
     for (const auto& list : *lists) {
       for (const auto& entryValue : list.toObject()["entries"].toArray()) {
         const auto entry = entryValue.toObject();
@@ -171,9 +174,12 @@ void Service::fetchListEntries() {
         }
         if (const auto listEntry = parseListEntry(entry)) {
           anime::db.updateEntry(*listEntry);
+          fetchedIds.insert(listEntry->anime_id);
         }
       }
     }
+
+    sync::pruneMissingEntries(fetchedIds);
   };
 
   manager_.post(api_.createRequest(), data, this, callback);

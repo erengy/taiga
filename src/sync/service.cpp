@@ -22,6 +22,7 @@
 
 #include "base/log.hpp"
 #include "base/string.hpp"
+#include "media/anime_db.hpp"
 #include "sync/anilist.hpp"
 #include "sync/anilist_utils.hpp"
 #include "sync/kitsu.hpp"
@@ -280,6 +281,20 @@ QString animePageUrl(const int id) {
       return QString::fromStdString(anilist::animePageUrl(id));
   }
   return {};
+}
+
+void pruneMissingEntries(const QSet<int>& fetchedIds) {
+  QList<int> staleIds;
+
+  for (const auto animeId : anime::db.entries().keys()) {
+    if (fetchedIds.contains(animeId)) continue;
+    if (queue.hasItem(animeId)) continue;
+    staleIds.append(animeId);
+  }
+
+  for (const auto animeId : staleIds) {
+    anime::db.deleteEntry(animeId);
+  }
 }
 
 }  // namespace sync

@@ -21,6 +21,7 @@
 #include <QList>
 #include <QNetworkRequestFactory>
 #include <QRestAccessManager>
+#include <QSet>
 #include <QString>
 
 #include "media/anime_list.hpp"
@@ -86,5 +87,7 @@ void deleteListEntry(const int id);
 bool isUserAuthenticated();
 
 QString animePageUrl(const int id);
+
+void pruneMissingEntries(const QSet<int>& fetchedIds);
 
 }  // namespace sync

@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <QSet>
 #include <functional>
 
 #include "sync/service.hpp"
@@ -42,7 +43,7 @@ public:
   void requestAccessToken(const QString& authorizationCode, const QString& codeVerifier);
   void fetchAnime(const int id);
   void search(const SearchParams& params, const int offset = 0);
-  void fetchListEntries(const int offset = 0);
+  void fetchListEntries(const int offset = 0, QSet<int> fetchedIds = {});
   void addListEntry(const int id, const anime::list::Fields dirty);
   void deleteListEntry(const int id);
   void updateListEntry(const int id, const anime::list::Fields dirty);
