@@ -45,15 +45,26 @@ AnimeListModel::AnimeListModel(QObject* parent) : QAbstractListModel(parent) {
     }
   });
 
-  const auto refreshRow = [this](int id) {
-    if (const auto row = m_ids.indexOf(id); row > -1) {
-      emit dataChanged(index(row, 0), index(row, NUM_COLUMNS - 1));
-    }
-  };
+  connect(&anime::db, &anime::Database::itemUpdated, this, &AnimeListModel::refreshRow);
+  connect(&anime::db, &anime::Database::itemDeleted, this, &AnimeListModel::deleteRow);
+  connect(&anime::db, &anime::Database::entryUpdated, this, &AnimeListModel::refreshRow);
+  connect(&anime::db, &anime::Database::entryDeleted, this, &AnimeListModel::refreshRow);
+}
 
-  connect(&anime::db, &anime::Database::itemUpdated, this, refreshRow);
-  connect(&anime::db, &anime::Database::entryUpdated, this, refreshRow);
-  connect(&anime::db, &anime::Database::entryDeleted, this, refreshRow);
+void AnimeListModel::refreshRow(int id) {
+  if (const auto row = m_ids.indexOf(id); row > -1) {
+    emit dataChanged(index(row, 0), index(row, NUM_COLUMNS - 1));
+  } else {
+    addIds({id});
+  }
+}
+
+void AnimeListModel::deleteRow(int id) {
+  if (const auto row = m_ids.indexOf(id); row > -1) {
+    beginRemoveRows({}, row, row);
+    m_ids.removeAt(row);
+    endRemoveRows();
+  }
 }
 
 void AnimeListModel::addIds(const QList<int>& ids) {
