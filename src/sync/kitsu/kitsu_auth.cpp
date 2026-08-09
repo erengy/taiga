@@ -25,8 +25,8 @@
 
 #include "base/string.hpp"
 #include "kitsu.hpp"
-#include "sync/kitsu_error.hpp"
-#include "sync/kitsu_utils.hpp"
+#include "sync/kitsu/kitsu_error.hpp"
+#include "sync/kitsu/kitsu_utils.hpp"
 #include "taiga/accounts.hpp"
 
 namespace sync::kitsu {

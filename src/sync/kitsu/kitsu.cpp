@@ -29,9 +29,9 @@
 
 #include "base/string.hpp"
 #include "media/anime_db.hpp"
-#include "sync/kitsu_error.hpp"
-#include "sync/kitsu_parsers.hpp"
-#include "sync/kitsu_utils.hpp"
+#include "sync/kitsu/kitsu_error.hpp"
+#include "sync/kitsu/kitsu_parsers.hpp"
+#include "sync/kitsu/kitsu_utils.hpp"
 #include "sync/queue.hpp"
 #include "taiga/accounts.hpp"
 

@@ -28,9 +28,9 @@
 #include "base/string.hpp"
 #include "media/anime_db.hpp"
 #include "media/anime_season.hpp"
-#include "sync/myanimelist_error.hpp"
-#include "sync/myanimelist_parsers.hpp"
-#include "sync/myanimelist_utils.hpp"
+#include "sync/myanimelist/myanimelist_error.hpp"
+#include "sync/myanimelist/myanimelist_parsers.hpp"
+#include "sync/myanimelist/myanimelist_utils.hpp"
 #include "sync/queue.hpp"
 #include "taiga/accounts.hpp"
 

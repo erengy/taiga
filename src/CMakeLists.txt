@@ -46,37 +46,37 @@ target_sources(taiga PRIVATE
 	media/anime_utils.hpp
 	media/anime.hpp
 
-	sync/anilist.cpp
-	sync/anilist.hpp
-	sync/anilist_auth.cpp
-	sync/anilist_error.cpp
-	sync/anilist_error.hpp
-	sync/anilist_parsers.cpp
-	sync/anilist_parsers.hpp
-	sync/anilist_ratings.cpp
-	sync/anilist_ratings.hpp
-	sync/anilist_utils.cpp
-	sync/anilist_utils.hpp
-	sync/kitsu.cpp
-	sync/kitsu.hpp
-	sync/kitsu_auth.cpp
-	sync/kitsu_error.cpp
-	sync/kitsu_error.hpp
-	sync/kitsu_parsers.cpp
-	sync/kitsu_parsers.hpp
-	sync/kitsu_ratings.cpp
-	sync/kitsu_ratings.hpp
-	sync/kitsu_utils.cpp
-	sync/kitsu_utils.hpp
-	sync/myanimelist.cpp
-	sync/myanimelist.hpp
-	sync/myanimelist_auth.cpp
-	sync/myanimelist_error.cpp
-	sync/myanimelist_error.hpp
-	sync/myanimelist_parsers.cpp
-	sync/myanimelist_parsers.hpp
-	sync/myanimelist_utils.cpp
-	sync/myanimelist_utils.hpp
+	sync/anilist/anilist.cpp
+	sync/anilist/anilist.hpp
+	sync/anilist/anilist_auth.cpp
+	sync/anilist/anilist_error.cpp
+	sync/anilist/anilist_error.hpp
+	sync/anilist/anilist_parsers.cpp
+	sync/anilist/anilist_parsers.hpp
+	sync/anilist/anilist_ratings.cpp
+	sync/anilist/anilist_ratings.hpp
+	sync/anilist/anilist_utils.cpp
+	sync/anilist/anilist_utils.hpp
+	sync/kitsu/kitsu.cpp
+	sync/kitsu/kitsu.hpp
+	sync/kitsu/kitsu_auth.cpp
+	sync/kitsu/kitsu_error.cpp
+	sync/kitsu/kitsu_error.hpp
+	sync/kitsu/kitsu_parsers.cpp
+	sync/kitsu/kitsu_parsers.hpp
+	sync/kitsu/kitsu_ratings.cpp
+	sync/kitsu/kitsu_ratings.hpp
+	sync/kitsu/kitsu_utils.cpp
+	sync/kitsu/kitsu_utils.hpp
+	sync/myanimelist/myanimelist.cpp
+	sync/myanimelist/myanimelist.hpp
+	sync/myanimelist/myanimelist_auth.cpp
+	sync/myanimelist/myanimelist_error.cpp
+	sync/myanimelist/myanimelist_error.hpp
+	sync/myanimelist/myanimelist_parsers.cpp
+	sync/myanimelist/myanimelist_parsers.hpp
+	sync/myanimelist/myanimelist_utils.cpp
+	sync/myanimelist/myanimelist_utils.hpp
 	sync/queue.cpp
 	sync/queue.hpp
 	sync/service.cpp

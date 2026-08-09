@@ -21,8 +21,8 @@
 #include <QRestReply>
 
 #include "anilist.hpp"
-#include "sync/anilist_error.hpp"
-#include "sync/anilist_utils.hpp"
+#include "sync/anilist/anilist_error.hpp"
+#include "sync/anilist/anilist_utils.hpp"
 #include "taiga/accounts.hpp"
 
 namespace sync::anilist {

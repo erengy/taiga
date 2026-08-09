@@ -27,8 +27,8 @@
 #include "base/string.hpp"
 #include "media/anime.hpp"
 #include "media/anime_season.hpp"
-#include "sync/kitsu_parsers.hpp"
-#include "sync/kitsu_ratings.hpp"
+#include "sync/kitsu/kitsu_parsers.hpp"
+#include "sync/kitsu/kitsu_ratings.hpp"
 #include "sync/search_params.hpp"
 
 namespace sync::kitsu {

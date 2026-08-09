@@ -28,7 +28,7 @@
 #include "base/string.hpp"
 #include "media/anime_list.hpp"
 #include "media/anime_season.hpp"
-#include "sync/myanimelist.hpp"
+#include "sync/myanimelist/myanimelist.hpp"
 #include "sync/service.hpp"
 
 namespace sync::myanimelist {

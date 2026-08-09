@@ -24,8 +24,8 @@
 
 #include "base/string.hpp"
 #include "myanimelist.hpp"
-#include "sync/myanimelist_error.hpp"
-#include "sync/myanimelist_utils.hpp"
+#include "sync/myanimelist/myanimelist_error.hpp"
+#include "sync/myanimelist/myanimelist_utils.hpp"
 #include "taiga/accounts.hpp"
 
 namespace sync::myanimelist {

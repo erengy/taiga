@@ -27,7 +27,7 @@
 #include "base/chrono.hpp"
 #include "media/anime.hpp"
 #include "media/anime_list.hpp"
-#include "sync/kitsu_ratings.hpp"
+#include "sync/kitsu/kitsu_ratings.hpp"
 #include "sync/service.hpp"
 
 namespace sync::kitsu {

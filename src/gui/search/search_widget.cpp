@@ -33,9 +33,9 @@
 #include "gui/utils/theme.hpp"
 #include "media/anime.hpp"
 #include "media/anime_season.hpp"
-#include "sync/anilist.hpp"
-#include "sync/kitsu.hpp"
-#include "sync/myanimelist.hpp"
+#include "sync/anilist/anilist.hpp"
+#include "sync/kitsu/kitsu.hpp"
+#include "sync/myanimelist/myanimelist.hpp"
 #include "sync/service.hpp"
 #include "taiga/session.hpp"
 

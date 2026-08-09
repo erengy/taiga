@@ -27,9 +27,9 @@
 
 #include "base/string.hpp"
 #include "media/anime_db.hpp"
-#include "sync/anilist_error.hpp"
-#include "sync/anilist_parsers.hpp"
-#include "sync/anilist_utils.hpp"
+#include "sync/anilist/anilist_error.hpp"
+#include "sync/anilist/anilist_parsers.hpp"
+#include "sync/anilist/anilist_utils.hpp"
 #include "sync/queue.hpp"
 #include "taiga/accounts.hpp"
 
