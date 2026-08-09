@@ -170,46 +170,37 @@ void search(const SearchParams& params) {
 }
 
 bool synchronize() {
+  const auto syncUnauthenticated = [](const bool hasToken, const bool hasUsername) {
+    if (hasToken) {
+      authenticateUser();  // can authenticate
+      return true;
+    }
+    if (hasUsername) {
+      fetchListEntries();  // can fetch the list without authentication
+      return true;
+    }
+    return false;
+  };
+
   switch (currentServiceId()) {
     case ServiceId::MyAnimeList:
       if (!taiga::accounts.myanimelistAuthenticated()) {
-        if (!taiga::accounts.myanimelistAccessToken().empty()) {
-          authenticateUser();
-        } else if (!taiga::accounts.myanimelistUsername().empty()) {
-          // Allow downloading the list without authentication
-          fetchListEntries();
-        } else {
-          return false;
-        }
-        return true;
+        return syncUnauthenticated(!taiga::accounts.myanimelistAccessToken().empty(),
+                                   !taiga::accounts.myanimelistUsername().empty());
       }
       break;
 
     case ServiceId::Kitsu:
       if (!taiga::accounts.kitsuAuthenticated()) {
-        if (!taiga::accounts.kitsuAccessToken().empty()) {
-          authenticateUser();
-        } else if (!taiga::accounts.kitsuUsername().empty()) {
-          // Allow downloading the list without authentication
-          fetchListEntries();
-        } else {
-          return false;
-        }
-        return true;
+        return syncUnauthenticated(!taiga::accounts.kitsuAccessToken().empty(),
+                                   !taiga::accounts.kitsuUsername().empty());
       }
       break;
 
     case ServiceId::AniList:
       if (!taiga::accounts.anilistAuthenticated()) {
-        if (!taiga::accounts.anilistToken().empty()) {
-          authenticateUser();
-        } else if (!taiga::accounts.anilistUsername().empty()) {
-          // Allow downloading the list without authentication
-          fetchListEntries();
-        } else {
-          return false;
-        }
-        return true;
+        return syncUnauthenticated(!taiga::accounts.anilistToken().empty(),
+                                   !taiga::accounts.anilistUsername().empty());
       }
       break;
   }
