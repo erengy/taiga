@@ -213,16 +213,22 @@ void MainWindow::initStatusbar() {
       sync::myanimelist::Service::instance(),
   };
   for (auto* service : services) {
-    connect(service, &sync::Service::listEntriesFetched, this,
-            [this]() { statusBar()->clearMessage(); });
+    connect(service, &sync::Service::listEntriesFetched, this, [this]() {
+      statusBar()->clearMessage();
+      setEnabled(true);
+    });
     connect(service, &sync::Service::errorOccurred, this, [this](const QString& message) {
       const auto sender_service = qobject_cast<sync::Service*>(sender());
       statusBar()->showMessage(sync::tagMessage(sender_service->id(), message));
+      setEnabled(true);
     });
   }
 
   connect(&sync::queue, &sync::Queue::changed, this, [this]() {
-    if (sync::queue.count() == 0) statusBar()->clearMessage();
+    if (sync::queue.count() == 0) {
+      statusBar()->clearMessage();
+      setEnabled(true);
+    }
   });
 }
 
@@ -346,9 +352,10 @@ void MainWindow::synchronize() {
   statusBar()->showMessage(
       tr("Synchronizing with %1...").arg(sync::serviceName(sync::currentServiceId())));
 
-  sync::synchronize();
-
-  setEnabled(true);
+  if (!sync::synchronize()) {
+    statusBar()->clearMessage();
+    setEnabled(true);
+  }
 }
 
 void MainWindow::profile() {

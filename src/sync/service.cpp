@@ -169,7 +169,7 @@ void search(const SearchParams& params) {
   }
 }
 
-void synchronize() {
+bool synchronize() {
   switch (currentServiceId()) {
     case ServiceId::MyAnimeList:
       if (!taiga::accounts.myanimelistAuthenticated()) {
@@ -178,8 +178,10 @@ void synchronize() {
         } else if (!taiga::accounts.myanimelistUsername().empty()) {
           // Allow downloading the list without authentication
           fetchListEntries();
+        } else {
+          return false;
         }
-        return;
+        return true;
       }
       break;
 
@@ -190,8 +192,10 @@ void synchronize() {
         } else if (!taiga::accounts.kitsuUsername().empty()) {
           // Allow downloading the list without authentication
           fetchListEntries();
+        } else {
+          return false;
         }
-        return;
+        return true;
       }
       break;
 
@@ -202,8 +206,10 @@ void synchronize() {
         } else if (!taiga::accounts.anilistUsername().empty()) {
           // Allow downloading the list without authentication
           fetchListEntries();
+        } else {
+          return false;
         }
-        return;
+        return true;
       }
       break;
   }
@@ -213,6 +219,8 @@ void synchronize() {
   } else {
     fetchListEntries();
   }
+
+  return true;
 }
 
 void addListEntry(const int id, const anime::list::Fields dirty) {

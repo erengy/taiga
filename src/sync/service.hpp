@@ -79,7 +79,7 @@ void authenticateUser();
 void fetchAnime(const int id);
 void fetchListEntries();
 void search(const SearchParams& params);
-void synchronize();
+bool synchronize();
 
 void addListEntry(const int id, const anime::list::Fields dirty);
 void updateListEntry(const int id, const anime::list::Fields dirty);
