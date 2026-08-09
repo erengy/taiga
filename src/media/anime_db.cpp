@@ -78,33 +78,65 @@ const QMap<int, ListEntry>& Database::entries() const {
 }
 
 void Database::updateItem(const Anime& item) {
+  updateItems({item});
+}
+
+void Database::updateItems(const QList<Anime>& items) {
+  if (items.isEmpty()) return;
   if (!db_.open()) return;
 
   QSqlQuery q{db_};
-  if (!q.prepare(sql("insertAnime"))) return;
-  bindItemToQuery(item, q);
-  q.exec();
+  if (!q.prepare(sql("insertAnime"))) {
+    db_.close();
+    return;
+  }
+
+  db_.transaction();
+  for (const auto& item : items) {
+    bindItemToQuery(item, q);
+    q.exec();
+  }
+  db_.commit();
 
   db_.close();
 
-  items_[item.id] = item;
-
-  emit itemUpdated(item.id);
+  for (const auto& item : items) {
+    items_[item.id] = item;
+  }
+  for (const auto& item : items) {
+    emit itemUpdated(item.id);
+  }
 }
 
 void Database::updateEntry(const ListEntry& entry) {
+  updateEntries({entry});
+}
+
+void Database::updateEntries(const QList<ListEntry>& entries) {
+  if (entries.isEmpty()) return;
   if (!db_.open()) return;
 
   QSqlQuery q{db_};
-  if (!q.prepare(sql("insertAnimeList"))) return;
-  bindEntryToQuery(entry, q);
-  q.exec();
+  if (!q.prepare(sql("insertAnimeList"))) {
+    db_.close();
+    return;
+  }
+
+  db_.transaction();
+  for (const auto& entry : entries) {
+    bindEntryToQuery(entry, q);
+    q.exec();
+  }
+  db_.commit();
 
   db_.close();
 
-  entries_[entry.anime_id] = entry;
-
-  emit entryUpdated(entry.anime_id);
+  for (const auto& entry : entries) {
+    entries_[entry.anime_id] = entry;
+  }
+  for (const auto& entry : entries) {
+    emit entryUpdated(entry.anime_id);
+  }
 }
 
 void Database::updateSettings(const Settings& settings) {

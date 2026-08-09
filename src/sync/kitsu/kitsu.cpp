@@ -145,20 +145,24 @@ void Service::fetchListEntries(const int offset, QSet<int> fetchedIds) {
 
     const auto root = json->object();
 
+    QList<Anime> items;
     for (const auto& value : root["included"].toArray()) {
       if (const auto item = parseAnime(value)) {
-        anime::db.updateItem(*item);
+        items.append(*item);
       }
     }
+    anime::db.updateItems(items);
 
+    QList<ListEntry> entries;
     for (const auto& value : root["data"].toArray()) {
       const auto entryObject = value.toObject();
       const auto animeId = entryObject["relationships"]["anime"]["data"]["id"].toVariant().toInt();
       if (const auto entry = parseListEntry(entryObject, animeId)) {
-        anime::db.updateEntry(*entry);
+        entries.append(*entry);
         fetchedIds.insert(animeId);
       }
     }
+    anime::db.updateEntries(entries);
 
     if (const auto nextOffset = pagingOffset(root["links"].toObject(), u"next"_s)) {
       fetchListEntries(*nextOffset, fetchedIds);

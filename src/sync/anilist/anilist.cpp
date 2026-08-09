@@ -168,20 +168,24 @@ void Service::fetchListEntries() {
     }
 
     QSet<int> fetchedIds;
+    QList<Anime> items;
+    QList<ListEntry> entries;
 
     for (const auto& list : *lists) {
       for (const auto& entryValue : list.toObject()["entries"].toArray()) {
         const auto entry = entryValue.toObject();
 
         if (const auto item = parseMedia(entry["media"])) {
-          anime::db.updateItem(*item);
+          items.append(*item);
         }
         if (const auto listEntry = parseListEntry(entry)) {
-          anime::db.updateEntry(*listEntry);
+          entries.append(*listEntry);
           fetchedIds.insert(listEntry->anime_id);
         }
       }
     }
+    anime::db.updateItems(items);
+    anime::db.updateEntries(entries);
 
     sync::pruneMissingEntries(fetchedIds);
     emit listEntriesFetched();

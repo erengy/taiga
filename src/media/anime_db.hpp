@@ -46,7 +46,9 @@ public:
   const QMap<int, ListEntry>& entries() const;
 
   void updateItem(const Anime& item);
+  void updateItems(const QList<Anime>& items);
   void updateEntry(const ListEntry& entry);
+  void updateEntries(const QList<ListEntry>& entries);
   void deleteItem(const int id);
   void deleteEntry(const int animeId);
   void updateSettings(const Settings& settings);
