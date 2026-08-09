@@ -122,6 +122,21 @@ void Database::updateSettings(const Settings& settings) {
   emit itemUpdated(settings.id);
 }
 
+void Database::deleteItem(const int id) {
+  if (!db_.open()) return;
+
+  QSqlQuery q{db_};
+  q.prepare("DELETE FROM anime WHERE id = :id");
+  q.bindValue(":id", id);
+  q.exec();
+
+  db_.close();
+
+  items_.remove(id);
+
+  emit itemDeleted(id);
+}
+
 void Database::deleteEntry(const int animeId) {
   if (!db_.open()) return;
 

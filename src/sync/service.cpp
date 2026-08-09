@@ -283,6 +283,13 @@ QString animePageUrl(const int id) {
   return {};
 }
 
+void invalidateAnime(const int id) {
+  if (queue.hasItem(id)) return;
+
+  anime::db.deleteEntry(id);
+  anime::db.deleteItem(id);
+}
+
 void pruneMissingEntries(const QSet<int>& fetchedIds) {
   QList<int> staleIds;
 

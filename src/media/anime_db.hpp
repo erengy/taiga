@@ -47,12 +47,14 @@ public:
 
   void updateItem(const Anime& item);
   void updateEntry(const ListEntry& entry);
+  void deleteItem(const int id);
   void deleteEntry(const int animeId);
   void updateSettings(const Settings& settings);
 
 signals:
   void itemUpdated(const int id);
   void entryUpdated(const int id);
+  void itemDeleted(const int id);
   void entryDeleted(const int id);
 
 private:

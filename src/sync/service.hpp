@@ -88,6 +88,7 @@ bool isUserAuthenticated();
 
 QString animePageUrl(const int id);
 
+void invalidateAnime(const int id);
 void pruneMissingEntries(const QSet<int>& fetchedIds);
 
 }  // namespace sync

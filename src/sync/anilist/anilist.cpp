@@ -59,9 +59,13 @@ void Service::fetchAnime(const int id) {
       {"variables", QJsonObject{{"id", id}}},
   }};
 
-  const auto callback = [this](QRestReply& reply) {
+  const auto callback = [this, id](QRestReply& reply) {
     if (isError(reply)) {
-      handleError(*this, reply);
+      if (reply.httpStatus() == 404) {
+        sync::invalidateAnime(id);
+      } else {
+        handleError(*this, reply);
+      }
       return;
     }
 

@@ -68,7 +68,11 @@ void Service::fetchAnime(const int id) {
   const auto callback = [this, id](QRestReply& reply) {
     if (isError(reply)) {
       if (retryOnTokenExpiry(reply, [this, id] { fetchAnime(id); })) return;
-      handleError(*this, reply);
+      if (reply.httpStatus() == 404) {
+        sync::invalidateAnime(id);
+      } else {
+        handleError(*this, reply);
+      }
       return;
     }
 
