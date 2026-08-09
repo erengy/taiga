@@ -35,6 +35,8 @@
 #include "gui/utils/tray_icon.hpp"
 #include "gui/utils/widgets.hpp"
 #include "sync/anilist.hpp"
+#include "sync/kitsu.hpp"
+#include "sync/myanimelist.hpp"
 #include "sync/service.hpp"
 #include "taiga/application.hpp"
 #include "taiga/session.hpp"
@@ -204,12 +206,17 @@ void MainWindow::initPage(MainWindowPage page) {
 void MainWindow::initStatusbar() {
   ui_->statusbar->setContentsMargins(0, 8, 0, 0);
 
-  // @TODO: Revise once other services are implemented
-  connect(sync::anilist::Service::instance(), &sync::Service::errorOccurred, this,
-          [this](const QString& message) {
-            const auto service = qobject_cast<sync::Service*>(sender());
-            statusBar()->showMessage(sync::tagMessage(service->id(), message));
-          });
+  const QList<sync::Service*> services{
+      sync::anilist::Service::instance(),
+      sync::kitsu::Service::instance(),
+      sync::myanimelist::Service::instance(),
+  };
+  for (auto* service : services) {
+    connect(service, &sync::Service::errorOccurred, this, [this](const QString& message) {
+      const auto sender_service = qobject_cast<sync::Service*>(sender());
+      statusBar()->showMessage(sync::tagMessage(sender_service->id(), message));
+    });
+  }
 }
 
 void MainWindow::initToolbar() {
