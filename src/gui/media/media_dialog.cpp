@@ -301,8 +301,16 @@ void MediaDialog::initList() {
   }
 
   // Score
-  populateRatingComboBox(ui_->comboScore);
-  setRatingComboBoxValue(ui_->comboScore, m_entry->score);
+  const bool useScoreSpinBox = usesRatingSpinBox();
+  ui_->comboScore->setVisible(!useScoreSpinBox);
+  ui_->spinScore->setVisible(useScoreSpinBox);
+  if (useScoreSpinBox) {
+    populateRatingSpinBox(ui_->spinScore);
+    setRatingSpinBoxValue(ui_->spinScore, m_entry->score);
+  } else {
+    populateRatingComboBox(ui_->comboScore);
+    setRatingComboBoxValue(ui_->comboScore, m_entry->score);
+  }
 
   const auto fuzzy_to_date = [](const FuzzyDate& date) {
     return QDate{date.year(), date.month(), date.day()};
@@ -378,7 +386,8 @@ void MediaDialog::accept() {
     m_entry->rewatched_times = ui_->spinRewatches->value();
     m_entry->rewatching = ui_->checkRewatching->isChecked();
     m_entry->status = ui_->comboStatus->currentData().value<anime::list::Status>();
-    m_entry->score = ui_->comboScore->currentData().toInt();
+    m_entry->score = usesRatingSpinBox() ? ratingSpinBoxValue(ui_->spinScore)
+                                         : ui_->comboScore->currentData().toInt();
     m_entry->date_started = ui_->checkDateStarted->isChecked()
                                 ? FuzzyDate{ui_->dateStarted->date().toStdSysDays()}
                                 : FuzzyDate{};

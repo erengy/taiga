@@ -22,6 +22,7 @@
 #include <QString>
 
 class QComboBox;
+class QDoubleSpinBox;
 
 namespace sync {
 struct Rating;
@@ -34,5 +35,10 @@ QString formatRating(int value);
 
 void populateRatingComboBox(QComboBox* comboBox);
 void setRatingComboBoxValue(QComboBox* comboBox, int score);
+
+bool usesRatingSpinBox();
+void populateRatingSpinBox(QDoubleSpinBox* spinBox);
+void setRatingSpinBoxValue(QDoubleSpinBox* spinBox, int score);
+int ratingSpinBoxValue(const QDoubleSpinBox* spinBox);
 
 }  // namespace gui

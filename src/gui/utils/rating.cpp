@@ -19,6 +19,7 @@
 #include "rating.hpp"
 
 #include <QComboBox>
+#include <QDoubleSpinBox>
 #include <cmath>
 #include <limits>
 
@@ -81,6 +82,54 @@ void setRatingComboBoxValue(QComboBox* comboBox, int score) {
   }
 
   comboBox->setCurrentIndex(index);
+}
+
+bool usesRatingSpinBox() {
+  if (sync::currentServiceId() != sync::ServiceId::AniList) return false;
+
+  switch (taiga::accounts.anilistRatingSystem()) {
+    case sync::anilist::RatingSystem::Point_100:
+    case sync::anilist::RatingSystem::Point_10_Decimal:
+      return true;
+    case sync::anilist::RatingSystem::Point_10:
+    case sync::anilist::RatingSystem::Point_5:
+    case sync::anilist::RatingSystem::Point_3:
+      return false;
+  }
+
+  return false;
+}
+
+void populateRatingSpinBox(QDoubleSpinBox* spinBox) {
+  switch (taiga::accounts.anilistRatingSystem()) {
+    case sync::anilist::RatingSystem::Point_10_Decimal:
+      spinBox->setDecimals(1);
+      spinBox->setRange(0.0, 10.0);
+      spinBox->setSingleStep(0.1);
+      return;
+    case sync::anilist::RatingSystem::Point_100:
+    case sync::anilist::RatingSystem::Point_10:
+    case sync::anilist::RatingSystem::Point_5:
+    case sync::anilist::RatingSystem::Point_3:
+      spinBox->setDecimals(0);
+      spinBox->setRange(0, 100);
+      spinBox->setSingleStep(1);
+      return;
+  }
+}
+
+void setRatingSpinBoxValue(QDoubleSpinBox* spinBox, int score) {
+  spinBox->setValue(taiga::accounts.anilistRatingSystem() ==
+                            sync::anilist::RatingSystem::Point_10_Decimal
+                        ? score / 10.0
+                        : score);
+}
+
+int ratingSpinBoxValue(const QDoubleSpinBox* spinBox) {
+  if (taiga::accounts.anilistRatingSystem() == sync::anilist::RatingSystem::Point_10_Decimal) {
+    return static_cast<int>(std::lround(spinBox->value() * 10));
+  }
+  return static_cast<int>(std::lround(spinBox->value()));
 }
 
 }  // namespace gui

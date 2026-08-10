@@ -315,6 +315,9 @@
                <item>
                 <widget class="QComboBox" name="comboScore"/>
                </item>
+               <item>
+                <widget class="QDoubleSpinBox" name="spinScore"/>
+               </item>
               </layout>
              </item>
              <item row="7" column="0">
