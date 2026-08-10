@@ -53,7 +53,6 @@ QString formatNumber(const int value, QString placeholder = "-");
 QString formatEpisodeLength(const int minutes, QString placeholder = "-");
 
 QString formatScore(const double value);
-QString formatListScore(const int value, QString placeholder = "-");
 
 QString formatDate(const base::Date& date, QString placeholder = "?");
 QString formatDate(const QDate date, QString placeholder = "?");

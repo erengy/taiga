@@ -45,7 +45,9 @@ QList<sync::Rating> currentRatingList() {
   return {};
 }
 
-QString formatRating(int value) {
+QString formatRating(int value, QString placeholder) {
+  if (value <= 0) return placeholder;
+
   switch (sync::currentServiceId()) {
     case sync::ServiceId::MyAnimeList:
       return sync::myanimelist::formatRating(value);

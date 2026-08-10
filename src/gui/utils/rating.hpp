@@ -31,7 +31,7 @@ struct Rating;
 namespace gui {
 
 QList<sync::Rating> currentRatingList();
-QString formatRating(int value);
+QString formatRating(int value, QString placeholder = "-");
 
 void populateRatingComboBox(QComboBox* comboBox);
 void setRatingComboBoxValue(QComboBox* comboBox, int score);

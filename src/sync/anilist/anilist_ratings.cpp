@@ -124,7 +124,7 @@ QString formatRating(int value, const RatingSystem ratingSystem) {
       return QString::number(value);
 
     case RatingSystem::Point_10_Decimal:
-      return QString::number(value / 10.0, 'g', 1);
+      return QString::number(value / 10.0, 'f', 1);
 
     case RatingSystem::Point_10:
       return QString::number(value / 10);

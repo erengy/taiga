@@ -27,6 +27,7 @@
 
 #include "gui/utils/format.hpp"
 #include "gui/utils/image_provider.hpp"
+#include "gui/utils/rating.hpp"
 #include "media/anime_db.hpp"
 #include "media/anime_list_utils.hpp"
 #include "media/anime_season.hpp"
@@ -107,7 +108,7 @@ QVariant AnimeListModel::data(const QModelIndex& index, int role) const {
           if (entry) return entry->rewatched_times;
           break;
         case COLUMN_SCORE:
-          if (entry) return formatListScore(entry->score);
+          if (entry) return formatRating(entry->score);
           break;
         case COLUMN_AVERAGE:
           return formatScore(anime->score);

@@ -45,10 +45,6 @@ QString formatScore(const double value) {
   return u"%1%"_s.arg(value * 10.0, 0, 'g', 4);
 }
 
-QString formatListScore(const int value, QString placeholder) {
-  return value > 0 ? u"%1"_s.arg(value / 10.0) : placeholder;
-}
-
 QString formatDate(const base::Date& date, QString placeholder) {
   return date.ok() ? formatDate(QDate(date), placeholder) : placeholder;
 }
