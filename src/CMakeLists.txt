@@ -75,6 +75,8 @@ target_sources(taiga PRIVATE
 	sync/myanimelist/myanimelist_error.hpp
 	sync/myanimelist/myanimelist_parsers.cpp
 	sync/myanimelist/myanimelist_parsers.hpp
+	sync/myanimelist/myanimelist_ratings.cpp
+	sync/myanimelist/myanimelist_ratings.hpp
 	sync/myanimelist/myanimelist_utils.cpp
 	sync/myanimelist/myanimelist_utils.hpp
 	sync/queue.cpp

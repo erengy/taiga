@@ -18,34 +18,16 @@
 
 #pragma once
 
-#include <QByteArray>
+#include <QList>
 #include <QString>
-#include <optional>
-#include <string>
 
-class QJsonObject;
-class QUrlQuery;
-
-namespace anime {
-enum class SeasonName;
-}
-
-namespace anime::list {
-enum class Status;
+namespace sync {
+struct Rating;
 }
 
 namespace sync::myanimelist {
 
-int fromListScore(int value);
-QString fromListStatus(const anime::list::Status value);
-QString fromSeasonName(const anime::SeasonName name);
-
-QString animeFields();
-QString listStatusFields();
-QByteArray formUrlEncode(const QUrlQuery& query);
-std::optional<int> pagingOffset(const QJsonObject& paging, const QString& key);
-
-std::string animePageUrl(const int id);
-std::string authorizationCodeUrl(std::string& codeVerifier);
+QList<sync::Rating> ratingList();
+QString formatRating(const int value);
 
 }  // namespace sync::myanimelist
