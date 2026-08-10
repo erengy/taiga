@@ -25,6 +25,7 @@
 #include "base/string.hpp"
 #include "gui/utils/format.hpp"
 #include "gui/utils/image_provider.hpp"
+#include "gui/utils/rating.hpp"
 #include "gui/utils/widgets.hpp"
 #include "media/anime_db.hpp"
 #include "media/anime_list_utils.hpp"
@@ -300,12 +301,8 @@ void MediaDialog::initList() {
   }
 
   // Score
-  if (!ui_->comboScore->count()) {
-    for (int i = 0; i <= 10; ++i) {
-      ui_->comboScore->addItem(tr("%1").arg(i), i * 10);
-    }
-  }
-  ui_->comboScore->setCurrentIndex(m_entry->score / 10);
+  populateRatingComboBox(ui_->comboScore);
+  setRatingComboBoxValue(ui_->comboScore, m_entry->score);
 
   const auto fuzzy_to_date = [](const FuzzyDate& date) {
     return QDate{date.year(), date.month(), date.day()};

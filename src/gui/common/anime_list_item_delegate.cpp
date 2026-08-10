@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,11 +20,11 @@
 
 #include <QComboBox>
 #include <QPainter>
-#include <limits>
 
 #include "gui/models/anime_list_model.hpp"
 #include "gui/utils/painter_state_saver.hpp"
 #include "gui/utils/painters.hpp"
+#include "gui/utils/rating.hpp"
 #include "gui/utils/theme.hpp"
 #include "media/anime.hpp"
 #include "media/anime_list.hpp"
@@ -38,7 +38,7 @@ void ListItemDelegate::setEditorData(QWidget* editor, const QModelIndex& index) 
       index.data(static_cast<int>(AnimeListItemDataRole::ListEntry)).value<const ListEntry*>();
   if (!entry) return;
   auto* combobox = static_cast<QComboBox*>(editor);
-  combobox->setCurrentIndex(std::clamp(entry->score / 10, 0, 10));
+  setRatingComboBoxValue(combobox, entry->score);
 }
 
 QWidget* ListItemDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem&,
@@ -46,10 +46,8 @@ QWidget* ListItemDelegate::createEditor(QWidget* parent, const QStyleOptionViewI
   if (index.column() != AnimeListModel::COLUMN_SCORE) return nullptr;
 
   auto* editor = new QComboBox(parent);
-  editor->addItem("-", 0);
-  editor->setItemData(0, Qt::AlignCenter, Qt::TextAlignmentRole);
-  for (int i = 1; i <= 10; ++i) {
-    editor->addItem(tr("%1").arg(i), i * 10);
+  populateRatingComboBox(editor);
+  for (int i = 0; i < editor->count(); ++i) {
     editor->setItemData(i, Qt::AlignCenter, Qt::TextAlignmentRole);
   }
 

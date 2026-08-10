@@ -75,6 +75,8 @@ target_sources(taiga-gui PRIVATE
 	utils/painter_state_saver.hpp
 	utils/painters.cpp
 	utils/painters.hpp
+	utils/rating.cpp
+	utils/rating.hpp
 	utils/svg_icon_engine.cpp
 	utils/svg_icon_engine.hpp
 	utils/theme.cpp

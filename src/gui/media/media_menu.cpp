@@ -33,6 +33,7 @@
 #include "gui/main/main_window.hpp"
 #include "gui/media/media_dialog.hpp"
 #include "gui/utils/format.hpp"
+#include "gui/utils/rating.hpp"
 #include "gui/utils/theme.hpp"
 #include "gui/utils/widgets.hpp"
 #include "media/anime.hpp"
@@ -129,6 +130,15 @@ void MediaMenu::editNotes() const {
       QInputDialog::getMultiLineText(parentWidget(), tr("Edit Notes"), tr("Enter notes:"), "", &ok);
   if (!ok) return;
   QMessageBox::information(nullptr, "TODO", notes);  // @TODO
+}
+
+void MediaMenu::editScore(const int value) const {
+  for (const auto& item : m_items) {
+    const auto* entry = getEntry(item.id);
+    auto updated = entry ? *entry : ListEntry{.anime_id = item.id};
+    updated.score = value;
+    anime::list::save(updated);
+  }
 }
 
 void MediaMenu::editStatus(const anime::list::Status status) const {
@@ -399,8 +409,8 @@ void MediaMenu::addListItems() {
 
       menu->addMenu([this]() {
         auto menu = new QMenu(tr("Score"), this);
-        for (int i = 0; i <= 10; ++i) {
-          menu->addAction(tr("%1").arg(i), this, &MediaMenu::test);
+        for (const auto& rating : currentRatingList()) {
+          menu->addAction(rating.text, this, [this, rating]() { editScore(rating.value); });
         }
         return menu;
       }());

@@ -48,6 +48,7 @@ private slots:
   void edit() const;
   void editEpisode() const;
   void editNotes() const;
+  void editScore(int value) const;
   void editStatus(const anime::list::Status status) const;
   void openFolder() const;
   void playEpisode(int number) const;
