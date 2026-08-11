@@ -77,6 +77,8 @@ private:
   void bindItemToQuery(const QueueItem& item, QSqlQuery& q) const;
   QueueItem itemFromQuery(const QSqlQuery& q) const;
 
+  void migrateFromV1();
+
   QList<QueueItem> items_;
   std::optional<int> processing_;
 };

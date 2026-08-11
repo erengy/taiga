@@ -20,18 +20,36 @@
 
 #include <QSqlDatabase>
 #include <algorithm>
+#include <format>
 
 #include "base/file.hpp"
 #include "base/string.hpp"
+#include "compat/history.hpp"
 #include "media/anime_db.hpp"
+#include "media/anime_list_utils.hpp"
 #include "sync/service.hpp"
+#include "taiga/accounts.hpp"
+#include "taiga/path.hpp"
+#include "taiga/settings.hpp"
 
 namespace sync {
 
 Queue::Queue() : QObject{} {}
 
 void Queue::init() {
-  createTable();
+  auto db = QSqlDatabase::database();
+  if (!db.open()) return;
+
+  const bool tableExists = db.tables().contains("queue");
+
+  db.close();
+
+  if (!tableExists) {
+    createTable();
+    migrateFromV1();
+    return;
+  }
+
   readItems();
 }
 
@@ -233,6 +251,35 @@ QueueItem Queue::itemFromQuery(const QSqlQuery& q) const {
   }
 
   return item;
+}
+
+void Queue::migrateFromV1() {
+  const auto path = []() {
+    const auto service = taiga::settings.service();
+    return std::format("{}/v1/user/{}@{}/history.xml", taiga::get_data_path(),
+                       taiga::accounts.serviceUsername(service), service);
+  }();
+
+  for (const auto& item : compat::v1::readQueue(path)) {
+    if (item.delete_entry) {
+      anime::list::remove(item.anime_id);
+      continue;
+    }
+
+    const auto* previous = anime::db.entry(item.anime_id);
+    anime::list::Entry entry = previous ? *previous : anime::list::Entry{.anime_id = item.anime_id};
+
+    if (item.episode) entry.watched_episodes = *item.episode;
+    if (item.score) entry.score = *item.score;
+    if (item.status) entry.status = *item.status;
+    if (item.rewatching) entry.rewatching = *item.rewatching;
+    if (item.rewatched_times) entry.rewatched_times = *item.rewatched_times;
+    if (item.notes) entry.notes = *item.notes;
+    if (item.date_started) entry.date_started = *item.date_started;
+    if (item.date_completed) entry.date_completed = *item.date_completed;
+
+    anime::list::save(entry);
+  }
 }
 
 }  // namespace sync

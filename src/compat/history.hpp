@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2025, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,10 @@
 #pragma once
 
 #include <QList>
+#include <optional>
 #include <string>
+
+#include "media/anime_list.hpp"
 
 namespace anime {
 struct HistoryItem;
@@ -27,6 +30,20 @@ struct HistoryItem;
 
 namespace compat::v1 {
 
+struct QueueItem {
+  int anime_id = 0;
+  bool delete_entry = false;
+  std::optional<int> episode;
+  std::optional<int> score;
+  std::optional<anime::list::Status> status;
+  std::optional<bool> rewatching;
+  std::optional<int> rewatched_times;
+  std::optional<std::string> notes;
+  std::optional<FuzzyDate> date_started;
+  std::optional<FuzzyDate> date_completed;
+};
+
 QList<anime::HistoryItem> readHistory(const std::string& path);
+QList<QueueItem> readQueue(const std::string& path);
 
 }  // namespace compat::v1
