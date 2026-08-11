@@ -23,6 +23,7 @@
 #include <QtWidgets>
 
 #include "base/string.hpp"
+#include "gui/common/spinner_widget.hpp"
 #include "gui/history/history_widget.hpp"
 #include "gui/library/library_widget.hpp"
 #include "gui/list/list_widget.hpp"
@@ -212,6 +213,13 @@ void MainWindow::initStatusbar() {
   setStatusBar(statusbar);
   ui_->statusbar = statusbar;
 
+  m_statusbarSpinner = new SpinnerWidget(this);
+  const auto spinnerContainer = new QWidget(this);
+  const auto spinnerLayout = new QVBoxLayout(spinnerContainer);
+  spinnerLayout->setContentsMargins(0, 2, 0, 0);
+  spinnerLayout->addWidget(m_statusbarSpinner);
+  ui_->statusbar->addPermanentWidget(spinnerContainer);
+
   const QList<sync::Service*> services{
       sync::anilist::Service::instance(),
       sync::kitsu::Service::instance(),
@@ -220,11 +228,13 @@ void MainWindow::initStatusbar() {
   for (auto* service : services) {
     connect(service, &sync::Service::listEntriesFetched, this, [this]() {
       statusBar()->clearMessage();
+      m_statusbarSpinner->stop();
       setEnabled(true);
     });
     connect(service, &sync::Service::errorOccurred, this, [this](const QString& message) {
       const auto sender_service = qobject_cast<sync::Service*>(sender());
       statusBar()->showMessage(sync::tagMessage(sender_service->id(), message));
+      m_statusbarSpinner->stop();
       setEnabled(true);
     });
     connect(service, &sync::Service::transferProgress, this,
@@ -232,12 +242,14 @@ void MainWindow::initStatusbar() {
               statusBar()->showMessage(tr("Synchronizing with %1... (%2)")
                                            .arg(sync::serviceName(sync::currentServiceId()))
                                            .arg(gui::formatTransferProgress(current, total)));
+              m_statusbarSpinner->start();
             });
   }
 
   connect(&sync::queue, &sync::Queue::changed, this, [this]() {
     if (sync::queue.count() == 0) {
       statusBar()->clearMessage();
+      m_statusbarSpinner->stop();
       setEnabled(true);
     }
   });
@@ -362,9 +374,11 @@ void MainWindow::synchronize() {
   setEnabled(false);
   statusBar()->showMessage(
       tr("Synchronizing with %1...").arg(sync::serviceName(sync::currentServiceId())));
+  m_statusbarSpinner->start();
 
   if (!sync::synchronize()) {
     statusBar()->clearMessage();
+    m_statusbarSpinner->stop();
     setEnabled(true);
   }
 }

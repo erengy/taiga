@@ -34,6 +34,7 @@ class ListWidget;
 class NavigationWidget;
 class NowPlayingWidget;
 class SearchWidget;
+class SpinnerWidget;
 class TrayIcon;
 
 enum class MainWindowPage {
@@ -76,7 +77,7 @@ private slots:
   void profile();
 
 protected:
-  void closeEvent(QCloseEvent *event) override;
+  void closeEvent(QCloseEvent* event) override;
 
 private:
   void initActions();
@@ -97,6 +98,7 @@ private:
   NowPlayingWidget* m_nowPlayingWidget = nullptr;
   QLineEdit* m_searchBox = nullptr;
   SearchWidget* m_searchWidget = nullptr;
+  SpinnerWidget* m_statusbarSpinner = nullptr;
   TrayIcon* m_trayIcon = nullptr;
 };
 
