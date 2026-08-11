@@ -39,7 +39,7 @@ NetworkAccessManager::NetworkAccessManager(QObject* parent) : QNetworkAccessMana
              << reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
     qDebug() << "Response headers:";
     for (const auto& [name, value] : reply->rawHeaderPairs()) {
-      qDebug().noquote() << name << ": " << value;
+      qDebug().noquote() << u"%1: %2"_s.arg(name).arg(value);
     }
   });
 }
