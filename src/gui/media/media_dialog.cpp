@@ -104,10 +104,19 @@ MediaDialog::MediaDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::MediaDi
     const int progress = ui_->spinProgress->value();
 
     // Set status
-    const int status =
-        static_cast<int>(isChecked ? anime::list::Status::Watching : m_entry->status);
-    if (const int index = ui_->comboStatus->findData(status); index > -1) {
-      ui_->comboStatus->setCurrentIndex(index);  // @TODO: Don't do this for MyAnimeList
+    switch (sync::currentServiceId()) {
+      case sync::ServiceId::MyAnimeList:
+        // MyAnimeList tracks rewatching independently of status.
+        break;
+      case sync::ServiceId::Kitsu:
+      case sync::ServiceId::AniList: {
+        const int status =
+            static_cast<int>(isChecked ? anime::list::Status::Watching : m_entry->status);
+        if (const int index = ui_->comboStatus->findData(status); index > -1) {
+          ui_->comboStatus->setCurrentIndex(index);
+        }
+        break;
+      }
     }
 
     // Reset progress
