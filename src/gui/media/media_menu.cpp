@@ -86,8 +86,10 @@ bool MediaMenu::isNowPlaying() const {
 }
 
 void MediaMenu::addToList(const anime::list::Status status) const {
-  QMessageBox::information(nullptr, "TODO",
-                           u"Status: %1"_s.arg(formatListStatus(status)));  // @TODO
+  for (const auto& item : m_items) {
+    if (getEntry(item.id)) continue;
+    anime::list::save(ListEntry{.anime_id = item.id, .status = status});
+  }
 }
 
 void MediaMenu::copyLinks() const {
@@ -121,7 +123,13 @@ void MediaMenu::editEpisode() const {
   const auto value = QInputDialog::getInt(parentWidget(), tr("Edit Episodes Watched"),
                                           tr("Enter a number:"), initalValue, 0, maxValue, 1, &ok);
   if (!ok) return;
-  QMessageBox::information(nullptr, "TODO", QString::number(value));  // @TODO
+
+  for (const auto& item : m_items) {
+    const auto* entry = getEntry(item.id);
+    auto updated = entry ? *entry : ListEntry{.anime_id = item.id};
+    updated.watched_episodes = value;
+    anime::list::save(updated);
+  }
 }
 
 void MediaMenu::editNotes() const {
@@ -129,7 +137,13 @@ void MediaMenu::editNotes() const {
   const auto notes =
       QInputDialog::getMultiLineText(parentWidget(), tr("Edit Notes"), tr("Enter notes:"), "", &ok);
   if (!ok) return;
-  QMessageBox::information(nullptr, "TODO", notes);  // @TODO
+
+  for (const auto& item : m_items) {
+    const auto* entry = getEntry(item.id);
+    auto updated = entry ? *entry : ListEntry{.anime_id = item.id};
+    updated.notes = notes.toStdString();
+    anime::list::save(updated);
+  }
 }
 
 void MediaMenu::editScore(const int value) const {
@@ -142,8 +156,12 @@ void MediaMenu::editScore(const int value) const {
 }
 
 void MediaMenu::editStatus(const anime::list::Status status) const {
-  QMessageBox::information(nullptr, "TODO",
-                           u"Status: %1"_s.arg(formatListStatus(status)));  // @TODO
+  for (const auto& item : m_items) {
+    const auto* entry = getEntry(item.id);
+    auto updated = entry ? *entry : ListEntry{.anime_id = item.id};
+    updated.status = status;
+    anime::list::save(updated);
+  }
 }
 
 void MediaMenu::openFolder() const {
