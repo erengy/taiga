@@ -26,6 +26,7 @@
 #include "gui/utils/format.hpp"
 #include "gui/utils/image_provider.hpp"
 #include "gui/utils/rating.hpp"
+#include "gui/utils/theme.hpp"
 #include "gui/utils/widgets.hpp"
 #include "media/anime_db.hpp"
 #include "media/anime_list_utils.hpp"
@@ -59,6 +60,11 @@ MediaDialog::MediaDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::MediaDi
   if (const auto state = taiga::session.mediaDialogSplitterState(); !state.isEmpty()) {
     ui_->splitter->restoreState(state);
   }
+
+  ui_->tabWidget->setTabIcon(static_cast<int>(MediaDialogPage::Details), theme.getIcon("info"));
+  ui_->tabWidget->setTabIcon(static_cast<int>(MediaDialogPage::List), theme.getIcon("list_alt"));
+  ui_->tabWidget->setTabIcon(static_cast<int>(MediaDialogPage::Settings),
+                             theme.getIcon("settings"));
 
   ui_->verticalLayoutRewatching->setAlignment(Qt::AlignBottom);
 
