@@ -29,6 +29,7 @@
 #include "gui/main/about_dialog.hpp"
 #include "gui/main/navigation_widget.hpp"
 #include "gui/main/now_playing_widget.hpp"
+#include "gui/main/status_bar.hpp"
 #include "gui/search/search_widget.hpp"
 #include "gui/settings/settings_dialog.hpp"
 #include "gui/utils/format.hpp"
@@ -206,7 +207,10 @@ void MainWindow::initPage(MainWindowPage page) {
 }
 
 void MainWindow::initStatusbar() {
-  ui_->statusbar->setContentsMargins(0, 8, 0, 0);
+  const auto statusbar = new StatusBar(this);
+  statusbar->setObjectName(ui_->statusbar->objectName());
+  setStatusBar(statusbar);
+  ui_->statusbar = statusbar;
 
   const QList<sync::Service*> services{
       sync::anilist::Service::instance(),

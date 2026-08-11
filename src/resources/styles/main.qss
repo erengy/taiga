@@ -94,4 +94,5 @@ QTreeView#libraryView::item {
 QStatusBar#statusbar {
   border-top-width: 1px;
   border-top-style: solid;
+  min-height: 32px;
 }
