@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2025, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -64,7 +64,12 @@ void Cache::add(const anime::Details& item) {
     }
   };
 
-  // @TODO: Add user-defined titles with higher weight
+  // User-defined titles
+  if (const auto* settings = anime::db.settings(item.id)) {
+    for (const auto& synonym : settings->synonyms) {
+      add(synonym, 2.0f);
+    }
+  }
 
   // Main titles
   add(item.titles.romaji);
