@@ -34,6 +34,14 @@
 #include "taiga/settings.hpp"
 #include "taiga/version.hpp"
 
+namespace {
+
+std::vector<std::string> splitToVector(const QVariant& variant) {
+  return toVector(variant.toString().split(", ", Qt::SkipEmptyParts));
+}
+
+}  // namespace
+
 namespace anime {
 
 Database::Database() : QObject{} {}
@@ -336,12 +344,10 @@ void Database::bindEntryToQuery(const ListEntry& entry, QSqlQuery& q) const {
 void Database::bindSettingsToQuery(const Settings& settings, QSqlQuery& q) const {
   q.bindValue(":id", settings.id);
   q.bindValue(":display_title", QString::fromStdString(settings.display_title));
+  q.bindValue(":synonyms", joinStrings(settings.synonyms, ""));
 }
 
 Anime Database::itemFromQuery(const QSqlQuery& q) const {
-  static const auto splitToVector = [](const QVariant& variant) {
-    return toVector(variant.toString().split(", ", Qt::SkipEmptyParts));
-  };
   return {
       .id = q.value("id").toInt(),
       .last_modified = q.value("modified").toInt(),
@@ -395,6 +401,7 @@ Settings Database::settingsFromQuery(const QSqlQuery& q) const {
   return {
       .id = q.value("id").toInt(),
       .display_title = q.value("display_title").toString().toStdString(),
+      .synonyms = splitToVector(q.value("synonyms")),
   };
 }
 

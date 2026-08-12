@@ -19,6 +19,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 #include "media/anime.hpp"
 
@@ -27,6 +28,7 @@ namespace anime {
 struct Settings {
   int id = kUnknownId;
   std::string display_title;
+  std::vector<std::string> synonyms;
 };
 
 }  // namespace anime
