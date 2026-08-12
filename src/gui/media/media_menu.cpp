@@ -524,12 +524,14 @@ void MediaMenu::addLibraryItems() {
                       [this, last_episode]() { playEpisode(last_episode); });
     }
 
-    if (total_episodes > 1) {
-      // Play random episode
+    // Play random episode
+    if (item.episode_count != 1) {
       menu->addAction(theme.getIcon("shuffle"), tr("Random episode"), this,
                       &MediaMenu::playRandomEpisode);
+    }
 
-      // Play episode
+    // Play episode
+    if (total_episodes > 1) {
       menu->addSeparator();
       menu->addMenu([this, total_episodes, last_episode]() {
         auto menu = new QMenu(tr("Episode"), this);
