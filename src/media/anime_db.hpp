@@ -80,6 +80,7 @@ private:
 
   void migrateItemsFromV1();
   void migrateListEntriesFromV1();
+  void migrateSettingsFromV1();
 
   QSqlDatabase db_;
 

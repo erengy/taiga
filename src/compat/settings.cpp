@@ -22,6 +22,7 @@
 #include <chrono>
 
 #include "base/log.hpp"
+#include "base/string.hpp"
 #include "base/xml.hpp"
 #include "compat/common.hpp"
 #include "media/anime.hpp"
@@ -37,6 +38,7 @@ namespace compat::v1 {
 
 void parseAccountElement(QXmlStreamReader&, const taiga::Settings&, const taiga::Accounts&);
 void parseAnimeElement(QXmlStreamReader&, const taiga::Settings&);
+void parseAnimeItemsElement(QXmlStreamReader&, QList<anime::Settings>&);
 void parseProgramElement(QXmlStreamReader&, const taiga::Settings&);
 void parseRecognitionElement(QXmlStreamReader&, const taiga::Settings&);
 
@@ -71,6 +73,35 @@ void readSettings(const std::string& path, const taiga::Settings& settings,
   if (xml.hasError()) {
     LOGE("{}", xml.errorString().toStdString());
   }
+}
+
+QList<anime::Settings> readAnimeSettings(const std::string& path) {
+  base::XmlFileReader xml;
+
+  if (!xml.open(QString::fromStdString(path), removeInvalidCharacterReferences)) {
+    LOGE("{}", xml.file().errorString().toStdString());
+    return {};
+  }
+
+  if (!xml.readElement(u"settings")) {
+    xml.raiseError("Invalid settings file.");
+  }
+
+  QList<anime::Settings> items;
+
+  while (xml.readNextStartElement()) {
+    if (xml.name() == u"anime") {
+      parseAnimeItemsElement(xml, items);
+    } else {
+      xml.skipCurrentElement();
+    }
+  }
+
+  if (xml.hasError()) {
+    LOGE("{}", xml.errorString().toStdString());
+  }
+
+  return items;
 }
 
 void parseAccountElement(QXmlStreamReader& xml, const taiga::Settings& settings,
@@ -117,25 +148,33 @@ void parseAnimeElement(QXmlStreamReader& xml, const taiga::Settings& settings) {
         }
       }
 
-    } else if (xml.name() == u"items") {
-      while (xml.readNextStartElement()) {
-        if (xml.name() == u"item") {
-          const int id = XML_ATTR_INT(u"id");
-          const auto folder = XML_ATTR_STR(u"folder");
-          const auto title = XML_ATTR_STR(u"title");
-          // @TODO: Store values
-          xml.skipCurrentElement();
-        } else {
-          xml.skipCurrentElement();
-        }
-      }
-
     } else {
       xml.skipCurrentElement();
     }
   }
 
   settings.setLibraryFolders(libraryFolders);
+}
+
+void parseAnimeItemsElement(QXmlStreamReader& xml, QList<anime::Settings>& items) {
+  while (xml.readNextStartElement()) {
+    if (xml.name() == u"items") {
+      while (xml.readNextStartElement()) {
+        if (xml.name() == u"item") {
+          const int id = XML_ATTR_INT(u"id");
+          auto synonyms = toVector(XML_ATTR(u"titles").toString().split("; ", Qt::SkipEmptyParts));
+          if (id != anime::kUnknownId && !synonyms.empty()) {
+            items.push_back({.id = id, .synonyms = std::move(synonyms)});
+          }
+          xml.skipCurrentElement();
+        } else {
+          xml.skipCurrentElement();
+        }
+      }
+    } else {
+      xml.skipCurrentElement();
+    }
+  }
 }
 
 void parseRecognitionElement(QXmlStreamReader& xml, const taiga::Settings& settings) {

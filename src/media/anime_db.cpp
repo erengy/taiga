@@ -29,6 +29,7 @@
 #include "base/string.hpp"
 #include "compat/anime.hpp"
 #include "compat/list.hpp"
+#include "compat/settings.hpp"
 #include "taiga/accounts.hpp"
 #include "taiga/path.hpp"
 #include "taiga/settings.hpp"
@@ -54,6 +55,7 @@ void Database::init() {
     createTables();
     migrateItemsFromV1();
     migrateListEntriesFromV1();
+    migrateSettingsFromV1();
     return;
   }
 
@@ -443,6 +445,27 @@ void Database::migrateListEntriesFromV1() {
     if (!items_.contains(entry.anime_id)) continue;
     entries_[entry.anime_id] = entry;
     bindEntryToQuery(entry, q);
+    q.exec();
+  }
+
+  db_.commit();
+  db_.close();
+}
+
+void Database::migrateSettingsFromV1() {
+  if (!db_.open()) return;
+
+  QSqlQuery q{db_};
+  if (!q.prepare(sql("insertAnimeSettings"))) return;
+
+  const auto path = std::format("{}/v1/settings.xml", taiga::get_data_path());
+
+  db_.transaction();
+
+  for (const auto& settings : compat::v1::readAnimeSettings(path)) {
+    if (!items_.contains(settings.id)) continue;
+    settings_[settings.id] = settings;
+    bindSettingsToQuery(settings, q);
     q.exec();
   }
 
