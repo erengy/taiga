@@ -20,6 +20,7 @@
 
 #include <algorithm>
 
+#include "media/anime.hpp"
 #include "media/anime_db.hpp"
 #include "taiga/settings.hpp"
 #include "track/episode.hpp"
@@ -105,6 +106,17 @@ void Detection::poll() {
     emit currentEpisodeChanged(episode);
   }
 #endif
+}
+
+bool Detection::isMediaIdentified() const {
+  return currentEpisode_.has_value() && currentEpisode_->animeId() != anime::kUnknownId;
+}
+
+void Detection::setCurrentEpisodeAnimeId(int animeId) {
+  if (!currentEpisode_) return;
+
+  currentEpisode_->setAnimeId(animeId);
+  emit currentEpisodeChanged(currentEpisode_);
 }
 
 void Detection::reset() {

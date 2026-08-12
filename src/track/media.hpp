@@ -45,6 +45,9 @@ public:
 
   bool init();
 
+  bool isMediaIdentified() const;
+  void setCurrentEpisodeAnimeId(int animeId);
+
 signals:
   void currentEpisodeChanged(std::optional<Episode> media) const;
 

@@ -26,6 +26,7 @@
 #include <QMessageBox>
 #include <QUrl>
 #include <QUrlQuery>
+#include <algorithm>
 #include <limits>
 #include <ranges>
 
@@ -37,12 +38,15 @@
 #include "gui/utils/theme.hpp"
 #include "gui/utils/widgets.hpp"
 #include "media/anime.hpp"
+#include "media/anime_db.hpp"
 #include "media/anime_list.hpp"
 #include "media/anime_list_utils.hpp"
 #include "media/anime_utils.hpp"
 #include "sync/service.hpp"
 #include "taiga/settings.hpp"
+#include "track/media.hpp"
 #include "track/play.hpp"
+#include "track/recognition_cache.hpp"
 #include "track/scanner.hpp"
 
 namespace gui {
@@ -81,8 +85,9 @@ bool MediaMenu::isInList() const {
   return m_entries.size() == m_items.size();
 }
 
-bool MediaMenu::isNowPlaying() const {
-  return false;  // @TODO
+bool MediaMenu::canMatchNowPlaying() const {
+  const auto* detection = track::media::detection();
+  return detection->getCurrentEpisode().has_value() && !detection->isMediaIdentified();
 }
 
 void MediaMenu::addToList(const anime::list::Status status) const {
@@ -162,6 +167,29 @@ void MediaMenu::editStatus(const anime::list::Status status) const {
     updated.status = status;
     anime::list::save(updated);
   }
+}
+
+void MediaMenu::matchNowPlaying() const {
+  if (m_items.empty()) return;
+
+  const auto& item = m_items.front();
+
+  if (const auto episode = track::media::detection()->getCurrentEpisode()) {
+    const auto title = episode->element(anitomy::ElementKind::Title);
+    if (!title.empty()) {
+      const auto* settings = anime::db.settings(item.id);
+      auto updated = settings ? *settings : anime::Settings{.id = item.id};
+      if (!std::ranges::contains(updated.synonyms, title)) {
+        updated.synonyms.push_back(title);
+        anime::db.updateSettings(updated);
+        if (const auto* anime = anime::db.item(item.id)) {
+          track::recognition::cache()->update(*anime);
+        }
+      }
+    }
+  }
+
+  track::media::detection()->setCurrentEpisodeAnimeId(item.id);
 }
 
 void MediaMenu::openFolder() const {
@@ -538,8 +566,8 @@ void MediaMenu::addMetaItems() {
     });
   }
 
-  if (isNowPlaying() && !isBatch()) {
-    addAction(tr("Set as now playing..."), this, &MediaMenu::test);
+  if (canMatchNowPlaying() && !isBatch()) {
+    addAction(tr("Set as now playing..."), this, &MediaMenu::matchNowPlaying);
   }
 }
 

@@ -50,6 +50,7 @@ private slots:
   void editNotes() const;
   void editScore(int value) const;
   void editStatus(const anime::list::Status status) const;
+  void matchNowPlaying() const;
   void openFolder() const;
   void playEpisode(int number) const;
   void refresh() const;
@@ -76,7 +77,7 @@ private:
 
   bool isBatch() const;
   bool isInList() const;
-  bool isNowPlaying() const;
+  bool canMatchNowPlaying() const;
 
   const ListEntry* getEntry(int id) const;
 
