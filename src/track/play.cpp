@@ -39,21 +39,26 @@ bool playEpisode(int animeId, int number) {
     }
   }
 
+  qDebug() << "Not found:" << animeId << "episode" << number;
+
   return false;
 }
 
 bool playNextEpisode(int animeId) {
   const auto item = anime::db.item(animeId);
-
   if (!item) return false;
 
   const auto entry = anime::db.entry(animeId);
+  const int watched_episodes = entry ? entry->watched_episodes : 0;
 
-  const int total_episodes = item->episode_count;
-  const int last_episode = entry ? std::min(entry->watched_episodes, total_episodes) : 0;
-  const int next_episode = last_episode + 1;
+  int number = watched_episodes + 1;
 
-  return playEpisode(animeId, next_episode);
+  // Replay first episode for completed anime.
+  if (item->episode_count > 0 && number > item->episode_count) {
+    number = 1;
+  }
+
+  return playEpisode(animeId, number);
 }
 
 bool playRandomEpisode(int animeId) {
