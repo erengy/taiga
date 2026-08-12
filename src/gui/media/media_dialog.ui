@@ -497,14 +497,14 @@
                  <number>3</number>
                 </property>
                 <item>
-                 <widget class="QLabel" name="labelRecognitionTitle">
+                 <widget class="QLabel" name="labelRecognitionTitles">
                   <property name="text">
                    <string>Recognition:</string>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QPlainTextEdit" name="recognitionTitle">
+                 <widget class="QPlainTextEdit" name="recognitionTitles">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
                     <horstretch>0</horstretch>

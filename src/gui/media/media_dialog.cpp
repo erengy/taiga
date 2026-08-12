@@ -21,6 +21,7 @@
 #include <QDesktopServices>
 #include <QResizeEvent>
 #include <QUrl>
+#include <algorithm>
 
 #include "base/string.hpp"
 #include "gui/utils/format.hpp"
@@ -371,6 +372,12 @@ void MediaDialog::initSettings() {
   ui_->comboDisplayTitle->setCurrentText(QString::fromStdString(m_settings.display_title));
   ui_->comboDisplayTitle->lineEdit()->setPlaceholderText(
       QString::fromStdString(anime::preferredTitle(m_anime)));
+
+  QStringList synonyms;
+  for (const auto& synonym : m_settings.synonyms) {
+    synonyms.push_back(QString::fromStdString(synonym));
+  }
+  ui_->recognitionTitles->setPlainText(synonyms.join("\n"));
 }
 
 void MediaDialog::loadPosterImage() {
@@ -415,6 +422,16 @@ void MediaDialog::accept() {
   }
 
   m_settings.display_title = ui_->comboDisplayTitle->currentText().trimmed().toStdString();
+
+  m_settings.synonyms.clear();
+  for (const auto& line : ui_->recognitionTitles->toPlainText().split("\n")) {
+    const auto synonym = line.trimmed().toStdString();
+    if (synonym.empty()) continue;
+    if (!std::ranges::contains(m_settings.synonyms, synonym)) {
+      m_settings.synonyms.push_back(synonym);
+    }
+  }
+
   anime::db.updateSettings(m_settings);
 
   QDialog::accept();
