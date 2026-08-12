@@ -222,6 +222,18 @@ void MediaMenu::playEpisode(int number) const {
       tr("Could not find %1 #%2.").arg(anime::preferredTitle(item)).arg(number));
 }
 
+void MediaMenu::playRandomEpisode() const {
+  const auto& item = m_items.front();
+
+  if (track::playRandomEpisode(item.id)) {
+    return;
+  }
+
+  QMessageBox::information(
+      nullptr, tr("Play Episode"),
+      tr("Could not find any episode of %1.").arg(anime::preferredTitle(item)));
+}
+
 void MediaMenu::refresh() const {
   for (const auto& item : m_items) {
     sync::fetchAnime(item.id);
@@ -514,10 +526,8 @@ void MediaMenu::addLibraryItems() {
 
     if (total_episodes > 1) {
       // Play random episode
-      menu->addAction(theme.getIcon("shuffle"), tr("Random episode"), this, [this]() {
-        const int number = 3;  // @TODO
-        playEpisode(number);
-      });
+      menu->addAction(theme.getIcon("shuffle"), tr("Random episode"), this,
+                      &MediaMenu::playRandomEpisode);
 
       // Play episode
       menu->addSeparator();

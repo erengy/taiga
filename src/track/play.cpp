@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2025, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 #include "play.hpp"
 
 #include <QDesktopServices>
+#include <QRandomGenerator>
 #include <QUrl>
 
 #include "media/anime_db.hpp"
@@ -56,7 +57,11 @@ bool playNextEpisode(int animeId) {
 }
 
 bool playRandomEpisode(int animeId) {
-  return playEpisode(animeId, 1);
+  const auto item = anime::db.item(animeId);
+  if (!item || item->episode_count < 1) return false;
+
+  const int number = QRandomGenerator::global()->bounded(1, item->episode_count + 1);
+  return playEpisode(animeId, number);
 }
 
 }  // namespace track

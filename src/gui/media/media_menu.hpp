@@ -53,6 +53,7 @@ private slots:
   void matchNowPlaying() const;
   void openFolder() const;
   void playEpisode(int number) const;
+  void playRandomEpisode() const;
   void refresh() const;
   void removeFromList() const;
   void search() const;
