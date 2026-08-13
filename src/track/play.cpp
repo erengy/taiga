@@ -63,9 +63,29 @@ bool playNextEpisode(int animeId) {
 
 bool playRandomEpisode(int animeId) {
   const auto item = anime::db.item(animeId);
-  if (!item || item->episode_count < 1) return false;
+  if (!item) return false;
 
-  const int number = QRandomGenerator::global()->bounded(1, item->episode_count + 1);
+  const auto entry = anime::db.entry(animeId);
+  const int watched_episodes = entry ? entry->watched_episodes : 0;
+
+  int max_episode = item->episode_count;
+
+  // Avoid spoiling unwatched episodes, unless the series is completed.
+  // `watched_episodes < episode_count` can be true if rewatching.
+  const bool completed = entry && entry->status == anime::list::Status::Completed;
+  if (!completed) {
+    max_episode = watched_episodes + 1;
+  }
+
+  // Clamp to the known episode count, if any.
+  if (item->episode_count > 0) {
+    max_episode = std::min(max_episode, item->episode_count);
+  }
+
+  if (max_episode < 1) return false;
+
+  const int number = QRandomGenerator::global()->bounded(1, max_episode + 1);
+
   return playEpisode(animeId, number);
 }
 
