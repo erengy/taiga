@@ -350,6 +350,19 @@ void MediaMenu::searchYouTube() const {
   }
 }
 
+void MediaMenu::startNewRewatch() const {
+  const auto& item = m_items.front();
+
+  const auto* entry = getEntry(item.id);
+  auto updated = entry ? *entry : ListEntry{.anime_id = item.id};
+  updated.status = anime::list::Status::Watching;
+  updated.rewatching = true;
+  updated.watched_episodes = 0;
+  anime::list::save(updated);
+
+  playEpisode(1);
+}
+
 void MediaMenu::torrents() const {
   const auto& item = m_items.front();
   mainWindow()->navigateTo(MainWindowPage::Torrents);
@@ -546,7 +559,12 @@ void MediaMenu::addLibraryItems() {
       }());
     }
 
-    // @TODO: Start new rewatch
+    // Start new rewatch
+    if (entry && !entry->rewatching && total_episodes > 0 &&
+        entry->watched_episodes == total_episodes && item.status == anime::Status::FinishedAiring) {
+      menu->addSeparator();
+      menu->addAction(tr("Start new rewatch"), this, &MediaMenu::startNewRewatch);
+    }
 
     return menu;
   }());

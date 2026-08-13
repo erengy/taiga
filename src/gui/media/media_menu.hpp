@@ -65,6 +65,7 @@ private slots:
   void searchReddit() const;
   void searchWikipedia() const;
   void searchYouTube() const;
+  void startNewRewatch() const;
   void torrents() const;
   void test() const;  // @TEMP
   void viewDetails() const;
