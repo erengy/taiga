@@ -27,6 +27,7 @@
 #include <QUrl>
 #include <QUrlQuery>
 #include <algorithm>
+#include <chrono>
 #include <limits>
 #include <ranges>
 
@@ -94,6 +95,24 @@ void MediaMenu::addToList(const anime::list::Status status) const {
   for (const auto& item : m_items) {
     if (getEntry(item.id)) continue;
     anime::list::save(ListEntry{.anime_id = item.id, .status = status});
+  }
+}
+
+void MediaMenu::clearDateCompleted() const {
+  for (const auto& item : m_items) {
+    const auto* entry = getEntry(item.id);
+    auto updated = entry ? *entry : ListEntry{.anime_id = item.id};
+    updated.date_completed = FuzzyDate{};
+    anime::list::save(updated);
+  }
+}
+
+void MediaMenu::clearDateStarted() const {
+  for (const auto& item : m_items) {
+    const auto* entry = getEntry(item.id);
+    auto updated = entry ? *entry : ListEntry{.anime_id = item.id};
+    updated.date_started = FuzzyDate{};
+    anime::list::save(updated);
   }
 }
 
@@ -350,6 +369,40 @@ void MediaMenu::searchYouTube() const {
   }
 }
 
+void MediaMenu::setDateCompletedToAiringEnd() const {
+  for (const auto& item : m_items) {
+    if (!item.date_finished) continue;
+    const auto* entry = getEntry(item.id);
+    if (entry && entry->date_completed) continue;
+    auto updated = entry ? *entry : ListEntry{.anime_id = item.id};
+    updated.date_completed = item.date_finished;
+    anime::list::save(updated);
+  }
+}
+
+void MediaMenu::setDateCompletedToLastUpdated() const {
+  for (const auto& item : m_items) {
+    const auto* entry = getEntry(item.id);
+    if (!entry || entry->date_completed || !entry->last_updated) continue;
+    const auto date = std::chrono::floor<std::chrono::days>(
+        std::chrono::system_clock::from_time_t(entry->last_updated));
+    auto updated = *entry;
+    updated.date_completed = FuzzyDate{date};
+    anime::list::save(updated);
+  }
+}
+
+void MediaMenu::setDateStartedToAiringStart() const {
+  for (const auto& item : m_items) {
+    if (!item.date_started) continue;
+    const auto* entry = getEntry(item.id);
+    if (entry && entry->date_started) continue;
+    auto updated = entry ? *entry : ListEntry{.anime_id = item.id};
+    updated.date_started = item.date_started;
+    anime::list::save(updated);
+  }
+}
+
 void MediaMenu::startNewRewatch() const {
   const auto& item = m_items.front();
 
@@ -367,19 +420,6 @@ void MediaMenu::torrents() const {
   const auto& item = m_items.front();
   mainWindow()->navigateTo(MainWindowPage::Torrents);
   mainWindow()->searchBox()->setText(QString::fromStdString(anime::preferredTitle(item)));
-}
-
-void MediaMenu::test() const {
-  const auto action = reinterpret_cast<QAction*>(QObject::sender())->text();
-
-  QList<QString> titles;
-  for (const auto& item : m_items) {
-    titles.push_back(QString::fromStdString(anime::preferredTitle(item)));
-  }
-
-  const auto text = u"Action: %1\n\n%2"_s.arg(action).arg(titles.join("\n"));
-
-  QMessageBox::information(nullptr, "TODO", text);
 }
 
 void MediaMenu::viewDetails() const {
@@ -462,16 +502,18 @@ void MediaMenu::addListItems() {
 
       menu->addMenu([this]() {
         auto menu = new QMenu(tr("Date started"), this);
-        menu->addAction(tr("Clear"), this, &MediaMenu::test);
-        menu->addAction(tr("Set to date started airing"), this, &MediaMenu::test);
+        menu->addAction(tr("Clear"), this, &MediaMenu::clearDateStarted);
+        menu->addAction(tr("Set to date started airing"), this,
+                        &MediaMenu::setDateStartedToAiringStart);
         return menu;
       }());
 
       menu->addMenu([this]() {
         auto menu = new QMenu(tr("Date completed"), this);
-        menu->addAction(tr("Clear"), this, &MediaMenu::test);
-        menu->addAction(tr("Set to date finished airing"), this, &MediaMenu::test);
-        menu->addAction(tr("Set to last updated"), this, &MediaMenu::test);
+        menu->addAction(tr("Clear"), this, &MediaMenu::clearDateCompleted);
+        menu->addAction(tr("Set to date finished airing"), this,
+                        &MediaMenu::setDateCompletedToAiringEnd);
+        menu->addAction(tr("Set to last updated"), this, &MediaMenu::setDateCompletedToLastUpdated);
         return menu;
       }());
 

@@ -43,6 +43,8 @@ public:
 
 private slots:
   void addToList(const anime::list::Status status) const;
+  void clearDateCompleted() const;
+  void clearDateStarted() const;
   void copyLinks() const;
   void copyTitles() const;
   void edit() const;
@@ -65,9 +67,11 @@ private slots:
   void searchReddit() const;
   void searchWikipedia() const;
   void searchYouTube() const;
+  void setDateCompletedToAiringEnd() const;
+  void setDateCompletedToLastUpdated() const;
+  void setDateStartedToAiringStart() const;
   void startNewRewatch() const;
   void torrents() const;
-  void test() const;  // @TEMP
   void viewDetails() const;
 
 private:
