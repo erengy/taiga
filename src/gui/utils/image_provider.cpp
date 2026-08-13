@@ -83,6 +83,7 @@ void ImageProvider::fetchPoster(const int id, const bool revalidate) {
     QDir().mkpath(QFileInfo(file).path());
     if (!file.open(QIODevice::WriteOnly)) return;
     file.write(reply.readBody());
+    m_retryAfter.remove(id);
     reloadPoster(id);
   });
 }
