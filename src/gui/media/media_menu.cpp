@@ -522,16 +522,38 @@ void MediaMenu::addListItems() {
 
       menu->addMenu([this]() {
         auto menu = new QMenu(tr("Score"), this);
+
+        QSet<int> scores;
+        for (const auto& item : m_items) {
+          if (const auto* entry = getEntry(item.id)) scores.insert(entry->score);
+        }
+        const bool hasCommonScore = scores.size() == 1;
+
         for (const auto& rating : currentRatingList()) {
-          menu->addAction(rating.text, this, [this, rating]() { editScore(rating.value); });
+          auto action = new QAction(rating.text, this);
+          action->setCheckable(true);
+          action->setChecked(hasCommonScore && *scores.begin() == rating.value);
+          menu->addAction(action);
+          connect(action, &QAction::triggered, this, [this, rating]() { editScore(rating.value); });
         }
         return menu;
       }());
 
       menu->addMenu([this]() {
         auto menu = new QMenu(tr("Status"), this);
+
+        QSet<int> statuses;
+        for (const auto& item : m_items) {
+          if (const auto* entry = getEntry(item.id)) {
+            statuses.insert(static_cast<int>(entry->status));
+          }
+        }
+        const bool hasCommonStatus = statuses.size() == 1;
+
         for (const auto status : anime::list::kStatuses) {
           auto action = new QAction(formatListStatus(status), this);
+          action->setCheckable(true);
+          action->setChecked(hasCommonStatus && *statuses.begin() == static_cast<int>(status));
           menu->addAction(action);
           connect(action, &QAction::triggered, this, [this, status]() { editStatus(status); });
         }
