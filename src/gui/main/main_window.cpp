@@ -31,6 +31,7 @@
 #include "gui/main/navigation_widget.hpp"
 #include "gui/main/now_playing_widget.hpp"
 #include "gui/main/status_bar.hpp"
+#include "gui/main/status_bar_controller.hpp"
 #include "gui/search/search_widget.hpp"
 #include "gui/settings/settings_dialog.hpp"
 #include "gui/utils/format.hpp"
@@ -87,6 +88,10 @@ QLineEdit* MainWindow::searchBox() const {
   return m_searchBox;
 }
 
+StatusBarController* MainWindow::statusBarController() const {
+  return m_statusBarController;
+}
+
 Ui::MainWindow* MainWindow::ui() const {
   return ui_;
 }
@@ -96,8 +101,8 @@ void MainWindow::init() {
   initIcons();
   initTrayIcon();
   initToolbar();
-  initNavigation();
   initStatusbar();
+  initNavigation();
   initNowPlaying();
   updateTitle();
 }
@@ -213,12 +218,14 @@ void MainWindow::initStatusbar() {
   setStatusBar(statusbar);
   ui_->statusbar = statusbar;
 
-  m_statusbarSpinner = new SpinnerWidget(this);
+  const auto spinner = new SpinnerWidget(this);
   const auto spinnerContainer = new QWidget(this);
   const auto spinnerLayout = new QVBoxLayout(spinnerContainer);
   spinnerLayout->setContentsMargins(0, 2, 0, 0);
-  spinnerLayout->addWidget(m_statusbarSpinner);
+  spinnerLayout->addWidget(spinner);
   ui_->statusbar->addPermanentWidget(spinnerContainer);
+
+  m_statusBarController = new StatusBarController(this, statusbar, spinner);
 
   const QList<sync::Service*> services{
       sync::anilist::Service::instance(),
@@ -227,29 +234,32 @@ void MainWindow::initStatusbar() {
   };
   for (auto* service : services) {
     connect(service, &sync::Service::listEntriesFetched, this, [this]() {
-      statusBar()->clearMessage();
-      m_statusbarSpinner->stop();
+      m_statusBarController->clearMessage(StatusBarController::Source::Sync);
       setEnabled(true);
     });
     connect(service, &sync::Service::errorOccurred, this, [this](const QString& message) {
       const auto sender_service = qobject_cast<sync::Service*>(sender());
-      statusBar()->showMessage(sync::tagMessage(sender_service->id(), message));
-      m_statusbarSpinner->stop();
+      m_statusBarController->showMessage({
+          .source = StatusBarController::Source::Sync,
+          .text = sync::tagMessage(sender_service->id(), message),
+          .spin = false,
+      });
       setEnabled(true);
     });
     connect(service, &sync::Service::transferProgress, this,
             [this](const qint64 current, const qint64 total) {
-              statusBar()->showMessage(tr("Synchronizing with %1... (%2)")
-                                           .arg(sync::serviceName(sync::currentServiceId()))
-                                           .arg(gui::formatTransferProgress(current, total)));
-              m_statusbarSpinner->start();
+              m_statusBarController->showMessage({
+                  .source = StatusBarController::Source::Sync,
+                  .text = tr("Synchronizing with %1... (%2)")
+                              .arg(sync::serviceName(sync::currentServiceId()))
+                              .arg(gui::formatTransferProgress(current, total)),
+              });
             });
   }
 
   connect(&sync::queue, &sync::Queue::changed, this, [this]() {
     if (sync::queue.count() == 0) {
-      statusBar()->clearMessage();
-      m_statusbarSpinner->stop();
+      m_statusBarController->clearMessage(StatusBarController::Source::Sync);
       setEnabled(true);
     }
   });
@@ -339,7 +349,7 @@ void MainWindow::navigateTo(MainWindowPage page) {
 
 void MainWindow::setPage(MainWindowPage page) {
   initPage(page);
-  ui_->statusbar->clearMessage();
+  m_statusBarController->clearAll();
   ui_->stackedWidget->setCurrentIndex(static_cast<int>(page));
 }
 
@@ -372,13 +382,13 @@ void MainWindow::support() const {
 
 void MainWindow::synchronize() {
   setEnabled(false);
-  statusBar()->showMessage(
-      tr("Synchronizing with %1...").arg(sync::serviceName(sync::currentServiceId())));
-  m_statusbarSpinner->start();
+  m_statusBarController->showMessage({
+      .source = StatusBarController::Source::Sync,
+      .text = tr("Synchronizing with %1...").arg(sync::serviceName(sync::currentServiceId())),
+  });
 
   if (!sync::synchronize()) {
-    statusBar()->clearMessage();
-    m_statusbarSpinner->stop();
+    m_statusBarController->clearMessage(StatusBarController::Source::Sync);
     setEnabled(true);
   }
 }

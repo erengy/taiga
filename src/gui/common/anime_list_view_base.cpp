@@ -21,7 +21,6 @@
 #include <QDesktopServices>
 #include <QLineEdit>
 #include <QListView>
-#include <QStatusBar>
 #include <QTreeView>
 #include <QUrl>
 
@@ -29,6 +28,7 @@
 #include "gui/main/navigation_item_delegate.hpp"
 #include "gui/main/navigation_widget.hpp"
 #include "gui/main/now_playing_widget.hpp"
+#include "gui/main/status_bar_controller.hpp"
 #include "gui/media/media_dialog.hpp"
 #include "gui/media/media_menu.hpp"
 #include "gui/models/anime_list_model.hpp"
@@ -110,7 +110,7 @@ void ListViewBase::updateSelectionStatus(const QItemSelection&, const QItemSelec
   const auto n_selected = selectedIndexes().size();
 
   if (!n_selected) {
-    mainWindow()->statusBar()->clearMessage();
+    mainWindow()->statusBarController()->clearMessage(StatusBarController::Source::Selection);
     return;
   }
 
@@ -137,7 +137,11 @@ void ListViewBase::updateSelectionStatus(const QItemSelection&, const QItemSelec
       tr("%1 average").arg(formatScore(average_score)),
   };
 
-  mainWindow()->statusBar()->showMessage(parts.join(" · "));
+  mainWindow()->statusBarController()->showMessage({
+      .source = StatusBarController::Source::Selection,
+      .text = parts.join(" · "),
+      .spin = false,
+  });
 }
 
 QModelIndexList ListViewBase::selectedIndexes() {

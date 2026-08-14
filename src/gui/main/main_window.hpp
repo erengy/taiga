@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ class ListWidget;
 class NavigationWidget;
 class NowPlayingWidget;
 class SearchWidget;
-class SpinnerWidget;
+class StatusBarController;
 class TrayIcon;
 
 enum class MainWindowPage {
@@ -58,6 +58,7 @@ public:
   NavigationWidget* navigation() const;
   NowPlayingWidget* nowPlaying() const;
   QLineEdit* searchBox() const;
+  StatusBarController* statusBarController() const;
   Ui::MainWindow* ui() const;
 
   void init();
@@ -98,7 +99,7 @@ private:
   NowPlayingWidget* m_nowPlayingWidget = nullptr;
   QLineEdit* m_searchBox = nullptr;
   SearchWidget* m_searchWidget = nullptr;
-  SpinnerWidget* m_statusbarSpinner = nullptr;
+  StatusBarController* m_statusBarController = nullptr;
   TrayIcon* m_trayIcon = nullptr;
 };
 

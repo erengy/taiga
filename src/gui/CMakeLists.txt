@@ -49,6 +49,8 @@ target_sources(taiga-gui PRIVATE
 	main/now_playing_widget.hpp
 	main/status_bar.cpp
 	main/status_bar.hpp
+	main/status_bar_controller.cpp
+	main/status_bar_controller.hpp
 
 	media/media_dialog.cpp
 	media/media_dialog.hpp
