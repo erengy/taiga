@@ -29,6 +29,7 @@
 #include "base/log.hpp"
 #include "base/string.hpp"
 #include "gui/main/main_window.hpp"
+#include "gui/utils/image_provider.hpp"
 #include "gui/utils/theme.hpp"
 #include "media/anime_db.hpp"
 #include "media/anime_history.hpp"
@@ -83,6 +84,7 @@ int Application::run() {
   anime::history.init();
   sync::queue.init();
   track::media::detection()->init();
+  gui::imageProvider.init();
 
   gui::theme.initStyle();
   setWindowIcon(gui::theme.getIcon("taiga", "png"));

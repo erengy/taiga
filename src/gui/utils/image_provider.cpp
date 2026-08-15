@@ -50,8 +50,12 @@ QString cacheKey(const int id) {
 
 }  // namespace
 
-ImageProvider::ImageProvider() : m_manager(taiga::network(), this) {
+ImageProvider::ImageProvider() : QObject() {
   QPixmapCache::setCacheLimit(kPixmapCacheLimitKb);
+}
+
+void ImageProvider::init() {
+  m_manager = new QRestAccessManager(taiga::network(), this);
 }
 
 void ImageProvider::fetchPoster(const int id, const bool revalidate) {
@@ -67,7 +71,7 @@ void ImageProvider::fetchPoster(const int id, const bool revalidate) {
     }
   }
 
-  m_manager.get(request, this, [this, id](QRestReply& reply) {
+  m_manager->get(request, this, [this, id](QRestReply& reply) {
     if (!reply.isHttpStatusSuccess() || reply.hasError()) {
       if (reply.httpStatus() == 404) {
         if (const auto item = anime::db.item(id)) {

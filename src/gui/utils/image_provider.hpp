@@ -35,6 +35,8 @@ class ImageProvider final : public QObject {
 public:
   ImageProvider();
 
+  void init();
+
   void fetchPoster(const int id, const bool revalidate = false);
   QPixmap loadPoster(const int id);
   void reloadPoster(const int id);
@@ -48,7 +50,7 @@ private:
   bool canRetry(const int id) const;
   void retryAfter(const int id);
 
-  QRestAccessManager m_manager;
+  QRestAccessManager* m_manager = nullptr;
   QSet<int> m_loading;
   QMap<int, QDateTime> m_retryAfter;
 };
