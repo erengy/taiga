@@ -288,6 +288,17 @@ void MainWindow::initStatusbar() {
         .text = text,
     });
   });
+
+  connect(&sync::queue, &sync::Queue::queuedWhileUnauthenticated, this, [this](const int animeId) {
+    const auto item = anime::db.item(animeId);
+    if (!item) return;
+
+    m_statusBarController->showMessage({
+        .source = StatusBarController::Source::Sync,
+        .text = tr("%1 is queued for update.").arg(anime::preferredTitle(*item)),
+        .spin = false,
+    });
+  });
 }
 
 void MainWindow::initToolbar() {

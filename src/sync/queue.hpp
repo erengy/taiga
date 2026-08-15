@@ -62,6 +62,7 @@ public:
 signals:
   void changed();
   void processing(int animeId);
+  void queuedWhileUnauthenticated(int animeId);
 
 private:
   QList<QueueItem>::iterator findItem(const int animeId);

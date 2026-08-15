@@ -71,6 +71,10 @@ void Queue::push(const int animeId, const anime::list::Fields dirty) {
   }
 
   emit changed();
+
+  if (!isUserAuthenticated()) {
+    emit queuedWhileUnauthenticated(animeId);
+  }
 }
 
 void Queue::pushDelete(const int animeId) {
