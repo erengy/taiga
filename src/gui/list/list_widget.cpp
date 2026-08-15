@@ -33,6 +33,7 @@
 #include "gui/common/anime_list_view_cards.hpp"
 #include "gui/main/main_window.hpp"
 #include "gui/main/navigation_widget.hpp"
+#include "gui/main/status_bar_controller.hpp"
 #include "gui/models/anime_list_model.hpp"
 #include "gui/models/anime_list_proxy_model.hpp"
 #include "gui/utils/theme.hpp"
@@ -199,7 +200,14 @@ void ListWidget::initMoreMenu() {
 
     const auto timestamp = QDateTime::currentDateTime().toSecsSinceEpoch();
     const auto path = u"%1/animelist_%2.%3"_s.arg(directory).arg(timestamp).arg(extension);
-    export_function(path.toStdString());
+    const auto success = export_function(path.toStdString());
+
+    mainWindow()->statusBarController()->showMessage({
+        .source = StatusBarController::Source::Export,
+        .text = success ? tr("Exported list to %1.").arg(path)
+                        : tr("Could not export list to %1.").arg(path),
+        .spin = false,
+    });
   };
 
   m_moreMenu->addAction(tr("Export as Markdown..."), this,

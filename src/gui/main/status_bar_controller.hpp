@@ -38,6 +38,7 @@ public:
   enum class Source {
     Sync,
     Playback,
+    Export,
     Selection,
   };
 
