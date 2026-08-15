@@ -131,7 +131,7 @@ std::optional<anime::Details> parseAnime(const QJsonValue& json) {
       .date_finished = parseFuzzyDate(json["end_date"].toString()),
       .score = static_cast<float>(json["mean"].toDouble()),
       .popularity_rank = json["popularity"].toInt(),
-      .image_url = json["main_picture"]["medium"].toString().toStdString(),
+      .image_url = json["main_picture"]["large"].toString().toStdString(),
       .synopsis = json["synopsis"].toString().toStdString(),
       .titles{
           .romaji = json["title"].toString().toStdString(),

@@ -145,7 +145,7 @@ std::optional<anime::Details> parseAnime(const QJsonValue& data, const QJsonArra
       .date_finished = parseDate(attributes["endDate"].toString()),
       .score = parseScore(attributes["averageRating"].toVariant().toString()),
       .popularity_rank = attributes["popularityRank"].toInt(),
-      .image_url = attributes["posterImage"]["small"].toString().toStdString(),
+      .image_url = attributes["posterImage"]["large"].toString().toStdString(),
       .slug = attributes["slug"].toString().toStdString(),
       .synopsis = attributes["synopsis"].toString().toStdString(),
       .trailer_id = attributes["youtubeVideoId"].toString().toStdString(),
