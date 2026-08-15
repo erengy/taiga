@@ -24,6 +24,7 @@
 #include <algorithm>
 
 #include "base/string.hpp"
+#include "gui/common/spinner_widget.hpp"
 #include "gui/utils/format.hpp"
 #include "gui/utils/image_provider.hpp"
 #include "gui/utils/rating.hpp"
@@ -57,6 +58,8 @@ MediaDialog::MediaDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::MediaDi
   }
 
   ui_->posterLabel->setFrameShape(QFrame::Shape::NoFrame);
+
+  posterSpinner_ = new SpinnerWidget(ui_->posterLabel, 24);
 
   ui_->splitter->setSizes({ui_->posterLabel->minimumWidth(), ui_->posterLabel->minimumWidth() * 4});
   if (const auto state = taiga::session.mediaDialogSplitterState(); !state.isEmpty()) {
@@ -385,6 +388,12 @@ void MediaDialog::loadPosterImage() {
   const auto posterPixmap = imageProvider.loadPoster(m_anime.id);
   ui_->posterLabel->setPixmap(posterPixmap);
   resizePosterImage();
+
+  if (posterPixmap.isNull()) {
+    posterSpinner_->start();
+  } else {
+    posterSpinner_->stop();
+  }
 }
 
 void MediaDialog::resizePosterImage() {
@@ -393,14 +402,15 @@ void MediaDialog::resizePosterImage() {
 
   if (posterPixmap.isNull()) {
     ui_->posterLabel->setFixedHeight(label_w * 3 / 2);
-    return;
+  } else {
+    const int w = posterPixmap.width();
+    const int h = posterPixmap.height();
+    const int height = h * (label_w / static_cast<float>(w));
+    ui_->posterLabel->setFixedHeight(height);
   }
 
-  const int w = posterPixmap.width();
-  const int h = posterPixmap.height();
-  const int height = h * (label_w / static_cast<float>(w));
-
-  ui_->posterLabel->setFixedHeight(height);
+  posterSpinner_->move((ui_->posterLabel->width() - posterSpinner_->width()) / 2,
+                       (ui_->posterLabel->height() - posterSpinner_->height()) / 2);
 }
 
 void MediaDialog::accept() {
