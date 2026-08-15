@@ -46,6 +46,7 @@
 #include "sync/myanimelist/myanimelist.hpp"
 #include "sync/queue.hpp"
 #include "sync/service.hpp"
+#include "taiga/accounts.hpp"
 #include "taiga/application.hpp"
 #include "taiga/session.hpp"
 #include "taiga/settings.hpp"
@@ -236,6 +237,20 @@ void MainWindow::initStatusbar() {
       sync::myanimelist::Service::instance(),
   };
   for (auto* service : services) {
+    connect(service, &sync::Service::authenticationCompleted, this,
+            [this](const bool authenticated) {
+              if (!authenticated) return;
+
+              const auto sender_service = qobject_cast<sync::Service*>(sender());
+              const auto slug = sync::serviceSlug(sender_service->id()).toStdString();
+              const auto username = taiga::accounts.serviceUsername(slug);
+
+              m_statusBarController->showMessage({
+                  .source = StatusBarController::Source::Sync,
+                  .text = tr("Logged in as %1.").arg(username),
+                  .spin = false,
+              });
+            });
     connect(service, &sync::Service::listEntriesFetched, this, [this]() {
       m_statusBarController->clearMessage(StatusBarController::Source::Sync);
       setEnabled(true);
