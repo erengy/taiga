@@ -44,9 +44,9 @@ bool playEpisode(int animeId, int number) {
   return false;
 }
 
-bool playNextEpisode(int animeId) {
+std::optional<int> nextEpisodeNumber(int animeId) {
   const auto item = anime::db.item(animeId);
-  if (!item) return false;
+  if (!item) return std::nullopt;
 
   const auto entry = anime::db.entry(animeId);
   const int watched_episodes = entry ? entry->watched_episodes : 0;
@@ -58,12 +58,12 @@ bool playNextEpisode(int animeId) {
     number = 1;
   }
 
-  return playEpisode(animeId, number);
+  return number;
 }
 
-bool playRandomEpisode(int animeId) {
+std::optional<int> randomEpisodeNumber(int animeId) {
   const auto item = anime::db.item(animeId);
-  if (!item) return false;
+  if (!item) return std::nullopt;
 
   const auto entry = anime::db.entry(animeId);
   const int watched_episodes = entry ? entry->watched_episodes : 0;
@@ -82,11 +82,9 @@ bool playRandomEpisode(int animeId) {
     max_episode = std::min(max_episode, item->episode_count);
   }
 
-  if (max_episode < 1) return false;
+  if (max_episode < 1) return std::nullopt;
 
-  const int number = QRandomGenerator::global()->bounded(1, max_episode + 1);
-
-  return playEpisode(animeId, number);
+  return QRandomGenerator::global()->bounded(1, max_episode + 1);
 }
 
 }  // namespace track

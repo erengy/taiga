@@ -33,6 +33,7 @@
 
 #include "base/string.hpp"
 #include "gui/main/main_window.hpp"
+#include "gui/main/status_bar_controller.hpp"
 #include "gui/media/media_dialog.hpp"
 #include "gui/utils/format.hpp"
 #include "gui/utils/rating.hpp"
@@ -233,24 +234,36 @@ void MediaMenu::playEpisode(int number) const {
   const auto& item = m_items.front();
 
   if (track::playEpisode(item.id, number)) {
+    mainWindow()->statusBarController()->clearMessage(StatusBarController::Source::Playback);
     return;
   }
 
-  QMessageBox::information(
-      nullptr, tr("Play Episode"),
-      tr("Could not find %1 #%2.").arg(anime::preferredTitle(item)).arg(number));
+  mainWindow()->statusBarController()->showMessage({
+      .source = StatusBarController::Source::Playback,
+      .text = tr("Could not find episode #%1 (%2).").arg(number).arg(anime::preferredTitle(item)),
+      .spin = false,
+  });
 }
 
 void MediaMenu::playRandomEpisode() const {
   const auto& item = m_items.front();
+  const auto number = track::randomEpisodeNumber(item.id);
 
-  if (track::playRandomEpisode(item.id)) {
+  if (!number) {
+    mainWindow()->statusBarController()->clearMessage(StatusBarController::Source::Playback);
     return;
   }
 
-  QMessageBox::information(
-      nullptr, tr("Play Episode"),
-      tr("Could not find any episode of %1.").arg(anime::preferredTitle(item)));
+  if (track::playEpisode(item.id, *number)) {
+    mainWindow()->statusBarController()->clearMessage(StatusBarController::Source::Playback);
+    return;
+  }
+
+  mainWindow()->statusBarController()->showMessage({
+      .source = StatusBarController::Source::Playback,
+      .text = tr("Could not find episode #%1 (%2).").arg(*number).arg(anime::preferredTitle(item)),
+      .spin = false,
+  });
 }
 
 void MediaMenu::refresh() const {

@@ -37,6 +37,7 @@ public:
   // Declaration order sets display priority.
   enum class Source {
     Sync,
+    Playback,
     Selection,
   };
 

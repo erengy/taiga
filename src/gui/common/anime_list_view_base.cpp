@@ -36,6 +36,7 @@
 #include "gui/utils/format.hpp"
 #include "media/anime.hpp"
 #include "media/anime_list.hpp"
+#include "media/anime_utils.hpp"
 #include "sync/service.hpp"
 #include "track/play.hpp"
 
@@ -73,9 +74,26 @@ void ListViewBase::openAnimePage(const QModelIndex& index) {
 
 void ListViewBase::playNextEpisode(const QModelIndex& index) {
   const auto mappedIndex = m_proxyModel->mapToSource(index);
-  const auto anime = m_model->getAnime(mappedIndex);
-  if (!anime) return;
-  track::playNextEpisode(anime->id);
+  const auto item = m_model->getAnime(mappedIndex);
+  if (!item) return;
+
+  const auto number = track::nextEpisodeNumber(item->id);
+
+  if (!number) {
+    mainWindow()->statusBarController()->clearMessage(StatusBarController::Source::Playback);
+    return;
+  }
+
+  if (track::playEpisode(item->id, *number)) {
+    mainWindow()->statusBarController()->clearMessage(StatusBarController::Source::Playback);
+    return;
+  }
+
+  mainWindow()->statusBarController()->showMessage({
+      .source = StatusBarController::Source::Playback,
+      .text = tr("Could not find episode #%1 (%2).").arg(*number).arg(anime::preferredTitle(*item)),
+      .spin = false,
+  });
 }
 
 void ListViewBase::showMediaDialog(const QModelIndex& index) {

@@ -18,10 +18,13 @@
 
 #pragma once
 
+#include <optional>
+
 namespace track {
 
 bool playEpisode(int animeId, int number);
-bool playNextEpisode(int animeId);
-bool playRandomEpisode(int animeId);
+
+std::optional<int> nextEpisodeNumber(int animeId);
+std::optional<int> randomEpisodeNumber(int animeId);
 
 }  // namespace track
