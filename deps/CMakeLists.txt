@@ -3,7 +3,6 @@ add_library(taiga-deps STATIC)
 target_link_libraries(taiga-deps
 	anisthesia
 	anitomy
-	monolog
 	nstd
 	semaver
 	taiga-config
@@ -12,7 +11,6 @@ target_link_libraries(taiga-deps
 
 add_subdirectory(anisthesia)
 add_subdirectory(anitomy)
-add_subdirectory(monolog)
 add_subdirectory(nstd)
 add_subdirectory(semaver)
 add_subdirectory(utf8proc)

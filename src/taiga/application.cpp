@@ -27,6 +27,7 @@
 #include <format>
 
 #include "base/log.hpp"
+#include "base/string.hpp"
 #include "gui/main/main_window.hpp"
 #include "gui/utils/theme.hpp"
 #include "media/anime_db.hpp"
@@ -60,18 +61,17 @@ int Application::run() {
 
   initLogger();
 
-  LOGD("Version {} ({})", taiga::version().to_string(),
-       QFileInfo{QCoreApplication::applicationFilePath()}
-           .lastModified()
-           .toString(Qt::DateFormat::ISODate)
-           .toStdString());
+  const auto version = taiga::version().to_string();
+  const auto fileInfo = QFileInfo{QCoreApplication::applicationFilePath()};
+  const auto lastModified = fileInfo.lastModified().toString(Qt::DateFormat::ISODate);
+  qDebug() << u"Version %1 (%2)"_s.arg(version).arg(lastModified);
   if (!parser_.optionNames().isEmpty()) {
-    LOGD("Options: {}", parser_.optionNames().join(", ").toStdString());
+    qDebug() << "Options:" << parser_.optionNames().join(", ");
   }
 
   if (hasPreviousInstance()) {
     activatePreviousInstance();
-    LOGD("Another instance of Taiga is running.");
+    qDebug() << "Another instance of Taiga is running.";
     return 0;
   }
 
@@ -134,17 +134,13 @@ void Application::activatePreviousInstance() {
 }
 
 void Application::initLogger() const {
-  using monolog::Level;
+  const auto directory = u"%1/logs"_s.arg(get_data_path());
+  QDir().mkpath(directory);
 
-  const auto directory = std::format("{}/logs", get_data_path());
-  QDir().mkpath(QString::fromStdString(directory));
+  const auto date = QDate::currentDate().toString(Qt::DateFormat::ISODate);
+  const auto path = u"%1/%2_%3.log"_s.arg(directory).arg(TAIGA_APP_NAME).arg(date);
 
-  const auto date = QDate::currentDate().toString(Qt::DateFormat::ISODate).toStdString();
-  const auto path = std::format("{}/{}_{}.log", directory, TAIGA_APP_NAME, date);
-
-  monolog::log.enable_console_output(false);
-  monolog::log.set_path(path);
-  monolog::log.set_level(options_.debug ? Level::Debug : Level::Warning);
+  base::initLogging(path, options_.debug ? QtDebugMsg : QtWarningMsg);
 }
 
 void Application::onNewConnection() {

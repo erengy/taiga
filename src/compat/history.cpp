@@ -38,7 +38,7 @@ QList<anime::HistoryItem> readHistory(const std::string& path) {
   base::XmlFileReader xml;
 
   if (!xml.open(QString::fromStdString(path), removeMetaElement)) {
-    LOGE("{}", xml.file().errorString().toStdString());
+    qCritical() << xml.file().errorString();
     return {};
   }
 
@@ -57,7 +57,7 @@ QList<anime::HistoryItem> readHistory(const std::string& path) {
   }
 
   if (xml.hasError()) {
-    LOGE("{}", xml.errorString().toStdString());
+    qCritical() << xml.errorString();
     return {};
   }
 
@@ -68,7 +68,7 @@ QList<QueueItem> readQueue(const std::string& path) {
   base::XmlFileReader xml;
 
   if (!xml.open(QString::fromStdString(path), removeMetaElement)) {
-    LOGE("{}", xml.file().errorString().toStdString());
+    qCritical() << xml.file().errorString();
     return {};
   }
 
@@ -87,7 +87,7 @@ QList<QueueItem> readQueue(const std::string& path) {
   }
 
   if (xml.hasError()) {
-    LOGE("{}", xml.errorString().toStdString());
+    qCritical() << xml.errorString();
     return {};
   }
 

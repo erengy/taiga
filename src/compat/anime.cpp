@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ QList<Anime> readAnimeDatabase(const std::string& path) {
   base::XmlFileReader xml;
 
   if (!xml.open(QString::fromStdString(path), removeMetaElement)) {
-    LOGE("{}", xml.file().errorString().toStdString());
+    qCritical() << xml.file().errorString();
     return {};
   }
 
@@ -50,7 +50,7 @@ QList<Anime> readAnimeDatabase(const std::string& path) {
   }
 
   if (xml.hasError()) {
-    LOGE("{}", xml.errorString().toStdString());
+    qCritical() << xml.errorString();
   }
 
   return db;

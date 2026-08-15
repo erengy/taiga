@@ -22,6 +22,7 @@
 #include <QRandomGenerator>
 #include <QUrl>
 
+#include "base/log.hpp"
 #include "media/anime_db.hpp"
 #include "taiga/settings.hpp"
 #include "track/scanner.hpp"

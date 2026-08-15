@@ -47,7 +47,7 @@ void readSettings(const std::string& path, const taiga::Settings& settings,
   base::XmlFileReader xml;
 
   if (!xml.open(QString::fromStdString(path), removeInvalidCharacterReferences)) {
-    LOGE("{}", xml.file().errorString().toStdString());
+    qCritical() << xml.file().errorString();
     return;
   }
 
@@ -71,7 +71,7 @@ void readSettings(const std::string& path, const taiga::Settings& settings,
   }
 
   if (xml.hasError()) {
-    LOGE("{}", xml.errorString().toStdString());
+    qCritical() << xml.errorString();
   }
 }
 
@@ -79,7 +79,7 @@ QList<anime::Settings> readAnimeSettings(const std::string& path) {
   base::XmlFileReader xml;
 
   if (!xml.open(QString::fromStdString(path), removeInvalidCharacterReferences)) {
-    LOGE("{}", xml.file().errorString().toStdString());
+    qCritical() << xml.file().errorString();
     return {};
   }
 
@@ -98,7 +98,7 @@ QList<anime::Settings> readAnimeSettings(const std::string& path) {
   }
 
   if (xml.hasError()) {
-    LOGE("{}", xml.errorString().toStdString());
+    qCritical() << xml.errorString();
   }
 
   return items;

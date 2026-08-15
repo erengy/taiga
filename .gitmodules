@@ -10,10 +10,6 @@
 	path = deps/anitomy
 	url = https://github.com/erengy/anitomy.git
 
-[submodule "monolog"]
-	path = deps/monolog
-	url = https://github.com/erengy/monolog.git
-
 [submodule "nstd"]
 	path = deps/nstd
 	url = https://github.com/erengy/nstd.git

@@ -31,6 +31,7 @@
 #include <limits>
 #include <ranges>
 
+#include "base/log.hpp"
 #include "base/string.hpp"
 #include "gui/main/main_window.hpp"
 #include "gui/main/status_bar_controller.hpp"

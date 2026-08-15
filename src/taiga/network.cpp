@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 #include <QNetworkReply>
 #include <QRestReply>
 
+#include "base/log.hpp"
 #include "base/string.hpp"
 #include "taiga/application.hpp"
 #include "taiga/config.h"
@@ -39,7 +40,7 @@ NetworkAccessManager::NetworkAccessManager(QObject* parent) : QNetworkAccessMana
              << reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
     qDebug() << "Response headers:";
     for (const auto& [name, value] : reply->rawHeaderPairs()) {
-      qDebug().noquote() << u"%1: %2"_s.arg(name).arg(value);
+      qDebug() << u"%1: %2"_s.arg(name).arg(value);
     }
   });
 }

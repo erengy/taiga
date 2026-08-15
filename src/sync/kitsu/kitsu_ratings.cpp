@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -111,7 +111,7 @@ QString formatRating(int value, const RatingSystem ratingSystem) {
       return QString::number(value / 2.0, 'f', 1);
   }
 
-  LOGW("Invalid value: {}", value);
+  qWarning() << "Invalid value:" << value;
 
   return QString::number(value);
 }

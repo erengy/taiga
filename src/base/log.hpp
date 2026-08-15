@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,25 +18,22 @@
 
 #pragma once
 
-#include <format>
-#include <monolog.hpp>
-#include <string_view>
+#include <QDebug>
+#include <QString>
 
 namespace base {
 
-template <class... Args>
-inline void log(const monolog::Level level, const monolog::Source& source,
-                const std::format_string<Args...> fmt, Args&&... args) {
-  const monolog::Record record{std::vformat(fmt.get(), std::make_format_args(args...))};
-  monolog::log.write(level, record, source);
-}
+void initLogging(const QString& path, const QtMsgType minType);
 
 }  // namespace base
 
-#define TAIGA_LOG(level, text, ...) \
-  base::log(level, monolog::Source{__FILE__, __FUNCTION__, __LINE__}, text, __VA_ARGS__)
-
-#define LOGD(text, ...) TAIGA_LOG(monolog::Level::Debug, text, __VA_ARGS__)
-#define LOGI(text, ...) TAIGA_LOG(monolog::Level::Informational, text, __VA_ARGS__)
-#define LOGW(text, ...) TAIGA_LOG(monolog::Level::Warning, text, __VA_ARGS__)
-#define LOGE(text, ...) TAIGA_LOG(monolog::Level::Error, text, __VA_ARGS__)
+// Redefining macros to capture context outside of debug builds and to disable
+// automatic quotation of strings.
+#undef qDebug
+#define qDebug QMessageLogger(__FILE__, __LINE__, __FUNCTION__).debug().noquote
+#undef qInfo
+#define qInfo QMessageLogger(__FILE__, __LINE__, __FUNCTION__).info().noquote
+#undef qWarning
+#define qWarning QMessageLogger(__FILE__, __LINE__, __FUNCTION__).warning().noquote
+#undef qCritical
+#define qCritical QMessageLogger(__FILE__, __LINE__, __FUNCTION__).critical().noquote

@@ -9,6 +9,7 @@ target_sources(taiga PRIVATE
 	base/chrono.hpp
 	base/file.cpp
 	base/file.hpp
+	base/log.cpp
 	base/log.hpp
 	base/preprocessor.h
 	base/rss.hpp

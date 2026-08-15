@@ -48,7 +48,7 @@ ServiceId Service::id() const {
 }
 
 void Service::logError(const QString& message) {
-  LOGE("{}", tagMessage(id_, message).toStdString());
+  qCritical() << tagMessage(id_, message);
 }
 
 void Service::onAuthenticationCompleted(bool authenticated) {
