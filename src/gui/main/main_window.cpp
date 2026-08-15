@@ -299,6 +299,16 @@ void MainWindow::initStatusbar() {
         .spin = false,
     });
   });
+
+  connect(&anime::db, &anime::Database::itemDeleted, this, [this](const int, const QString& title) {
+    if (title.isEmpty()) return;
+
+    m_statusBarController->showMessage({
+        .source = StatusBarController::Source::Sync,
+        .text = tr("Anime removed from database: %1").arg(title),
+        .spin = false,
+    });
+  });
 }
 
 void MainWindow::initToolbar() {

@@ -56,7 +56,7 @@ public:
 signals:
   void itemUpdated(const int id);
   void entryUpdated(const int id);
-  void itemDeleted(const int id);
+  void itemDeleted(const int id, const QString& title);
   void entryDeleted(const int id);
 
 private:

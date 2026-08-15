@@ -30,6 +30,7 @@
 #include "compat/anime.hpp"
 #include "compat/list.hpp"
 #include "compat/settings.hpp"
+#include "media/anime_utils.hpp"
 #include "taiga/accounts.hpp"
 #include "taiga/path.hpp"
 #include "taiga/settings.hpp"
@@ -165,6 +166,9 @@ void Database::updateSettings(const Settings& settings) {
 }
 
 void Database::deleteItem(const int id) {
+  const auto* existing = item(id);
+  const auto title = existing ? QString::fromStdString(preferredTitle(*existing)) : QString();
+
   if (!db_.open()) return;
 
   QSqlQuery q{db_};
@@ -176,7 +180,7 @@ void Database::deleteItem(const int id) {
 
   items_.remove(id);
 
-  emit itemDeleted(id);
+  emit itemDeleted(id, title);
 }
 
 void Database::deleteEntry(const int animeId) {
