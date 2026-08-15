@@ -198,7 +198,7 @@ void ListWidget::initMoreMenu() {
     if (directory.isEmpty()) return;
 
     const auto timestamp = QDateTime::currentDateTime().toSecsSinceEpoch();
-    const auto path = u"{}/animelist_{}.{}"_s.arg(directory).arg(timestamp).arg(extension);
+    const auto path = u"%1/animelist_%2.%3"_s.arg(directory).arg(timestamp).arg(extension);
     export_function(path.toStdString());
   };
 
