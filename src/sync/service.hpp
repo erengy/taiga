@@ -87,6 +87,7 @@ void updateListEntry(const int id, const anime::list::Fields dirty);
 void deleteListEntry(const int id);
 
 bool isUserAuthenticated();
+bool willAuthenticate();
 
 QString animePageUrl(const int id);
 

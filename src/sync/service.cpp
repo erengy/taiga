@@ -170,39 +170,18 @@ void search(const SearchParams& params) {
 }
 
 bool synchronize() {
-  const auto syncUnauthenticated = [](const bool hasToken, const bool hasUsername) {
-    if (hasToken) {
-      authenticateUser();  // can authenticate
-      return true;
-    }
-    if (hasUsername) {
-      fetchListEntries();  // can fetch the list without authentication
-      return true;
-    }
-    return false;
-  };
+  if (willAuthenticate()) {
+    authenticateUser();
+    return true;
+  }
 
-  switch (currentServiceId()) {
-    case ServiceId::MyAnimeList:
-      if (!taiga::accounts.myanimelistAuthenticated()) {
-        return syncUnauthenticated(!taiga::accounts.myanimelistAccessToken().empty(),
-                                   !taiga::accounts.myanimelistUsername().empty());
-      }
-      break;
+  if (!isUserAuthenticated()) {
+    const auto username =
+        taiga::accounts.serviceUsername(serviceSlug(currentServiceId()).toStdString());
+    if (username.empty()) return false;
 
-    case ServiceId::Kitsu:
-      if (!taiga::accounts.kitsuAuthenticated()) {
-        return syncUnauthenticated(!taiga::accounts.kitsuAccessToken().empty(),
-                                   !taiga::accounts.kitsuUsername().empty());
-      }
-      break;
-
-    case ServiceId::AniList:
-      if (!taiga::accounts.anilistAuthenticated()) {
-        return syncUnauthenticated(!taiga::accounts.anilistToken().empty(),
-                                   !taiga::accounts.anilistUsername().empty());
-      }
-      break;
+    fetchListEntries();  // can fetch the list without authentication
+    return true;
   }
 
   if (queue.count() > 0) {
@@ -264,6 +243,20 @@ bool isUserAuthenticated() {
       return taiga::accounts.kitsuAuthenticated();
     case ServiceId::AniList:
       return taiga::accounts.anilistAuthenticated();
+  }
+  return false;
+}
+
+bool willAuthenticate() {
+  if (isUserAuthenticated()) return false;
+
+  switch (currentServiceId()) {
+    case ServiceId::MyAnimeList:
+      return !taiga::accounts.myanimelistAccessToken().empty();
+    case ServiceId::Kitsu:
+      return !taiga::accounts.kitsuAccessToken().empty();
+    case ServiceId::AniList:
+      return !taiga::accounts.anilistToken().empty();
   }
   return false;
 }

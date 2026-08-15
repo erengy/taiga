@@ -443,9 +443,14 @@ void MainWindow::support() const {
 
 void MainWindow::synchronize() {
   setEnabled(false);
+
+  const auto serviceName = sync::serviceName(sync::currentServiceId());
+  const auto text = sync::willAuthenticate() ? tr("Authenticating with %1...").arg(serviceName)
+                                             : tr("Synchronizing with %1...").arg(serviceName);
+
   m_statusBarController->showMessage({
       .source = StatusBarController::Source::Sync,
-      .text = tr("Synchronizing with %1...").arg(sync::serviceName(sync::currentServiceId())),
+      .text = text,
   });
 
   if (!sync::synchronize()) {
