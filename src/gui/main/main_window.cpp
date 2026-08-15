@@ -179,7 +179,6 @@ void MainWindow::initPage(MainWindowPage page) {
     const auto layout = new QHBoxLayout(page);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(widget);
-    page->setLayout(layout);
   };
 
   switch (page) {

@@ -39,7 +39,6 @@ NowPlayingWidget::NowPlayingWidget(QWidget* parent) : QFrame(parent) {
 
   const auto layout = new QHBoxLayout(this);
   layout->setContentsMargins(16, 16, 16, 16);
-  setLayout(layout);
 
   // Icon
   m_iconLabel = new QLabel(this);

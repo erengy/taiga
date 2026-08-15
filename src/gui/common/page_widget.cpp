@@ -25,10 +25,9 @@ PageWidget::PageWidget(QWidget* parent) : QWidget(parent) {
   auto layout = new QVBoxLayout(this);
   layout->setContentsMargins(0, 0, 0, 0);
   layout->setSpacing(0);
-  setLayout(layout);
 
   // Toolbar layout
-  m_toolbarLayout = new QHBoxLayout(this);
+  m_toolbarLayout = new QHBoxLayout();
   m_toolbarLayout->setContentsMargins(16, 8, 16, 8);
   m_toolbarLayout->addStretch();
   layout->addLayout(m_toolbarLayout);
