@@ -107,6 +107,7 @@ void Queue::process() {
   }
 
   processing_ = item->anime_id;
+  emit processing(item->anime_id);
 
   if (entry->pending_delete) {
     deleteListEntry(item->anime_id);

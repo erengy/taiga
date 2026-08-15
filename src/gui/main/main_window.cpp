@@ -38,6 +38,9 @@
 #include "gui/utils/theme.hpp"
 #include "gui/utils/tray_icon.hpp"
 #include "gui/utils/widgets.hpp"
+#include "media/anime_db.hpp"
+#include "media/anime_list.hpp"
+#include "media/anime_utils.hpp"
 #include "sync/anilist/anilist.hpp"
 #include "sync/kitsu/kitsu.hpp"
 #include "sync/myanimelist/myanimelist.hpp"
@@ -262,6 +265,28 @@ void MainWindow::initStatusbar() {
       m_statusBarController->clearMessage(StatusBarController::Source::Sync);
       setEnabled(true);
     }
+  });
+
+  connect(&sync::queue, &sync::Queue::processing, this, [this](const int animeId) {
+    const auto item = anime::db.item(animeId);
+    const auto entry = anime::db.entry(animeId);
+    if (!item || !entry) return;
+
+    const auto title = anime::preferredTitle(*item);
+
+    QString text;
+    if (entry->pending_delete) {
+      text = tr("Deleting list entry... (%1)").arg(title);
+    } else if (entry->id == anime::list::kUnknownId) {
+      text = tr("Adding to list... (%1)").arg(title);
+    } else {
+      text = tr("Updating list entry... (%1)").arg(title);
+    }
+
+    m_statusBarController->showMessage({
+        .source = StatusBarController::Source::Sync,
+        .text = text,
+    });
   });
 }
 

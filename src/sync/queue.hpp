@@ -61,6 +61,7 @@ public:
 
 signals:
   void changed();
+  void processing(int animeId);
 
 private:
   QList<QueueItem>::iterator findItem(const int animeId);
