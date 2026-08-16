@@ -117,7 +117,7 @@ void NowPlayingWidget::refresh() {
   }
   m_iconLabel->setToolTip(lines.join("<br>"));
 
-  const QString iconName = m_anime ? "check_circle" : "info";
+  const QString iconName = m_anime ? "check_circle" : "error";
   m_iconLabel->setPixmap(theme.getIcon(iconName).pixmap(QSize(16, 16)));
 
   const auto title =
