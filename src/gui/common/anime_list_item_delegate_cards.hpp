@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,11 @@
 
 #pragma once
 
+#include <QPersistentModelIndex>
+#include <QPixmap>
+#include <QSet>
 #include <QStyledItemDelegate>
+#include <QTimer>
 
 namespace gui {
 
@@ -40,6 +44,12 @@ protected:
 
 private:
   QSize itemSize() const;
+  void advanceSpinner();
+
+  QPixmap m_spinnerPixmap;
+  qreal m_angle = 0.0;
+  mutable QTimer m_timerSpinner;
+  mutable QSet<QPersistentModelIndex> m_loadingIndices;
 };
 
 }  // namespace gui
