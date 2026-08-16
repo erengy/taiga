@@ -26,6 +26,10 @@ namespace Ui {
 class MainWindow;
 }
 
+namespace anime::list {
+enum class Status;
+}
+
 namespace gui {
 
 class HistoryWidget;
@@ -67,6 +71,7 @@ public slots:
   void addNewFolder();
   void displayWindow();
   void navigateTo(MainWindowPage page);
+  void navigateToListStatus(anime::list::Status status);
   void updateTitle();
 
 private slots:

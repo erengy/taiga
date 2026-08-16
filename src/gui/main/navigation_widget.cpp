@@ -171,6 +171,22 @@ void NavigationWidget::setItemData(QTreeWidgetItem* item, NavigationItemDataRole
   item->setData(0, static_cast<int>(role), value);
 }
 
+QTreeWidgetItem* NavigationWidget::findListStatusItem(anime::list::Status status) const {
+  const auto listItem = findItemByPage(MainWindowPage::List);
+  if (!listItem) return nullptr;
+
+  constexpr auto statusRole = static_cast<int>(NavigationItemDataRole::ListStatus);
+
+  for (int i = 0; i < listItem->childCount(); ++i) {
+    const auto child = listItem->child(i);
+    if (child->data(0, statusRole).value<anime::list::Status>() == status) {
+      return child;
+    }
+  }
+
+  return nullptr;
+}
+
 QTreeWidgetItem* NavigationWidget::findItemByPage(MainWindowPage page) const {
   const auto find = [page](this auto const& find, QTreeWidgetItem* item) -> QTreeWidgetItem* {
     const auto role = static_cast<int>(NavigationItemDataRole::PageIndex);

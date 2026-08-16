@@ -21,6 +21,7 @@
 #include <QDesktopServices>
 #include <QFileDialog>
 #include <QtWidgets>
+#include <algorithm>
 
 #include "base/string.hpp"
 #include "gui/common/spinner_widget.hpp"
@@ -158,7 +159,14 @@ void MainWindow::initNavigation() {
 
   connect(m_navigationWidget, &NavigationWidget::currentPageChanged, this, &MainWindow::setPage);
 
-  navigateTo(MainWindowPage::List);
+  const bool hasWatching = std::ranges::any_of(anime::db.entries(), [](const auto& entry) {
+    return entry.status == anime::list::Status::Watching;
+  });
+  if (hasWatching) {
+    navigateToListStatus(anime::list::Status::Watching);
+  } else {
+    navigateTo(MainWindowPage::List);
+  }
 
   ui_->splitter->insertWidget(0, m_navigationWidget);
 }
@@ -403,6 +411,12 @@ void MainWindow::addNewFolder() {
 
 void MainWindow::navigateTo(MainWindowPage page) {
   if (const auto item = m_navigationWidget->findItemByPage(page)) {
+    m_navigationWidget->setCurrentItem(item);
+  }
+}
+
+void MainWindow::navigateToListStatus(anime::list::Status status) {
+  if (const auto item = m_navigationWidget->findListStatusItem(status)) {
     m_navigationWidget->setCurrentItem(item);
   }
 }
