@@ -409,7 +409,7 @@ void MainWindow::navigateTo(MainWindowPage page) {
 
 void MainWindow::setPage(MainWindowPage page) {
   initPage(page);
-  m_statusBarController->clearAll();
+  m_statusBarController->clearMessage(StatusBarController::Source::Selection);
   ui_->stackedWidget->setCurrentIndex(static_cast<int>(page));
 }
 

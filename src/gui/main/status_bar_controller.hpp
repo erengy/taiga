@@ -53,7 +53,6 @@ public:
 
   void showMessage(const Message& message);
   void clearMessage(Source source);
-  void clearAll();
 
 private:
   void refresh();

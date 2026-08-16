@@ -46,12 +46,6 @@ void StatusBarController::clearMessage(Source source) {
   refresh();
 }
 
-void StatusBarController::clearAll() {
-  messages_.clear();
-  spinningSources_.clear();
-  refresh();
-}
-
 void StatusBarController::refresh() {
   if (messages_.isEmpty()) {
     statusBar_->clearMessage();
