@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -72,6 +72,18 @@ void paintProgressBar(QPainter* painter, const QStyleOption& option, const Anime
 
   static const auto proxyStyle{new QProxyStyle{"fusion"}};
   proxyStyle->drawControl(QStyle::CE_ProgressBar, &styleOption, painter);
+}
+
+void paintSpinner(QPainter* painter, const QPixmap& pixmap, const QPointF& center, qreal angle) {
+  const qreal dpr = pixmap.devicePixelRatio();
+  const QPointF halfSize(pixmap.width() / dpr / 2.0, pixmap.height() / dpr / 2.0);
+
+  painter->save();
+  painter->setRenderHint(QPainter::SmoothPixmapTransform);
+  painter->translate(center);
+  painter->rotate(angle);
+  painter->drawPixmap(-halfSize, pixmap);
+  painter->restore();
 }
 
 }  // namespace gui

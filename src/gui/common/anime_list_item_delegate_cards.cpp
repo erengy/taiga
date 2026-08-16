@@ -36,8 +36,6 @@ namespace gui {
 constexpr int itemHeight = 210;
 constexpr int posterWidth = itemHeight * 2 / 3;
 constexpr int kSpinnerSize = 24;
-constexpr int kSpinnerIntervalMs = 40;
-constexpr qreal kSpinnerDegreesPerTick = 12.0;
 
 ListItemDelegateCards::ListItemDelegateCards(QObject* parent) : QStyledItemDelegate(parent) {
   m_spinnerPixmap = theme.getIcon("progress_activity").pixmap(QSize(kSpinnerSize, kSpinnerSize));
@@ -106,14 +104,11 @@ void ListItemDelegateCards::paint(QPainter* painter, const QStyleOptionViewItem&
       painter->drawPixmap(posterRect, pixmap, sourceRect);
     } else if (!item->image_url.empty()) {
       m_loadingIndices.insert(index);
-      if (!m_timerSpinner.isActive()) m_timerSpinner.start(kSpinnerIntervalMs);
+      if (!m_timerSpinner.isActive()) {
+        m_timerSpinner.start(kSpinnerIntervalMs);
+      }
 
-      const PainterStateSaver spinnerStateSaver(painter);
-      painter->setRenderHint(QPainter::SmoothPixmapTransform);
-      painter->translate(posterRect.center());
-      painter->rotate(m_angle);
-      painter->drawPixmap(QRect(-kSpinnerSize / 2, -kSpinnerSize / 2, kSpinnerSize, kSpinnerSize),
-                          m_spinnerPixmap);
+      paintSpinner(painter, m_spinnerPixmap, posterRect.center(), m_angle);
     } else {
       m_loadingIndices.remove(index);
     }

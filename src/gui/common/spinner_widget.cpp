@@ -20,16 +20,10 @@
 
 #include <QPainter>
 
+#include "gui/utils/painters.hpp"
 #include "gui/utils/theme.hpp"
 
 namespace gui {
-
-namespace {
-
-constexpr int kIntervalMs = 40;
-constexpr qreal kDegreesPerTick = 12.0;
-
-}  // namespace
 
 SpinnerWidget::SpinnerWidget(QWidget* parent, int size) : QLabel(parent) {
   setFixedSize(size, size);
@@ -46,7 +40,7 @@ void SpinnerWidget::start() {
 
   if (m_timer.isActive()) return;
 
-  m_timer.start(kIntervalMs);
+  m_timer.start(kSpinnerIntervalMs);
 }
 
 void SpinnerWidget::stop() {
@@ -57,7 +51,7 @@ void SpinnerWidget::stop() {
 }
 
 void SpinnerWidget::advance() {
-  m_angle += kDegreesPerTick;
+  m_angle += kSpinnerDegreesPerTick;
   if (m_angle >= 360.0) m_angle -= 360.0;
 
   const qreal dpr = m_basePixmap.devicePixelRatio();
@@ -69,10 +63,7 @@ void SpinnerWidget::advance() {
   const QPointF center(m_basePixmap.width() / dpr / 2.0, m_basePixmap.height() / dpr / 2.0);
 
   QPainter painter(&frame);
-  painter.setRenderHint(QPainter::SmoothPixmapTransform);
-  painter.translate(center);
-  painter.rotate(m_angle);
-  painter.drawPixmap(-center, m_basePixmap);
+  paintSpinner(&painter, m_basePixmap, center, m_angle);
 
   setPixmap(frame);
 }
