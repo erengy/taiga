@@ -76,7 +76,7 @@ SearchWidget::SearchWidget(QWidget* parent)
     return index > -1 ? std::optional<int>{combo->itemData(index).toInt()} : std::nullopt;
   };
 
-  auto filtersLayout = new QHBoxLayout(this);
+  auto filtersLayout = new QHBoxLayout();
   filtersLayout->setSpacing(4);
   m_toolbarLayout->insertLayout(0, filtersLayout);
 

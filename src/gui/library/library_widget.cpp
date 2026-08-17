@@ -43,7 +43,7 @@ LibraryWidget::LibraryWidget(QWidget* parent)
 
   m_model->setRootPath(rootPath);
 
-  auto filtersLayout = new QHBoxLayout(this);
+  auto filtersLayout = new QHBoxLayout();
   filtersLayout->setSpacing(4);
   m_toolbarLayout->insertLayout(0, filtersLayout);
 
