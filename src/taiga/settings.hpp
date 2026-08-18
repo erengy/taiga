@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <QNetworkProxy>
 #include <chrono>
 #include <optional>
 #include <string>
@@ -37,6 +38,11 @@ public:
   std::string service() const;
   std::vector<std::string> libraryFolders() const;
   std::chrono::milliseconds mediaDetectionInterval() const;
+  QNetworkProxy::ProxyType proxyType() const;
+  std::string proxyHost() const;
+  int proxyPort() const;
+  std::string proxyUsername() const;
+  std::string proxyPassword() const;
   bool syncEnabled() const;
   anime::TitleLanguage titleLanguage() const;
 
@@ -45,6 +51,11 @@ public:
   void setService(const std::string& service) const;
   void setLibraryFolders(std::vector<std::string> folders) const;
   void setMediaDetectionInterval(const std::chrono::milliseconds interval) const;
+  void setProxyType(const QNetworkProxy::ProxyType type) const;
+  void setProxyHost(const std::string& host) const;
+  void setProxyPort(const int port) const;
+  void setProxyUsername(const std::string& username) const;
+  void setProxyPassword(const std::string& password) const;
   void setSyncEnabled(const bool enabled) const;
   void setTitleLanguage(const anime::TitleLanguage language) const;
 

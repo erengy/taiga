@@ -80,6 +80,28 @@ std::chrono::milliseconds Settings::mediaDetectionInterval() const {
   return std::chrono::milliseconds{interval};
 }
 
+QNetworkProxy::ProxyType Settings::proxyType() const {
+  const auto type = value("network.proxy.type", u"http"_s).toString();
+  if (type == u"socks5") return QNetworkProxy::Socks5Proxy;
+  return QNetworkProxy::HttpProxy;
+}
+
+std::string Settings::proxyHost() const {
+  return value("network.proxy.host").toString().toStdString();
+}
+
+int Settings::proxyPort() const {
+  return value("network.proxy.port", -1).toInt();
+}
+
+std::string Settings::proxyUsername() const {
+  return value("network.proxy.username").toString().toStdString();
+}
+
+std::string Settings::proxyPassword() const {
+  return value("network.proxy.password").toString().toStdString();
+}
+
 bool Settings::syncEnabled() const {
   return value("sync.enabled", true).toBool();
 }
@@ -126,6 +148,27 @@ void Settings::setLibraryFolders(std::vector<std::string> folders) const {
 
 void Settings::setMediaDetectionInterval(const std::chrono::milliseconds interval) const {
   setValue("track.detection.interval", interval.count());
+}
+
+void Settings::setProxyType(const QNetworkProxy::ProxyType type) const {
+  const std::string slug = type == QNetworkProxy::Socks5Proxy ? "socks5" : "http";
+  setValue("network.proxy.type", slug);
+}
+
+void Settings::setProxyHost(const std::string& host) const {
+  setValue("network.proxy.host", host);
+}
+
+void Settings::setProxyPort(const int port) const {
+  setValue("network.proxy.port", port);
+}
+
+void Settings::setProxyUsername(const std::string& username) const {
+  setValue("network.proxy.username", username);
+}
+
+void Settings::setProxyPassword(const std::string& password) const {
+  setValue("network.proxy.password", password);
 }
 
 void Settings::setSyncEnabled(const bool enabled) const {

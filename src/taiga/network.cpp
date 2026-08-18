@@ -18,6 +18,7 @@
 
 #include "network.hpp"
 
+#include <QNetworkProxy>
 #include <QNetworkReply>
 #include <QRestReply>
 
@@ -25,14 +26,42 @@
 #include "base/string.hpp"
 #include "taiga/application.hpp"
 #include "taiga/config.h"
+#include "taiga/settings.hpp"
 
 namespace taiga {
+
+namespace {
+
+QNetworkProxy buildProxy() {
+  const auto host = QString::fromStdString(settings.proxyHost());
+  if (host.isEmpty()) return QNetworkProxy{};
+
+  QNetworkProxy proxy;
+  proxy.setType(settings.proxyType());
+  proxy.setHostName(host);
+  if (const auto port = settings.proxyPort(); port >= 0) {
+    proxy.setPort(static_cast<quint16>(port));
+  }
+
+  if (const auto username = settings.proxyUsername(); !username.empty()) {
+    proxy.setUser(QString::fromStdString(username));
+  }
+  if (const auto password = settings.proxyPassword(); !password.empty()) {
+    proxy.setPassword(QString::fromStdString(password));
+  }
+
+  return proxy;
+}
+
+}  // namespace
 
 NetworkAccessManager::NetworkAccessManager(QObject* parent) : QNetworkAccessManager{parent} {
   setAutoDeleteReplies(true);
   setTransferTimeout(std::chrono::seconds{10});
 
-  // @TODO: Set proxy
+  if (const auto proxy = buildProxy(); proxy.type() != QNetworkProxy::DefaultProxy) {
+    setProxy(proxy);
+  }
 
   connect(this, &QNetworkAccessManager::finished, this, [](QNetworkReply* reply) {
     if (!app()->isDebug()) return;

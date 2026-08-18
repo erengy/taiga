@@ -18,6 +18,8 @@
 
 #include "settings.hpp"
 
+#include <QNetworkProxy>
+#include <QUrl>
 #include <QXmlStreamReader>
 #include <chrono>
 
@@ -222,6 +224,17 @@ void parseProgramElement(QXmlStreamReader& xml, const taiga::Settings& settings)
           xml.skipCurrentElement();
         }
       }
+
+    } else if (xml.name() == u"proxy") {
+      const auto raw = XML_ATTR(u"host").toString();
+      const QUrl url{raw.contains(u"://") ? raw : u"//" + raw};
+      settings.setProxyType(url.scheme().toLower().contains(u"socks5") ? QNetworkProxy::Socks5Proxy
+                                                                       : QNetworkProxy::HttpProxy);
+      settings.setProxyHost(url.host().toStdString());
+      settings.setProxyPort(url.port());
+      settings.setProxyUsername(XML_ATTR_STR(u"username"));
+      settings.setProxyPassword(XML_ATTR_STR(u"password"));
+      xml.skipCurrentElement();
 
     } else {
       xml.skipCurrentElement();
