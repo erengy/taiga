@@ -49,7 +49,6 @@
 #include "taiga/settings.hpp"
 #include "track/media.hpp"
 #include "track/play.hpp"
-#include "track/recognition_cache.hpp"
 #include "track/scanner.hpp"
 
 namespace gui {
@@ -203,9 +202,6 @@ void MediaMenu::matchNowPlaying() const {
       if (!std::ranges::contains(updated.synonyms, title)) {
         updated.synonyms.push_back(title);
         anime::db.updateSettings(updated);
-        if (const auto* anime = anime::db.item(item.id)) {
-          track::recognition::cache()->update(*anime);
-        }
       }
     }
   }

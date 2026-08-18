@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2025, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <QObject>
 #include <optional>
 #include <set>
 #include <string>
@@ -29,8 +30,13 @@ struct Details;
 
 namespace track::recognition {
 
-class Cache final {
+class Cache final : public QObject {
+  Q_OBJECT
+  Q_DISABLE_COPY_MOVE(Cache)
+
 public:
+  Cache();
+
   struct Data {
     struct Match {
       int id;
@@ -55,8 +61,8 @@ private:
 };
 
 inline Cache* cache() {
-  static Cache cache;
-  return &cache;
+  static auto cache = new Cache();
+  return cache;
 }
 
 }  // namespace track::recognition

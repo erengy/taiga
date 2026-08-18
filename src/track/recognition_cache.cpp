@@ -26,6 +26,14 @@
 
 namespace track::recognition {
 
+Cache::Cache() : QObject{} {
+  connect(&anime::db, &anime::Database::itemUpdated, this, [this](const int id) {
+    if (const auto* item = anime::db.item(id)) {
+      update(*item);
+    }
+  });
+}
+
 bool Cache::empty() const {
   return titles_.empty();
 }

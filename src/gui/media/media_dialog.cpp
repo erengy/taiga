@@ -36,7 +36,6 @@
 #include "media/anime_utils.hpp"
 #include "sync/service.hpp"
 #include "taiga/session.hpp"
-#include "track/recognition_cache.hpp"
 #include "ui_media_dialog.h"
 
 #ifdef Q_OS_WINDOWS
@@ -444,10 +443,6 @@ void MediaDialog::accept() {
   }
 
   anime::db.updateSettings(m_settings);
-
-  if (const auto* anime = anime::db.item(m_settings.id)) {
-    track::recognition::cache()->update(*anime);
-  }
 
   QDialog::accept();
 }
