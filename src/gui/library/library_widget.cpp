@@ -106,7 +106,6 @@ LibraryWidget::LibraryWidget(QWidget* parent)
 
   connect(m_view, &QTreeView::doubleClicked, this, [this](const QModelIndex& index) {
     if (!index.isValid()) return;
-    if (!(index.flags() & Qt::ItemIsEnabled)) return;
     const auto info = m_model->fileInfo(index);
     if (!info.isFile()) return;
     if (info.isExecutable()) return;  // avoid running potentially dangerous files

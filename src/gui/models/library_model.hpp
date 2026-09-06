@@ -55,7 +55,7 @@ private:
     int id = 0;
   };
 
-  bool isEnabled(const QModelIndex& index) const;
+  bool isVideoFile(const QModelIndex& index) const;
 
   void parse(const QString& path) const;
 

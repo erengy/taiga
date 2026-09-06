@@ -21,11 +21,11 @@
 #include <QApplication>
 #include <QFileInfo>
 #include <QPalette>
+#include <algorithm>
 #include <anitomy.hpp>
 #include <anitomy/detail/keyword.hpp>  // don't try this at home
 #include <ranges>
 
-#include "base/string.hpp"
 #include "media/anime_db.hpp"
 #include "media/anime_utils.hpp"
 #include "track/episode.hpp"
@@ -33,16 +33,7 @@
 
 namespace gui {
 
-LibraryModel::LibraryModel(QObject* parent) : QFileSystemModel(parent) {
-  setNameFilters([]() {
-    QStringList filters;
-    for (const auto& extension : anitomy::detail::file_extensions) {
-      filters.emplace_back(u"*.%1"_s.arg(extension));
-    }
-    return filters;
-  }());
-  setNameFilterDisables(true);
-}
+LibraryModel::LibraryModel(QObject* parent) : QFileSystemModel(parent) {}
 
 int LibraryModel::columnCount(const QModelIndex&) const {
   return NUM_COLUMNS;
@@ -55,10 +46,10 @@ QVariant LibraryModel::data(const QModelIndex& index, int role) const {
     case Qt::DisplayRole: {
       switch (index.column()) {
         case COLUMN_ANIME:
-          if (isEnabled(index)) return getTitle(filePath(index));
+          if (isVideoFile(index)) return getTitle(filePath(index));
           return {};
         case COLUMN_EPISODE:
-          if (isEnabled(index)) return getEpisode(filePath(index));
+          if (isVideoFile(index)) return getEpisode(filePath(index));
           return {};
       }
       break;
@@ -70,6 +61,9 @@ QVariant LibraryModel::data(const QModelIndex& index, int role) const {
           const auto info = fileInfo(index);
           if (info.isFile() && info.isExecutable()) {
             return QColorConstants::Red;  // potentially dangerous file
+          }
+          if (info.isFile() && !isVideoFile(index)) {
+            return qApp->palette().color(QPalette::ColorGroup::Disabled, QPalette::ColorRole::Text);
           }
           break;
         }
@@ -142,8 +136,12 @@ QVariant LibraryModel::headerData(int section, Qt::Orientation orientation, int 
   return QFileSystemModel::headerData(section, orientation, role);
 }
 
-bool LibraryModel::isEnabled(const QModelIndex& index) const {
-  return index.flags() & Qt::ItemIsEnabled;
+bool LibraryModel::isVideoFile(const QModelIndex& index) const {
+  const auto info = fileInfo(index);
+  if (!info.isFile()) return false;
+
+  return std::ranges::contains(anitomy::detail::file_extensions,
+                               info.suffix().toLower().toStdString());
 }
 
 QString LibraryModel::getTitle(const QString& path) const {
