@@ -32,7 +32,7 @@ namespace track::recognition {
 
 struct Redirection {
   int id;
-  int episode_number;
+  std::pair<int, int> episode_range;
 };
 
 class Relations {
@@ -54,6 +54,6 @@ private:
   std::unordered_map<int, std::vector<Rule>> rules_;
 };
 
-std::optional<Redirection> findRedirection(const int id, const int episode_number);
+std::optional<Redirection> findRedirection(const int id, const std::pair<int, int>& episode_range);
 
 }  // namespace track::recognition

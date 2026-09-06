@@ -36,6 +36,15 @@
 
 namespace track::recognition {
 
+namespace {
+
+QString formatEpisodeRange(const std::pair<int, int>& range) {
+  if (range.second > range.first) return u"%1-%2"_s.arg(range.first).arg(range.second);
+  return QString::number(range.first);
+}
+
+}  // namespace
+
 Episode parse(std::string_view input, const anitomy::Options options) {
   Episode episode;
 
@@ -84,17 +93,17 @@ int identify(Episode& episode) {
     if (!isValidEpisodeType(episode)) continue;
 
     if (!isValidEpisodeNumber(episode, *item)) {
-      const auto number = episode.getEpisodeNumber();
-      if (!number) continue;
+      const auto range = episode.episodeNumberRange();
+      if (!range) continue;
 
-      const auto redirect = findRedirection(match.id, *number);
+      const auto redirect = findRedirection(match.id, *range);
       if (!redirect) continue;
 
       qDebug() << u"Redirection: %1:%2 -> %3:%4"_s.arg(match.id)
-                      .arg(*number)
+                      .arg(formatEpisodeRange(*range))
                       .arg(redirect->id)
-                      .arg(redirect->episode_number);
-      episode.setElement(anitomy::ElementKind::Episode, std::to_string(redirect->episode_number));
+                      .arg(formatEpisodeRange(redirect->episode_range));
+      episode.setEpisodeNumberRange(redirect->episode_range);
       return redirect->id;
     }
 

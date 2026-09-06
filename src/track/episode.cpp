@@ -41,10 +41,21 @@ void Episode::setAnimeId(int id) {
   anime_id_ = id;
 }
 
-std::optional<int> Episode::getEpisodeNumber() const {
+std::optional<std::pair<int, int>> Episode::episodeNumberRange() const {
   const auto numbers = elements(anitomy::ElementKind::Episode);
   if (numbers.empty()) return std::nullopt;
-  return std::ranges::max(numbers | std::views::transform(toInt));
+  // @TODO: `toInt` returns 0 for non-numeric values (e.g. `4a`, `7.5`).
+  // v1 used to truncate (e.g. `4`, `7`) and special-case fractional episodes
+  // to avoid colliding with integer episode numbers.
+  return std::pair{toInt(numbers.front()), toInt(numbers.back())};
+}
+
+void Episode::setEpisodeNumberRange(const std::pair<int, int>& range) {
+  removeElements(anitomy::ElementKind::Episode);
+  addElement(anitomy::ElementKind::Episode, std::to_string(range.first));
+  if (range.second > range.first) {
+    addElement(anitomy::ElementKind::Episode, std::to_string(range.second));
+  }
 }
 
 const std::vector<anitomy::Element>& Episode::elements() const noexcept {
@@ -77,10 +88,9 @@ void Episode::addElement(const anitomy::ElementKind kind, const std::string& val
   elements_.emplace_back(anitomy::Element{.kind = kind, .value = value});
 }
 
-void Episode::setElement(const anitomy::ElementKind kind, const std::string& value) {
+void Episode::removeElements(const anitomy::ElementKind kind) {
   const auto is_kind = [kind](const anitomy::Element& element) { return element.kind == kind; };
   std::erase_if(elements_, is_kind);
-  addElement(kind, value);
 }
 
 }  // namespace track

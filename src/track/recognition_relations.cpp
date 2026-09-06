@@ -158,18 +158,32 @@ std::optional<Redirection> Relations::find(const int id, const int episode_numbe
 
     return Redirection{
         .id = rule.destination_id,
-        .episode_number = destination,
+        .episode_range = {destination, destination},
     };
   }
 
   return std::nullopt;
 }
 
-std::optional<Redirection> findRedirection(const int id, const int episode_number) {
+std::optional<Redirection> findRedirection(const int id, const std::pair<int, int>& episode_range) {
   const auto column = serviceIdColumn(sync::currentServiceId());
   if (!column) return std::nullopt;
 
-  return relationsFor(*column).find(id, episode_number);
+  const auto& relations = relationsFor(*column);
+
+  const auto first = relations.find(id, episode_range.first);
+  if (!first) return std::nullopt;
+
+  if (episode_range.first == episode_range.second) return first;
+
+  const auto second = relations.find(id, episode_range.second);
+  if (!second) return std::nullopt;
+  if (first->id != second->id) return std::nullopt;  // must redirect to the same anime
+
+  return Redirection{
+      .id = first->id,
+      .episode_range = {first->episode_range.first, second->episode_range.first},
+  };
 }
 
 }  // namespace track::recognition

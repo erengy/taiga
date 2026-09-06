@@ -21,6 +21,7 @@
 #include <anitomy.hpp>
 #include <optional>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace track {
@@ -32,7 +33,8 @@ public:
   int animeId() const;
   void setAnimeId(int id);
 
-  std::optional<int> getEpisodeNumber() const;
+  std::optional<std::pair<int, int>> episodeNumberRange() const;
+  void setEpisodeNumberRange(const std::pair<int, int>& range);
 
   const std::vector<anitomy::Element>& elements() const noexcept;
   void setElements(std::vector<anitomy::Element>& elements);
@@ -41,7 +43,7 @@ public:
   std::string element(const anitomy::ElementKind kind, const std::string placeholder = {}) const;
   std::vector<std::string> elements(const anitomy::ElementKind kind) const;
   void addElement(const anitomy::ElementKind kind, const std::string& value);
-  void setElement(const anitomy::ElementKind kind, const std::string& value);
+  void removeElements(const anitomy::ElementKind kind);
 
 private:
   auto find(const anitomy::ElementKind kind) const;

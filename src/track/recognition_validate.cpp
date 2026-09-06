@@ -51,9 +51,9 @@ bool isValidEpisodeNumber(const Episode& episode, const anime::Details& item) {
     return true;  // episode count is unknown, so anything goes
   }
 
-  const auto number = episode.getEpisodeNumber();
+  const auto range = episode.episodeNumberRange();
 
-  if (!number) {
+  if (!range) {
     if (item.episode_count == 1) {
       return true;  // single-episode anime can do without an episode number
     }
@@ -66,7 +66,13 @@ bool isValidEpisodeNumber(const Episode& episode, const anime::Details& item) {
     return false;  // no episode number to check against
   }
 
-  return *number <= item.episode_count;
+  const auto number = range->second;
+
+  if (number == 0) {
+    return false;  // let episode 0 fall through to redirection
+  }
+
+  return number <= item.episode_count;
 }
 
 }  // namespace track::recognition
