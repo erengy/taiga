@@ -29,6 +29,11 @@ namespace track::media {
 namespace {
 
 bool isDisabled(const Player& player) {
+  if (player.type == anisthesia::PlayerType::WebBrowser &&
+      !taiga::settings.streamingMediaEnabled()) {
+    return true;
+  }
+
   const auto disabledPlayers = taiga::settings.disabledMediaPlayers();
 
   return std::ranges::any_of(disabledPlayers, [&player](const std::string& name) {
@@ -53,8 +58,6 @@ std::vector<Player> getEnabledPlayers(const std::vector<Player>& players) {
   std::vector<Player> enabledPlayers;
 
   for (const auto player : players) {
-    // @TODO: Enable web browser detection
-    if (player.type == anisthesia::PlayerType::WebBrowser) continue;
     if (isDisabled(player)) continue;
 
     enabledPlayers.emplace_back(player);

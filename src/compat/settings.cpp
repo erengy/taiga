@@ -200,6 +200,10 @@ void parseRecognitionElement(QXmlStreamReader& xml, const taiga::Settings& setti
       settings.setMediaDetectionInterval(seconds);
       xml.skipCurrentElement();
 
+    } else if (xml.name() == u"streaming") {
+      settings.setStreamingMediaEnabled(XML_ATTR_BOOL(u"enabled"));
+      xml.skipCurrentElement();
+
     } else {
       xml.skipCurrentElement();
     }
