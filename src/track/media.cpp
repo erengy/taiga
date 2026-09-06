@@ -19,6 +19,8 @@
 #include "media.hpp"
 
 #include <algorithm>
+#include <optional>
+#include <string>
 
 #include "media/anime.hpp"
 #include "media/anime_db.hpp"
@@ -28,6 +30,69 @@
 #include "track/recognition.hpp"
 
 namespace track::media {
+
+namespace {
+
+struct MediaFields {
+  std::string file;
+  std::string title;
+  std::string url;
+};
+
+anisthesia::Media flattenMedia(const anisthesia::win::Result& result) {
+  anisthesia::Media media;
+
+  for (const auto& item : result.media) {
+    media.information.append_range(item.information);
+  }
+
+  return media;
+}
+
+MediaFields extractMediaFields(const anisthesia::Media& media) {
+  MediaFields fields;
+
+  for (const auto& information : media.information) {
+    switch (information.type) {
+      case anisthesia::MediaInfoType::File:
+        if (fields.file.empty()) fields.file = information.value;
+        break;
+      case anisthesia::MediaInfoType::Url:
+        fields.url = information.value;
+        break;
+      case anisthesia::MediaInfoType::Title:
+        if (fields.title.empty()) fields.title = information.value;
+        break;
+      case anisthesia::MediaInfoType::Unknown:
+        // Always prefer window title over page title reported via UI Automation.
+        fields.title = information.value;
+        break;
+      case anisthesia::MediaInfoType::Tab:
+        break;
+    }
+  }
+
+  return fields;
+}
+
+std::optional<Episode> resolveEpisode(const MediaFields& fields) {
+  if (!fields.file.empty()) {
+    const QFileInfo fileInfo{QString::fromStdString(fields.file)};
+    auto episode = track::recognition::parseFileInfo(fileInfo);
+
+    if (!track::recognition::isVideoFile(episode)) return std::nullopt;
+
+    return episode;
+  }
+
+  auto value = fields.title;
+
+  if (value.empty()) return std::nullopt;
+
+  return track::recognition::parse(value);
+}
+
+}  // namespace
 
 Detection::Detection(QObject* parent) : QObject(parent) {
   pollTimer_ = new QTimer(this);
@@ -79,29 +144,19 @@ void Detection::poll() {
   const auto& result = resultIt != results.end() ? *resultIt : results.front();
 
   currentPlayer_ = result.player;
-  currentMedia_ = result.media.front();
+  currentMedia_ = flattenMedia(result);
   currentWindowHandle_ = result.window.handle;
 
-  const auto mediaInfo = currentMedia_->information.front();
-  auto episode = [&mediaInfo]() {
-    if (mediaInfo.type == anisthesia::MediaInfoType::File) {
-      const QFileInfo fileInfo{QString::fromStdString(mediaInfo.value)};
-      return track::recognition::parseFileInfo(fileInfo);
-    } else {
-      return track::recognition::parse(mediaInfo.value);
-    }
-  }();
-
-  if (mediaInfo.type == anisthesia::MediaInfoType::File &&
-      !track::recognition::isVideoFile(episode)) {
+  auto episode = resolveEpisode(extractMediaFields(*currentMedia_));
+  if (!episode) {
     reset();
     return;
   }
 
-  const auto animeId = track::recognition::identify(episode);
-  episode.setAnimeId(animeId);
+  const auto animeId = track::recognition::identify(*episode);
+  episode->setAnimeId(animeId);
 
-  if (hasEpisodeChanged(episode)) {
+  if (hasEpisodeChanged(*episode)) {
     currentEpisode_ = episode;
     emit currentEpisodeChanged(episode);
   }
