@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,6 +36,7 @@ public:
   ~LibraryWidget() = default;
 
 private:
+  bool eventFilter(QObject* watched, QEvent* event) override;
   void showContextMenu() const;
 
   LibraryModel* m_model = nullptr;

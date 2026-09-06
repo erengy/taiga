@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2025, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,6 +32,10 @@ public:
   ~LibraryMenu() = default;
 
   void popup();
+
+  static void openPath(const QString& path);
+  static void deletePath(QWidget* parent, const QString& path);
+  static void renamePath(QWidget* parent, const QString& path);
 
 private slots:
   void open() const;

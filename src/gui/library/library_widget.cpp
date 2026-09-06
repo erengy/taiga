@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@
 
 #include <QDesktopServices>
 #include <QHeaderView>
+#include <QKeyEvent>
 #include <QLayout>
 #include <QUrl>
 
@@ -73,6 +74,7 @@ LibraryWidget::LibraryWidget(QWidget* parent)
     m_toolbar->addAction(actionMore);
   }
 
+  m_view->installEventFilter(this);
   m_view->setObjectName("libraryView");
   m_view->setFrameShape(QFrame::Shape::NoFrame);
   m_view->setModel(m_model);
@@ -110,6 +112,32 @@ LibraryWidget::LibraryWidget(QWidget* parent)
     if (info.isExecutable()) return;  // avoid running potentially dangerous files
     QDesktopServices::openUrl(QUrl::fromLocalFile(m_model->filePath(index)));
   });
+}
+
+bool LibraryWidget::eventFilter(QObject* watched, QEvent* event) {
+  if (watched == m_view && event->type() == QEvent::KeyPress) {
+    const auto* keyEvent = static_cast<QKeyEvent*>(event);
+    const auto index = m_view->currentIndex();
+
+    if (index.isValid()) {
+      const auto path = m_model->fileInfo(index).filePath();
+
+      switch (keyEvent->key()) {
+        case Qt::Key_Return:
+        case Qt::Key_Enter:
+          LibraryMenu::openPath(path);
+          return true;
+        case Qt::Key_Delete:
+          LibraryMenu::deletePath(m_view, path);
+          return true;
+        case Qt::Key_F2:
+          LibraryMenu::renamePath(m_view, path);
+          return true;
+      }
+    }
+  }
+
+  return PageWidget::eventFilter(watched, event);
 }
 
 void LibraryWidget::showContextMenu() const {

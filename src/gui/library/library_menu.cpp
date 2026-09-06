@@ -57,11 +57,23 @@ void LibraryMenu::popup() {
 }
 
 void LibraryMenu::open() const {
-  QDesktopServices::openUrl(QUrl::fromLocalFile(m_path));
+  openPath(m_path);
 }
 
 void LibraryMenu::remove() const {
-  const QFileInfo info(m_path);
+  deletePath(parentWidget(), m_path);
+}
+
+void LibraryMenu::rename() const {
+  renamePath(parentWidget(), m_path);
+}
+
+void LibraryMenu::openPath(const QString& path) {
+  QDesktopServices::openUrl(QUrl::fromLocalFile(path));
+}
+
+void LibraryMenu::deletePath(QWidget* parent, const QString& path) {
+  const QFileInfo info(path);
   const bool isDir = info.isDir();
 
   const auto text =
@@ -70,25 +82,25 @@ void LibraryMenu::remove() const {
       isDir ? tr("\"%1\" and everything inside it will be moved to the trash.").arg(info.fileName())
             : tr("\"%1\" will be moved to the trash.").arg(info.fileName());
 
-  if (!confirm(parentWidget(), text, informativeText, tr("Delete"))) return;
+  if (!confirm(parent, text, informativeText, tr("Delete"))) return;
 
-  if (!QFile::moveToTrash(m_path)) {
-    QMessageBox::warning(parentWidget(), tr("Delete"), tr("Could not delete \"%1\".").arg(m_path));
+  if (!QFile::moveToTrash(path)) {
+    QMessageBox::warning(parent, tr("Delete"), tr("Could not delete \"%1\".").arg(path));
   }
 }
 
-void LibraryMenu::rename() const {
-  const QFileInfo info(m_path);
+void LibraryMenu::renamePath(QWidget* parent, const QString& path) {
+  const QFileInfo info(path);
 
   bool ok = false;
-  const auto newName = QInputDialog::getText(parentWidget(), tr("Rename"), tr("New name:"),
+  const auto newName = QInputDialog::getText(parent, tr("Rename"), tr("New name:"),
                                              QLineEdit::Normal, info.fileName(), &ok);
   if (!ok || newName.isEmpty() || newName == info.fileName()) return;
 
   const auto newPath = info.dir().filePath(newName);
 
-  if (!QDir().rename(m_path, newPath)) {
-    QMessageBox::warning(parentWidget(), tr("Rename"), tr("Could not rename \"%1\".").arg(m_path));
+  if (!QDir().rename(path, newPath)) {
+    QMessageBox::warning(parent, tr("Rename"), tr("Could not rename \"%1\".").arg(path));
   }
 }
 
