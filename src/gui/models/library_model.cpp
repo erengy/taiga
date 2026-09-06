@@ -26,6 +26,7 @@
 #include <anitomy/detail/keyword.hpp>  // don't try this at home
 #include <ranges>
 
+#include "base/file.hpp"
 #include "media/anime_db.hpp"
 #include "media/anime_utils.hpp"
 #include "track/episode.hpp"
@@ -59,7 +60,7 @@ QVariant LibraryModel::data(const QModelIndex& index, int role) const {
       switch (index.column()) {
         case COLUMN_NAME: {
           const auto info = fileInfo(index);
-          if (info.isFile() && info.isExecutable()) {
+          if (base::isExecutableFile(filePath(index))) {
             return QColorConstants::Red;  // potentially dangerous file
           }
           if (info.isFile() && !isVideoFile(index)) {

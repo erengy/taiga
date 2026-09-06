@@ -27,6 +27,7 @@
 #include <QMessageBox>
 #include <QUrl>
 
+#include "base/file.hpp"
 #include "gui/media/media_dialog.hpp"
 #include "gui/media/media_menu.hpp"
 #include "gui/utils/theme.hpp"
@@ -43,7 +44,8 @@ LibraryMenu::LibraryMenu(QWidget* parent, const QString& path, int anime_id)
 void LibraryMenu::popup() {
   if (m_path.isEmpty()) return;
 
-  addAction(QIcon(m_path), tr("Open"), tr("Enter"), this, &LibraryMenu::open);
+  auto actionOpen = addAction(QIcon(m_path), tr("Open"), tr("Enter"), this, &LibraryMenu::open);
+  actionOpen->setEnabled(!base::isExecutableFile(m_path));
   addSeparator();
   addAction(theme.getIcon("delete"), tr("Delete"), tr("Del"), this, &LibraryMenu::remove);
   addAction(theme.getIcon("edit"), tr("Rename"), tr("F2"), this, &LibraryMenu::rename);
@@ -69,6 +71,8 @@ void LibraryMenu::rename() const {
 }
 
 void LibraryMenu::openPath(const QString& path) {
+  if (base::isExecutableFile(path)) return;  // avoid running potentially dangerous files
+
   QDesktopServices::openUrl(QUrl::fromLocalFile(path));
 }
 

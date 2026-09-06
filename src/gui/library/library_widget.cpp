@@ -18,11 +18,9 @@
 
 #include "library_widget.hpp"
 
-#include <QDesktopServices>
 #include <QHeaderView>
 #include <QKeyEvent>
 #include <QLayout>
-#include <QUrl>
 
 #include "gui/library/library_menu.hpp"
 #include "gui/main/main_window.hpp"
@@ -106,10 +104,8 @@ LibraryWidget::LibraryWidget(QWidget* parent)
 
   connect(m_view, &QTreeView::doubleClicked, this, [this](const QModelIndex& index) {
     if (!index.isValid()) return;
-    const auto info = m_model->fileInfo(index);
-    if (!info.isFile()) return;
-    if (info.isExecutable()) return;  // avoid running potentially dangerous files
-    QDesktopServices::openUrl(QUrl::fromLocalFile(m_model->filePath(index)));
+    if (!m_model->fileInfo(index).isFile()) return;  // let double-click expand/collapse folders
+    LibraryMenu::openPath(m_model->filePath(index));
   });
 }
 
