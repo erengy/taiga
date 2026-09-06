@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,4 +31,7 @@ int compareStrings(const std::string_view a, const std::string_view b,
 QString joinStrings(const std::vector<std::string>& list, QString placeholder = "?");
 void removeHtmlTags(QString& str);
 QString& replaceWholeWord(QString& str, const QString& before, const QString& after);
+
+int toInt(const std::string& value);
+std::string toStdString(const QString& s);
 std::vector<std::string> toVector(const QStringList& list);

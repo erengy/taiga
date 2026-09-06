@@ -24,11 +24,14 @@
 #include <ranges>
 #include <vector>
 
+#include "base/string.hpp"
 #include "media/anime.hpp"
+#include "media/anime_db.hpp"
 #include "track/episode.hpp"
 #include "track/recognition_cache.hpp"
 #include "track/recognition_normalize.hpp"
 #include "track/recognition_path.hpp"
+#include "track/recognition_relations.hpp"
 #include "track/recognition_validate.hpp"
 
 namespace track::recognition {
@@ -75,7 +78,27 @@ int identify(Episode& episode) {
   std::ranges::sort(matches, std::ranges::greater{}, &Cache::Data::Match::weight);
 
   for (const auto& match : matches) {
-    if (isValidMatch(match.id, episode)) return match.id;
+    const auto item = anime::db.item(match.id);
+    if (!item) continue;
+
+    if (!isValidEpisodeType(episode)) continue;
+
+    if (!isValidEpisodeNumber(episode, *item)) {
+      const auto number = episode.getEpisodeNumber();
+      if (!number) continue;
+
+      const auto redirect = findRedirection(match.id, *number);
+      if (!redirect) continue;
+
+      qDebug() << u"Redirection: %1:%2 -> %3:%4"_s.arg(match.id)
+                      .arg(*number)
+                      .arg(redirect->id)
+                      .arg(redirect->episode_number);
+      episode.setElement(anitomy::ElementKind::Episode, std::to_string(redirect->episode_number));
+      return redirect->id;
+    }
+
+    return match.id;
   }
 
   return anime::kUnknownId;

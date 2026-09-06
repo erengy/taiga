@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,14 +21,6 @@
 #include <QRegularExpression>
 #include <nstd/string.hpp>
 #include <ranges>
-
-namespace {
-
-[[nodiscard]] std::string toStdString(const QString& s) {
-  return s.toStdString();
-}
-
-}  // namespace
 
 int compareStrings(const std::string_view a, const std::string_view b,
                    Qt::CaseSensitivity caseSensitivity) {
@@ -66,6 +58,14 @@ QString& replaceWholeWord(QString& str, const QString& before, const QString& af
   }
 
   return str;
+}
+
+[[nodiscard]] int toInt(const std::string& value) {
+  return QString::fromStdString(value).toInt();
+};
+
+[[nodiscard]] std::string toStdString(const QString& s) {
+  return s.toStdString();
 }
 
 std::vector<std::string> toVector(const QStringList& list) {

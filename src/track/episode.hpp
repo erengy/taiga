@@ -19,6 +19,7 @@
 #pragma once
 
 #include <anitomy.hpp>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -31,13 +32,16 @@ public:
   int animeId() const;
   void setAnimeId(int id);
 
+  std::optional<int> getEpisodeNumber() const;
+
   const std::vector<anitomy::Element>& elements() const noexcept;
   void setElements(std::vector<anitomy::Element>& elements);
-  
+
   bool contains(const anitomy::ElementKind kind) const;
   std::string element(const anitomy::ElementKind kind, const std::string placeholder = {}) const;
   std::vector<std::string> elements(const anitomy::ElementKind kind) const;
   void addElement(const anitomy::ElementKind kind, const std::string& value);
+  void setElement(const anitomy::ElementKind kind, const std::string& value);
 
 private:
   auto find(const anitomy::ElementKind kind) const;

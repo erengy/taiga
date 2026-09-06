@@ -18,21 +18,15 @@
 
 #include "recognition_validate.hpp"
 
-#include <QString>
 #include <algorithm>
 #include <anitomy.hpp>
-#include <ranges>
-#include <utility>
 #include <vector>
 
 #include "base/string.hpp"
 #include "media/anime.hpp"
-#include "media/anime_db.hpp"
 #include "track/episode.hpp"
 
 namespace track::recognition {
-
-namespace {
 
 bool isValidEpisodeType(const Episode& episode) {
   const auto values = episode.elements(anitomy::ElementKind::Type);
@@ -57,9 +51,9 @@ bool isValidEpisodeNumber(const Episode& episode, const anime::Details& item) {
     return true;  // episode count is unknown, so anything goes
   }
 
-  const auto numbers = episode.elements(anitomy::ElementKind::Episode);
+  const auto number = episode.getEpisodeNumber();
 
-  if (numbers.empty()) {
+  if (!number) {
     if (item.episode_count == 1) {
       return true;  // single-episode anime can do without an episode number
     }
@@ -72,29 +66,7 @@ bool isValidEpisodeNumber(const Episode& episode, const anime::Details& item) {
     return false;  // no episode number to check against
   }
 
-  // @TODO: This truncates decimal episode numbers (e.g. "07.5")
-  const auto toInt = [](const std::string& value) { return QString::fromStdString(value).toInt(); };
-  const int value = std::ranges::max(numbers | std::views::transform(toInt));
-
-  if (value <= item.episode_count) return true;  // in range
-
-  // @TODO: Attempt episode redirection via deps/anime-relations
-
-  return false;  // out of range
-}
-
-}  // namespace
-
-bool isValidMatch(const int id, const Episode& episode) {
-  const auto item = anime::db.item(id);
-
-  if (!item) return false;
-
-  if (!isValidEpisodeType(episode)) return false;
-
-  if (!isValidEpisodeNumber(episode, *item)) return false;
-
-  return true;
+  return *number <= item.episode_count;
 }
 
 }  // namespace track::recognition

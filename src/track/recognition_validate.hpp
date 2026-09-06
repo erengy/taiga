@@ -18,12 +18,17 @@
 
 #pragma once
 
+namespace anime {
+struct Details;
+}
+
 namespace track {
 class Episode;
 }
 
 namespace track::recognition {
 
-bool isValidMatch(const int id, const Episode& episode);
+bool isValidEpisodeNumber(const Episode& episode, const anime::Details& item);
+bool isValidEpisodeType(const Episode& episode);
 
 }  // namespace track::recognition

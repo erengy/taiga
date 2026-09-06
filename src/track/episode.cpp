@@ -18,8 +18,10 @@
 
 #include "episode.hpp"
 
+#include <algorithm>
 #include <ranges>
 
+#include "base/string.hpp"
 #include "media/anime.hpp"
 
 namespace track {
@@ -37,6 +39,12 @@ int Episode::animeId() const {
 
 void Episode::setAnimeId(int id) {
   anime_id_ = id;
+}
+
+std::optional<int> Episode::getEpisodeNumber() const {
+  const auto numbers = elements(anitomy::ElementKind::Episode);
+  if (numbers.empty()) return std::nullopt;
+  return std::ranges::max(numbers | std::views::transform(toInt));
 }
 
 const std::vector<anitomy::Element>& Episode::elements() const noexcept {
@@ -67,6 +75,12 @@ std::vector<std::string> Episode::elements(const anitomy::ElementKind kind) cons
 
 void Episode::addElement(const anitomy::ElementKind kind, const std::string& value) {
   elements_.emplace_back(anitomy::Element{.kind = kind, .value = value});
+}
+
+void Episode::setElement(const anitomy::ElementKind kind, const std::string& value) {
+  const auto is_kind = [kind](const anitomy::Element& element) { return element.kind == kind; };
+  std::erase_if(elements_, is_kind);
+  addElement(kind, value);
 }
 
 }  // namespace track

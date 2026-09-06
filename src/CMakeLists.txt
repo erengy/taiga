@@ -119,6 +119,8 @@ target_sources(taiga PRIVATE
 	track/recognition_normalize.hpp
 	track/recognition_path.cpp
 	track/recognition_path.hpp
+	track/recognition_relations.cpp
+	track/recognition_relations.hpp
 	track/recognition_validate.cpp
 	track/recognition_validate.hpp
 	track/scanner.cpp
