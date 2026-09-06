@@ -19,8 +19,11 @@
 #include "library_menu.hpp"
 
 #include <QDesktopServices>
+#include <QDir>
 #include <QFile>
 #include <QFileInfo>
+#include <QInputDialog>
+#include <QLineEdit>
 #include <QMessageBox>
 #include <QUrl>
 
@@ -75,7 +78,18 @@ void LibraryMenu::remove() const {
 }
 
 void LibraryMenu::rename() const {
-  // @TODO
+  const QFileInfo info(m_path);
+
+  bool ok = false;
+  const auto newName = QInputDialog::getText(parentWidget(), tr("Rename"), tr("New name:"),
+                                             QLineEdit::Normal, info.fileName(), &ok);
+  if (!ok || newName.isEmpty() || newName == info.fileName()) return;
+
+  const auto newPath = info.dir().filePath(newName);
+
+  if (!QDir().rename(m_path, newPath)) {
+    QMessageBox::warning(parentWidget(), tr("Rename"), tr("Could not rename \"%1\".").arg(m_path));
+  }
 }
 
 void LibraryMenu::viewDetails() const {
