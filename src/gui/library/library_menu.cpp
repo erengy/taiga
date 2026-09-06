@@ -19,11 +19,15 @@
 #include "library_menu.hpp"
 
 #include <QDesktopServices>
+#include <QFile>
+#include <QFileInfo>
+#include <QMessageBox>
 #include <QUrl>
 
 #include "gui/media/media_dialog.hpp"
 #include "gui/media/media_menu.hpp"
 #include "gui/utils/theme.hpp"
+#include "gui/utils/widgets.hpp"
 #include "media/anime_db.hpp"
 
 namespace gui {
@@ -54,7 +58,20 @@ void LibraryMenu::open() const {
 }
 
 void LibraryMenu::remove() const {
-  // @TODO
+  const QFileInfo info(m_path);
+  const bool isDir = info.isDir();
+
+  const auto text =
+      isDir ? tr("Do you want to delete this folder?") : tr("Do you want to delete this file?");
+  const auto informativeText =
+      isDir ? tr("\"%1\" and everything inside it will be moved to the trash.").arg(info.fileName())
+            : tr("\"%1\" will be moved to the trash.").arg(info.fileName());
+
+  if (!confirm(parentWidget(), text, informativeText, tr("Delete"))) return;
+
+  if (!QFile::moveToTrash(m_path)) {
+    QMessageBox::warning(parentWidget(), tr("Delete"), tr("Could not delete \"%1\".").arg(m_path));
+  }
 }
 
 void LibraryMenu::rename() const {
