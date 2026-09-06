@@ -19,6 +19,7 @@
 #include "library_model.hpp"
 
 #include <QApplication>
+#include <QFileInfo>
 #include <QPalette>
 #include <anitomy.hpp>
 #include <anitomy/detail/keyword.hpp>  // don't try this at home
@@ -41,8 +42,6 @@ LibraryModel::LibraryModel(QObject* parent) : QFileSystemModel(parent) {
     return filters;
   }());
   setNameFilterDisables(true);
-
-  connect(this, &QFileSystemModel::directoryLoaded, this, &LibraryModel::parseDirectory);
 }
 
 int LibraryModel::columnCount(const QModelIndex&) const {
@@ -148,6 +147,8 @@ bool LibraryModel::isEnabled(const QModelIndex& index) const {
 }
 
 QString LibraryModel::getTitle(const QString& path) const {
+  parse(path);
+
   if (m_parsed[path].id) {
     const auto item = anime::db.item(m_parsed[path].id);
     if (item) return QString::fromStdString(anime::preferredTitle(*item));
@@ -157,32 +158,20 @@ QString LibraryModel::getTitle(const QString& path) const {
 }
 
 QString LibraryModel::getEpisode(const QString& path) const {
+  parse(path);
   return m_parsed[path].episode;
 }
 
 int LibraryModel::getId(const QString& path) const {
+  parse(path);
   return m_parsed[path].id;
 }
 
-void LibraryModel::parseDirectory(const QString& path) {
-  const auto parent = index(path);
-
-  if (!parent.isValid()) return;
-
-  for (int i = 0; i < rowCount(parent); ++i) {
-    const auto child = index(i, 0, parent);
-    if (!child.isValid()) continue;
-    if (!isEnabled(child)) continue;
-    const auto info = fileInfo(child);
-    if (!info.isFile()) continue;
-    parseFileInfo(info);
-  }
-}
-
-void LibraryModel::parseFileInfo(const QFileInfo& info) {
-  const auto path = info.filePath();
-
+void LibraryModel::parse(const QString& path) const {
   if (m_parsed.contains(path)) return;
+
+  const auto info = fileInfo(index(path));
+  if (!info.isFile()) return;
 
   auto episode = track::recognition::parseFileInfo(info);
   const auto anime_id = track::recognition::identify(episode);
