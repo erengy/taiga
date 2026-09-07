@@ -34,6 +34,7 @@ public:
   void init() const;
 
   Qt::ColorScheme appColorScheme() const;
+  bool detectionEnabled() const;
   std::vector<std::string> disabledMediaPlayers() const;
   std::string service() const;
   std::vector<std::string> libraryFolders() const;
@@ -48,6 +49,7 @@ public:
   anime::TitleLanguage titleLanguage() const;
 
   void setAppColorScheme(const Qt::ColorScheme scheme) const;
+  void setDetectionEnabled(const bool enabled) const;
   void setDisabledMediaPlayers(std::vector<std::string> players) const;
   void setService(const std::string& service) const;
   void setLibraryFolders(std::vector<std::string> folders) const;

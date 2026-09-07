@@ -116,12 +116,30 @@ bool Detection::init() {
     return false;
   }
 
-#ifdef Q_OS_WINDOWS
-  const auto interval = taiga::settings.mediaDetectionInterval();
-  pollTimer_->start(interval);
-#endif
+  setPollingEnabled(isEnabled());
 
   return true;
+}
+
+bool Detection::isEnabled() const {
+  return taiga::settings.detectionEnabled();
+}
+
+void Detection::setEnabled(bool enabled) {
+  taiga::settings.setDetectionEnabled(enabled);
+  setPollingEnabled(enabled);
+}
+
+void Detection::setPollingEnabled(bool enabled) {
+#ifdef Q_OS_WINDOWS
+  if (enabled) {
+    const auto interval = taiga::settings.mediaDetectionInterval();
+    pollTimer_->start(interval);
+  } else {
+    pollTimer_->stop();
+    reset();
+  }
+#endif
 }
 
 void Detection::poll() {

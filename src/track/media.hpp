@@ -45,6 +45,9 @@ public:
 
   bool init();
 
+  bool isEnabled() const;
+  void setEnabled(bool enabled);
+
   bool isMediaIdentified() const;
   void setCurrentEpisodeAnimeId(int animeId);
 
@@ -52,6 +55,7 @@ signals:
   void currentEpisodeChanged(std::optional<Episode> media) const;
 
 private:
+  void setPollingEnabled(bool enabled);
   void poll();
   void reset();
 

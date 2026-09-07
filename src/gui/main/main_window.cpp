@@ -51,6 +51,7 @@
 #include "taiga/application.hpp"
 #include "taiga/session.hpp"
 #include "taiga/settings.hpp"
+#include "track/media.hpp"
 #include "ui_main_window.h"
 
 #ifdef Q_OS_WINDOWS
@@ -126,6 +127,10 @@ void MainWindow::initActions() {
   connect(ui_->actionProfile, &QAction::triggered, this, &MainWindow::profile);
   connect(ui_->actionDisplayWindow, &QAction::triggered, this, &MainWindow::displayWindow);
   connect(ui_->actionSynchronize, &QAction::triggered, this, &MainWindow::synchronize);
+
+  ui_->actionToggleDetection->setChecked(track::media::detection()->isEnabled());
+  connect(ui_->actionToggleDetection, &QAction::toggled, this,
+          [](const bool checked) { track::media::detection()->setEnabled(checked); });
 
   ui_->actionToggleSynchronization->setChecked(taiga::settings.syncEnabled());
   connect(ui_->actionToggleSynchronization, &QAction::toggled, this,

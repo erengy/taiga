@@ -59,6 +59,10 @@ Qt::ColorScheme Settings::appColorScheme() const {
       .value<Qt::ColorScheme>();
 }
 
+bool Settings::detectionEnabled() const {
+  return value("track.detection.enabled", true).toBool();
+}
+
 std::vector<std::string> Settings::disabledMediaPlayers() const {
   return value("recognition.mediaPlayers.disabled").toJsonArray().toVariantList() |
          std::views::transform([](const QVariant& v) { return v.toString().toStdString(); }) |
@@ -128,6 +132,10 @@ anime::TitleLanguage Settings::titleLanguage() const {
 
 void Settings::setAppColorScheme(const Qt::ColorScheme scheme) const {
   setValue("app.colorScheme", static_cast<int>(scheme));
+}
+
+void Settings::setDetectionEnabled(const bool enabled) const {
+  setValue("track.detection.enabled", enabled);
 }
 
 void Settings::setDisabledMediaPlayers(std::vector<std::string> players) const {
