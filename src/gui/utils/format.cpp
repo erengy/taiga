@@ -41,6 +41,24 @@ QString formatEpisodeLength(const int minutes, QString placeholder) {
   return minutes > 0 ? u"%1m"_s.arg(minutes) : placeholder;
 }
 
+QString formatEpisodeNumbers(const std::vector<std::string>& numbers, QString placeholder) {
+  if (numbers.empty()) return placeholder;
+
+  // Strip leading zeros (e.g. "01" -> "1")
+  const auto normalize = [](const std::string& value) {
+    if (value == "0") return value;  // leave "0" alone
+    const auto pos = value.find_first_not_of('0');
+    return pos == std::string::npos ? value : value.substr(pos);
+  };
+
+  const auto first = normalize(numbers.front());
+  const auto last = normalize(numbers.back());
+
+  if (first == last) return QString::fromStdString(first);
+
+  return u"%1-%2"_s.arg(first).arg(last);
+}
+
 QString formatScore(const double value) {
   return u"%1%"_s.arg(value * 10.0, 0, 'g', 4);
 }

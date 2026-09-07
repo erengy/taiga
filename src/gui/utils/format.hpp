@@ -21,6 +21,8 @@
 #include <QDate>
 #include <QString>
 #include <chrono>
+#include <string>
+#include <vector>
 
 namespace base {
 
@@ -51,6 +53,7 @@ namespace gui {
 QString formatNumber(const int value, QString placeholder = "-");
 
 QString formatEpisodeLength(const int minutes, QString placeholder = "-");
+QString formatEpisodeNumbers(const std::vector<std::string>& numbers, QString placeholder = "1");
 
 QString formatScore(const double value);
 
