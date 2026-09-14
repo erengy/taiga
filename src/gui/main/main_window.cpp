@@ -148,7 +148,6 @@ void MainWindow::initIcons() {
   ui_->actionDonate->setIcon(theme.getIcon("favorite"));
   ui_->actionExit->setIcon(theme.getIcon("logout"));
   ui_->actionForward->setIcon(theme.getIcon("arrow_forward"));
-  ui_->actionLibraryFolders->setIcon(theme.getIcon("folder"));
   ui_->actionMenu->setIcon(theme.getIcon("menu"));
   ui_->actionPlayNextEpisode->setIcon(theme.getIcon("skip_next"));
   ui_->actionPlayRandomAnime->setIcon(theme.getIcon("shuffle"));

@@ -287,39 +287,6 @@
     <enum>QAction::MenuRole::PreferencesRole</enum>
    </property>
   </action>
-  <action name="actionLibraryFolders">
-   <property name="text">
-    <string>Library folders</string>
-   </property>
-   <property name="menuRole">
-    <enum>QAction::MenuRole::NoRole</enum>
-   </property>
-  </action>
-  <action name="actionToggleStatusbar">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="checked">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Show statusbar</string>
-   </property>
-   <property name="menuRole">
-    <enum>QAction::MenuRole::NoRole</enum>
-   </property>
-  </action>
-  <action name="actionToggleNowPlaying">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Show Now Playing</string>
-   </property>
-   <property name="menuRole">
-    <enum>QAction::MenuRole::NoRole</enum>
-   </property>
-  </action>
   <action name="actionToggleDetection">
    <property name="checkable">
     <bool>true</bool>
@@ -364,11 +331,6 @@
   <action name="actionExportListAsMarkdown">
    <property name="text">
     <string>Export anime list as Markdown...</string>
-   </property>
-  </action>
-  <action name="actionTest">
-   <property name="text">
-    <string>Test</string>
    </property>
   </action>
   <action name="actionMenu">
