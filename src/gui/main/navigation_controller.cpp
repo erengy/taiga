@@ -105,23 +105,32 @@ void NavigationController::updateHistoryActions() {
 }
 
 bool NavigationController::eventFilter(QObject* watched, QEvent* event) {
-  if (event->type() == QEvent::MouseButtonRelease) {
-    const auto mouseEvent = static_cast<QMouseEvent*>(event);
+  const auto type = event->type();
+  if (type != QEvent::MouseButtonPress && type != QEvent::MouseButtonRelease) {
+    return QObject::eventFilter(watched, event);
+  }
 
-    if (mouseEvent->button() == Qt::BackButton || mouseEvent->button() == Qt::ForwardButton) {
-      const auto widget = qobject_cast<QWidget*>(watched);
-      if (widget && widget->window() == m_mainWindow) {
-        if (mouseEvent->button() == Qt::BackButton) {
-          goBack();
-        } else {
-          goForward();
-        }
-        return true;
-      }
+  const auto mouseEvent = static_cast<QMouseEvent*>(event);
+  if (mouseEvent->button() != Qt::BackButton && mouseEvent->button() != Qt::ForwardButton) {
+    return QObject::eventFilter(watched, event);
+  }
+
+  const auto widget = qobject_cast<QWidget*>(watched);
+  if (!widget) {
+    // Allow redispatching top-level window's event to the real widget.
+    return QObject::eventFilter(watched, event);
+  }
+
+  if (type == QEvent::MouseButtonRelease && widget->window() == m_mainWindow) {
+    if (mouseEvent->button() == Qt::BackButton) {
+      goBack();
+    } else {
+      goForward();
     }
   }
 
-  return QObject::eventFilter(watched, event);
+  // Consume so it never counts as a normal click (e.g. selecting a list item).
+  return true;
 }
 
 }  // namespace gui
