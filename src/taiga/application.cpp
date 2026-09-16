@@ -21,6 +21,7 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QLocalSocket>
+#include <QMouseEvent>
 #include <QTimer>
 #include <QTranslator>
 #include <chrono>
@@ -123,6 +124,16 @@ bool Application::isVerbose() const {
 
 gui::MainWindow* Application::mainWindow() const {
   return window_.get();
+}
+
+bool Application::notify(QObject* receiver, QEvent* event) {
+  // Restrict double-click events to left mouse button.
+  if (event->type() == QEvent::MouseButtonDblClick &&
+      static_cast<QMouseEvent*>(event)->button() != Qt::LeftButton) {
+    return true;
+  }
+
+  return QApplication::notify(receiver, event);
 }
 
 bool Application::hasPreviousInstance() {
