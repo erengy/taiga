@@ -32,7 +32,7 @@
 namespace taiga {
 
 QString Session::fileName() const {
-  return u"%1/session.json"_s.arg(QString::fromStdString(get_data_path()));
+  return u"%1/session.json"_s.arg(get_data_path());
 }
 
 ////////////////////////////////////////////////////////////////////////////////

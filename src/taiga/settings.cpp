@@ -49,7 +49,7 @@ void Settings::init() const {
 }
 
 QString Settings::fileName() const {
-  return u"%1/settings.json"_s.arg(QString::fromStdString(get_data_path()));
+  return u"%1/settings.json"_s.arg(get_data_path());
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -272,7 +272,7 @@ void MediaMenu::refresh() const {
 void MediaMenu::removeFromList() const {
   QList<QString> titles;
   for (const auto& item : m_items) {
-    titles.push_back(u"<li>%1</li>"_s.arg(QString::fromStdString(anime::preferredTitle(item))));
+    titles.push_back(u"<li>%1</li>"_s.arg(anime::preferredTitle(item)));
   }
 
   if (confirm(parentWidget(), tr("Do you want to remove selected items from your list?"),
@@ -369,7 +369,7 @@ void MediaMenu::searchWikipedia() const {
 void MediaMenu::searchYouTube() const {
   for (const auto& item : m_items) {
     if (!item.trailer_id.empty()) {
-      QUrl url{u"https://youtu.be/%1"_s.arg(QString::fromStdString(item.trailer_id))};
+      QUrl url{u"https://youtu.be/%1"_s.arg(item.trailer_id)};
       QDesktopServices::openUrl(url);
     } else {
       QUrl url{"https://www.youtube.com/results"};

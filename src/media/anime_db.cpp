@@ -199,7 +199,7 @@ void Database::deleteEntry(const int animeId) {
 }
 
 QString Database::fileName() const {
-  return u"%1/media.sqlite"_s.arg(QString::fromStdString(taiga::get_data_path()));
+  return u"%1/media.sqlite"_s.arg(taiga::get_data_path());
 }
 
 QString Database::sql(const QString& name) const {

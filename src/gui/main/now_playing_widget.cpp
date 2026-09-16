@@ -117,7 +117,7 @@ void NowPlayingWidget::refresh() {
 
   QStringList lines;
   if (const auto player = track::media::detection()->getCurrentPlayer()) {
-    lines += u"<b>Media player:</b> %1"_s.arg(QString::fromStdString(player->name));
+    lines += u"<b>Media player:</b> %1"_s.arg(player->name);
   }
   if (m_episode->contains(anitomy::ElementKind::EpisodeTitle)) {
     const auto episodeTitle = m_episode->element(anitomy::ElementKind::EpisodeTitle);
@@ -138,8 +138,7 @@ void NowPlayingWidget::refresh() {
       formatEpisodeNumbers(m_episode->elements(anitomy::ElementKind::Episode));
   const auto episodeCount = formatNumber(m_anime ? m_anime->episode_count : 0, "?");
 
-  m_mainLabel->setText(u"Watching <a href=\"#\" style=\"%3\">%1</a> – Episode %2"_s
-                           .arg(QString::fromStdString(title))
+  m_mainLabel->setText(u"Watching <a href=\"#\" style=\"%3\">%1</a> – Episode %2"_s.arg(title)
                            .arg(u"%1/%2"_s.arg(episodeNumber).arg(episodeCount))
                            .arg("font-weight: 600; text-decoration: none;"));
 
