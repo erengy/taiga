@@ -81,7 +81,7 @@ LibraryWidget::LibraryWidget(QWidget* parent)
   m_view->setAlternatingRowColors(true);
   m_view->setAllColumnsShowFocus(true);
   m_view->setContextMenuPolicy(Qt::CustomContextMenu);
-  m_view->setEditTriggers(QAbstractItemView::NoEditTriggers);
+  m_view->setEditTriggers(QAbstractItemView::EditKeyPressed);
   m_view->setUniformRowHeights(true);
 
   m_view->setDragEnabled(true);
@@ -131,9 +131,6 @@ bool LibraryWidget::eventFilter(QObject* watched, QEvent* event) {
           return true;
         case Qt::Key_Delete:
           LibraryMenu::deletePath(m_view, path);
-          return true;
-        case Qt::Key_F2:
-          LibraryMenu::renamePath(m_view, path);
           return true;
       }
     }
