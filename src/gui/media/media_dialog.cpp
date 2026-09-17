@@ -19,6 +19,7 @@
 #include "media_dialog.hpp"
 
 #include <QDesktopServices>
+#include <QFileDialog>
 #include <QResizeEvent>
 #include <QUrl>
 #include <algorithm>
@@ -151,6 +152,16 @@ MediaDialog::MediaDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::MediaDi
           [this](Qt::CheckState state) {
             ui_->dateCompleted->setEnabled(state == Qt::CheckState::Checked);
           });
+
+  connect(ui_->browseLibraryFolderButton, &QToolButton::clicked, this, [this]() {
+    constexpr auto options =
+        QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks | QFileDialog::ReadOnly;
+    const auto directory = QFileDialog::getExistingDirectory(this, tr("Browse Folder"),
+                                                             ui_->libraryFolder->text(), options);
+    if (!directory.isEmpty()) {
+      ui_->libraryFolder->setText(directory);
+    }
+  });
 }
 
 void MediaDialog::closeEvent(QCloseEvent* event) {
@@ -381,6 +392,8 @@ void MediaDialog::initSettings() {
     synonyms.push_back(QString::fromStdString(synonym));
   }
   ui_->recognitionTitles->setPlainText(synonyms.join("\n"));
+
+  ui_->libraryFolder->setText(QString::fromStdString(m_settings.folder));
 }
 
 void MediaDialog::loadPosterImage() {
@@ -432,6 +445,7 @@ void MediaDialog::accept() {
   }
 
   m_settings.display_title = ui_->comboDisplayTitle->currentText().trimmed().toStdString();
+  m_settings.folder = ui_->libraryFolder->text().trimmed().toStdString();
 
   m_settings.synonyms.clear();
   for (const auto& line : ui_->recognitionTitles->toPlainText().split("\n")) {
