@@ -18,12 +18,11 @@
 
 #include "library_menu.hpp"
 
+#include <QAbstractItemView>
 #include <QDesktopServices>
-#include <QDir>
 #include <QFile>
 #include <QFileInfo>
-#include <QInputDialog>
-#include <QLineEdit>
+#include <QFileSystemModel>
 #include <QMessageBox>
 #include <QUrl>
 
@@ -67,7 +66,7 @@ void LibraryMenu::remove() const {
 }
 
 void LibraryMenu::rename() const {
-  renamePath(parentWidget(), m_path);
+  renamePath(qobject_cast<QAbstractItemView*>(parentWidget()), m_path);
 }
 
 void LibraryMenu::openPath(const QString& path) {
@@ -93,19 +92,15 @@ void LibraryMenu::deletePath(QWidget* parent, const QString& path) {
   }
 }
 
-void LibraryMenu::renamePath(QWidget* parent, const QString& path) {
-  const QFileInfo info(path);
+void LibraryMenu::renamePath(QAbstractItemView* view, const QString& path) {
+  if (!view) return;
 
-  bool ok = false;
-  const auto newName = QInputDialog::getText(parent, tr("Rename"), tr("New name:"),
-                                             QLineEdit::Normal, info.fileName(), &ok);
-  if (!ok || newName.isEmpty() || newName == info.fileName()) return;
+  auto* model = qobject_cast<QFileSystemModel*>(view->model());
+  if (!model) return;
 
-  const auto newPath = info.dir().filePath(newName);
-
-  if (!QDir().rename(path, newPath)) {
-    QMessageBox::warning(parent, tr("Rename"), tr("Could not rename \"%1\".").arg(path));
-  }
+  const auto index = model->index(path);
+  view->setCurrentIndex(index);
+  view->edit(index);
 }
 
 void LibraryMenu::viewDetails() const {

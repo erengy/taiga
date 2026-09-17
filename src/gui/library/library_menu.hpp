@@ -21,6 +21,8 @@
 #include <QMenu>
 #include <QString>
 
+class QAbstractItemView;
+
 namespace gui {
 
 class LibraryMenu final : public QMenu {
@@ -35,7 +37,7 @@ public:
 
   static void openPath(const QString& path);
   static void deletePath(QWidget* parent, const QString& path);
-  static void renamePath(QWidget* parent, const QString& path);
+  static void renamePath(QAbstractItemView* view, const QString& path);
 
 private slots:
   void open() const;
