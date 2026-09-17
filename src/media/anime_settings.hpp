@@ -28,6 +28,7 @@ namespace anime {
 struct Settings {
   int id = kUnknownId;
   std::string display_title;
+  std::string folder;
   std::vector<std::string> synonyms;
 };
 

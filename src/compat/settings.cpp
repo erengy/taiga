@@ -164,9 +164,14 @@ void parseAnimeItemsElement(QXmlStreamReader& xml, QList<anime::Settings>& items
       while (xml.readNextStartElement()) {
         if (xml.name() == u"item") {
           const int id = XML_ATTR_INT(u"id");
+          auto folder = XML_ATTR_STR(u"folder");
           auto synonyms = toVector(XML_ATTR(u"titles").toString().split("; ", Qt::SkipEmptyParts));
-          if (id != anime::kUnknownId && !synonyms.empty()) {
-            items.push_back({.id = id, .synonyms = std::move(synonyms)});
+          if (id != anime::kUnknownId && (!folder.empty() || !synonyms.empty())) {
+            items.push_back({
+                .id = id,
+                .folder = std::move(folder),
+                .synonyms = std::move(synonyms),
+            });
           }
           xml.skipCurrentElement();
         } else {
