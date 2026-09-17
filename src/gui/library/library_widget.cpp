@@ -40,6 +40,7 @@ LibraryWidget::LibraryWidget(QWidget* parent)
   const auto rootPath =
       !libraryFolders.empty() ? QString::fromStdString(libraryFolders.front()) : QString{};
 
+  m_model->setReadOnly(false);
   m_model->setRootPath(rootPath);
 
   auto filtersLayout = new QHBoxLayout();
@@ -80,7 +81,13 @@ LibraryWidget::LibraryWidget(QWidget* parent)
   m_view->setAlternatingRowColors(true);
   m_view->setAllColumnsShowFocus(true);
   m_view->setContextMenuPolicy(Qt::CustomContextMenu);
+  m_view->setEditTriggers(QAbstractItemView::NoEditTriggers);
   m_view->setUniformRowHeights(true);
+
+  m_view->setDragEnabled(true);
+  m_view->setAcceptDrops(true);
+  m_view->setDropIndicatorShown(true);
+  m_view->setDragDropMode(QAbstractItemView::InternalMove);
 
   m_view->header()->setSectionsMovable(false);
   m_view->header()->setStretchLastSection(false);
