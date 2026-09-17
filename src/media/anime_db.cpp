@@ -19,6 +19,8 @@
 #include "anime_db.hpp"
 
 #include <QFile>
+#include <QJsonArray>
+#include <QJsonDocument>
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QSqlRecord>
@@ -38,8 +40,22 @@
 
 namespace {
 
-std::vector<std::string> splitToVector(const QVariant& variant) {
-  return toVector(variant.toString().split(", ", Qt::SkipEmptyParts));
+std::vector<std::string> fromJsonArray(const QVariant& variant) {
+  const auto array = QJsonDocument::fromJson(variant.toString().toUtf8()).array();
+  std::vector<std::string> list;
+  list.reserve(array.size());
+  for (const auto& value : array) {
+    list.push_back(value.toString().toStdString());
+  }
+  return list;
+}
+
+QString toJsonArray(const std::vector<std::string>& list) {
+  QJsonArray array;
+  for (const auto& item : list) {
+    array.append(QString::fromStdString(item));
+  }
+  return QString::fromUtf8(QJsonDocument(array).toJson(QJsonDocument::Compact));
 }
 
 }  // namespace
@@ -308,7 +324,7 @@ void Database::bindItemToQuery(const Anime& item, QSqlQuery& q) const {
   q.bindValue(":title", QString::fromStdString(item.titles.romaji));
   q.bindValue(":english", QString::fromStdString(item.titles.english));
   q.bindValue(":japanese", QString::fromStdString(item.titles.japanese));
-  q.bindValue(":synonym", joinStrings(item.titles.synonyms, ""));
+  q.bindValue(":synonym", toJsonArray(item.titles.synonyms));
   q.bindValue(":type", static_cast<int>(item.type));
   q.bindValue(":status", static_cast<int>(item.status));
   q.bindValue(":episode_count", item.episode_count);
@@ -318,10 +334,10 @@ void Database::bindItemToQuery(const Anime& item, QSqlQuery& q) const {
   q.bindValue(":image", QString::fromStdString(item.image_url));
   q.bindValue(":trailer_id", QString::fromStdString(item.trailer_id));
   q.bindValue(":age_rating", static_cast<int>(item.age_rating));
-  q.bindValue(":genres", joinStrings(item.genres, ""));
-  q.bindValue(":tags", joinStrings(item.tags, ""));
-  q.bindValue(":producers", joinStrings(item.producers, ""));
-  q.bindValue(":studios", joinStrings(item.studios, ""));
+  q.bindValue(":genres", toJsonArray(item.genres));
+  q.bindValue(":tags", toJsonArray(item.tags));
+  q.bindValue(":producers", toJsonArray(item.producers));
+  q.bindValue(":studios", toJsonArray(item.studios));
   q.bindValue(":score", QString::number(item.score));
   q.bindValue(":popularity", item.popularity_rank);
   q.bindValue(":synopsis", QString::fromStdString(item.synopsis));
@@ -350,7 +366,7 @@ void Database::bindEntryToQuery(const ListEntry& entry, QSqlQuery& q) const {
 void Database::bindSettingsToQuery(const Settings& settings, QSqlQuery& q) const {
   q.bindValue(":id", settings.id);
   q.bindValue(":display_title", QString::fromStdString(settings.display_title));
-  q.bindValue(":synonyms", joinStrings(settings.synonyms, ""));
+  q.bindValue(":synonyms", toJsonArray(settings.synonyms));
 }
 
 Anime Database::itemFromQuery(const QSqlQuery& q) const {
@@ -373,12 +389,12 @@ Anime Database::itemFromQuery(const QSqlQuery& q) const {
           .romaji = q.value("title").toString().toStdString(),
           .english = q.value("english").toString().toStdString(),
           .japanese = q.value("japanese").toString().toStdString(),
-          .synonyms = splitToVector(q.value("synonym")),
+          .synonyms = fromJsonArray(q.value("synonym")),
       },
-      .genres = splitToVector(q.value("genres")),
-      .producers = splitToVector(q.value("producers")),
-      .studios = splitToVector(q.value("studios")),
-      .tags = splitToVector(q.value("tags")),
+      .genres = fromJsonArray(q.value("genres")),
+      .producers = fromJsonArray(q.value("producers")),
+      .studios = fromJsonArray(q.value("studios")),
+      .tags = fromJsonArray(q.value("tags")),
       .last_aired_episode = q.value("last_aired_episode").toInt(),
       .next_episode_time = q.value("next_episode_time").toInt(),
   };
@@ -407,7 +423,7 @@ Settings Database::settingsFromQuery(const QSqlQuery& q) const {
   return {
       .id = q.value("id").toInt(),
       .display_title = q.value("display_title").toString().toStdString(),
-      .synonyms = splitToVector(q.value("synonyms")),
+      .synonyms = fromJsonArray(q.value("synonyms")),
   };
 }
 
