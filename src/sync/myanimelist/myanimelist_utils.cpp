@@ -122,7 +122,7 @@ std::string authorizationCodeUrl(std::string& codeVerifier) {
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
         "abcdefghijklmnopqrstvuwxyz"
         "0123456789-._~";
-    return unreserved[QRandomGenerator::global()->bounded(unreserved.size())];
+    return unreserved[QRandomGenerator::global()->bounded(static_cast<quint64>(unreserved.size()))];
   });
 
   QUrl url{"https://myanimelist.net/v1/oauth2/authorize"};

@@ -347,7 +347,7 @@ void Database::bindItemToQuery(const Anime& item, QSqlQuery& q) const {
 }
 
 void Database::bindEntryToQuery(const ListEntry& entry, QSqlQuery& q) const {
-  q.bindValue(":id", entry.id);
+  q.bindValue(":id", static_cast<qint64>(entry.id));
   q.bindValue(":media_id", entry.anime_id);
   q.bindValue(":progress", entry.watched_episodes);
   q.bindValue(":date_start", QString::fromStdString(entry.date_started.to_string()));
