@@ -211,14 +211,13 @@ void Service::deleteListEntry(const int id) {
       {"variables", QJsonObject{{"id", listEntry->id}}},
   }};
 
-  const auto callback = [this, id](QRestReply& reply) {
+  const auto callback = [this](QRestReply& reply) {
     if (isError(reply) && reply.httpStatus() != 404) {
       handleError(*this, reply);
       sync::queue.complete(false, "Failed to delete list entry.");
       return;
     }
 
-    anime::db.deleteEntry(id);
     sync::queue.complete(true);
   };
 
@@ -279,10 +278,10 @@ void Service::updateListEntry(const int id, const anime::list::Fields dirty) {
       anime::db.updateItem(*item);
     }
     if (const auto listEntry = parseListEntry(*entry)) {
-      anime::db.updateEntry(*listEntry);
+      sync::queue.complete(*listEntry);
+    } else {
+      sync::queue.complete(true);
     }
-
-    sync::queue.complete(true);
   };
 
   manager_.post(api_.createRequest(), data, this, callback);

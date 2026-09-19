@@ -275,10 +275,10 @@ void Service::addListEntry(const int id, const anime::list::Fields dirty) {
 
     if (const auto entry =
             json ? parseListEntry(json->object()["data"].toObject(), id) : std::nullopt) {
-      anime::db.updateEntry(*entry);
+      sync::queue.complete(*entry);
+    } else {
+      sync::queue.complete(true);
     }
-
-    sync::queue.complete(true);
   };
 
   manager_.post(request, QJsonDocument(body).toJson(QJsonDocument::Compact), this, callback);
@@ -307,10 +307,10 @@ void Service::updateListEntry(const int id, const anime::list::Fields dirty) {
     const auto json = reply.readJson();
     if (const auto entry =
             json ? parseListEntry(json->object()["data"].toObject(), id) : std::nullopt) {
-      anime::db.updateEntry(*entry);
+      sync::queue.complete(*entry);
+    } else {
+      sync::queue.complete(true);
     }
-
-    sync::queue.complete(true);
   };
 
   manager_.patch(request, QJsonDocument(body).toJson(QJsonDocument::Compact), this, callback);
@@ -328,7 +328,6 @@ void Service::deleteListEntry(const int id) {
       return;
     }
 
-    anime::db.deleteEntry(id);
     sync::queue.complete(true);
   };
 

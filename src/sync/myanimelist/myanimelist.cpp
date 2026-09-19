@@ -217,7 +217,6 @@ void Service::deleteListEntry(const int id) {
       return;
     }
 
-    anime::db.deleteEntry(id);
     sync::queue.complete(true);
   };
 
@@ -277,10 +276,10 @@ void Service::updateListEntry(const int id, const anime::list::Fields dirty) {
     }
 
     if (const auto entry = parseListEntry(json->object(), id)) {
-      anime::db.updateEntry(*entry);
+      sync::queue.complete(*entry);
+    } else {
+      sync::queue.complete(true);
     }
-
-    sync::queue.complete(true);
   };
 
   manager_.patch(request, formUrlEncode(body), this, callback);

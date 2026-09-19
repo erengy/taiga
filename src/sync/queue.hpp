@@ -52,6 +52,7 @@ public:
 
   void process();
   void complete(const bool success, const QString& error = {});
+  void complete(const ListEntry& remote);
 
   const QueueItem* currentItem() const;
   int count() const;
@@ -81,8 +82,14 @@ private:
 
   void migrateFromV1();
 
+  void handleResult(const bool success, const QString& error, const ListEntry* remote);
+  void reconcile(const int animeId, const ListEntry* remote);
+
   QList<QueueItem> items_;
+
   std::optional<int> processing_;
+  bool deleting_ = false;
+  bool modifiedWhileProcessing_ = false;
 };
 
 inline Queue queue;

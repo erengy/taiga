@@ -54,6 +54,8 @@ void Queue::init() {
 }
 
 void Queue::push(const int animeId, const anime::list::Fields dirty) {
+  if (processing_ == animeId) modifiedWhileProcessing_ = true;
+
   const auto it = findItem(animeId);
 
   if (it != items_.end()) {
@@ -111,6 +113,8 @@ void Queue::process() {
   }
 
   processing_ = item->anime_id;
+  deleting_ = entry->pending_delete;
+  modifiedWhileProcessing_ = false;
   emit processing(item->anime_id);
 
   if (entry->pending_delete) {
@@ -123,22 +127,70 @@ void Queue::process() {
 }
 
 void Queue::complete(const bool success, const QString& error) {
+  handleResult(success, error, nullptr);
+}
+
+void Queue::complete(const ListEntry& remote) {
+  handleResult(true, {}, &remote);
+}
+
+void Queue::handleResult(const bool success, const QString& error, const ListEntry* remote) {
   if (!processing_) return;
 
   const int animeId = *processing_;
   processing_.reset();
 
-  if (success) {
-    pop(animeId);
-    process();
+  // On failure, record the retry.
+  if (!success) {
+    const auto it = findItem(animeId);
+    if (it != items_.end()) {
+      it->retry_count++;
+      it->last_error = error.toStdString();
+      persistItem(*it);
+    }
     return;
   }
 
+  // On success, reconcile the entry and update the row.
+  reconcile(animeId, remote);
   const auto it = findItem(animeId);
-  if (it != items_.end()) {
-    it->retry_count++;
-    it->last_error = error.toStdString();
+  if (modifiedWhileProcessing_ && it != items_.end()) {
+    it->retry_count = 0;
+    it->last_error.clear();
     persistItem(*it);
+    emit changed();
+  } else {
+    pop(animeId);
+  }
+
+  // Move on to the next item.
+  process();
+}
+
+void Queue::reconcile(const int animeId, const ListEntry* remote) {
+  const auto* local = anime::db.entry(animeId);
+  if (!local) return;
+
+  if (deleting_) {
+    if (local->pending_delete) {
+      anime::db.deleteEntry(animeId);
+    } else {
+      // The entry was saved again while the request was in flight, so the server no longer has it.
+      auto entry = *local;
+      entry.id = anime::list::kUnknownId;
+      anime::db.updateEntry(entry);
+    }
+    return;
+  }
+
+  if (remote) {
+    auto entry = *remote;
+    if (modifiedWhileProcessing_) {
+      // The response predates the local edits, so keep those.
+      entry = *local;
+      entry.id = remote->id;
+    }
+    anime::db.updateEntry(entry);
   }
 }
 
