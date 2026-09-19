@@ -127,6 +127,7 @@ target_sources(taiga PRIVATE
 	track/scanner.hpp
 	track/update_decision.cpp
 	track/update_decision.hpp
+	track/update_trigger.hpp
 
 	main.cpp
 )

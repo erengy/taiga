@@ -20,6 +20,7 @@
 
 #include <QFile>
 #include <QJsonArray>
+#include <algorithm>
 #include <ranges>
 
 #include "base/string.hpp"
@@ -128,6 +129,25 @@ anime::TitleLanguage Settings::titleLanguage() const {
   return *titleLanguageCache_;
 }
 
+std::chrono::seconds Settings::updateDelay() const {
+  const std::chrono::seconds delay{value("track.update.delay", 120).toInt()};
+  return std::clamp(delay, kUpdateDelayMin, kUpdateDelayMax);
+}
+
+bool Settings::updateLibraryOnly() const {
+  return value("track.update.libraryOnly", false).toBool();
+}
+
+bool Settings::updatePauseWhenUnfocused() const {
+  return value("track.update.pauseWhenUnfocused", false).toBool();
+}
+
+track::UpdateTrigger Settings::updateTrigger() const {
+  const auto trigger = value("track.update.trigger", u"afterDelay"_s).toString();
+  if (trigger == u"onPlayerClose") return track::UpdateTrigger::OnPlayerClose;
+  return track::UpdateTrigger::AfterDelay;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 void Settings::setAppColorScheme(const Qt::ColorScheme scheme) const {
@@ -205,6 +225,24 @@ void Settings::setTitleLanguage(const anime::TitleLanguage language) const {
   }();
   setValue("library.titleLanguage", slug);
   titleLanguageCache_ = language;
+}
+
+void Settings::setUpdateDelay(const std::chrono::seconds delay) const {
+  setValue("track.update.delay", static_cast<int>(delay.count()));
+}
+
+void Settings::setUpdateLibraryOnly(const bool enabled) const {
+  setValue("track.update.libraryOnly", enabled);
+}
+
+void Settings::setUpdatePauseWhenUnfocused(const bool enabled) const {
+  setValue("track.update.pauseWhenUnfocused", enabled);
+}
+
+void Settings::setUpdateTrigger(const track::UpdateTrigger trigger) const {
+  const std::string slug =
+      trigger == track::UpdateTrigger::OnPlayerClose ? "onPlayerClose" : "afterDelay";
+  setValue("track.update.trigger", slug);
 }
 
 }  // namespace taiga

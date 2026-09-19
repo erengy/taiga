@@ -26,11 +26,15 @@
 
 #include "base/settings.hpp"
 #include "media/anime.hpp"
+#include "track/update_trigger.hpp"
 
 namespace taiga {
 
 class Settings final : public base::Settings {
 public:
+  static constexpr std::chrono::seconds kUpdateDelayMin{10};
+  static constexpr std::chrono::seconds kUpdateDelayMax{3600};
+
   void init() const;
 
   Qt::ColorScheme appColorScheme() const;
@@ -47,6 +51,10 @@ public:
   bool streamingMediaEnabled() const;
   bool syncEnabled() const;
   anime::TitleLanguage titleLanguage() const;
+  std::chrono::seconds updateDelay() const;
+  bool updateLibraryOnly() const;
+  bool updatePauseWhenUnfocused() const;
+  track::UpdateTrigger updateTrigger() const;
 
   void setAppColorScheme(const Qt::ColorScheme scheme) const;
   void setDetectionEnabled(const bool enabled) const;
@@ -62,6 +70,10 @@ public:
   void setStreamingMediaEnabled(const bool enabled) const;
   void setSyncEnabled(const bool enabled) const;
   void setTitleLanguage(const anime::TitleLanguage language) const;
+  void setUpdateDelay(const std::chrono::seconds delay) const;
+  void setUpdateLibraryOnly(const bool enabled) const;
+  void setUpdatePauseWhenUnfocused(const bool enabled) const;
+  void setUpdateTrigger(const track::UpdateTrigger trigger) const;
 
 private:
   QString fileName() const override;
