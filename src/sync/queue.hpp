@@ -20,6 +20,7 @@
 
 #include <QList>
 #include <QSqlQuery>
+#include <QTimer>
 #include <ctime>
 #include <optional>
 #include <string>
@@ -85,7 +86,10 @@ private:
   void handleResult(const bool success, const QString& error, const ListEntry* remote);
   void reconcile(const int animeId, const ListEntry* remote);
 
+  void processAutomatically();
+
   QList<QueueItem> items_;
+  QTimer* processTimer_ = nullptr;
 
   std::optional<int> processing_;
   bool deleting_ = false;

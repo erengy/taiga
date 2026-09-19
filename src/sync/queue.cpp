@@ -20,6 +20,7 @@
 
 #include <QSqlDatabase>
 #include <algorithm>
+#include <chrono>
 #include <format>
 
 #include "base/file.hpp"
@@ -37,6 +38,12 @@ namespace sync {
 Queue::Queue() : QObject{} {}
 
 void Queue::init() {
+  // Wait for changes to settle, so that edits made in a row are sent together.
+  processTimer_ = new QTimer(this);
+  processTimer_->setSingleShot(true);
+  processTimer_->setInterval(std::chrono::seconds{10});
+  connect(processTimer_, &QTimer::timeout, this, &Queue::processAutomatically);
+
   auto db = QSqlDatabase::database();
   if (!db.open()) return;
 
@@ -77,6 +84,8 @@ void Queue::push(const int animeId, const anime::list::Fields dirty) {
   if (!isUserAuthenticated()) {
     emit queuedWhileUnauthenticated(animeId);
   }
+
+  if (processTimer_) processTimer_->start();
 }
 
 void Queue::pushDelete(const int animeId) {
@@ -192,6 +201,13 @@ void Queue::reconcile(const int animeId, const ListEntry* remote) {
     }
     anime::db.updateEntry(entry);
   }
+}
+
+void Queue::processAutomatically() {
+  if (!taiga::settings.syncEnabled()) return;
+  if (!isUserAuthenticated() && !willAuthenticate()) return;
+
+  process();
 }
 
 const QueueItem* Queue::currentItem() const {
