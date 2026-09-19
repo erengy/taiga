@@ -40,6 +40,7 @@ public:
   TrayIcon(QObject* parent, const QIcon& icon, QMenu* menu);
 
   void setBadge(Badge badge);
+  void showMessage(const QString& title, const QString& message);
 
 signals:
   void activated();
@@ -51,8 +52,8 @@ private:
 
   Badge m_badge = Badge::None;
   QIcon m_baseIcon;
-  QMenu* m_contextMenu;
-  QSystemTrayIcon* m_icon;
+  QMenu* m_contextMenu = nullptr;
+  QSystemTrayIcon* m_icon = nullptr;
 };
 
 }  // namespace gui

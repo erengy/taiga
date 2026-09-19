@@ -60,6 +60,12 @@ void TrayIcon::setBadge(Badge badge) {
   updateIcon();
 }
 
+void TrayIcon::showMessage(const QString& title, const QString& message) {
+  if (!m_icon) return;
+
+  m_icon->showMessage(title, message, QSystemTrayIcon::Information);
+}
+
 void TrayIcon::updateIcon() {
   if (!m_icon) return;
 

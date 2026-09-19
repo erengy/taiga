@@ -46,6 +46,7 @@ public:
 
 signals:
   void stateChanged(const UpdateState& state) const;
+  void confirmationRequested(const UpdateState& state) const;
 
 private:
   void onEpisodeChanged(std::optional<Episode> episode);
@@ -65,6 +66,7 @@ private:
   bool paused_ = false;
   bool dismissed_ = false;
   bool committed_ = false;
+  bool notified_ = false;
 
   UpdateState state_;
   QTimer* timer_;

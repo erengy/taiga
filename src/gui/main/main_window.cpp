@@ -54,6 +54,7 @@
 #include "taiga/session.hpp"
 #include "taiga/settings.hpp"
 #include "track/media.hpp"
+#include "track/update_session.hpp"
 #include "ui_main_window.h"
 
 #ifdef Q_OS_WINDOWS
@@ -393,8 +394,22 @@ void MainWindow::initTrayIcon() {
   m_trayIcon = new TrayIcon(this, windowIcon(), menu);
 
   connect(m_trayIcon, &TrayIcon::activated, this, &MainWindow::displayWindow);
-  connect(m_trayIcon, &TrayIcon::messageClicked, this,
-          []() { QMessageBox::information(nullptr, "Taiga", tr("Clicked message")); });
+  connect(m_trayIcon, &TrayIcon::messageClicked, this, &MainWindow::displayWindow);
+
+  connect(track::updateSession(), &track::UpdateSession::confirmationRequested, this,
+          [this](const track::UpdateState& state) {
+            if (isActiveWindow()) return;
+
+            const auto episode = track::media::detection()->getCurrentEpisode();
+            const auto item = episode ? anime::db.item(episode->animeId()) : nullptr;
+            if (!item) return;
+
+            m_trayIcon->showMessage(tr("Confirm list update"),
+                                    tr("%1: episode %2 is ahead of your progress (%3).")
+                                        .arg(QString::fromStdString(anime::preferredTitle(*item)))
+                                        .arg(state.episode)
+                                        .arg(state.previousEpisode));
+          });
 
   connect(track::media::detection(), &track::media::Detection::currentEpisodeChanged, this,
           [this](std::optional<track::Episode> episode) {

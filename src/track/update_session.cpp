@@ -92,6 +92,7 @@ void UpdateSession::onEpisodeChanged(std::optional<Episode> episode) {
     paused_ = false;
     dismissed_ = false;
     committed_ = false;
+    notified_ = false;
   }
 
   episode_ = std::move(episode);
@@ -180,6 +181,11 @@ void UpdateSession::evaluate() {
   }
 
   setState(state);
+
+  if (state.phase == Phase::Confirming && elapsed_ >= delay_ && !notified_) {
+    notified_ = true;
+    emit confirmationRequested(state_);
+  }
 }
 
 void UpdateSession::commit(const Anime& item) {
