@@ -40,14 +40,19 @@ namespace gui {
 
 namespace {
 
+constexpr int kPosterHeight = 64;
+constexpr int kPosterWidth = kPosterHeight * 2 / 3;
+constexpr int kHorizontalMargin = 16;
+constexpr int kVerticalMargin = 12;
+constexpr int kSpacing = 12;
+
 QString formatUpdateState(const track::UpdateState& state) {
   using Phase = track::UpdateState::Phase;
   using Reason = track::UpdateDecision::Reason;
 
   switch (state.phase) {
     case Phase::Countdown:
-      return u"List update in <b style=\"font-weight: 600;\">%1</b>%2"_s
-          .arg(formatDuration(Duration{state.remaining}))
+      return u"List update in %1%2"_s.arg(formatDuration(Duration{state.remaining}))
           .arg(state.paused ? u" (paused)"_s : QString{});
 
     case Phase::WaitingForClose:
@@ -103,30 +108,38 @@ std::pair<QString, QString> formatUpdateActions(const track::UpdateState& state)
 
 NowPlayingWidget::NowPlayingWidget(QWidget* parent) : QFrame(parent) {
   setObjectName("nowPlaying");
-  setSizePolicy(QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Maximum);
+  setSizePolicy(QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Fixed);
+  setFixedHeight(kPosterHeight + 2 * kVerticalMargin);
 
   const auto layout = new QHBoxLayout(this);
-  layout->setContentsMargins(16, 16, 16, 16);
+  layout->setContentsMargins(kHorizontalMargin, kVerticalMargin, kHorizontalMargin,
+                             kVerticalMargin);
+  layout->setSpacing(kSpacing);
 
-  // Icon
-  m_iconLabel = new QLabel(this);
-  m_iconLabel->setFixedWidth(16);
-  m_iconLabel->setFixedHeight(16);
-  m_iconLabel->setCursor(QCursor(Qt::CursorShape::PointingHandCursor));
-  m_iconLabel->setPixmap(theme.getIcon("info").pixmap(QSize(16, 16)));
-  layout->addWidget(m_iconLabel);
+  // Poster
+  m_posterLabel = new QLabel(this);
+  m_posterLabel->setFixedSize(kPosterWidth, kPosterHeight);
+  layout->addWidget(m_posterLabel);
 
-  // Main
-  m_mainLabel = new QLabel(this);
-  layout->addWidget(m_mainLabel);
-  connect(m_mainLabel, &QLabel::linkActivated, this, [this]() {
-    if (m_anime) {
-      m_mainLabel->unsetCursor();
+  // Text
+  const auto textLayout = new QVBoxLayout();
+  textLayout->setSpacing(2);
+  layout->addLayout(textLayout, 1);
+  textLayout->addStretch();
+
+  m_titleLabel = new ClickableLabel(this);
+  m_titleLabel->setElidable(true);
+  auto titleFont = m_titleLabel->font();
+  titleFont.setWeight(QFont::DemiBold);
+  m_titleLabel->setFont(titleFont);
+  textLayout->addWidget(m_titleLabel);
+  connect(m_titleLabel, &ClickableLabel::clicked, this, [this](Qt::MouseButton button) {
+    if (button == Qt::LeftButton && m_anime) {
       MediaDialog::show(this, MediaDialogPage::Details, *m_anime);
     }
   });
-  m_mainLabel->setContextMenuPolicy(Qt::CustomContextMenu);
-  connect(m_mainLabel, &QLabel::customContextMenuRequested, this, [this]() {
+  m_titleLabel->setContextMenuPolicy(Qt::CustomContextMenu);
+  connect(m_titleLabel, &QLabel::customContextMenuRequested, this, [this]() {
     if (!m_anime) return;
     QMap<int, ListEntry> entries;
     if (const auto entry = anime::db.entry(m_anime->id)) {
@@ -136,18 +149,41 @@ NowPlayingWidget::NowPlayingWidget(QWidget* parent) : QFrame(parent) {
     menu->popup();
   });
 
-  // Timer
-  m_timerLabel = new QLabel(this);
-  m_timerLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-  layout->addWidget(m_timerLabel);
+  m_detailsLabel = new ClickableLabel(this);
+  m_detailsLabel->setElidable(true);
+  textLayout->addWidget(m_detailsLabel);
+
+  const auto statusLayout = new QHBoxLayout();
+  statusLayout->setSpacing(4);
+  textLayout->addLayout(statusLayout);
+  textLayout->addStretch();
+
+  m_iconLabel = new QLabel(this);
+  m_iconLabel->setFixedSize(16, 16);
+  statusLayout->addWidget(m_iconLabel);
+
+  m_statusLabel = new ClickableLabel(this);
+  m_statusLabel->setElidable(true);
+  statusLayout->addWidget(m_statusLabel, 1);
 
   // Actions
-  m_acceptButton = new QPushButton(this);
-  layout->addWidget(m_acceptButton);
+  m_actions = new QWidget(this);
+  layout->addWidget(m_actions);
+
+  const auto actionsLayout = new QVBoxLayout(m_actions);
+  actionsLayout->setContentsMargins(0, 0, 0, 0);
+  actionsLayout->setSpacing(4);
+  actionsLayout->addStretch();
+
+  m_acceptButton = new QPushButton(m_actions);
+  actionsLayout->addWidget(m_acceptButton);
   connect(m_acceptButton, &QPushButton::clicked, this, []() { track::updateSession()->accept(); });
-  m_cancelButton = new QPushButton(this);
-  layout->addWidget(m_cancelButton);
+
+  m_cancelButton = new QPushButton(m_actions);
+  actionsLayout->addWidget(m_cancelButton);
   connect(m_cancelButton, &QPushButton::clicked, this, []() { track::updateSession()->cancel(); });
+
+  actionsLayout->addStretch();
 
   refresh();
 
@@ -229,31 +265,34 @@ void NowPlayingWidget::refresh() {
 
 void NowPlayingWidget::render(const std::optional<Content>& content) {
   if (!content) {
-    m_iconLabel->setToolTip({});
-    m_mainLabel->setText({});
-    m_timerLabel->setText({});
-    m_acceptButton->hide();
-    m_cancelButton->hide();
+    setToolTip({});
+    m_titleLabel->setText({});
+    m_detailsLabel->setText({});
+    m_iconLabel->clear();
+    m_statusLabel->setText({});
+    m_actions->hide();
     return;
   }
 
-  m_iconLabel->setToolTip(content->details);
+  setToolTip(content->details);
+
+  m_titleLabel->setText(content->title);
+  m_titleLabel->setCursor(content->isRecognized ? Qt::PointingHandCursor : Qt::ArrowCursor);
+
+  m_detailsLabel->setText(
+      u"%1 · Episode %2"_s.arg(content->isPlaying ? u"Watching"_s : u"Watched"_s)
+          .arg(content->progress));
 
   const QString iconName = content->isRecognized ? "check_circle" : "error";
   m_iconLabel->setPixmap(theme.getIcon(iconName).pixmap(QSize(16, 16)));
-
-  m_mainLabel->setText(u"%4 <a href=\"#\" style=\"%3\">%1</a> – Episode %2"_s.arg(content->title)
-                           .arg(content->progress)
-                           .arg("font-weight: 600; text-decoration: none;")
-                           .arg(content->isPlaying ? u"Watching"_s : u"Watched"_s));
-
-  m_timerLabel->setText(formatUpdateState(content->updateState));
+  m_statusLabel->setText(formatUpdateState(content->updateState));
 
   const auto [acceptText, cancelText] = formatUpdateActions(content->updateState);
   m_acceptButton->setText(acceptText);
   m_acceptButton->setVisible(!acceptText.isEmpty());
   m_cancelButton->setText(cancelText);
   m_cancelButton->setVisible(!cancelText.isEmpty());
+  m_actions->setVisible(!acceptText.isEmpty());
 }
 
 }  // namespace gui

@@ -23,6 +23,7 @@
 #include <QPushButton>
 #include <optional>
 
+#include "gui/common/clickable_label.hpp"
 #include "media/anime.hpp"
 #include "track/episode.hpp"
 #include "track/update_state.hpp"
@@ -54,9 +55,12 @@ private:
   void render(const std::optional<Content>& content);
   void updateVisibility();
 
+  QLabel* m_posterLabel = nullptr;
+  ClickableLabel* m_titleLabel = nullptr;
+  ClickableLabel* m_detailsLabel = nullptr;
   QLabel* m_iconLabel = nullptr;
-  QLabel* m_mainLabel = nullptr;
-  QLabel* m_timerLabel = nullptr;
+  ClickableLabel* m_statusLabel = nullptr;
+  QWidget* m_actions = nullptr;
   QPushButton* m_acceptButton = nullptr;
   QPushButton* m_cancelButton = nullptr;
 
