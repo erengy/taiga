@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2025, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,5 +26,7 @@ namespace track {
 std::optional<QString> findEpisode(const QString& path, const int anime_id,
                                    const int episode_number);
 std::optional<QString> findFolder(const QString& path, const int anime_id);
+
+bool isInsideLibraryFolders(const QString& path);
 
 }  // namespace track

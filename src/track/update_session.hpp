@@ -62,6 +62,7 @@ private:
   std::chrono::seconds elapsed_{0};
   std::chrono::seconds delay_{0};
   UpdateTrigger trigger_ = UpdateTrigger::AfterDelay;
+  bool outsideLibrary_ = false;
   bool pauseWhenUnfocused_ = false;
   bool paused_ = false;
   bool dismissed_ = false;

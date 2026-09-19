@@ -34,10 +34,12 @@ std::optional<int> watchedEpisodeNumber(const Episode& episode, const anime::Det
 }
 
 UpdateDecision decideUpdate(const Episode& episode, const anime::Details& item,
-                            const ListEntry* entry) {
+                            const ListEntry* entry, const bool outsideLibrary) {
   using Action = UpdateDecision::Action;
   using Reason = UpdateDecision::Reason;
   using Status = anime::list::Status;
+
+  if (outsideLibrary) return {Action::Deny, Reason::OutsideLibrary};
 
   const auto number = watchedEpisodeNumber(episode, item);
   if (!number || (item.episode_count > 0 && *number > item.episode_count)) {

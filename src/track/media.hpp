@@ -23,6 +23,7 @@
 #include <QTimer>
 #include <anisthesia.hpp>
 #include <optional>
+#include <string>
 #include <vector>
 
 #include "track/episode.hpp"
@@ -40,6 +41,7 @@ public:
   Detection(QObject* parent);
 
   const std::optional<Episode> getCurrentEpisode() const;
+  const std::optional<std::string> getCurrentFile() const;
   const std::optional<media_t> getCurrentMedia() const;
   const std::optional<player_t> getCurrentPlayer() const;
 

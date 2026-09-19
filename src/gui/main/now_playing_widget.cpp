@@ -59,6 +59,8 @@ QString formatUpdateState(const track::UpdateState& state) {
           return u"List won't be updated: episode already watched"_s;
         case Reason::InvalidEpisode:
           return u"List won't be updated: invalid episode number"_s;
+        case Reason::OutsideLibrary:
+          return u"List won't be updated: file is outside of library folders"_s;
         default:
           return {};
       }

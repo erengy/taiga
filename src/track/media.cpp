@@ -103,6 +103,15 @@ const std::optional<Episode> Detection::getCurrentEpisode() const {
   return currentEpisode_;
 }
 
+const std::optional<std::string> Detection::getCurrentFile() const {
+  if (!currentMedia_) return std::nullopt;
+
+  auto file = extractMediaFields(*currentMedia_).file;
+  if (file.empty()) return std::nullopt;
+
+  return file;
+}
+
 const std::optional<Detection::media_t> Detection::getCurrentMedia() const {
   return currentMedia_;
 }

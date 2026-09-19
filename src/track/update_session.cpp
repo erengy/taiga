@@ -24,6 +24,7 @@
 #include "media/anime_list_utils.hpp"
 #include "taiga/settings.hpp"
 #include "track/media.hpp"
+#include "track/scanner.hpp"
 #include "track/update_decision.hpp"
 
 namespace track {
@@ -38,6 +39,16 @@ bool isSameMedia(const Episode& previous, const Episode& current) {
 
   return previous.elements(anitomy::ElementKind::Episode) ==
          current.elements(anitomy::ElementKind::Episode);
+}
+
+bool isOutsideLibrary() {
+  if (!taiga::settings.updateLibraryOnly()) return false;
+  if (taiga::settings.libraryFolders().empty()) return false;
+
+  const auto file = media::detection()->getCurrentFile();
+  if (!file) return false;
+
+  return !isInsideLibraryFolders(QString::fromStdString(*file));
 }
 
 }  // namespace
@@ -65,7 +76,7 @@ void UpdateSession::accept() {
   if (!item) return;
 
   const auto* entry = anime::db.entry(item->id);
-  const auto decision = decideUpdate(*episode_, *item, entry);
+  const auto decision = decideUpdate(*episode_, *item, entry, outsideLibrary_);
   if (decision.action == UpdateDecision::Action::Deny) return;
 
   commit(*item);
@@ -96,6 +107,7 @@ void UpdateSession::onEpisodeChanged(std::optional<Episode> episode) {
   }
 
   episode_ = std::move(episode);
+  outsideLibrary_ = isOutsideLibrary();
 
   if (!committed_ && !timer_->isActive()) timer_->start();
 
@@ -146,7 +158,7 @@ void UpdateSession::evaluate() {
   }
 
   const auto* entry = anime::db.entry(item->id);
-  const auto decision = decideUpdate(*episode_, *item, entry);
+  const auto decision = decideUpdate(*episode_, *item, entry, outsideLibrary_);
 
   using Action = UpdateDecision::Action;
   using Phase = UpdateState::Phase;

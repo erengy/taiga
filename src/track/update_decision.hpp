@@ -36,6 +36,7 @@ struct UpdateDecision {
   enum class Reason {
     None,
     InvalidEpisode,
+    OutsideLibrary,
     AlreadyWatched,
     SkipsAhead,
   };
@@ -47,6 +48,6 @@ struct UpdateDecision {
 std::optional<int> watchedEpisodeNumber(const Episode& episode, const anime::Details& item);
 
 UpdateDecision decideUpdate(const Episode& episode, const anime::Details& item,
-                            const ListEntry* entry);
+                            const ListEntry* entry, const bool outsideLibrary);
 
 }  // namespace track
