@@ -39,6 +39,7 @@ public:
 
   static QColor errorColor();
   static QColor successColor();
+  static QColor warningColor();
 
 private:
   QString readStylesheet(const QString& name) const;

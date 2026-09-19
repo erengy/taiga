@@ -18,6 +18,7 @@
 
 #include "now_playing_widget.hpp"
 
+#include <QApplication>
 #include <QBoxLayout>
 #include <QLabel>
 #include <optional>
@@ -104,6 +105,22 @@ std::pair<QString, QString> formatUpdateActions(const track::UpdateState& state)
   }
 }
 
+QColor statusColor(const track::UpdateState& state) {
+  using Phase = track::UpdateState::Phase;
+
+  switch (state.phase) {
+    case Phase::Committed:
+      return Theme::successColor();
+
+    case Phase::Confirming:
+    case Phase::Denied:
+      return Theme::warningColor();
+
+    default:
+      return {};
+  }
+}
+
 }  // namespace
 
 NowPlayingWidget::NowPlayingWidget(QWidget* parent) : QFrame(parent) {
@@ -151,6 +168,7 @@ NowPlayingWidget::NowPlayingWidget(QWidget* parent) : QFrame(parent) {
 
   m_detailsLabel = new ClickableLabel(this);
   m_detailsLabel->setElidable(true);
+  m_detailsLabel->setForegroundRole(QPalette::PlaceholderText);
   textLayout->addWidget(m_detailsLabel);
 
   const auto statusLayout = new QHBoxLayout();
@@ -176,6 +194,7 @@ NowPlayingWidget::NowPlayingWidget(QWidget* parent) : QFrame(parent) {
   actionsLayout->addStretch();
 
   m_acceptButton = new QPushButton(m_actions);
+  m_acceptButton->setDefault(true);
   actionsLayout->addWidget(m_acceptButton);
   connect(m_acceptButton, &QPushButton::clicked, this, []() { track::updateSession()->accept(); });
 
@@ -286,6 +305,16 @@ void NowPlayingWidget::render(const std::optional<Content>& content) {
   const QString iconName = content->isRecognized ? "check_circle" : "error";
   m_iconLabel->setPixmap(theme.getIcon(iconName).pixmap(QSize(16, 16)));
   m_statusLabel->setText(formatUpdateState(content->updateState));
+
+  if (const auto color = statusColor(content->updateState); color.isValid()) {
+    auto palette = QApplication::palette();
+    palette.setColor(QPalette::WindowText, color);
+    m_statusLabel->setPalette(palette);
+    m_statusLabel->setForegroundRole(QPalette::WindowText);
+  } else {
+    m_statusLabel->setPalette({});
+    m_statusLabel->setForegroundRole(QPalette::PlaceholderText);
+  }
 
   const auto [acceptText, cancelText] = formatUpdateActions(content->updateState);
   m_acceptButton->setText(acceptText);

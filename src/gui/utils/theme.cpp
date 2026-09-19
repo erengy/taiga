@@ -72,4 +72,8 @@ QColor Theme::successColor() {
   return QColor(0x43, 0xa0, 0x47);  // Green 600
 }
 
+QColor Theme::warningColor() {
+  return QColor(0xfb, 0x8c, 0x00);  // Orange 600
+}
+
 }  // namespace gui
