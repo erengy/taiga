@@ -22,6 +22,7 @@
 #include <QLabel>
 #include <optional>
 
+#include "base/chrono.hpp"
 #include "base/string.hpp"
 #include "gui/media/media_dialog.hpp"
 #include "gui/media/media_menu.hpp"
@@ -32,8 +33,28 @@
 #include "media/anime_utils.hpp"
 #include "track/episode.hpp"
 #include "track/media.hpp"
+#include "track/update_session.hpp"
 
 namespace gui {
+
+namespace {
+
+QString formatUpdateState(const track::UpdateState& state) {
+  switch (state.phase) {
+    case track::UpdateState::Phase::Countdown:
+      return u"List update in <b style=\"font-weight: 600;\">%1</b>%2"_s
+          .arg(formatDuration(Duration{state.remaining}))
+          .arg(state.paused ? u" (paused)"_s : QString{});
+
+    case track::UpdateState::Phase::WaitingForClose:
+      return u"List will be updated when the media is closed"_s;
+
+    default:
+      return {};
+  }
+}
+
+}  // namespace
 
 NowPlayingWidget::NowPlayingWidget(QWidget* parent) : QFrame(parent) {
   setObjectName("nowPlaying");
@@ -77,6 +98,8 @@ NowPlayingWidget::NowPlayingWidget(QWidget* parent) : QFrame(parent) {
 
   refresh();
 
+  connect(track::updateSession(), &track::UpdateSession::stateChanged, this,
+          &NowPlayingWidget::refresh);
   connect(track::media::detection(), &track::media::Detection::currentEpisodeChanged, this,
           [this](std::optional<track::Episode> episode) {
             if (episode) {
@@ -142,7 +165,7 @@ void NowPlayingWidget::refresh() {
                            .arg(u"%1/%2"_s.arg(episodeNumber).arg(episodeCount))
                            .arg("font-weight: 600; text-decoration: none;"));
 
-  m_timerLabel->setText("List update in <b style=\"font-weight: 600;\">00:00</b>");
+  m_timerLabel->setText(formatUpdateState(track::updateSession()->state()));
 }
 
 }  // namespace gui
