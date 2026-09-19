@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2025, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,11 +30,17 @@ public:
   explicit ClickableLabel(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
   ~ClickableLabel() = default;
 
+  void setElidable(const bool elidable);
+
 signals:
   void clicked(Qt::MouseButton button);
 
 protected:
   void mousePressEvent(QMouseEvent* event) override;
+  void paintEvent(QPaintEvent* event) override;
+
+private:
+  bool m_elidable = false;
 };
 
 }  // namespace gui

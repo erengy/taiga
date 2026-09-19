@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2025, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,15 +19,40 @@
 #include "clickable_label.hpp"
 
 #include <QMouseEvent>
+#include <QPainter>
+#include <QStyle>
 
 namespace gui {
 
 ClickableLabel::ClickableLabel(QWidget* parent, Qt::WindowFlags f) : QLabel(parent, f) {}
 
+void ClickableLabel::setElidable(const bool elidable) {
+  m_elidable = elidable;
+
+  // The text is allowed to be wider than the space we are given.
+  setSizePolicy(elidable ? QSizePolicy::Ignored : QSizePolicy::Preferred, QSizePolicy::Preferred);
+
+  update();
+}
+
 void ClickableLabel::mousePressEvent(QMouseEvent* event) {
   emit clicked(event->button());
 
   QLabel::mousePressEvent(event);
+}
+
+void ClickableLabel::paintEvent(QPaintEvent* event) {
+  if (!m_elidable) {
+    QLabel::paintEvent(event);
+    return;
+  }
+
+  const auto rect = contentsRect();
+  const auto text = fontMetrics().elidedText(this->text(), Qt::ElideRight, rect.width());
+
+  QPainter painter(this);
+  style()->drawItemText(&painter, rect, alignment(), palette(), isEnabled(), text,
+                        foregroundRole());
 }
 
 }  // namespace gui
