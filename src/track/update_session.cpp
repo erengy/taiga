@@ -153,6 +153,7 @@ void UpdateSession::evaluate() {
   UpdateState state{
       .reason = decision.reason,
       .episode = watchedEpisodeNumber(*episode_, *item).value_or(0),
+      .previousEpisode = anime::list::isInList(entry) ? entry->watched_episodes : 0,
   };
 
   switch (decision.action) {

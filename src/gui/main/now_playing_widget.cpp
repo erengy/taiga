@@ -40,14 +40,37 @@ namespace gui {
 namespace {
 
 QString formatUpdateState(const track::UpdateState& state) {
+  using Phase = track::UpdateState::Phase;
+  using Reason = track::UpdateDecision::Reason;
+
   switch (state.phase) {
-    case track::UpdateState::Phase::Countdown:
+    case Phase::Countdown:
       return u"List update in <b style=\"font-weight: 600;\">%1</b>%2"_s
           .arg(formatDuration(Duration{state.remaining}))
           .arg(state.paused ? u" (paused)"_s : QString{});
 
-    case track::UpdateState::Phase::WaitingForClose:
+    case Phase::WaitingForClose:
       return u"List will be updated when the media is closed"_s;
+
+    case Phase::Denied:
+      switch (state.reason) {
+        case Reason::AlreadyWatched:
+          return u"List won't be updated: episode already watched"_s;
+        case Reason::InvalidEpisode:
+          return u"List won't be updated: invalid episode number"_s;
+        default:
+          return {};
+      }
+
+    case Phase::Confirming:
+      return u"Episode %1 is ahead of your progress (%2)"_s.arg(state.episode)
+          .arg(state.previousEpisode);
+
+    case Phase::Committed:
+      return u"List updated: episode %1 → %2"_s.arg(state.previousEpisode).arg(state.episode);
+
+    case Phase::Cancelled:
+      return u"List update cancelled"_s;
 
     default:
       return {};
