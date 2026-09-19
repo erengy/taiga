@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@
 
 #include <QFrame>
 #include <QLabel>
+#include <QPushButton>
 #include <optional>
 
 #include "media/anime.hpp"
@@ -44,6 +45,8 @@ private:
   QLabel* m_iconLabel = nullptr;
   QLabel* m_mainLabel = nullptr;
   QLabel* m_timerLabel = nullptr;
+  QPushButton* m_acceptButton = nullptr;
+  QPushButton* m_cancelButton = nullptr;
 
   std::optional<Anime> m_anime;
   std::optional<track::Episode> m_episode;

@@ -21,6 +21,7 @@
 #include <QBoxLayout>
 #include <QLabel>
 #include <optional>
+#include <utility>
 
 #include "base/chrono.hpp"
 #include "base/string.hpp"
@@ -77,6 +78,25 @@ QString formatUpdateState(const track::UpdateState& state) {
   }
 }
 
+std::pair<QString, QString> formatUpdateActions(const track::UpdateState& state) {
+  using Phase = track::UpdateState::Phase;
+
+  switch (state.phase) {
+    case Phase::Countdown:
+    case Phase::WaitingForClose:
+      return {u"Update now"_s, u"Cancel"_s};
+
+    case Phase::Confirming:
+      return {u"Update to %1"_s.arg(state.episode), u"Ignore"_s};
+
+    case Phase::Cancelled:
+      return {u"Update"_s, {}};
+
+    default:
+      return {};
+  }
+}
+
 }  // namespace
 
 NowPlayingWidget::NowPlayingWidget(QWidget* parent) : QFrame(parent) {
@@ -119,6 +139,14 @@ NowPlayingWidget::NowPlayingWidget(QWidget* parent) : QFrame(parent) {
   m_timerLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
   layout->addWidget(m_timerLabel);
 
+  // Actions
+  m_acceptButton = new QPushButton(this);
+  layout->addWidget(m_acceptButton);
+  connect(m_acceptButton, &QPushButton::clicked, this, []() { track::updateSession()->accept(); });
+  m_cancelButton = new QPushButton(this);
+  layout->addWidget(m_cancelButton);
+  connect(m_cancelButton, &QPushButton::clicked, this, []() { track::updateSession()->cancel(); });
+
   refresh();
 
   connect(track::updateSession(), &track::UpdateSession::stateChanged, this,
@@ -158,6 +186,8 @@ void NowPlayingWidget::refresh() {
     m_iconLabel->setToolTip({});
     m_mainLabel->setText({});
     m_timerLabel->setText({});
+    m_acceptButton->hide();
+    m_cancelButton->hide();
     return;
   }
 
@@ -188,7 +218,14 @@ void NowPlayingWidget::refresh() {
                            .arg(u"%1/%2"_s.arg(episodeNumber).arg(episodeCount))
                            .arg("font-weight: 600; text-decoration: none;"));
 
-  m_timerLabel->setText(formatUpdateState(track::updateSession()->state()));
+  const auto& state = track::updateSession()->state();
+  m_timerLabel->setText(formatUpdateState(state));
+
+  const auto [acceptText, cancelText] = formatUpdateActions(state);
+  m_acceptButton->setText(acceptText);
+  m_acceptButton->setVisible(!acceptText.isEmpty());
+  m_cancelButton->setText(cancelText);
+  m_cancelButton->setVisible(!cancelText.isEmpty());
 }
 
 }  // namespace gui
