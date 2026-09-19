@@ -194,11 +194,7 @@ void NowPlayingWidget::updateVisibility() {
 
 void NowPlayingWidget::refresh() {
   if (!m_episode.has_value()) {
-    m_iconLabel->setToolTip({});
-    m_mainLabel->setText({});
-    m_timerLabel->setText({});
-    m_acceptButton->hide();
-    m_cancelButton->hide();
+    render(std::nullopt);
     return;
   }
 
@@ -214,10 +210,6 @@ void NowPlayingWidget::refresh() {
     const auto releaseGroup = m_episode->element(anitomy::ElementKind::ReleaseGroup);
     lines += u"<b>Group:</b> %1"_s.arg(releaseGroup);
   }
-  m_iconLabel->setToolTip(lines.join("<br>"));
-
-  const QString iconName = m_anime ? "check_circle" : "error";
-  m_iconLabel->setPixmap(theme.getIcon(iconName).pixmap(QSize(16, 16)));
 
   const auto title =
       m_anime ? anime::preferredTitle(*m_anime) : m_episode->element(anitomy::ElementKind::Title);
@@ -225,17 +217,39 @@ void NowPlayingWidget::refresh() {
       formatEpisodeNumbers(m_episode->elements(anitomy::ElementKind::Episode));
   const auto episodeCount = formatNumber(m_anime ? m_anime->episode_count : 0, "?");
 
-  const bool isPlaying = track::media::detection()->getCurrentEpisode().has_value();
+  render(Content{
+      .title = QString::fromStdString(title),
+      .progress = u"%1/%2"_s.arg(episodeNumber).arg(episodeCount),
+      .details = lines.join("<br>"),
+      .isPlaying = track::media::detection()->getCurrentEpisode().has_value(),
+      .isRecognized = m_anime.has_value(),
+      .updateState = track::updateSession()->state(),
+  });
+}
 
-  m_mainLabel->setText(u"%4 <a href=\"#\" style=\"%3\">%1</a> – Episode %2"_s.arg(title)
-                           .arg(u"%1/%2"_s.arg(episodeNumber).arg(episodeCount))
+void NowPlayingWidget::render(const std::optional<Content>& content) {
+  if (!content) {
+    m_iconLabel->setToolTip({});
+    m_mainLabel->setText({});
+    m_timerLabel->setText({});
+    m_acceptButton->hide();
+    m_cancelButton->hide();
+    return;
+  }
+
+  m_iconLabel->setToolTip(content->details);
+
+  const QString iconName = content->isRecognized ? "check_circle" : "error";
+  m_iconLabel->setPixmap(theme.getIcon(iconName).pixmap(QSize(16, 16)));
+
+  m_mainLabel->setText(u"%4 <a href=\"#\" style=\"%3\">%1</a> – Episode %2"_s.arg(content->title)
+                           .arg(content->progress)
                            .arg("font-weight: 600; text-decoration: none;")
-                           .arg(isPlaying ? u"Watching"_s : u"Watched"_s));
+                           .arg(content->isPlaying ? u"Watching"_s : u"Watched"_s));
 
-  const auto& state = track::updateSession()->state();
-  m_timerLabel->setText(formatUpdateState(state));
+  m_timerLabel->setText(formatUpdateState(content->updateState));
 
-  const auto [acceptText, cancelText] = formatUpdateActions(state);
+  const auto [acceptText, cancelText] = formatUpdateActions(content->updateState);
   m_acceptButton->setText(acceptText);
   m_acceptButton->setVisible(!acceptText.isEmpty());
   m_cancelButton->setText(cancelText);

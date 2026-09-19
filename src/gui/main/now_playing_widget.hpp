@@ -25,6 +25,7 @@
 
 #include "media/anime.hpp"
 #include "track/episode.hpp"
+#include "track/update_state.hpp"
 
 namespace gui {
 
@@ -40,7 +41,17 @@ public:
   void setPlaying(track::Episode episode);
 
 private:
+  struct Content {
+    QString title;
+    QString progress;
+    QString details;
+    bool isPlaying = false;
+    bool isRecognized = false;
+    track::UpdateState updateState;
+  };
+
   void refresh();
+  void render(const std::optional<Content>& content);
   void updateVisibility();
 
   QLabel* m_iconLabel = nullptr;
