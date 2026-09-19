@@ -22,6 +22,7 @@
 #include <QFileDialog>
 #include <QtWidgets>
 #include <algorithm>
+#include <optional>
 
 #include "base/string.hpp"
 #include "gui/common/spinner_widget.hpp"
@@ -394,6 +395,16 @@ void MainWindow::initTrayIcon() {
   connect(m_trayIcon, &TrayIcon::activated, this, &MainWindow::displayWindow);
   connect(m_trayIcon, &TrayIcon::messageClicked, this,
           []() { QMessageBox::information(nullptr, "Taiga", tr("Clicked message")); });
+
+  connect(track::media::detection(), &track::media::Detection::currentEpisodeChanged, this,
+          [this](std::optional<track::Episode> episode) {
+            if (!episode) {
+              m_trayIcon->setBadge(TrayIcon::Badge::None);
+            } else {
+              const bool recognized = anime::db.item(episode->animeId()) != nullptr;
+              m_trayIcon->setBadge(recognized ? TrayIcon::Badge::Success : TrayIcon::Badge::Error);
+            }
+          });
 }
 
 void MainWindow::closeEvent(QCloseEvent* event) {

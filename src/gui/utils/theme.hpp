@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <QColor>
 #include <QHash>
 #include <QIcon>
 #include <QObject>
@@ -35,6 +36,9 @@ public:
                        bool useSvgIconEngine = true);
   void initStyle();
   bool isDark() const;
+
+  static QColor errorColor();
+  static QColor successColor();
 
 private:
   QString readStylesheet(const QString& name) const;

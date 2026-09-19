@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -62,6 +62,14 @@ bool Theme::isDark() const {
 
 QString Theme::readStylesheet(const QString& name) const {
   return base::readFile(u":/styles/%1.qss"_s.arg(name));
+}
+
+QColor Theme::errorColor() {
+  return QColor(0xe5, 0x39, 0x35);  // Red 600
+}
+
+QColor Theme::successColor() {
+  return QColor(0x43, 0xa0, 0x47);  // Green 600
 }
 
 }  // namespace gui

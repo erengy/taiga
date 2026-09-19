@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,13 +18,15 @@
 
 #include "tray_icon.hpp"
 
-#include <QIcon>
 #include <QMenu>
+#include <QPainter>
 #include <QSystemTrayIcon>
+
+#include "gui/utils/theme.hpp"
 
 namespace gui {
 
-TrayIcon::TrayIcon(QObject* parent, const QIcon& icon, QMenu* menu) {
+TrayIcon::TrayIcon(QObject* parent, const QIcon& icon, QMenu* menu) : m_baseIcon(icon) {
   if (!QSystemTrayIcon::isSystemTrayAvailable()) {
     return;
   }
@@ -33,7 +35,7 @@ TrayIcon::TrayIcon(QObject* parent, const QIcon& icon, QMenu* menu) {
 
   m_icon = new QSystemTrayIcon(parent);
   m_icon->setContextMenu(m_contextMenu);
-  m_icon->setIcon(icon);
+  m_icon->setIcon(m_baseIcon);
   m_icon->setToolTip("Taiga");
   m_icon->show();
 
@@ -49,6 +51,42 @@ TrayIcon::TrayIcon(QObject* parent, const QIcon& icon, QMenu* menu) {
           });
 
   connect(m_icon, &QSystemTrayIcon::messageClicked, this, &TrayIcon::messageClicked);
+}
+
+void TrayIcon::setBadge(Badge badge) {
+  if (m_badge == badge) return;
+
+  m_badge = badge;
+  updateIcon();
+}
+
+void TrayIcon::updateIcon() {
+  if (!m_icon) return;
+
+  if (m_badge == Badge::None) {
+    m_icon->setIcon(m_baseIcon);
+    return;
+  }
+
+  const auto sizes = m_baseIcon.availableSizes();
+  const QSize size = sizes.isEmpty() ? QSize(64, 64) : sizes.front();
+
+  QPixmap pixmap = m_baseIcon.pixmap(size);
+  paintBadge(pixmap);
+  m_icon->setIcon(QIcon(pixmap));
+}
+
+void TrayIcon::paintBadge(QPixmap& pixmap) const {
+  const auto color = m_badge == Badge::Success ? Theme::successColor() : Theme::errorColor();
+
+  const QSize pixmapSize = pixmap.size();
+  const int size = pixmapSize.width() / 2;
+  const QRect rect(pixmapSize.width() - size, pixmapSize.height() - size, size, size);
+
+  QPainter painter(&pixmap);
+  painter.setRenderHint(QPainter::Antialiasing);
+  painter.setBrush(color);
+  painter.drawEllipse(rect);
 }
 
 }  // namespace gui
