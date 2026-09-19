@@ -18,6 +18,7 @@
 
 #include "anime_list_utils.hpp"
 
+#include <QDate>
 #include <ctime>
 
 #include "media/anime.hpp"
@@ -33,6 +34,31 @@ float getProgressRatio(const Details* item, const Entry* entry) {
   const auto total = (item ? item->episode_count : 0);
   if (!total) return 0.8f;
   return std::min(progress / static_cast<float>(total), 1.0f);
+}
+
+Entry entryWithEpisodeWatched(const Details& item, const Entry* entry, const int number) {
+  auto updated = entry ? *entry : Entry{.anime_id = item.id};
+
+  const bool isFinalEpisode = item.episode_count > 0 && number == item.episode_count;
+  const FuzzyDate today{QDate::currentDate().toStdSysDays()};
+
+  updated.watched_episodes = number;
+
+  if (number == 1 && !updated.date_started) updated.date_started = today;
+  if (isFinalEpisode && !updated.date_completed) updated.date_completed = today;
+
+  if (updated.rewatching && isFinalEpisode) {
+    updated.rewatching = false;
+    updated.rewatched_times++;
+  }
+
+  if (isFinalEpisode) {
+    updated.status = Status::Completed;
+  } else if (!updated.rewatching) {
+    updated.status = Status::Watching;
+  }
+
+  return updated;
 }
 
 void save(Entry entry) {
