@@ -26,6 +26,7 @@
 
 #include "track/episode.hpp"
 #include "track/update_state.hpp"
+#include "track/update_trigger.hpp"
 
 namespace track {
 
@@ -48,15 +49,18 @@ signals:
 
 private:
   void onEpisodeChanged(std::optional<Episode> episode);
+  void onMediaClosed();
   void tick();
 
   void evaluate();
   void commit(const Anime& item);
+  void reset();
   void setState(const UpdateState& state);
 
   std::optional<Episode> episode_;
   std::chrono::seconds elapsed_{0};
   std::chrono::seconds delay_{0};
+  UpdateTrigger trigger_ = UpdateTrigger::AfterDelay;
   bool dismissed_ = false;
   bool committed_ = false;
 

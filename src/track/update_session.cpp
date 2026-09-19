@@ -80,15 +80,14 @@ void UpdateSession::cancel() {
 
 void UpdateSession::onEpisodeChanged(std::optional<Episode> episode) {
   if (!episode) {
-    timer_->stop();
-    episode_.reset();
-    setState({});
+    onMediaClosed();
     return;
   }
 
   if (!episode_ || !isSameMedia(*episode_, *episode)) {
     elapsed_ = std::chrono::seconds{0};
     delay_ = taiga::settings.updateDelay();
+    trigger_ = taiga::settings.updateTrigger();
     dismissed_ = false;
     committed_ = false;
   }
@@ -98,6 +97,32 @@ void UpdateSession::onEpisodeChanged(std::optional<Episode> episode) {
   if (!committed_ && !timer_->isActive()) timer_->start();
 
   evaluate();
+}
+
+void UpdateSession::onMediaClosed() {
+  timer_->stop();
+
+  evaluate();
+
+  // Committed state stays in place until the next media.
+  if (committed_) return;
+
+  switch (state_.phase) {
+    case UpdateState::Phase::WaitingForClose:
+      if (const auto* item = anime::db.item(episode_->animeId())) {
+        commit(*item);
+        return;
+      }
+      break;
+    case UpdateState::Phase::Confirming:
+      // Keep asking, unless the media was closed too soon.
+      if (elapsed_ >= delay_) return;
+      break;
+    default:
+      break;
+  }
+
+  reset();
 }
 
 void UpdateSession::tick() {
@@ -130,12 +155,14 @@ void UpdateSession::evaluate() {
     case Action::Allow:
       if (dismissed_) {
         state.phase = Phase::Cancelled;
-      } else if (const auto remaining = delay_ - elapsed_; remaining <= std::chrono::seconds{0}) {
-        commit(*item);
-        return;
-      } else {
+      } else if (const auto remaining = delay_ - elapsed_; remaining > std::chrono::seconds{0}) {
         state.phase = Phase::Countdown;
         state.remaining = remaining;
+      } else if (trigger_ == UpdateTrigger::OnPlayerClose) {
+        state.phase = Phase::WaitingForClose;
+      } else {
+        commit(*item);
+        return;
       }
       break;
     case Action::Confirm:
@@ -167,6 +194,13 @@ void UpdateSession::commit(const Anime& item) {
       .episode = *number,
       .previousEpisode = previous,
   });
+}
+
+void UpdateSession::reset() {
+  episode_.reset();
+  dismissed_ = false;
+  committed_ = false;
+  setState({});
 }
 
 void UpdateSession::setState(const UpdateState& state) {

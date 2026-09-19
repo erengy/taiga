@@ -26,12 +26,13 @@ namespace track {
 
 struct UpdateState {
   enum class Phase {
-    Idle,        // nothing to update
-    Denied,      // update is not allowed, see `reason`
-    Countdown,   // list will be updated automatically after `remaining`
-    Confirming,  // list will be updated if user agrees, see `reason`
-    Committed,   // list has been updated
-    Cancelled,   // user has declined the update
+    Idle,             // nothing to update
+    Denied,           // update is not allowed, see `reason`
+    Countdown,        // list will be updated automatically after `remaining`
+    WaitingForClose,  // list will be updated automatically when media is closed
+    Confirming,       // list will be updated if user agrees, see `reason`
+    Committed,        // list has been updated
+    Cancelled,        // user has declined the update
   };
 
   Phase phase = Phase::Idle;
