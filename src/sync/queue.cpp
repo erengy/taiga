@@ -44,6 +44,12 @@ void Queue::init() {
   processTimer_->setInterval(std::chrono::seconds{10});
   connect(processTimer_, &QTimer::timeout, this, &Queue::processAutomatically);
 
+  // Retry failed items and leftovers periodically.
+  periodicTimer_ = new QTimer(this);
+  periodicTimer_->setInterval(std::chrono::minutes{5});
+  connect(periodicTimer_, &QTimer::timeout, this, &Queue::processAutomatically);
+  periodicTimer_->start();
+
   auto db = QSqlDatabase::database();
   if (!db.open()) return;
 

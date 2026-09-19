@@ -90,6 +90,7 @@ private:
 
   QList<QueueItem> items_;
   QTimer* processTimer_ = nullptr;
+  QTimer* periodicTimer_ = nullptr;
 
   std::optional<int> processing_;
   bool deleting_ = false;
