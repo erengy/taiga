@@ -88,6 +88,8 @@ void UpdateSession::onEpisodeChanged(std::optional<Episode> episode) {
     elapsed_ = std::chrono::seconds{0};
     delay_ = taiga::settings.updateDelay();
     trigger_ = taiga::settings.updateTrigger();
+    pauseWhenUnfocused_ = taiga::settings.updatePauseWhenUnfocused();
+    paused_ = false;
     dismissed_ = false;
     committed_ = false;
   }
@@ -127,7 +129,9 @@ void UpdateSession::onMediaClosed() {
 
 void UpdateSession::tick() {
   // We count ticks instead of comparing timestamps, so that skipping a tick is enough to pause.
-  elapsed_ += std::chrono::seconds{1};
+  // Being out of focus is our best guess for the media player not playing.
+  paused_ = pauseWhenUnfocused_ && !media::detection()->isPlayerFocused();
+  if (!paused_) elapsed_ += std::chrono::seconds{1};
   evaluate();
 }
 
@@ -158,6 +162,7 @@ void UpdateSession::evaluate() {
       } else if (const auto remaining = delay_ - elapsed_; remaining > std::chrono::seconds{0}) {
         state.phase = Phase::Countdown;
         state.remaining = remaining;
+        state.paused = paused_;
       } else if (trigger_ == UpdateTrigger::OnPlayerClose) {
         state.phase = Phase::WaitingForClose;
       } else {

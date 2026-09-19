@@ -40,6 +40,7 @@ struct UpdateState {
   std::chrono::seconds remaining{0};
   int episode = 0;
   int previousEpisode = 0;
+  bool paused = false;  // countdown is not running, because media player is not in focus
 
   bool operator==(const UpdateState&) const = default;
 };

@@ -185,6 +185,14 @@ bool Detection::isMediaIdentified() const {
   return currentEpisode_.has_value() && currentEpisode_->animeId() != anime::kUnknownId;
 }
 
+bool Detection::isPlayerFocused() const {
+#ifdef Q_OS_WINDOWS
+  return currentWindowHandle_ && currentWindowHandle_ == static_cast<void*>(GetForegroundWindow());
+#else
+  return true;  // no way to tell yet
+#endif
+}
+
 void Detection::setCurrentEpisodeAnimeId(int animeId) {
   if (!currentEpisode_) return;
 
