@@ -41,6 +41,7 @@ public:
 
 private:
   void refresh();
+  void updateVisibility();
 
   QLabel* m_iconLabel = nullptr;
   QLabel* m_mainLabel = nullptr;

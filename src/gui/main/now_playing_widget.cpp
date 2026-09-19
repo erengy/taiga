@@ -149,15 +149,18 @@ NowPlayingWidget::NowPlayingWidget(QWidget* parent) : QFrame(parent) {
 
   refresh();
 
-  connect(track::updateSession(), &track::UpdateSession::stateChanged, this,
-          &NowPlayingWidget::refresh);
+  connect(track::updateSession(), &track::UpdateSession::stateChanged, this, [this]() {
+    refresh();
+    updateVisibility();
+  });
   connect(track::media::detection(), &track::media::Detection::currentEpisodeChanged, this,
           [this](std::optional<track::Episode> episode) {
             if (episode) {
               setPlaying(*episode);
             } else {
-              reset();
+              refresh();
             }
+            updateVisibility();
           });
 }
 
@@ -179,6 +182,12 @@ void NowPlayingWidget::setPlaying(track::Episode episode) {
 
   refresh();
   show();
+}
+
+void NowPlayingWidget::updateVisibility() {
+  const bool isPlaying = track::media::detection()->getCurrentEpisode().has_value();
+  const bool hasUpdate = track::updateSession()->state().phase != track::UpdateState::Phase::Idle;
+  if (!isPlaying && !hasUpdate) reset();
 }
 
 void NowPlayingWidget::refresh() {
@@ -214,9 +223,12 @@ void NowPlayingWidget::refresh() {
       formatEpisodeNumbers(m_episode->elements(anitomy::ElementKind::Episode));
   const auto episodeCount = formatNumber(m_anime ? m_anime->episode_count : 0, "?");
 
-  m_mainLabel->setText(u"Watching <a href=\"#\" style=\"%3\">%1</a> – Episode %2"_s.arg(title)
+  const bool isPlaying = track::media::detection()->getCurrentEpisode().has_value();
+
+  m_mainLabel->setText(u"%4 <a href=\"#\" style=\"%3\">%1</a> – Episode %2"_s.arg(title)
                            .arg(u"%1/%2"_s.arg(episodeNumber).arg(episodeCount))
-                           .arg("font-weight: 600; text-decoration: none;"));
+                           .arg("font-weight: 600; text-decoration: none;")
+                           .arg(isPlaying ? u"Watching"_s : u"Watched"_s));
 
   const auto& state = track::updateSession()->state();
   m_timerLabel->setText(formatUpdateState(state));
