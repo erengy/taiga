@@ -40,6 +40,7 @@
 #include "taiga/settings.hpp"
 #include "taiga/version.hpp"
 #include "track/media.hpp"
+#include "track/update_session.hpp"
 
 namespace taiga {
 
@@ -85,6 +86,7 @@ int Application::run() {
   anime::history.init();
   sync::queue.init();
   track::media::detection()->init();
+  track::updateSession()->init();
   gui::imageProvider.init();
 
   gui::theme.initStyle();

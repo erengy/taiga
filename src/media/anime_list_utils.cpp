@@ -36,8 +36,13 @@ float getProgressRatio(const Details* item, const Entry* entry) {
   return std::min(progress / static_cast<float>(total), 1.0f);
 }
 
+bool isInList(const Entry* entry) {
+  // Pending removal counts as not being in list.
+  return entry && entry->status != Status::NotInList && !entry->pending_delete;
+}
+
 Entry entryWithEpisodeWatched(const Details& item, const Entry* entry, const int number) {
-  auto updated = entry ? *entry : Entry{.anime_id = item.id};
+  auto updated = isInList(entry) ? *entry : Entry{.anime_id = item.id};
 
   const bool isFinalEpisode = item.episode_count > 0 && number == item.episode_count;
   const FuzzyDate today{QDate::currentDate().toStdSysDays()};

@@ -18,21 +18,29 @@
 
 #pragma once
 
-namespace anime {
-struct Details;
-}
+#include <chrono>
 
-namespace anime::list {
+#include "track/update_decision.hpp"
 
-struct Entry;
+namespace track {
 
-float getProgressRatio(const Details* item, const Entry* entry);
+struct UpdateState {
+  enum class Phase {
+    Idle,        // nothing to update
+    Denied,      // update is not allowed, see `reason`
+    Countdown,   // list will be updated automatically after `remaining`
+    Confirming,  // list will be updated if user agrees, see `reason`
+    Committed,   // list has been updated
+    Cancelled,   // user has declined the update
+  };
 
-bool isInList(const Entry* entry);
+  Phase phase = Phase::Idle;
+  UpdateDecision::Reason reason = UpdateDecision::Reason::None;
+  std::chrono::seconds remaining{0};
+  int episode = 0;
+  int previousEpisode = 0;
 
-Entry entryWithEpisodeWatched(const Details& item, const Entry* entry, const int number);
+  bool operator==(const UpdateState&) const = default;
+};
 
-void save(Entry entry);
-void remove(const int animeId);
-
-}  // namespace anime::list
+}  // namespace track

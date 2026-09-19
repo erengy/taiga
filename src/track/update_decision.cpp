@@ -18,6 +18,8 @@
 
 #include "update_decision.hpp"
 
+#include "media/anime_list_utils.hpp"
+
 namespace track {
 
 std::optional<int> watchedEpisodeNumber(const Episode& episode, const anime::Details& item) {
@@ -42,7 +44,7 @@ UpdateDecision decideUpdate(const Episode& episode, const anime::Details& item,
     return {Action::Deny, Reason::InvalidEpisode};
   }
 
-  const bool inList = entry && entry->status != Status::NotInList && !entry->pending_delete;
+  const bool inList = anime::list::isInList(entry);
   const bool completed = inList && entry->status == Status::Completed && !entry->rewatching;
   const int watchedEpisodes = inList ? entry->watched_episodes : 0;
 
