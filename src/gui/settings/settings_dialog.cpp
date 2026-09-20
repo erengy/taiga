@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,6 +28,8 @@
 
 namespace gui {
 
+constexpr int kPageRole = Qt::UserRole;
+
 SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::SettingsDialog) {
   ui_->setupUi(this);
 
@@ -37,10 +39,11 @@ SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::S
 
   ui_->treeWidget->setIndentation(22);
 
-  const auto add_item = [this](QString icon, QString text) {
+  const auto add_item = [this](QString icon, QString text, QWidget* page = nullptr) {
     auto item = new QTreeWidgetItem(ui_->treeWidget, QStringList(text));
     item->setIcon(0, theme.getIcon(icon));
     item->setSizeHint(0, QSize{0, 24});
+    item->setData(0, kPageRole, QVariant::fromValue(page));
     return item;
   };
 
@@ -83,8 +86,13 @@ SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::S
                 text = u"%1 / %2"_s.arg(current->parent()->text(0), text);
               }
               ui_->titleLabel->setText(text);
+
+              auto page = current->data(0, kPageRole).value<QWidget*>();
+              ui_->stackedWidget->setCurrentWidget(page ? page : ui_->todoPage);
             }
           });
+
+  ui_->treeWidget->setCurrentItem(ui_->treeWidget->topLevelItem(0));
 }
 
 void SettingsDialog::show(QWidget* parent) {
