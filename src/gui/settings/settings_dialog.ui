@@ -244,6 +244,121 @@
            </item>
           </layout>
          </widget>
+         <widget class="QWidget" name="recognitionPage">
+          <layout class="QVBoxLayout" name="verticalLayout_6">
+           <item>
+            <widget class="QCheckBox" name="detectionEnabledCheckBox">
+             <property name="text">
+              <string>Enable media detection</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <layout class="QFormLayout" name="detectionFormLayout">
+             <item row="0" column="0">
+              <widget class="QLabel" name="detectionIntervalLabel">
+               <property name="text">
+                <string>Detection interval:</string>
+               </property>
+               <property name="buddy">
+                <cstring>detectionIntervalSpinBox</cstring>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QSpinBox" name="detectionIntervalSpinBox">
+               <property name="suffix">
+                <string> seconds</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="validationGroupBox">
+             <property name="title">
+              <string>Validation</string>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_8">
+              <item>
+               <widget class="QCheckBox" name="updateLibraryOnlyCheckBox">
+                <property name="text">
+                 <string>Ignore files outside of library folders</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="updateGroupBox">
+             <property name="title">
+              <string>Anime list update</string>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_7">
+              <item>
+               <layout class="QFormLayout" name="updateDelayFormLayout">
+                <item row="0" column="0">
+                 <widget class="QLabel" name="updateDelayLabel">
+                  <property name="text">
+                   <string>Delay:</string>
+                  </property>
+                  <property name="buddy">
+                   <cstring>updateDelaySpinBox</cstring>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QSpinBox" name="updateDelaySpinBox">
+                  <property name="suffix">
+                   <string> seconds</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="QCheckBox" name="updatePauseWhenUnfocusedCheckBox">
+                  <property name="text">
+                   <string>Pause delay while player is not in focus</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <widget class="QRadioButton" name="updateAfterDelayRadioButton">
+                <property name="text">
+                 <string>Update after delay</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QRadioButton" name="updateOnPlayerCloseRadioButton">
+                <property name="text">
+                 <string>Update when media is closed (after delay)</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <spacer name="recognitionVerticalSpacer">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </widget>
         </widget>
        </item>
       </layout>
