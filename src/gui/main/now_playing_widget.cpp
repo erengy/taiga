@@ -20,7 +20,9 @@
 
 #include <QApplication>
 #include <QBoxLayout>
+#include <QDesktopServices>
 #include <QLabel>
+#include <QUrl>
 #include <optional>
 #include <utility>
 
@@ -34,6 +36,7 @@
 #include "media/anime_db.hpp"
 #include "media/anime_list.hpp"
 #include "media/anime_utils.hpp"
+#include "sync/service.hpp"
 #include "track/episode.hpp"
 #include "track/media.hpp"
 #include "track/update_session.hpp"
@@ -163,6 +166,11 @@ NowPlayingWidget::NowPlayingWidget(QWidget* parent) : QFrame(parent) {
   m_posterWidget->setFixedSize(kPosterWidth, kPosterHeight);
   m_posterWidget->setCornerRadius(kPosterCornerRadius);
   layout->addWidget(m_posterWidget);
+  connect(m_posterWidget, &PosterWidget::clicked, this, [this](Qt::MouseButton button) {
+    if (button == Qt::MouseButton::LeftButton && m_anime) {
+      QDesktopServices::openUrl(QUrl{sync::animePageUrl(m_anime->id)});
+    }
+  });
 
   // Text
   const auto textLayout = new QVBoxLayout();
@@ -340,6 +348,7 @@ void NowPlayingWidget::render(const std::optional<Content>& content) {
 
   m_posterWidget->setPixmap(content->poster);
   m_posterWidget->setLoading(content->isPosterLoading);
+  m_posterWidget->setCursor(content->isRecognized ? Qt::PointingHandCursor : Qt::ArrowCursor);
 
   m_titleLabel->setText(content->title);
   m_titleLabel->setCursor(content->isRecognized ? Qt::PointingHandCursor : Qt::ArrowCursor);

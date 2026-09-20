@@ -38,7 +38,11 @@ public:
   void setPixmap(const QPixmap& pixmap);
   void setLoading(const bool loading);
 
+signals:
+  void clicked(Qt::MouseButton button);
+
 protected:
+  void mousePressEvent(QMouseEvent* event) override;
   void paintEvent(QPaintEvent* event) override;
   void resizeEvent(QResizeEvent* event) override;
 

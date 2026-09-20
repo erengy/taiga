@@ -18,6 +18,7 @@
 
 #include "poster_widget.hpp"
 
+#include <QMouseEvent>
 #include <QPainter>
 #include <QPainterPath>
 
@@ -59,6 +60,12 @@ void PosterWidget::setLoading(const bool loading) {
   } else {
     m_spinner->stop();
   }
+}
+
+void PosterWidget::mousePressEvent(QMouseEvent* event) {
+  emit clicked(event->button());
+
+  QWidget::mousePressEvent(event);
 }
 
 void PosterWidget::paintEvent(QPaintEvent*) {
