@@ -126,6 +126,187 @@
             </layout>
            </item>
            <item>
+            <widget class="QGroupBox" name="anilistGroupBox">
+             <property name="title">
+              <string>AniList</string>
+             </property>
+             <layout class="QFormLayout" name="anilistFormLayout">
+              <item row="0" column="0">
+               <widget class="QLabel" name="anilistUsernameLabel">
+                <property name="text">
+                 <string>Username:</string>
+                </property>
+                <property name="buddy">
+                 <cstring>anilistUsernameLineEdit</cstring>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLineEdit" name="anilistUsernameLineEdit"/>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="anilistTokenLabel">
+                <property name="text">
+                 <string>Token:</string>
+                </property>
+                <property name="buddy">
+                 <cstring>anilistTokenLineEdit</cstring>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QLineEdit" name="anilistTokenLineEdit">
+                <property name="echoMode">
+                 <enum>QLineEdit::Password</enum>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="kitsuGroupBox">
+             <property name="title">
+              <string>Kitsu</string>
+             </property>
+             <layout class="QFormLayout" name="kitsuFormLayout">
+              <item row="0" column="0">
+               <widget class="QLabel" name="kitsuEmailLabel">
+                <property name="text">
+                 <string>Email:</string>
+                </property>
+                <property name="buddy">
+                 <cstring>kitsuEmailLineEdit</cstring>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLineEdit" name="kitsuEmailLineEdit"/>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="kitsuUsernameLabel">
+                <property name="text">
+                 <string>Username:</string>
+                </property>
+                <property name="buddy">
+                 <cstring>kitsuUsernameLineEdit</cstring>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QLineEdit" name="kitsuUsernameLineEdit"/>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="kitsuPasswordLabel">
+                <property name="text">
+                 <string>Password:</string>
+                </property>
+                <property name="buddy">
+                 <cstring>kitsuPasswordLineEdit</cstring>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QLineEdit" name="kitsuPasswordLineEdit">
+                <property name="echoMode">
+                 <enum>QLineEdit::Password</enum>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="kitsuAccessTokenLabel">
+                <property name="text">
+                 <string>Access token:</string>
+                </property>
+                <property name="buddy">
+                 <cstring>kitsuAccessTokenLineEdit</cstring>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QLineEdit" name="kitsuAccessTokenLineEdit">
+                <property name="echoMode">
+                 <enum>QLineEdit::Password</enum>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="0">
+               <widget class="QLabel" name="kitsuRefreshTokenLabel">
+                <property name="text">
+                 <string>Refresh token:</string>
+                </property>
+                <property name="buddy">
+                 <cstring>kitsuRefreshTokenLineEdit</cstring>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="1">
+               <widget class="QLineEdit" name="kitsuRefreshTokenLineEdit">
+                <property name="echoMode">
+                 <enum>QLineEdit::Password</enum>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="myanimelistGroupBox">
+             <property name="title">
+              <string>MyAnimeList</string>
+             </property>
+             <layout class="QFormLayout" name="myanimelistFormLayout">
+              <item row="0" column="0">
+               <widget class="QLabel" name="myanimelistUsernameLabel">
+                <property name="text">
+                 <string>Username:</string>
+                </property>
+                <property name="buddy">
+                 <cstring>myanimelistUsernameLineEdit</cstring>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLineEdit" name="myanimelistUsernameLineEdit"/>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="myanimelistAccessTokenLabel">
+                <property name="text">
+                 <string>Access token:</string>
+                </property>
+                <property name="buddy">
+                 <cstring>myanimelistAccessTokenLineEdit</cstring>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QLineEdit" name="myanimelistAccessTokenLineEdit">
+                <property name="echoMode">
+                 <enum>QLineEdit::Password</enum>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="myanimelistRefreshTokenLabel">
+                <property name="text">
+                 <string>Refresh token:</string>
+                </property>
+                <property name="buddy">
+                 <cstring>myanimelistRefreshTokenLineEdit</cstring>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QLineEdit" name="myanimelistRefreshTokenLineEdit">
+                <property name="echoMode">
+                 <enum>QLineEdit::Password</enum>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
             <widget class="QCheckBox" name="syncEnabledCheckBox">
              <property name="text">
               <string>Enable automatic synchronization</string>

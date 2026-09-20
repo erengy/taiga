@@ -31,6 +31,9 @@ public:
 
   void load() override;
   void apply() const override;
+
+private:
+  void updateVisibleGroup();
 };
 
 }  // namespace gui
