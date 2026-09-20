@@ -18,9 +18,11 @@
 
 #include "clickable_label.hpp"
 
+#include <QHelpEvent>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QStyle>
+#include <QToolTip>
 
 namespace gui {
 
@@ -35,6 +37,17 @@ void ClickableLabel::setElidable(const bool elidable) {
   update();
 }
 
+bool ClickableLabel::event(QEvent* event) {
+  if (event->type() == QEvent::ToolTip && toolTip().isEmpty()) {
+    if (m_elidable && elidedText() != text()) {
+      QToolTip::showText(static_cast<QHelpEvent*>(event)->globalPos(), text(), this);
+      return true;
+    }
+  }
+
+  return QLabel::event(event);
+}
+
 void ClickableLabel::mousePressEvent(QMouseEvent* event) {
   emit clicked(event->button());
 
@@ -47,12 +60,13 @@ void ClickableLabel::paintEvent(QPaintEvent* event) {
     return;
   }
 
-  const auto rect = contentsRect();
-  const auto text = fontMetrics().elidedText(this->text(), Qt::ElideRight, rect.width());
-
   QPainter painter(this);
-  style()->drawItemText(&painter, rect, alignment(), palette(), isEnabled(), text,
+  style()->drawItemText(&painter, contentsRect(), alignment(), palette(), isEnabled(), elidedText(),
                         foregroundRole());
+}
+
+QString ClickableLabel::elidedText() const {
+  return fontMetrics().elidedText(text(), Qt::ElideRight, contentsRect().width());
 }
 
 }  // namespace gui

@@ -36,10 +36,13 @@ signals:
   void clicked(Qt::MouseButton button);
 
 protected:
+  bool event(QEvent* event) override;
   void mousePressEvent(QMouseEvent* event) override;
   void paintEvent(QPaintEvent* event) override;
 
 private:
+  QString elidedText() const;
+
   bool m_elidable = false;
 };
 
