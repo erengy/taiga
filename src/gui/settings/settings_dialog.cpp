@@ -19,6 +19,7 @@
 #include "settings_dialog.hpp"
 
 #include "base/string.hpp"
+#include "gui/settings/settings_page_advanced.hpp"
 #include "gui/settings/settings_page_application.hpp"
 #include "gui/settings/settings_page_library.hpp"
 #include "gui/settings/settings_page_media_players.hpp"
@@ -78,7 +79,7 @@ SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::S
     add_child(item, "Filters");
   }
   {
-    auto item = add_item("warning", "Advanced");
+    auto item = add_item("warning", "Advanced", ui_->advancedPage);
     add_child(item, "Cache");
   }
 
@@ -102,6 +103,7 @@ SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::S
 
   pages_ = {
       // clang-format off
+      new SettingsPageAdvanced(ui_, this),
       new SettingsPageApplication(ui_, this),
       new SettingsPageLibrary(ui_, this),
       new SettingsPageMediaPlayers(ui_, this),
