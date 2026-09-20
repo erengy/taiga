@@ -123,6 +123,29 @@ QColor statusColor(const track::UpdateState& state) {
   }
 }
 
+QString statusIconName(const track::UpdateState& state, const bool isRecognized) {
+  using Phase = track::UpdateState::Phase;
+
+  switch (state.phase) {
+    case Phase::Countdown:
+    case Phase::WaitingForClose:
+      return u"sync"_s;
+
+    case Phase::Confirming:
+      return u"help"_s;
+
+    case Phase::Denied:
+    case Phase::Cancelled:
+      return u"info"_s;
+
+    case Phase::Committed:
+      return u"check_circle"_s;
+
+    default:
+      return isRecognized ? QString{} : u"error"_s;
+  }
+}
+
 }  // namespace
 
 NowPlayingWidget::NowPlayingWidget(QWidget* parent) : QFrame(parent) {
@@ -326,8 +349,12 @@ void NowPlayingWidget::render(const std::optional<Content>& content) {
   if (!content->episodeTitle.isEmpty()) details += u" · "_s + content->episodeTitle;
   m_detailsLabel->setText(details);
 
-  const QString iconName = content->isRecognized ? "check_circle" : "error";
-  m_iconLabel->setPixmap(theme.getIcon(iconName).pixmap(QSize(16, 16)));
+  if (const auto iconName = statusIconName(content->updateState, content->isRecognized);
+      iconName.isEmpty()) {
+    m_iconLabel->clear();
+  } else {
+    m_iconLabel->setPixmap(theme.getIcon(iconName).pixmap(QSize(16, 16)));
+  }
   m_statusLabel->setText(formatUpdateState(content->updateState));
 
   if (const auto color = statusColor(content->updateState); color.isValid()) {
