@@ -18,8 +18,11 @@
 
 #include "settings_dialog.hpp"
 
+#include <algorithm>
+
 #include "base/string.hpp"
 #include "gui/utils/theme.hpp"
+#include "taiga/settings.hpp"
 #include "ui_settings_dialog.h"
 
 #ifdef Q_OS_WINDOWS
@@ -52,7 +55,7 @@ SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::S
   };
 
   add_item("account_circle", "Accounts");
-  add_item("web_asset", "Application");
+  add_item("web_asset", "Application", ui_->applicationPage);
   add_item("list_alt", "Anime List");
   add_item("folder", "Library");
   {
@@ -93,6 +96,8 @@ SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::S
           });
 
   ui_->treeWidget->setCurrentItem(ui_->treeWidget->topLevelItem(0));
+
+  load();
 }
 
 void SettingsDialog::show(QWidget* parent) {
@@ -100,6 +105,40 @@ void SettingsDialog::show(QWidget* parent) {
   dlg->setAttribute(Qt::WA_DeleteOnClose);
   dlg->setModal(true);
   dlg->QDialog::show();
+}
+
+void SettingsDialog::accept() {
+  apply();
+  QDialog::accept();
+}
+
+void SettingsDialog::load() {
+  // Application
+  {
+    auto combo = ui_->colorSchemeComboBox;
+    combo->addItem(tr("System"), static_cast<int>(Qt::ColorScheme::Unknown));
+    combo->addItem(tr("Light"), static_cast<int>(Qt::ColorScheme::Light));
+    combo->addItem(tr("Dark"), static_cast<int>(Qt::ColorScheme::Dark));
+    combo->setCurrentIndex(
+        std::max(0, combo->findData(static_cast<int>(taiga::settings.appColorScheme()))));
+  }
+  {
+    using anime::TitleLanguage;
+    auto combo = ui_->titleLanguageComboBox;
+    combo->addItem(tr("Romaji"), static_cast<int>(TitleLanguage::Romaji));
+    combo->addItem(tr("English"), static_cast<int>(TitleLanguage::English));
+    combo->addItem(tr("Native"), static_cast<int>(TitleLanguage::Native));
+    combo->setCurrentIndex(
+        std::max(0, combo->findData(static_cast<int>(taiga::settings.titleLanguage()))));
+  }
+}
+
+void SettingsDialog::apply() const {
+  // Application
+  taiga::settings.setAppColorScheme(
+      static_cast<Qt::ColorScheme>(ui_->colorSchemeComboBox->currentData().toInt()));
+  taiga::settings.setTitleLanguage(
+      static_cast<anime::TitleLanguage>(ui_->titleLanguageComboBox->currentData().toInt()));
 }
 
 }  // namespace gui

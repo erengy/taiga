@@ -106,6 +106,63 @@
            </item>
           </layout>
          </widget>
+         <widget class="QWidget" name="applicationPage">
+          <layout class="QVBoxLayout" name="verticalLayout_4">
+           <item>
+            <layout class="QFormLayout" name="applicationFormLayout">
+             <item row="0" column="0">
+              <widget class="QLabel" name="colorSchemeLabel">
+               <property name="text">
+                <string>Color scheme:</string>
+               </property>
+               <property name="buddy">
+                <cstring>colorSchemeComboBox</cstring>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QComboBox" name="colorSchemeComboBox"/>
+             </item>
+             <item row="1" column="1">
+              <widget class="QLabel" name="colorSchemeHintLabel">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="text">
+                <string>Takes effect after restarting the application.</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="titleLanguageLabel">
+               <property name="text">
+                <string>Title language:</string>
+               </property>
+               <property name="buddy">
+                <cstring>titleLanguageComboBox</cstring>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QComboBox" name="titleLanguageComboBox"/>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <spacer name="applicationVerticalSpacer">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </widget>
         </widget>
        </item>
       </layout>
