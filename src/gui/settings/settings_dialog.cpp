@@ -20,6 +20,7 @@
 
 #include "base/string.hpp"
 #include "gui/settings/settings_page_application.hpp"
+#include "gui/settings/settings_page_library.hpp"
 #include "gui/utils/theme.hpp"
 #include "ui_settings_dialog.h"
 
@@ -55,7 +56,7 @@ SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::S
   add_item("account_circle", "Accounts");
   add_item("web_asset", "Application", ui_->applicationPage);
   add_item("list_alt", "Anime List");
-  add_item("folder", "Library");
+  add_item("folder", "Library", ui_->libraryPage);
   {
     auto item = add_item("check_circle", "Recognition");
     add_child(item, "Media players");
@@ -97,6 +98,7 @@ SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::S
 
   pages_ = {
       new SettingsPageApplication(ui_, this),
+      new SettingsPageLibrary(ui_, this),
   };
   for (auto page : pages_) {
     page->load();
