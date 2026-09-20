@@ -60,6 +60,16 @@ Qt::ColorScheme Settings::appColorScheme() const {
       .value<Qt::ColorScheme>();
 }
 
+std::string Settings::appStyle() const {
+#ifdef Q_OS_WINDOWS
+  // Fusion is more consistent than the Windows 11 style.
+  const auto defaultStyle = u"fusion"_s;
+#else
+  const auto defaultStyle = QString{kAppStyleSystem};
+#endif
+  return value("app.style", defaultStyle).toString().toStdString();
+}
+
 bool Settings::detectionEnabled() const {
   return value("track.detection.enabled", true).toBool();
 }
@@ -154,6 +164,10 @@ track::UpdateTrigger Settings::updateTrigger() const {
 
 void Settings::setAppColorScheme(const Qt::ColorScheme scheme) const {
   setValue("app.colorScheme", static_cast<int>(scheme));
+}
+
+void Settings::setAppStyle(const std::string& style) const {
+  setValue("app.style", style);
 }
 
 void Settings::setDetectionEnabled(const bool enabled) const {

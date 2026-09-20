@@ -48,11 +48,16 @@ void Theme::initStyle() {
   connect(qApp->styleHints(), &QStyleHints::colorSchemeChanged, this,
           [](Qt::ColorScheme scheme) { qApp->styleHints()->setColorScheme(scheme); });
 
+  const auto style = QString::fromStdString(taiga::settings.appStyle());
+  if (style.compare(taiga::Settings::kAppStyleSystem, Qt::CaseInsensitive) != 0) {
+    qApp->setStyle(style);
+  }
 #ifdef Q_OS_WINDOWS
-  qApp->setStyle("fusion");
-  const QString mainStylesheet = readStylesheet("main");
-  const QString themeStylesheet = readStylesheet(isDark() ? "dark" : "light");
-  qApp->setStyleSheet(mainStylesheet + themeStylesheet);
+  if (style.compare("fusion", Qt::CaseInsensitive) == 0) {
+    const QString mainStylesheet = readStylesheet("main");
+    const QString themeStylesheet = readStylesheet(isDark() ? "dark" : "light");
+    qApp->setStyleSheet(mainStylesheet + themeStylesheet);
+  }
 #endif
 }
 

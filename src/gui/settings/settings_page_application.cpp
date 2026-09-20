@@ -18,6 +18,7 @@
 #include "settings_page_application.hpp"
 
 #include <QComboBox>
+#include <QStyleFactory>
 #include <algorithm>
 
 #include "taiga/settings.hpp"
@@ -29,6 +30,21 @@ SettingsPageApplication::SettingsPageApplication(Ui::SettingsDialog* ui, QDialog
     : SettingsPage(ui, dialog) {}
 
 void SettingsPageApplication::load() {
+  {
+    auto combo = ui_->styleComboBox;
+    const QString system{taiga::Settings::kAppStyleSystem};
+    auto keys = QStyleFactory::keys();
+    const auto style = QString::fromStdString(taiga::settings.appStyle()).toLower();
+    if (style != system && !keys.contains(style, Qt::CaseInsensitive)) {
+      keys.append(style);  // keep unavailable style
+    }
+    keys.sort(Qt::CaseInsensitive);
+    combo->addItem(tr("System"), system);
+    for (const auto& key : keys) {
+      combo->addItem(key, key.toLower());
+    }
+    combo->setCurrentIndex(std::max(0, combo->findData(style)));
+  }
   {
     auto combo = ui_->colorSchemeComboBox;
     combo->addItem(tr("System"), static_cast<int>(Qt::ColorScheme::Unknown));
@@ -49,6 +65,7 @@ void SettingsPageApplication::load() {
 }
 
 void SettingsPageApplication::apply() const {
+  taiga::settings.setAppStyle(ui_->styleComboBox->currentData().toString().toStdString());
   taiga::settings.setAppColorScheme(
       static_cast<Qt::ColorScheme>(ui_->colorSchemeComboBox->currentData().toInt()));
   taiga::settings.setTitleLanguage(

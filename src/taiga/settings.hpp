@@ -32,12 +32,14 @@ namespace taiga {
 
 class Settings final : public base::Settings {
 public:
+  static constexpr QLatin1StringView kAppStyleSystem{"system"};
   static constexpr std::chrono::seconds kUpdateDelayMin{10};
   static constexpr std::chrono::seconds kUpdateDelayMax{3600};
 
   void init() const;
 
   Qt::ColorScheme appColorScheme() const;
+  std::string appStyle() const;
   bool detectionEnabled() const;
   std::vector<std::string> disabledMediaPlayers() const;
   std::string service() const;
@@ -57,6 +59,7 @@ public:
   track::UpdateTrigger updateTrigger() const;
 
   void setAppColorScheme(const Qt::ColorScheme scheme) const;
+  void setAppStyle(const std::string& style) const;
   void setDetectionEnabled(const bool enabled) const;
   void setDisabledMediaPlayers(std::vector<std::string> players) const;
   void setService(const std::string& service) const;
