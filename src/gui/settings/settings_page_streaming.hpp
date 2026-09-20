@@ -15,24 +15,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-#include "settings_page_media_players.hpp"
+#pragma once
 
-#include <anisthesia.hpp>
-
-#include "gui/settings/settings_player_list.hpp"
-#include "ui_settings_dialog.h"
+#include "gui/settings/settings_page.hpp"
 
 namespace gui {
 
-SettingsPageMediaPlayers::SettingsPageMediaPlayers(Ui::SettingsDialog* ui, QDialog* dialog)
-    : SettingsPage(ui, dialog) {}
+class SettingsPageStreaming final : public SettingsPage {
+  Q_OBJECT
+  Q_DISABLE_COPY_MOVE(SettingsPageStreaming)
 
-void SettingsPageMediaPlayers::load() {
-  loadPlayerList(ui_->mediaPlayersList, anisthesia::PlayerType::Default);
-}
+public:
+  SettingsPageStreaming(Ui::SettingsDialog* ui, QDialog* dialog);
+  ~SettingsPageStreaming() override = default;
 
-void SettingsPageMediaPlayers::apply() const {
-  savePlayerList(ui_->mediaPlayersList, anisthesia::PlayerType::Default);
-}
+  void load() override;
+  void apply() const override;
+};
 
 }  // namespace gui

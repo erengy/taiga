@@ -15,24 +15,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-#include "settings_page_media_players.hpp"
+#pragma once
 
-#include <anisthesia.hpp>
+class QListWidget;
 
-#include "gui/settings/settings_player_list.hpp"
-#include "ui_settings_dialog.h"
+namespace anisthesia {
+enum class PlayerType;
+}
 
 namespace gui {
 
-SettingsPageMediaPlayers::SettingsPageMediaPlayers(Ui::SettingsDialog* ui, QDialog* dialog)
-    : SettingsPage(ui, dialog) {}
-
-void SettingsPageMediaPlayers::load() {
-  loadPlayerList(ui_->mediaPlayersList, anisthesia::PlayerType::Default);
-}
-
-void SettingsPageMediaPlayers::apply() const {
-  savePlayerList(ui_->mediaPlayersList, anisthesia::PlayerType::Default);
-}
+void loadPlayerList(QListWidget* list, anisthesia::PlayerType type);
+void savePlayerList(const QListWidget* list, anisthesia::PlayerType type);
 
 }  // namespace gui
