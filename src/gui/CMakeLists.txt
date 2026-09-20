@@ -77,6 +77,10 @@ target_sources(taiga-gui PRIVATE
 
 	settings/settings_dialog.cpp
 	settings/settings_dialog.hpp
+	settings/settings_page.cpp
+	settings/settings_page.hpp
+	settings/settings_page_application.cpp
+	settings/settings_page_application.hpp
 
 	utils/format.cpp
 	utils/format.hpp

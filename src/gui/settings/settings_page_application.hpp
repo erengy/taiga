@@ -15,35 +15,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-
 #pragma once
 
-#include <QDialog>
-#include <QList>
-
-namespace Ui {
-class SettingsDialog;
-}
+#include "gui/settings/settings_page.hpp"
 
 namespace gui {
 
-class SettingsPage;
-
-class SettingsDialog final : public QDialog {
+class SettingsPageApplication final : public SettingsPage {
   Q_OBJECT
-  Q_DISABLE_COPY_MOVE(SettingsDialog)
+  Q_DISABLE_COPY_MOVE(SettingsPageApplication)
 
 public:
-  SettingsDialog(QWidget* parent);
-  ~SettingsDialog() = default;
+  SettingsPageApplication(Ui::SettingsDialog* ui, QDialog* dialog);
+  ~SettingsPageApplication() override = default;
 
-  static void show(QWidget* parent);
-
-  void accept() override;
-
-private:
-  Ui::SettingsDialog* ui_ = nullptr;
-  QList<SettingsPage*> pages_;
+  void load() override;
+  void apply() const override;
 };
 
 }  // namespace gui
