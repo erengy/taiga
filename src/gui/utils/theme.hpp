@@ -22,6 +22,7 @@
 #include <QHash>
 #include <QIcon>
 #include <QObject>
+#include <QTimer>
 
 namespace gui {
 
@@ -35,6 +36,7 @@ public:
   const QIcon& getIcon(const QString& key, const QString& extension = QString{u"svg"},
                        bool useSvgIconEngine = true);
   void initStyle();
+  void applyStyle();
   bool isDark() const;
 
   static QColor errorColor();
@@ -45,6 +47,8 @@ private:
   QString readStylesheet(const QString& name) const;
 
   QHash<QString, QIcon> m_icons;
+  QTimer* m_themeTimer = nullptr;
+  Qt::ColorScheme m_lastScheme = Qt::ColorScheme::Unknown;
 };
 
 inline Theme theme;

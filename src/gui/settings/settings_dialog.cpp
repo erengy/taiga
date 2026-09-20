@@ -18,8 +18,11 @@
 
 #include "settings_dialog.hpp"
 
+#include <QStyleHints>
+
 #include "base/string.hpp"
 #include "gui/utils/theme.hpp"
+#include "taiga/settings.hpp"
 #include "ui_settings_dialog.h"
 
 #ifdef Q_OS_WINDOWS
@@ -75,6 +78,29 @@ SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::S
 
   ui_->treeWidget->expandAll();
 
+  // Populate color scheme combo box
+  ui_->colorSchemeCombo->addItem("System Default", static_cast<int>(Qt::ColorScheme::Unknown));
+  ui_->colorSchemeCombo->addItem("Light", static_cast<int>(Qt::ColorScheme::Light));
+  ui_->colorSchemeCombo->addItem("Dark", static_cast<int>(Qt::ColorScheme::Dark));
+
+  // Set current value from settings
+  const auto currentScheme = taiga::settings.appColorScheme();
+  for (int i = 0; i < ui_->colorSchemeCombo->count(); ++i) {
+    if (ui_->colorSchemeCombo->itemData(i).toInt() == static_cast<int>(currentScheme)) {
+      ui_->colorSchemeCombo->setCurrentIndex(i);
+      break;
+    }
+  }
+
+  // Save and apply immediately when changed
+  connect(ui_->colorSchemeCombo, &QComboBox::currentIndexChanged, this, [this](int index) {
+    const auto scheme =
+        static_cast<Qt::ColorScheme>(ui_->colorSchemeCombo->itemData(index).toInt());
+    taiga::settings.setAppColorScheme(scheme);
+    qApp->styleHints()->setColorScheme(scheme);
+  });
+
+  // Switch pages when a section is selected in the tree
   connect(ui_->treeWidget, &QTreeWidget::currentItemChanged, this,
           [this](QTreeWidgetItem* current, QTreeWidgetItem*) {
             if (current) {
@@ -83,6 +109,15 @@ SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::S
                 text = u"%1 / %2"_s.arg(current->parent()->text(0), text);
               }
               ui_->titleLabel->setText(text);
+
+              // Switch stacked widget page based on selection
+              const auto rootText =
+                  current->parent() ? current->parent()->text(0) : current->text(0);
+              if (rootText == "Application") {
+                ui_->stackedWidget->setCurrentWidget(ui_->applicationPage);
+              } else {
+                ui_->stackedWidget->setCurrentWidget(ui_->accountsPage);
+              }
             }
           });
 }
