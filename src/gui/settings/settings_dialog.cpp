@@ -19,6 +19,7 @@
 #include "settings_dialog.hpp"
 
 #include "base/string.hpp"
+#include "gui/settings/settings_page_accounts.hpp"
 #include "gui/settings/settings_page_advanced.hpp"
 #include "gui/settings/settings_page_application.hpp"
 #include "gui/settings/settings_page_library.hpp"
@@ -58,7 +59,7 @@ SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::S
     item->setData(0, kPageRole, QVariant::fromValue(page));
   };
 
-  add_item("account_circle", "Accounts");
+  add_item("account_circle", "Accounts", ui_->accountsPage);
   add_item("web_asset", "Application", ui_->applicationPage);
   add_item("list_alt", "Anime List");
   add_item("folder", "Library", ui_->libraryPage);
@@ -103,6 +104,7 @@ SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::S
 
   pages_ = {
       // clang-format off
+      new SettingsPageAccounts(ui_, this),
       new SettingsPageAdvanced(ui_, this),
       new SettingsPageApplication(ui_, this),
       new SettingsPageLibrary(ui_, this),

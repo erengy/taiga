@@ -79,6 +79,8 @@ target_sources(taiga-gui PRIVATE
 	settings/settings_dialog.hpp
 	settings/settings_page.cpp
 	settings/settings_page.hpp
+	settings/settings_page_accounts.cpp
+	settings/settings_page_accounts.hpp
 	settings/settings_page_advanced.cpp
 	settings/settings_page_advanced.hpp
 	settings/settings_page_application.cpp
