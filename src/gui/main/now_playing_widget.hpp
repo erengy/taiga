@@ -47,6 +47,7 @@ private:
   struct Content {
     QString title;
     QString progress;
+    QString episodeTitle;
     QString details;
     bool isPlaying = false;
     bool isRecognized = false;

@@ -289,6 +289,8 @@ void NowPlayingWidget::refresh() {
   render(Content{
       .title = QString::fromStdString(title),
       .progress = u"%1/%2"_s.arg(episodeNumber).arg(episodeCount),
+      .episodeTitle =
+          QString::fromStdString(m_episode->element(anitomy::ElementKind::EpisodeTitle)),
       .details = lines.join("<br>"),
       .isPlaying = track::media::detection()->getCurrentEpisode().has_value(),
       .isRecognized = m_anime.has_value(),
@@ -319,9 +321,10 @@ void NowPlayingWidget::render(const std::optional<Content>& content) {
   m_titleLabel->setText(content->title);
   m_titleLabel->setCursor(content->isRecognized ? Qt::PointingHandCursor : Qt::ArrowCursor);
 
-  m_detailsLabel->setText(
-      u"%1 · Episode %2"_s.arg(content->isPlaying ? u"Watching"_s : u"Watched"_s)
-          .arg(content->progress));
+  auto details = u"%1 · Episode %2"_s.arg(content->isPlaying ? u"Watching"_s : u"Watched"_s)
+                     .arg(content->progress);
+  if (!content->episodeTitle.isEmpty()) details += u" · "_s + content->episodeTitle;
+  m_detailsLabel->setText(details);
 
   const QString iconName = content->isRecognized ? "check_circle" : "error";
   m_iconLabel->setPixmap(theme.getIcon(iconName).pixmap(QSize(16, 16)));
