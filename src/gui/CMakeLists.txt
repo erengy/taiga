@@ -23,6 +23,8 @@ target_sources(taiga-gui PRIVATE
 	common/combobox.hpp
 	common/page_widget.cpp
 	common/page_widget.hpp
+	common/poster_widget.cpp
+	common/poster_widget.hpp
 	common/spinner_widget.cpp
 	common/spinner_widget.hpp
 

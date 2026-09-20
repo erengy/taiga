@@ -20,10 +20,12 @@
 
 #include <QFrame>
 #include <QLabel>
+#include <QPixmap>
 #include <QPushButton>
 #include <optional>
 
 #include "gui/common/clickable_label.hpp"
+#include "gui/common/poster_widget.hpp"
 #include "media/anime.hpp"
 #include "track/episode.hpp"
 #include "track/update_state.hpp"
@@ -48,6 +50,8 @@ private:
     QString details;
     bool isPlaying = false;
     bool isRecognized = false;
+    QPixmap poster;
+    bool isPosterLoading = false;
     track::UpdateState updateState;
   };
 
@@ -55,7 +59,7 @@ private:
   void render(const std::optional<Content>& content);
   void updateVisibility();
 
-  QLabel* m_posterLabel = nullptr;
+  PosterWidget* m_posterWidget = nullptr;
   ClickableLabel* m_titleLabel = nullptr;
   ClickableLabel* m_detailsLabel = nullptr;
   QLabel* m_iconLabel = nullptr;

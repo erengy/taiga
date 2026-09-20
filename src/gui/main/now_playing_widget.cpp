@@ -29,6 +29,7 @@
 #include "gui/media/media_dialog.hpp"
 #include "gui/media/media_menu.hpp"
 #include "gui/utils/format.hpp"
+#include "gui/utils/image_provider.hpp"
 #include "gui/utils/theme.hpp"
 #include "media/anime_db.hpp"
 #include "media/anime_list.hpp"
@@ -43,6 +44,7 @@ namespace {
 
 constexpr int kPosterHeight = 64;
 constexpr int kPosterWidth = kPosterHeight * 2 / 3;
+constexpr int kPosterCornerRadius = 4;
 constexpr int kHorizontalMargin = 16;
 constexpr int kVerticalMargin = 12;
 constexpr int kSpacing = 12;
@@ -134,9 +136,10 @@ NowPlayingWidget::NowPlayingWidget(QWidget* parent) : QFrame(parent) {
   layout->setSpacing(kSpacing);
 
   // Poster
-  m_posterLabel = new QLabel(this);
-  m_posterLabel->setFixedSize(kPosterWidth, kPosterHeight);
-  layout->addWidget(m_posterLabel);
+  m_posterWidget = new PosterWidget(this);
+  m_posterWidget->setFixedSize(kPosterWidth, kPosterHeight);
+  m_posterWidget->setCornerRadius(kPosterCornerRadius);
+  layout->addWidget(m_posterWidget);
 
   // Text
   const auto textLayout = new QVBoxLayout();
@@ -206,6 +209,14 @@ NowPlayingWidget::NowPlayingWidget(QWidget* parent) : QFrame(parent) {
 
   refresh();
 
+  connect(&anime::db, &anime::Database::itemUpdated, this, [this](const int id) {
+    if (!m_anime || m_anime->id != id) return;
+    if (const auto item = anime::db.item(id)) m_anime = *item;
+    refresh();
+  });
+  connect(&imageProvider, &ImageProvider::posterChanged, this, [this](const int id) {
+    if (m_anime && m_anime->id == id) refresh();
+  });
   connect(track::updateSession(), &track::UpdateSession::stateChanged, this, [this]() {
     refresh();
     updateVisibility();
@@ -272,12 +283,17 @@ void NowPlayingWidget::refresh() {
       formatEpisodeNumbers(m_episode->elements(anitomy::ElementKind::Episode));
   const auto episodeCount = formatNumber(m_anime ? m_anime->episode_count : 0, "?");
 
+  QPixmap poster;
+  if (m_anime) poster = imageProvider.loadPoster(m_anime->id);
+
   render(Content{
       .title = QString::fromStdString(title),
       .progress = u"%1/%2"_s.arg(episodeNumber).arg(episodeCount),
       .details = lines.join("<br>"),
       .isPlaying = track::media::detection()->getCurrentEpisode().has_value(),
       .isRecognized = m_anime.has_value(),
+      .poster = poster,
+      .isPosterLoading = m_anime && poster.isNull() && !m_anime->image_url.empty(),
       .updateState = track::updateSession()->state(),
   });
 }
@@ -285,6 +301,8 @@ void NowPlayingWidget::refresh() {
 void NowPlayingWidget::render(const std::optional<Content>& content) {
   if (!content) {
     setToolTip({});
+    m_posterWidget->setPixmap({});
+    m_posterWidget->setLoading(false);
     m_titleLabel->setText({});
     m_detailsLabel->setText({});
     m_iconLabel->clear();
@@ -294,6 +312,9 @@ void NowPlayingWidget::render(const std::optional<Content>& content) {
   }
 
   setToolTip(content->details);
+
+  m_posterWidget->setPixmap(content->poster);
+  m_posterWidget->setLoading(content->isPosterLoading);
 
   m_titleLabel->setText(content->title);
   m_titleLabel->setCursor(content->isRecognized ? Qt::PointingHandCursor : Qt::ArrowCursor);
