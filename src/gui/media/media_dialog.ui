@@ -525,6 +525,9 @@
                 </property>
                 <item>
                  <widget class="QLabel" name="labelTorrentTitle">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
                   <property name="text">
                    <string>Torrent search:</string>
                   </property>
@@ -532,6 +535,9 @@
                 </item>
                 <item>
                  <widget class="QLineEdit" name="torrentTitle">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
                   <property name="text">
                    <string/>
                   </property>

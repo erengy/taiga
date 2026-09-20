@@ -648,7 +648,8 @@ void MediaMenu::addTorrentsItems() {
   if (isBatch()) return;
 
   // Torrents
-  addAction(theme.getIcon("rss_feed"), tr("Torrents"), this, &MediaMenu::torrents);
+  addAction(theme.getIcon("rss_feed"), tr("Torrents"), this, &MediaMenu::torrents)
+      ->setDisabled(true);  // placeholder
 }
 
 void MediaMenu::addMetaItems() {

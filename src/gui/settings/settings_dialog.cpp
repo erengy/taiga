@@ -51,12 +51,14 @@ SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::S
     item->setIcon(0, theme.getIcon(icon));
     item->setSizeHint(0, QSize{0, 24});
     item->setData(0, kPageRole, QVariant::fromValue(page));
+    if (!page) item->setDisabled(true);
     return item;
   };
 
   const auto add_child = [this](QTreeWidgetItem* parent, QString text, QWidget* page = nullptr) {
     auto item = new QTreeWidgetItem(parent, QStringList(text));
     item->setData(0, kPageRole, QVariant::fromValue(page));
+    if (!page) item->setDisabled(true);
   };
 
   add_item("account_circle", "Accounts", ui_->accountsPage);
