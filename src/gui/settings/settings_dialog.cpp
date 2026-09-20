@@ -21,6 +21,7 @@
 #include "base/string.hpp"
 #include "gui/settings/settings_page_application.hpp"
 #include "gui/settings/settings_page_library.hpp"
+#include "gui/settings/settings_page_media_players.hpp"
 #include "gui/settings/settings_page_recognition.hpp"
 #include "gui/utils/theme.hpp"
 #include "ui_settings_dialog.h"
@@ -50,8 +51,9 @@ SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::S
     return item;
   };
 
-  const auto add_child = [this](QTreeWidgetItem* parent, QString text) {
-    new QTreeWidgetItem(parent, QStringList(text));
+  const auto add_child = [this](QTreeWidgetItem* parent, QString text, QWidget* page = nullptr) {
+    auto item = new QTreeWidgetItem(parent, QStringList(text));
+    item->setData(0, kPageRole, QVariant::fromValue(page));
   };
 
   add_item("account_circle", "Accounts");
@@ -60,7 +62,7 @@ SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::S
   add_item("folder", "Library", ui_->libraryPage);
   {
     auto item = add_item("check_circle", "Recognition", ui_->recognitionPage);
-    add_child(item, "Media players");
+    add_child(item, "Media players", ui_->mediaPlayersPage);
     add_child(item, "Streaming");
   }
   {
@@ -100,6 +102,7 @@ SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::S
   pages_ = {
       new SettingsPageApplication(ui_, this),
       new SettingsPageLibrary(ui_, this),
+      new SettingsPageMediaPlayers(ui_, this),
       new SettingsPageRecognition(ui_, this),
   };
   for (auto page : pages_) {

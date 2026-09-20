@@ -83,6 +83,8 @@ target_sources(taiga-gui PRIVATE
 	settings/settings_page_application.hpp
 	settings/settings_page_library.cpp
 	settings/settings_page_library.hpp
+	settings/settings_page_media_players.cpp
+	settings/settings_page_media_players.hpp
 	settings/settings_page_recognition.cpp
 	settings/settings_page_recognition.hpp
 

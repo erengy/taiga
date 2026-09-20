@@ -359,6 +359,30 @@
            </item>
           </layout>
          </widget>
+         <widget class="QWidget" name="mediaPlayersPage">
+          <layout class="QVBoxLayout" name="verticalLayout_9">
+           <item>
+            <widget class="QLabel" name="mediaPlayersLabel">
+             <property name="text">
+              <string>Detect the following media players:</string>
+             </property>
+             <property name="buddy">
+              <cstring>mediaPlayersList</cstring>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QListWidget" name="mediaPlayersList">
+             <property name="alternatingRowColors">
+              <bool>true</bool>
+             </property>
+             <property name="selectionMode">
+              <enum>QAbstractItemView::NoSelection</enum>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
         </widget>
        </item>
       </layout>
