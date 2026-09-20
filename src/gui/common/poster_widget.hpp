@@ -35,6 +35,7 @@ public:
   ~PosterWidget() = default;
 
   void setCornerRadius(const qreal radius);
+  void setSpinnerSize(const int size);
   void setPixmap(const QPixmap& pixmap);
   void setLoading(const bool loading);
 
@@ -47,6 +48,8 @@ protected:
   void resizeEvent(QResizeEvent* event) override;
 
 private:
+  void positionSpinner();
+
   qreal m_cornerRadius = 0;
   QPixmap m_pixmap;
   QPixmap m_scaledPixmap;

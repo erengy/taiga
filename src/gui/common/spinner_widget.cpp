@@ -26,13 +26,17 @@
 namespace gui {
 
 SpinnerWidget::SpinnerWidget(QWidget* parent, int size) : QLabel(parent) {
+  setSize(size);
+  hide();
+
+  connect(&m_timer, &QTimer::timeout, this, &SpinnerWidget::advance);
+}
+
+void SpinnerWidget::setSize(int size) {
   setFixedSize(size, size);
 
   m_basePixmap = theme.getIcon("progress_activity").pixmap(QSize(size, size));
   setPixmap(m_basePixmap);
-  hide();
-
-  connect(&m_timer, &QTimer::timeout, this, &SpinnerWidget::advance);
 }
 
 void SpinnerWidget::start() {

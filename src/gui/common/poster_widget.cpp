@@ -27,10 +27,10 @@
 
 namespace gui {
 
-constexpr int kSpinnerSize = 20;
+constexpr int kDefaultSpinnerSize = 24;
 
 PosterWidget::PosterWidget(QWidget* parent) : QWidget(parent) {
-  m_spinner = new SpinnerWidget(this, kSpinnerSize);
+  m_spinner = new SpinnerWidget(this, kDefaultSpinnerSize);
 }
 
 void PosterWidget::setCornerRadius(const qreal radius) {
@@ -48,6 +48,11 @@ void PosterWidget::setPixmap(const QPixmap& pixmap) {
   m_scaledPixmap = QPixmap{};
 
   update();
+}
+
+void PosterWidget::setSpinnerSize(const int size) {
+  m_spinner->setSize(size);
+  positionSpinner();
 }
 
 void PosterWidget::setLoading(const bool loading) {
@@ -99,6 +104,10 @@ void PosterWidget::paintEvent(QPaintEvent*) {
 }
 
 void PosterWidget::resizeEvent(QResizeEvent*) {
+  positionSpinner();
+}
+
+void PosterWidget::positionSpinner() {
   m_spinner->move((width() - m_spinner->width()) / 2, (height() - m_spinner->height()) / 2);
 }
 

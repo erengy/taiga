@@ -48,6 +48,7 @@ namespace {
 constexpr int kPosterHeight = 64;
 constexpr int kPosterWidth = kPosterHeight * 2 / 3;
 constexpr int kPosterCornerRadius = 4;
+constexpr int kPosterSpinnerSize = 20;
 constexpr int kHorizontalMargin = 16;
 constexpr int kVerticalMargin = 12;
 constexpr int kSpacing = 12;
@@ -165,6 +166,7 @@ NowPlayingWidget::NowPlayingWidget(QWidget* parent) : QFrame(parent) {
   m_posterWidget = new PosterWidget(this);
   m_posterWidget->setFixedSize(kPosterWidth, kPosterHeight);
   m_posterWidget->setCornerRadius(kPosterCornerRadius);
+  m_posterWidget->setSpinnerSize(kPosterSpinnerSize);
   layout->addWidget(m_posterWidget);
   connect(m_posterWidget, &PosterWidget::clicked, this, [this](Qt::MouseButton button) {
     if (button == Qt::MouseButton::LeftButton && m_anime) {
