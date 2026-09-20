@@ -34,6 +34,8 @@ public:
   explicit PosterWidget(QWidget* parent = nullptr);
   ~PosterWidget() = default;
 
+  const QPixmap& pixmap() const;
+
   void setCornerRadius(const qreal radius);
   void setSpinnerSize(const int size);
   void setPixmap(const QPixmap& pixmap);

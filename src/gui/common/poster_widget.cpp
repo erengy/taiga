@@ -33,6 +33,10 @@ PosterWidget::PosterWidget(QWidget* parent) : QWidget(parent) {
   m_spinner = new SpinnerWidget(this, kDefaultSpinnerSize);
 }
 
+const QPixmap& PosterWidget::pixmap() const {
+  return m_pixmap;
+}
+
 void PosterWidget::setCornerRadius(const qreal radius) {
   if (radius == m_cornerRadius) return;
 

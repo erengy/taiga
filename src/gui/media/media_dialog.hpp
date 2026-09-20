@@ -34,8 +34,6 @@ class MediaDialog;
 
 namespace gui {
 
-class SpinnerWidget;
-
 enum class MediaDialogPage {
   Details,
   List,
@@ -71,7 +69,6 @@ private:
   void resizePosterImage();
 
   Ui::MediaDialog* ui_ = nullptr;
-  SpinnerWidget* posterSpinner_ = nullptr;
 
   Anime m_anime;
   std::optional<ListEntry> m_entry;

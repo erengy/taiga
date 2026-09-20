@@ -71,9 +71,3 @@ QTreeView#libraryView::item:selected:!active {
 QStatusBar {
   border-top-color: rgba(255, 255, 255, 16%);
 }
-
-/* Media dialog */
-
-#posterLabel {
-  background-color: rgba(0, 0, 0, 30%);
-}

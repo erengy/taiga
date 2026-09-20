@@ -25,7 +25,7 @@
 #include <algorithm>
 
 #include "base/string.hpp"
-#include "gui/common/spinner_widget.hpp"
+#include "gui/common/poster_widget.hpp"
 #include "gui/utils/format.hpp"
 #include "gui/utils/image_provider.hpp"
 #include "gui/utils/rating.hpp"
@@ -57,11 +57,8 @@ MediaDialog::MediaDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::MediaDi
     centerWidgetToScreen(this);
   }
 
-  ui_->posterLabel->setFrameShape(QFrame::Shape::NoFrame);
-
-  posterSpinner_ = new SpinnerWidget(ui_->posterLabel, 24);
-
-  ui_->splitter->setSizes({ui_->posterLabel->minimumWidth(), ui_->posterLabel->minimumWidth() * 4});
+  ui_->splitter->setSizes(
+      {ui_->posterWidget->minimumWidth(), ui_->posterWidget->minimumWidth() * 4});
   if (const auto state = taiga::session.mediaDialogSplitterState(); !state.isEmpty()) {
     ui_->splitter->restoreState(state);
   }
@@ -95,7 +92,7 @@ MediaDialog::MediaDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::MediaDi
     initList();
   });
 
-  connect(ui_->posterLabel, &ClickableLabel::clicked, this, [this](Qt::MouseButton button) {
+  connect(ui_->posterWidget, &PosterWidget::clicked, this, [this](Qt::MouseButton button) {
     if (button == Qt::MouseButton::LeftButton) {
       QUrl url{sync::animePageUrl(m_anime.id)};
       QDesktopServices::openUrl(url);
@@ -398,31 +395,23 @@ void MediaDialog::initSettings() {
 
 void MediaDialog::loadPosterImage() {
   const auto posterPixmap = imageProvider.loadPoster(m_anime.id);
-  ui_->posterLabel->setPixmap(posterPixmap);
+  ui_->posterWidget->setPixmap(posterPixmap);
+  ui_->posterWidget->setLoading(posterPixmap.isNull() && !m_anime.image_url.empty());
   resizePosterImage();
-
-  if (posterPixmap.isNull()) {
-    posterSpinner_->start();
-  } else {
-    posterSpinner_->stop();
-  }
 }
 
 void MediaDialog::resizePosterImage() {
-  const auto& posterPixmap = ui_->posterLabel->pixmap();
-  const int label_w = ui_->posterLabel->width();
+  const auto& posterPixmap = ui_->posterWidget->pixmap();
+  const int width = ui_->posterWidget->width();
 
   if (posterPixmap.isNull()) {
-    ui_->posterLabel->setFixedHeight(label_w * 3 / 2);
+    ui_->posterWidget->setFixedHeight(width * 3 / 2);
   } else {
     const int w = posterPixmap.width();
     const int h = posterPixmap.height();
-    const int height = h * (label_w / static_cast<float>(w));
-    ui_->posterLabel->setFixedHeight(height);
+    const int height = h * (width / static_cast<float>(w));
+    ui_->posterWidget->setFixedHeight(height);
   }
-
-  posterSpinner_->move((ui_->posterLabel->width() - posterSpinner_->width()) / 2,
-                       (ui_->posterLabel->height() - posterSpinner_->height()) / 2);
 }
 
 void MediaDialog::accept() {

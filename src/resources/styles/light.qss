@@ -71,9 +71,3 @@ QTreeView#animeList::item:selected:!active {
 QStatusBar {
   border-top-color: rgba(0, 0, 0, 16%);
 }
-
-/* Media dialog */
-
-#posterLabel {
-  background-color: rgba(255, 255, 255, 30%);
-}

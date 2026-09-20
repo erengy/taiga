@@ -46,7 +46,7 @@
         <enum>QLayout::SizeConstraint::SetMaximumSize</enum>
        </property>
        <item>
-        <widget class="gui::ClickableLabel" name="posterLabel">
+        <widget class="gui::PosterWidget" name="posterWidget">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -67,9 +67,6 @@
          </property>
          <property name="cursor">
           <cursorShape>PointingHandCursor</cursorShape>
-         </property>
-         <property name="scaledContents">
-          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -624,9 +621,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>gui::ClickableLabel</class>
-   <extends>QLabel</extends>
-   <header>gui/common/clickable_label.hpp</header>
+   <class>gui::PosterWidget</class>
+   <extends>QWidget</extends>
+   <header>gui/common/poster_widget.hpp</header>
   </customwidget>
  </customwidgets>
  <tabstops>
