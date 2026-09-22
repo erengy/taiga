@@ -19,6 +19,7 @@
 #pragma once
 
 #include <QString>
+#include <ctime>
 #include <optional>
 
 class QJsonValue;
