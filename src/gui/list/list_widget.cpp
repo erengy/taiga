@@ -191,7 +191,8 @@ void ListWidget::initViewMenu() {
 void ListWidget::initMoreMenu() {
   m_moreMenu->clear();
 
-  constexpr auto export_as = [](QWidget* parent, const QString& extension, auto export_function) {
+  static constexpr auto export_as = [](QWidget* parent, const QString& extension,
+                                       auto export_function) {
     const auto directory = QFileDialog::getExistingDirectory(
         parent, tr("Select Export Location"), {},
         QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks | QFileDialog::ReadOnly);

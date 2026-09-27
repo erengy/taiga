@@ -39,6 +39,7 @@ struct MediaFields {
   std::string url;
 };
 
+#ifdef Q_OS_WINDOWS
 anisthesia::Media flattenMedia(const anisthesia::win::Result& result) {
   anisthesia::Media media;
 
@@ -48,6 +49,7 @@ anisthesia::Media flattenMedia(const anisthesia::win::Result& result) {
 
   return media;
 }
+#endif
 
 MediaFields extractMediaFields(const anisthesia::Media& media) {
   MediaFields fields;

@@ -208,7 +208,7 @@ void Service::deleteListEntry(const int id) {
 
   const QJsonDocument data{{
       {"query", gql("DeleteMediaListEntry")},
-      {"variables", QJsonObject{{"id", listEntry->id}}},
+      {"variables", QJsonObject{{"id", static_cast<qint64>(listEntry->id)}}},
   }};
 
   const auto callback = [this](QRestReply& reply) {
@@ -234,7 +234,7 @@ void Service::updateListEntry(const int id, const anime::list::Fields dirty) {
   };
 
   if (listEntry->id != anime::list::kUnknownId) {
-    variables["id"] = listEntry->id;
+    variables["id"] = static_cast<qint64>(listEntry->id);
   }
 
   using anime::list::Field;
