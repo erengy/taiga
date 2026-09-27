@@ -42,6 +42,7 @@ public:
   static QColor warningColor();
 
 private:
+  void applyStylesheet() const;
   QString readStylesheet(const QString& name) const;
 
   QHash<QString, QIcon> m_icons;
