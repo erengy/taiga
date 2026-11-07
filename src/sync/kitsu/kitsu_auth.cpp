@@ -28,6 +28,7 @@
 #include "sync/kitsu/kitsu_error.hpp"
 #include "sync/kitsu/kitsu_utils.hpp"
 #include "taiga/accounts.hpp"
+#include "taiga/network.hpp"
 
 namespace sync::kitsu {
 
@@ -46,13 +47,13 @@ void Service::authenticateUser() {
 
   // Resource Owner Password Credentials Grant
   // https://tools.ietf.org/html/rfc6749#section-4.3
-  const QUrlQuery body{{
+  const taiga::NameValuePairs body{
       {"grant_type", "password"},
       {"username", QString::fromStdString(username)},
       {"password", QString::fromStdString(taiga::accounts.kitsuPassword())},
       {"client_id", kClientId},
       {"client_secret", kClientSecret},
-  }};
+  };
 
   const auto callback = [this](QRestReply& reply) {
     if (isError(reply)) {
@@ -79,7 +80,7 @@ void Service::authenticateUser() {
     resolveUser();
   };
 
-  manager_.post(request, formUrlEncode(body), this, callback);
+  manager_.post(request, taiga::formUrlEncode(body), this, callback);
 }
 
 void Service::refreshAccessToken(std::function<void()> onSuccess) {
@@ -94,12 +95,12 @@ void Service::refreshAccessToken(std::function<void()> onSuccess) {
   QNetworkRequest request{QUrl{kTokenUrl}};
   request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
 
-  const QUrlQuery body{{
+  const taiga::NameValuePairs body{
       {"grant_type", "refresh_token"},
       {"refresh_token", QString::fromStdString(refreshToken)},
       {"client_id", kClientId},
       {"client_secret", kClientSecret},
-  }};
+  };
 
   const auto callback = [this, onSuccess](QRestReply& reply) {
     if (isError(reply)) {
@@ -124,7 +125,7 @@ void Service::refreshAccessToken(std::function<void()> onSuccess) {
     if (onSuccess) onSuccess();
   };
 
-  manager_.post(request, formUrlEncode(body), this, callback);
+  manager_.post(request, taiga::formUrlEncode(body), this, callback);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

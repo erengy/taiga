@@ -33,6 +33,7 @@
 #include "sync/myanimelist/myanimelist_utils.hpp"
 #include "sync/queue.hpp"
 #include "taiga/accounts.hpp"
+#include "taiga/network.hpp"
 
 // MyAnimeList API documentation:
 // https://myanimelist.net/apiconfig/references/api/v2
@@ -231,29 +232,29 @@ void Service::updateListEntry(const int id, const anime::list::Fields dirty) {
 
   using anime::list::Field;
 
-  QUrlQuery body;
+  taiga::NameValuePairs body;
   if (dirty & Field::Episode) {
-    body.addQueryItem(u"num_watched_episodes"_s, QString::number(listEntry->watched_episodes));
+    body.emplaceBack(u"num_watched_episodes"_s, QString::number(listEntry->watched_episodes));
   }
   if (dirty & (Field::Status | Field::Rewatching)) {
-    body.addQueryItem(u"status"_s, fromListStatus(listEntry->status));
-    body.addQueryItem(u"is_rewatching"_s, listEntry->rewatching ? u"true"_s : u"false"_s);
+    body.emplaceBack(u"status"_s, fromListStatus(listEntry->status));
+    body.emplaceBack(u"is_rewatching"_s, listEntry->rewatching ? u"true"_s : u"false"_s);
   }
   if (dirty & Field::Score) {
-    body.addQueryItem(u"score"_s, QString::number(fromListScore(listEntry->score)));
+    body.emplaceBack(u"score"_s, QString::number(fromListScore(listEntry->score)));
   }
   if (dirty & Field::RewatchedTimes) {
-    body.addQueryItem(u"num_times_rewatched"_s, QString::number(listEntry->rewatched_times));
+    body.emplaceBack(u"num_times_rewatched"_s, QString::number(listEntry->rewatched_times));
   }
   if (dirty & Field::DateStarted) {
-    body.addQueryItem(u"start_date"_s, QString::fromStdString(listEntry->date_started.to_string()));
+    body.emplaceBack(u"start_date"_s, QString::fromStdString(listEntry->date_started.to_string()));
   }
   if (dirty & Field::DateCompleted) {
-    body.addQueryItem(u"finish_date"_s,
-                      QString::fromStdString(listEntry->date_completed.to_string()));
+    body.emplaceBack(u"finish_date"_s,
+                     QString::fromStdString(listEntry->date_completed.to_string()));
   }
   if (dirty & Field::Notes) {
-    body.addQueryItem(u"comments"_s, QString::fromStdString(listEntry->notes));
+    body.emplaceBack(u"comments"_s, QString::fromStdString(listEntry->notes));
   }
 
   auto request = api_.createRequest(u"/anime/%1/my_list_status"_s.arg(id));
@@ -282,7 +283,7 @@ void Service::updateListEntry(const int id, const anime::list::Fields dirty) {
     }
   };
 
-  manager_.patch(request, formUrlEncode(body), this, callback);
+  manager_.patch(request, taiga::formUrlEncode(body), this, callback);
 }
 
 }  // namespace sync::myanimelist

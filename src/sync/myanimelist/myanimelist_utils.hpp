@@ -18,13 +18,11 @@
 
 #pragma once
 
-#include <QByteArray>
 #include <QString>
 #include <optional>
 #include <string>
 
 class QJsonObject;
-class QUrlQuery;
 
 namespace anime {
 enum class SeasonName;
@@ -42,7 +40,6 @@ QString fromSeasonName(const anime::SeasonName name);
 
 QString animeFields();
 QString listStatusFields();
-QByteArray formUrlEncode(const QUrlQuery& query);
 std::optional<int> pagingOffset(const QJsonObject& paging, const QString& key);
 
 std::string animePageUrl(const int id);

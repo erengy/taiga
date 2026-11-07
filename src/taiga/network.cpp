@@ -21,6 +21,7 @@
 #include <QNetworkProxy>
 #include <QNetworkReply>
 #include <QRestReply>
+#include <QUrl>
 
 #include "base/log.hpp"
 #include "base/string.hpp"
@@ -83,6 +84,17 @@ QHttpHeaders NetworkAccessManager::commonHeaders() {
   headers.append(QHttpHeaders::WellKnownHeader::UserAgent, userAgentString());
 
   return headers;
+}
+
+QByteArray formUrlEncode(const NameValuePairs& pairs) {
+  // Unlike `QUrlQuery`, this encodes `+` (decoded as space otherwise) and keeps `%XX` sequences
+  // in values literal.
+  QByteArray result;
+  for (const auto& [name, value] : pairs) {
+    if (!result.isEmpty()) result += '&';
+    result += QUrl::toPercentEncoding(name) + '=' + QUrl::toPercentEncoding(value);
+  }
+  return result;
 }
 
 bool isDdosProtectionActive(const QRestReply& reply) {
