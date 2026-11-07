@@ -18,7 +18,6 @@
 
 #include "now_playing_widget.hpp"
 
-#include <QApplication>
 #include <QBoxLayout>
 #include <QDesktopServices>
 #include <QLabel>
@@ -265,6 +264,11 @@ NowPlayingWidget::NowPlayingWidget(QWidget* parent) : QFrame(parent) {
           });
 }
 
+void NowPlayingWidget::changeEvent(QEvent* event) {
+  if (event->type() == QEvent::PaletteChange && m_episode) refresh();
+  QFrame::changeEvent(event);
+}
+
 void NowPlayingWidget::reset() {
   hide();
   m_anime.reset();
@@ -369,7 +373,7 @@ void NowPlayingWidget::render(const std::optional<Content>& content) {
   m_statusLabel->setText(formatUpdateState(content->updateState));
 
   if (const auto color = statusColor(content->updateState); color.isValid()) {
-    auto palette = QApplication::palette();
+    QPalette palette;  // only override text color, inherit the rest
     palette.setColor(QPalette::WindowText, color);
     m_statusLabel->setPalette(palette);
     m_statusLabel->setForegroundRole(QPalette::WindowText);

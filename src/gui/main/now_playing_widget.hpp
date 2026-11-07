@@ -43,6 +43,9 @@ public:
   void reset();
   void setPlaying(track::Episode episode);
 
+protected:
+  void changeEvent(QEvent* event) override;
+
 private:
   struct Content {
     QString title;
