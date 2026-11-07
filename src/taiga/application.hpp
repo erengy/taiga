@@ -35,7 +35,7 @@ class Application final : public QApplication {
   Q_DISABLE_COPY_MOVE(Application)
 
 public:
-  Application(int argc, char* argv[]);
+  Application(int& argc, char* argv[]);
   ~Application() override;
 
   int run();

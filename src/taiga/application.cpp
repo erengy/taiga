@@ -44,7 +44,7 @@
 
 namespace taiga {
 
-Application::Application(int argc, char* argv[])
+Application::Application(int& argc, char* argv[])
     : QApplication(argc, argv), shared_memory_(TAIGA_APP_NAME) {
   setApplicationName("taiga");
   setApplicationDisplayName("Taiga");
@@ -174,7 +174,7 @@ void Application::parseCommandLine() {
   });
 
   // This stops the current process in case of an error (e.g. an unknown option was passed).
-  parser_.process(QApplication::arguments());
+  parser_.process(QCoreApplication::arguments());
 
 #ifdef _DEBUG
   options_.debug = true;
