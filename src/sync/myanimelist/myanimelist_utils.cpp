@@ -96,7 +96,8 @@ QString listStatusFields() {
 }
 
 QByteArray formUrlEncode(const QUrlQuery& query) {
-  return query.toString(QUrl::FullyEncoded).toUtf8();
+  // QUrlQuery leaves '+' as is, but form decoding treats it as a space
+  return query.toString(QUrl::FullyEncoded).replace(u'+', u"%2B"_s).toUtf8();
 }
 
 std::optional<int> pagingOffset(const QJsonObject& paging, const QString& key) {
