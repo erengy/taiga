@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <QColor>
 #include <QIconEngine>
 
 namespace gui {
@@ -41,6 +42,7 @@ private:
   const QString m_iconName;
   QPixmap m_pixmap;
   quint64 m_cacheKey{};
+  QColor m_color;
 };
 
 }  // namespace gui

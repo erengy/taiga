@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -54,25 +54,28 @@ QPixmap SvgIconEngine::scaledPixmap(const QSize& size, QIcon::Mode mode, QIcon::
                                     qreal scale) {
   const quint64 cacheKey = (static_cast<quint64>(mode) << 32) | state;
 
-  if (cacheKey != m_cacheKey || m_pixmap.size() != size || m_pixmap.devicePixelRatio() != scale) {
+  // Resolved on every call, so that icons follow palette changes (e.g. color scheme)
+  const QColor color = [mode]() {
+    QPalette palette;
+    switch (mode) {
+      default:
+      case QIcon::Normal:
+        return palette.color(QPalette::Normal, QPalette::Text);
+      case QIcon::Disabled:
+        return palette.color(QPalette::Disabled, QPalette::Text);
+      case QIcon::Active:
+        return palette.color(QPalette::Active, QPalette::Text);
+      case QIcon::Selected:
+        return palette.color(QPalette::Active, QPalette::HighlightedText);
+    }
+  }();
+
+  if (cacheKey != m_cacheKey || color != m_color || m_pixmap.size() != size ||
+      m_pixmap.devicePixelRatio() != scale) {
     const QRect rect({0, 0}, size);
 
-    const QColor color = [mode]() {
-      QPalette palette;
-      switch (mode) {
-        default:
-        case QIcon::Normal:
-          return palette.color(QPalette::Normal, QPalette::Text);
-        case QIcon::Disabled:
-          return palette.color(QPalette::Disabled, QPalette::Text);
-        case QIcon::Active:
-          return palette.color(QPalette::Active, QPalette::Text);
-        case QIcon::Selected:
-          return palette.color(QPalette::Active, QPalette::HighlightedText);
-      }
-    }();
-
     m_cacheKey = cacheKey;
+    m_color = color;
     m_pixmap = QPixmap(size * scale);
     m_pixmap.fill(Qt::transparent);
     m_pixmap.setDevicePixelRatio(scale);
