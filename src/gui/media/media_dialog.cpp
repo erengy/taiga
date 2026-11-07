@@ -21,6 +21,7 @@
 #include <QDesktopServices>
 #include <QFileDialog>
 #include <QResizeEvent>
+#include <QSignalBlocker>
 #include <QUrl>
 #include <algorithm>
 
@@ -316,7 +317,10 @@ void MediaDialog::initList() {
   ui_->spinRewatches->setValue(m_entry->rewatched_times);
 
   // Rewatching
-  ui_->checkRewatching->setChecked(m_entry->rewatching);
+  {
+    const QSignalBlocker blocker(ui_->checkRewatching);
+    ui_->checkRewatching->setChecked(m_entry->rewatching);
+  }
 
   // Status
   ui_->comboStatus->clear();
