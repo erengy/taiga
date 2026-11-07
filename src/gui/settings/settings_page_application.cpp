@@ -17,8 +17,10 @@
  */
 #include "settings_page_application.hpp"
 
+#include <QApplication>
 #include <QComboBox>
 #include <QStyleFactory>
+#include <QStyleHints>
 #include <algorithm>
 
 #include "taiga/settings.hpp"
@@ -66,8 +68,10 @@ void SettingsPageApplication::load() {
 
 void SettingsPageApplication::apply() const {
   taiga::settings.setAppStyle(ui_->styleComboBox->currentData().toString().toStdString());
-  taiga::settings.setAppColorScheme(
-      static_cast<Qt::ColorScheme>(ui_->colorSchemeComboBox->currentData().toInt()));
+  const auto colorScheme =
+      static_cast<Qt::ColorScheme>(ui_->colorSchemeComboBox->currentData().toInt());
+  taiga::settings.setAppColorScheme(colorScheme);
+  qApp->styleHints()->setColorScheme(colorScheme);
   taiga::settings.setTitleLanguage(
       static_cast<anime::TitleLanguage>(ui_->titleLanguageComboBox->currentData().toInt()));
 }
