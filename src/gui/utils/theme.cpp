@@ -52,8 +52,9 @@ void Theme::initStyle() {
 #ifdef Q_OS_WINDOWS
   if (style.compare("fusion", Qt::CaseInsensitive) == 0) {
     applyStylesheet();
-    connect(qApp->styleHints(), &QStyleHints::colorSchemeChanged, this,
-            [this]() { applyStylesheet(); });
+    connect(
+        qApp->styleHints(), &QStyleHints::colorSchemeChanged, this, [this]() { applyStylesheet(); },
+        Qt::QueuedConnection);
   }
 #endif
 }
