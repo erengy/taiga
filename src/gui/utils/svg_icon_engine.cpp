@@ -70,12 +70,13 @@ QPixmap SvgIconEngine::scaledPixmap(const QSize& size, QIcon::Mode mode, QIcon::
     }
   }();
 
-  if (cacheKey != m_cacheKey || color != m_color || m_pixmap.size() != size ||
+  if (cacheKey != m_cacheKey || color != m_color || size != m_size ||
       m_pixmap.devicePixelRatio() != scale) {
     const QRect rect({0, 0}, size);
 
     m_cacheKey = cacheKey;
     m_color = color;
+    m_size = size;
     m_pixmap = QPixmap(size * scale);
     m_pixmap.fill(Qt::transparent);
     m_pixmap.setDevicePixelRatio(scale);

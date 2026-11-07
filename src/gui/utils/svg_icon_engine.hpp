@@ -43,6 +43,7 @@ private:
   QPixmap m_pixmap;
   quint64 m_cacheKey{};
   QColor m_color;
+  QSize m_size;
 };
 
 }  // namespace gui
