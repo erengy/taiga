@@ -2,7 +2,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC OFF)
 
-list(APPEND CMAKE_PREFIX_PATH "%QTDIR%/lib/cmake")
+list(APPEND CMAKE_PREFIX_PATH "$ENV{QTDIR}/lib/cmake")
 
 find_package(Qt6 REQUIRED COMPONENTS
 	Concurrent
@@ -16,5 +16,5 @@ find_package(Qt6 REQUIRED COMPONENTS
 )
 
 qt_standard_project_setup(
-	REQUIRES 6.8
+	REQUIRES 6.10
 )
