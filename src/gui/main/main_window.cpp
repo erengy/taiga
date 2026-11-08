@@ -354,6 +354,12 @@ void MainWindow::initToolbar() {
     button->setPopupMode(QToolButton::InstantPopup);
     button->setMenu([this]() {
       auto menu = new QMenu(this);
+      // Can also be changed from the settings dialog
+      connect(menu, &QMenu::aboutToShow, this, [this]() {
+        ui_->actionToggleDetection->setChecked(taiga::settings.detectionEnabled());
+        ui_->actionToggleSharing->setChecked(taiga::settings.sharingEnabled());
+        ui_->actionToggleSynchronization->setChecked(taiga::settings.syncEnabled());
+      });
       menu->addAction(ui_->actionToggleDetection);
       menu->addAction(ui_->actionToggleSharing);
       menu->addAction(ui_->actionToggleSynchronization);
