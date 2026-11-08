@@ -42,6 +42,7 @@ public:
   std::string appStyle() const;
   bool detectionEnabled() const;
   std::vector<std::string> disabledMediaPlayers() const;
+  bool discordEnabled() const;
   std::string service() const;
   std::vector<std::string> libraryFolders() const;
   std::chrono::milliseconds mediaDetectionInterval() const;
@@ -63,6 +64,7 @@ public:
   void setAppStyle(const std::string& style) const;
   void setDetectionEnabled(const bool enabled) const;
   void setDisabledMediaPlayers(std::vector<std::string> players) const;
+  void setDiscordEnabled(const bool enabled) const;
   void setService(const std::string& service) const;
   void setLibraryFolders(std::vector<std::string> folders) const;
   void setMediaDetectionInterval(const std::chrono::milliseconds interval) const;

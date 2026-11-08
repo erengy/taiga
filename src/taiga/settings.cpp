@@ -80,6 +80,10 @@ std::vector<std::string> Settings::disabledMediaPlayers() const {
          std::ranges::to<std::vector>();
 }
 
+bool Settings::discordEnabled() const {
+  return value("sharing.discord.enabled", false).toBool();
+}
+
 std::string Settings::service() const {
   return value("sync.service", sync::serviceSlug(sync::ServiceId::AniList))
       .toString()
@@ -184,6 +188,10 @@ void Settings::setDisabledMediaPlayers(std::vector<std::string> players) const {
       std::views::transform([](const std::string& s) { return QString::fromStdString(s); }) |
       std::ranges::to<QList>();
   setValue("recognition.mediaPlayers.disabled", QJsonArray::fromStringList(list));
+}
+
+void Settings::setDiscordEnabled(const bool enabled) const {
+  setValue("sharing.discord.enabled", enabled);
 }
 
 void Settings::setService(const std::string& service) const {
