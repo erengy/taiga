@@ -21,6 +21,8 @@
 #include <algorithm>
 #include <optional>
 #include <string>
+#include <utility>
+#include <vector>
 
 #include "media/anime.hpp"
 #include "media/anime_db.hpp"
@@ -34,9 +36,14 @@ namespace track::media {
 namespace {
 
 struct MediaFields {
-  std::string file;
+  std::vector<std::string> files;
   std::string title;
   std::string url;
+};
+
+struct ResolvedMedia {
+  Episode episode;
+  std::optional<std::string> file;
 };
 
 #ifdef Q_OS_WINDOWS
@@ -57,7 +64,7 @@ MediaFields extractMediaFields(const anisthesia::Media& media) {
   for (const auto& information : media.information) {
     switch (information.type) {
       case anisthesia::MediaInfoType::File:
-        if (fields.file.empty()) fields.file = information.value;
+        fields.files.push_back(information.value);
         break;
       case anisthesia::MediaInfoType::Url:
         fields.url = information.value;
@@ -77,21 +84,26 @@ MediaFields extractMediaFields(const anisthesia::Media& media) {
   return fields;
 }
 
-std::optional<Episode> resolveEpisode(const MediaFields& fields) {
-  if (!fields.file.empty()) {
-    const QFileInfo fileInfo{QString::fromStdString(fields.file)};
-    auto episode = track::recognition::parseFileInfo(fileInfo);
+std::optional<ResolvedMedia> resolveMedia(const MediaFields& fields) {
+  if (!fields.files.empty()) {
+    // Players may have other files open (e.g. subtitles, external audio tracks,
+    // resource files), so pick the first one that is a video file.
+    for (const auto& file : fields.files) {
+      const QFileInfo fileInfo{QString::fromStdString(file)};
+      auto episode = track::recognition::parseFileInfo(fileInfo);
+      if (track::recognition::isVideoFile(episode)) {
+        return ResolvedMedia{.episode = std::move(episode), .file = file};
+      }
+    }
 
-    if (!track::recognition::isVideoFile(episode)) return std::nullopt;
-
-    return episode;
+    // Files are open, but none of them is a video (e.g. audio files). Don't
+    // fall back to window title, which would describe the same file.
+    return std::nullopt;
   }
 
-  auto value = fields.title;
+  if (fields.title.empty()) return std::nullopt;
 
-  if (value.empty()) return std::nullopt;
-
-  return track::recognition::parse(value);
+  return ResolvedMedia{.episode = track::recognition::parse(fields.title)};
 }
 
 }  // namespace
@@ -106,12 +118,7 @@ const std::optional<Episode> Detection::getCurrentEpisode() const {
 }
 
 const std::optional<std::string> Detection::getCurrentFile() const {
-  if (!currentMedia_) return std::nullopt;
-
-  auto file = extractMediaFields(*currentMedia_).file;
-  if (file.empty()) return std::nullopt;
-
-  return file;
+  return currentFile_;
 }
 
 const std::optional<Detection::media_t> Detection::getCurrentMedia() const {
@@ -176,16 +183,19 @@ void Detection::poll() {
   currentMedia_ = flattenMedia(result);
   currentWindowHandle_ = result.window.handle;
 
-  auto episode = resolveEpisode(extractMediaFields(*currentMedia_));
-  if (!episode) {
+  auto resolved = resolveMedia(extractMediaFields(*currentMedia_));
+  if (!resolved) {
     reset();
     return;
   }
 
-  const auto animeId = track::recognition::identify(*episode);
-  episode->setAnimeId(animeId);
+  currentFile_ = std::move(resolved->file);
+  auto& episode = resolved->episode;
 
-  if (hasEpisodeChanged(*episode)) {
+  const auto animeId = track::recognition::identify(episode);
+  episode.setAnimeId(animeId);
+
+  if (hasEpisodeChanged(episode)) {
     currentEpisode_ = episode;
     emit currentEpisodeChanged(episode);
   }
@@ -214,6 +224,7 @@ void Detection::setCurrentEpisodeAnimeId(int animeId) {
 void Detection::reset() {
   currentPlayer_.reset();
   currentMedia_.reset();
+  currentFile_.reset();
   currentWindowHandle_ = nullptr;
 
   if (currentEpisode_) {
