@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 #pragma once
 
 #include <QSortFilterProxyModel>
+#include <compare>
 #include <optional>
 
 namespace gui {
@@ -55,12 +56,22 @@ public:
   void setListStatusFilter(AnimeListStatusFilter filter);
   void setTextFilter(const QString& text);
 
+  int secondarySortColumn() const;
+  Qt::SortOrder secondarySortOrder() const;
+  void setSecondarySort(int column, Qt::SortOrder order);
+
+  void sort(int column, Qt::SortOrder order = Qt::AscendingOrder) override;
+
 protected:
   bool filterAcceptsRow(int row, const QModelIndex& parent) const override;
   bool lessThan(const QModelIndex& lhs, const QModelIndex& rhs) const override;
 
 private:
+  std::partial_ordering compare(const QModelIndex& lhs, const QModelIndex& rhs, int column) const;
+
   AnimeListProxyModelFilter m_filter;
+  int m_secondarySortColumn = -1;
+  Qt::SortOrder m_secondarySortOrder = Qt::AscendingOrder;
 };
 
 }  // namespace gui

@@ -161,62 +161,108 @@ bool AnimeListProxyModel::filterAcceptsRow(int row, const QModelIndex& parent) c
   return true;
 }
 
+int AnimeListProxyModel::secondarySortColumn() const {
+  return m_secondarySortColumn;
+}
+
+Qt::SortOrder AnimeListProxyModel::secondarySortOrder() const {
+  return m_secondarySortOrder;
+}
+
+void AnimeListProxyModel::setSecondarySort(int column, Qt::SortOrder order) {
+  m_secondarySortColumn = column;
+  m_secondarySortOrder = order;
+}
+
+void AnimeListProxyModel::sort(int column, Qt::SortOrder order) {
+  // The previous primary sort becomes the secondary sort, which orders items
+  // that are equal in the primary comparison.
+  if (sortColumn() > -1 && sortColumn() != column) {
+    setSecondarySort(sortColumn(), sortOrder());
+  }
+
+  QSortFilterProxyModel::sort(column, order);
+}
+
 bool AnimeListProxyModel::lessThan(const QModelIndex& lhs, const QModelIndex& rhs) const {
+  const int primaryColumn = lhs.column();
+
+  if (const auto result = compare(lhs, rhs, primaryColumn); result != 0) {
+    return result < 0;
+  }
+
+  // Qt swaps arguments for descending order, which also flips tie-breakers.
+  const auto compareInOrder = [&](int column, Qt::SortOrder order) {
+    return order == sortOrder() ? compare(lhs, rhs, column) : compare(rhs, lhs, column);
+  };
+
+  if (m_secondarySortColumn > -1 && m_secondarySortColumn != primaryColumn) {
+    const auto result = compareInOrder(m_secondarySortColumn, m_secondarySortOrder);
+    if (result != 0) return result < 0;
+  }
+
+  // Fall back to title, so that the order doesn't depend on the source model.
+  return compareInOrder(AnimeListModel::COLUMN_TITLE, Qt::AscendingOrder) < 0;
+}
+
+std::partial_ordering AnimeListProxyModel::compare(const QModelIndex& lhs, const QModelIndex& rhs,
+                                                   int column) const {
   const auto lhs_anime = getAnime(lhs);
   const auto rhs_anime = getAnime(rhs);
-  if (!lhs_anime || !rhs_anime) return false;
+  if (!lhs_anime || !rhs_anime) return std::partial_ordering::equivalent;
 
   const auto lhs_entry = getListEntry(lhs);
   const auto rhs_entry = getListEntry(rhs);
 
-  switch (lhs.column()) {
+  switch (column) {
     case AnimeListModel::COLUMN_TITLE:
       return compareStrings(anime::preferredTitle(*lhs_anime), anime::preferredTitle(*rhs_anime),
-                            Qt::CaseInsensitive) < 0;
+                            Qt::CaseInsensitive) <=> 0;
 
     case AnimeListModel::COLUMN_DURATION:
-      return lhs_anime->episode_length < rhs_anime->episode_length;
+      return lhs_anime->episode_length <=> rhs_anime->episode_length;
 
     case AnimeListModel::COLUMN_AVERAGE:
-      return lhs_anime->score < rhs_anime->score;
+      return lhs_anime->score <=> rhs_anime->score;
 
     case AnimeListModel::COLUMN_TYPE:
-      return lhs_anime->type < rhs_anime->type;
+      return lhs_anime->type <=> rhs_anime->type;
 
     case AnimeListModel::COLUMN_PROGRESS: {
       const auto lhs_ratio = anime::list::getProgressRatio(lhs_anime, lhs_entry);
       const auto rhs_ratio = anime::list::getProgressRatio(rhs_anime, rhs_entry);
-      if (lhs_ratio != rhs_ratio) return lhs_ratio < rhs_ratio;
-      return anime::estimateEpisodeCount(*lhs_anime, 0) <
+      if (const auto result = lhs_ratio <=> rhs_ratio; result != 0) return result;
+      return anime::estimateEpisodeCount(*lhs_anime, 0) <=>
              anime::estimateEpisodeCount(*rhs_anime, 0);
     }
 
     case AnimeListModel::COLUMN_REWATCHES:
-      return (lhs_entry ? lhs_entry->rewatched_times : 0) <
+      return (lhs_entry ? lhs_entry->rewatched_times : 0) <=>
              (rhs_entry ? rhs_entry->rewatched_times : 0);
 
     case AnimeListModel::COLUMN_SCORE:
-      return (lhs_entry ? lhs_entry->score : 0) < (rhs_entry ? rhs_entry->score : 0);
+      return (lhs_entry ? lhs_entry->score : 0) <=> (rhs_entry ? rhs_entry->score : 0);
 
     case AnimeListModel::COLUMN_SEASON:
-      return lhs_anime->date_started < rhs_anime->date_started;
+      return lhs_anime->date_started <=> rhs_anime->date_started;
 
     case AnimeListModel::COLUMN_STARTED:
-      return (lhs_entry ? lhs_entry->date_started : FuzzyDate{}) <
+      return (lhs_entry ? lhs_entry->date_started : FuzzyDate{}) <=>
              (rhs_entry ? rhs_entry->date_started : FuzzyDate{});
 
     case AnimeListModel::COLUMN_COMPLETED:
-      return (lhs_entry ? lhs_entry->date_completed : FuzzyDate{}) <
+      return (lhs_entry ? lhs_entry->date_completed : FuzzyDate{}) <=>
              (rhs_entry ? rhs_entry->date_completed : FuzzyDate{});
 
     case AnimeListModel::COLUMN_LAST_UPDATED:
-      return (lhs_entry ? lhs_entry->last_updated : 0) < (rhs_entry ? rhs_entry->last_updated : 0);
+      return (lhs_entry ? lhs_entry->last_updated : 0) <=>
+             (rhs_entry ? rhs_entry->last_updated : 0);
 
     case AnimeListModel::COLUMN_NOTES:
-      return (lhs_entry ? lhs_entry->notes : "") < (rhs_entry ? rhs_entry->notes : "");
+      return (lhs_entry ? lhs_entry->notes : "") <=> (rhs_entry ? rhs_entry->notes : "");
   }
 
-  return false;
+  return std::partial_ordering::equivalent;
 }
 
 }  // namespace gui

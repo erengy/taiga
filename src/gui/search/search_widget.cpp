@@ -69,6 +69,8 @@ SearchWidget::SearchWidget(QWidget* parent)
       m_comboListStatus(new ComboBox(this)),
       m_sortMenu(new QMenu(this)),
       m_viewMenu(new QMenu(this)) {
+  m_proxyModel->setSecondarySort(taiga::session.searchListSecondarySortColumn(),
+                                 taiga::session.searchListSecondarySortOrder());
   m_proxyModel->sort(taiga::session.searchListSortColumn(), taiga::session.searchListSortOrder());
   m_proxyModel->setFilters(taiga::session.searchListFilters());
 
@@ -217,6 +219,8 @@ void SearchWidget::saveState() {
   taiga::session.setSearchListFilters(m_proxyModel->filters());
   taiga::session.setSearchListSortColumn(m_proxyModel->sortColumn());
   taiga::session.setSearchListSortOrder(m_proxyModel->sortOrder());
+  taiga::session.setSearchListSecondarySortColumn(m_proxyModel->secondarySortColumn());
+  taiga::session.setSearchListSecondarySortOrder(m_proxyModel->secondarySortOrder());
   taiga::session.setSearchListViewMode(m_viewMode);
 }
 

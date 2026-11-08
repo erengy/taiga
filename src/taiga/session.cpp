@@ -45,6 +45,15 @@ Qt::SortOrder Session::animeListSortOrder() const {
   return value("animeList.sortOrder", Qt::SortOrder::AscendingOrder).value<Qt::SortOrder>();
 }
 
+int Session::animeListSecondarySortColumn() const {
+  return value("animeList.secondarySortColumn", -1).toInt();
+}
+
+Qt::SortOrder Session::animeListSecondarySortOrder() const {
+  return value("animeList.secondarySortOrder", Qt::SortOrder::AscendingOrder)
+      .value<Qt::SortOrder>();
+}
+
 gui::ListViewMode Session::animeListViewMode() const {
   return value("animeList.viewMode", static_cast<int>(gui::ListViewMode::List))
       .value<gui::ListViewMode>();
@@ -98,6 +107,15 @@ Qt::SortOrder Session::searchListSortOrder() const {
   return value("searchList.sortOrder", Qt::SortOrder::DescendingOrder).value<Qt::SortOrder>();
 }
 
+int Session::searchListSecondarySortColumn() const {
+  return value("searchList.secondarySortColumn", -1).toInt();
+}
+
+Qt::SortOrder Session::searchListSecondarySortOrder() const {
+  return value("searchList.secondarySortOrder", Qt::SortOrder::AscendingOrder)
+      .value<Qt::SortOrder>();
+}
+
 gui::ListViewMode Session::searchListViewMode() const {
   return value("searchList.viewMode", static_cast<int>(gui::ListViewMode::Cards))
       .value<gui::ListViewMode>();
@@ -111,6 +129,14 @@ void Session::setAnimeListSortColumn(const int column) const {
 
 void Session::setAnimeListSortOrder(const Qt::SortOrder order) const {
   setValue("animeList.sortOrder", order);
+}
+
+void Session::setAnimeListSecondarySortColumn(const int column) const {
+  setValue("animeList.secondarySortColumn", column);
+}
+
+void Session::setAnimeListSecondarySortOrder(const Qt::SortOrder order) const {
+  setValue("animeList.secondarySortOrder", order);
 }
 
 void Session::setAnimeListViewMode(const gui::ListViewMode mode) const {
@@ -151,6 +177,14 @@ void Session::setSearchListSortColumn(const int column) const {
 
 void Session::setSearchListSortOrder(const Qt::SortOrder order) const {
   setValue("searchList.sortOrder", order);
+}
+
+void Session::setSearchListSecondarySortColumn(const int column) const {
+  setValue("searchList.secondarySortColumn", column);
+}
+
+void Session::setSearchListSecondarySortOrder(const Qt::SortOrder order) const {
+  setValue("searchList.secondarySortOrder", order);
 }
 
 void Session::setSearchListViewMode(const gui::ListViewMode mode) const {

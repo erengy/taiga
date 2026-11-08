@@ -49,6 +49,8 @@ ListWidget::ListWidget(QWidget* parent)
       m_sortMenu(new QMenu(this)),
       m_viewMenu(new QMenu(this)),
       m_moreMenu(new QMenu(this)) {
+  m_proxyModel->setSecondarySort(taiga::session.animeListSecondarySortColumn(),
+                                 taiga::session.animeListSecondarySortOrder());
   m_proxyModel->sort(taiga::session.animeListSortColumn(), taiga::session.animeListSortOrder());
 
   initToolbar();
@@ -103,6 +105,8 @@ void ListWidget::setViewMode(ListViewMode mode) {
 void ListWidget::saveState() {
   taiga::session.setAnimeListSortColumn(m_proxyModel->sortColumn());
   taiga::session.setAnimeListSortOrder(m_proxyModel->sortOrder());
+  taiga::session.setAnimeListSecondarySortColumn(m_proxyModel->secondarySortColumn());
+  taiga::session.setAnimeListSecondarySortOrder(m_proxyModel->secondarySortOrder());
   taiga::session.setAnimeListViewMode(m_viewMode);
 }
 
