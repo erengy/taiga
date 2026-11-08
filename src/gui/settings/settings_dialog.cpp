@@ -25,6 +25,7 @@
 #include "gui/settings/settings_page_library.hpp"
 #include "gui/settings/settings_page_media_players.hpp"
 #include "gui/settings/settings_page_recognition.hpp"
+#include "gui/settings/settings_page_sharing.hpp"
 #include "gui/settings/settings_page_streaming.hpp"
 #include "gui/utils/theme.hpp"
 #include "ui_settings_dialog.h"
@@ -71,7 +72,7 @@ SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::S
     add_child(item, "Streaming", ui_->streamingPage);
   }
   {
-    auto item = add_item("share", "Sharing");
+    auto item = add_item("share", "Sharing", ui_->sharingPage);
     add_child(item, "Discord");
     add_child(item, "HTTP");
     add_child(item, "mIRC");
@@ -112,6 +113,7 @@ SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::S
       new SettingsPageLibrary(ui_, this),
       new SettingsPageMediaPlayers(ui_, this),
       new SettingsPageRecognition(ui_, this),
+      new SettingsPageSharing(ui_, this),
       new SettingsPageStreaming(ui_, this),
       // clang-format on
   };

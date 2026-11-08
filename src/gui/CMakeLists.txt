@@ -91,6 +91,8 @@ target_sources(taiga-gui PRIVATE
 	settings/settings_page_media_players.hpp
 	settings/settings_page_recognition.cpp
 	settings/settings_page_recognition.hpp
+	settings/settings_page_sharing.cpp
+	settings/settings_page_sharing.hpp
 	settings/settings_page_streaming.cpp
 	settings/settings_page_streaming.hpp
 	settings/settings_player_list.cpp

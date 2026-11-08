@@ -119,6 +119,10 @@ std::string Settings::proxyPassword() const {
   return value("network.proxy.password").toString().toStdString();
 }
 
+bool Settings::sharingEnabled() const {
+  return value("sharing.enabled", true).toBool();
+}
+
 bool Settings::streamingMediaEnabled() const {
   return value("recognition.streaming.enabled", false).toBool();
 }
@@ -217,6 +221,10 @@ void Settings::setProxyUsername(const std::string& username) const {
 
 void Settings::setProxyPassword(const std::string& password) const {
   setValue("network.proxy.password", password);
+}
+
+void Settings::setSharingEnabled(const bool enabled) const {
+  setValue("sharing.enabled", enabled);
 }
 
 void Settings::setStreamingMediaEnabled(const bool enabled) const {

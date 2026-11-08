@@ -239,6 +239,12 @@ void parseProgramElement(QXmlStreamReader& xml, const taiga::Settings& settings)
         }
       }
 
+    } else if (xml.name() == u"general") {
+      if (xml.attributes().hasAttribute(u"enablesharing")) {
+        settings.setSharingEnabled(XML_ATTR_BOOL(u"enablesharing"));
+      }
+      xml.skipCurrentElement();
+
     } else if (xml.name() == u"proxy") {
       const auto raw = XML_ATTR(u"host").toString();
       const QUrl url{raw.contains(u"://") ? raw : u"//" + raw};

@@ -136,6 +136,10 @@ void MainWindow::initActions() {
   connect(ui_->actionToggleDetection, &QAction::toggled, this,
           [](const bool checked) { track::media::detection()->setEnabled(checked); });
 
+  ui_->actionToggleSharing->setChecked(taiga::settings.sharingEnabled());
+  connect(ui_->actionToggleSharing, &QAction::toggled, this,
+          [](const bool checked) { taiga::settings.setSharingEnabled(checked); });
+
   ui_->actionToggleSynchronization->setChecked(taiga::settings.syncEnabled());
   connect(ui_->actionToggleSynchronization, &QAction::toggled, this,
           [](const bool checked) { taiga::settings.setSyncEnabled(checked); });

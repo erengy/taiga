@@ -50,6 +50,7 @@ public:
   int proxyPort() const;
   std::string proxyUsername() const;
   std::string proxyPassword() const;
+  bool sharingEnabled() const;
   bool streamingMediaEnabled() const;
   bool syncEnabled() const;
   anime::TitleLanguage titleLanguage() const;
@@ -70,6 +71,7 @@ public:
   void setProxyPort(const int port) const;
   void setProxyUsername(const std::string& username) const;
   void setProxyPassword(const std::string& password) const;
+  void setSharingEnabled(const bool enabled) const;
   void setStreamingMediaEnabled(const bool enabled) const;
   void setSyncEnabled(const bool enabled) const;
   void setTitleLanguage(const anime::TitleLanguage language) const;
