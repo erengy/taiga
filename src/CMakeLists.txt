@@ -47,6 +47,9 @@ target_sources(taiga PRIVATE
 	media/anime_utils.hpp
 	media/anime.hpp
 
+	share/discord_ipc.cpp
+	share/discord_ipc.hpp
+
 	sync/anilist/anilist.cpp
 	sync/anilist/anilist.hpp
 	sync/anilist/anilist_auth.cpp
