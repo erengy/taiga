@@ -20,6 +20,7 @@
 #include <QCheckBox>
 #include <QGroupBox>
 
+#include "share/discord.hpp"
 #include "taiga/settings.hpp"
 #include "ui_settings_dialog.h"
 
@@ -40,6 +41,7 @@ void SettingsPageSharing::load() {
 void SettingsPageSharing::apply() const {
   taiga::settings.setSharingEnabled(ui_->sharingEnabledCheckBox->isChecked());
   taiga::settings.setDiscordEnabled(ui_->discordEnabledCheckBox->isChecked());
+  share::discord::presence()->applySettings();  // settings have no change notifications yet
 }
 
 }  // namespace gui

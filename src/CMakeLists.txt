@@ -47,6 +47,8 @@ target_sources(taiga PRIVATE
 	media/anime_utils.hpp
 	media/anime.hpp
 
+	share/discord.cpp
+	share/discord.hpp
 	share/discord_ipc.cpp
 	share/discord_ipc.hpp
 	share/discord_rpc.cpp
