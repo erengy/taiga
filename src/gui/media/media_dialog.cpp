@@ -189,7 +189,8 @@ void MediaDialog::showEvent(QShowEvent* event) {
 }
 
 void MediaDialog::show(QWidget* parent, MediaDialogPage page, const Anime& anime) {
-  auto* dlg = new MediaDialog(parent);
+  // Parent to the window, so that the dialog doesn't match stylesheet rules meant for the widget.
+  auto* dlg = new MediaDialog(parent ? parent->window() : nullptr);
   dlg->setAttribute(Qt::WA_DeleteOnClose);
   dlg->setAnime(anime);
   dlg->ui_->tabWidget->setCurrentIndex(static_cast<int>(page));
