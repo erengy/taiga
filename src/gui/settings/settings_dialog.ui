@@ -213,6 +213,19 @@
                     </item>
                    </layout>
                   </item>
+                  <item row="2" column="0" colspan="2">
+                   <widget class="QLabel" name="anilistAccountLinkLabel">
+                    <property name="text">
+                     <string>&lt;a href="https://anilist.co/signup"&gt;Create a new AniList account&lt;/a&gt;</string>
+                    </property>
+                    <property name="textFormat">
+                     <enum>Qt::TextFormat::RichText</enum>
+                    </property>
+                    <property name="openExternalLinks">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
                  </layout>
                 </widget>
                </item>
@@ -265,6 +278,19 @@
                     </property>
                    </widget>
                   </item>
+                  <item row="3" column="0" colspan="2">
+                   <widget class="QLabel" name="kitsuAccountLinkLabel">
+                    <property name="text">
+                     <string>&lt;a href="https://kitsu.app"&gt;Create a new Kitsu account&lt;/a&gt; and make sure to &lt;a href="https://kitsu.app/settings/profile"&gt;set your profile URL&lt;/a&gt;</string>
+                    </property>
+                    <property name="textFormat">
+                     <enum>Qt::TextFormat::RichText</enum>
+                    </property>
+                    <property name="openExternalLinks">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
                  </layout>
                 </widget>
                </item>
@@ -307,6 +333,19 @@
                      </widget>
                     </item>
                    </layout>
+                  </item>
+                  <item row="2" column="0" colspan="2">
+                   <widget class="QLabel" name="myanimelistAccountLinkLabel">
+                    <property name="text">
+                     <string>&lt;a href="https://myanimelist.net/register.php"&gt;Create a new MyAnimeList account&lt;/a&gt;</string>
+                    </property>
+                    <property name="textFormat">
+                     <enum>Qt::TextFormat::RichText</enum>
+                    </property>
+                    <property name="openExternalLinks">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
                   </item>
                  </layout>
                 </widget>
