@@ -20,6 +20,7 @@
 
 #include <chrono>
 
+#include "media/anime.hpp"
 #include "track/update_decision.hpp"
 
 namespace track {
@@ -38,6 +39,7 @@ struct UpdateState {
   Phase phase = Phase::Idle;
   UpdateDecision::Reason reason = UpdateDecision::Reason::None;
   std::chrono::seconds remaining{0};
+  int animeId = anime::kUnknownId;
   int episode = 0;
   int previousEpisode = 0;
   bool paused = false;  // countdown is not running, because media player is not in focus

@@ -165,6 +165,7 @@ void UpdateSession::evaluate() {
 
   UpdateState state{
       .reason = decision.reason,
+      .animeId = item->id,
       .episode = watchedEpisodeNumber(*episode_, *item).value_or(0),
       .previousEpisode = anime::list::isInList(entry) ? entry->watched_episodes : 0,
   };
@@ -215,6 +216,7 @@ void UpdateSession::commit(const Anime& item) {
 
   setState({
       .phase = UpdateState::Phase::Committed,
+      .animeId = item.id,
       .episode = *number,
       .previousEpisode = previous,
   });
