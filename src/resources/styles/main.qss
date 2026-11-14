@@ -44,8 +44,8 @@ QTreeWidget#navigation::item {
 
 /* List */
 
-QStackedWidget QListView,
-QStackedWidget QTreeView {
+QMainWindow > #centralWidget QStackedWidget QListView,
+QMainWindow > #centralWidget QStackedWidget QTreeView {
   border-top-width: 1px;
   border-top-style: solid;
 }
