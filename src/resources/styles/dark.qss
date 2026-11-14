@@ -11,18 +11,6 @@ QMainWindow > #centralWidget > QSplitter::handle {
   background-color: rgba(255, 255, 255, 16%);
 }
 
-/* Navigation */
-
-QTreeWidget#navigation::item:hover {
-  background-color: rgba(255, 255, 255, 5%);
-}
-QTreeWidget#navigation::item:selected:active {
-  background-color: rgba(255, 255, 255, 20%);
-}
-QTreeWidget#navigation::item:selected:!active {
-  background-color: rgba(255, 255, 255, 10%);
-}
-
 /* List */
 
 QMainWindow > #centralWidget QStackedWidget QListView,

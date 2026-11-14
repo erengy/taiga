@@ -11,21 +11,6 @@ QMainWindow > #centralWidget > QSplitter::handle {
   background-color: rgba(0, 0, 0, 16%);
 }
 
-/* Navigation */
-
-QTreeWidget#navigation::item:hover:!selected {
-  background-color: rgba(0, 0, 0, 4%);
-}
-QTreeWidget#navigation::item:active {
-  color: #000;
-}
-QTreeWidget#navigation::item:selected:active {
-  background-color: rgba(0, 0, 0, 8%);
-}
-QTreeWidget#navigation::item:selected:!active {
-  background-color: rgba(0, 0, 0, 6%);
-}
-
 /* List */
 
 QMainWindow > #centralWidget QStackedWidget QListView,
@@ -41,11 +26,9 @@ QTreeView#animeList QHeaderView {
   border-bottom-color: rgba(0, 0, 0, 16%);
 }
 
-QAbstractItemView[themed="true"]::item {
+QAbstractItemView[themed="true"] {
   background-color: #fff;
-}
-QAbstractItemView[themed="true"]::item:alternate {
-  background-color: rgba(0, 0, 0, 1%);
+  alternate-background-color: rgba(0, 0, 0, 4%);
 }
 QAbstractItemView[themed="true"]::item:hover:!selected {
   background-color: rgba(0, 0, 0, 4%);

@@ -36,7 +36,6 @@ QTreeWidget#navigation {
 }
 
 QTreeWidget#navigation::item {
-  background-color: transparent;
   border-radius: 3px;
   padding-left: 4px;
   padding-right: 4px;

@@ -36,6 +36,7 @@ namespace gui {
 
 NavigationWidget::NavigationWidget(QWidget* parent) : QTreeWidget(parent) {
   setObjectName("navigation");
+  setProperty("themed", true);
   setFixedWidth(200);
   setFrameShape(QFrame::Shape::NoFrame);
   setItemDelegate(new NavigationItemDelegate(this));
