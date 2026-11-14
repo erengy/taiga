@@ -24,8 +24,6 @@
 #include <ranges>
 
 #include "base/string.hpp"
-#include "share/discord.hpp"
-#include "share/http.hpp"
 #include "taiga/settings.hpp"
 #include "ui_settings_dialog.h"
 
@@ -74,10 +72,6 @@ void SettingsPageSharing::apply() const {
       toVector(lines | std::views::transform([](const QString& s) { return s.trimmed(); }) |
                std::views::filter([](const QString& s) { return !s.isEmpty(); }) |
                std::ranges::to<QStringList>()));
-
-  // Settings have no change notifications yet.
-  share::discord::presence()->applySettings();
-  share::http::webhook()->applySettings();
 }
 
 }  // namespace gui

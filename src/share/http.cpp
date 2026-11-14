@@ -89,10 +89,18 @@ void Webhook::init() {
   };
   connect(anime::db(), &anime::Database::itemUpdated, this, refreshIfCurrent);
   connect(anime::db(), &anime::Database::entryUpdated, this, refreshIfCurrent);
+
+  connect(taiga::settings(), &taiga::Settings::changed, this, &Webhook::onSettingsChanged);
 }
 
 void Webhook::applySettings() {
   updatePlaying();
+}
+
+void Webhook::onSettingsChanged(const QSet<QString>& keys) {
+  static const QSet<QString> relevantKeys{u"sharing.enabled"_s, u"sharing.http.enabled"_s,
+                                          u"sharing.http.headers"_s, u"sharing.http.url"_s};
+  if (keys.intersects(relevantKeys)) applySettings();
 }
 
 void Webhook::onEpisodeChanged(const std::optional<track::Episode>& episode) {

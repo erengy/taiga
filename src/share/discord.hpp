@@ -19,6 +19,7 @@
 #pragma once
 
 #include <QObject>
+#include <QSet>
 #include <optional>
 
 #include "share/discord_rpc.hpp"
@@ -39,11 +40,11 @@ public:
 
   void init();
 
-  // Connects or disconnects according to the sharing settings, which have no change
-  // notifications. Disconnecting removes the presence immediately.
-  void applySettings();
-
 private:
+  // Connects or disconnects according to the sharing settings. Disconnecting removes the presence
+  // immediately.
+  void applySettings();
+  void onSettingsChanged(const QSet<QString>& keys);
   void onEpisodeChanged(const std::optional<track::Episode>& episode);
   void update();
 

@@ -19,6 +19,7 @@
 #pragma once
 
 #include <QObject>
+#include <QSet>
 #include <optional>
 
 #include "share/event.hpp"
@@ -41,11 +42,10 @@ public:
 
   void init();
 
-  // Sends `stopped` if sharing was disabled while an episode was shared as playing. Sharing
-  // settings have no change notifications.
-  void applySettings();
-
 private:
+  // Sends `stopped` if sharing was disabled while an episode was shared as playing.
+  void applySettings();
+  void onSettingsChanged(const QSet<QString>& keys);
   void onEpisodeChanged(const std::optional<track::Episode>& episode);
   void onUpdateStateChanged(const track::UpdateState& state);
   void updatePlaying();

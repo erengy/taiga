@@ -72,6 +72,8 @@ void Presence::init() {
   connect(anime::db(), &anime::Database::itemUpdated, this, refreshIfCurrent);
   connect(anime::db(), &anime::Database::entryUpdated, this, refreshIfCurrent);
 
+  connect(taiga::settings(), &taiga::Settings::changed, this, &Presence::onSettingsChanged);
+
   applySettings();
 }
 
@@ -81,6 +83,11 @@ void Presence::applySettings() {
   } else {
     activityManager_->close();
   }
+}
+
+void Presence::onSettingsChanged(const QSet<QString>& keys) {
+  static const QSet<QString> relevantKeys{u"sharing.enabled"_s, u"sharing.discord.enabled"_s};
+  if (keys.intersects(relevantKeys)) applySettings();
 }
 
 void Presence::onEpisodeChanged(const std::optional<track::Episode>& episode) {
