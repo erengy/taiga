@@ -141,8 +141,14 @@
              </widget>
              <widget class="QWidget" name="accountsPage">
               <layout class="QVBoxLayout" name="verticalLayout_13">
+               <property name="spacing">
+                <number>12</number>
+               </property>
                <item>
                 <layout class="QFormLayout" name="accountsFormLayout">
+                 <property name="spacing">
+                  <number>6</number>
+                 </property>
                  <item row="0" column="0">
                   <widget class="QLabel" name="serviceLabel">
                    <property name="text">
@@ -363,6 +369,9 @@
              </widget>
              <widget class="QWidget" name="applicationPage">
               <layout class="QVBoxLayout" name="verticalLayout_4">
+               <property name="spacing">
+                <number>12</number>
+               </property>
                <item>
                 <widget class="QGroupBox" name="interfaceGroupBox">
                  <property name="title">
@@ -447,65 +456,75 @@
              </widget>
              <widget class="QWidget" name="libraryPage">
               <layout class="QVBoxLayout" name="verticalLayout_5">
+               <property name="spacing">
+                <number>12</number>
+               </property>
                <item>
-                <widget class="QLabel" name="libraryFoldersLabel">
-                 <property name="text">
-                  <string>Anime folders:</string>
+                <layout class="QVBoxLayout" name="libraryFoldersGroupLayout">
+                 <property name="spacing">
+                  <number>6</number>
                  </property>
-                 <property name="buddy">
-                  <cstring>libraryFoldersList</cstring>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <layout class="QHBoxLayout" name="libraryFoldersLayout">
-                 <item alignment="Qt::AlignmentFlag::AlignTop">
-                  <widget class="QListWidget" name="libraryFoldersList">
-                   <property name="maximumSize">
-                    <size>
-                     <width>16777215</width>
-                     <height>200</height>
-                    </size>
+                 <item>
+                  <widget class="QLabel" name="libraryFoldersLabel">
+                   <property name="text">
+                    <string>Anime folders:</string>
                    </property>
-                   <property name="alternatingRowColors">
-                    <bool>true</bool>
-                   </property>
-                   <property name="selectionMode">
-                    <enum>QAbstractItemView::SelectionMode::ExtendedSelection</enum>
+                   <property name="buddy">
+                    <cstring>libraryFoldersList</cstring>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <layout class="QVBoxLayout" name="libraryFoldersButtonsLayout">
-                   <item>
-                    <widget class="QPushButton" name="libraryAddFolderButton">
-                     <property name="text">
-                      <string>Add folder...</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QPushButton" name="libraryRemoveFolderButton">
-                     <property name="enabled">
-                      <bool>false</bool>
-                     </property>
-                     <property name="text">
-                      <string>Remove</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <spacer name="libraryButtonsVerticalSpacer">
-                     <property name="orientation">
-                      <enum>Qt::Orientation::Vertical</enum>
-                     </property>
-                     <property name="sizeHint" stdset="0">
+                  <layout class="QHBoxLayout" name="libraryFoldersLayout">
+                   <item alignment="Qt::AlignmentFlag::AlignTop">
+                    <widget class="QListWidget" name="libraryFoldersList">
+                     <property name="maximumSize">
                       <size>
-                       <width>20</width>
-                       <height>40</height>
+                       <width>16777215</width>
+                       <height>200</height>
                       </size>
                      </property>
-                    </spacer>
+                     <property name="alternatingRowColors">
+                      <bool>true</bool>
+                     </property>
+                     <property name="selectionMode">
+                      <enum>QAbstractItemView::SelectionMode::ExtendedSelection</enum>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <layout class="QVBoxLayout" name="libraryFoldersButtonsLayout">
+                     <item>
+                      <widget class="QPushButton" name="libraryAddFolderButton">
+                       <property name="text">
+                        <string>Add folder...</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="libraryRemoveFolderButton">
+                       <property name="enabled">
+                        <bool>false</bool>
+                       </property>
+                       <property name="text">
+                        <string>Remove</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <spacer name="libraryButtonsVerticalSpacer">
+                       <property name="orientation">
+                        <enum>Qt::Orientation::Vertical</enum>
+                       </property>
+                       <property name="sizeHint" stdset="0">
+                        <size>
+                         <width>20</width>
+                         <height>40</height>
+                        </size>
+                       </property>
+                      </spacer>
+                     </item>
+                    </layout>
                    </item>
                   </layout>
                  </item>
@@ -528,6 +547,9 @@
              </widget>
              <widget class="QWidget" name="recognitionPage">
               <layout class="QVBoxLayout" name="verticalLayout_6">
+               <property name="spacing">
+                <number>12</number>
+               </property>
                <item>
                 <widget class="QCheckBox" name="detectionEnabledCheckBox">
                  <property name="text">
@@ -537,6 +559,9 @@
                </item>
                <item>
                 <layout class="QFormLayout" name="detectionFormLayout">
+                 <property name="spacing">
+                  <number>6</number>
+                 </property>
                  <item row="0" column="0">
                   <widget class="QLabel" name="detectionIntervalLabel">
                    <property name="text">
@@ -643,6 +668,9 @@
              </widget>
              <widget class="QWidget" name="mediaPlayersPage">
               <layout class="QVBoxLayout" name="verticalLayout_9">
+               <property name="spacing">
+                <number>12</number>
+               </property>
                <item>
                 <widget class="QLabel" name="mediaPlayersLabel">
                  <property name="text">
@@ -667,22 +695,32 @@
              </widget>
              <widget class="QWidget" name="sharingPage">
               <layout class="QVBoxLayout" name="sharingPageLayout">
+               <property name="spacing">
+                <number>12</number>
+               </property>
                <item>
-                <widget class="QCheckBox" name="sharingEnabledCheckBox">
-                 <property name="text">
-                  <string>Enable sharing</string>
+                <layout class="QVBoxLayout" name="sharingEnabledLayout">
+                 <property name="spacing">
+                  <number>6</number>
                  </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLabel" name="sharingHintLabel">
-                 <property name="enabled">
-                  <bool>false</bool>
-                 </property>
-                 <property name="text">
-                  <string>Private list entries are not shared.</string>
-                 </property>
-                </widget>
+                 <item>
+                  <widget class="QCheckBox" name="sharingEnabledCheckBox">
+                   <property name="text">
+                    <string>Enable sharing</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="sharingHintLabel">
+                   <property name="enabled">
+                    <bool>false</bool>
+                   </property>
+                   <property name="text">
+                    <string>Private list entries are not shared.</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
                </item>
                <item>
                 <widget class="QGroupBox" name="discordGroupBox">
@@ -718,58 +756,62 @@
                  <property name="title">
                   <string>HTTP</string>
                  </property>
-                 <layout class="QFormLayout" name="httpGroupBoxLayout">
-                  <item row="0" column="0" colspan="2">
+                 <layout class="QVBoxLayout" name="httpGroupBoxLayout">
+                  <item>
                    <widget class="QCheckBox" name="httpEnabledCheckBox">
                     <property name="text">
                      <string>Send what I'm watching to a URL</string>
                     </property>
                    </widget>
                   </item>
-                  <item row="1" column="0">
-                   <widget class="QLabel" name="httpUrlLabel">
-                    <property name="text">
-                     <string>URL:</string>
-                    </property>
-                    <property name="buddy">
-                     <cstring>httpUrlLineEdit</cstring>
-                    </property>
-                   </widget>
+                  <item>
+                   <layout class="QFormLayout" name="httpFormLayout">
+                    <item row="0" column="0">
+                     <widget class="QLabel" name="httpUrlLabel">
+                      <property name="text">
+                       <string>URL:</string>
+                      </property>
+                      <property name="buddy">
+                       <cstring>httpUrlLineEdit</cstring>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="0" column="1">
+                     <widget class="QLineEdit" name="httpUrlLineEdit">
+                      <property name="placeholderText">
+                       <string>https://example.com/taiga</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="1" column="0">
+                     <widget class="QLabel" name="httpHeadersLabel">
+                      <property name="text">
+                       <string>Headers:</string>
+                      </property>
+                      <property name="buddy">
+                       <cstring>httpHeadersPlainTextEdit</cstring>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="1" column="1">
+                     <widget class="QPlainTextEdit" name="httpHeadersPlainTextEdit">
+                      <property name="maximumSize">
+                       <size>
+                        <width>16777215</width>
+                        <height>48</height>
+                       </size>
+                      </property>
+                      <property name="lineWrapMode">
+                       <enum>QPlainTextEdit::LineWrapMode::NoWrap</enum>
+                      </property>
+                      <property name="placeholderText">
+                       <string>Authorization: Bearer token</string>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
                   </item>
-                  <item row="1" column="1">
-                   <widget class="QLineEdit" name="httpUrlLineEdit">
-                    <property name="placeholderText">
-                     <string>https://example.com/taiga</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="2" column="0">
-                   <widget class="QLabel" name="httpHeadersLabel">
-                    <property name="text">
-                     <string>Headers:</string>
-                    </property>
-                    <property name="buddy">
-                     <cstring>httpHeadersPlainTextEdit</cstring>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="2" column="1">
-                   <widget class="QPlainTextEdit" name="httpHeadersPlainTextEdit">
-                    <property name="maximumSize">
-                     <size>
-                      <width>16777215</width>
-                      <height>48</height>
-                     </size>
-                    </property>
-                    <property name="lineWrapMode">
-                     <enum>QPlainTextEdit::LineWrapMode::NoWrap</enum>
-                    </property>
-                    <property name="placeholderText">
-                     <string>Authorization: Bearer token</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="3" column="0" colspan="2">
+                  <item>
                    <widget class="QLabel" name="httpHintLabel">
                     <property name="enabled">
                      <bool>false</bool>
@@ -802,6 +844,9 @@
              </widget>
              <widget class="QWidget" name="streamingPage">
               <layout class="QVBoxLayout" name="verticalLayout_10">
+               <property name="spacing">
+                <number>12</number>
+               </property>
                <item>
                 <widget class="QCheckBox" name="streamingEnabledCheckBox">
                  <property name="text">
@@ -835,6 +880,9 @@
              </widget>
              <widget class="QWidget" name="advancedPage">
               <layout class="QVBoxLayout" name="verticalLayout_12">
+               <property name="spacing">
+                <number>12</number>
+               </property>
                <item>
                 <widget class="QTableWidget" name="advancedTable">
                  <property name="alternatingRowColors">
