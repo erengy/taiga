@@ -192,22 +192,26 @@
                   <item row="0" column="1">
                    <widget class="QLineEdit" name="anilistUsernameLineEdit"/>
                   </item>
-                  <item row="1" column="0">
-                   <widget class="QLabel" name="anilistTokenLabel">
-                    <property name="text">
-                     <string>Token:</string>
-                    </property>
-                    <property name="buddy">
-                     <cstring>anilistTokenLineEdit</cstring>
-                    </property>
-                   </widget>
-                  </item>
                   <item row="1" column="1">
-                   <widget class="QLineEdit" name="anilistTokenLineEdit">
-                    <property name="echoMode">
-                     <enum>QLineEdit::EchoMode::Password</enum>
-                    </property>
-                   </widget>
+                   <layout class="QHBoxLayout" name="anilistAuthorizeLayout">
+                    <item>
+                     <widget class="QPushButton" name="anilistAuthorizeButton">
+                      <property name="text">
+                       <string>Authorize...</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QLabel" name="anilistAuthorizeStatusLabel">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
                   </item>
                  </layout>
                 </widget>
@@ -317,39 +321,26 @@
                   <item row="0" column="1">
                    <widget class="QLineEdit" name="myanimelistUsernameLineEdit"/>
                   </item>
-                  <item row="1" column="0">
-                   <widget class="QLabel" name="myanimelistAccessTokenLabel">
-                    <property name="text">
-                     <string>Access token:</string>
-                    </property>
-                    <property name="buddy">
-                     <cstring>myanimelistAccessTokenLineEdit</cstring>
-                    </property>
-                   </widget>
-                  </item>
                   <item row="1" column="1">
-                   <widget class="QLineEdit" name="myanimelistAccessTokenLineEdit">
-                    <property name="echoMode">
-                     <enum>QLineEdit::EchoMode::Password</enum>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="2" column="0">
-                   <widget class="QLabel" name="myanimelistRefreshTokenLabel">
-                    <property name="text">
-                     <string>Refresh token:</string>
-                    </property>
-                    <property name="buddy">
-                     <cstring>myanimelistRefreshTokenLineEdit</cstring>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="2" column="1">
-                   <widget class="QLineEdit" name="myanimelistRefreshTokenLineEdit">
-                    <property name="echoMode">
-                     <enum>QLineEdit::EchoMode::Password</enum>
-                    </property>
-                   </widget>
+                   <layout class="QHBoxLayout" name="myanimelistAuthorizeLayout">
+                    <item>
+                     <widget class="QPushButton" name="myanimelistAuthorizeButton">
+                      <property name="text">
+                       <string>Authorize...</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QLabel" name="myanimelistAuthorizeStatusLabel">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
                   </item>
                  </layout>
                 </widget>

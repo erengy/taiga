@@ -59,4 +59,11 @@ void Service::authenticateUser() {
   manager_.post(api_.createRequest(), data, this, callback);
 }
 
+void Service::authorize(const QString& accessToken) {
+  taiga::accounts()->setAnilistToken(accessToken.toStdString());
+  api_.setBearerToken(accessToken.toUtf8());
+
+  authenticateUser();
+}
+
 }  // namespace sync::anilist

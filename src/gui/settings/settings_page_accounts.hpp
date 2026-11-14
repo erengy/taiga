@@ -17,7 +17,17 @@
  */
 #pragma once
 
+#include <functional>
+#include <string>
+
 #include "gui/settings/settings_page.hpp"
+
+class QLabel;
+class QPushButton;
+
+namespace sync {
+class Service;
+}
 
 namespace gui {
 
@@ -34,6 +44,13 @@ public:
 
 private:
   void updateVisibleGroup();
+
+  void authorizeAnilist();
+  void authorizeMyanimelist();
+
+  QString promptAuthorizationCode(const QString& serviceName) const;
+  void watchAuthorization(sync::Service* service, QPushButton* button, QLabel* statusLabel,
+                          std::function<std::string()> onSuccess);
 };
 
 }  // namespace gui
