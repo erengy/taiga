@@ -265,40 +265,6 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="3" column="0">
-                   <widget class="QLabel" name="kitsuAccessTokenLabel">
-                    <property name="text">
-                     <string>Access token:</string>
-                    </property>
-                    <property name="buddy">
-                     <cstring>kitsuAccessTokenLineEdit</cstring>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="3" column="1">
-                   <widget class="QLineEdit" name="kitsuAccessTokenLineEdit">
-                    <property name="echoMode">
-                     <enum>QLineEdit::EchoMode::Password</enum>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="4" column="0">
-                   <widget class="QLabel" name="kitsuRefreshTokenLabel">
-                    <property name="text">
-                     <string>Refresh token:</string>
-                    </property>
-                    <property name="buddy">
-                     <cstring>kitsuRefreshTokenLineEdit</cstring>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="4" column="1">
-                   <widget class="QLineEdit" name="kitsuRefreshTokenLineEdit">
-                    <property name="echoMode">
-                     <enum>QLineEdit::EchoMode::Password</enum>
-                    </property>
-                   </widget>
-                  </item>
                  </layout>
                 </widget>
                </item>

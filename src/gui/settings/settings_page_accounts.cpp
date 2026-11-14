@@ -92,8 +92,6 @@ void SettingsPageAccounts::load() {
   ui_->kitsuEmailLineEdit->setText(toQString(accounts.kitsuEmail()));
   ui_->kitsuUsernameLineEdit->setText(toQString(accounts.kitsuUsername()));
   ui_->kitsuPasswordLineEdit->setText(toQString(accounts.kitsuPassword()));
-  ui_->kitsuAccessTokenLineEdit->setText(toQString(accounts.kitsuAccessToken()));
-  ui_->kitsuRefreshTokenLineEdit->setText(toQString(accounts.kitsuRefreshToken()));
 
   ui_->myanimelistUsernameLineEdit->setText(toQString(accounts.myanimelistUsername()));
   ui_->myanimelistAuthorizeButton->setText(authorizeButtonText(accounts.myanimelistAccessToken()));
@@ -107,11 +105,9 @@ void SettingsPageAccounts::apply() const {
 
   accounts.setAnilistUsername(toStdString(ui_->anilistUsernameLineEdit));
 
-  accounts.setKitsuEmail(toStdString(ui_->kitsuEmailLineEdit));
-  accounts.setKitsuUsername(toStdString(ui_->kitsuUsernameLineEdit));
-  accounts.setKitsuPassword(ui_->kitsuPasswordLineEdit->text().toStdString());
-  accounts.setKitsuAccessToken(toStdString(ui_->kitsuAccessTokenLineEdit));
-  accounts.setKitsuRefreshToken(toStdString(ui_->kitsuRefreshTokenLineEdit));
+  accounts.setKitsuCredentials(toStdString(ui_->kitsuEmailLineEdit),
+                               toStdString(ui_->kitsuUsernameLineEdit),
+                               ui_->kitsuPasswordLineEdit->text().toStdString());
 
   accounts.setMyanimelistUsername(toStdString(ui_->myanimelistUsernameLineEdit));
 }

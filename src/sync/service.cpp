@@ -255,7 +255,7 @@ bool willAuthenticate() {
     case ServiceId::MyAnimeList:
       return !taiga::accounts()->myanimelistAccessToken().empty();
     case ServiceId::Kitsu:
-      return !taiga::accounts()->kitsuAccessToken().empty();
+      return !taiga::accounts()->kitsuPassword().empty();
     case ServiceId::AniList:
       return !taiga::accounts()->anilistToken().empty();
   }

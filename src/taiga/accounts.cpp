@@ -129,6 +129,23 @@ void Accounts::setKitsuAuthenticated(bool authenticated) {
   emit authenticationChanged(authenticated);
 }
 
+void Accounts::setKitsuCredentials(const std::string& email, const std::string& username,
+                                   const std::string& password) {
+  if (email == kitsuEmail() && username == kitsuUsername() && password == kitsuPassword()) {
+    return;
+  }
+
+  setKitsuEmail(email);
+  setKitsuUsername(username);
+  setKitsuPassword(password);
+
+  // Session data belongs to the previous credentials
+  setKitsuAccessToken({});
+  setKitsuRefreshToken({});
+  setKitsuUserId({});
+  setKitsuAuthenticated(false);
+}
+
 void Accounts::setKitsuAccessToken(const std::string& accessToken) const {
   setValue("kitsu.accessToken", accessToken);
 }

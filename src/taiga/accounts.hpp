@@ -71,6 +71,8 @@ public:
   void setAnilistToken(const std::string& token) const;
 
   void setKitsuAuthenticated(bool authenticated);
+  void setKitsuCredentials(const std::string& email, const std::string& username,
+                           const std::string& password);
   void setKitsuAccessToken(const std::string& accessToken) const;
   void setKitsuDisplayName(const std::string& displayName) const;
   void setKitsuEmail(const std::string& email) const;
