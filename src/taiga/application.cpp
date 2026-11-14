@@ -52,6 +52,10 @@ Application::Application(int& argc, char* argv[])
   setApplicationVersion(QString::fromStdString(taiga::version().to_string()));
   setOrganizationDomain("taiga.moe");
   setOrganizationName("erengy");
+
+  // Otherwise `winId()` on a dialog (for Mica) makes its parent's child widgets native, and
+  // menus opened from them cannot use the main window as their transient parent.
+  setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
 }
 
 Application::~Application() {
