@@ -23,6 +23,7 @@
 #include <QJsonArray>
 #include <algorithm>
 #include <ranges>
+#include <utility>
 
 #include "base/string.hpp"
 #include "compat/settings.hpp"
@@ -58,7 +59,13 @@ QString Settings::fileName() const {
 }
 
 void Settings::onValueChanged(QAnyStringView key) const {
-  emit valueChanged(key.toString());
+  const bool scheduled = !changedKeys_.isEmpty();
+  changedKeys_.insert(key.toString());
+  if (scheduled) return;
+
+  QMetaObject::invokeMethod(
+      const_cast<Settings*>(this), [this] { emit changed(std::exchange(changedKeys_, {})); },
+      Qt::QueuedConnection);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

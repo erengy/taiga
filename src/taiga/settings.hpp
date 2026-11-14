@@ -20,6 +20,7 @@
 
 #include <QNetworkProxy>
 #include <QObject>
+#include <QSet>
 #include <chrono>
 #include <optional>
 #include <string>
@@ -95,12 +96,15 @@ public:
   void setUpdateTrigger(const track::UpdateTrigger trigger) const;
 
 signals:
-  void valueChanged(const QString& key) const;
+  // Emitted once per event loop iteration with the keys that were changed, as settings are often
+  // changed together.
+  void changed(const QSet<QString>& keys) const;
 
 private:
   QString fileName() const override;
   void onValueChanged(QAnyStringView key) const override;
 
+  mutable QSet<QString> changedKeys_;
   mutable std::optional<anime::TitleLanguage> titleLanguageCache_;
 };
 
