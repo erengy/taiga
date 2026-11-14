@@ -25,6 +25,7 @@
 #include <QPalette>
 #include <QSize>
 
+#include "base/string.hpp"
 #include "gui/utils/format.hpp"
 #include "gui/utils/image_provider.hpp"
 #include "gui/utils/rating.hpp"
@@ -32,6 +33,7 @@
 #include "media/anime_list_utils.hpp"
 #include "media/anime_season.hpp"
 #include "media/anime_utils.hpp"
+#include "taiga/settings.hpp"
 
 namespace gui {
 
@@ -50,6 +52,12 @@ AnimeListModel::AnimeListModel(QObject* parent) : QAbstractListModel(parent) {
   connect(anime::db(), &anime::Database::itemDeleted, this, &AnimeListModel::deleteRow);
   connect(anime::db(), &anime::Database::entryUpdated, this, &AnimeListModel::refreshRow);
   connect(anime::db(), &anime::Database::entryDeleted, this, &AnimeListModel::refreshRow);
+
+  connect(taiga::settings(), &taiga::Settings::changed, this, [this](const QSet<QString>& keys) {
+    if (keys.contains(u"library.titleLanguage"_s) && !m_ids.isEmpty()) {
+      emit dataChanged(index(0, 0), index(m_ids.size() - 1, NUM_COLUMNS - 1));
+    }
+  });
 }
 
 void AnimeListModel::refreshRow(int id) {

@@ -37,6 +37,7 @@
 #include "media/anime_list.hpp"
 #include "media/anime_utils.hpp"
 #include "sync/service.hpp"
+#include "taiga/settings.hpp"
 #include "track/episode.hpp"
 #include "track/media.hpp"
 #include "track/update_session.hpp"
@@ -249,6 +250,9 @@ NowPlayingWidget::NowPlayingWidget(QWidget* parent) : QFrame(parent) {
   });
   connect(imageProvider(), &ImageProvider::posterChanged, this, [this](const int id) {
     if (m_anime && m_anime->id == id) refresh();
+  });
+  connect(taiga::settings(), &taiga::Settings::changed, this, [this](const QSet<QString>& keys) {
+    if (keys.contains(u"library.titleLanguage"_s)) refresh();
   });
   connect(track::updateSession(), &track::UpdateSession::stateChanged, this, [this]() {
     refresh();
