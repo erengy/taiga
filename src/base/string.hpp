@@ -34,4 +34,5 @@ QString& replaceWholeWord(QString& str, const QString& before, const QString& af
 
 int toInt(const std::string& value);
 std::string toStdString(const QString& s);
+QStringList toStringList(const std::vector<std::string>& list);
 std::vector<std::string> toVector(const QStringList& list);

@@ -68,6 +68,10 @@ QString& replaceWholeWord(QString& str, const QString& before, const QString& af
   return s.toStdString();
 }
 
+QStringList toStringList(const std::vector<std::string>& list) {
+  return list | std::views::transform(QString::fromStdString) | std::ranges::to<QStringList>();
+}
+
 std::vector<std::string> toVector(const QStringList& list) {
   return list | std::views::transform(toStdString) | std::ranges::to<std::vector>();
 }

@@ -183,11 +183,7 @@ void Settings::setDetectionEnabled(const bool enabled) const {
 }
 
 void Settings::setDisabledMediaPlayers(std::vector<std::string> players) const {
-  const auto list =
-      players |
-      std::views::transform([](const std::string& s) { return QString::fromStdString(s); }) |
-      std::ranges::to<QList>();
-  setValue("recognition.mediaPlayers.disabled", QJsonArray::fromStringList(list));
+  setValue("recognition.mediaPlayers.disabled", QJsonArray::fromStringList(toStringList(players)));
 }
 
 void Settings::setDiscordEnabled(const bool enabled) const {
@@ -199,11 +195,7 @@ void Settings::setService(const std::string& service) const {
 }
 
 void Settings::setLibraryFolders(std::vector<std::string> folders) const {
-  const auto list =
-      folders |
-      std::views::transform([](const std::string& s) { return QString::fromStdString(s); }) |
-      std::ranges::to<QList>();
-  setValue("library.folders", QJsonArray::fromStringList(list));
+  setValue("library.folders", QJsonArray::fromStringList(toStringList(folders)));
 }
 
 void Settings::setMediaDetectionInterval(const std::chrono::milliseconds interval) const {
