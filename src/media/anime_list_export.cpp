@@ -126,7 +126,7 @@ bool exportAsXml(const std::string& path) {
 
   xml.writeStartElement("myinfo");
   xml.writeNumberElement("user_id", 0);
-  xml.writeTextElement("user_name", taiga::accounts.myanimelistUsername());
+  xml.writeTextElement("user_name", taiga::accounts()->myanimelistUsername());
   xml.writeNumberElement("user_export_type", 1);  // anime
   xml.writeNumberElement("user_total_anime", anime::db()->entries().count());
   xml.writeNumberElement("user_total_watching", status_counts[anime::list::Status::Watching]);

@@ -42,7 +42,7 @@ class Accounts final : public QObject, public base::Settings {
   Q_DISABLE_COPY_MOVE(Accounts)
 
 public:
-  Accounts();
+  explicit Accounts(QObject* parent);
   ~Accounts() = default;
 
   bool anilistAuthenticated() const;
@@ -94,6 +94,6 @@ private:
   QString fileName() const override;
 };
 
-inline Accounts accounts;
+Accounts* accounts();
 
 }  // namespace taiga

@@ -49,8 +49,8 @@ void Service::authenticateUser() {
       return;
     }
 
-    taiga::accounts.setAnilistUsername((*viewer)["name"].toString().toStdString());
-    taiga::accounts.setAnilistRatingSystem(
+    taiga::accounts()->setAnilistUsername((*viewer)["name"].toString().toStdString());
+    taiga::accounts()->setAnilistRatingSystem(
         (*viewer)["mediaListOptions"]["scoreFormat"].toString().toStdString());
 
     emit authenticationCompleted(true);

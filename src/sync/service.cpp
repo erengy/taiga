@@ -54,13 +54,13 @@ void Service::logError(const QString& message) {
 void Service::onAuthenticationCompleted(bool authenticated) {
   switch (currentServiceId()) {
     case ServiceId::MyAnimeList:
-      taiga::accounts.setMyanimelistAuthenticated(authenticated);
+      taiga::accounts()->setMyanimelistAuthenticated(authenticated);
       break;
     case ServiceId::Kitsu:
-      taiga::accounts.setKitsuAuthenticated(authenticated);
+      taiga::accounts()->setKitsuAuthenticated(authenticated);
       break;
     case ServiceId::AniList:
-      taiga::accounts.setAnilistAuthenticated(authenticated);
+      taiga::accounts()->setAnilistAuthenticated(authenticated);
       break;
   }
 
@@ -177,7 +177,7 @@ bool synchronize() {
 
   if (!isUserAuthenticated()) {
     const auto username =
-        taiga::accounts.serviceUsername(serviceSlug(currentServiceId()).toStdString());
+        taiga::accounts()->serviceUsername(serviceSlug(currentServiceId()).toStdString());
     if (username.empty()) return false;
 
     fetchListEntries();  // can fetch the list without authentication
@@ -238,11 +238,11 @@ void deleteListEntry(const int id) {
 bool isUserAuthenticated() {
   switch (currentServiceId()) {
     case ServiceId::MyAnimeList:
-      return taiga::accounts.myanimelistAuthenticated();
+      return taiga::accounts()->myanimelistAuthenticated();
     case ServiceId::Kitsu:
-      return taiga::accounts.kitsuAuthenticated();
+      return taiga::accounts()->kitsuAuthenticated();
     case ServiceId::AniList:
-      return taiga::accounts.anilistAuthenticated();
+      return taiga::accounts()->anilistAuthenticated();
   }
   return false;
 }
@@ -252,11 +252,11 @@ bool willAuthenticate() {
 
   switch (currentServiceId()) {
     case ServiceId::MyAnimeList:
-      return !taiga::accounts.myanimelistAccessToken().empty();
+      return !taiga::accounts()->myanimelistAccessToken().empty();
     case ServiceId::Kitsu:
-      return !taiga::accounts.kitsuAccessToken().empty();
+      return !taiga::accounts()->kitsuAccessToken().empty();
     case ServiceId::AniList:
-      return !taiga::accounts.anilistToken().empty();
+      return !taiga::accounts()->anilistToken().empty();
   }
   return false;
 }

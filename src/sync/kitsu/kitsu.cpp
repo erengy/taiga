@@ -57,7 +57,7 @@ Service::Service() : sync::Service{ServiceId::Kitsu} {
   headers.append(QHttpHeaders::WellKnownHeader::Accept, kJsonApiMediaType);
   api_.setCommonHeaders(headers);
 
-  if (const auto token = taiga::accounts.kitsuAccessToken(); !token.empty()) {
+  if (const auto token = taiga::accounts()->kitsuAccessToken(); !token.empty()) {
     api_.setBearerToken(QByteArray::fromStdString(token));
   }
 }
@@ -112,13 +112,13 @@ void Service::fetchAnime(const int id) {
 void Service::fetchListEntries(const int offset, QSet<int> fetchedIds) {
   // Library entries are filtered by numeric user ID rather than username, so it must be
   // resolved first.
-  if (taiga::accounts.kitsuUserId().empty()) {
+  if (taiga::accounts()->kitsuUserId().empty()) {
     resolveUser([this, offset, fetchedIds] { fetchListEntries(offset, fetchedIds); });
     return;
   }
 
   const QUrlQuery query{{
-      {"filter[user_id]", QString::fromStdString(taiga::accounts.kitsuUserId())},
+      {"filter[user_id]", QString::fromStdString(taiga::accounts()->kitsuUserId())},
       {"filter[kind]", "anime"},
       {"include", "anime"},
       {"page[offset]", QString::number(offset)},
@@ -247,8 +247,8 @@ void Service::addListEntry(const int id, const anime::list::Fields dirty) {
   auto request = api_.createRequest(u"/library-entries"_s, query);
   request.setHeader(QNetworkRequest::ContentTypeHeader, kJsonApiMediaType);
 
-  const auto body = buildLibraryEntryObject(*listEntry, dirty,
-                                            QString::fromStdString(taiga::accounts.kitsuUserId()));
+  const auto body = buildLibraryEntryObject(
+      *listEntry, dirty, QString::fromStdString(taiga::accounts()->kitsuUserId()));
 
   const auto callback = [this, id, dirty](QRestReply& reply) {
     const auto json = reply.readJson();
@@ -292,8 +292,8 @@ void Service::updateListEntry(const int id, const anime::list::Fields dirty) {
   auto request = api_.createRequest(u"/library-entries/%1"_s.arg(listEntry->id), query);
   request.setHeader(QNetworkRequest::ContentTypeHeader, kJsonApiMediaType);
 
-  const auto body = buildLibraryEntryObject(*listEntry, dirty,
-                                            QString::fromStdString(taiga::accounts.kitsuUserId()));
+  const auto body = buildLibraryEntryObject(
+      *listEntry, dirty, QString::fromStdString(taiga::accounts()->kitsuUserId()));
 
   const auto callback = [this, id, dirty](QRestReply& reply) {
     if (isError(reply)) {

@@ -267,7 +267,7 @@ void MainWindow::initStatusbar() {
 
               const auto sender_service = qobject_cast<sync::Service*>(sender());
               const auto slug = sync::serviceSlug(sender_service->id()).toStdString();
-              const auto username = taiga::accounts.serviceUsername(slug);
+              const auto username = taiga::accounts()->serviceUsername(slug);
 
               m_statusBarController->showMessage({
                   .source = StatusBarController::Source::Sync,

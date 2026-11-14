@@ -51,7 +51,7 @@ constexpr int kSeasonPageLimit = 500;
 Service::Service() : sync::Service{ServiceId::MyAnimeList} {
   api_.setBaseUrl(QUrl{kApiUrl});
 
-  if (const auto token = taiga::accounts.myanimelistAccessToken(); !token.empty()) {
+  if (const auto token = taiga::accounts()->myanimelistAccessToken(); !token.empty()) {
     api_.setBearerToken(QByteArray::fromStdString(token));
   }
 }
@@ -148,7 +148,7 @@ void Service::search(const SearchParams& params, const int offset) {
 }
 
 void Service::fetchListEntries(const int offset, QSet<int> fetchedIds) {
-  const auto username = QString::fromStdString(taiga::accounts.myanimelistUsername());
+  const auto username = QString::fromStdString(taiga::accounts()->myanimelistUsername());
   const auto path = u"/users/%1/animelist"_s.arg(username);
 
   const QUrlQuery query{

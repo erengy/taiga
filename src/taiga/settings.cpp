@@ -40,7 +40,8 @@ void Settings::init() const {
 
   // v1 to v2
   if (!QFile::exists(fileName())) {
-    compat::v1::readSettings(std::format("{}/v1/settings.xml", get_data_path()), *this, accounts);
+    compat::v1::readSettings(std::format("{}/v1/settings.xml", get_data_path()), *this,
+                             *accounts());
     setValue("meta.version", appVersion);
     return;
   }

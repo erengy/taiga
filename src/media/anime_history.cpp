@@ -165,7 +165,7 @@ void History::migrateFromV1() {
   const auto path = []() {
     const auto service = taiga::settings()->service();
     return std::format("{}/v1/user/{}@{}/history.xml", taiga::get_data_path(),
-                       taiga::accounts.serviceUsername(service), service);
+                       taiga::accounts()->serviceUsername(service), service);
   }();
 
   db.transaction();

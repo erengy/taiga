@@ -42,7 +42,7 @@ namespace sync::anilist {
 Service::Service() : sync::Service{ServiceId::AniList} {
   api_.setBaseUrl(QUrl{"https://graphql.anilist.co"});
 
-  if (const auto token = taiga::accounts.anilistToken(); !token.empty()) {
+  if (const auto token = taiga::accounts()->anilistToken(); !token.empty()) {
     api_.setBearerToken(QByteArray::fromStdString(token));
   }
 }
@@ -143,7 +143,7 @@ void Service::search(const SearchParams& params, const int page) {
 
 void Service::fetchListEntries() {
   const QJsonObject variables{
-      {"userName", QString::fromStdString(taiga::accounts.anilistUsername())},
+      {"userName", QString::fromStdString(taiga::accounts()->anilistUsername())},
   };
 
   const QJsonDocument data{{

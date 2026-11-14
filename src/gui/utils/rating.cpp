@@ -36,9 +36,9 @@ QList<sync::Rating> currentRatingList() {
     case sync::ServiceId::MyAnimeList:
       return sync::myanimelist::ratingList();
     case sync::ServiceId::Kitsu:
-      return sync::kitsu::ratingList(taiga::accounts.kitsuRatingSystem());
+      return sync::kitsu::ratingList(taiga::accounts()->kitsuRatingSystem());
     case sync::ServiceId::AniList:
-      return sync::anilist::ratingList(taiga::accounts.anilistRatingSystem());
+      return sync::anilist::ratingList(taiga::accounts()->anilistRatingSystem());
     case sync::ServiceId::Unknown:
       break;
   }
@@ -52,9 +52,9 @@ QString formatRating(int value, QString placeholder) {
     case sync::ServiceId::MyAnimeList:
       return sync::myanimelist::formatRating(value);
     case sync::ServiceId::Kitsu:
-      return sync::kitsu::formatRating(value, taiga::accounts.kitsuRatingSystem());
+      return sync::kitsu::formatRating(value, taiga::accounts()->kitsuRatingSystem());
     case sync::ServiceId::AniList:
-      return sync::anilist::formatRating(value, taiga::accounts.anilistRatingSystem());
+      return sync::anilist::formatRating(value, taiga::accounts()->anilistRatingSystem());
     case sync::ServiceId::Unknown:
       break;
   }
@@ -89,7 +89,7 @@ void setRatingComboBoxValue(QComboBox* comboBox, int score) {
 bool usesRatingSpinBox() {
   if (sync::currentServiceId() != sync::ServiceId::AniList) return false;
 
-  switch (taiga::accounts.anilistRatingSystem()) {
+  switch (taiga::accounts()->anilistRatingSystem()) {
     case sync::anilist::RatingSystem::Point_100:
     case sync::anilist::RatingSystem::Point_10_Decimal:
       return true;
@@ -103,7 +103,7 @@ bool usesRatingSpinBox() {
 }
 
 void populateRatingSpinBox(QDoubleSpinBox* spinBox) {
-  switch (taiga::accounts.anilistRatingSystem()) {
+  switch (taiga::accounts()->anilistRatingSystem()) {
     case sync::anilist::RatingSystem::Point_10_Decimal:
       spinBox->setDecimals(1);
       spinBox->setRange(0.0, 10.0);
@@ -121,14 +121,14 @@ void populateRatingSpinBox(QDoubleSpinBox* spinBox) {
 }
 
 void setRatingSpinBoxValue(QDoubleSpinBox* spinBox, int score) {
-  spinBox->setValue(taiga::accounts.anilistRatingSystem() ==
+  spinBox->setValue(taiga::accounts()->anilistRatingSystem() ==
                             sync::anilist::RatingSystem::Point_10_Decimal
                         ? score / 10.0
                         : score);
 }
 
 int ratingSpinBoxValue(const QDoubleSpinBox* spinBox) {
-  if (taiga::accounts.anilistRatingSystem() == sync::anilist::RatingSystem::Point_10_Decimal) {
+  if (taiga::accounts()->anilistRatingSystem() == sync::anilist::RatingSystem::Point_10_Decimal) {
     return static_cast<int>(std::lround(spinBox->value() * 10));
   }
   return static_cast<int>(std::lround(spinBox->value()));

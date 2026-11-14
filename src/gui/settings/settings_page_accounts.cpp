@@ -62,7 +62,7 @@ void SettingsPageAccounts::load() {
 
   ui_->syncEnabledCheckBox->setChecked(taiga::settings()->syncEnabled());
 
-  const auto& accounts = taiga::accounts;
+  const auto& accounts = *taiga::accounts();
 
   ui_->anilistUsernameLineEdit->setText(toQString(accounts.anilistUsername()));
   ui_->anilistTokenLineEdit->setText(toQString(accounts.anilistToken()));
@@ -82,7 +82,7 @@ void SettingsPageAccounts::apply() const {
   taiga::settings()->setService(ui_->serviceComboBox->currentData().toString().toStdString());
   taiga::settings()->setSyncEnabled(ui_->syncEnabledCheckBox->isChecked());
 
-  auto& accounts = taiga::accounts;
+  auto& accounts = *taiga::accounts();
 
   accounts.setAnilistUsername(toStdString(ui_->anilistUsernameLineEdit));
   accounts.setAnilistToken(toStdString(ui_->anilistTokenLineEdit));

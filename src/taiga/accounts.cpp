@@ -18,6 +18,8 @@
 
 #include "accounts.hpp"
 
+#include <QCoreApplication>
+
 #include "base/string.hpp"
 #include "sync/anilist/anilist_ratings.hpp"
 #include "sync/kitsu/kitsu_ratings.hpp"
@@ -25,7 +27,7 @@
 
 namespace taiga {
 
-Accounts::Accounts() : QObject{} {}
+Accounts::Accounts(QObject* parent) : QObject{parent} {}
 
 QString Accounts::fileName() const {
   return u"%1/accounts.json"_s.arg(get_data_path());
@@ -183,6 +185,11 @@ std::string Accounts::serviceUsername(const std::string& service) const {
   if (service == "kitsu") return kitsuUsername();
   if (service == "myanimelist") return myanimelistUsername();
   return {};
+}
+
+Accounts* accounts() {
+  static auto instance = new Accounts{qApp};
+  return instance;
 }
 
 }  // namespace taiga
