@@ -18,6 +18,7 @@
 
 #include "image_provider.hpp"
 
+#include <QCoreApplication>
 #include <QDateTime>
 #include <QDir>
 #include <QFile>
@@ -50,7 +51,7 @@ QString cacheKey(const int id) {
 
 }  // namespace
 
-ImageProvider::ImageProvider() : QObject() {
+ImageProvider::ImageProvider(QObject* parent) : QObject{parent} {
   QPixmapCache::setCacheLimit(kPixmapCacheLimitKb);
 }
 
@@ -173,6 +174,11 @@ bool ImageProvider::canRetry(const int id) const {
 void ImageProvider::retryAfter(const int id) {
   constexpr int kRetryCooldownSecs = 60;
   m_retryAfter[id] = QDateTime::currentDateTime().addSecs(kRetryCooldownSecs);
+}
+
+ImageProvider* imageProvider() {
+  static auto instance = new ImageProvider{qApp};
+  return instance;
 }
 
 }  // namespace gui

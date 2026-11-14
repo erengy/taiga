@@ -71,7 +71,7 @@ MediaDialog::MediaDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::MediaDi
 
   ui_->verticalLayoutRewatching->setAlignment(Qt::AlignBottom);
 
-  connect(&imageProvider, &ImageProvider::posterChanged, this, [this](int id) {
+  connect(imageProvider(), &ImageProvider::posterChanged, this, [this](int id) {
     if (id == m_anime.id) loadPosterImage();
   });
 
@@ -170,7 +170,7 @@ void MediaDialog::closeEvent(QCloseEvent* event) {
 
 void MediaDialog::keyPressEvent(QKeyEvent* event) {
   if (event->key() == Qt::Key_F5) {
-    imageProvider.fetchPoster(m_anime.id);
+    imageProvider()->fetchPoster(m_anime.id);
     sync::fetchAnime(m_anime.id);
     return;
   }
@@ -398,7 +398,7 @@ void MediaDialog::initSettings() {
 }
 
 void MediaDialog::loadPosterImage() {
-  const auto posterPixmap = imageProvider.loadPoster(m_anime.id);
+  const auto posterPixmap = imageProvider()->loadPoster(m_anime.id);
   ui_->posterWidget->setPixmap(posterPixmap);
   ui_->posterWidget->setLoading(posterPixmap.isNull() && !m_anime.image_url.empty());
   resizePosterImage();

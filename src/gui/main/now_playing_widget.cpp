@@ -246,7 +246,7 @@ NowPlayingWidget::NowPlayingWidget(QWidget* parent) : QFrame(parent) {
     if (const auto item = anime::db.item(id)) m_anime = *item;
     refresh();
   });
-  connect(&imageProvider, &ImageProvider::posterChanged, this, [this](const int id) {
+  connect(imageProvider(), &ImageProvider::posterChanged, this, [this](const int id) {
     if (m_anime && m_anime->id == id) refresh();
   });
   connect(track::updateSession(), &track::UpdateSession::stateChanged, this, [this]() {
@@ -321,7 +321,7 @@ void NowPlayingWidget::refresh() {
   const auto episodeCount = formatNumber(m_anime ? m_anime->episode_count : 0, "?");
 
   QPixmap poster;
-  if (m_anime) poster = imageProvider.loadPoster(m_anime->id);
+  if (m_anime) poster = imageProvider()->loadPoster(m_anime->id);
 
   render(Content{
       .title = QString::fromStdString(title),

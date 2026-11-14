@@ -91,7 +91,7 @@ int Application::run() {
   track::updateSession()->init();
   share::discord::presence()->init();
   share::http::webhook()->init();
-  gui::imageProvider.init();
+  gui::imageProvider()->init();
 
   gui::theme()->initStyle();
   setWindowIcon(gui::theme()->getIcon("taiga", "png"));

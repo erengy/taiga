@@ -33,7 +33,7 @@ class ImageProvider final : public QObject {
   Q_DISABLE_COPY_MOVE(ImageProvider)
 
 public:
-  ImageProvider();
+  explicit ImageProvider(QObject* parent);
 
   void init();
 
@@ -55,6 +55,6 @@ private:
   QMap<int, QDateTime> m_retryAfter;
 };
 
-inline ImageProvider imageProvider;
+ImageProvider* imageProvider();
 
 }  // namespace gui
