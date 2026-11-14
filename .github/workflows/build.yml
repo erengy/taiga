@@ -1,0 +1,101 @@
+name: Build
+
+on:
+  push:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build (${{ matrix.arch }})
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x64
+            msvc-arch: x64
+            qt-arch: win64_msvc2022_64
+            cmake-extra: ''
+          - arch: arm64
+            msvc-arch: x64_arm64
+            qt-arch: win64_msvc2022_arm64_cross_compiled
+            # Tell the cross-compiled Qt where the x64 host tools are, otherwise
+            # CMake tries to run the ARM64-built moc.exe from the target prefix
+            cmake-extra: >-
+              -DQT_HOST_PATH="$env:QT_HOST_PATH"
+              -DQT_HOST_PATH_CMAKE_DIR="$env:QT_HOST_PATH/lib/cmake"
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+        with:
+          submodules: recursive
+
+      - name: Set up MSVC Developer Command Prompt
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: ${{ matrix.msvc-arch }}
+
+      - name: Install Qt
+        id: install-qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.10.3'
+          arch: ${{ matrix.qt-arch }}
+          modules: 'qtimageformats'
+          cache: true
+          # Use the unreleased aqtinstall fix for installing Qt 6.10 ARM64:
+          # https://github.com/miurahr/aqtinstall/issues/998
+          aqtsource: git+https://github.com/miurahr/aqtinstall.git
+          # Skip setup-python: its latest Python (3.15) has no prebuilt wheels for
+          # aqt's native deps, so pip builds them from source — which fails under
+          # the ARM64 cross-compiler environment. The runner's preinstalled
+          # Python 3.12 has prebuilt wheels.
+          setup-python: false
+
+      - name: Point the project to the Qt installation
+        shell: pwsh
+        run: '"QTDIR=$env:QT_ROOT_DIR" >> $env:GITHUB_ENV'
+
+      - name: Determine artifact name
+        id: meta
+        shell: pwsh
+        run: |
+          $version = (Select-String -Path CMakeLists.txt -Pattern '^\s*VERSION\s+(?<v>\d+(?:\.\d+)+)').Matches[0].Groups['v'].Value
+          $sha = "${{ github.sha }}".Substring(0, 7)
+          $name = "taiga-$version-${{ matrix.arch }}-$sha"
+          "name=$name" >> $env:GITHUB_OUTPUT
+          Write-Output "Artifact name: $name"
+
+      - name: Configure
+        run: cmake -B build/msvc-${{ matrix.arch }} -G "Ninja Multi-Config" -DCMAKE_BUILD_TYPE=msvc-${{ matrix.arch }}-release ${{ matrix.cmake-extra }}
+
+      - name: Build
+        run: cmake --build build/msvc-${{ matrix.arch }} --config RelWithDebInfo --target taiga
+
+      - name: Deploy Qt dependencies
+        shell: pwsh
+        run: |
+          # For cross-compiled Qt (arm64), the windeployqt.exe in the target
+          # package is an ARM64 binary that cannot run on the x64 host. Use the
+          # host tool instead, with the target package's host-qtpaths wrapper so
+          # the ARM64 Qt libraries get deployed.
+          $windeployqt = if ($env:QT_HOST_PATH) { "$env:QT_HOST_PATH/bin/windeployqt.exe" } else { "$env:QTDIR/bin/windeployqt.exe" }
+          $qtpathsArgs = if ($env:QT_HOST_PATH) { '--qtpaths', "$env:QTDIR/bin/host-qtpaths6.bat" } else { @() }
+          & $windeployqt --release @qtpathsArgs bin/RelWithDebInfo/Taiga.exe
+
+      - name: Create archive
+        shell: pwsh
+        run: |
+          Compress-Archive -Path bin/RelWithDebInfo/* -DestinationPath "${{ steps.meta.outputs.name }}.zip"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          # Uploading the zip as-is (the file name is used as the artifact
+          # name); without this the artifact would be a zip inside a zip
+          path: ${{ steps.meta.outputs.name }}.zip
+          archive: false
+          if-no-files-found: error
