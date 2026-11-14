@@ -18,6 +18,7 @@
 
 #include "service.hpp"
 
+#include <QCoreApplication>
 #include <QMap>
 
 #include "base/log.hpp"

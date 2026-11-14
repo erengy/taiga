@@ -18,6 +18,7 @@
 
 #include "media.hpp"
 
+#include <QCoreApplication>
 #include <algorithm>
 #include <optional>
 #include <string>
@@ -239,6 +240,11 @@ bool Detection::hasEpisodeChanged(const Episode& episode) const {
 
   return currentEpisode_->elements(anitomy::ElementKind::Episode) !=
          episode.elements(anitomy::ElementKind::Episode);
+}
+
+Detection* detection() {
+  static auto instance = new Detection{qApp};
+  return instance;
 }
 
 }  // namespace track::media

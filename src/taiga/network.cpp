@@ -18,6 +18,7 @@
 
 #include "network.hpp"
 
+#include <QCoreApplication>
 #include <QNetworkProxy>
 #include <QNetworkReply>
 #include <QRestReply>
@@ -109,6 +110,11 @@ bool isDdosProtectionActive(const QRestReply& reply) {
     default:
       return false;
   }
+}
+
+NetworkAccessManager* network() {
+  static auto instance = new NetworkAccessManager{qApp};
+  return instance;
 }
 
 }  // namespace taiga

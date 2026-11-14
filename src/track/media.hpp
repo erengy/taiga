@@ -18,7 +18,6 @@
 
 #pragma once
 
-#include <QApplication>
 #include <QObject>
 #include <QTimer>
 #include <anisthesia.hpp>
@@ -74,9 +73,6 @@ private:
   QTimer* pollTimer_;
 };
 
-inline Detection* detection() {
-  static auto detection = new Detection(qApp);
-  return detection;
-}
+Detection* detection();
 
 }  // namespace track::media

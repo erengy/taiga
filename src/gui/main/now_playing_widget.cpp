@@ -20,6 +20,7 @@
 
 #include <QBoxLayout>
 #include <QDesktopServices>
+#include <QEvent>
 #include <QLabel>
 #include <QUrl>
 #include <optional>

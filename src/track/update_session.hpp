@@ -18,7 +18,6 @@
 
 #pragma once
 
-#include <QApplication>
 #include <QObject>
 #include <QTimer>
 #include <chrono>
@@ -73,9 +72,6 @@ private:
   QTimer* timer_;
 };
 
-inline UpdateSession* updateSession() {
-  static auto session = new UpdateSession(qApp);
-  return session;
-}
+UpdateSession* updateSession();
 
 }  // namespace track

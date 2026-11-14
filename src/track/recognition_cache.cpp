@@ -18,6 +18,7 @@
 
 #include "recognition_cache.hpp"
 
+#include <QCoreApplication>
 #include <format>
 
 #include "media/anime_db.hpp"
@@ -26,7 +27,7 @@
 
 namespace track::recognition {
 
-Cache::Cache() : QObject{} {
+Cache::Cache(QObject* parent) : QObject{parent} {
   connect(anime::db(), &anime::Database::itemUpdated, this, [this](const int id) {
     if (const auto* item = anime::db()->item(id)) {
       update(*item);
@@ -107,6 +108,11 @@ void Cache::remove(const anime::Details& item) {
 void Cache::update(const anime::Details& item) {
   remove(item);
   add(item);
+}
+
+Cache* cache() {
+  static auto instance = new Cache{qApp};
+  return instance;
 }
 
 }  // namespace track::recognition

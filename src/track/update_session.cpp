@@ -18,6 +18,8 @@
 
 #include "update_session.hpp"
 
+#include <QCoreApplication>
+
 #include "base/log.hpp"
 #include "media/anime.hpp"
 #include "media/anime_db.hpp"
@@ -234,6 +236,11 @@ void UpdateSession::setState(const UpdateState& state) {
 
   state_ = state;
   emit stateChanged(state_);
+}
+
+UpdateSession* updateSession() {
+  static auto instance = new UpdateSession{qApp};
+  return instance;
 }
 
 }  // namespace track

@@ -35,7 +35,7 @@ class Cache final : public QObject {
   Q_DISABLE_COPY_MOVE(Cache)
 
 public:
-  Cache();
+  explicit Cache(QObject* parent);
 
   struct Data {
     struct Match {
@@ -60,9 +60,6 @@ private:
   std::unordered_map<std::string, Data> titles_;
 };
 
-inline Cache* cache() {
-  static auto cache = new Cache();
-  return cache;
-}
+Cache* cache();
 
 }  // namespace track::recognition
