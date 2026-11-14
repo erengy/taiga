@@ -44,6 +44,9 @@ public:
   std::vector<std::string> disabledMediaPlayers() const;
   bool discordEnabled() const;
   std::string service() const;
+  bool httpEnabled() const;
+  std::vector<std::string> httpHeaders() const;
+  std::string httpUrl() const;
   std::vector<std::string> libraryFolders() const;
   std::chrono::milliseconds mediaDetectionInterval() const;
   QNetworkProxy::ProxyType proxyType() const;
@@ -66,6 +69,9 @@ public:
   void setDisabledMediaPlayers(std::vector<std::string> players) const;
   void setDiscordEnabled(const bool enabled) const;
   void setService(const std::string& service) const;
+  void setHttpEnabled(const bool enabled) const;
+  void setHttpHeaders(std::vector<std::string> headers) const;
+  void setHttpUrl(const std::string& url) const;
   void setLibraryFolders(std::vector<std::string> folders) const;
   void setMediaDetectionInterval(const std::chrono::milliseconds interval) const;
   void setProxyType(const QNetworkProxy::ProxyType type) const;

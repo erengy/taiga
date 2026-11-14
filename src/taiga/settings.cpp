@@ -90,6 +90,20 @@ std::string Settings::service() const {
       .toStdString();
 }
 
+bool Settings::httpEnabled() const {
+  return value("sharing.http.enabled", false).toBool();
+}
+
+std::vector<std::string> Settings::httpHeaders() const {
+  return value("sharing.http.headers").toJsonArray().toVariantList() |
+         std::views::transform([](const QVariant& v) { return v.toString().toStdString(); }) |
+         std::ranges::to<std::vector>();
+}
+
+std::string Settings::httpUrl() const {
+  return value("sharing.http.url").toString().toStdString();
+}
+
 std::vector<std::string> Settings::libraryFolders() const {
   return value("library.folders").toJsonArray().toVariantList() |
          std::views::transform([](const QVariant& v) { return v.toString().toStdString(); }) |
@@ -192,6 +206,18 @@ void Settings::setDiscordEnabled(const bool enabled) const {
 
 void Settings::setService(const std::string& service) const {
   setValue("sync.service", service);
+}
+
+void Settings::setHttpEnabled(const bool enabled) const {
+  setValue("sharing.http.enabled", enabled);
+}
+
+void Settings::setHttpHeaders(std::vector<std::string> headers) const {
+  setValue("sharing.http.headers", QJsonArray::fromStringList(toStringList(headers)));
+}
+
+void Settings::setHttpUrl(const std::string& url) const {
+  setValue("sharing.http.url", url);
 }
 
 void Settings::setLibraryFolders(std::vector<std::string> folders) const {

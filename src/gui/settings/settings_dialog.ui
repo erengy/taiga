@@ -681,6 +681,78 @@
             </widget>
            </item>
            <item>
+            <widget class="QGroupBox" name="httpGroupBox">
+             <property name="title">
+              <string>HTTP</string>
+             </property>
+             <layout class="QFormLayout" name="httpGroupBoxLayout">
+              <item row="0" column="0" colspan="2">
+               <widget class="QCheckBox" name="httpEnabledCheckBox">
+                <property name="text">
+                 <string>Send what I'm watching to a URL</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="httpUrlLabel">
+                <property name="text">
+                 <string>URL:</string>
+                </property>
+                <property name="buddy">
+                 <cstring>httpUrlLineEdit</cstring>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QLineEdit" name="httpUrlLineEdit">
+                <property name="placeholderText">
+                 <string>https://example.com/taiga</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="httpHeadersLabel">
+                <property name="text">
+                 <string>Headers:</string>
+                </property>
+                <property name="buddy">
+                 <cstring>httpHeadersPlainTextEdit</cstring>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QPlainTextEdit" name="httpHeadersPlainTextEdit">
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>48</height>
+                 </size>
+                </property>
+                <property name="lineWrapMode">
+                 <enum>QPlainTextEdit::NoWrap</enum>
+                </property>
+                <property name="placeholderText">
+                 <string>Authorization: Bearer token</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0" colspan="2">
+               <widget class="QLabel" name="httpHintLabel">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="text">
+                 <string>Sends a POST request with JSON data when you start or stop watching an episode, and when your list is updated.</string>
+                </property>
+                <property name="wordWrap">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
             <spacer name="sharingVerticalSpacer">
              <property name="orientation">
               <enum>Qt::Vertical</enum>
