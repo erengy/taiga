@@ -42,8 +42,8 @@ bool isSameMedia(const Episode& previous, const Episode& current) {
 }
 
 bool isOutsideLibrary() {
-  if (!taiga::settings.updateLibraryOnly()) return false;
-  if (taiga::settings.libraryFolders().empty()) return false;
+  if (!taiga::settings()->updateLibraryOnly()) return false;
+  if (taiga::settings()->libraryFolders().empty()) return false;
 
   const auto file = media::detection()->getCurrentFile();
   if (!file) return false;
@@ -97,9 +97,9 @@ void UpdateSession::onEpisodeChanged(std::optional<Episode> episode) {
 
   if (!episode_ || !isSameMedia(*episode_, *episode)) {
     elapsed_ = std::chrono::seconds{0};
-    delay_ = taiga::settings.updateDelay();
-    trigger_ = taiga::settings.updateTrigger();
-    pauseWhenUnfocused_ = taiga::settings.updatePauseWhenUnfocused();
+    delay_ = taiga::settings()->updateDelay();
+    trigger_ = taiga::settings()->updateTrigger();
+    pauseWhenUnfocused_ = taiga::settings()->updatePauseWhenUnfocused();
     paused_ = false;
     dismissed_ = false;
     committed_ = false;

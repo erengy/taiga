@@ -140,18 +140,18 @@ bool Detection::init() {
 }
 
 bool Detection::isEnabled() const {
-  return taiga::settings.detectionEnabled();
+  return taiga::settings()->detectionEnabled();
 }
 
 void Detection::setEnabled(bool enabled) {
-  taiga::settings.setDetectionEnabled(enabled);
+  taiga::settings()->setDetectionEnabled(enabled);
   setPollingEnabled(enabled);
 }
 
 void Detection::setPollingEnabled(bool enabled) {
 #ifdef Q_OS_WINDOWS
   if (enabled) {
-    const auto interval = taiga::settings.mediaDetectionInterval();
+    const auto interval = taiga::settings()->mediaDetectionInterval();
     pollTimer_->start(interval);
   } else {
     pollTimer_->stop();

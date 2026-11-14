@@ -19,6 +19,7 @@
 #pragma once
 
 #include <QNetworkProxy>
+#include <QObject>
 #include <chrono>
 #include <optional>
 #include <string>
@@ -30,11 +31,16 @@
 
 namespace taiga {
 
-class Settings final : public base::Settings {
+class Settings final : public QObject, public base::Settings {
+  Q_OBJECT
+  Q_DISABLE_COPY_MOVE(Settings)
+
 public:
   static constexpr QLatin1StringView kAppStyleSystem{"system"};
   static constexpr std::chrono::seconds kUpdateDelayMin{10};
   static constexpr std::chrono::seconds kUpdateDelayMax{3600};
+
+  explicit Settings(QObject* parent);
 
   void init() const;
 
@@ -94,6 +100,6 @@ private:
   mutable std::optional<anime::TitleLanguage> titleLanguageCache_;
 };
 
-inline Settings settings;
+Settings* settings();
 
 }  // namespace taiga

@@ -34,20 +34,20 @@ namespace taiga {
 namespace {
 
 QNetworkProxy buildProxy() {
-  const auto host = QString::fromStdString(settings.proxyHost());
+  const auto host = QString::fromStdString(settings()->proxyHost());
   if (host.isEmpty()) return QNetworkProxy{};
 
   QNetworkProxy proxy;
-  proxy.setType(settings.proxyType());
+  proxy.setType(settings()->proxyType());
   proxy.setHostName(host);
-  if (const auto port = settings.proxyPort(); port >= 0) {
+  if (const auto port = settings()->proxyPort(); port >= 0) {
     proxy.setPort(static_cast<quint16>(port));
   }
 
-  if (const auto username = settings.proxyUsername(); !username.empty()) {
+  if (const auto username = settings()->proxyUsername(); !username.empty()) {
     proxy.setUser(QString::fromStdString(username));
   }
-  if (const auto password = settings.proxyPassword(); !password.empty()) {
+  if (const auto password = settings()->proxyPassword(); !password.empty()) {
     proxy.setPassword(QString::fromStdString(password));
   }
 

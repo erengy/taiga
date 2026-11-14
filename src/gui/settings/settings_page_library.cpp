@@ -52,7 +52,7 @@ SettingsPageLibrary::SettingsPageLibrary(Ui::SettingsDialog* ui, QDialog* dialog
 }
 
 void SettingsPageLibrary::load() {
-  for (const auto& folder : taiga::settings.libraryFolders()) {
+  for (const auto& folder : taiga::settings()->libraryFolders()) {
     ui_->libraryFoldersList->addItem(QDir::toNativeSeparators(QString::fromStdString(folder)));
   }
 }
@@ -62,7 +62,7 @@ void SettingsPageLibrary::apply() const {
   for (int i = 0; i < ui_->libraryFoldersList->count(); ++i) {
     folders.push_back(ui_->libraryFoldersList->item(i)->text().toStdString());
   }
-  taiga::settings.setLibraryFolders(std::move(folders));
+  taiga::settings()->setLibraryFolders(std::move(folders));
 }
 
 }  // namespace gui

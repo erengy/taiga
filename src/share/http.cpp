@@ -39,11 +39,11 @@ namespace share::http {
 namespace {
 
 bool isEnabled() {
-  return taiga::settings.sharingEnabled() && taiga::settings.httpEnabled();
+  return taiga::settings()->sharingEnabled() && taiga::settings()->httpEnabled();
 }
 
 std::optional<QUrl> targetUrl() {
-  const QUrl url{QString::fromStdString(taiga::settings.httpUrl()), QUrl::StrictMode};
+  const QUrl url{QString::fromStdString(taiga::settings()->httpUrl()), QUrl::StrictMode};
   if (!url.isValid() || url.host().isEmpty()) return std::nullopt;
   if (url.scheme() != u"http" && url.scheme() != u"https") return std::nullopt;
   return url;
@@ -54,7 +54,7 @@ QHttpHeaders requestHeaders() {
   headers.replaceOrAppend(QHttpHeaders::WellKnownHeader::ContentType, "application/json");
 
   // User-defined headers are in "Name: value" format, and may override the common ones.
-  for (const auto& header : taiga::settings.httpHeaders()) {
+  for (const auto& header : taiga::settings()->httpHeaders()) {
     const auto line = QString::fromStdString(header);
     const auto separator = line.indexOf(u':');
     if (separator <= 0) continue;

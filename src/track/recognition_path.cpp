@@ -42,7 +42,8 @@ bool isTitle(const anitomy::Element& element) {
 }
 
 bool isLibraryFolder(const QDir& dir) {
-  return std::ranges::any_of(taiga::settings.libraryFolders(), [&dir](const std::string& folder) {
+  return std::ranges::any_of(taiga::settings()->libraryFolders(), [&dir](
+                                                                      const std::string& folder) {
     const auto normalizedPath = [](const QDir& dir) { return dir.absolutePath().toStdString(); };
     const auto path = normalizedPath(dir);
     const auto folderPath = normalizedPath(QDir(QString::fromStdString(folder)));

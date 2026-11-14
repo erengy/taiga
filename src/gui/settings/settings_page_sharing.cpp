@@ -50,27 +50,27 @@ SettingsPageSharing::SettingsPageSharing(Ui::SettingsDialog* ui, QDialog* dialog
 }
 
 void SettingsPageSharing::load() {
-  ui_->sharingEnabledCheckBox->setChecked(taiga::settings.sharingEnabled());
+  ui_->sharingEnabledCheckBox->setChecked(taiga::settings()->sharingEnabled());
   ui_->discordGroupBox->setEnabled(ui_->sharingEnabledCheckBox->isChecked());
   ui_->httpGroupBox->setEnabled(ui_->sharingEnabledCheckBox->isChecked());
 
-  ui_->discordEnabledCheckBox->setChecked(taiga::settings.discordEnabled());
+  ui_->discordEnabledCheckBox->setChecked(taiga::settings()->discordEnabled());
 
-  ui_->httpEnabledCheckBox->setChecked(taiga::settings.httpEnabled());
+  ui_->httpEnabledCheckBox->setChecked(taiga::settings()->httpEnabled());
   emit ui_->httpEnabledCheckBox->toggled(ui_->httpEnabledCheckBox->isChecked());
-  ui_->httpUrlLineEdit->setText(QString::fromStdString(taiga::settings.httpUrl()));
+  ui_->httpUrlLineEdit->setText(QString::fromStdString(taiga::settings()->httpUrl()));
   ui_->httpHeadersPlainTextEdit->setPlainText(
-      toStringList(taiga::settings.httpHeaders()).join(u'\n'));
+      toStringList(taiga::settings()->httpHeaders()).join(u'\n'));
 }
 
 void SettingsPageSharing::apply() const {
-  taiga::settings.setSharingEnabled(ui_->sharingEnabledCheckBox->isChecked());
-  taiga::settings.setDiscordEnabled(ui_->discordEnabledCheckBox->isChecked());
+  taiga::settings()->setSharingEnabled(ui_->sharingEnabledCheckBox->isChecked());
+  taiga::settings()->setDiscordEnabled(ui_->discordEnabledCheckBox->isChecked());
 
-  taiga::settings.setHttpEnabled(ui_->httpEnabledCheckBox->isChecked());
-  taiga::settings.setHttpUrl(ui_->httpUrlLineEdit->text().trimmed().toStdString());
+  taiga::settings()->setHttpEnabled(ui_->httpEnabledCheckBox->isChecked());
+  taiga::settings()->setHttpUrl(ui_->httpUrlLineEdit->text().trimmed().toStdString());
   const auto lines = ui_->httpHeadersPlainTextEdit->toPlainText().split(u'\n');
-  taiga::settings.setHttpHeaders(
+  taiga::settings()->setHttpHeaders(
       toVector(lines | std::views::transform([](const QString& s) { return s.trimmed(); }) |
                std::views::filter([](const QString& s) { return !s.isEmpty(); }) |
                std::ranges::to<QStringList>()));

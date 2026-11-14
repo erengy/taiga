@@ -43,9 +43,9 @@ const QIcon& Theme::getIcon(const QString& key, const QString& extension, bool u
 }
 
 void Theme::initStyle() {
-  qApp->styleHints()->setColorScheme(taiga::settings.appColorScheme());
+  qApp->styleHints()->setColorScheme(taiga::settings()->appColorScheme());
 
-  const auto style = QString::fromStdString(taiga::settings.appStyle());
+  const auto style = QString::fromStdString(taiga::settings()->appStyle());
   if (style.compare(taiga::Settings::kAppStyleSystem, Qt::CaseInsensitive) != 0) {
     qApp->setStyle(style);
   }

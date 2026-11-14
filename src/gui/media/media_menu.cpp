@@ -212,7 +212,7 @@ void MediaMenu::matchNowPlaying() const {
 void MediaMenu::openFolder() const {
   const auto& item = m_items.front();
 
-  const auto libraryFolders = taiga::settings.libraryFolders();
+  const auto libraryFolders = taiga::settings()->libraryFolders();
 
   for (const auto& path : libraryFolders) {
     const auto folder = track::findFolder(QString::fromStdString(path), item.id);

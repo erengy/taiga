@@ -18,6 +18,7 @@
 
 #include "settings.hpp"
 
+#include <QCoreApplication>
 #include <QFile>
 #include <QJsonArray>
 #include <algorithm>
@@ -31,6 +32,8 @@
 #include "taiga/version.hpp"
 
 namespace taiga {
+
+Settings::Settings(QObject* parent) : QObject{parent} {}
 
 void Settings::init() const {
   const auto appVersion = taiga::version().to_string();
@@ -293,6 +296,11 @@ void Settings::setUpdateTrigger(const track::UpdateTrigger trigger) const {
   const std::string slug =
       trigger == track::UpdateTrigger::OnPlayerClose ? "onPlayerClose" : "afterDelay";
   setValue("track.update.trigger", slug);
+}
+
+Settings* settings() {
+  static auto instance = new Settings{qApp};
+  return instance;
 }
 
 }  // namespace taiga

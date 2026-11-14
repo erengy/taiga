@@ -34,12 +34,12 @@ SettingsPageStreaming::SettingsPageStreaming(Ui::SettingsDialog* ui, QDialog* di
 }
 
 void SettingsPageStreaming::load() {
-  ui_->streamingEnabledCheckBox->setChecked(taiga::settings.streamingMediaEnabled());
+  ui_->streamingEnabledCheckBox->setChecked(taiga::settings()->streamingMediaEnabled());
   loadPlayerList(ui_->streamingBrowsersList, anisthesia::PlayerType::WebBrowser);
 }
 
 void SettingsPageStreaming::apply() const {
-  taiga::settings.setStreamingMediaEnabled(ui_->streamingEnabledCheckBox->isChecked());
+  taiga::settings()->setStreamingMediaEnabled(ui_->streamingEnabledCheckBox->isChecked());
   savePlayerList(ui_->streamingBrowsersList, anisthesia::PlayerType::WebBrowser);
 }
 

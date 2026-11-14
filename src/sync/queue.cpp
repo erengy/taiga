@@ -210,7 +210,7 @@ void Queue::reconcile(const int animeId, const ListEntry* remote) {
 }
 
 void Queue::processAutomatically() {
-  if (!taiga::settings.syncEnabled()) return;
+  if (!taiga::settings()->syncEnabled()) return;
   if (!isUserAuthenticated() && !willAuthenticate()) return;
 
   process();
@@ -334,7 +334,7 @@ QueueItem Queue::itemFromQuery(const QSqlQuery& q) const {
 
 void Queue::migrateFromV1() {
   const auto path = []() {
-    const auto service = taiga::settings.service();
+    const auto service = taiga::settings()->service();
     return std::format("{}/v1/user/{}@{}/history.xml", taiga::get_data_path(),
                        taiga::accounts.serviceUsername(service), service);
   }();

@@ -76,7 +76,7 @@ void Presence::init() {
 }
 
 void Presence::applySettings() {
-  if (taiga::settings.sharingEnabled() && taiga::settings.discordEnabled()) {
+  if (taiga::settings()->sharingEnabled() && taiga::settings()->discordEnabled()) {
     activityManager_->open();
   } else {
     activityManager_->close();

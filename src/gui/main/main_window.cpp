@@ -138,16 +138,16 @@ void MainWindow::initActions() {
   connect(ui_->actionToggleDetection, &QAction::toggled, this,
           [](const bool checked) { track::media::detection()->setEnabled(checked); });
 
-  ui_->actionToggleSharing->setChecked(taiga::settings.sharingEnabled());
+  ui_->actionToggleSharing->setChecked(taiga::settings()->sharingEnabled());
   connect(ui_->actionToggleSharing, &QAction::toggled, this, [](const bool checked) {
-    taiga::settings.setSharingEnabled(checked);
+    taiga::settings()->setSharingEnabled(checked);
     share::discord::presence()->applySettings();
     share::http::webhook()->applySettings();
   });
 
-  ui_->actionToggleSynchronization->setChecked(taiga::settings.syncEnabled());
+  ui_->actionToggleSynchronization->setChecked(taiga::settings()->syncEnabled());
   connect(ui_->actionToggleSynchronization, &QAction::toggled, this,
-          [](const bool checked) { taiga::settings.setSyncEnabled(checked); });
+          [](const bool checked) { taiga::settings()->setSyncEnabled(checked); });
 }
 
 void MainWindow::initIcons() {
@@ -361,9 +361,9 @@ void MainWindow::initToolbar() {
       auto menu = new QMenu(this);
       // Can also be changed from the settings dialog
       connect(menu, &QMenu::aboutToShow, this, [this]() {
-        ui_->actionToggleDetection->setChecked(taiga::settings.detectionEnabled());
-        ui_->actionToggleSharing->setChecked(taiga::settings.sharingEnabled());
-        ui_->actionToggleSynchronization->setChecked(taiga::settings.syncEnabled());
+        ui_->actionToggleDetection->setChecked(taiga::settings()->detectionEnabled());
+        ui_->actionToggleSharing->setChecked(taiga::settings()->sharingEnabled());
+        ui_->actionToggleSynchronization->setChecked(taiga::settings()->syncEnabled());
       });
       menu->addAction(ui_->actionToggleDetection);
       menu->addAction(ui_->actionToggleSharing);

@@ -30,7 +30,7 @@
 namespace track {
 
 bool playEpisode(int animeId, int number) {
-  const auto libraryFolders = taiga::settings.libraryFolders();
+  const auto libraryFolders = taiga::settings()->libraryFolders();
 
   for (const auto& folder : libraryFolders) {
     const auto episodePath = findEpisode(QString::fromStdString(folder), animeId, number);

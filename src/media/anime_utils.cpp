@@ -178,7 +178,7 @@ std::string preferredTitle(const Details& item) {
     return settings->display_title;
   }
 
-  switch (taiga::settings.titleLanguage()) {
+  switch (taiga::settings()->titleLanguage()) {
     default:
     case TitleLanguage::Romaji:
       return item.titles.romaji;

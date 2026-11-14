@@ -83,7 +83,7 @@ int Application::run() {
   connect(&local_server_, &QLocalServer::newConnection, this, &Application::onNewConnection);
   local_server_.listen(TAIGA_APP_NAME);
 
-  taiga::settings.init();
+  taiga::settings()->init();
   anime::db.init();
   anime::history.init();
   sync::queue.init();

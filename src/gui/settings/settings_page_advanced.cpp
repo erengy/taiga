@@ -109,7 +109,7 @@ void SettingsPageAdvanced::load() {
     auto combo = appStyleComboBox_;
     const QString system{taiga::Settings::kAppStyleSystem};
     auto keys = QStyleFactory::keys();
-    const auto style = QString::fromStdString(taiga::settings.appStyle()).toLower();
+    const auto style = QString::fromStdString(taiga::settings()->appStyle()).toLower();
     if (style != system && !keys.contains(style, Qt::CaseInsensitive)) {
       keys.append(style);  // keep unavailable style
     }
@@ -121,17 +121,17 @@ void SettingsPageAdvanced::load() {
     combo->setCurrentIndex(std::max(0, combo->findData(style)));
   }
 
-  detectionIntervalSpinBox_->setValue(
-      static_cast<int>(duration_cast<seconds>(taiga::settings.mediaDetectionInterval()).count()));
+  detectionIntervalSpinBox_->setValue(static_cast<int>(
+      duration_cast<seconds>(taiga::settings()->mediaDetectionInterval()).count()));
 
   proxyTypeComboBox_->setCurrentIndex(
-      std::max(0, proxyTypeComboBox_->findData(static_cast<int>(taiga::settings.proxyType()))));
+      std::max(0, proxyTypeComboBox_->findData(static_cast<int>(taiga::settings()->proxyType()))));
   table->item(ProxyHost, kValueColumn)
-      ->setText(QString::fromStdString(taiga::settings.proxyHost()));
-  proxyPortSpinBox_->setValue(std::max(0, taiga::settings.proxyPort()));
+      ->setText(QString::fromStdString(taiga::settings()->proxyHost()));
+  proxyPortSpinBox_->setValue(std::max(0, taiga::settings()->proxyPort()));
   table->item(ProxyUsername, kValueColumn)
-      ->setText(QString::fromStdString(taiga::settings.proxyUsername()));
-  proxyPasswordLineEdit_->setText(QString::fromStdString(taiga::settings.proxyPassword()));
+      ->setText(QString::fromStdString(taiga::settings()->proxyUsername()));
+  proxyPasswordLineEdit_->setText(QString::fromStdString(taiga::settings()->proxyPassword()));
 }
 
 void SettingsPageAdvanced::apply() const {
@@ -139,16 +139,17 @@ void SettingsPageAdvanced::apply() const {
 
   const auto table = ui_->advancedTable;
 
-  taiga::settings.setAppStyle(appStyleComboBox_->currentData().toString().toStdString());
-  taiga::settings.setMediaDetectionInterval(seconds{detectionIntervalSpinBox_->value()});
+  taiga::settings()->setAppStyle(appStyleComboBox_->currentData().toString().toStdString());
+  taiga::settings()->setMediaDetectionInterval(seconds{detectionIntervalSpinBox_->value()});
 
-  taiga::settings.setProxyType(
+  taiga::settings()->setProxyType(
       static_cast<QNetworkProxy::ProxyType>(proxyTypeComboBox_->currentData().toInt()));
-  taiga::settings.setProxyHost(
+  taiga::settings()->setProxyHost(
       table->item(ProxyHost, kValueColumn)->text().trimmed().toStdString());
-  taiga::settings.setProxyPort(proxyPortSpinBox_->value() > 0 ? proxyPortSpinBox_->value() : -1);
-  taiga::settings.setProxyUsername(table->item(ProxyUsername, kValueColumn)->text().toStdString());
-  taiga::settings.setProxyPassword(proxyPasswordLineEdit_->text().toStdString());
+  taiga::settings()->setProxyPort(proxyPortSpinBox_->value() > 0 ? proxyPortSpinBox_->value() : -1);
+  taiga::settings()->setProxyUsername(
+      table->item(ProxyUsername, kValueColumn)->text().toStdString());
+  taiga::settings()->setProxyPassword(proxyPasswordLineEdit_->text().toStdString());
 }
 
 }  // namespace gui

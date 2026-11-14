@@ -37,7 +37,7 @@ void SettingsPageApplication::load() {
     combo->addItem(tr("Light"), static_cast<int>(Qt::ColorScheme::Light));
     combo->addItem(tr("Dark"), static_cast<int>(Qt::ColorScheme::Dark));
     combo->setCurrentIndex(
-        std::max(0, combo->findData(static_cast<int>(taiga::settings.appColorScheme()))));
+        std::max(0, combo->findData(static_cast<int>(taiga::settings()->appColorScheme()))));
   }
   {
     using anime::TitleLanguage;
@@ -46,16 +46,16 @@ void SettingsPageApplication::load() {
     combo->addItem(tr("English"), static_cast<int>(TitleLanguage::English));
     combo->addItem(tr("Native"), static_cast<int>(TitleLanguage::Native));
     combo->setCurrentIndex(
-        std::max(0, combo->findData(static_cast<int>(taiga::settings.titleLanguage()))));
+        std::max(0, combo->findData(static_cast<int>(taiga::settings()->titleLanguage()))));
   }
 }
 
 void SettingsPageApplication::apply() const {
   const auto colorScheme =
       static_cast<Qt::ColorScheme>(ui_->colorSchemeComboBox->currentData().toInt());
-  taiga::settings.setAppColorScheme(colorScheme);
+  taiga::settings()->setAppColorScheme(colorScheme);
   qApp->styleHints()->setColorScheme(colorScheme);
-  taiga::settings.setTitleLanguage(
+  taiga::settings()->setTitleLanguage(
       static_cast<anime::TitleLanguage>(ui_->titleLanguageComboBox->currentData().toInt()));
 }
 

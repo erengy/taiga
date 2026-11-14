@@ -36,7 +36,7 @@ LibraryWidget::LibraryWidget(QWidget* parent)
       m_model(new LibraryModel(parent)),
       m_comboRoot(new ComboBox(this)),
       m_view(new QTreeView(parent)) {
-  const auto libraryFolders = taiga::settings.libraryFolders();
+  const auto libraryFolders = taiga::settings()->libraryFolders();
   const auto rootPath =
       !libraryFolders.empty() ? QString::fromStdString(libraryFolders.front()) : QString{};
 
