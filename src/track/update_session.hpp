@@ -48,6 +48,7 @@ signals:
   void confirmationRequested(const UpdateState& state) const;
 
 private:
+  void loadSettings();
   void onEpisodeChanged(std::optional<Episode> episode);
   void onMediaClosed();
   void tick();

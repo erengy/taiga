@@ -21,6 +21,7 @@
 #include <QCoreApplication>
 
 #include "base/log.hpp"
+#include "base/string.hpp"
 #include "media/anime.hpp"
 #include "media/anime_db.hpp"
 #include "media/anime_list_utils.hpp"
@@ -63,8 +64,22 @@ UpdateSession::UpdateSession(QObject* parent) : QObject(parent) {
 }
 
 void UpdateSession::init() {
+  loadSettings();
+
   connect(media::detection(), &media::Detection::currentEpisodeChanged, this,
           &UpdateSession::onEpisodeChanged);
+
+  // Changes apply to the current media too. Time already watched still counts towards the delay.
+  connect(taiga::settings(), &taiga::Settings::changed, this, [this](const QSet<QString>& keys) {
+    static const QSet<QString> relevantKeys{
+        u"track.update.delay"_s,
+        u"track.update.trigger"_s,
+        u"track.update.pauseWhenUnfocused"_s,
+    };
+    if (!keys.intersects(relevantKeys)) return;
+    loadSettings();
+    evaluate();
+  });
 }
 
 const UpdateState& UpdateSession::state() const {
@@ -91,6 +106,13 @@ void UpdateSession::cancel() {
   evaluate();
 }
 
+void UpdateSession::loadSettings() {
+  delay_ = taiga::settings()->updateDelay();
+  trigger_ = taiga::settings()->updateTrigger();
+  pauseWhenUnfocused_ = taiga::settings()->updatePauseWhenUnfocused();
+  if (!pauseWhenUnfocused_) paused_ = false;
+}
+
 void UpdateSession::onEpisodeChanged(std::optional<Episode> episode) {
   if (!episode) {
     onMediaClosed();
@@ -99,9 +121,6 @@ void UpdateSession::onEpisodeChanged(std::optional<Episode> episode) {
 
   if (!episode_ || !isSameMedia(*episode_, *episode)) {
     elapsed_ = std::chrono::seconds{0};
-    delay_ = taiga::settings()->updateDelay();
-    trigger_ = taiga::settings()->updateTrigger();
-    pauseWhenUnfocused_ = taiga::settings()->updatePauseWhenUnfocused();
     paused_ = false;
     dismissed_ = false;
     committed_ = false;
