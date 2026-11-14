@@ -56,7 +56,7 @@ SettingsPageAccounts::SettingsPageAccounts(Ui::SettingsDialog* ui, QDialog* dial
 }
 
 void SettingsPageAccounts::load() {
-  const auto slug = QString::fromStdString(taiga::settings()->service());
+  const auto slug = QString::fromStdString(taiga::settings()->syncService());
   ui_->serviceComboBox->setCurrentIndex(std::max(0, ui_->serviceComboBox->findData(slug)));
   updateVisibleGroup();
 
@@ -79,7 +79,7 @@ void SettingsPageAccounts::load() {
 }
 
 void SettingsPageAccounts::apply() const {
-  taiga::settings()->setService(ui_->serviceComboBox->currentData().toString().toStdString());
+  taiga::settings()->setSyncService(ui_->serviceComboBox->currentData().toString().toStdString());
   taiga::settings()->setSyncEnabled(ui_->syncEnabledCheckBox->isChecked());
 
   auto& accounts = *taiga::accounts();

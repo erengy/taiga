@@ -44,25 +44,26 @@ public:
   struct Key {
     static constexpr QLatin1StringView kAppColorScheme{"app.colorScheme"};
     static constexpr QLatin1StringView kAppStyle{"app.style"};
+    static constexpr QLatin1StringView kAppTitleLanguage{"app.titleLanguage"};
     static constexpr QLatin1StringView kLibraryFolders{"library.folders"};
-    static constexpr QLatin1StringView kTitleLanguage{"library.titleLanguage"};
     static constexpr QLatin1StringView kMetaVersion{"meta.version"};
     static constexpr QLatin1StringView kProxyHost{"network.proxy.host"};
     static constexpr QLatin1StringView kProxyPassword{"network.proxy.password"};
     static constexpr QLatin1StringView kProxyPort{"network.proxy.port"};
     static constexpr QLatin1StringView kProxyType{"network.proxy.type"};
     static constexpr QLatin1StringView kProxyUsername{"network.proxy.username"};
-    static constexpr QLatin1StringView kDisabledMediaPlayers{"recognition.mediaPlayers.disabled"};
-    static constexpr QLatin1StringView kStreamingMediaEnabled{"recognition.streaming.enabled"};
     static constexpr QLatin1StringView kDiscordEnabled{"sharing.discord.enabled"};
     static constexpr QLatin1StringView kSharingEnabled{"sharing.enabled"};
-    static constexpr QLatin1StringView kHttpEnabled{"sharing.http.enabled"};
-    static constexpr QLatin1StringView kHttpHeaders{"sharing.http.headers"};
-    static constexpr QLatin1StringView kHttpUrl{"sharing.http.url"};
+    static constexpr QLatin1StringView kWebhookEnabled{"sharing.webhook.enabled"};
+    static constexpr QLatin1StringView kWebhookHeaders{"sharing.webhook.headers"};
+    static constexpr QLatin1StringView kWebhookUrl{"sharing.webhook.url"};
     static constexpr QLatin1StringView kSyncEnabled{"sync.enabled"};
-    static constexpr QLatin1StringView kService{"sync.service"};
+    static constexpr QLatin1StringView kSyncService{"sync.service"};
+    static constexpr QLatin1StringView kDisabledPlayers{"track.detection.disabledPlayers"};
     static constexpr QLatin1StringView kDetectionEnabled{"track.detection.enabled"};
-    static constexpr QLatin1StringView kMediaDetectionInterval{"track.detection.interval"};
+    static constexpr QLatin1StringView kDetectionInterval{"track.detection.interval"};
+    static constexpr QLatin1StringView kStreamingDetectionEnabled{
+        "track.detection.streaming.enabled"};
     static constexpr QLatin1StringView kUpdateDelay{"track.update.delay"};
     static constexpr QLatin1StringView kUpdateLibraryOnly{"track.update.libraryOnly"};
     static constexpr QLatin1StringView kUpdatePauseWhenUnfocused{"track.update.pauseWhenUnfocused"};
@@ -75,53 +76,53 @@ public:
 
   Qt::ColorScheme appColorScheme() const;
   std::string appStyle() const;
+  anime::TitleLanguage appTitleLanguage() const;
   bool detectionEnabled() const;
-  std::vector<std::string> disabledMediaPlayers() const;
+  std::chrono::milliseconds detectionInterval() const;
+  std::vector<std::string> disabledPlayers() const;
   bool discordEnabled() const;
-  bool httpEnabled() const;
-  std::vector<std::string> httpHeaders() const;
-  std::string httpUrl() const;
   std::vector<std::string> libraryFolders() const;
-  std::chrono::milliseconds mediaDetectionInterval() const;
   QNetworkProxy::ProxyType proxyType() const;
   std::string proxyHost() const;
   int proxyPort() const;
   std::string proxyUsername() const;
   std::string proxyPassword() const;
-  std::string service() const;
   bool sharingEnabled() const;
-  bool streamingMediaEnabled() const;
+  bool streamingDetectionEnabled() const;
   bool syncEnabled() const;
-  anime::TitleLanguage titleLanguage() const;
+  std::string syncService() const;
   std::chrono::seconds updateDelay() const;
   bool updateLibraryOnly() const;
   bool updatePauseWhenUnfocused() const;
   track::UpdateTrigger updateTrigger() const;
+  bool webhookEnabled() const;
+  std::vector<std::string> webhookHeaders() const;
+  std::string webhookUrl() const;
 
   void setAppColorScheme(const Qt::ColorScheme scheme) const;
   void setAppStyle(const std::string& style) const;
+  void setAppTitleLanguage(const anime::TitleLanguage language) const;
   void setDetectionEnabled(const bool enabled) const;
-  void setDisabledMediaPlayers(std::vector<std::string> players) const;
+  void setDetectionInterval(const std::chrono::milliseconds interval) const;
+  void setDisabledPlayers(std::vector<std::string> players) const;
   void setDiscordEnabled(const bool enabled) const;
-  void setHttpEnabled(const bool enabled) const;
-  void setHttpHeaders(std::vector<std::string> headers) const;
-  void setHttpUrl(const std::string& url) const;
   void setLibraryFolders(std::vector<std::string> folders) const;
-  void setMediaDetectionInterval(const std::chrono::milliseconds interval) const;
   void setProxyType(const QNetworkProxy::ProxyType type) const;
   void setProxyHost(const std::string& host) const;
   void setProxyPort(const int port) const;
   void setProxyUsername(const std::string& username) const;
   void setProxyPassword(const std::string& password) const;
-  void setService(const std::string& service) const;
   void setSharingEnabled(const bool enabled) const;
-  void setStreamingMediaEnabled(const bool enabled) const;
+  void setStreamingDetectionEnabled(const bool enabled) const;
   void setSyncEnabled(const bool enabled) const;
-  void setTitleLanguage(const anime::TitleLanguage language) const;
+  void setSyncService(const std::string& service) const;
   void setUpdateDelay(const std::chrono::seconds delay) const;
   void setUpdateLibraryOnly(const bool enabled) const;
   void setUpdatePauseWhenUnfocused(const bool enabled) const;
   void setUpdateTrigger(const track::UpdateTrigger trigger) const;
+  void setWebhookEnabled(const bool enabled) const;
+  void setWebhookHeaders(std::vector<std::string> headers) const;
+  void setWebhookUrl(const std::string& url) const;
 
 signals:
   // Emitted once per event loop iteration with the keys that were changed, as settings are often
@@ -133,7 +134,7 @@ private:
   void onValueChanged(QAnyStringView key) const override;
 
   mutable QSet<QString> changedKeys_;
-  mutable std::optional<anime::TitleLanguage> titleLanguageCache_;
+  mutable std::optional<anime::TitleLanguage> appTitleLanguageCache_;
 };
 
 Settings* settings();

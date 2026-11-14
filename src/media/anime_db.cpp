@@ -457,7 +457,7 @@ void Database::migrateListEntriesFromV1() {
   if (!q.prepare(sql("insertAnimeList"))) return;
 
   const auto path = []() {
-    const auto service = taiga::settings()->service();
+    const auto service = taiga::settings()->syncService();
     return std::format("{}/v1/user/{}@{}/anime.xml", taiga::get_data_path(),
                        taiga::accounts()->serviceUsername(service), service);
   }();

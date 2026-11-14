@@ -50,7 +50,7 @@ bool containsName(const std::vector<std::string>& names, const std::string& name
 }  // namespace
 
 void loadPlayerList(QListWidget* list, const anisthesia::PlayerType type) {
-  const auto disabledPlayers = taiga::settings()->disabledMediaPlayers();
+  const auto disabledPlayers = taiga::settings()->disabledPlayers();
 
   for (const auto& player : getPlayers(type)) {
     auto item = new QListWidgetItem(QString::fromStdString(player.name), list);
@@ -63,7 +63,7 @@ void savePlayerList(const QListWidget* list, const anisthesia::PlayerType type) 
   const auto players = getPlayers(type);
 
   // Keep disabled names that aren't listed here.
-  auto disabledPlayers = taiga::settings()->disabledMediaPlayers();
+  auto disabledPlayers = taiga::settings()->disabledPlayers();
   std::erase_if(disabledPlayers, [&players](const std::string& name) {
     return std::ranges::any_of(players, [&name](const track::media::Player& player) {
       return isSameName(player.name, name);
@@ -77,7 +77,7 @@ void savePlayerList(const QListWidget* list, const anisthesia::PlayerType type) 
     }
   }
 
-  taiga::settings()->setDisabledMediaPlayers(std::move(disabledPlayers));
+  taiga::settings()->setDisabledPlayers(std::move(disabledPlayers));
 }
 
 }  // namespace gui

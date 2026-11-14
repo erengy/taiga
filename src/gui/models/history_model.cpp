@@ -33,7 +33,7 @@ HistoryModel::HistoryModel(QObject* parent) : QAbstractListModel(parent) {
   });
 
   connect(taiga::settings(), &taiga::Settings::changed, this, [this](const QSet<QString>& keys) {
-    if (!keys.contains(taiga::Settings::Key::kTitleLanguage)) return;
+    if (!keys.contains(taiga::Settings::Key::kAppTitleLanguage)) return;
     if (const auto rows = rowCount(); rows > 0) {
       emit dataChanged(index(0, COLUMN_TITLE), index(rows - 1, COLUMN_TITLE));
     }

@@ -113,7 +113,7 @@ void parseAccountElement(QXmlStreamReader& xml, const taiga::Settings& settings,
                          const taiga::Accounts& accounts) {
   while (xml.readNextStartElement()) {
     if (xml.name() == u"update") {
-      settings.setService(XML_ATTR_STR(u"activeservice"));
+      settings.setSyncService(XML_ATTR_STR(u"activeservice"));
       settings.setUpdateDelay(std::chrono::seconds{XML_ATTR_INT(u"delay")});
       settings.setUpdatePauseWhenUnfocused(XML_ATTR_BOOL(u"checkplayer"));
       settings.setUpdateLibraryOnly(XML_ATTR_BOOL(u"outofroot"));
@@ -206,15 +206,15 @@ void parseRecognitionElement(QXmlStreamReader& xml, const taiga::Settings& setti
           xml.skipCurrentElement();
         }
       }
-      settings.setDisabledMediaPlayers(disabledPlayers);
+      settings.setDisabledPlayers(disabledPlayers);
 
     } else if (xml.name() == u"general") {
       const auto seconds = std::chrono::seconds{XML_ATTR_INT(u"detectioninterval")};
-      settings.setMediaDetectionInterval(seconds);
+      settings.setDetectionInterval(seconds);
       xml.skipCurrentElement();
 
     } else if (xml.name() == u"streaming") {
-      settings.setStreamingMediaEnabled(XML_ATTR_BOOL(u"enabled"));
+      settings.setStreamingDetectionEnabled(XML_ATTR_BOOL(u"enabled"));
       xml.skipCurrentElement();
 
     } else {
@@ -239,11 +239,11 @@ void parseProgramElement(QXmlStreamReader& xml, const taiga::Settings& settings)
         if (xml.name() == u"action") {
           const auto titleLanguage = XML_ATTR_STR(u"titlelang");
           if (titleLanguage == "english") {
-            settings.setTitleLanguage(anime::TitleLanguage::English);
+            settings.setAppTitleLanguage(anime::TitleLanguage::English);
           } else if (titleLanguage == "native") {
-            settings.setTitleLanguage(anime::TitleLanguage::Native);
+            settings.setAppTitleLanguage(anime::TitleLanguage::Native);
           } else {
-            settings.setTitleLanguage(anime::TitleLanguage::Romaji);
+            settings.setAppTitleLanguage(anime::TitleLanguage::Romaji);
           }
           xml.skipCurrentElement();
         } else {

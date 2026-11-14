@@ -71,8 +71,10 @@ void Settings::onValueChanged(QAnyStringView key) const {
 ////////////////////////////////////////////////////////////////////////////////
 
 Qt::ColorScheme Settings::appColorScheme() const {
-  return value(Key::kAppColorScheme, static_cast<int>(Qt::ColorScheme::Unknown))
-      .value<Qt::ColorScheme>();
+  const auto scheme = value(Key::kAppColorScheme, u"system"_s).toString();
+  if (scheme == u"light") return Qt::ColorScheme::Light;
+  if (scheme == u"dark") return Qt::ColorScheme::Dark;
+  return Qt::ColorScheme::Unknown;
 }
 
 std::string Settings::appStyle() const {
@@ -85,12 +87,31 @@ std::string Settings::appStyle() const {
   return value(Key::kAppStyle, defaultStyle).toString().toStdString();
 }
 
+anime::TitleLanguage Settings::appTitleLanguage() const {
+  if (!appTitleLanguageCache_) {
+    const auto language = value(Key::kAppTitleLanguage, u"romaji"_s).toString();
+    if (language == u"english") {
+      appTitleLanguageCache_ = anime::TitleLanguage::English;
+    } else if (language == u"native") {
+      appTitleLanguageCache_ = anime::TitleLanguage::Native;
+    } else {
+      appTitleLanguageCache_ = anime::TitleLanguage::Romaji;
+    }
+  }
+  return *appTitleLanguageCache_;
+}
+
 bool Settings::detectionEnabled() const {
   return value(Key::kDetectionEnabled, true).toBool();
 }
 
-std::vector<std::string> Settings::disabledMediaPlayers() const {
-  return value(Key::kDisabledMediaPlayers).toJsonArray().toVariantList() |
+std::chrono::milliseconds Settings::detectionInterval() const {
+  const auto interval = value(Key::kDetectionInterval, 3000).toInt();
+  return std::chrono::milliseconds{interval};
+}
+
+std::vector<std::string> Settings::disabledPlayers() const {
+  return value(Key::kDisabledPlayers).toJsonArray().toVariantList() |
          std::views::transform([](const QVariant& v) { return v.toString().toStdString(); }) |
          std::ranges::to<std::vector>();
 }
@@ -99,29 +120,10 @@ bool Settings::discordEnabled() const {
   return value(Key::kDiscordEnabled, false).toBool();
 }
 
-bool Settings::httpEnabled() const {
-  return value(Key::kHttpEnabled, false).toBool();
-}
-
-std::vector<std::string> Settings::httpHeaders() const {
-  return value(Key::kHttpHeaders).toJsonArray().toVariantList() |
-         std::views::transform([](const QVariant& v) { return v.toString().toStdString(); }) |
-         std::ranges::to<std::vector>();
-}
-
-std::string Settings::httpUrl() const {
-  return value(Key::kHttpUrl).toString().toStdString();
-}
-
 std::vector<std::string> Settings::libraryFolders() const {
   return value(Key::kLibraryFolders).toJsonArray().toVariantList() |
          std::views::transform([](const QVariant& v) { return v.toString().toStdString(); }) |
          std::ranges::to<std::vector>();
-}
-
-std::chrono::milliseconds Settings::mediaDetectionInterval() const {
-  const auto interval = value(Key::kMediaDetectionInterval, 3000).toInt();
-  return std::chrono::milliseconds{interval};
 }
 
 QNetworkProxy::ProxyType Settings::proxyType() const {
@@ -146,34 +148,22 @@ std::string Settings::proxyPassword() const {
   return value(Key::kProxyPassword).toString().toStdString();
 }
 
-std::string Settings::service() const {
-  return value(Key::kService, sync::serviceSlug(sync::ServiceId::AniList)).toString().toStdString();
-}
-
 bool Settings::sharingEnabled() const {
   return value(Key::kSharingEnabled, true).toBool();
 }
 
-bool Settings::streamingMediaEnabled() const {
-  return value(Key::kStreamingMediaEnabled, false).toBool();
+bool Settings::streamingDetectionEnabled() const {
+  return value(Key::kStreamingDetectionEnabled, false).toBool();
 }
 
 bool Settings::syncEnabled() const {
   return value(Key::kSyncEnabled, true).toBool();
 }
 
-anime::TitleLanguage Settings::titleLanguage() const {
-  if (!titleLanguageCache_) {
-    const auto language = value(Key::kTitleLanguage, u"romaji"_s).toString();
-    if (language == u"english") {
-      titleLanguageCache_ = anime::TitleLanguage::English;
-    } else if (language == u"native") {
-      titleLanguageCache_ = anime::TitleLanguage::Native;
-    } else {
-      titleLanguageCache_ = anime::TitleLanguage::Romaji;
-    }
-  }
-  return *titleLanguageCache_;
+std::string Settings::syncService() const {
+  return value(Key::kSyncService, sync::serviceSlug(sync::ServiceId::AniList))
+      .toString()
+      .toStdString();
 }
 
 std::chrono::seconds Settings::updateDelay() const {
@@ -195,46 +185,75 @@ track::UpdateTrigger Settings::updateTrigger() const {
   return track::UpdateTrigger::AfterDelay;
 }
 
+bool Settings::webhookEnabled() const {
+  return value(Key::kWebhookEnabled, false).toBool();
+}
+
+std::vector<std::string> Settings::webhookHeaders() const {
+  return value(Key::kWebhookHeaders).toJsonArray().toVariantList() |
+         std::views::transform([](const QVariant& v) { return v.toString().toStdString(); }) |
+         std::ranges::to<std::vector>();
+}
+
+std::string Settings::webhookUrl() const {
+  return value(Key::kWebhookUrl).toString().toStdString();
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 void Settings::setAppColorScheme(const Qt::ColorScheme scheme) const {
-  setValue(Key::kAppColorScheme, static_cast<int>(scheme));
+  const auto slug = [scheme]() -> std::string {
+    switch (scheme) {
+      default:
+      case Qt::ColorScheme::Unknown:
+        return "system";
+      case Qt::ColorScheme::Light:
+        return "light";
+      case Qt::ColorScheme::Dark:
+        return "dark";
+    }
+  }();
+  setValue(Key::kAppColorScheme, slug);
 }
 
 void Settings::setAppStyle(const std::string& style) const {
   setValue(Key::kAppStyle, style);
 }
 
+void Settings::setAppTitleLanguage(const anime::TitleLanguage language) const {
+  const auto slug = [language]() -> std::string {
+    switch (language) {
+      default:
+      case anime::TitleLanguage::Romaji:
+        return "romaji";
+      case anime::TitleLanguage::English:
+        return "english";
+      case anime::TitleLanguage::Native:
+        return "native";
+    }
+  }();
+  setValue(Key::kAppTitleLanguage, slug);
+  appTitleLanguageCache_ = language;
+}
+
 void Settings::setDetectionEnabled(const bool enabled) const {
   setValue(Key::kDetectionEnabled, enabled);
 }
 
-void Settings::setDisabledMediaPlayers(std::vector<std::string> players) const {
-  setValue(Key::kDisabledMediaPlayers, QJsonArray::fromStringList(toStringList(players)));
+void Settings::setDetectionInterval(const std::chrono::milliseconds interval) const {
+  setValue(Key::kDetectionInterval, static_cast<qint64>(interval.count()));
+}
+
+void Settings::setDisabledPlayers(std::vector<std::string> players) const {
+  setValue(Key::kDisabledPlayers, QJsonArray::fromStringList(toStringList(players)));
 }
 
 void Settings::setDiscordEnabled(const bool enabled) const {
   setValue(Key::kDiscordEnabled, enabled);
 }
 
-void Settings::setHttpEnabled(const bool enabled) const {
-  setValue(Key::kHttpEnabled, enabled);
-}
-
-void Settings::setHttpHeaders(std::vector<std::string> headers) const {
-  setValue(Key::kHttpHeaders, QJsonArray::fromStringList(toStringList(headers)));
-}
-
-void Settings::setHttpUrl(const std::string& url) const {
-  setValue(Key::kHttpUrl, url);
-}
-
 void Settings::setLibraryFolders(std::vector<std::string> folders) const {
   setValue(Key::kLibraryFolders, QJsonArray::fromStringList(toStringList(folders)));
-}
-
-void Settings::setMediaDetectionInterval(const std::chrono::milliseconds interval) const {
-  setValue(Key::kMediaDetectionInterval, static_cast<qint64>(interval.count()));
 }
 
 void Settings::setProxyType(const QNetworkProxy::ProxyType type) const {
@@ -258,36 +277,20 @@ void Settings::setProxyPassword(const std::string& password) const {
   setValue(Key::kProxyPassword, password);
 }
 
-void Settings::setService(const std::string& service) const {
-  setValue(Key::kService, service);
-}
-
 void Settings::setSharingEnabled(const bool enabled) const {
   setValue(Key::kSharingEnabled, enabled);
 }
 
-void Settings::setStreamingMediaEnabled(const bool enabled) const {
-  setValue(Key::kStreamingMediaEnabled, enabled);
+void Settings::setStreamingDetectionEnabled(const bool enabled) const {
+  setValue(Key::kStreamingDetectionEnabled, enabled);
 }
 
 void Settings::setSyncEnabled(const bool enabled) const {
   setValue(Key::kSyncEnabled, enabled);
 }
 
-void Settings::setTitleLanguage(const anime::TitleLanguage language) const {
-  const auto slug = [language]() -> std::string {
-    switch (language) {
-      default:
-      case anime::TitleLanguage::Romaji:
-        return "romaji";
-      case anime::TitleLanguage::English:
-        return "english";
-      case anime::TitleLanguage::Native:
-        return "native";
-    }
-  }();
-  setValue(Key::kTitleLanguage, slug);
-  titleLanguageCache_ = language;
+void Settings::setSyncService(const std::string& service) const {
+  setValue(Key::kSyncService, service);
 }
 
 void Settings::setUpdateDelay(const std::chrono::seconds delay) const {
@@ -306,6 +309,18 @@ void Settings::setUpdateTrigger(const track::UpdateTrigger trigger) const {
   const std::string slug =
       trigger == track::UpdateTrigger::OnPlayerClose ? "onPlayerClose" : "afterDelay";
   setValue(Key::kUpdateTrigger, slug);
+}
+
+void Settings::setWebhookEnabled(const bool enabled) const {
+  setValue(Key::kWebhookEnabled, enabled);
+}
+
+void Settings::setWebhookHeaders(std::vector<std::string> headers) const {
+  setValue(Key::kWebhookHeaders, QJsonArray::fromStringList(toStringList(headers)));
+}
+
+void Settings::setWebhookUrl(const std::string& url) const {
+  setValue(Key::kWebhookUrl, url);
 }
 
 Settings* settings() {

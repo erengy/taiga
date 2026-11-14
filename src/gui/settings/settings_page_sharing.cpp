@@ -54,21 +54,21 @@ void SettingsPageSharing::load() {
 
   ui_->discordEnabledCheckBox->setChecked(taiga::settings()->discordEnabled());
 
-  ui_->httpEnabledCheckBox->setChecked(taiga::settings()->httpEnabled());
+  ui_->httpEnabledCheckBox->setChecked(taiga::settings()->webhookEnabled());
   emit ui_->httpEnabledCheckBox->toggled(ui_->httpEnabledCheckBox->isChecked());
-  ui_->httpUrlLineEdit->setText(QString::fromStdString(taiga::settings()->httpUrl()));
+  ui_->httpUrlLineEdit->setText(QString::fromStdString(taiga::settings()->webhookUrl()));
   ui_->httpHeadersPlainTextEdit->setPlainText(
-      toStringList(taiga::settings()->httpHeaders()).join(u'\n'));
+      toStringList(taiga::settings()->webhookHeaders()).join(u'\n'));
 }
 
 void SettingsPageSharing::apply() const {
   taiga::settings()->setSharingEnabled(ui_->sharingEnabledCheckBox->isChecked());
   taiga::settings()->setDiscordEnabled(ui_->discordEnabledCheckBox->isChecked());
 
-  taiga::settings()->setHttpEnabled(ui_->httpEnabledCheckBox->isChecked());
-  taiga::settings()->setHttpUrl(ui_->httpUrlLineEdit->text().trimmed().toStdString());
+  taiga::settings()->setWebhookEnabled(ui_->httpEnabledCheckBox->isChecked());
+  taiga::settings()->setWebhookUrl(ui_->httpUrlLineEdit->text().trimmed().toStdString());
   const auto lines = ui_->httpHeadersPlainTextEdit->toPlainText().split(u'\n');
-  taiga::settings()->setHttpHeaders(
+  taiga::settings()->setWebhookHeaders(
       toVector(lines | std::views::transform([](const QString& s) { return s.trimmed(); }) |
                std::views::filter([](const QString& s) { return !s.isEmpty(); }) |
                std::ranges::to<QStringList>()));

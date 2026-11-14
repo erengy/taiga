@@ -121,8 +121,8 @@ void SettingsPageAdvanced::load() {
     combo->setCurrentIndex(std::max(0, combo->findData(style)));
   }
 
-  detectionIntervalSpinBox_->setValue(static_cast<int>(
-      duration_cast<seconds>(taiga::settings()->mediaDetectionInterval()).count()));
+  detectionIntervalSpinBox_->setValue(
+      static_cast<int>(duration_cast<seconds>(taiga::settings()->detectionInterval()).count()));
 
   proxyTypeComboBox_->setCurrentIndex(
       std::max(0, proxyTypeComboBox_->findData(static_cast<int>(taiga::settings()->proxyType()))));
@@ -140,7 +140,7 @@ void SettingsPageAdvanced::apply() const {
   const auto table = ui_->advancedTable;
 
   taiga::settings()->setAppStyle(appStyleComboBox_->currentData().toString().toStdString());
-  taiga::settings()->setMediaDetectionInterval(seconds{detectionIntervalSpinBox_->value()});
+  taiga::settings()->setDetectionInterval(seconds{detectionIntervalSpinBox_->value()});
 
   taiga::settings()->setProxyType(
       static_cast<QNetworkProxy::ProxyType>(proxyTypeComboBox_->currentData().toInt()));

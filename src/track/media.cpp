@@ -140,7 +140,7 @@ bool Detection::init() {
   connect(taiga::settings(), &taiga::Settings::changed, this, [this](const QSet<QString>& keys) {
     static const QSet<QString> relevantKeys{
         taiga::Settings::Key::kDetectionEnabled,
-        taiga::Settings::Key::kMediaDetectionInterval,
+        taiga::Settings::Key::kDetectionInterval,
     };
     if (keys.intersects(relevantKeys)) setPollingEnabled(isEnabled());
   });
@@ -155,7 +155,7 @@ bool Detection::isEnabled() const {
 void Detection::setPollingEnabled(bool enabled) {
 #ifdef Q_OS_WINDOWS
   if (enabled) {
-    const auto interval = taiga::settings()->mediaDetectionInterval();
+    const auto interval = taiga::settings()->detectionInterval();
     pollTimer_->start(interval);
   } else {
     pollTimer_->stop();

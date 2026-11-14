@@ -73,7 +73,7 @@ void Service::onAuthenticationCompleted(bool authenticated) {
 ////////////////////////////////////////////////////////////////////////////////
 
 ServiceId currentServiceId() {
-  const auto slug = QString::fromStdString(taiga::settings()->service());
+  const auto slug = QString::fromStdString(taiga::settings()->syncService());
   return serviceIdFromSlug(slug);
 }
 

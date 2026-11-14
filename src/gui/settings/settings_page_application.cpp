@@ -44,14 +44,14 @@ void SettingsPageApplication::load() {
     combo->addItem(tr("English"), static_cast<int>(TitleLanguage::English));
     combo->addItem(tr("Native"), static_cast<int>(TitleLanguage::Native));
     combo->setCurrentIndex(
-        std::max(0, combo->findData(static_cast<int>(taiga::settings()->titleLanguage()))));
+        std::max(0, combo->findData(static_cast<int>(taiga::settings()->appTitleLanguage()))));
   }
 }
 
 void SettingsPageApplication::apply() const {
   taiga::settings()->setAppColorScheme(
       static_cast<Qt::ColorScheme>(ui_->colorSchemeComboBox->currentData().toInt()));
-  taiga::settings()->setTitleLanguage(
+  taiga::settings()->setAppTitleLanguage(
       static_cast<anime::TitleLanguage>(ui_->titleLanguageComboBox->currentData().toInt()));
 }
 
