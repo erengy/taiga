@@ -94,8 +94,12 @@ public:
   void setUpdatePauseWhenUnfocused(const bool enabled) const;
   void setUpdateTrigger(const track::UpdateTrigger trigger) const;
 
+signals:
+  void valueChanged(const QString& key) const;
+
 private:
   QString fileName() const override;
+  void onValueChanged(QAnyStringView key) const override;
 
   mutable std::optional<anime::TitleLanguage> titleLanguageCache_;
 };

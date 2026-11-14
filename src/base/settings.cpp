@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 #include <QIODevice>
 #include <QJsonDocument>
 #include <QJsonParseError>
+#include <QJsonValue>
 
 namespace {
 
@@ -53,7 +54,16 @@ QVariant Settings::value(QAnyStringView key, const QVariant& defaultValue) const
 }
 
 void Settings::setValue(QAnyStringView key, const QVariant& value) const {
-  settings().setValue(key, value);
+  auto qsettings = settings();
+
+  // Values are compared as JSON, which is how they are stored (e.g. `QJsonArray` is read back as
+  // `QVariantList`).
+  if (QJsonValue::fromVariant(qsettings.value(key)) == QJsonValue::fromVariant(value)) return;
+
+  qsettings.setValue(key, value);
+  qsettings.sync();
+
+  onValueChanged(key);
 }
 
 void Settings::setValue(QAnyStringView key, const std::string_view value) const {

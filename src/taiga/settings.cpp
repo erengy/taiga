@@ -57,6 +57,10 @@ QString Settings::fileName() const {
   return u"%1/settings.json"_s.arg(get_data_path());
 }
 
+void Settings::onValueChanged(QAnyStringView key) const {
+  emit valueChanged(key.toString());
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 Qt::ColorScheme Settings::appColorScheme() const {

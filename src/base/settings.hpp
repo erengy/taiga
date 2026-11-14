@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,6 +27,9 @@ namespace base {
 class Settings {
 protected:
   virtual QString fileName() const = 0;
+
+  // Called after `setValue` changes the stored value of `key`.
+  virtual void onValueChanged([[maybe_unused]] QAnyStringView key) const {}
 
   QVariant value(QAnyStringView key) const;
   QVariant value(QAnyStringView key, const QVariant& defaultValue) const;
