@@ -26,6 +26,7 @@
 #include "base/string.hpp"
 #include "media/anime_db.hpp"
 #include "media/anime_utils.hpp"
+#include "share/event.hpp"
 #include "sync/service.hpp"
 #include "taiga/settings.hpp"
 #include "track/media.hpp"
@@ -111,12 +112,8 @@ Presence* presence() {
 }
 
 std::optional<Activity> buildActivity(const track::Episode& episode, const qint64 startTime) {
-  const auto* item = anime::db.item(episode.animeId());
+  const auto* item = shareableAnime(episode.animeId());
   if (!item) return std::nullopt;
-
-  if (const auto* entry = anime::db.entry(item->id); entry && entry->is_private) {
-    return std::nullopt;
-  }
 
   const auto serviceId = sync::currentServiceId();
   const auto title = QString::fromStdString(anime::preferredTitle(*item));

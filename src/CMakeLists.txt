@@ -53,6 +53,8 @@ target_sources(taiga PRIVATE
 	share/discord_ipc.hpp
 	share/discord_rpc.cpp
 	share/discord_rpc.hpp
+	share/event.cpp
+	share/event.hpp
 
 	sync/anilist/anilist.cpp
 	sync/anilist/anilist.hpp
