@@ -61,9 +61,19 @@ NetworkAccessManager::NetworkAccessManager(QObject* parent) : QNetworkAccessMana
   setAutoDeleteReplies(true);
   setTransferTimeout(std::chrono::seconds{10});
 
-  if (const auto proxy = buildProxy(); proxy.type() != QNetworkProxy::DefaultProxy) {
-    setProxy(proxy);
-  }
+  setProxy(buildProxy());
+  connect(settings(), &Settings::changed, this, [this](const QSet<QString>& keys) {
+    // clang-format off
+    static const QSet<QString> relevantKeys{
+        u"network.proxy.type"_s,
+        u"network.proxy.host"_s,
+        u"network.proxy.port"_s,
+        u"network.proxy.username"_s,
+        u"network.proxy.password"_s,
+    };
+    // clang-format on
+    if (keys.intersects(relevantKeys)) setProxy(buildProxy());
+  });
 
   connect(this, &QNetworkAccessManager::finished, this, [](QNetworkReply* reply) {
     if (!app()->isDebug()) return;
