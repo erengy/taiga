@@ -69,7 +69,8 @@ SearchWidget::SearchWidget(QWidget* parent)
       m_comboStatus(new ComboBox(this)),
       m_comboListStatus(new ComboBox(this)),
       m_sortMenu(new QMenu(this)),
-      m_viewMenu(new QMenu(this)) {
+      m_viewMenu(new QMenu(this)),
+      m_moreMenu(new QMenu(this)) {
   m_proxyModel->setSecondarySort(taiga::session.searchListSecondarySortColumn(),
                                  taiga::session.searchListSecondarySortOrder());
   m_proxyModel->sort(taiga::session.searchListSortColumn(), taiga::session.searchListSortOrder());
@@ -197,10 +198,15 @@ SearchWidget::SearchWidget(QWidget* parent)
     const auto viewButton = static_cast<QToolButton*>(m_toolbar->widgetForAction(actionView));
     viewButton->setPopupMode(QToolButton::InstantPopup);
     viewButton->setMenu(m_viewMenu);
+
+    const auto moreButton = static_cast<QToolButton*>(m_toolbar->widgetForAction(actionMore));
+    moreButton->setPopupMode(QToolButton::InstantPopup);
+    moreButton->setMenu(m_moreMenu);
   }
 
   connect(m_sortMenu, &QMenu::aboutToShow, this, &SearchWidget::initSortMenu);
   connect(m_viewMenu, &QMenu::aboutToShow, this, &SearchWidget::initViewMenu);
+  connect(m_moreMenu, &QMenu::aboutToShow, this, &SearchWidget::initMoreMenu);
 
   // List
   setViewMode(taiga::session.searchListViewMode());
@@ -289,6 +295,16 @@ void SearchWidget::initViewMenu() {
     action->setChecked(mode == m_viewMode);
     actionGroup->addAction(action);
   }
+}
+
+void SearchWidget::initMoreMenu() {
+  m_moreMenu->clear();
+
+  const auto actionHideNsfw =
+      m_moreMenu->addAction(tr("Hide adult content"), this,
+                            [](bool checked) { taiga::settings()->setAppHideNsfw(checked); });
+  actionHideNsfw->setCheckable(true);
+  actionHideNsfw->setChecked(taiga::settings()->appHideNsfw());
 }
 
 void SearchWidget::setViewMode(ListViewMode mode) {

@@ -48,6 +48,7 @@ public:
 private:
   void initSortMenu();
   void initViewMenu();
+  void initMoreMenu();
   void setViewMode(ListViewMode mode);
 
   sync::SearchParams currentSearchParams() const;
@@ -65,6 +66,7 @@ private:
   ListViewMode m_viewMode = ListViewMode::Cards;
   QMenu* m_sortMenu = nullptr;
   QMenu* m_viewMenu = nullptr;
+  QMenu* m_moreMenu = nullptr;
 };
 
 }  // namespace gui
