@@ -21,6 +21,8 @@ target_sources(taiga-gui PRIVATE
 	common/clickable_label.hpp
 	common/combobox.cpp
 	common/combobox.hpp
+	common/header_view.cpp
+	common/header_view.hpp
 	common/page_widget.cpp
 	common/page_widget.hpp
 	common/poster_widget.cpp

@@ -23,6 +23,7 @@
 
 #include "gui/common/anime_list_item_delegate.hpp"
 #include "gui/common/anime_list_view_base.hpp"
+#include "gui/common/header_view.hpp"
 #include "gui/models/anime_list_model.hpp"
 #include "gui/models/anime_list_proxy_model.hpp"
 #include "gui/utils/painters.hpp"
@@ -47,6 +48,8 @@ ListView::ListView(QWidget* parent, AnimeListModel* model, AnimeListProxyModel* 
   setRootIsDecorated(false);
   setUniformRowHeights(true);
 
+  HeaderView::install(this);
+
   header()->setFirstSectionMovable(true);
   header()->setStretchLastSection(false);
   header()->setTextElideMode(Qt::ElideRight);
@@ -65,7 +68,7 @@ ListView::ListView(QWidget* parent, AnimeListModel* model, AnimeListProxyModel* 
   header()->resizeSection(AnimeListModel::COLUMN_PROGRESS, 150);
   header()->resizeSection(AnimeListModel::COLUMN_DURATION, 75);
   header()->resizeSection(AnimeListModel::COLUMN_SCORE, 75);
-  header()->resizeSection(AnimeListModel::COLUMN_AVERAGE, 75);
+  header()->resizeSection(AnimeListModel::COLUMN_AVERAGE, 85);
   header()->resizeSection(AnimeListModel::COLUMN_TYPE, 75);
   header()->resizeSection(AnimeListModel::COLUMN_LAST_UPDATED, 110);
 

@@ -24,6 +24,7 @@
 #include <QSignalBlocker>
 #include <algorithm>
 
+#include "gui/common/header_view.hpp"
 #include "gui/library/library_menu.hpp"
 #include "gui/main/main_window.hpp"
 #include "gui/models/library_model.hpp"
@@ -81,6 +82,7 @@ LibraryWidget::LibraryWidget(QWidget* parent)
   m_view->setDropIndicatorShown(true);
   m_view->setDragDropMode(QAbstractItemView::InternalMove);
 
+  HeaderView::install(m_view);
   m_view->header()->setSectionsMovable(false);
   m_view->header()->setStretchLastSection(false);
   m_view->header()->setTextElideMode(Qt::ElideRight);

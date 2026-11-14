@@ -36,6 +36,7 @@ public:
                        bool useSvgIconEngine = true);
   void initStyle();
   bool isDark() const;
+  bool isFusion() const;
 
   static QColor errorColor();
   static QColor successColor();
@@ -46,6 +47,7 @@ private:
   QString readStylesheet(const QString& name) const;
 
   QHash<QString, QIcon> m_icons;
+  bool m_isFusion = false;
 };
 
 Theme* theme();

@@ -25,6 +25,7 @@
 #include <QToolButton>
 #include <QUrl>
 
+#include "gui/common/header_view.hpp"
 #include "gui/main/main_window.hpp"
 #include "gui/media/media_dialog.hpp"
 #include "gui/models/history_model.hpp"
@@ -58,6 +59,7 @@ HistoryWidget::HistoryWidget(QWidget* parent)
   m_view->setRootIsDecorated(false);
   m_view->setUniformRowHeights(true);
 
+  HeaderView::install(m_view);
   m_view->header()->setSectionsMovable(false);
   m_view->header()->setStretchLastSection(false);
   m_view->header()->setTextElideMode(Qt::ElideRight);

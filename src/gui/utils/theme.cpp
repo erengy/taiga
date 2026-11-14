@@ -19,6 +19,7 @@
 #include "theme.hpp"
 
 #include <QApplication>
+#include <QStyle>
 #include <QStyleHints>
 
 #include "base/file.hpp"
@@ -54,6 +55,11 @@ void Theme::initStyle() {
   if (style.compare(taiga::Settings::kAppStyleSystem, Qt::CaseInsensitive) != 0) {
     qApp->setStyle(style);
   }
+
+  // Must be checked before applying the stylesheet: Qt then wraps the app style in a
+  // QStyleSheetStyle, whose name() is empty.
+  m_isFusion = qApp->style()->name().compare("fusion", Qt::CaseInsensitive) == 0;
+
 #ifdef Q_OS_WINDOWS
   if (style.compare("fusion", Qt::CaseInsensitive) == 0) {
     applyStylesheet();
@@ -62,6 +68,10 @@ void Theme::initStyle() {
         Qt::QueuedConnection);
   }
 #endif
+}
+
+bool Theme::isFusion() const {
+  return m_isFusion;
 }
 
 bool Theme::isDark() const {
