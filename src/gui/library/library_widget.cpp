@@ -21,7 +21,10 @@
 #include <QHeaderView>
 #include <QKeyEvent>
 #include <QLayout>
+#include <QSignalBlocker>
+#include <algorithm>
 
+#include "base/string.hpp"
 #include "gui/library/library_menu.hpp"
 #include "gui/main/main_window.hpp"
 #include "gui/models/library_model.hpp"
@@ -36,12 +39,7 @@ LibraryWidget::LibraryWidget(QWidget* parent)
       m_model(new LibraryModel(parent)),
       m_comboRoot(new ComboBox(this)),
       m_view(new QTreeView(parent)) {
-  const auto libraryFolders = taiga::settings()->libraryFolders();
-  const auto rootPath =
-      !libraryFolders.empty() ? QString::fromStdString(libraryFolders.front()) : QString{};
-
   m_model->setReadOnly(false);
-  m_model->setRootPath(rootPath);
 
   auto filtersLayout = new QHBoxLayout();
   filtersLayout->setSpacing(4);
@@ -50,11 +48,6 @@ LibraryWidget::LibraryWidget(QWidget* parent)
   // Root
   {
     m_comboRoot->setPlaceholderText("Location");
-    m_comboRoot->setDisabled(rootPath.isEmpty());
-    for (const auto& folder : libraryFolders) {
-      m_comboRoot->addItem(QString::fromStdString(folder));
-    }
-    m_comboRoot->setCurrentText(rootPath);
     connect(m_comboRoot, &QComboBox::currentIndexChanged, this,
             [this](int index) { m_model->setRootPath(m_comboRoot->itemText(index)); });
     filtersLayout->addWidget(m_comboRoot);
@@ -77,7 +70,6 @@ LibraryWidget::LibraryWidget(QWidget* parent)
   m_view->setObjectName("libraryView");
   m_view->setFrameShape(QFrame::Shape::NoFrame);
   m_view->setModel(m_model);
-  m_view->setRootIndex(m_model->index(rootPath));
   m_view->setAlternatingRowColors(true);
   m_view->setAllColumnsShowFocus(true);
   m_view->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -114,6 +106,11 @@ LibraryWidget::LibraryWidget(QWidget* parent)
     if (!m_model->fileInfo(index).isFile()) return;  // let double-click expand/collapse folders
     LibraryMenu::openPath(m_model->filePath(index));
   });
+
+  refreshFolders();
+  connect(taiga::settings(), &taiga::Settings::changed, this, [this](const QSet<QString>& keys) {
+    if (keys.contains(u"library.folders"_s)) refreshFolders();
+  });
 }
 
 bool LibraryWidget::eventFilter(QObject* watched, QEvent* event) {
@@ -137,6 +134,25 @@ bool LibraryWidget::eventFilter(QObject* watched, QEvent* event) {
   }
 
   return PageWidget::eventFilter(watched, event);
+}
+
+void LibraryWidget::refreshFolders() {
+  const auto folders = taiga::settings()->libraryFolders();
+
+  {
+    // Keep the current folder if it's still there.
+    const auto current = m_comboRoot->currentText();
+    const QSignalBlocker blocker{m_comboRoot};
+    m_comboRoot->clear();
+    for (const auto& folder : folders) {
+      m_comboRoot->addItem(QString::fromStdString(folder));
+    }
+    m_comboRoot->setCurrentIndex(folders.empty() ? -1
+                                                 : std::max(0, m_comboRoot->findText(current)));
+  }
+
+  m_comboRoot->setDisabled(folders.empty());
+  m_view->setRootIndex(m_model->setRootPath(m_comboRoot->currentText()));
 }
 
 void LibraryWidget::showContextMenu() const {
