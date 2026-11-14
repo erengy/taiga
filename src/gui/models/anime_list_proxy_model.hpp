@@ -55,6 +55,7 @@ public:
   void setStatusFilter(std::optional<int> status);
   void setListStatusFilter(AnimeListStatusFilter filter);
   void setTextFilter(const QString& text);
+  void setNsfwHidden(bool hidden);
 
   int secondarySortColumn() const;
   Qt::SortOrder secondarySortOrder() const;
@@ -70,6 +71,7 @@ private:
   std::partial_ordering compare(const QModelIndex& lhs, const QModelIndex& rhs, int column) const;
 
   AnimeListProxyModelFilter m_filter;
+  bool m_nsfwHidden = false;
   int m_secondarySortColumn = -1;
   Qt::SortOrder m_secondarySortOrder = Qt::AscendingOrder;
 };

@@ -98,6 +98,12 @@ void AnimeListProxyModel::setTextFilter(const QString& text) {
   endFilterChange(QSortFilterProxyModel::Direction::Rows);
 }
 
+void AnimeListProxyModel::setNsfwHidden(bool hidden) {
+  beginFilterChange();
+  m_nsfwHidden = hidden;
+  endFilterChange(QSortFilterProxyModel::Direction::Rows);
+}
+
 bool AnimeListProxyModel::filterAcceptsRow(int row, const QModelIndex& parent) const {
   const auto model = static_cast<AnimeListModel*>(sourceModel());
   if (!model) return false;
@@ -115,6 +121,9 @@ bool AnimeListProxyModel::filterAcceptsRow(int row, const QModelIndex& parent) c
     return std::ranges::any_of(list,
                                [view](const std::string& str) { return contains(str, view); });
   };
+
+  // Age rating
+  if (m_nsfwHidden && anime::isNsfw(*anime)) return false;
 
   // Year
   if (m_filter.year) {
