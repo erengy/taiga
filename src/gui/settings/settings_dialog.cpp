@@ -47,6 +47,10 @@ SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::S
 
   ui_->treeWidget->setIndentation(22);
 
+  // Keep the scroll area transparent, so that it doesn't paint over the Mica background
+  ui_->scrollArea->viewport()->setAutoFillBackground(false);
+  ui_->scrollAreaWidgetContents->setAutoFillBackground(false);
+
   const auto add_item = [this](QString icon, QString text, QWidget* page = nullptr) {
     auto item = new QTreeWidgetItem(ui_->treeWidget, QStringList(text));
     item->setIcon(0, theme.getIcon(icon));
@@ -83,6 +87,15 @@ SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::S
   }
 
   ui_->treeWidget->expandAll();
+
+  // Only the current page should contribute to the minimum size of the stacked widget, so that
+  // the scroll area doesn't scroll pages that fit
+  connect(ui_->stackedWidget, &QStackedWidget::currentChanged, this, [this](int index) {
+    for (int i = 0; i < ui_->stackedWidget->count(); ++i) {
+      const auto policy = i == index ? QSizePolicy::Preferred : QSizePolicy::Ignored;
+      ui_->stackedWidget->widget(i)->setSizePolicy(policy, policy);
+    }
+  });
 
   connect(ui_->treeWidget, &QTreeWidget::currentItemChanged, this,
           [this](QTreeWidgetItem* current, QTreeWidgetItem*) {
