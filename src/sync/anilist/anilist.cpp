@@ -78,7 +78,7 @@ void Service::fetchAnime(const int id) {
       return;
     }
 
-    anime::db.updateItem(*item);
+    anime::db()->updateItem(*item);
   };
 
   manager_.post(api_.createRequest(), data, this, callback);
@@ -125,7 +125,7 @@ void Service::search(const SearchParams& params, const int page) {
     QList<int> ids;
     for (const auto& item : *items) {
       if (!item) continue;
-      anime::db.updateItem(*item);
+      anime::db()->updateItem(*item);
       ids.append(item->id);
     }
 
@@ -185,8 +185,8 @@ void Service::fetchListEntries() {
         }
       }
     }
-    anime::db.updateItems(items);
-    anime::db.updateEntries(entries);
+    anime::db()->updateItems(items);
+    anime::db()->updateEntries(entries);
 
     sync::pruneMissingEntries(fetchedIds);
     emit listEntriesFetched();
@@ -202,7 +202,7 @@ void Service::addListEntry(const int id, const anime::list::Fields dirty) {
 }
 
 void Service::deleteListEntry(const int id) {
-  const auto listEntry = anime::db.entry(id);
+  const auto listEntry = anime::db()->entry(id);
 
   if (!listEntry) return;
 
@@ -225,7 +225,7 @@ void Service::deleteListEntry(const int id) {
 }
 
 void Service::updateListEntry(const int id, const anime::list::Fields dirty) {
-  const auto listEntry = anime::db.entry(id);
+  const auto listEntry = anime::db()->entry(id);
 
   if (!listEntry) return;
 
@@ -275,7 +275,7 @@ void Service::updateListEntry(const int id, const anime::list::Fields dirty) {
     }
 
     if (const auto item = parseMedia((*entry)["media"])) {
-      anime::db.updateItem(*item);
+      anime::db()->updateItem(*item);
     }
     if (const auto listEntry = parseListEntry(*entry)) {
       sync::queue.complete(*listEntry);

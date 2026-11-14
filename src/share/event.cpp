@@ -79,10 +79,10 @@ QJsonObject entryToJson(const ListEntry& entry) {
 }  // namespace
 
 const Anime* shareableAnime(const int animeId) {
-  const auto* item = anime::db.item(animeId);
+  const auto* item = anime::db()->item(animeId);
   if (!item) return nullptr;
 
-  const auto* entry = anime::db.entry(item->id);
+  const auto* entry = anime::db()->entry(item->id);
   if (entry && entry->is_private) return nullptr;
 
   return item;
@@ -98,7 +98,7 @@ QJsonObject toJson(const Event& event) {
 
   if (const auto* item = shareableAnime(event.animeId)) {
     object[u"anime"_s] = animeToJson(*item);
-    if (const auto* entry = anime::db.entry(item->id); anime::list::isInList(entry)) {
+    if (const auto* entry = anime::db()->entry(item->id); anime::list::isInList(entry)) {
       object[u"entry"_s] = entryToJson(*entry);
     }
   }

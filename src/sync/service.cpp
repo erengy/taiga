@@ -278,21 +278,21 @@ QString animePageUrl(const int id) {
 void invalidateAnime(const int id) {
   if (queue.hasItem(id)) return;
 
-  anime::db.deleteEntry(id);
-  anime::db.deleteItem(id);
+  anime::db()->deleteEntry(id);
+  anime::db()->deleteItem(id);
 }
 
 void pruneMissingEntries(const QSet<int>& fetchedIds) {
   QList<int> staleIds;
 
-  for (const auto animeId : anime::db.entries().keys()) {
+  for (const auto animeId : anime::db()->entries().keys()) {
     if (fetchedIds.contains(animeId)) continue;
     if (queue.hasItem(animeId)) continue;
     staleIds.append(animeId);
   }
 
   for (const auto animeId : staleIds) {
-    anime::db.deleteEntry(animeId);
+    anime::db()->deleteEntry(animeId);
   }
 }
 

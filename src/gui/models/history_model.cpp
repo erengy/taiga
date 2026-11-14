@@ -47,7 +47,7 @@ QVariant HistoryModel::data(const QModelIndex& index, int role) const {
 
   switch (role) {
     case Qt::DisplayRole: {
-      const auto item = anime::db.item(historyItem.anime_id);
+      const auto item = anime::db()->item(historyItem.anime_id);
       switch (index.column()) {
         case COLUMN_TITLE:
           if (item) return QString::fromStdString(anime::preferredTitle(*item));

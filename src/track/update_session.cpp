@@ -72,10 +72,10 @@ const UpdateState& UpdateSession::state() const {
 void UpdateSession::accept() {
   if (!episode_ || committed_) return;
 
-  const auto* item = anime::db.item(episode_->animeId());
+  const auto* item = anime::db()->item(episode_->animeId());
   if (!item) return;
 
-  const auto* entry = anime::db.entry(item->id);
+  const auto* entry = anime::db()->entry(item->id);
   const auto decision = decideUpdate(*episode_, *item, entry, outsideLibrary_);
   if (decision.action == UpdateDecision::Action::Deny) return;
 
@@ -124,7 +124,7 @@ void UpdateSession::onMediaClosed() {
 
   switch (state_.phase) {
     case UpdateState::Phase::WaitingForClose:
-      if (const auto* item = anime::db.item(episode_->animeId())) {
+      if (const auto* item = anime::db()->item(episode_->animeId())) {
         commit(*item);
         return;
       }
@@ -151,13 +151,13 @@ void UpdateSession::tick() {
 void UpdateSession::evaluate() {
   if (committed_) return;
 
-  const auto* item = episode_ ? anime::db.item(episode_->animeId()) : nullptr;
+  const auto* item = episode_ ? anime::db()->item(episode_->animeId()) : nullptr;
   if (!item) {
     setState({});
     return;
   }
 
-  const auto* entry = anime::db.entry(item->id);
+  const auto* entry = anime::db()->entry(item->id);
   const auto decision = decideUpdate(*episode_, *item, entry, outsideLibrary_);
 
   using Action = UpdateDecision::Action;
@@ -202,7 +202,7 @@ void UpdateSession::evaluate() {
 }
 
 void UpdateSession::commit(const Anime& item) {
-  const auto* entry = anime::db.entry(item.id);
+  const auto* entry = anime::db()->entry(item.id);
   const auto number = watchedEpisodeNumber(*episode_, item);
   if (!number) return;
 

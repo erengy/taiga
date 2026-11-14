@@ -115,7 +115,7 @@ void Queue::process() {
   const auto item = currentItem();
   if (!item) return;
 
-  const auto entry = anime::db.entry(item->anime_id);
+  const auto entry = anime::db()->entry(item->anime_id);
   if (!entry) {
     pop(item->anime_id);
     process();
@@ -183,17 +183,17 @@ void Queue::handleResult(const bool success, const QString& error, const ListEnt
 }
 
 void Queue::reconcile(const int animeId, const ListEntry* remote) {
-  const auto* local = anime::db.entry(animeId);
+  const auto* local = anime::db()->entry(animeId);
   if (!local) return;
 
   if (deleting_) {
     if (local->pending_delete) {
-      anime::db.deleteEntry(animeId);
+      anime::db()->deleteEntry(animeId);
     } else {
       // The entry was saved again while the request was in flight, so the server no longer has it.
       auto entry = *local;
       entry.id = anime::list::kUnknownId;
-      anime::db.updateEntry(entry);
+      anime::db()->updateEntry(entry);
     }
     return;
   }
@@ -205,7 +205,7 @@ void Queue::reconcile(const int animeId, const ListEntry* remote) {
       entry = *local;
       entry.id = remote->id;
     }
-    anime::db.updateEntry(entry);
+    anime::db()->updateEntry(entry);
   }
 }
 
@@ -345,7 +345,7 @@ void Queue::migrateFromV1() {
       continue;
     }
 
-    const auto* previous = anime::db.entry(item.anime_id);
+    const auto* previous = anime::db()->entry(item.anime_id);
     anime::list::Entry entry = previous ? *previous : anime::list::Entry{.anime_id = item.anime_id};
 
     if (item.episode) entry.watched_episodes = *item.episode;

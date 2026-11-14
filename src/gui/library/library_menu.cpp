@@ -49,7 +49,7 @@ void LibraryMenu::popup() {
   addAction(theme()->getIcon("delete"), tr("Delete"), tr("Del"), this, &LibraryMenu::remove);
   addAction(theme()->getIcon("edit"), tr("Rename"), tr("F2"), this, &LibraryMenu::rename);
 
-  if (const auto item = anime::db.item(m_anime_id)) {
+  if (const auto item = anime::db()->item(m_anime_id)) {
     addSeparator();
     addAction(theme()->getIcon("info"), tr("Details"), this, &LibraryMenu::viewDetails);
   }
@@ -104,7 +104,7 @@ void LibraryMenu::renamePath(QAbstractItemView* view, const QString& path) {
 }
 
 void LibraryMenu::viewDetails() const {
-  const auto item = anime::db.item(m_anime_id);
+  const auto item = anime::db()->item(m_anime_id);
   if (!item) return;
 
   MediaDialog::show(parentWidget(), MediaDialogPage::Details, *item);

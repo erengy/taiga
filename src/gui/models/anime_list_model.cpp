@@ -36,8 +36,8 @@
 namespace gui {
 
 AnimeListModel::AnimeListModel(QObject* parent) : QAbstractListModel(parent) {
-  beginInsertRows({}, 0, anime::db.items().size());
-  m_ids = anime::db.items().keys();
+  beginInsertRows({}, 0, anime::db()->items().size());
+  m_ids = anime::db()->items().keys();
   endInsertRows();
 
   connect(imageProvider(), &ImageProvider::posterChanged, this, [this](int id) {
@@ -46,10 +46,10 @@ AnimeListModel::AnimeListModel(QObject* parent) : QAbstractListModel(parent) {
     }
   });
 
-  connect(&anime::db, &anime::Database::itemUpdated, this, &AnimeListModel::refreshRow);
-  connect(&anime::db, &anime::Database::itemDeleted, this, &AnimeListModel::deleteRow);
-  connect(&anime::db, &anime::Database::entryUpdated, this, &AnimeListModel::refreshRow);
-  connect(&anime::db, &anime::Database::entryDeleted, this, &AnimeListModel::refreshRow);
+  connect(anime::db(), &anime::Database::itemUpdated, this, &AnimeListModel::refreshRow);
+  connect(anime::db(), &anime::Database::itemDeleted, this, &AnimeListModel::deleteRow);
+  connect(anime::db(), &anime::Database::entryUpdated, this, &AnimeListModel::refreshRow);
+  connect(anime::db(), &anime::Database::entryDeleted, this, &AnimeListModel::refreshRow);
 }
 
 void AnimeListModel::refreshRow(int id) {
@@ -216,7 +216,7 @@ bool AnimeListModel::setData(const QModelIndex& index, const QVariant& value, in
   if (index.isValid() && role == Qt::EditRole) {
     if (index.column() == COLUMN_SCORE) {
       const int id = m_ids.at(index.row());
-      if (const auto entry = anime::db.entry(id)) {
+      if (const auto entry = anime::db()->entry(id)) {
         auto updated = *entry;
         updated.score = value.toInt();
         anime::list::save(updated);
@@ -297,12 +297,12 @@ Qt::ItemFlags AnimeListModel::flags(const QModelIndex& index) const {
 
 const Anime* AnimeListModel::getAnime(const QModelIndex& index) const {
   if (!index.isValid()) return nullptr;
-  return anime::db.item(m_ids.at(index.row()));
+  return anime::db()->item(m_ids.at(index.row()));
 }
 
 const ListEntry* AnimeListModel::getListEntry(const QModelIndex& index) const {
   if (!index.isValid()) return nullptr;
-  return anime::db.entry(m_ids.at(index.row()));
+  return anime::db()->entry(m_ids.at(index.row()));
 }
 
 }  // namespace gui

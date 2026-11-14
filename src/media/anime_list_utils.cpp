@@ -67,7 +67,7 @@ Entry entryWithEpisodeWatched(const Details& item, const Entry* entry, const int
 }
 
 void save(Entry entry) {
-  const auto previous = db.entry(entry.anime_id);
+  const auto previous = db()->entry(entry.anime_id);
   const Entry baseline = previous ? *previous : Entry{.anime_id = entry.anime_id};
 
   Fields dirty;
@@ -84,7 +84,7 @@ void save(Entry entry) {
 
   entry.pending_delete = false;
   entry.last_updated = std::time(nullptr);
-  db.updateEntry(entry);
+  db()->updateEntry(entry);
 
   if ((dirty & Field::Episode) && entry.watched_episodes > 0) {
     history.add(entry.anime_id, entry.watched_episodes, entry.last_updated);
@@ -94,14 +94,14 @@ void save(Entry entry) {
 }
 
 void remove(const int animeId) {
-  const auto entry = db.entry(animeId);
+  const auto entry = db()->entry(animeId);
   if (!entry) return;
 
   auto updated = *entry;
   updated.pending_delete = true;
   updated.last_updated = std::time(nullptr);
 
-  db.updateEntry(updated);
+  db()->updateEntry(updated);
 
   sync::queue.pushDelete(animeId);
 }

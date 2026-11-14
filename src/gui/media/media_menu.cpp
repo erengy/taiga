@@ -197,11 +197,11 @@ void MediaMenu::matchNowPlaying() const {
   if (const auto episode = track::media::detection()->getCurrentEpisode()) {
     const auto title = episode->element(anitomy::ElementKind::Title);
     if (!title.empty()) {
-      const auto* settings = anime::db.settings(item.id);
+      const auto* settings = anime::db()->settings(item.id);
       auto updated = settings ? *settings : anime::Settings{.id = item.id};
       if (!std::ranges::contains(updated.synonyms, title)) {
         updated.synonyms.push_back(title);
-        anime::db.updateSettings(updated);
+        anime::db()->updateSettings(updated);
       }
     }
   }

@@ -87,7 +87,7 @@ int identify(Episode& episode) {
   std::ranges::sort(matches, std::ranges::greater{}, &Cache::Data::Match::weight);
 
   for (const auto& match : matches) {
-    const auto item = anime::db.item(match.id);
+    const auto item = anime::db()->item(match.id);
     if (!item) continue;
 
     if (!isValidEpisodeType(episode)) continue;

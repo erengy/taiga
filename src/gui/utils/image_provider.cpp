@@ -60,7 +60,7 @@ void ImageProvider::init() {
 }
 
 void ImageProvider::fetchPoster(const int id, const bool revalidate) {
-  const auto item = anime::db.item(id);
+  const auto item = anime::db()->item(id);
 
   if (!item || item->image_url.empty()) return;
 
@@ -75,10 +75,10 @@ void ImageProvider::fetchPoster(const int id, const bool revalidate) {
   m_manager->get(request, this, [this, id](QRestReply& reply) {
     if (!reply.isHttpStatusSuccess() || reply.hasError()) {
       if (reply.httpStatus() == 404) {
-        if (const auto item = anime::db.item(id)) {
+        if (const auto item = anime::db()->item(id)) {
           auto updatedItem = *item;
           updatedItem.image_url.clear();
-          anime::db.updateItem(updatedItem);
+          anime::db()->updateItem(updatedItem);
         }
       }
       return;
@@ -141,7 +141,7 @@ QString ImageProvider::fileName(const int id) const {
   const auto service = sync::serviceSlug(sync::currentServiceId());
 
   auto extension = u"jpg"_s;
-  if (const auto item = anime::db.item(id); item && !item->image_url.empty()) {
+  if (const auto item = anime::db()->item(id); item && !item->image_url.empty()) {
     const QUrl url{QString::fromStdString(item->image_url)};
     if (const auto suffix = QFileInfo(url.path()).suffix(); !suffix.isEmpty()) {
       extension = suffix;
@@ -154,7 +154,7 @@ QString ImageProvider::fileName(const int id) const {
 bool ImageProvider::isStale(const int id) const {
   constexpr int kStaleDays = 7;
 
-  const auto item = anime::db.item(id);
+  const auto item = anime::db()->item(id);
 
   if (!item) return false;
 

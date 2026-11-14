@@ -84,7 +84,7 @@ int Application::run() {
   local_server_.listen(TAIGA_APP_NAME);
 
   taiga::settings()->init();
-  anime::db.init();
+  anime::db()->init();
   anime::history.init();
   sync::queue.init();
   track::media::detection()->init();

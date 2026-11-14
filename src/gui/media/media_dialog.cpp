@@ -75,20 +75,20 @@ MediaDialog::MediaDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::MediaDi
     if (id == m_anime.id) loadPosterImage();
   });
 
-  connect(&anime::db, &anime::Database::itemUpdated, this, [this](const int id) {
+  connect(anime::db(), &anime::Database::itemUpdated, this, [this](const int id) {
     if (id != m_anime.id) return;
-    m_anime = *anime::db.item(id);
+    m_anime = *anime::db()->item(id);
     initTitles();
     initDetails();
     initSettings();
   });
 
-  connect(&anime::db, &anime::Database::entryUpdated, this, [this](const int id) {
+  connect(anime::db(), &anime::Database::entryUpdated, this, [this](const int id) {
     if (id != m_anime.id) return;
     initList();
   });
 
-  connect(&anime::db, &anime::Database::entryDeleted, this, [this](const int id) {
+  connect(anime::db(), &anime::Database::entryDeleted, this, [this](const int id) {
     if (id != m_anime.id) return;
     initList();
   });
@@ -300,7 +300,7 @@ void MediaDialog::initDetails() {
 }
 
 void MediaDialog::initList() {
-  const auto entry = anime::db.entry(m_anime.id);
+  const auto entry = anime::db()->entry(m_anime.id);
   m_entry = entry ? std::optional<ListEntry>{*entry} : std::nullopt;
 
   ui_->tabWidget->setTabVisible(1, m_entry.has_value());
@@ -364,7 +364,7 @@ void MediaDialog::initList() {
 }
 
 void MediaDialog::initSettings() {
-  const auto settings = anime::db.settings(m_anime.id);
+  const auto settings = anime::db()->settings(m_anime.id);
   m_settings = settings ? *settings : anime::Settings{.id = m_anime.id};
 
   ui_->comboDisplayTitle->clear();
@@ -449,7 +449,7 @@ void MediaDialog::accept() {
     }
   }
 
-  anime::db.updateSettings(m_settings);
+  anime::db()->updateSettings(m_settings);
 
   QDialog::accept();
 }

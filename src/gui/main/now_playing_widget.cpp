@@ -194,7 +194,7 @@ NowPlayingWidget::NowPlayingWidget(QWidget* parent) : QFrame(parent) {
   connect(m_titleLabel, &QLabel::customContextMenuRequested, this, [this]() {
     if (!m_anime) return;
     QMap<int, ListEntry> entries;
-    if (const auto entry = anime::db.entry(m_anime->id)) {
+    if (const auto entry = anime::db()->entry(m_anime->id)) {
       entries[m_anime->id] = *entry;
     }
     auto* menu = new MediaMenu(this, {*m_anime}, entries, nullptr, AnimeListContext::List);
@@ -241,9 +241,9 @@ NowPlayingWidget::NowPlayingWidget(QWidget* parent) : QFrame(parent) {
 
   refresh();
 
-  connect(&anime::db, &anime::Database::itemUpdated, this, [this](const int id) {
+  connect(anime::db(), &anime::Database::itemUpdated, this, [this](const int id) {
     if (!m_anime || m_anime->id != id) return;
-    if (const auto item = anime::db.item(id)) m_anime = *item;
+    if (const auto item = anime::db()->item(id)) m_anime = *item;
     refresh();
   });
   connect(imageProvider(), &ImageProvider::posterChanged, this, [this](const int id) {
@@ -279,7 +279,7 @@ void NowPlayingWidget::reset() {
 void NowPlayingWidget::setPlaying(track::Episode episode) {
   m_episode = episode;
 
-  if (const auto item = anime::db.item(episode.animeId())) {
+  if (const auto item = anime::db()->item(episode.animeId())) {
     m_anime = *item;
   } else {
     m_anime.reset();

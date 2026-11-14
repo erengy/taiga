@@ -41,8 +41,8 @@ namespace anime::list {
 bool exportAsMarkdown(const std::string& path) {
   std::map<anime::list::Status, std::vector<std::string>> status_lists;
 
-  for (const auto& entry : anime::db.entries()) {
-    const auto item = anime::db.item(entry.anime_id);
+  for (const auto& entry : anime::db()->entries()) {
+    const auto item = anime::db()->item(entry.anime_id);
     const auto line =
         std::format("{} ({}/{})", item->titles.romaji, entry.watched_episodes, item->episode_count);
     status_lists[entry.status].push_back(line);
@@ -120,7 +120,7 @@ bool exportAsXml(const std::string& path) {
   xml.writeStartElement("myanimelist");
 
   std::map<anime::list::Status, int> status_counts;
-  for (const auto& entry : anime::db.entries()) {
+  for (const auto& entry : anime::db()->entries()) {
     ++status_counts[entry.status];
   }
 
@@ -128,7 +128,7 @@ bool exportAsXml(const std::string& path) {
   xml.writeNumberElement("user_id", 0);
   xml.writeTextElement("user_name", taiga::accounts.myanimelistUsername());
   xml.writeNumberElement("user_export_type", 1);  // anime
-  xml.writeNumberElement("user_total_anime", anime::db.entries().count());
+  xml.writeNumberElement("user_total_anime", anime::db()->entries().count());
   xml.writeNumberElement("user_total_watching", status_counts[anime::list::Status::Watching]);
   xml.writeNumberElement("user_total_completed", status_counts[anime::list::Status::Completed]);
   xml.writeNumberElement("user_total_onhold", status_counts[anime::list::Status::OnHold]);
@@ -136,8 +136,8 @@ bool exportAsXml(const std::string& path) {
   xml.writeNumberElement("user_total_plantowatch", status_counts[anime::list::Status::PlanToWatch]);
   xml.writeEndElement();  // myinfo
 
-  for (const auto& entry : anime::db.entries()) {
-    const auto item = anime::db.item(entry.anime_id);
+  for (const auto& entry : anime::db()->entries()) {
+    const auto item = anime::db()->item(entry.anime_id);
     xml.writeStartElement("anime");
     xml.writeNumberElement("series_animedb_id", item->id);  // @TODO: pass actual MAL ID
     xml.writeTextElement("series_title", item->titles.romaji);

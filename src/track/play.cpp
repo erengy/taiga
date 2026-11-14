@@ -46,10 +46,10 @@ bool playEpisode(int animeId, int number) {
 }
 
 std::optional<int> nextEpisodeNumber(int animeId) {
-  const auto item = anime::db.item(animeId);
+  const auto item = anime::db()->item(animeId);
   if (!item) return std::nullopt;
 
-  const auto entry = anime::db.entry(animeId);
+  const auto entry = anime::db()->entry(animeId);
   const int watched_episodes = entry ? entry->watched_episodes : 0;
 
   int number = watched_episodes + 1;
@@ -63,10 +63,10 @@ std::optional<int> nextEpisodeNumber(int animeId) {
 }
 
 std::optional<int> randomEpisodeNumber(int animeId) {
-  const auto item = anime::db.item(animeId);
+  const auto item = anime::db()->item(animeId);
   if (!item) return std::nullopt;
 
-  const auto entry = anime::db.entry(animeId);
+  const auto entry = anime::db()->entry(animeId);
   const int watched_episodes = entry ? entry->watched_episodes : 0;
 
   int max_episode = item->episode_count;

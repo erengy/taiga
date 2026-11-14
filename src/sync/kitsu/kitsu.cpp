@@ -103,7 +103,7 @@ void Service::fetchAnime(const int id) {
       return;
     }
 
-    anime::db.updateItem(*item);
+    anime::db()->updateItem(*item);
   };
 
   manager_.get(api_.createRequest(u"/anime/%1"_s.arg(id), query), this, callback);
@@ -151,7 +151,7 @@ void Service::fetchListEntries(const int offset, QSet<int> fetchedIds) {
         items.append(*item);
       }
     }
-    anime::db.updateItems(items);
+    anime::db()->updateItems(items);
 
     QList<ListEntry> entries;
     for (const auto& value : root["data"].toArray()) {
@@ -162,7 +162,7 @@ void Service::fetchListEntries(const int offset, QSet<int> fetchedIds) {
         fetchedIds.insert(animeId);
       }
     }
-    anime::db.updateEntries(entries);
+    anime::db()->updateEntries(entries);
 
     if (const auto nextOffset = pagingOffset(root["links"].toObject(), u"next"_s)) {
       fetchListEntries(*nextOffset, fetchedIds);
@@ -220,7 +220,7 @@ void Service::search(const SearchParams& params, const int offset) {
     QList<int> ids;
     for (const auto& value : root["data"].toArray()) {
       if (const auto item = parseAnime(value)) {
-        anime::db.updateItem(*item);
+        anime::db()->updateItem(*item);
         ids.append(item->id);
       }
     }
@@ -240,7 +240,7 @@ void Service::search(const SearchParams& params, const int offset) {
 }
 
 void Service::addListEntry(const int id, const anime::list::Fields dirty) {
-  const auto listEntry = anime::db.entry(id);
+  const auto listEntry = anime::db()->entry(id);
   if (!listEntry) return;
 
   const QUrlQuery query{{"fields[libraryEntries]", libraryEntryFields()}};
@@ -285,7 +285,7 @@ void Service::addListEntry(const int id, const anime::list::Fields dirty) {
 }
 
 void Service::updateListEntry(const int id, const anime::list::Fields dirty) {
-  const auto listEntry = anime::db.entry(id);
+  const auto listEntry = anime::db()->entry(id);
   if (!listEntry) return;
 
   const QUrlQuery query{{"fields[libraryEntries]", libraryEntryFields()}};
@@ -317,7 +317,7 @@ void Service::updateListEntry(const int id, const anime::list::Fields dirty) {
 }
 
 void Service::deleteListEntry(const int id) {
-  const auto listEntry = anime::db.entry(id);
+  const auto listEntry = anime::db()->entry(id);
   if (!listEntry) return;
 
   const auto callback = [this, id](QRestReply& reply) {

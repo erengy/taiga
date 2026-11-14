@@ -18,6 +18,7 @@
 
 #include "anime_db.hpp"
 
+#include <QCoreApplication>
 #include <QFile>
 #include <QJsonArray>
 #include <QJsonDocument>
@@ -62,7 +63,7 @@ QString toJsonArray(const std::vector<std::string>& list) {
 
 namespace anime {
 
-Database::Database() : QObject{} {}
+Database::Database(QObject* parent) : QObject{parent} {}
 
 void Database::init() {
   db_ = QSqlDatabase::addDatabase("QSQLITE");
@@ -493,6 +494,11 @@ void Database::migrateSettingsFromV1() {
 
   db_.commit();
   db_.close();
+}
+
+Database* db() {
+  static auto instance = new Database{qApp};
+  return instance;
 }
 
 }  // namespace anime

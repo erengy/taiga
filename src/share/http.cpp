@@ -87,8 +87,8 @@ void Webhook::init() {
   const auto refreshIfCurrent = [this](const int id) {
     if (episode_ && episode_->animeId() == id) playingTimer_->start();
   };
-  connect(&anime::db, &anime::Database::itemUpdated, this, refreshIfCurrent);
-  connect(&anime::db, &anime::Database::entryUpdated, this, refreshIfCurrent);
+  connect(anime::db(), &anime::Database::itemUpdated, this, refreshIfCurrent);
+  connect(anime::db(), &anime::Database::entryUpdated, this, refreshIfCurrent);
 }
 
 void Webhook::applySettings() {

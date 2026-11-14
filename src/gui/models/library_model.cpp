@@ -149,7 +149,7 @@ QString LibraryModel::getTitle(const QString& path) const {
   parse(path);
 
   if (m_parsed[path].id) {
-    const auto item = anime::db.item(m_parsed[path].id);
+    const auto item = anime::db()->item(m_parsed[path].id);
     if (item) return QString::fromStdString(anime::preferredTitle(*item));
   }
 

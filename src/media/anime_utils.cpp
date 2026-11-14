@@ -174,7 +174,8 @@ bool isStale(const Details& item) {
 ////////////////////////////////////////////////////////////////////////////////
 
 std::string preferredTitle(const Details& item) {
-  if (const auto* settings = db.settings(item.id); settings && !settings->display_title.empty()) {
+  if (const auto* settings = db()->settings(item.id);
+      settings && !settings->display_title.empty()) {
     return settings->display_title;
   }
 

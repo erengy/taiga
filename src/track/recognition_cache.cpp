@@ -27,8 +27,8 @@
 namespace track::recognition {
 
 Cache::Cache() : QObject{} {
-  connect(&anime::db, &anime::Database::itemUpdated, this, [this](const int id) {
-    if (const auto* item = anime::db.item(id)) {
+  connect(anime::db(), &anime::Database::itemUpdated, this, [this](const int id) {
+    if (const auto* item = anime::db()->item(id)) {
       update(*item);
     }
   });
@@ -51,7 +51,7 @@ void Cache::clear() {
 void Cache::init() {
   if (!empty()) return;
 
-  for (const auto& item : anime::db.items()) {
+  for (const auto& item : anime::db()->items()) {
     add(item);
   }
 }
@@ -73,7 +73,7 @@ void Cache::add(const anime::Details& item) {
   };
 
   // User-defined titles
-  if (const auto* settings = anime::db.settings(item.id)) {
+  if (const auto* settings = anime::db()->settings(item.id)) {
     for (const auto& synonym : settings->synonyms) {
       add(synonym, 2.0f);
     }

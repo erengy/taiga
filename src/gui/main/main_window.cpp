@@ -176,7 +176,7 @@ void MainWindow::initNavigation() {
   // Connects to m_navigationWidget's signals on construction, so it must come after.
   m_navigationController = new NavigationController(this);
 
-  const bool hasWatching = std::ranges::any_of(anime::db.entries(), [](const auto& entry) {
+  const bool hasWatching = std::ranges::any_of(anime::db()->entries(), [](const auto& entry) {
     return entry.status == anime::list::Status::Watching;
   });
   if (hasWatching) {
@@ -307,8 +307,8 @@ void MainWindow::initStatusbar() {
   });
 
   connect(&sync::queue, &sync::Queue::processing, this, [this](const int animeId) {
-    const auto item = anime::db.item(animeId);
-    const auto entry = anime::db.entry(animeId);
+    const auto item = anime::db()->item(animeId);
+    const auto entry = anime::db()->entry(animeId);
     if (!item || !entry) return;
 
     const auto title = anime::preferredTitle(*item);
@@ -329,7 +329,7 @@ void MainWindow::initStatusbar() {
   });
 
   connect(&sync::queue, &sync::Queue::queuedWhileUnauthenticated, this, [this](const int animeId) {
-    const auto item = anime::db.item(animeId);
+    const auto item = anime::db()->item(animeId);
     if (!item) return;
 
     m_statusBarController->showMessage({
@@ -339,15 +339,16 @@ void MainWindow::initStatusbar() {
     });
   });
 
-  connect(&anime::db, &anime::Database::itemDeleted, this, [this](const int, const QString& title) {
-    if (title.isEmpty()) return;
+  connect(anime::db(), &anime::Database::itemDeleted, this,
+          [this](const int, const QString& title) {
+            if (title.isEmpty()) return;
 
-    m_statusBarController->showMessage({
-        .source = StatusBarController::Source::Sync,
-        .text = tr("Anime removed from database: %1").arg(title),
-        .spin = false,
-    });
-  });
+            m_statusBarController->showMessage({
+                .source = StatusBarController::Source::Sync,
+                .text = tr("Anime removed from database: %1").arg(title),
+                .spin = false,
+            });
+          });
 }
 
 void MainWindow::initToolbar() {
@@ -417,7 +418,7 @@ void MainWindow::initTrayIcon() {
             if (isActiveWindow()) return;
 
             const auto episode = track::media::detection()->getCurrentEpisode();
-            const auto item = episode ? anime::db.item(episode->animeId()) : nullptr;
+            const auto item = episode ? anime::db()->item(episode->animeId()) : nullptr;
             if (!item) return;
 
             m_trayIcon->showMessage(tr("Confirm list update"),
@@ -432,7 +433,7 @@ void MainWindow::initTrayIcon() {
             if (!episode) {
               m_trayIcon->setBadge(TrayIcon::Badge::None);
             } else {
-              const bool recognized = anime::db.item(episode->animeId()) != nullptr;
+              const bool recognized = anime::db()->item(episode->animeId()) != nullptr;
               m_trayIcon->setBadge(recognized ? TrayIcon::Badge::Success : TrayIcon::Badge::Error);
             }
           });
