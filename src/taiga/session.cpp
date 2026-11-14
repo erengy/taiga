@@ -63,6 +63,10 @@ QByteArray Session::mainWindowGeometry() const {
   return QByteArray::fromBase64(value("mainWindow.geometry", QByteArray{}).toByteArray());
 }
 
+bool Session::mainWindowTrayNoticeShown() const {
+  return value("mainWindow.trayNoticeShown", false).toBool();
+}
+
 QByteArray Session::mediaDialogGeometry() const {
   return QByteArray::fromBase64(value("mediaDialog.geometry", QByteArray{}).toByteArray());
 }
@@ -145,6 +149,10 @@ void Session::setAnimeListViewMode(const gui::ListViewMode mode) const {
 
 void Session::setMainWindowGeometry(const QByteArray& geometry) const {
   setValue("mainWindow.geometry", geometry.toBase64().toStdString());
+}
+
+void Session::setMainWindowTrayNoticeShown(const bool shown) const {
+  setValue("mainWindow.trayNoticeShown", shown);
 }
 
 void Session::setMediaDialogGeometry(const QByteArray& geometry) const {

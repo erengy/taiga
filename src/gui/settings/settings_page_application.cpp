@@ -17,7 +17,9 @@
  */
 #include "settings_page_application.hpp"
 
+#include <QCheckBox>
 #include <QComboBox>
+#include <QSystemTrayIcon>
 #include <algorithm>
 
 #include "taiga/settings.hpp"
@@ -46,13 +48,25 @@ void SettingsPageApplication::load() {
     combo->setCurrentIndex(
         std::max(0, combo->findData(static_cast<int>(taiga::settings()->appTitleLanguage()))));
   }
+  {
+    ui_->closeToTrayCheckBox->setChecked(taiga::settings()->appCloseToTray());
+    ui_->startInTrayCheckBox->setChecked(taiga::settings()->appStartInTray());
+    if (!QSystemTrayIcon::isSystemTrayAvailable()) {
+      ui_->behaviorGroupBox->setDisabled(true);
+      ui_->behaviorGroupBox->setToolTip(tr("The system tray is not available."));
+    }
+  }
 }
 
 void SettingsPageApplication::apply() const {
   taiga::settings()->setAppColorScheme(
       static_cast<Qt::ColorScheme>(ui_->colorSchemeComboBox->currentData().toInt()));
+
   taiga::settings()->setAppTitleLanguage(
       static_cast<anime::TitleLanguage>(ui_->titleLanguageComboBox->currentData().toInt()));
+
+  taiga::settings()->setAppCloseToTray(ui_->closeToTrayCheckBox->isChecked());
+  taiga::settings()->setAppStartInTray(ui_->startInTrayCheckBox->isChecked());
 }
 
 }  // namespace gui

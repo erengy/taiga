@@ -70,11 +70,19 @@ void Settings::onValueChanged(QAnyStringView key) const {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+bool Settings::appCloseToTray() const {
+  return value(Key::kAppCloseToTray, true).toBool();
+}
+
 Qt::ColorScheme Settings::appColorScheme() const {
   const auto scheme = value(Key::kAppColorScheme, u"system"_s).toString();
   if (scheme == u"light") return Qt::ColorScheme::Light;
   if (scheme == u"dark") return Qt::ColorScheme::Dark;
   return Qt::ColorScheme::Unknown;
+}
+
+bool Settings::appStartInTray() const {
+  return value(Key::kAppStartInTray, false).toBool();
 }
 
 std::string Settings::appStyle() const {
@@ -201,6 +209,10 @@ std::string Settings::webhookUrl() const {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+void Settings::setAppCloseToTray(const bool enabled) const {
+  setValue(Key::kAppCloseToTray, enabled);
+}
+
 void Settings::setAppColorScheme(const Qt::ColorScheme scheme) const {
   const auto slug = [scheme]() -> std::string {
     switch (scheme) {
@@ -214,6 +226,10 @@ void Settings::setAppColorScheme(const Qt::ColorScheme scheme) const {
     }
   }();
   setValue(Key::kAppColorScheme, slug);
+}
+
+void Settings::setAppStartInTray(const bool enabled) const {
+  setValue(Key::kAppStartInTray, enabled);
 }
 
 void Settings::setAppStyle(const std::string& style) const {

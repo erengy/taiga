@@ -53,6 +53,10 @@ TrayIcon::TrayIcon(QObject* parent, const QIcon& icon, QMenu* menu) : m_baseIcon
   connect(m_icon, &QSystemTrayIcon::messageClicked, this, &TrayIcon::messageClicked);
 }
 
+bool TrayIcon::isAvailable() const {
+  return m_icon != nullptr;
+}
+
 void TrayIcon::setBadge(Badge badge) {
   if (m_badge == badge) return;
 

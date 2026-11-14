@@ -101,9 +101,20 @@ int Application::run() {
     installTranslator(&translator);
   }
 
+  // The window may be hidden in the tray, so we quit explicitly instead.
+  setQuitOnLastWindowClosed(false);
+
   window_ = new gui::MainWindow();
   window_->init();
 
+  if (!(taiga::settings()->appStartInTray() && window_->canHideToTray())) {
+    showMainWindow();
+  }
+
+  return QApplication::exec();
+}
+
+void Application::showMainWindow() {
 #ifdef Q_OS_WINDOWS
   // Delay showing the window to avoid a white flash.
   window_->setWindowOpacity(0.0);
@@ -116,8 +127,6 @@ int Application::run() {
 #else
   window_->show();
 #endif
-
-  return QApplication::exec();
 }
 
 bool Application::isDebug() const {

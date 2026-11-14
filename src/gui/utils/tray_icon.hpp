@@ -39,6 +39,8 @@ public:
 
   TrayIcon(QObject* parent, const QIcon& icon, QMenu* menu);
 
+  bool isAvailable() const;
+
   void setBadge(Badge badge);
   void showMessage(const QString& title, const QString& message);
 

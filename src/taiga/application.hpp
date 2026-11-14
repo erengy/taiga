@@ -54,6 +54,7 @@ private:
   void initLogger() const;
   void onNewConnection();
   void parseCommandLine();
+  void showMainWindow();
 
   struct Options {
     bool debug = false;

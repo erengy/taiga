@@ -38,6 +38,7 @@ public:
   Qt::SortOrder animeListSecondarySortOrder() const;
   gui::ListViewMode animeListViewMode() const;
   QByteArray mainWindowGeometry() const;
+  bool mainWindowTrayNoticeShown() const;
   QByteArray mediaDialogGeometry() const;
   QByteArray mediaDialogSplitterState() const;
   gui::AnimeListProxyModelFilter searchListFilters() const;
@@ -53,6 +54,7 @@ public:
   void setAnimeListSecondarySortOrder(const Qt::SortOrder order) const;
   void setAnimeListViewMode(const gui::ListViewMode mode) const;
   void setMainWindowGeometry(const QByteArray& geometry) const;
+  void setMainWindowTrayNoticeShown(const bool shown) const;
   void setMediaDialogGeometry(const QByteArray& geometry) const;
   void setMediaDialogSplitterState(const QByteArray& state) const;
   void setSearchListFilters(const gui::AnimeListProxyModelFilter& filters) const;

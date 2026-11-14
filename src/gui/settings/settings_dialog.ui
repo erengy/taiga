@@ -417,6 +417,29 @@
                 </widget>
                </item>
                <item>
+                <widget class="QGroupBox" name="behaviorGroupBox">
+                 <property name="title">
+                  <string>Behavior</string>
+                 </property>
+                 <layout class="QVBoxLayout" name="behaviorLayout">
+                  <item>
+                   <widget class="QCheckBox" name="closeToTrayCheckBox">
+                    <property name="text">
+                     <string>Keep running in the system tray when the window is closed</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QCheckBox" name="startInTrayCheckBox">
+                    <property name="text">
+                     <string>Start in the system tray</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
                 <spacer name="applicationVerticalSpacer">
                  <property name="orientation">
                   <enum>Qt::Orientation::Vertical</enum>

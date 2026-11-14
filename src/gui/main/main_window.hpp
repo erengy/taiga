@@ -61,6 +61,8 @@ public:
 
   void init();
 
+  bool canHideToTray() const;
+
 public slots:
   void addNewFolder();
   void displayWindow();

@@ -445,6 +445,23 @@ void MainWindow::closeEvent(QCloseEvent* event) {
   taiga::session.setMainWindowGeometry(saveGeometry());
   if (m_listWidget) m_listWidget->saveState();
   if (m_searchWidget) m_searchWidget->saveState();
+
+  // Closed by the user, rather than by quitting the application.
+  if (event->spontaneous()) {
+    if (taiga::settings()->appCloseToTray() && canHideToTray()) {
+      hide();
+      event->ignore();
+      if (!taiga::session.mainWindowTrayNoticeShown()) {
+        taiga::session.setMainWindowTrayNoticeShown(true);
+        m_trayIcon->showMessage(tr("Taiga is still running"),
+                                tr("Taiga keeps detecting what you watch in the background. "
+                                   "To quit, use Exit from the tray menu."));
+      }
+      return;
+    }
+    QMetaObject::invokeMethod(qApp, &QApplication::quit, Qt::QueuedConnection);
+  }
+
   event->accept();
 }
 
@@ -478,8 +495,14 @@ void MainWindow::updateTitle() {
 }
 
 void MainWindow::displayWindow() {
+  show();
   setWindowState((windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
+  raise();
   activateWindow();
+}
+
+bool MainWindow::canHideToTray() const {
+  return m_trayIcon && m_trayIcon->isAvailable();
 }
 
 void MainWindow::about() {
