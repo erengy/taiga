@@ -214,11 +214,11 @@ void Service::deleteListEntry(const int id) {
   const auto callback = [this](QRestReply& reply) {
     if (isError(reply) && reply.httpStatus() != 404) {
       handleError(*this, reply);
-      sync::queue.complete(false, "Failed to delete list entry.");
+      sync::queue()->complete(false, "Failed to delete list entry.");
       return;
     }
 
-    sync::queue.complete(true);
+    sync::queue()->complete(true);
   };
 
   manager_.post(api_.createRequest(), data, this, callback);
@@ -260,7 +260,7 @@ void Service::updateListEntry(const int id, const anime::list::Fields dirty) {
   const auto callback = [this](QRestReply& reply) {
     if (isError(reply)) {
       handleError(*this, reply);
-      sync::queue.complete(false, "Failed to update list entry.");
+      sync::queue()->complete(false, "Failed to update list entry.");
       return;
     }
 
@@ -270,7 +270,7 @@ void Service::updateListEntry(const int id, const anime::list::Fields dirty) {
 
     if (!entry) {
       handleError(*this, reply, "Could not parse list entry.");
-      sync::queue.complete(false, "Could not parse list entry.");
+      sync::queue()->complete(false, "Could not parse list entry.");
       return;
     }
 
@@ -278,9 +278,9 @@ void Service::updateListEntry(const int id, const anime::list::Fields dirty) {
       anime::db()->updateItem(*item);
     }
     if (const auto listEntry = parseListEntry(*entry)) {
-      sync::queue.complete(*listEntry);
+      sync::queue()->complete(*listEntry);
     } else {
-      sync::queue.complete(true);
+      sync::queue()->complete(true);
     }
   };
 

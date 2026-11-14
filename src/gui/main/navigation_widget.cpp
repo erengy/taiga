@@ -60,7 +60,7 @@ NavigationWidget::NavigationWidget(QWidget* parent) : QTreeWidget(parent) {
     emit currentListStatusChanged(status);
   });
 
-  connect(&sync::queue, &sync::Queue::changed, this, &NavigationWidget::refresh);
+  connect(sync::queue(), &sync::Queue::changed, this, &NavigationWidget::refresh);
 
   const QList<sync::Service*> services{
       sync::anilist::Service::instance(),
@@ -101,7 +101,7 @@ void NavigationWidget::refresh() {
   }
 
   auto historyItem = addItem("History", "history", MainWindowPage::History);
-  setItemData(historyItem, NavigationItemDataRole::Counter, sync::queue.count());
+  setItemData(historyItem, NavigationItemDataRole::Counter, sync::queue()->count());
 
   addSeparator();
   addItem("Library", "folder", MainWindowPage::Library);

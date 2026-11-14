@@ -299,14 +299,14 @@ void MainWindow::initStatusbar() {
             });
   }
 
-  connect(&sync::queue, &sync::Queue::changed, this, [this]() {
-    if (sync::queue.count() == 0) {
+  connect(sync::queue(), &sync::Queue::changed, this, [this]() {
+    if (sync::queue()->count() == 0) {
       m_statusBarController->clearMessage(StatusBarController::Source::Sync);
       setEnabled(true);
     }
   });
 
-  connect(&sync::queue, &sync::Queue::processing, this, [this](const int animeId) {
+  connect(sync::queue(), &sync::Queue::processing, this, [this](const int animeId) {
     const auto item = anime::db()->item(animeId);
     const auto entry = anime::db()->entry(animeId);
     if (!item || !entry) return;
@@ -328,7 +328,7 @@ void MainWindow::initStatusbar() {
     });
   });
 
-  connect(&sync::queue, &sync::Queue::queuedWhileUnauthenticated, this, [this](const int animeId) {
+  connect(sync::queue(), &sync::Queue::queuedWhileUnauthenticated, this, [this](const int animeId) {
     const auto item = anime::db()->item(animeId);
     if (!item) return;
 

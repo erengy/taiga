@@ -86,7 +86,7 @@ int Application::run() {
   taiga::settings()->init();
   anime::db()->init();
   anime::history()->init();
-  sync::queue.init();
+  sync::queue()->init();
   track::media::detection()->init();
   track::updateSession()->init();
   share::discord::presence()->init();

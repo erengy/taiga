@@ -261,7 +261,7 @@ void Service::addListEntry(const int id, const anime::list::Fields dirty) {
         return value["detail"].toString().contains(u"has already been taken"_s);
       });
       if (duplicate) {
-        sync::queue.complete(true);
+        sync::queue()->complete(true);
         return;
       }
     }
@@ -269,15 +269,15 @@ void Service::addListEntry(const int id, const anime::list::Fields dirty) {
     if (isError(reply)) {
       if (retryOnTokenExpiry(reply, [this, id, dirty] { addListEntry(id, dirty); })) return;
       handleError(*this, reply, json);
-      sync::queue.complete(false, "Failed to add list entry.");
+      sync::queue()->complete(false, "Failed to add list entry.");
       return;
     }
 
     if (const auto entry =
             json ? parseListEntry(json->object()["data"].toObject(), id) : std::nullopt) {
-      sync::queue.complete(*entry);
+      sync::queue()->complete(*entry);
     } else {
-      sync::queue.complete(true);
+      sync::queue()->complete(true);
     }
   };
 
@@ -300,16 +300,16 @@ void Service::updateListEntry(const int id, const anime::list::Fields dirty) {
       if (retryOnTokenExpiry(reply, [this, id, dirty] { updateListEntry(id, dirty); })) return;
       handleError(*this, reply,
                   reply.httpStatus() == 404 ? u"Anime list entry does not exist."_s : QString{});
-      sync::queue.complete(false, "Failed to update list entry.");
+      sync::queue()->complete(false, "Failed to update list entry.");
       return;
     }
 
     const auto json = reply.readJson();
     if (const auto entry =
             json ? parseListEntry(json->object()["data"].toObject(), id) : std::nullopt) {
-      sync::queue.complete(*entry);
+      sync::queue()->complete(*entry);
     } else {
-      sync::queue.complete(true);
+      sync::queue()->complete(true);
     }
   };
 
@@ -324,11 +324,11 @@ void Service::deleteListEntry(const int id) {
     if (isError(reply) && reply.httpStatus() != 404) {
       if (retryOnTokenExpiry(reply, [this, id] { deleteListEntry(id); })) return;
       handleError(*this, reply);
-      sync::queue.complete(false, "Failed to delete list entry.");
+      sync::queue()->complete(false, "Failed to delete list entry.");
       return;
     }
 
-    sync::queue.complete(true);
+    sync::queue()->complete(true);
   };
 
   manager_.deleteResource(api_.createRequest(u"/library-entries/%1"_s.arg(listEntry->id)), this,

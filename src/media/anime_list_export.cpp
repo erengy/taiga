@@ -160,7 +160,7 @@ bool exportAsXml(const std::string& path) {
     xml.writeTextElement("my_tags", "");
     xml.writeNumberElement("my_rewatching", entry.rewatching);
     xml.writeNumberElement("my_rewatching_ep", entry.rewatching_ep);
-    xml.writeNumberElement("update_on_import", sync::queue.hasItem(entry.anime_id) ? 1 : 0);
+    xml.writeNumberElement("update_on_import", sync::queue()->hasItem(entry.anime_id) ? 1 : 0);
     xml.writeEndElement();
   }
 

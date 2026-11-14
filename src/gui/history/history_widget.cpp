@@ -136,7 +136,7 @@ void HistoryWidget::clearQueue() const {
                                    .arg(sync::serviceName(sync::currentServiceId()));
 
   if (confirm(nullptr, tr("Do you want to clear the sync queue?"), informativeText, tr("Clear"))) {
-    sync::queue.clear();
+    sync::queue()->clear();
   }
 }
 

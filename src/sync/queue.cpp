@@ -18,6 +18,7 @@
 
 #include "queue.hpp"
 
+#include <QCoreApplication>
 #include <QSqlDatabase>
 #include <algorithm>
 #include <chrono>
@@ -35,7 +36,7 @@
 
 namespace sync {
 
-Queue::Queue() : QObject{} {}
+Queue::Queue(QObject* parent) : QObject{parent} {}
 
 void Queue::init() {
   // Wait for changes to settle, so that edits made in a row are sent together.
@@ -359,6 +360,11 @@ void Queue::migrateFromV1() {
 
     anime::list::save(entry);
   }
+}
+
+Queue* queue() {
+  static auto instance = new Queue{qApp};
+  return instance;
 }
 
 }  // namespace sync

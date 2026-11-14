@@ -214,11 +214,11 @@ void Service::deleteListEntry(const int id) {
     if (isError(reply) && reply.httpStatus() != 404) {
       if (retryOnTokenExpiry(reply, [this, id] { deleteListEntry(id); })) return;
       handleError(*this, reply);
-      sync::queue.complete(false, "Failed to delete list entry.");
+      sync::queue()->complete(false, "Failed to delete list entry.");
       return;
     }
 
-    sync::queue.complete(true);
+    sync::queue()->complete(true);
   };
 
   manager_.deleteResource(api_.createRequest(u"/anime/%1/my_list_status"_s.arg(id)), this,
@@ -265,21 +265,21 @@ void Service::updateListEntry(const int id, const anime::list::Fields dirty) {
       if (retryOnTokenExpiry(reply, [this, id, dirty] { updateListEntry(id, dirty); })) return;
       handleError(*this, reply,
                   reply.httpStatus() == 404 ? u"Anime list entry does not exist."_s : QString{});
-      sync::queue.complete(false, "Failed to update list entry.");
+      sync::queue()->complete(false, "Failed to update list entry.");
       return;
     }
 
     const auto json = reply.readJson();
     if (!json) {
       handleError(*this, reply, "Could not parse list entry.");
-      sync::queue.complete(false, "Could not parse list entry.");
+      sync::queue()->complete(false, "Could not parse list entry.");
       return;
     }
 
     if (const auto entry = parseListEntry(json->object(), id)) {
-      sync::queue.complete(*entry);
+      sync::queue()->complete(*entry);
     } else {
-      sync::queue.complete(true);
+      sync::queue()->complete(true);
     }
   };
 

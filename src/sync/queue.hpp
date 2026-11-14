@@ -42,7 +42,7 @@ class Queue final : public QObject {
   Q_DISABLE_COPY_MOVE(Queue)
 
 public:
-  Queue();
+  explicit Queue(QObject* parent);
   ~Queue() = default;
 
   void init();
@@ -97,6 +97,6 @@ private:
   bool modifiedWhileProcessing_ = false;
 };
 
-inline Queue queue;
+Queue* queue();
 
 }  // namespace sync
