@@ -44,6 +44,7 @@ public:
   struct Key {
     static constexpr QLatin1StringView kAppCloseToTray{"app.closeToTray"};
     static constexpr QLatin1StringView kAppColorScheme{"app.colorScheme"};
+    static constexpr QLatin1StringView kAppHideNsfw{"app.hideNsfw"};
     static constexpr QLatin1StringView kAppStartInTray{"app.startInTray"};
     static constexpr QLatin1StringView kAppStyle{"app.style"};
     static constexpr QLatin1StringView kAppTitleLanguage{"app.titleLanguage"};
@@ -78,6 +79,7 @@ public:
 
   bool appCloseToTray() const;
   Qt::ColorScheme appColorScheme() const;
+  bool appHideNsfw() const;
   bool appStartInTray() const;
   std::string appStyle() const;
   anime::TitleLanguage appTitleLanguage() const;
@@ -105,6 +107,7 @@ public:
 
   void setAppCloseToTray(const bool enabled) const;
   void setAppColorScheme(const Qt::ColorScheme scheme) const;
+  void setAppHideNsfw(const bool enabled) const;
   void setAppStartInTray(const bool enabled) const;
   void setAppStyle(const std::string& style) const;
   void setAppTitleLanguage(const anime::TitleLanguage language) const;

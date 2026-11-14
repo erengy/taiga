@@ -71,6 +71,7 @@ void SettingsPageApplication::load() {
     combo->setCurrentIndex(
         std::max(0, combo->findData(static_cast<int>(taiga::settings()->appTitleLanguage()))));
   }
+  ui_->hideNsfwCheckBox->setChecked(taiga::settings()->appHideNsfw());
   {
     ui_->closeToTrayCheckBox->setChecked(taiga::settings()->appCloseToTray());
     ui_->startInTrayCheckBox->setChecked(taiga::settings()->appStartInTray());
@@ -87,6 +88,8 @@ void SettingsPageApplication::apply() const {
 
   taiga::settings()->setAppTitleLanguage(
       static_cast<anime::TitleLanguage>(ui_->titleLanguageComboBox->currentData().toInt()));
+
+  taiga::settings()->setAppHideNsfw(ui_->hideNsfwCheckBox->isChecked());
 
   taiga::settings()->setAppCloseToTray(ui_->closeToTrayCheckBox->isChecked());
   taiga::settings()->setAppStartInTray(ui_->startInTrayCheckBox->isChecked());

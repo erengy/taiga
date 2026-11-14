@@ -38,6 +38,7 @@
 #include "sync/myanimelist/myanimelist.hpp"
 #include "sync/service.hpp"
 #include "taiga/session.hpp"
+#include "taiga/settings.hpp"
 
 namespace {
 
@@ -73,7 +74,13 @@ SearchWidget::SearchWidget(QWidget* parent)
                                  taiga::session.searchListSecondarySortOrder());
   m_proxyModel->sort(taiga::session.searchListSortColumn(), taiga::session.searchListSortOrder());
   m_proxyModel->setFilters(taiga::session.searchListFilters());
-  m_proxyModel->setNsfwHidden(true);
+  m_proxyModel->setNsfwHidden(taiga::settings()->appHideNsfw());
+
+  connect(taiga::settings(), &taiga::Settings::changed, this, [this](const QSet<QString>& keys) {
+    if (keys.contains(taiga::Settings::Key::kAppHideNsfw)) {
+      m_proxyModel->setNsfwHidden(taiga::settings()->appHideNsfw());
+    }
+  });
 
   static const auto filterValue = [](QComboBox* combo, int index) {
     return index > -1 ? std::optional<int>{combo->itemData(index).toInt()} : std::nullopt;

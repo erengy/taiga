@@ -81,6 +81,10 @@ Qt::ColorScheme Settings::appColorScheme() const {
   return Qt::ColorScheme::Unknown;
 }
 
+bool Settings::appHideNsfw() const {
+  return value(Key::kAppHideNsfw, true).toBool();
+}
+
 bool Settings::appStartInTray() const {
   return value(Key::kAppStartInTray, false).toBool();
 }
@@ -226,6 +230,10 @@ void Settings::setAppColorScheme(const Qt::ColorScheme scheme) const {
     }
   }();
   setValue(Key::kAppColorScheme, slug);
+}
+
+void Settings::setAppHideNsfw(const bool enabled) const {
+  setValue(Key::kAppHideNsfw, enabled);
 }
 
 void Settings::setAppStartInTray(const bool enabled) const {
