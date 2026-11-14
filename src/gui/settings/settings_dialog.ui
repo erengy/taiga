@@ -406,6 +406,13 @@
                   <item row="1" column="1">
                    <widget class="QComboBox" name="titleLanguageComboBox"/>
                   </item>
+                  <item row="2" column="1">
+                   <widget class="QLabel" name="titleLanguageHintLabel">
+                    <property name="enabled">
+                     <bool>false</bool>
+                    </property>
+                   </widget>
+                  </item>
                  </layout>
                 </widget>
                </item>

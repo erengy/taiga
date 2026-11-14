@@ -22,13 +22,36 @@
 #include <QSystemTrayIcon>
 #include <algorithm>
 
+#include "base/string.hpp"
 #include "taiga/settings.hpp"
 #include "ui_settings_dialog.h"
 
 namespace gui {
 
+namespace {
+
+QString titleExamples(const anime::TitleLanguage language) {
+  switch (language) {
+    default:
+    case anime::TitleLanguage::Romaji:
+      return u"Shingeki no Kyojin"_s;
+    case anime::TitleLanguage::English:
+      return u"Attack on Titan"_s;
+    case anime::TitleLanguage::Native:
+      return u"進撃の巨人"_s;
+  }
+}
+
+}  // namespace
+
 SettingsPageApplication::SettingsPageApplication(Ui::SettingsDialog* ui, QDialog* dialog)
-    : SettingsPage(ui, dialog) {}
+    : SettingsPage(ui, dialog) {
+  connect(ui_->titleLanguageComboBox, &QComboBox::currentIndexChanged, this, [this]() {
+    const auto language =
+        static_cast<anime::TitleLanguage>(ui_->titleLanguageComboBox->currentData().toInt());
+    ui_->titleLanguageHintLabel->setText(tr("e.g. %1").arg(titleExamples(language)));
+  });
+}
 
 void SettingsPageApplication::load() {
   {
