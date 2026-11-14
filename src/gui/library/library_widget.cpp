@@ -69,7 +69,7 @@ LibraryWidget::LibraryWidget(QWidget* parent)
     m_toolbar->addAction(mainWindow()->ui()->actionPlayRandomAnime);
 
     // More
-    const auto actionMore = new QAction(theme.getIcon("more_horiz"), tr("More"), this);
+    const auto actionMore = new QAction(theme()->getIcon("more_horiz"), tr("More"), this);
     m_toolbar->addAction(actionMore);
   }
 

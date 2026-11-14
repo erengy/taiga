@@ -30,7 +30,7 @@ class Theme final : public QObject {
   Q_DISABLE_COPY_MOVE(Theme)
 
 public:
-  Theme();
+  explicit Theme(QObject* parent);
 
   const QIcon& getIcon(const QString& key, const QString& extension = QString{u"svg"},
                        bool useSvgIconEngine = true);
@@ -48,6 +48,6 @@ private:
   QHash<QString, QIcon> m_icons;
 };
 
-inline Theme theme;
+Theme* theme();
 
 }  // namespace gui

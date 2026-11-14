@@ -73,7 +73,7 @@ HistoryWidget::HistoryWidget(QWidget* parent)
 }
 
 void HistoryWidget::initToolbar() {
-  const auto actionMore = new QAction(theme.getIcon("more_horiz"), tr("More"), this);
+  const auto actionMore = new QAction(theme()->getIcon("more_horiz"), tr("More"), this);
   m_toolbar->addAction(actionMore);
 
   auto* menu = new QMenu(this);
@@ -93,9 +93,9 @@ void HistoryWidget::showContextMenu() const {
   auto* menu = new QMenu(m_view);
   menu->setAttribute(Qt::WA_DeleteOnClose);
 
-  menu->addAction(theme.getIcon("info"), tr("Details"), this,
+  menu->addAction(theme()->getIcon("info"), tr("Details"), this,
                   [this, index]() { showMediaDialog(index); });
-  menu->addAction(theme.getIcon("delete"), tr("Remove..."), this,
+  menu->addAction(theme()->getIcon("delete"), tr("Remove..."), this,
                   [this, index]() { removeItem(index); });
 
   menu->popup(QCursor::pos());

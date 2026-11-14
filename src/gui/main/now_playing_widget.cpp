@@ -368,7 +368,7 @@ void NowPlayingWidget::render(const std::optional<Content>& content) {
       iconName.isEmpty()) {
     m_iconLabel->clear();
   } else {
-    m_iconLabel->setPixmap(theme.getIcon(iconName).pixmap(QSize(16, 16)));
+    m_iconLabel->setPixmap(theme()->getIcon(iconName).pixmap(QSize(16, 16)));
   }
   m_statusLabel->setText(formatUpdateState(content->updateState));
 

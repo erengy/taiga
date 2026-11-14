@@ -53,7 +53,7 @@ SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::S
 
   const auto add_item = [this](QString icon, QString text, QWidget* page = nullptr) {
     auto item = new QTreeWidgetItem(ui_->treeWidget, QStringList(text));
-    item->setIcon(0, theme.getIcon(icon));
+    item->setIcon(0, theme()->getIcon(icon));
     item->setSizeHint(0, QSize{0, 24});
     item->setData(0, kPageRole, QVariant::fromValue(page));
     if (!page) item->setDisabled(true);

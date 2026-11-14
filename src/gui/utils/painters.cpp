@@ -59,7 +59,7 @@ void paintProgressBar(QPainter* painter, const QStyleOption& option, const Anime
   styleOption.rect = option.rect;
   styleOption.palette = option.palette;
   styleOption.palette.setCurrentColorGroup(QPalette::ColorGroup::Active);
-  styleOption.palette.setColor(QPalette::ColorRole::Highlight, theme.isDark()
+  styleOption.palette.setColor(QPalette::ColorRole::Highlight, theme()->isDark()
                                                                    ? QColor{12, 164, 12, 128}
                                                                    : QColor{12, 164, 12, 255});
   styleOption.fontMetrics = option.fontMetrics;

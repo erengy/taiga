@@ -35,7 +35,7 @@ SpinnerWidget::SpinnerWidget(QWidget* parent, int size) : QLabel(parent) {
 void SpinnerWidget::setSize(int size) {
   setFixedSize(size, size);
 
-  m_basePixmap = theme.getIcon("progress_activity").pixmap(QSize(size, size));
+  m_basePixmap = theme()->getIcon("progress_activity").pixmap(QSize(size, size));
   setPixmap(m_basePixmap);
 }
 

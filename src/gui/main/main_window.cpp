@@ -151,24 +151,24 @@ void MainWindow::initActions() {
 }
 
 void MainWindow::initIcons() {
-  ui_->menuLibraryFolders->setIcon(theme.getIcon("folder"));
-  ui_->menuExport->setIcon(theme.getIcon("export_notes"));
+  ui_->menuLibraryFolders->setIcon(theme()->getIcon("folder"));
+  ui_->menuExport->setIcon(theme()->getIcon("export_notes"));
 
-  ui_->actionAddNewFolder->setIcon(theme.getIcon("create_new_folder"));
-  ui_->actionAbout->setIcon(theme.getIcon("info"));
-  ui_->actionBack->setIcon(theme.getIcon("arrow_back"));
-  ui_->actionCheckForUpdates->setIcon(theme.getIcon("cloud_download"));
-  ui_->actionDonate->setIcon(theme.getIcon("favorite"));
-  ui_->actionExit->setIcon(theme.getIcon("logout"));
-  ui_->actionForward->setIcon(theme.getIcon("arrow_forward"));
-  ui_->actionMenu->setIcon(theme.getIcon("menu"));
-  ui_->actionPlayNextEpisode->setIcon(theme.getIcon("skip_next"));
-  ui_->actionPlayRandomAnime->setIcon(theme.getIcon("shuffle"));
-  ui_->actionProfile->setIcon(theme.getIcon("account_circle"));
-  ui_->actionScanAvailableEpisodes->setIcon(theme.getIcon("pageview"));
-  ui_->actionSettings->setIcon(theme.getIcon("settings"));
-  ui_->actionSupport->setIcon(theme.getIcon("help"));
-  ui_->actionSynchronize->setIcon(theme.getIcon("sync"));
+  ui_->actionAddNewFolder->setIcon(theme()->getIcon("create_new_folder"));
+  ui_->actionAbout->setIcon(theme()->getIcon("info"));
+  ui_->actionBack->setIcon(theme()->getIcon("arrow_back"));
+  ui_->actionCheckForUpdates->setIcon(theme()->getIcon("cloud_download"));
+  ui_->actionDonate->setIcon(theme()->getIcon("favorite"));
+  ui_->actionExit->setIcon(theme()->getIcon("logout"));
+  ui_->actionForward->setIcon(theme()->getIcon("arrow_forward"));
+  ui_->actionMenu->setIcon(theme()->getIcon("menu"));
+  ui_->actionPlayNextEpisode->setIcon(theme()->getIcon("skip_next"));
+  ui_->actionPlayRandomAnime->setIcon(theme()->getIcon("shuffle"));
+  ui_->actionProfile->setIcon(theme()->getIcon("account_circle"));
+  ui_->actionScanAvailableEpisodes->setIcon(theme()->getIcon("pageview"));
+  ui_->actionSettings->setIcon(theme()->getIcon("settings"));
+  ui_->actionSupport->setIcon(theme()->getIcon("help"));
+  ui_->actionSynchronize->setIcon(theme()->getIcon("sync"));
 }
 
 void MainWindow::initNavigation() {

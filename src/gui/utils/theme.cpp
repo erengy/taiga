@@ -28,7 +28,7 @@
 
 namespace gui {
 
-Theme::Theme() : QObject() {}
+Theme::Theme(QObject* parent) : QObject{parent} {}
 
 const QIcon& Theme::getIcon(const QString& key, const QString& extension, bool useSvgIconEngine) {
   if (!m_icons.contains(key)) {
@@ -83,6 +83,11 @@ QColor Theme::successColor() {
 
 QColor Theme::warningColor() {
   return QColor(0xfb, 0x8c, 0x00);  // Orange 600
+}
+
+Theme* theme() {
+  static auto instance = new Theme{qApp};
+  return instance;
 }
 
 }  // namespace gui

@@ -38,7 +38,7 @@ constexpr int posterWidth = itemHeight * 2 / 3;
 constexpr int kSpinnerSize = 24;
 
 ListItemDelegateCards::ListItemDelegateCards(QObject* parent) : QStyledItemDelegate(parent) {
-  m_spinnerPixmap = theme.getIcon("progress_activity").pixmap(QSize(kSpinnerSize, kSpinnerSize));
+  m_spinnerPixmap = theme()->getIcon("progress_activity").pixmap(QSize(kSpinnerSize, kSpinnerSize));
 
   connect(&m_timerSpinner, &QTimer::timeout, this, &ListItemDelegateCards::advanceSpinner);
 }
@@ -64,7 +64,7 @@ void ListItemDelegateCards::paint(QPainter* painter, const QStyleOptionViewItem&
   // Background
   if (option.state & QStyle::State_Selected) {
     painter->fillRect(rect, opt.palette.highlight());
-  } else if (theme.isDark()) {
+  } else if (theme()->isDark()) {
     painter->fillRect(rect, opt.palette.mid());
   } else {
     painter->fillRect(rect, opt.palette.alternateBase());
@@ -75,7 +75,7 @@ void ListItemDelegateCards::paint(QPainter* painter, const QStyleOptionViewItem&
     QRect posterRect = rect;
     posterRect.setWidth(posterWidth);
 
-    if (theme.isDark()) {
+    if (theme()->isDark()) {
       painter->fillRect(posterRect, opt.palette.dark());
     } else {
       painter->fillRect(posterRect, opt.palette.mid());

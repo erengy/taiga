@@ -64,7 +64,7 @@ void NavigationItemDelegate::paintBranch(QPainter* painter, QRect rect, bool isL
 
   painter->setPen([painter]() {
     auto pen = painter->pen();
-    pen.setColor(theme.isDark() ? lineColorDark : lineColorLight);
+    pen.setColor(theme()->isDark() ? lineColorDark : lineColorLight);
     return pen;
   }());
 
@@ -104,9 +104,9 @@ void NavigationItemDelegate::paintCounter(QPainter* painter, QRect rect, const i
   path.addRoundedRect(rect, 8, 8);
   painter->setClipPath(path);
 
-  painter->fillRect(rect, theme.isDark() ? lineColorDark : lineColorLight);
+  painter->fillRect(rect, theme()->isDark() ? lineColorDark : lineColorLight);
 
-  painter->setPen(QColor(theme.isDark() ? 0xAAAAAA : 0x666666));
+  painter->setPen(QColor(theme()->isDark() ? 0xAAAAAA : 0x666666));
   painter->drawText(rect, Qt::AlignCenter | Qt::TextSingleLine, text);
 }
 
@@ -115,7 +115,7 @@ void NavigationItemDelegate::paintSeparator(QPainter* painter, const QRect& rect
 
   const int y = rect.center().y();
 
-  painter->setPen(theme.isDark() ? lineColorDark : lineColorLight);
+  painter->setPen(theme()->isDark() ? lineColorDark : lineColorLight);
   painter->drawLine(rect.left() + 8, y, rect.right() - 8, y);
 };
 

@@ -64,10 +64,10 @@ MediaDialog::MediaDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::MediaDi
     ui_->splitter->restoreState(state);
   }
 
-  ui_->tabWidget->setTabIcon(static_cast<int>(MediaDialogPage::Details), theme.getIcon("info"));
-  ui_->tabWidget->setTabIcon(static_cast<int>(MediaDialogPage::List), theme.getIcon("list_alt"));
+  ui_->tabWidget->setTabIcon(static_cast<int>(MediaDialogPage::Details), theme()->getIcon("info"));
+  ui_->tabWidget->setTabIcon(static_cast<int>(MediaDialogPage::List), theme()->getIcon("list_alt"));
   ui_->tabWidget->setTabIcon(static_cast<int>(MediaDialogPage::Settings),
-                             theme.getIcon("settings"));
+                             theme()->getIcon("settings"));
 
   ui_->verticalLayoutRewatching->setAlignment(Qt::AlignBottom);
 

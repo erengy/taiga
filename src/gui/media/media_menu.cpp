@@ -449,23 +449,23 @@ void MediaMenu::edit() const {
 void MediaMenu::addMediaItems() {
   if (!isBatch()) {
     // View details
-    addAction(theme.getIcon("info"), tr("Details"), tr("Enter"), this, &MediaMenu::viewDetails);
+    addAction(theme()->getIcon("info"), tr("Details"), tr("Enter"), this, &MediaMenu::viewDetails);
 
     if (m_context != AnimeListContext::Search) {
       // Search
-      addAction(theme.getIcon("search"), tr("Search"), this, &MediaMenu::search);
+      addAction(theme()->getIcon("search"), tr("Search"), this, &MediaMenu::search);
     }
   }
 
   if (m_context == AnimeListContext::Search) {
     // Refresh
-    addAction(theme.getIcon("sync"), tr("Refresh"), this, &MediaMenu::refresh);
+    addAction(theme()->getIcon("sync"), tr("Refresh"), this, &MediaMenu::refresh);
   }
 
   // External
   addMenu([this]() {
     auto menu = new QMenu(tr("External"), this);
-    menu->setIcon(theme.getIcon("open_in_new"));
+    menu->setIcon(theme()->getIcon("open_in_new"));
 
     using slot_t = void (MediaMenu::*)() const;
     const QList<QPair<QString, slot_t>> items = {
@@ -491,7 +491,7 @@ void MediaMenu::addListItems() {
     // Add to list
     addMenu([this]() {
       auto menu = new QMenu(tr("Add to list"), this);
-      menu->setIcon(theme.getIcon("list_alt"));
+      menu->setIcon(theme()->getIcon("list_alt"));
       for (const auto& status : anime::list::kStatuses) {
         menu->addAction(formatListStatus(status), this, [this, status]() { addToList(status); });
       }
@@ -503,12 +503,12 @@ void MediaMenu::addListItems() {
 
   // Edit
   if (!isBatch()) {
-    addAction(theme.getIcon("edit"), tr("Edit..."), this, &MediaMenu::edit);
+    addAction(theme()->getIcon("edit"), tr("Edit..."), this, &MediaMenu::edit);
 
   } else {
     addMenu([this]() {
       auto menu = new QMenu(tr("Edit"), this);
-      menu->setIcon(theme.getIcon("edit"));
+      menu->setIcon(theme()->getIcon("edit"));
 
       menu->addMenu([this]() {
         auto menu = new QMenu(tr("Date started"), this);
@@ -575,13 +575,13 @@ void MediaMenu::addListItems() {
   }
 
   // Remove from list
-  addAction(theme.getIcon("delete"), tr("Remove..."), QKeySequence::Delete, this,
+  addAction(theme()->getIcon("delete"), tr("Remove..."), QKeySequence::Delete, this,
             &MediaMenu::removeFromList);
 }
 
 void MediaMenu::addLibraryItems() {
   // Open folder
-  addAction(theme.getIcon("folder"), tr("Open folder"), this, &MediaMenu::openFolder);
+  addAction(theme()->getIcon("folder"), tr("Open folder"), this, &MediaMenu::openFolder);
 
   if (isBatch()) return;
 
@@ -597,12 +597,12 @@ void MediaMenu::addLibraryItems() {
     const int next_episode = last_episode + 1;
 
     auto menu = new QMenu(tr("Play"), this);
-    menu->setIcon(theme.getIcon("play_arrow"));
+    menu->setIcon(theme()->getIcon("play_arrow"));
 
     // Play next episode
     if (next_episode <= max_episodes) {
-      menu->addAction(theme.getIcon("skip_next"), tr("Next episode (#%1)").arg(next_episode), this,
-                      [this, next_episode]() { playEpisode(next_episode); });
+      menu->addAction(theme()->getIcon("skip_next"), tr("Next episode (#%1)").arg(next_episode),
+                      this, [this, next_episode]() { playEpisode(next_episode); });
     }
 
     // Play last episode
@@ -613,7 +613,7 @@ void MediaMenu::addLibraryItems() {
 
     // Play random episode
     if (item.episode_count != 1) {
-      menu->addAction(theme.getIcon("shuffle"), tr("Random episode"), this,
+      menu->addAction(theme()->getIcon("shuffle"), tr("Random episode"), this,
                       &MediaMenu::playRandomEpisode);
     }
 
@@ -648,14 +648,14 @@ void MediaMenu::addTorrentsItems() {
   if (isBatch()) return;
 
   // Torrents
-  addAction(theme.getIcon("rss_feed"), tr("Torrents"), this, &MediaMenu::torrents)
+  addAction(theme()->getIcon("rss_feed"), tr("Torrents"), this, &MediaMenu::torrents)
       ->setDisabled(true);  // placeholder
 }
 
 void MediaMenu::addMetaItems() {
   addMenu([this]() {
     auto menu = new QMenu(tr("Copy"), this);
-    menu->setIcon(theme.getIcon("content_copy"));
+    menu->setIcon(theme()->getIcon("content_copy"));
     menu->addAction(isBatch() ? tr("Titles") : tr("Title"), this, &MediaMenu::copyTitles);
     menu->addAction(isBatch() ? tr("Links") : tr("Link"), this, &MediaMenu::copyLinks);
     return menu;

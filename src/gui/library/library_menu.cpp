@@ -46,12 +46,12 @@ void LibraryMenu::popup() {
   auto actionOpen = addAction(QIcon(m_path), tr("Open"), tr("Enter"), this, &LibraryMenu::open);
   actionOpen->setEnabled(!base::isExecutableFile(m_path));
   addSeparator();
-  addAction(theme.getIcon("delete"), tr("Delete"), tr("Del"), this, &LibraryMenu::remove);
-  addAction(theme.getIcon("edit"), tr("Rename"), tr("F2"), this, &LibraryMenu::rename);
+  addAction(theme()->getIcon("delete"), tr("Delete"), tr("Del"), this, &LibraryMenu::remove);
+  addAction(theme()->getIcon("edit"), tr("Rename"), tr("F2"), this, &LibraryMenu::rename);
 
   if (const auto item = anime::db.item(m_anime_id)) {
     addSeparator();
-    addAction(theme.getIcon("info"), tr("Details"), this, &LibraryMenu::viewDetails);
+    addAction(theme()->getIcon("info"), tr("Details"), this, &LibraryMenu::viewDetails);
   }
 
   QMenu::popup(QCursor::pos());

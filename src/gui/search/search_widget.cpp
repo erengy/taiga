@@ -175,9 +175,9 @@ SearchWidget::SearchWidget(QWidget* parent)
 
   // Toolbar
   {
-    const auto actionSort = new QAction(theme.getIcon("sort"), tr("Sort"), this);
-    const auto actionView = new QAction(theme.getIcon("grid_view"), tr("View"), this);
-    const auto actionMore = new QAction(theme.getIcon("more_horiz"), tr("More"), this);
+    const auto actionSort = new QAction(theme()->getIcon("sort"), tr("Sort"), this);
+    const auto actionView = new QAction(theme()->getIcon("grid_view"), tr("View"), this);
+    const auto actionMore = new QAction(theme()->getIcon("more_horiz"), tr("More"), this);
     m_toolbar->addAction(actionSort);
     m_toolbar->addAction(actionView);
     m_toolbar->addAction(actionMore);

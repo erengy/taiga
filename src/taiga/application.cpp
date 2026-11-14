@@ -93,8 +93,8 @@ int Application::run() {
   share::http::webhook()->init();
   gui::imageProvider.init();
 
-  gui::theme.initStyle();
-  setWindowIcon(gui::theme.getIcon("taiga", "png"));
+  gui::theme()->initStyle();
+  setWindowIcon(gui::theme()->getIcon("taiga", "png"));
 
   QTranslator translator;
   if (translator.load(QLocale::system(), "taiga", "_", ":/i18n")) {
