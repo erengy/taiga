@@ -25,12 +25,12 @@ QTreeWidget#navigation::item:selected:!active {
 
 /* List */
 
-QMainWindow > QWidget > QSplitter > QStackedWidget QListView,
-QMainWindow > QWidget > QSplitter > QStackedWidget QTreeView {
+QMainWindow > #centralWidget QStackedWidget QListView,
+QMainWindow > #centralWidget QStackedWidget QTreeView {
   border-top-color: rgba(255, 255, 255, 16%);
 }
 
-QMainWindow > QWidget > QSplitter > QStackedWidget QAbstractScrollArea {
+QMainWindow > #centralWidget QStackedWidget QAbstractScrollArea {
   background-color: #1c1c1c;
 }
 
@@ -60,6 +60,6 @@ QAbstractItemView[themed="true"]::item:selected:!active {
 
 /* Statusbar */
 
-QStatusBar {
+QStatusBar#statusbar {
   border-top-color: rgba(255, 255, 255, 16%);
 }
