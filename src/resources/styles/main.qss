@@ -49,11 +49,6 @@ QMainWindow > #centralWidget QStackedWidget QTreeView {
   border-top-style: solid;
 }
 
-QTreeView#animeList QHeaderView {
-  border-bottom-width: 1px;
-  border-bottom-style: solid;
-}
-
 QTreeView#animeList QHeaderView::section,
 QTreeView#historyView QHeaderView::section,
 QTreeView#libraryView QHeaderView::section {

@@ -22,10 +22,6 @@ QMainWindow > #centralWidget QStackedWidget QAbstractScrollArea {
   background-color: #1c1c1c;
 }
 
-QTreeView#animeList QHeaderView {
-  border-bottom-color: rgba(255, 255, 255, 16%);
-}
-
 QAbstractItemView[themed="true"] {
   background-color: #1c1c1c;
   alternate-background-color: rgba(255, 255, 255, 3%);
