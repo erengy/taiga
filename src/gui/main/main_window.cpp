@@ -134,7 +134,7 @@ void MainWindow::initActions() {
 
   ui_->actionToggleDetection->setChecked(track::media::detection()->isEnabled());
   connect(ui_->actionToggleDetection, &QAction::toggled, this,
-          [](const bool checked) { track::media::detection()->setEnabled(checked); });
+          [](const bool checked) { taiga::settings()->setDetectionEnabled(checked); });
 
   ui_->actionToggleSharing->setChecked(taiga::settings()->sharingEnabled());
   connect(ui_->actionToggleSharing, &QAction::toggled, this,
@@ -146,6 +146,9 @@ void MainWindow::initActions() {
 
   // Settings can also be changed from the settings dialog.
   connect(taiga::settings(), &taiga::Settings::changed, this, [this](const QSet<QString>& keys) {
+    if (keys.contains(u"track.detection.enabled"_s)) {
+      ui_->actionToggleDetection->setChecked(taiga::settings()->detectionEnabled());
+    }
     if (keys.contains(u"sharing.enabled"_s)) {
       ui_->actionToggleSharing->setChecked(taiga::settings()->sharingEnabled());
     }
@@ -365,12 +368,6 @@ void MainWindow::initToolbar() {
     button->setPopupMode(QToolButton::InstantPopup);
     button->setMenu([this]() {
       auto menu = new QMenu(this);
-      // Can also be changed from the settings dialog
-      connect(menu, &QMenu::aboutToShow, this, [this]() {
-        ui_->actionToggleDetection->setChecked(taiga::settings()->detectionEnabled());
-        ui_->actionToggleSharing->setChecked(taiga::settings()->sharingEnabled());
-        ui_->actionToggleSynchronization->setChecked(taiga::settings()->syncEnabled());
-      });
       menu->addAction(ui_->actionToggleDetection);
       menu->addAction(ui_->actionToggleSharing);
       menu->addAction(ui_->actionToggleSynchronization);

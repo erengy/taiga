@@ -23,7 +23,6 @@
 #include <chrono>
 
 #include "taiga/settings.hpp"
-#include "track/media.hpp"
 #include "track/update_trigger.hpp"
 #include "ui_settings_dialog.h"
 
@@ -59,10 +58,7 @@ void SettingsPageRecognition::apply() const {
   taiga::settings()->setUpdatePauseWhenUnfocused(
       ui_->updatePauseWhenUnfocusedCheckBox->isChecked());
   taiga::settings()->setUpdateLibraryOnly(ui_->updateLibraryOnlyCheckBox->isChecked());
-
-  // Must come after the interval is saved on the Advanced page, since it restarts polling with the
-  // new interval.
-  track::media::detection()->setEnabled(ui_->detectionEnabledCheckBox->isChecked());
+  taiga::settings()->setDetectionEnabled(ui_->detectionEnabledCheckBox->isChecked());
 }
 
 }  // namespace gui

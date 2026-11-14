@@ -25,6 +25,7 @@
 #include <utility>
 #include <vector>
 
+#include "base/string.hpp"
 #include "media/anime.hpp"
 #include "media/anime_db.hpp"
 #include "taiga/settings.hpp"
@@ -137,16 +138,19 @@ bool Detection::init() {
 
   setPollingEnabled(isEnabled());
 
+  connect(taiga::settings(), &taiga::Settings::changed, this, [this](const QSet<QString>& keys) {
+    static const QSet<QString> relevantKeys{
+        u"track.detection.enabled"_s,
+        u"track.detection.interval"_s,
+    };
+    if (keys.intersects(relevantKeys)) setPollingEnabled(isEnabled());
+  });
+
   return true;
 }
 
 bool Detection::isEnabled() const {
   return taiga::settings()->detectionEnabled();
-}
-
-void Detection::setEnabled(bool enabled) {
-  taiga::settings()->setDetectionEnabled(enabled);
-  setPollingEnabled(enabled);
 }
 
 void Detection::setPollingEnabled(bool enabled) {

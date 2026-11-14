@@ -47,7 +47,6 @@ public:
   bool init();
 
   bool isEnabled() const;
-  void setEnabled(bool enabled);
 
   bool isMediaIdentified() const;
   bool isPlayerFocused() const;
