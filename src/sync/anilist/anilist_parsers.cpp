@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -103,6 +103,7 @@ std::optional<Anime> parseMedia(const QJsonValue& json) {
       .last_modified = QDateTime::currentSecsSinceEpoch(),
       .episode_count = json["episodes"].toInt(),
       .episode_length = json["duration"].toInt(),
+      .age_rating = json["isAdult"].toBool() ? anime::AgeRating::R18 : anime::AgeRating::Unknown,
       .status = parseStatus(json["status"].toString()),
       .type = parseType(json["format"].toString()),
       .date_started = parseFuzzyDate(json["startDate"]),
