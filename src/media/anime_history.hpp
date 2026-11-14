@@ -36,7 +36,7 @@ class History final : public QObject {
   Q_DISABLE_COPY_MOVE(History)
 
 public:
-  History();
+  explicit History(QObject* parent);
   ~History() = default;
 
   void init();
@@ -64,6 +64,6 @@ private:
   QList<HistoryItem> items_;
 };
 
-inline History history;
+History* history();
 
 }  // namespace anime

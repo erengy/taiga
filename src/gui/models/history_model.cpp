@@ -26,14 +26,14 @@
 namespace gui {
 
 HistoryModel::HistoryModel(QObject* parent) : QAbstractListModel(parent) {
-  connect(&anime::history, &anime::History::changed, this, [this]() {
+  connect(anime::history(), &anime::History::changed, this, [this]() {
     beginResetModel();
     endResetModel();
   });
 }
 
 int HistoryModel::rowCount(const QModelIndex&) const {
-  return anime::history.items().size();
+  return anime::history()->items().size();
 }
 
 int HistoryModel::columnCount(const QModelIndex&) const {
@@ -43,7 +43,7 @@ int HistoryModel::columnCount(const QModelIndex&) const {
 QVariant HistoryModel::data(const QModelIndex& index, int role) const {
   if (!index.isValid()) return {};
 
-  const auto& historyItem = anime::history.items().at(index.row());
+  const auto& historyItem = anime::history()->items().at(index.row());
 
   switch (role) {
     case Qt::DisplayRole: {

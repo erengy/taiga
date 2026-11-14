@@ -87,7 +87,7 @@ void save(Entry entry) {
   db()->updateEntry(entry);
 
   if ((dirty & Field::Episode) && entry.watched_episodes > 0) {
-    history.add(entry.anime_id, entry.watched_episodes, entry.last_updated);
+    history()->add(entry.anime_id, entry.watched_episodes, entry.last_updated);
   }
 
   sync::queue.push(entry.anime_id, dirty);

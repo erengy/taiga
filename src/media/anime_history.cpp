@@ -18,6 +18,7 @@
 
 #include "anime_history.hpp"
 
+#include <QCoreApplication>
 #include <QSqlDatabase>
 #include <algorithm>
 #include <format>
@@ -31,7 +32,7 @@
 
 namespace anime {
 
-History::History() : QObject{} {}
+History::History(QObject* parent) : QObject{parent} {}
 
 void History::init() {
   auto db = QSqlDatabase::database();
@@ -178,6 +179,11 @@ void History::migrateFromV1() {
 
   db.commit();
   db.close();
+}
+
+History* history() {
+  static auto instance = new History{qApp};
+  return instance;
 }
 
 }  // namespace anime

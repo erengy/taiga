@@ -120,14 +120,14 @@ void HistoryWidget::removeItem(const QModelIndex& index) const {
 
   if (confirm(nullptr, tr("Do you want to remove this entry from history?"),
               tr("%1 - Episode %2").arg(title).arg(historyItem->episode), tr("Remove"))) {
-    anime::history.remove(historyItem->id);
+    anime::history()->remove(historyItem->id);
   }
 }
 
 void HistoryWidget::clearHistory() const {
   if (confirm(nullptr, tr("Do you want to clear your history?"),
               tr("All entries will be permanently removed."), tr("Clear"))) {
-    anime::history.clear();
+    anime::history()->clear();
   }
 }
 
