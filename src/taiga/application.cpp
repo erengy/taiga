@@ -35,6 +35,7 @@
 #include "media/anime_db.hpp"
 #include "media/anime_history.hpp"
 #include "share/discord.hpp"
+#include "share/http.hpp"
 #include "sync/queue.hpp"
 #include "taiga/config.h"
 #include "taiga/path.hpp"
@@ -89,6 +90,7 @@ int Application::run() {
   track::media::detection()->init();
   track::updateSession()->init();
   share::discord::presence()->init();
+  share::http::webhook()->init();
   gui::imageProvider.init();
 
   gui::theme.initStyle();

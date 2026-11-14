@@ -45,6 +45,7 @@
 #include "media/anime_list.hpp"
 #include "media/anime_utils.hpp"
 #include "share/discord.hpp"
+#include "share/http.hpp"
 #include "sync/anilist/anilist.hpp"
 #include "sync/kitsu/kitsu.hpp"
 #include "sync/myanimelist/myanimelist.hpp"
@@ -141,6 +142,7 @@ void MainWindow::initActions() {
   connect(ui_->actionToggleSharing, &QAction::toggled, this, [](const bool checked) {
     taiga::settings.setSharingEnabled(checked);
     share::discord::presence()->applySettings();
+    share::http::webhook()->applySettings();
   });
 
   ui_->actionToggleSynchronization->setChecked(taiga::settings.syncEnabled());
