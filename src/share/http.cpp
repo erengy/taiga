@@ -98,8 +98,12 @@ void Webhook::applySettings() {
 }
 
 void Webhook::onSettingsChanged(const QSet<QString>& keys) {
-  static const QSet<QString> relevantKeys{u"sharing.enabled"_s, u"sharing.http.enabled"_s,
-                                          u"sharing.http.headers"_s, u"sharing.http.url"_s};
+  static const QSet<QString> relevantKeys{
+      taiga::Settings::Key::kSharingEnabled,
+      taiga::Settings::Key::kHttpEnabled,
+      taiga::Settings::Key::kHttpHeaders,
+      taiga::Settings::Key::kHttpUrl,
+  };
   if (keys.intersects(relevantKeys)) applySettings();
 }
 

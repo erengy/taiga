@@ -45,7 +45,7 @@ const QIcon& Theme::getIcon(const QString& key, const QString& extension, bool u
 void Theme::initStyle() {
   qApp->styleHints()->setColorScheme(taiga::settings()->appColorScheme());
   connect(taiga::settings(), &taiga::Settings::changed, this, [](const QSet<QString>& keys) {
-    if (keys.contains(u"app.colorScheme"_s)) {
+    if (keys.contains(taiga::Settings::Key::kAppColorScheme)) {
       qApp->styleHints()->setColorScheme(taiga::settings()->appColorScheme());
     }
   });

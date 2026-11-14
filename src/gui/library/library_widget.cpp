@@ -24,7 +24,6 @@
 #include <QSignalBlocker>
 #include <algorithm>
 
-#include "base/string.hpp"
 #include "gui/library/library_menu.hpp"
 #include "gui/main/main_window.hpp"
 #include "gui/models/library_model.hpp"
@@ -109,7 +108,7 @@ LibraryWidget::LibraryWidget(QWidget* parent)
 
   refreshFolders();
   connect(taiga::settings(), &taiga::Settings::changed, this, [this](const QSet<QString>& keys) {
-    if (keys.contains(u"library.folders"_s)) refreshFolders();
+    if (keys.contains(taiga::Settings::Key::kLibraryFolders)) refreshFolders();
   });
 }
 

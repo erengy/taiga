@@ -21,7 +21,6 @@
 #include <QCoreApplication>
 
 #include "base/log.hpp"
-#include "base/string.hpp"
 #include "media/anime.hpp"
 #include "media/anime_db.hpp"
 #include "media/anime_list_utils.hpp"
@@ -72,9 +71,9 @@ void UpdateSession::init() {
   // Changes apply to the current media too. Time already watched still counts towards the delay.
   connect(taiga::settings(), &taiga::Settings::changed, this, [this](const QSet<QString>& keys) {
     static const QSet<QString> relevantKeys{
-        u"track.update.delay"_s,
-        u"track.update.trigger"_s,
-        u"track.update.pauseWhenUnfocused"_s,
+        taiga::Settings::Key::kUpdateDelay,
+        taiga::Settings::Key::kUpdateTrigger,
+        taiga::Settings::Key::kUpdatePauseWhenUnfocused,
     };
     if (!keys.intersects(relevantKeys)) return;
     loadSettings();

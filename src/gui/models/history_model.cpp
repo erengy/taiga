@@ -18,7 +18,6 @@
 
 #include "history_model.hpp"
 
-#include "base/string.hpp"
 #include "gui/utils/format.hpp"
 #include "media/anime_db.hpp"
 #include "media/anime_history.hpp"
@@ -34,7 +33,8 @@ HistoryModel::HistoryModel(QObject* parent) : QAbstractListModel(parent) {
   });
 
   connect(taiga::settings(), &taiga::Settings::changed, this, [this](const QSet<QString>& keys) {
-    if (const auto rows = rowCount(); keys.contains(u"library.titleLanguage"_s) && rows > 0) {
+    if (!keys.contains(taiga::Settings::Key::kTitleLanguage)) return;
+    if (const auto rows = rowCount(); rows > 0) {
       emit dataChanged(index(0, COLUMN_TITLE), index(rows - 1, COLUMN_TITLE));
     }
   });

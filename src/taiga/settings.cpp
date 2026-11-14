@@ -43,14 +43,14 @@ void Settings::init() const {
   if (!QFile::exists(fileName())) {
     compat::v1::readSettings(std::format("{}/v1/settings.xml", get_data_path()), *this,
                              *accounts());
-    setValue("meta.version", appVersion);
+    setValue(Key::kMetaVersion, appVersion);
     return;
   }
 
   // v2.x
-  const auto fileVersion = value("meta.version").toString().toStdString();
+  const auto fileVersion = value(Key::kMetaVersion).toString().toStdString();
   if (fileVersion != appVersion) {
-    setValue("meta.version", appVersion);
+    setValue(Key::kMetaVersion, appVersion);
   }
 }
 
@@ -71,7 +71,7 @@ void Settings::onValueChanged(QAnyStringView key) const {
 ////////////////////////////////////////////////////////////////////////////////
 
 Qt::ColorScheme Settings::appColorScheme() const {
-  return value("app.colorScheme", static_cast<int>(Qt::ColorScheme::Unknown))
+  return value(Key::kAppColorScheme, static_cast<int>(Qt::ColorScheme::Unknown))
       .value<Qt::ColorScheme>();
 }
 
@@ -82,91 +82,89 @@ std::string Settings::appStyle() const {
 #else
   const auto defaultStyle = QString{kAppStyleSystem};
 #endif
-  return value("app.style", defaultStyle).toString().toStdString();
+  return value(Key::kAppStyle, defaultStyle).toString().toStdString();
 }
 
 bool Settings::detectionEnabled() const {
-  return value("track.detection.enabled", true).toBool();
+  return value(Key::kDetectionEnabled, true).toBool();
 }
 
 std::vector<std::string> Settings::disabledMediaPlayers() const {
-  return value("recognition.mediaPlayers.disabled").toJsonArray().toVariantList() |
+  return value(Key::kDisabledMediaPlayers).toJsonArray().toVariantList() |
          std::views::transform([](const QVariant& v) { return v.toString().toStdString(); }) |
          std::ranges::to<std::vector>();
 }
 
 bool Settings::discordEnabled() const {
-  return value("sharing.discord.enabled", false).toBool();
+  return value(Key::kDiscordEnabled, false).toBool();
 }
 
 std::string Settings::service() const {
-  return value("sync.service", sync::serviceSlug(sync::ServiceId::AniList))
-      .toString()
-      .toStdString();
+  return value(Key::kService, sync::serviceSlug(sync::ServiceId::AniList)).toString().toStdString();
 }
 
 bool Settings::httpEnabled() const {
-  return value("sharing.http.enabled", false).toBool();
+  return value(Key::kHttpEnabled, false).toBool();
 }
 
 std::vector<std::string> Settings::httpHeaders() const {
-  return value("sharing.http.headers").toJsonArray().toVariantList() |
+  return value(Key::kHttpHeaders).toJsonArray().toVariantList() |
          std::views::transform([](const QVariant& v) { return v.toString().toStdString(); }) |
          std::ranges::to<std::vector>();
 }
 
 std::string Settings::httpUrl() const {
-  return value("sharing.http.url").toString().toStdString();
+  return value(Key::kHttpUrl).toString().toStdString();
 }
 
 std::vector<std::string> Settings::libraryFolders() const {
-  return value("library.folders").toJsonArray().toVariantList() |
+  return value(Key::kLibraryFolders).toJsonArray().toVariantList() |
          std::views::transform([](const QVariant& v) { return v.toString().toStdString(); }) |
          std::ranges::to<std::vector>();
 }
 
 std::chrono::milliseconds Settings::mediaDetectionInterval() const {
-  const auto interval = value("track.detection.interval", 3000).toInt();
+  const auto interval = value(Key::kMediaDetectionInterval, 3000).toInt();
   return std::chrono::milliseconds{interval};
 }
 
 QNetworkProxy::ProxyType Settings::proxyType() const {
-  const auto type = value("network.proxy.type", u"http"_s).toString();
+  const auto type = value(Key::kProxyType, u"http"_s).toString();
   if (type == u"socks5") return QNetworkProxy::Socks5Proxy;
   return QNetworkProxy::HttpProxy;
 }
 
 std::string Settings::proxyHost() const {
-  return value("network.proxy.host").toString().toStdString();
+  return value(Key::kProxyHost).toString().toStdString();
 }
 
 int Settings::proxyPort() const {
-  return value("network.proxy.port", -1).toInt();
+  return value(Key::kProxyPort, -1).toInt();
 }
 
 std::string Settings::proxyUsername() const {
-  return value("network.proxy.username").toString().toStdString();
+  return value(Key::kProxyUsername).toString().toStdString();
 }
 
 std::string Settings::proxyPassword() const {
-  return value("network.proxy.password").toString().toStdString();
+  return value(Key::kProxyPassword).toString().toStdString();
 }
 
 bool Settings::sharingEnabled() const {
-  return value("sharing.enabled", true).toBool();
+  return value(Key::kSharingEnabled, true).toBool();
 }
 
 bool Settings::streamingMediaEnabled() const {
-  return value("recognition.streaming.enabled", false).toBool();
+  return value(Key::kStreamingMediaEnabled, false).toBool();
 }
 
 bool Settings::syncEnabled() const {
-  return value("sync.enabled", true).toBool();
+  return value(Key::kSyncEnabled, true).toBool();
 }
 
 anime::TitleLanguage Settings::titleLanguage() const {
   if (!titleLanguageCache_) {
-    const auto language = value("library.titleLanguage", u"romaji"_s).toString();
+    const auto language = value(Key::kTitleLanguage, u"romaji"_s).toString();
     if (language == u"english") {
       titleLanguageCache_ = anime::TitleLanguage::English;
     } else if (language == u"native") {
@@ -179,20 +177,20 @@ anime::TitleLanguage Settings::titleLanguage() const {
 }
 
 std::chrono::seconds Settings::updateDelay() const {
-  const std::chrono::seconds delay{value("track.update.delay", 120).toInt()};
+  const std::chrono::seconds delay{value(Key::kUpdateDelay, 120).toInt()};
   return std::clamp(delay, kUpdateDelayMin, kUpdateDelayMax);
 }
 
 bool Settings::updateLibraryOnly() const {
-  return value("track.update.libraryOnly", false).toBool();
+  return value(Key::kUpdateLibraryOnly, false).toBool();
 }
 
 bool Settings::updatePauseWhenUnfocused() const {
-  return value("track.update.pauseWhenUnfocused", false).toBool();
+  return value(Key::kUpdatePauseWhenUnfocused, false).toBool();
 }
 
 track::UpdateTrigger Settings::updateTrigger() const {
-  const auto trigger = value("track.update.trigger", u"afterDelay"_s).toString();
+  const auto trigger = value(Key::kUpdateTrigger, u"afterDelay"_s).toString();
   if (trigger == u"onPlayerClose") return track::UpdateTrigger::OnPlayerClose;
   return track::UpdateTrigger::AfterDelay;
 }
@@ -200,80 +198,80 @@ track::UpdateTrigger Settings::updateTrigger() const {
 ////////////////////////////////////////////////////////////////////////////////
 
 void Settings::setAppColorScheme(const Qt::ColorScheme scheme) const {
-  setValue("app.colorScheme", static_cast<int>(scheme));
+  setValue(Key::kAppColorScheme, static_cast<int>(scheme));
 }
 
 void Settings::setAppStyle(const std::string& style) const {
-  setValue("app.style", style);
+  setValue(Key::kAppStyle, style);
 }
 
 void Settings::setDetectionEnabled(const bool enabled) const {
-  setValue("track.detection.enabled", enabled);
+  setValue(Key::kDetectionEnabled, enabled);
 }
 
 void Settings::setDisabledMediaPlayers(std::vector<std::string> players) const {
-  setValue("recognition.mediaPlayers.disabled", QJsonArray::fromStringList(toStringList(players)));
+  setValue(Key::kDisabledMediaPlayers, QJsonArray::fromStringList(toStringList(players)));
 }
 
 void Settings::setDiscordEnabled(const bool enabled) const {
-  setValue("sharing.discord.enabled", enabled);
+  setValue(Key::kDiscordEnabled, enabled);
 }
 
 void Settings::setService(const std::string& service) const {
-  setValue("sync.service", service);
+  setValue(Key::kService, service);
 }
 
 void Settings::setHttpEnabled(const bool enabled) const {
-  setValue("sharing.http.enabled", enabled);
+  setValue(Key::kHttpEnabled, enabled);
 }
 
 void Settings::setHttpHeaders(std::vector<std::string> headers) const {
-  setValue("sharing.http.headers", QJsonArray::fromStringList(toStringList(headers)));
+  setValue(Key::kHttpHeaders, QJsonArray::fromStringList(toStringList(headers)));
 }
 
 void Settings::setHttpUrl(const std::string& url) const {
-  setValue("sharing.http.url", url);
+  setValue(Key::kHttpUrl, url);
 }
 
 void Settings::setLibraryFolders(std::vector<std::string> folders) const {
-  setValue("library.folders", QJsonArray::fromStringList(toStringList(folders)));
+  setValue(Key::kLibraryFolders, QJsonArray::fromStringList(toStringList(folders)));
 }
 
 void Settings::setMediaDetectionInterval(const std::chrono::milliseconds interval) const {
-  setValue("track.detection.interval", static_cast<qint64>(interval.count()));
+  setValue(Key::kMediaDetectionInterval, static_cast<qint64>(interval.count()));
 }
 
 void Settings::setProxyType(const QNetworkProxy::ProxyType type) const {
   const std::string slug = type == QNetworkProxy::Socks5Proxy ? "socks5" : "http";
-  setValue("network.proxy.type", slug);
+  setValue(Key::kProxyType, slug);
 }
 
 void Settings::setProxyHost(const std::string& host) const {
-  setValue("network.proxy.host", host);
+  setValue(Key::kProxyHost, host);
 }
 
 void Settings::setProxyPort(const int port) const {
-  setValue("network.proxy.port", port);
+  setValue(Key::kProxyPort, port);
 }
 
 void Settings::setProxyUsername(const std::string& username) const {
-  setValue("network.proxy.username", username);
+  setValue(Key::kProxyUsername, username);
 }
 
 void Settings::setProxyPassword(const std::string& password) const {
-  setValue("network.proxy.password", password);
+  setValue(Key::kProxyPassword, password);
 }
 
 void Settings::setSharingEnabled(const bool enabled) const {
-  setValue("sharing.enabled", enabled);
+  setValue(Key::kSharingEnabled, enabled);
 }
 
 void Settings::setStreamingMediaEnabled(const bool enabled) const {
-  setValue("recognition.streaming.enabled", enabled);
+  setValue(Key::kStreamingMediaEnabled, enabled);
 }
 
 void Settings::setSyncEnabled(const bool enabled) const {
-  setValue("sync.enabled", enabled);
+  setValue(Key::kSyncEnabled, enabled);
 }
 
 void Settings::setTitleLanguage(const anime::TitleLanguage language) const {
@@ -288,26 +286,26 @@ void Settings::setTitleLanguage(const anime::TitleLanguage language) const {
         return "native";
     }
   }();
-  setValue("library.titleLanguage", slug);
+  setValue(Key::kTitleLanguage, slug);
   titleLanguageCache_ = language;
 }
 
 void Settings::setUpdateDelay(const std::chrono::seconds delay) const {
-  setValue("track.update.delay", static_cast<int>(delay.count()));
+  setValue(Key::kUpdateDelay, static_cast<int>(delay.count()));
 }
 
 void Settings::setUpdateLibraryOnly(const bool enabled) const {
-  setValue("track.update.libraryOnly", enabled);
+  setValue(Key::kUpdateLibraryOnly, enabled);
 }
 
 void Settings::setUpdatePauseWhenUnfocused(const bool enabled) const {
-  setValue("track.update.pauseWhenUnfocused", enabled);
+  setValue(Key::kUpdatePauseWhenUnfocused, enabled);
 }
 
 void Settings::setUpdateTrigger(const track::UpdateTrigger trigger) const {
   const std::string slug =
       trigger == track::UpdateTrigger::OnPlayerClose ? "onPlayerClose" : "afterDelay";
-  setValue("track.update.trigger", slug);
+  setValue(Key::kUpdateTrigger, slug);
 }
 
 Settings* settings() {

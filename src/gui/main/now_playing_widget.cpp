@@ -252,7 +252,7 @@ NowPlayingWidget::NowPlayingWidget(QWidget* parent) : QFrame(parent) {
     if (m_anime && m_anime->id == id) refresh();
   });
   connect(taiga::settings(), &taiga::Settings::changed, this, [this](const QSet<QString>& keys) {
-    if (keys.contains(u"library.titleLanguage"_s)) refresh();
+    if (keys.contains(taiga::Settings::Key::kTitleLanguage)) refresh();
   });
   connect(track::updateSession(), &track::UpdateSession::stateChanged, this, [this]() {
     refresh();

@@ -65,11 +65,11 @@ NetworkAccessManager::NetworkAccessManager(QObject* parent) : QNetworkAccessMana
   connect(settings(), &Settings::changed, this, [this](const QSet<QString>& keys) {
     // clang-format off
     static const QSet<QString> relevantKeys{
-        u"network.proxy.type"_s,
-        u"network.proxy.host"_s,
-        u"network.proxy.port"_s,
-        u"network.proxy.username"_s,
-        u"network.proxy.password"_s,
+        Settings::Key::kProxyType,
+        Settings::Key::kProxyHost,
+        Settings::Key::kProxyPort,
+        Settings::Key::kProxyUsername,
+        Settings::Key::kProxyPassword,
     };
     // clang-format on
     if (keys.intersects(relevantKeys)) setProxy(buildProxy());

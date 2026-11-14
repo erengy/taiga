@@ -146,13 +146,13 @@ void MainWindow::initActions() {
 
   // Settings can also be changed from the settings dialog.
   connect(taiga::settings(), &taiga::Settings::changed, this, [this](const QSet<QString>& keys) {
-    if (keys.contains(u"track.detection.enabled"_s)) {
+    if (keys.contains(taiga::Settings::Key::kDetectionEnabled)) {
       ui_->actionToggleDetection->setChecked(taiga::settings()->detectionEnabled());
     }
-    if (keys.contains(u"sharing.enabled"_s)) {
+    if (keys.contains(taiga::Settings::Key::kSharingEnabled)) {
       ui_->actionToggleSharing->setChecked(taiga::settings()->sharingEnabled());
     }
-    if (keys.contains(u"sync.enabled"_s)) {
+    if (keys.contains(taiga::Settings::Key::kSyncEnabled)) {
       ui_->actionToggleSynchronization->setChecked(taiga::settings()->syncEnabled());
     }
   });

@@ -86,7 +86,10 @@ void Presence::applySettings() {
 }
 
 void Presence::onSettingsChanged(const QSet<QString>& keys) {
-  static const QSet<QString> relevantKeys{u"sharing.enabled"_s, u"sharing.discord.enabled"_s};
+  static const QSet<QString> relevantKeys{
+      taiga::Settings::Key::kSharingEnabled,
+      taiga::Settings::Key::kDiscordEnabled,
+  };
   if (keys.intersects(relevantKeys)) applySettings();
 }
 

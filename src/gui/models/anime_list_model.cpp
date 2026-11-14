@@ -25,7 +25,6 @@
 #include <QPalette>
 #include <QSize>
 
-#include "base/string.hpp"
 #include "gui/utils/format.hpp"
 #include "gui/utils/image_provider.hpp"
 #include "gui/utils/rating.hpp"
@@ -54,7 +53,7 @@ AnimeListModel::AnimeListModel(QObject* parent) : QAbstractListModel(parent) {
   connect(anime::db(), &anime::Database::entryDeleted, this, &AnimeListModel::refreshRow);
 
   connect(taiga::settings(), &taiga::Settings::changed, this, [this](const QSet<QString>& keys) {
-    if (keys.contains(u"library.titleLanguage"_s) && !m_ids.isEmpty()) {
+    if (keys.contains(taiga::Settings::Key::kTitleLanguage) && !m_ids.isEmpty()) {
       emit dataChanged(index(0, 0), index(m_ids.size() - 1, NUM_COLUMNS - 1));
     }
   });

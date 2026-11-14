@@ -41,6 +41,34 @@ public:
   static constexpr std::chrono::seconds kUpdateDelayMin{10};
   static constexpr std::chrono::seconds kUpdateDelayMax{3600};
 
+  struct Key {
+    static constexpr QLatin1StringView kAppColorScheme{"app.colorScheme"};
+    static constexpr QLatin1StringView kAppStyle{"app.style"};
+    static constexpr QLatin1StringView kDetectionEnabled{"track.detection.enabled"};
+    static constexpr QLatin1StringView kDisabledMediaPlayers{"recognition.mediaPlayers.disabled"};
+    static constexpr QLatin1StringView kDiscordEnabled{"sharing.discord.enabled"};
+    static constexpr QLatin1StringView kService{"sync.service"};
+    static constexpr QLatin1StringView kHttpEnabled{"sharing.http.enabled"};
+    static constexpr QLatin1StringView kHttpHeaders{"sharing.http.headers"};
+    static constexpr QLatin1StringView kHttpUrl{"sharing.http.url"};
+    static constexpr QLatin1StringView kLibraryFolders{"library.folders"};
+    static constexpr QLatin1StringView kMediaDetectionInterval{"track.detection.interval"};
+    static constexpr QLatin1StringView kMetaVersion{"meta.version"};
+    static constexpr QLatin1StringView kProxyType{"network.proxy.type"};
+    static constexpr QLatin1StringView kProxyHost{"network.proxy.host"};
+    static constexpr QLatin1StringView kProxyPort{"network.proxy.port"};
+    static constexpr QLatin1StringView kProxyUsername{"network.proxy.username"};
+    static constexpr QLatin1StringView kProxyPassword{"network.proxy.password"};
+    static constexpr QLatin1StringView kSharingEnabled{"sharing.enabled"};
+    static constexpr QLatin1StringView kStreamingMediaEnabled{"recognition.streaming.enabled"};
+    static constexpr QLatin1StringView kSyncEnabled{"sync.enabled"};
+    static constexpr QLatin1StringView kTitleLanguage{"library.titleLanguage"};
+    static constexpr QLatin1StringView kUpdateDelay{"track.update.delay"};
+    static constexpr QLatin1StringView kUpdateLibraryOnly{"track.update.libraryOnly"};
+    static constexpr QLatin1StringView kUpdatePauseWhenUnfocused{"track.update.pauseWhenUnfocused"};
+    static constexpr QLatin1StringView kUpdateTrigger{"track.update.trigger"};
+  };
+
   explicit Settings(QObject* parent);
 
   void init() const;
