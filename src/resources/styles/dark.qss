@@ -18,7 +18,10 @@ QMainWindow > #centralWidget QStackedWidget QTreeView {
   border-top-color: rgba(255, 255, 255, 16%);
 }
 
-QMainWindow > #centralWidget QStackedWidget QAbstractScrollArea {
+QTreeView#animeList > QHeaderView,
+QTreeView#historyView > QHeaderView,
+QTreeView#libraryView > QHeaderView,
+QListView#animeCards {
   background-color: #1c1c1c;
 }
 

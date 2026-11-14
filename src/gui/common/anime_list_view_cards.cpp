@@ -34,6 +34,8 @@ namespace gui {
 ListViewCards::ListViewCards(QWidget* parent, AnimeListModel* model,
                              AnimeListProxyModel* proxyModel, AnimeListContext context)
     : m_base(new ListViewBase(parent, this, model, proxyModel, context)) {
+  setObjectName("animeCards");
+
   setFrameShape(QFrame::Shape::NoFrame);
 
   setItemDelegate(new ListItemDelegateCards(this));
