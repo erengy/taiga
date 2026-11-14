@@ -25,6 +25,7 @@
 #include <QStyleFactory>
 #include <QTableWidget>
 #include <algorithm>
+#include <chrono>
 
 #include "taiga/settings.hpp"
 #include "ui_settings_dialog.h"
@@ -35,6 +36,7 @@ namespace {
 
 enum Row {
   AppStyle,
+  DetectionInterval,
   ProxyType,
   ProxyHost,
   ProxyPort,
@@ -51,6 +53,7 @@ constexpr int kValueColumn = 1;
 SettingsPageAdvanced::SettingsPageAdvanced(Ui::SettingsDialog* ui, QDialog* dialog)
     : SettingsPage(ui, dialog),
       appStyleComboBox_(new QComboBox(ui->advancedTable)),
+      detectionIntervalSpinBox_(new QSpinBox(ui->advancedTable)),
       proxyTypeComboBox_(new QComboBox(ui->advancedTable)),
       proxyPortSpinBox_(new QSpinBox(ui->advancedTable)),
       proxyPasswordLineEdit_(new QLineEdit(ui->advancedTable)) {
@@ -64,6 +67,7 @@ SettingsPageAdvanced::SettingsPageAdvanced(Ui::SettingsDialog* ui, QDialog* dial
     table->setItem(row, kNameColumn, item);
   };
   setName(AppStyle, tr("Application style"));
+  setName(DetectionInterval, tr("Media detection interval"));
   setName(ProxyType, tr("Proxy type"));
   setName(ProxyHost, tr("Proxy host"));
   setName(ProxyPort, tr("Proxy port"));
@@ -71,6 +75,11 @@ SettingsPageAdvanced::SettingsPageAdvanced(Ui::SettingsDialog* ui, QDialog* dial
   setName(ProxyPassword, tr("Proxy password"));
 
   table->setCellWidget(AppStyle, kValueColumn, appStyleComboBox_);
+
+  detectionIntervalSpinBox_->setRange(1, 60);
+  detectionIntervalSpinBox_->setSuffix(tr(" seconds"));
+  detectionIntervalSpinBox_->setFrame(false);
+  table->setCellWidget(DetectionInterval, kValueColumn, detectionIntervalSpinBox_);
 
   proxyTypeComboBox_->addItem(tr("HTTP"), static_cast<int>(QNetworkProxy::HttpProxy));
   proxyTypeComboBox_->addItem(tr("SOCKS5"), static_cast<int>(QNetworkProxy::Socks5Proxy));
@@ -91,6 +100,9 @@ SettingsPageAdvanced::SettingsPageAdvanced(Ui::SettingsDialog* ui, QDialog* dial
 }
 
 void SettingsPageAdvanced::load() {
+  using std::chrono::duration_cast;
+  using std::chrono::seconds;
+
   auto table = ui_->advancedTable;
 
   {
@@ -109,6 +121,9 @@ void SettingsPageAdvanced::load() {
     combo->setCurrentIndex(std::max(0, combo->findData(style)));
   }
 
+  detectionIntervalSpinBox_->setValue(
+      static_cast<int>(duration_cast<seconds>(taiga::settings.mediaDetectionInterval()).count()));
+
   proxyTypeComboBox_->setCurrentIndex(
       std::max(0, proxyTypeComboBox_->findData(static_cast<int>(taiga::settings.proxyType()))));
   table->item(ProxyHost, kValueColumn)
@@ -120,9 +135,12 @@ void SettingsPageAdvanced::load() {
 }
 
 void SettingsPageAdvanced::apply() const {
+  using std::chrono::seconds;
+
   const auto table = ui_->advancedTable;
 
   taiga::settings.setAppStyle(appStyleComboBox_->currentData().toString().toStdString());
+  taiga::settings.setMediaDetectionInterval(seconds{detectionIntervalSpinBox_->value()});
 
   taiga::settings.setProxyType(
       static_cast<QNetworkProxy::ProxyType>(proxyTypeComboBox_->currentData().toInt()));

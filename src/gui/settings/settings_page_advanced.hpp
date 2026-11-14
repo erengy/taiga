@@ -38,6 +38,7 @@ public:
 
 private:
   QComboBox* appStyleComboBox_;
+  QSpinBox* detectionIntervalSpinBox_;
   QComboBox* proxyTypeComboBox_;
   QSpinBox* proxyPortSpinBox_;
   QLineEdit* proxyPasswordLineEdit_;
