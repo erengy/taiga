@@ -99,10 +99,6 @@ bool Settings::discordEnabled() const {
   return value(Key::kDiscordEnabled, false).toBool();
 }
 
-std::string Settings::service() const {
-  return value(Key::kService, sync::serviceSlug(sync::ServiceId::AniList)).toString().toStdString();
-}
-
 bool Settings::httpEnabled() const {
   return value(Key::kHttpEnabled, false).toBool();
 }
@@ -148,6 +144,10 @@ std::string Settings::proxyUsername() const {
 
 std::string Settings::proxyPassword() const {
   return value(Key::kProxyPassword).toString().toStdString();
+}
+
+std::string Settings::service() const {
+  return value(Key::kService, sync::serviceSlug(sync::ServiceId::AniList)).toString().toStdString();
 }
 
 bool Settings::sharingEnabled() const {
@@ -217,10 +217,6 @@ void Settings::setDiscordEnabled(const bool enabled) const {
   setValue(Key::kDiscordEnabled, enabled);
 }
 
-void Settings::setService(const std::string& service) const {
-  setValue(Key::kService, service);
-}
-
 void Settings::setHttpEnabled(const bool enabled) const {
   setValue(Key::kHttpEnabled, enabled);
 }
@@ -260,6 +256,10 @@ void Settings::setProxyUsername(const std::string& username) const {
 
 void Settings::setProxyPassword(const std::string& password) const {
   setValue(Key::kProxyPassword, password);
+}
+
+void Settings::setService(const std::string& service) const {
+  setValue(Key::kService, service);
 }
 
 void Settings::setSharingEnabled(const bool enabled) const {
