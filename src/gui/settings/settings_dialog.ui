@@ -795,6 +795,12 @@
                     </item>
                     <item row="1" column="1">
                      <widget class="QPlainTextEdit" name="httpHeadersPlainTextEdit">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
                       <property name="maximumSize">
                        <size>
                         <width>16777215</width>
