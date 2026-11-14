@@ -56,10 +56,6 @@ Service::Service() : sync::Service{ServiceId::Kitsu} {
   auto headers = api_.commonHeaders();
   headers.append(QHttpHeaders::WellKnownHeader::Accept, kJsonApiMediaType);
   api_.setCommonHeaders(headers);
-
-  if (const auto token = taiga::accounts()->kitsuAccessToken(); !token.empty()) {
-    api_.setBearerToken(QByteArray::fromStdString(token));
-  }
 }
 
 Service* Service::instance() {
@@ -106,7 +102,7 @@ void Service::fetchAnime(const int id) {
     anime::db()->updateItem(*item);
   };
 
-  manager_.get(api_.createRequest(u"/anime/%1"_s.arg(id), query), this, callback);
+  manager_.get(createRequest(u"/anime/%1"_s.arg(id), query), this, callback);
 }
 
 void Service::fetchListEntries(const int offset, QSet<int> fetchedIds) {
@@ -172,7 +168,7 @@ void Service::fetchListEntries(const int offset, QSet<int> fetchedIds) {
     }
   };
 
-  manager_.get(api_.createRequest(u"/library-entries"_s, query), this, callback);
+  manager_.get(createRequest(u"/library-entries"_s, query), this, callback);
 }
 
 void Service::search(const SearchParams& params, const int offset) {
@@ -236,7 +232,7 @@ void Service::search(const SearchParams& params, const int offset) {
     }
   };
 
-  manager_.get(api_.createRequest(u"/anime"_s, query), this, callback);
+  manager_.get(createRequest(u"/anime"_s, query), this, callback);
 }
 
 void Service::addListEntry(const int id, const anime::list::Fields dirty) {
@@ -244,7 +240,7 @@ void Service::addListEntry(const int id, const anime::list::Fields dirty) {
   if (!listEntry) return;
 
   const QUrlQuery query{{"fields[libraryEntries]", libraryEntryFields()}};
-  auto request = api_.createRequest(u"/library-entries"_s, query);
+  auto request = createRequest(u"/library-entries"_s, query);
   request.setHeader(QNetworkRequest::ContentTypeHeader, kJsonApiMediaType);
 
   const auto body = buildLibraryEntryObject(
@@ -289,7 +285,7 @@ void Service::updateListEntry(const int id, const anime::list::Fields dirty) {
   if (!listEntry) return;
 
   const QUrlQuery query{{"fields[libraryEntries]", libraryEntryFields()}};
-  auto request = api_.createRequest(u"/library-entries/%1"_s.arg(listEntry->id), query);
+  auto request = createRequest(u"/library-entries/%1"_s.arg(listEntry->id), query);
   request.setHeader(QNetworkRequest::ContentTypeHeader, kJsonApiMediaType);
 
   const auto body = buildLibraryEntryObject(
@@ -331,7 +327,7 @@ void Service::deleteListEntry(const int id) {
     sync::queue()->complete(true);
   };
 
-  manager_.deleteResource(api_.createRequest(u"/library-entries/%1"_s.arg(listEntry->id)), this,
+  manager_.deleteResource(createRequest(u"/library-entries/%1"_s.arg(listEntry->id)), this,
                           callback);
 }
 

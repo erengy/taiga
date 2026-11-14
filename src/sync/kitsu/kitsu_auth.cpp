@@ -32,6 +32,16 @@
 
 namespace sync::kitsu {
 
+QNetworkRequest Service::createRequest(const QString& path, const QUrlQuery& query) {
+  // Credentials can change at any time, so the stored access token is the source of truth
+  if (const auto token = taiga::accounts()->kitsuAccessToken(); !token.empty()) {
+    api_.setBearerToken(QByteArray::fromStdString(token));
+  } else {
+    api_.clearBearerToken();
+  }
+  return api_.createRequest(path, query);
+}
+
 bool Service::retryOnTokenExpiry(QRestReply& reply, std::function<void()> retry) {
   if (!isTokenExpired(reply)) return false;
   refreshAccessToken(std::move(retry));
@@ -73,7 +83,6 @@ void Service::authenticateUser() {
     const auto accessToken = root["access_token"].toString();
     taiga::accounts()->setKitsuAccessToken(accessToken.toStdString());
     taiga::accounts()->setKitsuRefreshToken(root["refresh_token"].toString().toStdString());
-    api_.setBearerToken(accessToken.toUtf8());
 
     // Kitsu's token response doesn't include user information, so we need to make an additional
     // request to resolve it.
@@ -120,7 +129,6 @@ void Service::refreshAccessToken(std::function<void()> onSuccess) {
     const auto accessToken = root["access_token"].toString();
     taiga::accounts()->setKitsuAccessToken(accessToken.toStdString());
     taiga::accounts()->setKitsuRefreshToken(root["refresh_token"].toString().toStdString());
-    api_.setBearerToken(accessToken.toUtf8());
 
     if (onSuccess) onSuccess();
   };
@@ -172,7 +180,7 @@ void Service::resolveUser(std::function<void()> onSuccess) {
     if (onSuccess) onSuccess();
   };
 
-  manager_.get(api_.createRequest(u"/users"_s, query), this, callback);
+  manager_.get(createRequest(u"/users"_s, query), this, callback);
 }
 
 }  // namespace sync::kitsu

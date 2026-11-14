@@ -18,7 +18,9 @@
 
 #pragma once
 
+#include <QNetworkRequest>
 #include <QSet>
+#include <QUrlQuery>
 #include <functional>
 
 #include "sync/service.hpp"
@@ -64,6 +66,7 @@ public:
   void deleteListEntry(const int id);
 
 private:
+  QNetworkRequest createRequest(const QString& path, const QUrlQuery& query = {});
   void resolveUser(std::function<void()> onSuccess = nullptr);
   void refreshAccessToken(std::function<void()> onSuccess);
   bool retryOnTokenExpiry(QRestReply& reply, std::function<void()> retry);
