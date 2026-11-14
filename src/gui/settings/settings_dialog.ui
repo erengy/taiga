@@ -18,6 +18,9 @@
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QTreeWidget" name="treeWidget">
+       <property name="themed" stdset="0">
+        <bool>true</bool>
+       </property>
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
          <horstretch>0</horstretch>
@@ -481,6 +484,9 @@
                   <layout class="QHBoxLayout" name="libraryFoldersLayout">
                    <item alignment="Qt::AlignmentFlag::AlignTop">
                     <widget class="QListWidget" name="libraryFoldersList">
+                     <property name="themed" stdset="0">
+                      <bool>true</bool>
+                     </property>
                      <property name="maximumSize">
                       <size>
                        <width>16777215</width>
@@ -662,6 +668,9 @@
                </item>
                <item>
                 <widget class="QListWidget" name="mediaPlayersList">
+                 <property name="themed" stdset="0">
+                  <bool>true</bool>
+                 </property>
                  <property name="alternatingRowColors">
                   <bool>true</bool>
                  </property>
@@ -850,6 +859,9 @@
                  <layout class="QVBoxLayout" name="verticalLayout_11">
                   <item>
                    <widget class="QListWidget" name="streamingBrowsersList">
+                    <property name="themed" stdset="0">
+                     <bool>true</bool>
+                    </property>
                     <property name="alternatingRowColors">
                      <bool>true</bool>
                     </property>
@@ -870,6 +882,9 @@
                </property>
                <item>
                 <widget class="QTableWidget" name="advancedTable">
+                 <property name="themed" stdset="0">
+                  <bool>true</bool>
+                 </property>
                  <property name="alternatingRowColors">
                   <bool>true</bool>
                  </property>

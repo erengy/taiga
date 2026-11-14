@@ -38,25 +38,17 @@ QTreeView#animeList QHeaderView {
   border-bottom-color: rgba(255, 255, 255, 16%);
 }
 
-QTreeView#animeList,
-QTreeView#historyView,
-QTreeView#libraryView {
+QAbstractItemView[themed="true"] {
   background-color: #1c1c1c;
   alternate-background-color: rgba(255, 255, 255, 3%);
 }
-QTreeView#animeList::item:hover,
-QTreeView#historyView::item:hover,
-QTreeView#libraryView::item:hover {
+QAbstractItemView[themed="true"]::item:hover {
   background-color: rgba(255, 255, 255, 5%);
 }
-QTreeView#animeList::item:selected:active,
-QTreeView#historyView::item:selected:active,
-QTreeView#libraryView::item:selected:active {
+QAbstractItemView[themed="true"]::item:selected:active {
   background-color: rgba(255, 255, 255, 20%);
 }
-QTreeView#animeList::item:selected:!active,
-QTreeView#historyView::item:selected:!active,
-QTreeView#libraryView::item:selected:!active {
+QAbstractItemView[themed="true"]::item:selected:!active {
   background-color: rgba(255, 255, 255, 10%);
 }
 

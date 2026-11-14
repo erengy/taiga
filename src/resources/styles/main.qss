@@ -64,9 +64,7 @@ QTreeView#libraryView QHeaderView::section {
   padding-right: 12px;
 }
 
-QTreeView#animeList,
-QTreeView#historyView,
-QTreeView#libraryView {
+QAbstractItemView[themed="true"] {
   selection-background-color: transparent;
 }
 

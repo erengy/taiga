@@ -34,6 +34,7 @@ ListView::ListView(QWidget* parent, AnimeListModel* model, AnimeListProxyModel* 
                    AnimeListContext context)
     : m_base(new ListViewBase(parent, this, model, proxyModel, context)) {
   setObjectName("animeList");
+  setProperty("themed", true);
 
   setFrameShape(QFrame::Shape::NoFrame);
 

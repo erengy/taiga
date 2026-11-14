@@ -67,6 +67,7 @@ LibraryWidget::LibraryWidget(QWidget* parent)
 
   m_view->installEventFilter(this);
   m_view->setObjectName("libraryView");
+  m_view->setProperty("themed", true);
   m_view->setFrameShape(QFrame::Shape::NoFrame);
   m_view->setModel(m_model);
   m_view->setAlternatingRowColors(true);

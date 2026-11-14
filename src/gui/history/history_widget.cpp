@@ -49,6 +49,7 @@ HistoryWidget::HistoryWidget(QWidget* parent)
   m_proxyModel->sort(HistoryModel::COLUMN_MODIFIED, Qt::SortOrder::DescendingOrder);
 
   m_view->setObjectName("historyView");
+  m_view->setProperty("themed", true);
   m_view->setFrameShape(QFrame::Shape::NoFrame);
   m_view->setModel(m_proxyModel);
   m_view->setAlternatingRowColors(true);
