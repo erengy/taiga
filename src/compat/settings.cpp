@@ -129,7 +129,8 @@ void parseAccountElement(QXmlStreamReader& xml, const taiga::Settings& settings,
     } else if (xml.name() == u"kitsu") {
       accounts.setKitsuEmail(XML_ATTR_STR(u"email"));
       accounts.setKitsuUsername(XML_ATTR_STR(u"username"));
-      accounts.setKitsuPassword(XML_ATTR_STR(u"password"));
+      accounts.setKitsuPassword(
+          QByteArray::fromBase64(XML_ATTR(u"password").toLatin1()).toStdString());
       xml.skipCurrentElement();
 
     } else if (xml.name() == u"myanimelist") {
