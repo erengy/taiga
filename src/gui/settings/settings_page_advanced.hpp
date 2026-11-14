@@ -37,6 +37,7 @@ public:
   void apply() const override;
 
 private:
+  QComboBox* appStyleComboBox_;
   QComboBox* proxyTypeComboBox_;
   QSpinBox* proxyPortSpinBox_;
   QLineEdit* proxyPasswordLineEdit_;

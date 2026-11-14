@@ -22,6 +22,7 @@
 #include <QLineEdit>
 #include <QNetworkProxy>
 #include <QSpinBox>
+#include <QStyleFactory>
 #include <QTableWidget>
 #include <algorithm>
 
@@ -33,6 +34,7 @@ namespace gui {
 namespace {
 
 enum Row {
+  AppStyle,
   ProxyType,
   ProxyHost,
   ProxyPort,
@@ -48,6 +50,7 @@ constexpr int kValueColumn = 1;
 
 SettingsPageAdvanced::SettingsPageAdvanced(Ui::SettingsDialog* ui, QDialog* dialog)
     : SettingsPage(ui, dialog),
+      appStyleComboBox_(new QComboBox(ui->advancedTable)),
       proxyTypeComboBox_(new QComboBox(ui->advancedTable)),
       proxyPortSpinBox_(new QSpinBox(ui->advancedTable)),
       proxyPasswordLineEdit_(new QLineEdit(ui->advancedTable)) {
@@ -60,11 +63,14 @@ SettingsPageAdvanced::SettingsPageAdvanced(Ui::SettingsDialog* ui, QDialog* dial
     item->setFlags(item->flags() & ~Qt::ItemIsEditable);
     table->setItem(row, kNameColumn, item);
   };
+  setName(AppStyle, tr("Application style"));
   setName(ProxyType, tr("Proxy type"));
   setName(ProxyHost, tr("Proxy host"));
   setName(ProxyPort, tr("Proxy port"));
   setName(ProxyUsername, tr("Proxy username"));
   setName(ProxyPassword, tr("Proxy password"));
+
+  table->setCellWidget(AppStyle, kValueColumn, appStyleComboBox_);
 
   proxyTypeComboBox_->addItem(tr("HTTP"), static_cast<int>(QNetworkProxy::HttpProxy));
   proxyTypeComboBox_->addItem(tr("SOCKS5"), static_cast<int>(QNetworkProxy::Socks5Proxy));
@@ -87,6 +93,22 @@ SettingsPageAdvanced::SettingsPageAdvanced(Ui::SettingsDialog* ui, QDialog* dial
 void SettingsPageAdvanced::load() {
   auto table = ui_->advancedTable;
 
+  {
+    auto combo = appStyleComboBox_;
+    const QString system{taiga::Settings::kAppStyleSystem};
+    auto keys = QStyleFactory::keys();
+    const auto style = QString::fromStdString(taiga::settings.appStyle()).toLower();
+    if (style != system && !keys.contains(style, Qt::CaseInsensitive)) {
+      keys.append(style);  // keep unavailable style
+    }
+    keys.sort(Qt::CaseInsensitive);
+    combo->addItem(tr("System"), system);
+    for (const auto& key : keys) {
+      combo->addItem(key, key.toLower());
+    }
+    combo->setCurrentIndex(std::max(0, combo->findData(style)));
+  }
+
   proxyTypeComboBox_->setCurrentIndex(
       std::max(0, proxyTypeComboBox_->findData(static_cast<int>(taiga::settings.proxyType()))));
   table->item(ProxyHost, kValueColumn)
@@ -99,6 +121,8 @@ void SettingsPageAdvanced::load() {
 
 void SettingsPageAdvanced::apply() const {
   const auto table = ui_->advancedTable;
+
+  taiga::settings.setAppStyle(appStyleComboBox_->currentData().toString().toStdString());
 
   taiga::settings.setProxyType(
       static_cast<QNetworkProxy::ProxyType>(proxyTypeComboBox_->currentData().toInt()));
