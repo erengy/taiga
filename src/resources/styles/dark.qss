@@ -11,17 +11,16 @@ QMainWindow > #centralWidget > QSplitter::handle {
   background-color: rgba(255, 255, 255, 16%);
 }
 
-/* List */
-
-QMainWindow > #centralWidget QStackedWidget QListView,
-QMainWindow > #centralWidget QStackedWidget QTreeView {
-  border-top-color: rgba(255, 255, 255, 16%);
+QFrame#pageSeparator {
+  background-color: rgba(255, 255, 255, 16%);
 }
 
+/* List */
+
+QListView#animeCards,
 QTreeView#animeList > QHeaderView,
 QTreeView#historyView > QHeaderView,
-QTreeView#libraryView > QHeaderView,
-QListView#animeCards {
+QTreeView#libraryView > QHeaderView {
   background-color: #1c1c1c;
 }
 

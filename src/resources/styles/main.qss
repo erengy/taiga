@@ -43,12 +43,6 @@ QTreeWidget#navigation::item {
 
 /* List */
 
-QMainWindow > #centralWidget QStackedWidget QListView,
-QMainWindow > #centralWidget QStackedWidget QTreeView {
-  border-top-width: 1px;
-  border-top-style: solid;
-}
-
 QTreeView#animeList QHeaderView::section,
 QTreeView#historyView QHeaderView::section,
 QTreeView#libraryView QHeaderView::section {
