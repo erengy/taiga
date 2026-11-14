@@ -143,6 +143,16 @@ void MainWindow::initActions() {
   ui_->actionToggleSynchronization->setChecked(taiga::settings()->syncEnabled());
   connect(ui_->actionToggleSynchronization, &QAction::toggled, this,
           [](const bool checked) { taiga::settings()->setSyncEnabled(checked); });
+
+  // Settings can also be changed from the settings dialog.
+  connect(taiga::settings(), &taiga::Settings::changed, this, [this](const QSet<QString>& keys) {
+    if (keys.contains(u"sharing.enabled"_s)) {
+      ui_->actionToggleSharing->setChecked(taiga::settings()->sharingEnabled());
+    }
+    if (keys.contains(u"sync.enabled"_s)) {
+      ui_->actionToggleSynchronization->setChecked(taiga::settings()->syncEnabled());
+    }
+  });
 }
 
 void MainWindow::initIcons() {
