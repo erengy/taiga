@@ -46,7 +46,7 @@
         <enum>QLayout::SizeConstraint::SetMaximumSize</enum>
        </property>
        <item>
-        <widget class="gui::PosterWidget" name="posterWidget">
+        <widget class="gui::PosterWidget" name="posterWidget" native="true">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
            <horstretch>0</horstretch>
