@@ -41,6 +41,7 @@ namespace compat::v1 {
 void parseAccountElement(QXmlStreamReader&, const taiga::Settings&, const taiga::Accounts&);
 void parseAnimeElement(QXmlStreamReader&, const taiga::Settings&);
 void parseAnimeItemsElement(QXmlStreamReader&, QList<anime::Settings>&);
+void parseAnnounceElement(QXmlStreamReader&, const taiga::Settings&);
 void parseProgramElement(QXmlStreamReader&, const taiga::Settings&);
 void parseRecognitionElement(QXmlStreamReader&, const taiga::Settings&);
 
@@ -66,8 +67,10 @@ void readSettings(const std::string& path, const taiga::Settings& settings,
       parseRecognitionElement(xml, settings);
     } else if (xml.name() == u"program") {
       parseProgramElement(xml, settings);
+    } else if (xml.name() == u"announce") {
+      parseAnnounceElement(xml, settings);
     } else {
-      // @TODO: announce, rss
+      // @TODO: rss
       xml.skipCurrentElement();
     }
   }
@@ -217,6 +220,15 @@ void parseRecognitionElement(QXmlStreamReader& xml, const taiga::Settings& setti
     } else {
       xml.skipCurrentElement();
     }
+  }
+}
+
+void parseAnnounceElement(QXmlStreamReader& xml, const taiga::Settings& settings) {
+  while (xml.readNextStartElement()) {
+    if (xml.name() == u"discord") {
+      settings.setDiscordEnabled(XML_ATTR_BOOL(u"enabled"));
+    }
+    xml.skipCurrentElement();
   }
 }
 

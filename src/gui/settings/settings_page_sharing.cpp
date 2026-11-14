@@ -18,21 +18,30 @@
 #include "settings_page_sharing.hpp"
 
 #include <QCheckBox>
+#include <QGroupBox>
 
+#include "share/discord.hpp"
 #include "taiga/settings.hpp"
 #include "ui_settings_dialog.h"
 
 namespace gui {
 
 SettingsPageSharing::SettingsPageSharing(Ui::SettingsDialog* ui, QDialog* dialog)
-    : SettingsPage(ui, dialog) {}
+    : SettingsPage(ui, dialog) {
+  connect(ui_->sharingEnabledCheckBox, &QCheckBox::toggled, ui_->discordGroupBox,
+          &QWidget::setEnabled);
+}
 
 void SettingsPageSharing::load() {
   ui_->sharingEnabledCheckBox->setChecked(taiga::settings.sharingEnabled());
+  ui_->discordGroupBox->setEnabled(ui_->sharingEnabledCheckBox->isChecked());
+  ui_->discordEnabledCheckBox->setChecked(taiga::settings.discordEnabled());
 }
 
 void SettingsPageSharing::apply() const {
   taiga::settings.setSharingEnabled(ui_->sharingEnabledCheckBox->isChecked());
+  taiga::settings.setDiscordEnabled(ui_->discordEnabledCheckBox->isChecked());
+  share::discord::presence()->applySettings();  // settings have no change notifications yet
 }
 
 }  // namespace gui

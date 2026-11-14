@@ -44,6 +44,7 @@
 #include "media/anime_db.hpp"
 #include "media/anime_list.hpp"
 #include "media/anime_utils.hpp"
+#include "share/discord.hpp"
 #include "sync/anilist/anilist.hpp"
 #include "sync/kitsu/kitsu.hpp"
 #include "sync/myanimelist/myanimelist.hpp"
@@ -137,8 +138,10 @@ void MainWindow::initActions() {
           [](const bool checked) { track::media::detection()->setEnabled(checked); });
 
   ui_->actionToggleSharing->setChecked(taiga::settings.sharingEnabled());
-  connect(ui_->actionToggleSharing, &QAction::toggled, this,
-          [](const bool checked) { taiga::settings.setSharingEnabled(checked); });
+  connect(ui_->actionToggleSharing, &QAction::toggled, this, [](const bool checked) {
+    taiga::settings.setSharingEnabled(checked);
+    share::discord::presence()->applySettings();
+  });
 
   ui_->actionToggleSynchronization->setChecked(taiga::settings.syncEnabled());
   connect(ui_->actionToggleSynchronization, &QAction::toggled, this,

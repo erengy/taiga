@@ -642,6 +642,45 @@
             </widget>
            </item>
            <item>
+            <widget class="QLabel" name="sharingHintLabel">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="text">
+              <string>Private list entries are not shared.</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="discordGroupBox">
+             <property name="title">
+              <string>Discord</string>
+             </property>
+             <layout class="QVBoxLayout" name="discordGroupBoxLayout">
+              <item>
+               <widget class="QCheckBox" name="discordEnabledCheckBox">
+                <property name="text">
+                 <string>Show what I'm watching on Discord</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="discordHintLabel">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="text">
+                 <string>Requires the Discord desktop app with activity sharing enabled.</string>
+                </property>
+                <property name="wordWrap">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
             <spacer name="sharingVerticalSpacer">
              <property name="orientation">
               <enum>Qt::Vertical</enum>

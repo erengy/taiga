@@ -71,12 +71,7 @@ SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::S
     add_child(item, "Media players", ui_->mediaPlayersPage);
     add_child(item, "Streaming", ui_->streamingPage);
   }
-  {
-    auto item = add_item("share", "Sharing", ui_->sharingPage);
-    add_child(item, "Discord");
-    add_child(item, "HTTP");
-    add_child(item, "mIRC");
-  }
+  add_item("share", "Sharing", ui_->sharingPage);
   {
     auto item = add_item("rss_feed", "Torrents");
     add_child(item, "Downloads");
