@@ -44,7 +44,7 @@ namespace gui {
 
 ListViewBase::ListViewBase(QWidget* parent, QAbstractItemView* view, AnimeListModel* model,
                            AnimeListProxyModel* proxyModel, AnimeListContext context)
-    : QObject(parent), view_(view), model_(model), proxyModel_(proxyModel), context_(context) {
+    : QObject(parent), model_(model), proxyModel_(proxyModel), view_(view), context_(context) {
   view_->setContextMenuPolicy(Qt::CustomContextMenu);
   view_->setSelectionMode(QAbstractItemView::SelectionMode::ExtendedSelection);
 
