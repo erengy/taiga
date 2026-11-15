@@ -33,8 +33,8 @@
 
 namespace gui {
 
-constexpr int itemHeight = 210;
-constexpr int posterWidth = itemHeight * 2 / 3;
+constexpr int kItemHeight = 210;
+constexpr int kPosterWidth = kItemHeight * 2 / 3;
 constexpr int kSpinnerSize = 24;
 
 ListItemDelegateCards::ListItemDelegateCards(QObject* parent) : QStyledItemDelegate(parent) {
@@ -75,7 +75,7 @@ void ListItemDelegateCards::paint(QPainter* painter, const QStyleOptionViewItem&
   // Poster
   {
     QRect posterRect = rect;
-    posterRect.setWidth(posterWidth);
+    posterRect.setWidth(kPosterWidth);
 
     painter->fillRect(posterRect, theme()->isDark() ? opt.palette.dark() : opt.palette.mid());
 
@@ -115,13 +115,13 @@ void ListItemDelegateCards::paint(QPainter* painter, const QStyleOptionViewItem&
   if (entry) {
     auto progressOptions = opt;
     progressOptions.rect = rect;
-    progressOptions.rect.setWidth(posterWidth);
+    progressOptions.rect.setWidth(kPosterWidth);
     progressOptions.rect.setTop(progressOptions.rect.bottom() - 28);
     progressOptions.rect.adjust(4, 4, -4, -4);
     paintProgressBar(painter, progressOptions, item, entry);
   }
 
-  rect.adjust(posterWidth, 0, 0, 0);
+  rect.adjust(kPosterWidth, 0, 0, 0);
 
   // Title
   {
@@ -295,7 +295,7 @@ QSize ListItemDelegateCards::itemSize() const {
   const int columnsWidth = availableWidth - (columns * spacing);
   const float itemWidth = columnsWidth / static_cast<float>(columns);
 
-  return QSize(std::floor(itemWidth), itemHeight);
+  return QSize(std::floor(itemWidth), kItemHeight);
 }
 
 }  // namespace gui

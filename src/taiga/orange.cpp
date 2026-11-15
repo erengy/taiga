@@ -28,7 +28,7 @@
 namespace {
 
 // clang-format off
-constexpr std::array<std::pair<int, float>, 32> notes{{
+constexpr std::array<std::pair<int, float>, 32> kNotes{{
   {84, 1/2.f}, {84, 1/4.f}, {86, 1/8.f}, {84, 1/4.f},
   {82, 1/4.f}, {81, 1/4.f}, {77, 1/8.f}, {79, 1/8.f},
   {72, 1/8.f}, {77, 1/2.f}, {76, 1/8.f}, {77, 1/8.f},
@@ -61,7 +61,7 @@ Orange::~Orange() {
 }
 
 void Orange::run() {
-  for (const auto& [note, duration] : notes) {
+  for (const auto& [note, duration] : kNotes) {
     if (isInterruptionRequested()) break;
 #ifdef Q_OS_WINDOWS
     ::Beep(static_cast<DWORD>(getFrequency(note)), static_cast<DWORD>(getDuration(duration)));
