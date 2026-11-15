@@ -174,9 +174,8 @@ bool isStale(const Details& item) {
 ////////////////////////////////////////////////////////////////////////////////
 
 std::string preferredTitle(const Details& item) {
-  if (const auto* settings = db()->settings(item.id);
-      settings && !settings->display_title.empty()) {
-    return settings->display_title;
+  if (const auto* settings = db()->settings(item.id); settings && !settings->displayTitle.empty()) {
+    return settings->displayTitle;
   }
 
   switch (taiga::settings()->appTitleLanguage()) {

@@ -379,10 +379,10 @@ void MediaDialog::initSettings() {
   for (const auto& synonym : m_anime.titles.synonyms) {
     addCandidate(QString::fromStdString(synonym));
   }
-  addCandidate(QString::fromStdString(m_settings.display_title));
+  addCandidate(QString::fromStdString(m_settings.displayTitle));
   ui_->comboDisplayTitle->addItems(candidates);
 
-  ui_->comboDisplayTitle->setCurrentText(QString::fromStdString(m_settings.display_title));
+  ui_->comboDisplayTitle->setCurrentText(QString::fromStdString(m_settings.displayTitle));
   ui_->comboDisplayTitle->lineEdit()->setPlaceholderText(
       QString::fromStdString(anime::preferredTitle(m_anime)));
 
@@ -435,7 +435,7 @@ void MediaDialog::accept() {
     anime::list::save(*m_entry);
   }
 
-  m_settings.display_title = ui_->comboDisplayTitle->currentText().trimmed().toStdString();
+  m_settings.displayTitle = ui_->comboDisplayTitle->currentText().trimmed().toStdString();
   m_settings.folder = ui_->libraryFolder->text().trimmed().toStdString();
 
   m_settings.synonyms.clear();
