@@ -1,0 +1,10 @@
+# Store and check out text files with LF line endings, regardless of core.autocrlf.
+* text=auto eol=lf
+
+# NSIS installer script, stored as-is with CRLF line endings
+*.nsi -text
+
+# Binary files
+*.bmp binary
+*.ico binary
+*.png binary

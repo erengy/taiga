@@ -8,4 +8,5 @@ AccessModifierOffset: -2
 AllowShortFunctionsOnASingleLine: Empty
 ColumnLimit: 100
 DerivePointerAlignment: false
+LineEnding: LF
 Standard: Latest
