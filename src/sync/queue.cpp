@@ -78,7 +78,7 @@ void Queue::push(const int animeId, const anime::list::Fields dirty) {
     persistItem(*it);
   } else {
     QueueItem item{
-        .anime_id = animeId,
+        .animeId = animeId,
         .dirty = dirty,
         .time = std::time(nullptr),
     };
@@ -116,9 +116,9 @@ void Queue::process() {
   const auto item = currentItem();
   if (!item) return;
 
-  const auto entry = anime::db()->entry(item->anime_id);
+  const auto entry = anime::db()->entry(item->animeId);
   if (!entry) {
-    pop(item->anime_id);
+    pop(item->animeId);
     process();
     return;
   }
@@ -128,17 +128,17 @@ void Queue::process() {
     return;
   }
 
-  processing_ = item->anime_id;
+  processing_ = item->animeId;
   deleting_ = entry->pendingDelete;
   modifiedWhileProcessing_ = false;
-  emit processing(item->anime_id);
+  emit processing(item->animeId);
 
   if (entry->pendingDelete) {
-    deleteListEntry(item->anime_id);
+    deleteListEntry(item->animeId);
   } else if (entry->id == anime::list::kUnknownId) {
-    addListEntry(item->anime_id, item->dirty);
+    addListEntry(item->animeId, item->dirty);
   } else {
-    updateListEntry(item->anime_id, item->dirty);
+    updateListEntry(item->animeId, item->dirty);
   }
 }
 
@@ -160,8 +160,8 @@ void Queue::handleResult(const bool success, const QString& error, const ListEnt
   if (!success) {
     const auto it = findItem(animeId);
     if (it != items_.end()) {
-      it->retry_count++;
-      it->last_error = error.toStdString();
+      it->retryCount++;
+      it->lastError = error.toStdString();
       persistItem(*it);
     }
     return;
@@ -171,8 +171,8 @@ void Queue::handleResult(const bool success, const QString& error, const ListEnt
   reconcile(animeId, remote);
   const auto it = findItem(animeId);
   if (modifiedWhileProcessing_ && it != items_.end()) {
-    it->retry_count = 0;
-    it->last_error.clear();
+    it->retryCount = 0;
+    it->lastError.clear();
     persistItem(*it);
     emit changed();
   } else {
@@ -246,11 +246,11 @@ void Queue::clear() {
 }
 
 QList<QueueItem>::iterator Queue::findItem(const int animeId) {
-  return std::ranges::find(items_, animeId, &QueueItem::anime_id);
+  return std::ranges::find(items_, animeId, &QueueItem::animeId);
 }
 
 QList<QueueItem>::const_iterator Queue::findItem(const int animeId) const {
-  return std::ranges::find(items_, animeId, &QueueItem::anime_id);
+  return std::ranges::find(items_, animeId, &QueueItem::animeId);
 }
 
 QString Queue::sql(const QString& name) const {
@@ -309,25 +309,25 @@ void Queue::deleteItem(const int animeId) {
 }
 
 void Queue::bindItemToQuery(const QueueItem& item, QSqlQuery& q) const {
-  q.bindValue(":anime_id", item.anime_id);
+  q.bindValue(":anime_id", item.animeId);
   q.bindValue(":dirty", item.dirty.toInt());
   q.bindValue(":time", static_cast<qlonglong>(item.time));
-  q.bindValue(":retry_count", item.retry_count);
-  q.bindValue(":last_error", item.last_error.empty()
+  q.bindValue(":retry_count", item.retryCount);
+  q.bindValue(":last_error", item.lastError.empty()
                                  ? QVariant()
-                                 : QVariant(QString::fromStdString(item.last_error)));
+                                 : QVariant(QString::fromStdString(item.lastError)));
 }
 
 QueueItem Queue::itemFromQuery(const QSqlQuery& q) const {
   QueueItem item{
-      .anime_id = q.value("anime_id").toInt(),
+      .animeId = q.value("anime_id").toInt(),
       .dirty = anime::list::Fields::fromInt(q.value("dirty").toInt()),
       .time = static_cast<std::time_t>(q.value("time").toLongLong()),
-      .retry_count = q.value("retry_count").toInt(),
+      .retryCount = q.value("retry_count").toInt(),
   };
 
   if (!q.value("last_error").isNull()) {
-    item.last_error = q.value("last_error").toString().toStdString();
+    item.lastError = q.value("last_error").toString().toStdString();
   }
 
   return item;
