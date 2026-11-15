@@ -58,7 +58,7 @@ float fromScore(float value) {
   return value * 10.0f;
 }
 
-QString fromSearchParams(const SearchParams params) {
+QString fromSearchParams(const SearchParams& params) {
   if (!params.text.isEmpty()) return "SEARCH_MATCH";
 
   if (params.sort) {

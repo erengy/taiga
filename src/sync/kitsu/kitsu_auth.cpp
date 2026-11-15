@@ -42,9 +42,9 @@ QNetworkRequest Service::createRequest(const QString& path, const QUrlQuery& que
   return api_.createRequest(path, query);
 }
 
-bool Service::retryOnTokenExpiry(QRestReply& reply, std::function<void()> retry) {
+bool Service::retryOnTokenExpiry(QRestReply& reply, const std::function<void()>& retry) {
   if (!isTokenExpired(reply)) return false;
-  refreshAccessToken(std::move(retry));
+  refreshAccessToken(retry);
   return true;
 }
 
@@ -92,7 +92,7 @@ void Service::authenticateUser() {
   manager_.post(request, taiga::formUrlEncode(body), this, callback);
 }
 
-void Service::refreshAccessToken(std::function<void()> onSuccess) {
+void Service::refreshAccessToken(const std::function<void()>& onSuccess) {
   const auto refreshToken = taiga::accounts()->kitsuRefreshToken();
 
   if (refreshToken.empty()) {
@@ -138,7 +138,7 @@ void Service::refreshAccessToken(std::function<void()> onSuccess) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void Service::resolveUser(std::function<void()> onSuccess) {
+void Service::resolveUser(const std::function<void()>& onSuccess) {
   const bool authenticated = !taiga::accounts()->kitsuAccessToken().empty();
 
   QUrlQuery query = authenticated

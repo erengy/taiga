@@ -35,7 +35,7 @@ class MediaMenu final : public QMenu {
   Q_DISABLE_COPY_MOVE(MediaMenu)
 
 public:
-  MediaMenu(QWidget* parent, const QList<Anime>& items, const QMap<int, ListEntry> entries,
+  MediaMenu(QWidget* parent, const QList<Anime>& items, const QMap<int, ListEntry>& entries,
             QItemSelectionModel* selectionModel, AnimeListContext context);
 
   void popup();

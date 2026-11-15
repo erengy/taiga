@@ -25,6 +25,7 @@
 #include <QUuid>
 #include <QtEndian>
 #include <algorithm>
+#include <utility>
 
 #include "base/log.hpp"
 #include "base/string.hpp"
@@ -41,11 +42,11 @@ constexpr std::chrono::milliseconds kMaxRetryInterval = std::chrono::minutes{1};
 
 }  // namespace
 
-Client::Client(const QString& clientId, QObject* parent, const QString& socketPrefix,
+Client::Client(QString clientId, QObject* parent, QString socketPrefix,
                std::chrono::milliseconds retryInterval, std::chrono::milliseconds handshakeTimeout)
     : QObject{parent},
-      clientId_{clientId},
-      socketPrefix_{socketPrefix},
+      clientId_{std::move(clientId)},
+      socketPrefix_{std::move(socketPrefix)},
       minRetryInterval_{retryInterval},
       retryInterval_{retryInterval},
       socket_{new QLocalSocket{this}},

@@ -50,7 +50,7 @@ private:
 
   QString promptAuthorizationCode(const QString& serviceName) const;
   void watchAuthorization(sync::Service* service, QPushButton* button, QLabel* statusLabel,
-                          std::function<std::string()> onSuccess);
+                          const std::function<std::string()>& onSuccess);
 };
 
 }  // namespace gui

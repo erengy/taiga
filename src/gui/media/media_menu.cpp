@@ -62,8 +62,9 @@ QWidget* dialogParent(const QWidget* widget) {
 
 }  // namespace
 
-MediaMenu::MediaMenu(QWidget* parent, const QList<Anime>& items, const QMap<int, ListEntry> entries,
-                     QItemSelectionModel* selectionModel, AnimeListContext context)
+MediaMenu::MediaMenu(QWidget* parent, const QList<Anime>& items,
+                     const QMap<int, ListEntry>& entries, QItemSelectionModel* selectionModel,
+                     AnimeListContext context)
     : QMenu(parent),
       items_(items),
       entries_(entries),

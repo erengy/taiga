@@ -62,7 +62,7 @@ void SettingsPageLibrary::apply() const {
   for (int i = 0; i < ui_->libraryFoldersList->count(); ++i) {
     folders.push_back(ui_->libraryFoldersList->item(i)->text().toStdString());
   }
-  taiga::settings()->setLibraryFolders(std::move(folders));
+  taiga::settings()->setLibraryFolders(folders);
 }
 
 }  // namespace gui

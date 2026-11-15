@@ -267,7 +267,7 @@ void Settings::setDetectionInterval(const std::chrono::milliseconds interval) co
   setValue(Key::kDetectionInterval, static_cast<qint64>(interval.count()));
 }
 
-void Settings::setDisabledPlayers(std::vector<std::string> players) const {
+void Settings::setDisabledPlayers(const std::vector<std::string>& players) const {
   setValue(Key::kDisabledPlayers, QJsonArray::fromStringList(toStringList(players)));
 }
 
@@ -275,7 +275,7 @@ void Settings::setDiscordEnabled(const bool enabled) const {
   setValue(Key::kDiscordEnabled, enabled);
 }
 
-void Settings::setLibraryFolders(std::vector<std::string> folders) const {
+void Settings::setLibraryFolders(const std::vector<std::string>& folders) const {
   setValue(Key::kLibraryFolders, QJsonArray::fromStringList(toStringList(folders)));
 }
 
@@ -338,7 +338,7 @@ void Settings::setWebhookEnabled(const bool enabled) const {
   setValue(Key::kWebhookEnabled, enabled);
 }
 
-void Settings::setWebhookHeaders(std::vector<std::string> headers) const {
+void Settings::setWebhookHeaders(const std::vector<std::string>& headers) const {
   setValue(Key::kWebhookHeaders, QJsonArray::fromStringList(toStringList(headers)));
 }
 

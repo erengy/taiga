@@ -29,7 +29,7 @@
 
 namespace track::recognition {
 
-std::string normalize(std::string title) {
+std::string normalize(const std::string& title) {
   auto str = QString::fromStdString(title);
 
   normalizeRomanNumbers(str);

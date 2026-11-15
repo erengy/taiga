@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2025, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ const QFile& XmlFileReader::file() const {
   return file_;
 }
 
-bool XmlFileReader::open(const QString& name, std::function<void(QString&)> preprocessor) {
+bool XmlFileReader::open(const QString& name, const std::function<void(QString&)>& preprocessor) {
   file_.setFileName(name);
 
   if (!file_.open(QIODevice::ReadOnly)) return false;

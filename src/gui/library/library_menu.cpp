@@ -25,6 +25,7 @@
 #include <QFileSystemModel>
 #include <QMessageBox>
 #include <QUrl>
+#include <utility>
 
 #include "base/file.hpp"
 #include "gui/media/media_dialog.hpp"
@@ -35,8 +36,8 @@
 
 namespace gui {
 
-LibraryMenu::LibraryMenu(QWidget* parent, const QString& path, int animeId)
-    : QMenu(parent), path_(path), animeId_(animeId) {
+LibraryMenu::LibraryMenu(QWidget* parent, QString path, int animeId)
+    : QMenu(parent), path_(std::move(path)), animeId_(animeId) {
   setAttribute(Qt::WA_DeleteOnClose);
 }
 

@@ -168,7 +168,7 @@ QString SettingsPageAccounts::promptAuthorizationCode(const QString& serviceName
 
 void SettingsPageAccounts::watchAuthorization(sync::Service* service, QPushButton* button,
                                               QLabel* statusLabel,
-                                              std::function<std::string()> onSuccess) {
+                                              const std::function<std::string()>& onSuccess) {
   button->setEnabled(false);
   statusLabel->setText(tr("Authorizing..."));
 

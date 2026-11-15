@@ -70,7 +70,8 @@ bool Episode::contains(const anitomy::ElementKind kind) const {
   return find(kind) != elements_.end();
 }
 
-std::string Episode::element(const anitomy::ElementKind kind, const std::string placeholder) const {
+std::string Episode::element(const anitomy::ElementKind kind,
+                             const std::string& placeholder) const {
   const auto it = find(kind);
   if (it != elements_.end()) return it->value;
   return placeholder;

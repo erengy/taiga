@@ -50,24 +50,25 @@ enum class Status;
 
 namespace gui {
 
-QString formatNumber(const int value, QString placeholder = "-");
+QString formatNumber(const int value, const QString& placeholder = "-");
 
-QString formatEpisodeLength(const int minutes, QString placeholder = "-");
-QString formatEpisodeNumbers(const std::vector<std::string>& numbers, QString placeholder = "1");
+QString formatEpisodeLength(const int minutes, const QString& placeholder = "-");
+QString formatEpisodeNumbers(const std::vector<std::string>& numbers,
+                             const QString& placeholder = "1");
 
 QString formatScore(const double value);
 
-QString formatDate(const base::Date& date, QString placeholder = "?");
-QString formatDate(const QDate date, QString placeholder = "?");
-QString formatFuzzyDate(const base::FuzzyDate& date, QString placeholder = "?");
+QString formatDate(const base::Date& date, const QString& placeholder = "?");
+QString formatDate(const QDate date, const QString& placeholder = "?");
+QString formatFuzzyDate(const base::FuzzyDate& date, const QString& placeholder = "?");
 QString formatFuzzyDateRange(const base::FuzzyDate& from, const base::FuzzyDate& to,
-                             QString placeholder = "?");
-QString formatAsRelativeTime(const qint64 time, QString placeholder = "Unknown");
+                             const QString& placeholder = "?");
+QString formatAsRelativeTime(const qint64 time, const QString& placeholder = "Unknown");
 QString formatDuration(base::Duration duration);
 QString formatTimestamp(const qint64 time);
 QString formatTransferProgress(const qint64 current, const qint64 total);
 
-QString formatSeason(const anime::Season season, QString placeholder = "Unknown");
+QString formatSeason(const anime::Season season, const QString& placeholder = "Unknown");
 QString formatSeasonName(const anime::SeasonName name);
 QString formatStatus(const anime::Status value);
 QString formatType(const anime::Type value);

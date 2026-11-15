@@ -30,7 +30,7 @@ class LibraryMenu final : public QMenu {
   Q_DISABLE_COPY_MOVE(LibraryMenu)
 
 public:
-  LibraryMenu(QWidget* parent, const QString& path, int animeId);
+  LibraryMenu(QWidget* parent, QString path, int animeId);
 
   void popup();
 

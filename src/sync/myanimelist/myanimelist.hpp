@@ -48,8 +48,8 @@ public:
   void updateListEntry(const int id, const anime::list::Fields dirty);
 
 private:
-  void refreshAccessToken(std::function<void()> onSuccess);
-  bool retryOnTokenExpiry(QRestReply& reply, std::function<void()> retry);
+  void refreshAccessToken(const std::function<void()>& onSuccess);
+  bool retryOnTokenExpiry(QRestReply& reply, const std::function<void()>& retry);
 };
 
 }  // namespace sync::myanimelist

@@ -37,7 +37,7 @@ public:
     Error,
   };
 
-  TrayIcon(QObject* parent, const QIcon& icon, QMenu* menu);
+  TrayIcon(QObject* parent, QIcon icon, QMenu* menu);
 
   bool isAvailable() const;
 

@@ -66,9 +66,9 @@ public:
 
 private:
   QNetworkRequest createRequest(const QString& path, const QUrlQuery& query = {});
-  void resolveUser(std::function<void()> onSuccess = nullptr);
-  void refreshAccessToken(std::function<void()> onSuccess);
-  bool retryOnTokenExpiry(QRestReply& reply, std::function<void()> retry);
+  void resolveUser(const std::function<void()>& onSuccess = nullptr);
+  void refreshAccessToken(const std::function<void()>& onSuccess);
+  bool retryOnTokenExpiry(QRestReply& reply, const std::function<void()>& retry);
 };
 
 }  // namespace sync::kitsu

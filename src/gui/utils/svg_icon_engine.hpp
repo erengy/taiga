@@ -25,7 +25,7 @@ namespace gui {
 
 class SvgIconEngine : public QIconEngine {
 public:
-  SvgIconEngine(const QString& iconName);
+  SvgIconEngine(QString iconName);
 
   QString key() const override;
   QIconEngine* clone() const override;

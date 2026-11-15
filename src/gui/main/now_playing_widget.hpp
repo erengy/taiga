@@ -40,7 +40,7 @@ public:
   NowPlayingWidget(QWidget* parent);
 
   void reset();
-  void setPlaying(track::Episode episode);
+  void setPlaying(const track::Episode& episode);
 
 protected:
   void changeEvent(QEvent* event) override;

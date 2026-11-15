@@ -52,8 +52,8 @@ class Client final : public QObject {
   Q_DISABLE_COPY_MOVE(Client)
 
 public:
-  Client(const QString& clientId, QObject* parent = nullptr,
-         const QString& socketPrefix = QStringLiteral("discord-ipc-"),
+  Client(QString clientId, QObject* parent = nullptr,
+         QString socketPrefix = QStringLiteral("discord-ipc-"),
          std::chrono::milliseconds retryInterval = std::chrono::seconds{2},
          std::chrono::milliseconds handshakeTimeout = std::chrono::seconds{20});
   ~Client() override = default;

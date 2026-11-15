@@ -21,12 +21,13 @@
 #include <QGuiApplication>
 #include <QPainter>
 #include <QPalette>
+#include <utility>
 
 #include "base/string.hpp"
 
 namespace gui {
 
-SvgIconEngine::SvgIconEngine(const QString& iconName) : iconName_(iconName) {}
+SvgIconEngine::SvgIconEngine(QString iconName) : iconName_(std::move(iconName)) {}
 
 QString SvgIconEngine::key() const {
   return u"SvgIconEngine"_s;

@@ -40,7 +40,7 @@ public:
   void setElements(std::vector<anitomy::Element>& elements);
 
   bool contains(const anitomy::ElementKind kind) const;
-  std::string element(const anitomy::ElementKind kind, const std::string placeholder = {}) const;
+  std::string element(const anitomy::ElementKind kind, const std::string& placeholder = {}) const;
   std::vector<std::string> elements(const anitomy::ElementKind kind) const;
   void addElement(const anitomy::ElementKind kind, const std::string& value);
   void removeElements(const anitomy::ElementKind kind);

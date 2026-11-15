@@ -77,7 +77,7 @@ void savePlayerList(const QListWidget* list, const anisthesia::PlayerType type) 
     }
   }
 
-  taiga::settings()->setDisabledPlayers(std::move(disabledPlayers));
+  taiga::settings()->setDisabledPlayers(disabledPlayers);
 }
 
 }  // namespace gui

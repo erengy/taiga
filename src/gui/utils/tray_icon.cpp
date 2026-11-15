@@ -21,12 +21,13 @@
 #include <QMenu>
 #include <QPainter>
 #include <QSystemTrayIcon>
+#include <utility>
 
 #include "gui/utils/theme.hpp"
 
 namespace gui {
 
-TrayIcon::TrayIcon(QObject* parent, const QIcon& icon, QMenu* menu) : baseIcon_(icon) {
+TrayIcon::TrayIcon(QObject* parent, QIcon icon, QMenu* menu) : baseIcon_(std::move(icon)) {
   if (!QSystemTrayIcon::isSystemTrayAvailable()) {
     return;
   }

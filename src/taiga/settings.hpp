@@ -113,9 +113,9 @@ public:
   void setAppTitleLanguage(const anime::TitleLanguage language) const;
   void setDetectionEnabled(const bool enabled) const;
   void setDetectionInterval(const std::chrono::milliseconds interval) const;
-  void setDisabledPlayers(std::vector<std::string> players) const;
+  void setDisabledPlayers(const std::vector<std::string>& players) const;
   void setDiscordEnabled(const bool enabled) const;
-  void setLibraryFolders(std::vector<std::string> folders) const;
+  void setLibraryFolders(const std::vector<std::string>& folders) const;
   void setProxyType(const QNetworkProxy::ProxyType type) const;
   void setProxyHost(const std::string& host) const;
   void setProxyPort(const int port) const;
@@ -130,7 +130,7 @@ public:
   void setUpdatePauseWhenUnfocused(const bool enabled) const;
   void setUpdateTrigger(const track::UpdateTrigger trigger) const;
   void setWebhookEnabled(const bool enabled) const;
-  void setWebhookHeaders(std::vector<std::string> headers) const;
+  void setWebhookHeaders(const std::vector<std::string>& headers) const;
   void setWebhookUrl(const std::string& url) const;
 
 signals:

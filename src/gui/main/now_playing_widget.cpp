@@ -281,7 +281,7 @@ void NowPlayingWidget::reset() {
   refresh();
 }
 
-void NowPlayingWidget::setPlaying(track::Episode episode) {
+void NowPlayingWidget::setPlaying(const track::Episode& episode) {
   episode_ = episode;
 
   if (const auto item = anime::db()->item(episode.animeId())) {

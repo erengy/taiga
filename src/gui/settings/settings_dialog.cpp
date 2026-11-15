@@ -51,7 +51,7 @@ SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::S
   ui_->scrollArea->viewport()->setAutoFillBackground(false);
   ui_->scrollAreaWidgetContents->setAutoFillBackground(false);
 
-  const auto addItem = [this](QString icon, QString text, QWidget* page = nullptr) {
+  const auto addItem = [this](const QString& icon, const QString& text, QWidget* page = nullptr) {
     auto item = new QTreeWidgetItem(ui_->treeWidget, QStringList(text));
     item->setIcon(0, theme()->getIcon(icon));
     item->setSizeHint(0, QSize{0, 24});
@@ -60,7 +60,8 @@ SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::S
     return item;
   };
 
-  const auto addChild = [this](QTreeWidgetItem* parent, QString text, QWidget* page = nullptr) {
+  const auto addChild = [this](QTreeWidgetItem* parent, const QString& text,
+                               QWidget* page = nullptr) {
     auto item = new QTreeWidgetItem(parent, QStringList(text));
     item->setData(0, kPageRole, QVariant::fromValue(page));
     if (!page) item->setDisabled(true);

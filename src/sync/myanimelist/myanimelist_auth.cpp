@@ -30,9 +30,9 @@
 
 namespace sync::myanimelist {
 
-bool Service::retryOnTokenExpiry(QRestReply& reply, std::function<void()> retry) {
+bool Service::retryOnTokenExpiry(QRestReply& reply, const std::function<void()>& retry) {
   if (!isTokenExpired(reply)) return false;
-  refreshAccessToken(std::move(retry));
+  refreshAccessToken(retry);
   return true;
 }
 
@@ -76,7 +76,7 @@ void Service::requestAccessToken(const QString& authorizationCode, const QString
   manager_.post(request, taiga::formUrlEncode(body), this, callback);
 }
 
-void Service::refreshAccessToken(std::function<void()> onSuccess) {
+void Service::refreshAccessToken(const std::function<void()>& onSuccess) {
   const auto refreshToken = taiga::accounts()->myanimelistRefreshToken();
 
   if (refreshToken.empty()) {

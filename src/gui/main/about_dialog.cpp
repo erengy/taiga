@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2025, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -88,7 +88,7 @@ QString getAboutDialogText(QWidget* parent) {
 
   QStringList sections;
 
-  const auto addSection = [&sections](QString title, QString text) {
+  const auto addSection = [&sections](const QString& title, const QString& text) {
     sections.append(u"<b>%1:</b><br>%2"_s.arg(title).arg(text));
   };
 
