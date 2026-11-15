@@ -1,0 +1,40 @@
+---
+# https://clang.llvm.org/extra/clang-tidy/checks/readability/identifier-naming.html
+Checks: '-*,readability-identifier-naming'
+HeaderFilterRegex: '.*[/\\]src[/\\](base|compat|gui|media|share|sync|taiga|track)[/\\].*'
+CheckOptions:
+  # Types
+  readability-identifier-naming.ClassCase: CamelCase
+  readability-identifier-naming.StructCase: CamelCase
+  readability-identifier-naming.EnumCase: CamelCase
+  readability-identifier-naming.EnumConstantCase: CamelCase
+  readability-identifier-naming.TypeAliasCase: CamelCase
+  # Standard-library-style aliases (`unsigned_t`)
+  readability-identifier-naming.TypeAliasIgnoredRegexp: '^[a-z][a-z0-9_]*_t$'
+  readability-identifier-naming.TemplateParameterCase: CamelCase
+  # Namespaces
+  readability-identifier-naming.NamespaceCase: lower_case
+  # `Ui` is the namespace of uic-generated classes
+  readability-identifier-naming.NamespaceIgnoredRegexp: '^Ui$'
+  # Functions
+  readability-identifier-naming.FunctionCase: camelBack
+  readability-identifier-naming.MethodCase: camelBack
+  # Variables
+  readability-identifier-naming.VariableCase: camelBack
+  readability-identifier-naming.ParameterCase: camelBack
+  # Mutable namespace-scope variables may be prefixed with `g_` (`g_mutex`)
+  readability-identifier-naming.GlobalVariableCase: camelBack
+  readability-identifier-naming.GlobalVariableIgnoredRegexp: '^g_[a-z][a-zA-Z0-9]*$'
+  # Members
+  readability-identifier-naming.PublicMemberCase: camelBack
+  readability-identifier-naming.PrivateMemberCase: camelBack
+  readability-identifier-naming.PrivateMemberSuffix: '_'
+  readability-identifier-naming.ProtectedMemberCase: camelBack
+  readability-identifier-naming.ProtectedMemberSuffix: '_'
+  # Constants
+  readability-identifier-naming.GlobalConstantCase: CamelCase
+  readability-identifier-naming.GlobalConstantPrefix: 'k'
+  # Macros
+  readability-identifier-naming.MacroDefinitionCase: UPPER_CASE
+  # Overrides of Qt's logging macros (`qDebug`, `qWarning`, ...)
+  readability-identifier-naming.MacroDefinitionIgnoredRegexp: '^q[A-Z][A-Za-z]*$'
