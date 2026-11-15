@@ -61,12 +61,15 @@ void ListItemDelegateCards::paint(QPainter* painter, const QStyleOptionViewItem&
   path.addRoundedRect(rect, 4, 4);
   painter->setClipPath(path);
 
+  const auto& colors = theme()->colors();
+
   // Background
-  painter->fillRect(rect, theme()->itemAlternateColor());
+  painter->fillRect(rect, colors.itemAlternate);
   if (option.state & QStyle::State_Selected) {
-    painter->fillRect(rect, theme()->itemSelectionColor(option.state & QStyle::State_Active));
+    painter->fillRect(rect, option.state & QStyle::State_Active ? colors.itemSelected
+                                                                : colors.itemSelectedInactive);
   } else if (option.state & QStyle::State_MouseOver) {
-    painter->fillRect(rect, theme()->itemHoverColor());
+    painter->fillRect(rect, colors.itemHover);
   }
 
   // Poster
@@ -125,7 +128,7 @@ void ListItemDelegateCards::paint(QPainter* painter, const QStyleOptionViewItem&
     QRect titleRect = rect;
     titleRect.setHeight(32);
 
-    painter->fillRect(titleRect, theme()->itemAlternateColor());
+    painter->fillRect(titleRect, colors.itemAlternate);
     titleRect.adjust(12, 0, -12, 0);
 
     auto titleFont = font;

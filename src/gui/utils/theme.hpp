@@ -25,6 +25,19 @@
 
 namespace gui {
 
+// Colors that differ between light and dark themes. Keep in sync with dark.qss and light.qss.
+struct ThemeColors {
+  QColor background;
+  QColor border;
+  QColor splitter;
+  QColor itemAlternate;
+  QColor itemHover;
+  QColor itemSelected;
+  QColor itemSelectedInactive;
+  QColor success;
+  QColor warning;
+};
+
 class Theme final : public QObject {
   Q_OBJECT
   Q_DISABLE_COPY_MOVE(Theme)
@@ -38,15 +51,11 @@ public:
   bool isDark() const;
   bool isFusion() const;
 
-  // Item view colors for widgets that paint their own items. Keep in sync with the themed item
-  // rules in dark.qss and light.qss.
-  QColor itemAlternateColor() const;
-  QColor itemHoverColor() const;
-  QColor itemSelectionColor(bool active) const;
+  const ThemeColors& colors() const;
 
+  // Same for both themes, for things drawn outside the app (e.g. the tray icon).
   static QColor errorColor();
   static QColor successColor();
-  static QColor warningColor();
 
 private:
   void applyStylesheet() const;

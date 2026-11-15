@@ -29,6 +29,42 @@
 
 namespace gui {
 
+namespace {
+
+QColor black(const float alpha) {
+  return QColor::fromRgbF(0, 0, 0, alpha);
+}
+
+QColor white(const float alpha) {
+  return QColor::fromRgbF(1, 1, 1, alpha);
+}
+
+const ThemeColors kDarkColors{
+    .background = QColor(0x1c, 0x1c, 0x1c),
+    .border = white(0.16f),
+    .splitter = black(0.30f),
+    .itemAlternate = white(0.03f),
+    .itemHover = white(0.05f),
+    .itemSelected = white(0.20f),
+    .itemSelectedInactive = white(0.10f),
+    .success = QColor(0x66, 0xbb, 0x6a),  // Green 400
+    .warning = QColor(0xff, 0xa7, 0x26),  // Orange 400
+};
+
+const ThemeColors kLightColors{
+    .background = QColor(0xff, 0xff, 0xff),
+    .border = black(0.16f),
+    .splitter = white(0.30f),
+    .itemAlternate = black(0.04f),
+    .itemHover = black(0.04f),
+    .itemSelected = black(0.08f),
+    .itemSelectedInactive = black(0.06f),
+    .success = QColor(0x43, 0xa0, 0x47),  // Green 600
+    .warning = QColor(0xfb, 0x8c, 0x00),  // Orange 600
+};
+
+}  // namespace
+
 Theme::Theme(QObject* parent) : QObject{parent} {}
 
 const QIcon& Theme::getIcon(const QString& key, const QString& extension, bool useSvgIconEngine) {
@@ -96,21 +132,8 @@ QColor Theme::successColor() {
   return QColor(0x43, 0xa0, 0x47);  // Green 600
 }
 
-QColor Theme::warningColor() {
-  return QColor(0xfb, 0x8c, 0x00);  // Orange 600
-}
-
-QColor Theme::itemAlternateColor() const {
-  return isDark() ? QColor::fromRgbF(1, 1, 1, 0.03f) : QColor::fromRgbF(0, 0, 0, 0.04f);
-}
-
-QColor Theme::itemHoverColor() const {
-  return isDark() ? QColor::fromRgbF(1, 1, 1, 0.05f) : QColor::fromRgbF(0, 0, 0, 0.04f);
-}
-
-QColor Theme::itemSelectionColor(bool active) const {
-  if (isDark()) return QColor::fromRgbF(1, 1, 1, active ? 0.20f : 0.10f);
-  return QColor::fromRgbF(0, 0, 0, active ? 0.08f : 0.06f);
+const ThemeColors& Theme::colors() const {
+  return isDark() ? kDarkColors : kLightColors;
 }
 
 Theme* theme() {

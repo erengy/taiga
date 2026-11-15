@@ -117,11 +117,11 @@ QColor statusColor(const track::UpdateState& state) {
 
   switch (state.phase) {
     case Phase::Committed:
-      return Theme::successColor();
+      return theme()->colors().success;
 
     case Phase::Confirming:
     case Phase::Denied:
-      return Theme::warningColor();
+      return theme()->colors().warning;
 
     default:
       return {};
