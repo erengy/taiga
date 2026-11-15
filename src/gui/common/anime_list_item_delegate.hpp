@@ -20,8 +20,6 @@
 
 #include <QStyledItemDelegate>
 
-class QProxyStyle;
-
 namespace gui {
 
 class ListItemDelegate final : public QStyledItemDelegate {
@@ -46,9 +44,6 @@ public slots:
                     const QModelIndex& index) const override;
   void updateEditorGeometry(QWidget* editor, const QStyleOptionViewItem& option,
                             const QModelIndex& index) const override;
-
-private:
-  QProxyStyle* proxyStyle_;
 };
 
 }  // namespace gui
