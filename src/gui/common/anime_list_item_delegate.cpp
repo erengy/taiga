@@ -19,7 +19,9 @@
 #include "anime_list_item_delegate.hpp"
 
 #include <QComboBox>
+#include <QHeaderView>
 #include <QPainter>
+#include <QTreeView>
 
 #include "gui/models/anime_list_model.hpp"
 #include "gui/utils/painter_state_saver.hpp"
@@ -30,6 +32,18 @@
 #include "media/anime_list.hpp"
 
 namespace gui {
+
+namespace {
+
+bool isLastVisibleColumn(const QHeaderView* header, const int logicalIndex) {
+  for (int visualIndex = header->count() - 1; visualIndex >= 0; --visualIndex) {
+    const int logical = header->logicalIndex(visualIndex);
+    if (!header->isSectionHidden(logical)) return logical == logicalIndex;
+  }
+  return true;
+}
+
+}  // namespace
 
 ListItemDelegate::ListItemDelegate(QObject* parent) : QStyledItemDelegate(parent) {}
 
@@ -68,10 +82,12 @@ void ListItemDelegate::updateEditorGeometry(QWidget* editor, const QStyleOptionV
 void ListItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option,
                              const QModelIndex& index) const {
   // Grid lines
-  if (index.column() > 0) {
+  const auto* view = qobject_cast<const QTreeView*>(option.widget);
+  if (view && !isLastVisibleColumn(view->header(), index.column())) {
     const PainterStateSaver painterStateSaver(painter);
     painter->setPen(theme()->colors().gridLine);
-    painter->drawLine(option.rect.topLeft(), option.rect.bottomLeft());
+    const int x = option.rect.right() - (theme()->isFusion() ? 1 : 0);
+    painter->drawLine(x, option.rect.top(), x, option.rect.bottom());
   }
 
   switch (index.column()) {
@@ -83,7 +99,7 @@ void ListItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opti
       const auto entry =
           index.data(static_cast<int>(AnimeListItemDataRole::ListEntry)).value<const ListEntry*>();
       QStyleOptionViewItem opt = option;
-      opt.rect.adjust(2, 2, -2, -2);
+      opt.rect.adjust(2, 2, theme()->isFusion() ? -6 : -2, -2);
       paintProgressBar(painter, opt, anime, entry);
       return;
     }
