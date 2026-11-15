@@ -103,7 +103,7 @@ void parseItems(QXmlStreamReader& xml, QList<anime::HistoryItem>& items) {
   while (xml.readNextStartElement()) {
     if (xml.name() == u"item") {
       items.emplace_back(anime::HistoryItem{
-          .anime_id = XML_ATTR(u"anime_id").toInt(),
+          .animeId = XML_ATTR(u"anime_id").toInt(),
           .episode = XML_ATTR(u"episode").toInt(),
           .time = parseTime(XML_ATTR(u"time").toString()),
       });

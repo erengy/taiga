@@ -26,7 +26,7 @@ namespace anime {
 
 struct HistoryItem {
   int id = 0;
-  int anime_id = 0;
+  int animeId = 0;
   int episode = 0;
   std::time_t time = 0;
 };

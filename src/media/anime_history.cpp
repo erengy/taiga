@@ -69,7 +69,7 @@ void History::add(const int animeId, const int episode, const std::time_t time) 
 
   items_.append(HistoryItem{
       .id = id,
-      .anime_id = animeId,
+      .animeId = animeId,
       .episode = episode,
       .time = time,
   });
@@ -141,7 +141,7 @@ void History::readItems() {
 }
 
 void History::bindItemToQuery(const HistoryItem& item, QSqlQuery& q) const {
-  q.bindValue(":anime_id", item.anime_id);
+  q.bindValue(":anime_id", item.animeId);
   q.bindValue(":episode", item.episode);
   q.bindValue(":time", static_cast<qlonglong>(item.time));
 }
@@ -149,7 +149,7 @@ void History::bindItemToQuery(const HistoryItem& item, QSqlQuery& q) const {
 HistoryItem History::itemFromQuery(const QSqlQuery& q) const {
   return {
       .id = q.value("id").toInt(),
-      .anime_id = q.value("anime_id").toInt(),
+      .animeId = q.value("anime_id").toInt(),
       .episode = q.value("episode").toInt(),
       .time = static_cast<std::time_t>(q.value("time").toLongLong()),
   };

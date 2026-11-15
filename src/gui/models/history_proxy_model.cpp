@@ -44,8 +44,8 @@ bool HistoryProxyModel::lessThan(const QModelIndex& lhs, const QModelIndex& rhs)
 
   switch (lhs.column()) {
     case HistoryModel::ColumnTitle: {
-      const auto lhsAnime = anime::db()->item(lhsItem->anime_id);
-      const auto rhsAnime = anime::db()->item(rhsItem->anime_id);
+      const auto lhsAnime = anime::db()->item(lhsItem->animeId);
+      const auto rhsAnime = anime::db()->item(rhsItem->animeId);
       const auto lhsTitle = lhsAnime ? anime::preferredTitle(*lhsAnime) : std::string{};
       const auto rhsTitle = rhsAnime ? anime::preferredTitle(*rhsAnime) : std::string{};
       return compareStrings(lhsTitle, rhsTitle, Qt::CaseInsensitive) < 0;

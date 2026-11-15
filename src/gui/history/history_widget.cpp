@@ -108,7 +108,7 @@ void HistoryWidget::showMediaDialog(const QModelIndex& index) const {
   const auto historyItem = getHistoryItem(index);
   if (!historyItem) return;
 
-  const auto item = anime::db()->item(historyItem->anime_id);
+  const auto item = anime::db()->item(historyItem->animeId);
   if (!item) return;
 
   MediaDialog::show(mainWindow(), MediaDialogPage::Details, *item);
@@ -118,7 +118,7 @@ void HistoryWidget::removeItem(const QModelIndex& index) const {
   const auto historyItem = getHistoryItem(index);
   if (!historyItem) return;
 
-  const auto item = anime::db()->item(historyItem->anime_id);
+  const auto item = anime::db()->item(historyItem->animeId);
   const auto title = item ? QString::fromStdString(anime::preferredTitle(*item)) : tr("Unknown");
 
   if (confirm(nullptr, tr("Do you want to remove this entry from history?"),
