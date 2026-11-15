@@ -59,19 +59,21 @@ enum class TitleLanguage {
 };
 
 constexpr std::array<Status, 3> kStatuses{
-  Status::FinishedAiring,
-  Status::Airing,
-  Status::NotYetAired,
+    Status::FinishedAiring,
+    Status::Airing,
+    Status::NotYetAired,
 };
 
+// clang-format off
 constexpr std::array<Type, 6> kTypes{
-  Type::Tv,
-  Type::Ova,
-  Type::Movie,
-  Type::Special,
-  Type::Ona,
-  Type::Music,
+    Type::Tv,
+    Type::Ova,
+    Type::Movie,
+    Type::Special,
+    Type::Ona,
+    Type::Music,
 };
+// clang-format on
 
 constexpr int kMaxEpisodeCount = 1900;
 constexpr int kUnknownEpisodeCount = -1;

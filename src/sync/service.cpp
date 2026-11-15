@@ -91,7 +91,7 @@ QString serviceName(const ServiceId serviceId) {
   switch (serviceId) {
     case ServiceId::MyAnimeList: return "MyAnimeList";
     case ServiceId::Kitsu: return "Kitsu";
-    case ServiceId::AniList: return "AniList";  
+    case ServiceId::AniList: return "AniList";
   }
   // clang-format on
   return "Taiga";

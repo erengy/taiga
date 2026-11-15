@@ -31,7 +31,7 @@ namespace anime {
 enum class SeasonName;
 enum class Status;
 enum class Type;
-}
+}  // namespace anime
 
 namespace anime::list {
 enum class Status;

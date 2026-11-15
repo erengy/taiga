@@ -37,7 +37,7 @@ struct Details;
 namespace anime::list {
 enum class Status;
 struct Entry;
-}
+}  // namespace anime::list
 
 namespace sync::anilist {
 
