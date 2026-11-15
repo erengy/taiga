@@ -37,7 +37,7 @@ namespace gui {
 constexpr int kSpinnerIntervalMs = 40;
 constexpr qreal kSpinnerDegreesPerTick = 12.0;
 
-void paintEmptyListText(QAbstractScrollArea* widget, const QString& text);
+void paintEmptyListText(QAbstractScrollArea* area, const QString& text);
 
 void paintProgressBar(QPainter* painter, const QStyleOption& option, const anime::Details* anime,
                       const anime::list::Entry* entry);

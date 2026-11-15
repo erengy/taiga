@@ -50,12 +50,8 @@ int rank(const QtMsgType type) {
 bool isIgnored(const QMessageLogContext& context, const QString& message) {
   // On color scheme changes, Qt requests a new title bar color for every window, which fails for
   // windows that don't have one (e.g. popups). The window simply keeps its frame.
-  if (qstrcmp(context.category, "qt.qpa.window") == 0 &&
-      message.contains(u"setDarkBorderToWindow")) {
-    return true;
-  }
-
-  return false;
+  return qstrcmp(context.category, "qt.qpa.window") == 0 &&
+         message.contains(u"setDarkBorderToWindow");
 }
 
 void writeToFile(const QString& text) {

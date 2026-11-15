@@ -164,7 +164,7 @@ void ListViewBase::updateSelectionStatus(const QItemSelection&, const QItemSelec
 
 QModelIndexList ListViewBase::selectedIndexes() {
   const auto model = view_->selectionModel();
-  return model->selectedRows().size() ? model->selectedRows() : model->selectedIndexes();
+  return !model->selectedRows().empty() ? model->selectedRows() : model->selectedIndexes();
 }
 
 }  // namespace gui

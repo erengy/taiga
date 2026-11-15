@@ -63,7 +63,7 @@
 
 namespace gui {
 
-MainWindow::MainWindow() : QMainWindow(), ui_(new Ui::MainWindow) {
+MainWindow::MainWindow() : ui_(new Ui::MainWindow) {
   ui_->setupUi(this);
 
   ui_->menubar->hide();

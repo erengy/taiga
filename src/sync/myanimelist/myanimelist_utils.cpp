@@ -113,7 +113,7 @@ std::string animePageUrl(const int id) {
 
 std::string authorizationCodeUrl(std::string& codeVerifier) {
   codeVerifier.assign(64, '\0');
-  std::generate(codeVerifier.begin(), codeVerifier.end(), []() {
+  std::ranges::generate(codeVerifier, []() {
     static const std::string unreserved =
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
         "abcdefghijklmnopqrstvuwxyz"

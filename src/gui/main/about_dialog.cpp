@@ -20,6 +20,7 @@
 
 #include <utf8proc.h>
 
+#include <QCoreApplication>
 #include <QEvent>
 #include <QLabel>
 #include <QMessageBox>
@@ -31,7 +32,15 @@
 
 namespace gui {
 
-QString getAboutDialogText(QWidget* parent) {
+namespace {
+
+class AboutDialog {
+  Q_DECLARE_TR_FUNCTIONS(gui::AboutDialog)
+};
+
+}  // namespace
+
+QString getAboutDialogText() {
   const auto version = QString::fromStdString(taiga::version().to_string());
 
   const QStringList links{
@@ -76,7 +85,7 @@ QString getAboutDialogText(QWidget* parent) {
       u"WhatsCPS"_s,
       u"Jerico64"_s,
       u"Xen the Greedy"_s,
-      parent->tr("and other anonymous supporters"),
+      AboutDialog::tr("and other anonymous supporters"),
   };
   // clang-format on
 
@@ -94,10 +103,10 @@ QString getAboutDialogText(QWidget* parent) {
 
   sections.append(u"<big><b>Taiga</b> %1</big>"_s.arg(version));
   sections.append(links.join(" · "));
-  addSection(parent->tr("Author"), "erengy (Eren Okka)");
-  addSection(parent->tr("Contributors"), contributors.join(", "));
-  addSection(parent->tr("Donators"), donators.join(", "));
-  addSection(parent->tr("Third-party components"), components.join(", "));
+  addSection(AboutDialog::tr("Author"), "erengy (Eren Okka)");
+  addSection(AboutDialog::tr("Contributors"), contributors.join(", "));
+  addSection(AboutDialog::tr("Donators"), donators.join(", "));
+  addSection(AboutDialog::tr("Third-party components"), components.join(", "));
 
   return sections.join("<br><br>");
 }
@@ -108,8 +117,8 @@ void displayAboutDialog(QWidget* parent) {
   // See `QMessageBox::about()`
   msgBox->setAttribute(Qt::WA_DeleteOnClose);
   msgBox->setIconPixmap(parent->windowIcon().pixmap(QSize(64, 64), msgBox->devicePixelRatio()));
-  msgBox->setText(getAboutDialogText(parent));
-  msgBox->setWindowTitle(parent->tr("About Taiga"));
+  msgBox->setText(getAboutDialogText());
+  msgBox->setWindowTitle(AboutDialog::tr("About Taiga"));
 
   if (const auto iconLabel = msgBox->findChild<QLabel*>()) {
     const auto handler = new AboutDialogHandler(msgBox);

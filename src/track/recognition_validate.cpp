@@ -58,8 +58,7 @@ bool isValidEpisodeNumber(const Episode& episode, const anime::Details& item) {
       return true;  // single-episode anime can do without an episode number
     }
 
-    const auto extension = episode.element(anitomy::ElementKind::FileExtension);
-    if (extension.empty()) {
+    if (episode.element(anitomy::ElementKind::FileExtension).empty()) {
       return true;  // batch release
     }
 
