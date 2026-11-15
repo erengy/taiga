@@ -144,6 +144,7 @@ void UpdateSession::onMediaClosed() {
 
   switch (state_.phase) {
     case UpdateState::Phase::WaitingForClose:
+      if (!episode_) break;
       if (const auto* item = anime::db()->item(episode_->animeId())) {
         commit(*item);
         return;
