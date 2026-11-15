@@ -87,10 +87,10 @@ private:
 
   const ListEntry* getEntry(int id) const;
 
-  const QList<Anime> m_items;
-  const QMap<int, ListEntry> m_entries;
-  QItemSelectionModel* m_selectionModel = nullptr;
-  const AnimeListContext m_context;
+  const QList<Anime> items_;
+  const QMap<int, ListEntry> entries_;
+  QItemSelectionModel* selectionModel_ = nullptr;
+  const AnimeListContext context_;
 };
 
 }  // namespace gui

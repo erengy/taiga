@@ -69,7 +69,7 @@ public:
   void addIds(const QList<int>& ids);
 
 private:
-  QList<int> m_ids;
+  QList<int> ids_;
 
 private slots:
   void refreshRow(int id);

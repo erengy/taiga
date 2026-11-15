@@ -29,7 +29,7 @@ namespace gui {
 ClickableLabel::ClickableLabel(QWidget* parent, Qt::WindowFlags f) : QLabel(parent, f) {}
 
 void ClickableLabel::setElidable(const bool elidable) {
-  m_elidable = elidable;
+  elidable_ = elidable;
 
   // The text is allowed to be wider than the space we are given.
   setSizePolicy(elidable ? QSizePolicy::Ignored : QSizePolicy::Preferred, QSizePolicy::Preferred);
@@ -39,7 +39,7 @@ void ClickableLabel::setElidable(const bool elidable) {
 
 bool ClickableLabel::event(QEvent* event) {
   if (event->type() == QEvent::ToolTip && toolTip().isEmpty()) {
-    if (m_elidable && elidedText() != text()) {
+    if (elidable_ && elidedText() != text()) {
       QToolTip::showText(static_cast<QHelpEvent*>(event)->globalPos(), text(), this);
       return true;
     }
@@ -55,7 +55,7 @@ void ClickableLabel::mousePressEvent(QMouseEvent* event) {
 }
 
 void ClickableLabel::paintEvent(QPaintEvent* event) {
-  if (!m_elidable) {
+  if (!elidable_) {
     QLabel::paintEvent(event);
     return;
   }

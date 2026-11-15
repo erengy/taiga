@@ -38,7 +38,7 @@ public:
   ~ListViewCards() = default;
 
   ListViewBase* baseView() {
-    return m_base;
+    return base_;
   }
 
 protected:
@@ -48,7 +48,7 @@ protected:
   void wheelEvent(QWheelEvent* event) override;
 
 private:
-  ListViewBase* m_base = nullptr;
+  ListViewBase* base_ = nullptr;
 };
 
 }  // namespace gui

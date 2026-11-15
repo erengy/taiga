@@ -38,9 +38,9 @@ constexpr int kPosterWidth = kItemHeight * 2 / 3;
 constexpr int kSpinnerSize = 24;
 
 ListItemDelegateCards::ListItemDelegateCards(QObject* parent) : QStyledItemDelegate(parent) {
-  m_spinnerPixmap = theme()->getIcon("progress_activity").pixmap(QSize(kSpinnerSize, kSpinnerSize));
+  spinnerPixmap_ = theme()->getIcon("progress_activity").pixmap(QSize(kSpinnerSize, kSpinnerSize));
 
-  connect(&m_timerSpinner, &QTimer::timeout, this, &ListItemDelegateCards::advanceSpinner);
+  connect(&timerSpinner_, &QTimer::timeout, this, &ListItemDelegateCards::advanceSpinner);
 }
 
 void ListItemDelegateCards::paint(QPainter* painter, const QStyleOptionViewItem& option,
@@ -83,7 +83,7 @@ void ListItemDelegateCards::paint(QPainter* painter, const QStyleOptionViewItem&
         index.data(static_cast<int>(AnimeListItemDataRole::Poster)).value<QPixmap>();
 
     if (!pixmap.isNull()) {
-      m_loadingIndices.remove(index);
+      loadingIndices_.remove(index);
 
       const auto scaled =
           pixmap.size().scaled(posterRect.size(), Qt::AspectRatioMode::KeepAspectRatioByExpanding);
@@ -101,14 +101,14 @@ void ListItemDelegateCards::paint(QPainter* painter, const QStyleOptionViewItem&
 
       painter->drawPixmap(posterRect, pixmap, sourceRect);
     } else if (!item->imageUrl.empty()) {
-      m_loadingIndices.insert(index);
-      if (!m_timerSpinner.isActive()) {
-        m_timerSpinner.start(kSpinnerIntervalMs);
+      loadingIndices_.insert(index);
+      if (!timerSpinner_.isActive()) {
+        timerSpinner_.start(kSpinnerIntervalMs);
       }
 
-      paintSpinner(painter, m_spinnerPixmap, posterRect.center(), m_angle);
+      paintSpinner(painter, spinnerPixmap_, posterRect.center(), angle_);
     } else {
-      m_loadingIndices.remove(index);
+      loadingIndices_.remove(index);
     }
   }
 
@@ -252,19 +252,19 @@ void ListItemDelegateCards::initStyleOption(QStyleOptionViewItem* option,
 }
 
 void ListItemDelegateCards::advanceSpinner() {
-  m_angle += kSpinnerDegreesPerTick;
-  if (m_angle >= 360.0) m_angle -= 360.0;
+  angle_ += kSpinnerDegreesPerTick;
+  if (angle_ >= 360.0) angle_ -= 360.0;
 
   auto* view = reinterpret_cast<QListView*>(parent());
 
-  for (auto it = m_loadingIndices.begin(); it != m_loadingIndices.end();) {
+  for (auto it = loadingIndices_.begin(); it != loadingIndices_.end();) {
     const QModelIndex index = *it;
     const bool stillLoading =
         index.isValid() &&
         index.data(static_cast<int>(AnimeListItemDataRole::Poster)).value<QPixmap>().isNull();
 
     if (!stillLoading) {
-      it = m_loadingIndices.erase(it);
+      it = loadingIndices_.erase(it);
       continue;
     }
 
@@ -272,7 +272,7 @@ void ListItemDelegateCards::advanceSpinner() {
     ++it;
   }
 
-  if (m_loadingIndices.isEmpty()) m_timerSpinner.stop();
+  if (loadingIndices_.isEmpty()) timerSpinner_.stop();
 }
 
 QSize ListItemDelegateCards::itemSize() const {

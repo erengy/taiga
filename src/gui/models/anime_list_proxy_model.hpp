@@ -70,10 +70,10 @@ protected:
 private:
   std::partial_ordering compare(const QModelIndex& lhs, const QModelIndex& rhs, int column) const;
 
-  AnimeListProxyModelFilter m_filter;
-  bool m_nsfwHidden = false;
-  int m_secondarySortColumn = -1;
-  Qt::SortOrder m_secondarySortOrder = Qt::AscendingOrder;
+  AnimeListProxyModelFilter filter_;
+  bool nsfwHidden_ = false;
+  int secondarySortColumn_ = -1;
+  Qt::SortOrder secondarySortOrder_ = Qt::AscendingOrder;
 };
 
 }  // namespace gui

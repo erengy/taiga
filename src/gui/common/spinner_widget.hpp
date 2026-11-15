@@ -40,9 +40,9 @@ public:
 private:
   void advance();
 
-  QPixmap m_basePixmap;
-  QTimer m_timer;
-  qreal m_angle = 0.0;
+  QPixmap basePixmap_;
+  QTimer timer_;
+  qreal angle_ = 0.0;
 };
 
 }  // namespace gui

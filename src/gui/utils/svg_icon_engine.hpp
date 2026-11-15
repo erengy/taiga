@@ -39,11 +39,11 @@ public:
   void paint(QPainter* painter, const QRect& rect, QIcon::Mode mode, QIcon::State state) override;
 
 private:
-  const QString m_iconName;
-  QPixmap m_pixmap;
-  quint64 m_cacheKey{};
-  QColor m_color;
-  QSize m_size;
+  const QString iconName_;
+  QPixmap pixmap_;
+  quint64 cacheKey_{};
+  QColor color_;
+  QSize size_;
 };
 
 }  // namespace gui

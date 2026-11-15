@@ -44,25 +44,25 @@ namespace gui {
 
 ListWidget::ListWidget(QWidget* parent)
     : PageWidget(parent),
-      m_model(new AnimeListModel(this)),
-      m_proxyModel(new AnimeListProxyModel(this)),
-      m_sortMenu(new QMenu(this)),
-      m_viewMenu(new QMenu(this)),
-      m_moreMenu(new QMenu(this)) {
-  m_proxyModel->setSecondarySort(taiga::session.animeListSecondarySortColumn(),
-                                 taiga::session.animeListSecondarySortOrder());
-  m_proxyModel->sort(taiga::session.animeListSortColumn(), taiga::session.animeListSortOrder());
+      model_(new AnimeListModel(this)),
+      proxyModel_(new AnimeListProxyModel(this)),
+      sortMenu_(new QMenu(this)),
+      viewMenu_(new QMenu(this)),
+      moreMenu_(new QMenu(this)) {
+  proxyModel_->setSecondarySort(taiga::session.animeListSecondarySortColumn(),
+                                taiga::session.animeListSecondarySortOrder());
+  proxyModel_->sort(taiga::session.animeListSortColumn(), taiga::session.animeListSortOrder());
 
   initToolbar();
   setViewMode(taiga::session.animeListViewMode());
 
-  connect(m_sortMenu, &QMenu::aboutToShow, this, &ListWidget::initSortMenu);
-  connect(m_viewMenu, &QMenu::aboutToShow, this, &ListWidget::initViewMenu);
-  connect(m_moreMenu, &QMenu::aboutToShow, this, &ListWidget::initMoreMenu);
+  connect(sortMenu_, &QMenu::aboutToShow, this, &ListWidget::initSortMenu);
+  connect(viewMenu_, &QMenu::aboutToShow, this, &ListWidget::initViewMenu);
+  connect(moreMenu_, &QMenu::aboutToShow, this, &ListWidget::initMoreMenu);
 
   connect(mainWindow()->navigation(), &NavigationWidget::currentListStatusChanged, this,
           [this](anime::list::Status status) {
-            m_proxyModel->setListStatusFilter({
+            proxyModel_->setListStatusFilter({
                 .status = static_cast<int>(status),
                 .anyStatus = !static_cast<int>(status),
             });
@@ -70,44 +70,44 @@ ListWidget::ListWidget(QWidget* parent)
 }
 
 ListViewMode ListWidget::viewMode() const {
-  return m_viewMode;
+  return viewMode_;
 }
 
 void ListWidget::setViewMode(ListViewMode mode) {
-  if (m_listView) {
-    layout()->removeWidget(m_listView);
-    m_listView->deleteLater();
-    m_listView = nullptr;
+  if (listView_) {
+    layout()->removeWidget(listView_);
+    listView_->deleteLater();
+    listView_ = nullptr;
   };
-  if (m_listViewCards) {
-    layout()->removeWidget(m_listViewCards);
-    m_listViewCards->deleteLater();
-    m_listViewCards = nullptr;
+  if (listViewCards_) {
+    layout()->removeWidget(listViewCards_);
+    listViewCards_->deleteLater();
+    listViewCards_ = nullptr;
   };
 
-  m_viewMode = mode;
+  viewMode_ = mode;
 
   switch (mode) {
     case ListViewMode::List:
-      m_listView = new ListView(this, m_model, m_proxyModel, AnimeListContext::List);
-      layout()->addWidget(m_listView);
-      m_listView->show();
+      listView_ = new ListView(this, model_, proxyModel_, AnimeListContext::List);
+      layout()->addWidget(listView_);
+      listView_->show();
       break;
 
     case ListViewMode::Cards:
-      m_listViewCards = new ListViewCards(this, m_model, m_proxyModel, AnimeListContext::List);
-      layout()->addWidget(m_listViewCards);
-      m_listViewCards->show();
+      listViewCards_ = new ListViewCards(this, model_, proxyModel_, AnimeListContext::List);
+      layout()->addWidget(listViewCards_);
+      listViewCards_->show();
       break;
   }
 }
 
 void ListWidget::saveState() {
-  taiga::session.setAnimeListSortColumn(m_proxyModel->sortColumn());
-  taiga::session.setAnimeListSortOrder(m_proxyModel->sortOrder());
-  taiga::session.setAnimeListSecondarySortColumn(m_proxyModel->secondarySortColumn());
-  taiga::session.setAnimeListSecondarySortOrder(m_proxyModel->secondarySortOrder());
-  taiga::session.setAnimeListViewMode(m_viewMode);
+  taiga::session.setAnimeListSortColumn(proxyModel_->sortColumn());
+  taiga::session.setAnimeListSortOrder(proxyModel_->sortOrder());
+  taiga::session.setAnimeListSecondarySortColumn(proxyModel_->secondarySortColumn());
+  taiga::session.setAnimeListSecondarySortOrder(proxyModel_->secondarySortOrder());
+  taiga::session.setAnimeListViewMode(viewMode_);
 }
 
 void ListWidget::initToolbar() {
@@ -115,21 +115,21 @@ void ListWidget::initToolbar() {
   const auto actionView = new QAction(theme()->getIcon("grid_view"), tr("View"), this);
   const auto actionMore = new QAction(theme()->getIcon("more_horiz"), tr("More"), this);
 
-  m_toolbar->addAction(actionSort);
-  m_toolbar->addAction(actionView);
-  m_toolbar->addAction(actionMore);
+  toolbar_->addAction(actionSort);
+  toolbar_->addAction(actionView);
+  toolbar_->addAction(actionMore);
 
-  const auto sortButton = static_cast<QToolButton*>(m_toolbar->widgetForAction(actionSort));
+  const auto sortButton = static_cast<QToolButton*>(toolbar_->widgetForAction(actionSort));
   sortButton->setPopupMode(QToolButton::InstantPopup);
-  sortButton->setMenu(m_sortMenu);
+  sortButton->setMenu(sortMenu_);
 
-  const auto viewButton = static_cast<QToolButton*>(m_toolbar->widgetForAction(actionView));
+  const auto viewButton = static_cast<QToolButton*>(toolbar_->widgetForAction(actionView));
   viewButton->setPopupMode(QToolButton::InstantPopup);
-  viewButton->setMenu(m_viewMenu);
+  viewButton->setMenu(viewMenu_);
 
-  const auto moreButton = static_cast<QToolButton*>(m_toolbar->widgetForAction(actionMore));
+  const auto moreButton = static_cast<QToolButton*>(toolbar_->widgetForAction(actionMore));
   moreButton->setPopupMode(QToolButton::InstantPopup);
-  moreButton->setMenu(m_moreMenu);
+  moreButton->setMenu(moreMenu_);
 }
 
 void ListWidget::initSortMenu() {
@@ -153,23 +153,23 @@ void ListWidget::initSortMenu() {
 
   const auto actionGroup = new QActionGroup(this);
 
-  m_sortMenu->clear();
+  sortMenu_->clear();
 
   for (const auto& [column, order] : items) {
     const auto headerData =
-        m_model->headerData(column, Qt::Orientation::Horizontal, Qt::DisplayRole);
+        model_->headerData(column, Qt::Orientation::Horizontal, Qt::DisplayRole);
 
-    const auto action = m_sortMenu->addAction(headerData.toString(), this, [this, column, order]() {
-      if (m_listView) {
+    const auto action = sortMenu_->addAction(headerData.toString(), this, [this, column, order]() {
+      if (listView_) {
         // Sorting the proxy model doesn't update the sort indicator on the header.
-        m_listView->sortByColumn(column, order);
+        listView_->sortByColumn(column, order);
       } else {
-        m_proxyModel->sort(column, order);
+        proxyModel_->sort(column, order);
       }
     });
 
     action->setCheckable(true);
-    action->setChecked(column == m_proxyModel->sortColumn());
+    action->setChecked(column == proxyModel_->sortColumn());
     actionGroup->addAction(action);
   }
 }
@@ -182,18 +182,18 @@ void ListWidget::initViewMenu() {
 
   const auto actionGroup = new QActionGroup(this);
 
-  m_viewMenu->clear();
+  viewMenu_->clear();
 
   for (const auto& [text, mode] : items) {
-    const auto action = m_viewMenu->addAction(text, this, [this, mode]() { setViewMode(mode); });
+    const auto action = viewMenu_->addAction(text, this, [this, mode]() { setViewMode(mode); });
     action->setCheckable(true);
-    action->setChecked(mode == m_viewMode);
+    action->setChecked(mode == viewMode_);
     actionGroup->addAction(action);
   }
 }
 
 void ListWidget::initMoreMenu() {
-  m_moreMenu->clear();
+  moreMenu_->clear();
 
   static constexpr auto exportAs = [](QWidget* parent, const QString& extension,
                                       auto exportFunction) {
@@ -215,11 +215,11 @@ void ListWidget::initMoreMenu() {
     });
   };
 
-  m_moreMenu->addAction(tr("Export as Markdown..."), this,
-                        [this]() { exportAs(this, "md", &anime::list::exportAsMarkdown); });
+  moreMenu_->addAction(tr("Export as Markdown..."), this,
+                       [this]() { exportAs(this, "md", &anime::list::exportAsMarkdown); });
 
-  m_moreMenu->addAction(tr("Export as XML..."), this,
-                        [this]() { exportAs(this, "xml", &anime::list::exportAsXml); });
+  moreMenu_->addAction(tr("Export as XML..."), this,
+                       [this]() { exportAs(this, "xml", &anime::list::exportAsXml); });
 }
 
 }  // namespace gui

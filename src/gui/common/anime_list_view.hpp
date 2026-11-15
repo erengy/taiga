@@ -38,7 +38,7 @@ public:
   ~ListView() = default;
 
   ListViewBase* baseView() {
-    return m_base;
+    return base_;
   }
 
 protected:
@@ -47,7 +47,7 @@ protected:
   void paintEvent(QPaintEvent* event) override;
 
 private:
-  ListViewBase* m_base = nullptr;
+  ListViewBase* base_ = nullptr;
 };
 
 }  // namespace gui

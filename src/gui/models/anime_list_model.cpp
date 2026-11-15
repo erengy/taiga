@@ -38,11 +38,11 @@ namespace gui {
 
 AnimeListModel::AnimeListModel(QObject* parent) : QAbstractListModel(parent) {
   beginInsertRows({}, 0, anime::db()->items().size());
-  m_ids = anime::db()->items().keys();
+  ids_ = anime::db()->items().keys();
   endInsertRows();
 
   connect(imageProvider(), &ImageProvider::posterChanged, this, [this](int id) {
-    if (const auto row = m_ids.indexOf(id); row > -1) {
+    if (const auto row = ids_.indexOf(id); row > -1) {
       emit dataChanged(index(row), index(row), {static_cast<int>(AnimeListItemDataRole::Poster)});
     }
   });
@@ -53,14 +53,14 @@ AnimeListModel::AnimeListModel(QObject* parent) : QAbstractListModel(parent) {
   connect(anime::db(), &anime::Database::entryDeleted, this, &AnimeListModel::refreshRow);
 
   connect(taiga::settings(), &taiga::Settings::changed, this, [this](const QSet<QString>& keys) {
-    if (keys.contains(taiga::Settings::Key::kAppTitleLanguage) && !m_ids.isEmpty()) {
-      emit dataChanged(index(0, 0), index(m_ids.size() - 1, NumColumns - 1));
+    if (keys.contains(taiga::Settings::Key::kAppTitleLanguage) && !ids_.isEmpty()) {
+      emit dataChanged(index(0, 0), index(ids_.size() - 1, NumColumns - 1));
     }
   });
 }
 
 void AnimeListModel::refreshRow(int id) {
-  if (const auto row = m_ids.indexOf(id); row > -1) {
+  if (const auto row = ids_.indexOf(id); row > -1) {
     emit dataChanged(index(row, 0), index(row, NumColumns - 1));
   } else {
     addIds({id});
@@ -68,9 +68,9 @@ void AnimeListModel::refreshRow(int id) {
 }
 
 void AnimeListModel::deleteRow(int id) {
-  if (const auto row = m_ids.indexOf(id); row > -1) {
+  if (const auto row = ids_.indexOf(id); row > -1) {
     beginRemoveRows({}, row, row);
-    m_ids.removeAt(row);
+    ids_.removeAt(row);
     endRemoveRows();
   }
 }
@@ -78,18 +78,18 @@ void AnimeListModel::deleteRow(int id) {
 void AnimeListModel::addIds(const QList<int>& ids) {
   QList<int> newIds;
   for (const int id : ids) {
-    if (!m_ids.contains(id)) newIds.append(id);
+    if (!ids_.contains(id)) newIds.append(id);
   }
   if (newIds.isEmpty()) return;
 
-  const int first = m_ids.size();
+  const int first = ids_.size();
   beginInsertRows({}, first, first + newIds.size() - 1);
-  m_ids.append(newIds);
+  ids_.append(newIds);
   endInsertRows();
 }
 
 int AnimeListModel::rowCount(const QModelIndex&) const {
-  return m_ids.size();
+  return ids_.size();
 }
 
 int AnimeListModel::columnCount(const QModelIndex&) const {
@@ -222,7 +222,7 @@ QVariant AnimeListModel::data(const QModelIndex& index, int role) const {
 bool AnimeListModel::setData(const QModelIndex& index, const QVariant& value, int role) {
   if (index.isValid() && role == Qt::EditRole) {
     if (index.column() == ColumnScore) {
-      const int id = m_ids.at(index.row());
+      const int id = ids_.at(index.row());
       if (const auto entry = anime::db()->entry(id)) {
         auto updated = *entry;
         updated.score = value.toInt();
@@ -304,12 +304,12 @@ Qt::ItemFlags AnimeListModel::flags(const QModelIndex& index) const {
 
 const Anime* AnimeListModel::getAnime(const QModelIndex& index) const {
   if (!index.isValid()) return nullptr;
-  return anime::db()->item(m_ids.at(index.row()));
+  return anime::db()->item(ids_.at(index.row()));
 }
 
 const ListEntry* AnimeListModel::getListEntry(const QModelIndex& index) const {
   if (!index.isValid()) return nullptr;
-  return anime::db()->entry(m_ids.at(index.row()));
+  return anime::db()->entry(ids_.at(index.row()));
 }
 
 }  // namespace gui

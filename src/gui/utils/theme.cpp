@@ -117,15 +117,15 @@ QString replaceColorPlaceholders(const QString& stylesheet, const ThemeColors& c
 Theme::Theme(QObject* parent) : QObject{parent} {}
 
 const QIcon& Theme::getIcon(const QString& key, const QString& extension, bool useSvgIconEngine) {
-  if (!m_icons.contains(key)) {
+  if (!icons_.contains(key)) {
     if (extension == "svg" && useSvgIconEngine) {
-      m_icons[key] = QIcon(new SvgIconEngine(key));
+      icons_[key] = QIcon(new SvgIconEngine(key));
     } else {
-      m_icons[key] = QIcon(u":/icons/%1.%2"_s.arg(key, extension));
+      icons_[key] = QIcon(u":/icons/%1.%2"_s.arg(key, extension));
     }
   }
 
-  return m_icons[key];
+  return icons_[key];
 }
 
 void Theme::initStyle() {
@@ -143,7 +143,7 @@ void Theme::initStyle() {
 
   // Must be checked before applying the stylesheet: Qt then wraps the app style in a
   // QStyleSheetStyle, whose name() is empty.
-  m_isFusion = qApp->style()->name().compare("fusion", Qt::CaseInsensitive) == 0;
+  isFusion_ = qApp->style()->name().compare("fusion", Qt::CaseInsensitive) == 0;
 
 #ifdef Q_OS_WINDOWS
   if (style.compare("fusion", Qt::CaseInsensitive) == 0) {
@@ -156,7 +156,7 @@ void Theme::initStyle() {
 }
 
 bool Theme::isFusion() const {
-  return m_isFusion;
+  return isFusion_;
 }
 
 bool Theme::isDark() const {

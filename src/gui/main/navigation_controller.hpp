@@ -63,10 +63,10 @@ private:
   void recordPageHistory(MainWindowPage page);
   void updateHistoryActions();
 
-  MainWindow* m_mainWindow;
+  MainWindow* mainWindow_;
 
-  QList<MainWindowPage> m_pageHistory;
-  int m_pageHistoryIndex = -1;
+  QList<MainWindowPage> pageHistory_;
+  int pageHistoryIndex_ = -1;
 };
 
 }  // namespace gui

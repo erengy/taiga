@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,16 +24,16 @@ namespace gui {
 
 class PainterStateSaver {
 public:
-  PainterStateSaver(QPainter* painter) : m_painter(painter) {
-    m_painter->save();
+  PainterStateSaver(QPainter* painter) : painter_(painter) {
+    painter_->save();
   }
 
   ~PainterStateSaver() {
-    m_painter->restore();
+    painter_->restore();
   }
 
 private:
-  QPainter* m_painter;
+  QPainter* painter_;
 };
 
 }  // namespace gui

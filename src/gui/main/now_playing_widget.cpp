@@ -164,14 +164,14 @@ NowPlayingWidget::NowPlayingWidget(QWidget* parent) : QFrame(parent) {
   layout->setSpacing(kSpacing);
 
   // Poster
-  m_posterWidget = new PosterWidget(this);
-  m_posterWidget->setFixedSize(kPosterWidth, kPosterHeight);
-  m_posterWidget->setCornerRadius(kPosterCornerRadius);
-  m_posterWidget->setSpinnerSize(kPosterSpinnerSize);
-  layout->addWidget(m_posterWidget);
-  connect(m_posterWidget, &PosterWidget::clicked, this, [this](Qt::MouseButton button) {
-    if (button == Qt::MouseButton::LeftButton && m_anime) {
-      QDesktopServices::openUrl(QUrl{sync::animePageUrl(m_anime->id)});
+  posterWidget_ = new PosterWidget(this);
+  posterWidget_->setFixedSize(kPosterWidth, kPosterHeight);
+  posterWidget_->setCornerRadius(kPosterCornerRadius);
+  posterWidget_->setSpinnerSize(kPosterSpinnerSize);
+  layout->addWidget(posterWidget_);
+  connect(posterWidget_, &PosterWidget::clicked, this, [this](Qt::MouseButton button) {
+    if (button == Qt::MouseButton::LeftButton && anime_) {
+      QDesktopServices::openUrl(QUrl{sync::animePageUrl(anime_->id)});
     }
   });
 
@@ -181,75 +181,75 @@ NowPlayingWidget::NowPlayingWidget(QWidget* parent) : QFrame(parent) {
   layout->addLayout(textLayout, 1);
   textLayout->addStretch();
 
-  m_titleLabel = new ClickableLabel(this);
-  m_titleLabel->setElidable(true);
-  auto titleFont = m_titleLabel->font();
+  titleLabel_ = new ClickableLabel(this);
+  titleLabel_->setElidable(true);
+  auto titleFont = titleLabel_->font();
   titleFont.setWeight(QFont::DemiBold);
-  m_titleLabel->setFont(titleFont);
-  textLayout->addWidget(m_titleLabel);
-  connect(m_titleLabel, &ClickableLabel::clicked, this, [this](Qt::MouseButton button) {
-    if (button == Qt::LeftButton && m_anime) {
-      MediaDialog::show(this, MediaDialogPage::Details, *m_anime);
+  titleLabel_->setFont(titleFont);
+  textLayout->addWidget(titleLabel_);
+  connect(titleLabel_, &ClickableLabel::clicked, this, [this](Qt::MouseButton button) {
+    if (button == Qt::LeftButton && anime_) {
+      MediaDialog::show(this, MediaDialogPage::Details, *anime_);
     }
   });
-  m_titleLabel->setContextMenuPolicy(Qt::CustomContextMenu);
-  connect(m_titleLabel, &QLabel::customContextMenuRequested, this, [this]() {
-    if (!m_anime) return;
+  titleLabel_->setContextMenuPolicy(Qt::CustomContextMenu);
+  connect(titleLabel_, &QLabel::customContextMenuRequested, this, [this]() {
+    if (!anime_) return;
     QMap<int, ListEntry> entries;
-    if (const auto entry = anime::db()->entry(m_anime->id)) {
-      entries[m_anime->id] = *entry;
+    if (const auto entry = anime::db()->entry(anime_->id)) {
+      entries[anime_->id] = *entry;
     }
-    auto* menu = new MediaMenu(this, {*m_anime}, entries, nullptr, AnimeListContext::List);
+    auto* menu = new MediaMenu(this, {*anime_}, entries, nullptr, AnimeListContext::List);
     menu->popup();
   });
 
-  m_detailsLabel = new ClickableLabel(this);
-  m_detailsLabel->setElidable(true);
-  m_detailsLabel->setForegroundRole(QPalette::PlaceholderText);
-  textLayout->addWidget(m_detailsLabel);
+  detailsLabel_ = new ClickableLabel(this);
+  detailsLabel_->setElidable(true);
+  detailsLabel_->setForegroundRole(QPalette::PlaceholderText);
+  textLayout->addWidget(detailsLabel_);
 
   const auto statusLayout = new QHBoxLayout();
   statusLayout->setSpacing(4);
   textLayout->addLayout(statusLayout);
   textLayout->addStretch();
 
-  m_iconLabel = new QLabel(this);
-  m_iconLabel->setFixedSize(16, 16);
-  statusLayout->addWidget(m_iconLabel);
+  iconLabel_ = new QLabel(this);
+  iconLabel_->setFixedSize(16, 16);
+  statusLayout->addWidget(iconLabel_);
 
-  m_statusLabel = new ClickableLabel(this);
-  m_statusLabel->setElidable(true);
-  statusLayout->addWidget(m_statusLabel, 1);
+  statusLabel_ = new ClickableLabel(this);
+  statusLabel_->setElidable(true);
+  statusLayout->addWidget(statusLabel_, 1);
 
   // Actions
-  m_actions = new QWidget(this);
-  layout->addWidget(m_actions);
+  actions_ = new QWidget(this);
+  layout->addWidget(actions_);
 
-  const auto actionsLayout = new QVBoxLayout(m_actions);
+  const auto actionsLayout = new QVBoxLayout(actions_);
   actionsLayout->setContentsMargins(0, 0, 0, 0);
   actionsLayout->setSpacing(4);
   actionsLayout->addStretch();
 
-  m_acceptButton = new QPushButton(m_actions);
-  m_acceptButton->setDefault(true);
-  actionsLayout->addWidget(m_acceptButton);
-  connect(m_acceptButton, &QPushButton::clicked, this, []() { track::updateSession()->accept(); });
+  acceptButton_ = new QPushButton(actions_);
+  acceptButton_->setDefault(true);
+  actionsLayout->addWidget(acceptButton_);
+  connect(acceptButton_, &QPushButton::clicked, this, []() { track::updateSession()->accept(); });
 
-  m_cancelButton = new QPushButton(m_actions);
-  actionsLayout->addWidget(m_cancelButton);
-  connect(m_cancelButton, &QPushButton::clicked, this, []() { track::updateSession()->cancel(); });
+  cancelButton_ = new QPushButton(actions_);
+  actionsLayout->addWidget(cancelButton_);
+  connect(cancelButton_, &QPushButton::clicked, this, []() { track::updateSession()->cancel(); });
 
   actionsLayout->addStretch();
 
   refresh();
 
   connect(anime::db(), &anime::Database::itemUpdated, this, [this](const int id) {
-    if (!m_anime || m_anime->id != id) return;
-    if (const auto item = anime::db()->item(id)) m_anime = *item;
+    if (!anime_ || anime_->id != id) return;
+    if (const auto item = anime::db()->item(id)) anime_ = *item;
     refresh();
   });
   connect(imageProvider(), &ImageProvider::posterChanged, this, [this](const int id) {
-    if (m_anime && m_anime->id == id) refresh();
+    if (anime_ && anime_->id == id) refresh();
   });
   connect(taiga::settings(), &taiga::Settings::changed, this, [this](const QSet<QString>& keys) {
     if (keys.contains(taiga::Settings::Key::kAppTitleLanguage)) refresh();
@@ -270,24 +270,24 @@ NowPlayingWidget::NowPlayingWidget(QWidget* parent) : QFrame(parent) {
 }
 
 void NowPlayingWidget::changeEvent(QEvent* event) {
-  if (event->type() == QEvent::PaletteChange && m_episode) refresh();
+  if (event->type() == QEvent::PaletteChange && episode_) refresh();
   QFrame::changeEvent(event);
 }
 
 void NowPlayingWidget::reset() {
   hide();
-  m_anime.reset();
-  m_episode.reset();
+  anime_.reset();
+  episode_.reset();
   refresh();
 }
 
 void NowPlayingWidget::setPlaying(track::Episode episode) {
-  m_episode = episode;
+  episode_ = episode;
 
   if (const auto item = anime::db()->item(episode.animeId())) {
-    m_anime = *item;
+    anime_ = *item;
   } else {
-    m_anime.reset();
+    anime_.reset();
   }
 
   refresh();
@@ -301,7 +301,7 @@ void NowPlayingWidget::updateVisibility() {
 }
 
 void NowPlayingWidget::refresh() {
-  if (!m_episode.has_value()) {
+  if (!episode_.has_value()) {
     render(std::nullopt);
     return;
   }
@@ -310,34 +310,33 @@ void NowPlayingWidget::refresh() {
   if (const auto player = track::media::detection()->getCurrentPlayer()) {
     lines += u"<b>Media player:</b> %1"_s.arg(player->name);
   }
-  if (m_episode->contains(anitomy::ElementKind::EpisodeTitle)) {
-    const auto episodeTitle = m_episode->element(anitomy::ElementKind::EpisodeTitle);
+  if (episode_->contains(anitomy::ElementKind::EpisodeTitle)) {
+    const auto episodeTitle = episode_->element(anitomy::ElementKind::EpisodeTitle);
     lines += u"<b>Episode title:</b> %1"_s.arg(episodeTitle);
   }
-  if (m_episode->contains(anitomy::ElementKind::ReleaseGroup)) {
-    const auto releaseGroup = m_episode->element(anitomy::ElementKind::ReleaseGroup);
+  if (episode_->contains(anitomy::ElementKind::ReleaseGroup)) {
+    const auto releaseGroup = episode_->element(anitomy::ElementKind::ReleaseGroup);
     lines += u"<b>Group:</b> %1"_s.arg(releaseGroup);
   }
 
   const auto title =
-      m_anime ? anime::preferredTitle(*m_anime) : m_episode->element(anitomy::ElementKind::Title);
+      anime_ ? anime::preferredTitle(*anime_) : episode_->element(anitomy::ElementKind::Title);
   const auto episodeNumber =
-      formatEpisodeNumbers(m_episode->elements(anitomy::ElementKind::Episode));
-  const auto episodeCount = formatNumber(m_anime ? m_anime->episodeCount : 0, "?");
+      formatEpisodeNumbers(episode_->elements(anitomy::ElementKind::Episode));
+  const auto episodeCount = formatNumber(anime_ ? anime_->episodeCount : 0, "?");
 
   QPixmap poster;
-  if (m_anime) poster = imageProvider()->loadPoster(m_anime->id);
+  if (anime_) poster = imageProvider()->loadPoster(anime_->id);
 
   render(Content{
       .title = QString::fromStdString(title),
       .progress = u"%1/%2"_s.arg(episodeNumber).arg(episodeCount),
-      .episodeTitle =
-          QString::fromStdString(m_episode->element(anitomy::ElementKind::EpisodeTitle)),
+      .episodeTitle = QString::fromStdString(episode_->element(anitomy::ElementKind::EpisodeTitle)),
       .details = lines.join("<br>"),
       .isPlaying = track::media::detection()->getCurrentEpisode().has_value(),
-      .isRecognized = m_anime.has_value(),
+      .isRecognized = anime_.has_value(),
       .poster = poster,
-      .isPosterLoading = m_anime && poster.isNull() && !m_anime->imageUrl.empty(),
+      .isPosterLoading = anime_ && poster.isNull() && !anime_->imageUrl.empty(),
       .updateState = track::updateSession()->state(),
   });
 }
@@ -345,54 +344,54 @@ void NowPlayingWidget::refresh() {
 void NowPlayingWidget::render(const std::optional<Content>& content) {
   if (!content) {
     setToolTip({});
-    m_posterWidget->setPixmap({});
-    m_posterWidget->setLoading(false);
-    m_titleLabel->setText({});
-    m_detailsLabel->setText({});
-    m_iconLabel->clear();
-    m_statusLabel->setText({});
-    m_actions->hide();
+    posterWidget_->setPixmap({});
+    posterWidget_->setLoading(false);
+    titleLabel_->setText({});
+    detailsLabel_->setText({});
+    iconLabel_->clear();
+    statusLabel_->setText({});
+    actions_->hide();
     return;
   }
 
   setToolTip(content->details);
 
-  m_posterWidget->setPixmap(content->poster);
-  m_posterWidget->setLoading(content->isPosterLoading);
-  m_posterWidget->setCursor(content->isRecognized ? Qt::PointingHandCursor : Qt::ArrowCursor);
+  posterWidget_->setPixmap(content->poster);
+  posterWidget_->setLoading(content->isPosterLoading);
+  posterWidget_->setCursor(content->isRecognized ? Qt::PointingHandCursor : Qt::ArrowCursor);
 
-  m_titleLabel->setText(content->title);
-  m_titleLabel->setCursor(content->isRecognized ? Qt::PointingHandCursor : Qt::ArrowCursor);
+  titleLabel_->setText(content->title);
+  titleLabel_->setCursor(content->isRecognized ? Qt::PointingHandCursor : Qt::ArrowCursor);
 
   auto details = u"%1 · Episode %2"_s.arg(content->isPlaying ? u"Watching"_s : u"Watched"_s)
                      .arg(content->progress);
   if (!content->episodeTitle.isEmpty()) details += u" · "_s + content->episodeTitle;
-  m_detailsLabel->setText(details);
+  detailsLabel_->setText(details);
 
   if (const auto iconName = statusIconName(content->updateState, content->isRecognized);
       iconName.isEmpty()) {
-    m_iconLabel->clear();
+    iconLabel_->clear();
   } else {
-    m_iconLabel->setPixmap(theme()->getIcon(iconName).pixmap(QSize(16, 16)));
+    iconLabel_->setPixmap(theme()->getIcon(iconName).pixmap(QSize(16, 16)));
   }
-  m_statusLabel->setText(formatUpdateState(content->updateState));
+  statusLabel_->setText(formatUpdateState(content->updateState));
 
   if (const auto color = statusColor(content->updateState); color.isValid()) {
     QPalette palette;  // only override text color, inherit the rest
     palette.setColor(QPalette::WindowText, color);
-    m_statusLabel->setPalette(palette);
-    m_statusLabel->setForegroundRole(QPalette::WindowText);
+    statusLabel_->setPalette(palette);
+    statusLabel_->setForegroundRole(QPalette::WindowText);
   } else {
-    m_statusLabel->setPalette({});
-    m_statusLabel->setForegroundRole(QPalette::PlaceholderText);
+    statusLabel_->setPalette({});
+    statusLabel_->setForegroundRole(QPalette::PlaceholderText);
   }
 
   const auto [acceptText, cancelText] = formatUpdateActions(content->updateState);
-  m_acceptButton->setText(acceptText);
-  m_acceptButton->setVisible(!acceptText.isEmpty());
-  m_cancelButton->setText(cancelText);
-  m_cancelButton->setVisible(!cancelText.isEmpty());
-  m_actions->setVisible(!acceptText.isEmpty());
+  acceptButton_->setText(acceptText);
+  acceptButton_->setVisible(!acceptText.isEmpty());
+  cancelButton_->setText(cancelText);
+  cancelButton_->setVisible(!cancelText.isEmpty());
+  actions_->setVisible(!acceptText.isEmpty());
 }
 
 }  // namespace gui

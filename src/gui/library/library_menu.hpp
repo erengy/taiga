@@ -46,8 +46,8 @@ private slots:
   void viewDetails() const;
 
 private:
-  int m_anime_id = 0;
-  QString m_path;
+  int animeId_ = 0;
+  QString path_;
 };
 
 }  // namespace gui

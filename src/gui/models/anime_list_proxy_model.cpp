@@ -53,54 +53,54 @@ AnimeListProxyModel::AnimeListProxyModel(QObject* parent) : QSortFilterProxyMode
 }
 
 const AnimeListProxyModelFilter& AnimeListProxyModel::filters() const {
-  return m_filter;
+  return filter_;
 }
 
 void AnimeListProxyModel::setFilters(const AnimeListProxyModelFilter& filters) {
   beginFilterChange();
-  m_filter = filters;
+  filter_ = filters;
   endFilterChange(QSortFilterProxyModel::Direction::Rows);
 }
 
 void AnimeListProxyModel::setYearFilter(std::optional<int> year) {
   beginFilterChange();
-  m_filter.year = year;
+  filter_.year = year;
   endFilterChange(QSortFilterProxyModel::Direction::Rows);
 }
 
 void AnimeListProxyModel::setSeasonFilter(std::optional<int> season) {
   beginFilterChange();
-  m_filter.season = season;
+  filter_.season = season;
   endFilterChange(QSortFilterProxyModel::Direction::Rows);
 }
 
 void AnimeListProxyModel::setTypeFilter(std::optional<int> type) {
   beginFilterChange();
-  m_filter.type = type;
+  filter_.type = type;
   endFilterChange(QSortFilterProxyModel::Direction::Rows);
 }
 
 void AnimeListProxyModel::setStatusFilter(std::optional<int> status) {
   beginFilterChange();
-  m_filter.status = status;
+  filter_.status = status;
   endFilterChange(QSortFilterProxyModel::Direction::Rows);
 }
 
 void AnimeListProxyModel::setListStatusFilter(AnimeListStatusFilter filter) {
   beginFilterChange();
-  m_filter.listStatus = filter;
+  filter_.listStatus = filter;
   endFilterChange(QSortFilterProxyModel::Direction::Rows);
 }
 
 void AnimeListProxyModel::setTextFilter(const QString& text) {
   beginFilterChange();
-  m_filter.text = text;
+  filter_.text = text;
   endFilterChange(QSortFilterProxyModel::Direction::Rows);
 }
 
 void AnimeListProxyModel::setNsfwHidden(bool hidden) {
   beginFilterChange();
-  m_nsfwHidden = hidden;
+  nsfwHidden_ = hidden;
   endFilterChange(QSortFilterProxyModel::Direction::Rows);
 }
 
@@ -123,46 +123,46 @@ bool AnimeListProxyModel::filterAcceptsRow(int row, const QModelIndex& parent) c
   };
 
   // Age rating
-  if (m_nsfwHidden && anime::isNsfw(*anime)) return false;
+  if (nsfwHidden_ && anime::isNsfw(*anime)) return false;
 
   // Year
-  if (m_filter.year) {
-    if (anime->dateStarted.year() != *m_filter.year) return false;
+  if (filter_.year) {
+    if (anime->dateStarted.year() != *filter_.year) return false;
   }
 
   // Season
-  if (m_filter.season) {
+  if (filter_.season) {
     const anime::Season season{anime->dateStarted};
-    if (static_cast<int>(season.name) != *m_filter.season) return false;
+    if (static_cast<int>(season.name) != *filter_.season) return false;
   }
 
   // Type
-  if (m_filter.type) {
-    if (static_cast<int>(anime->type) != *m_filter.type) return false;
+  if (filter_.type) {
+    if (static_cast<int>(anime->type) != *filter_.type) return false;
   }
 
   // Status
-  if (m_filter.status) {
-    if (static_cast<int>(anime->status) != *m_filter.status) return false;
+  if (filter_.status) {
+    if (static_cast<int>(anime->status) != *filter_.status) return false;
   }
 
   // List status
-  if (m_filter.listStatus.status) {
+  if (filter_.listStatus.status) {
     auto status = anime::list::Status::NotInList;
     if (entry && !entry->pendingDelete) status = entry->status;
-    if (m_filter.listStatus.anyStatus) {
+    if (filter_.listStatus.anyStatus) {
       if (status == anime::list::Status::NotInList) return false;
     } else {
-      if (static_cast<int>(status) != *m_filter.listStatus.status) return false;
+      if (static_cast<int>(status) != *filter_.listStatus.status) return false;
     }
   }
 
   // Titles
-  if (!m_filter.text.isEmpty()) {
-    if (!contains(anime->titles.romaji, m_filter.text) &&
-        !contains(anime->titles.english, m_filter.text) &&
-        !contains(anime->titles.japanese, m_filter.text) &&
-        !listContains(anime->titles.synonyms, m_filter.text)) {
+  if (!filter_.text.isEmpty()) {
+    if (!contains(anime->titles.romaji, filter_.text) &&
+        !contains(anime->titles.english, filter_.text) &&
+        !contains(anime->titles.japanese, filter_.text) &&
+        !listContains(anime->titles.synonyms, filter_.text)) {
       return false;
     }
   }
@@ -171,16 +171,16 @@ bool AnimeListProxyModel::filterAcceptsRow(int row, const QModelIndex& parent) c
 }
 
 int AnimeListProxyModel::secondarySortColumn() const {
-  return m_secondarySortColumn;
+  return secondarySortColumn_;
 }
 
 Qt::SortOrder AnimeListProxyModel::secondarySortOrder() const {
-  return m_secondarySortOrder;
+  return secondarySortOrder_;
 }
 
 void AnimeListProxyModel::setSecondarySort(int column, Qt::SortOrder order) {
-  m_secondarySortColumn = column;
-  m_secondarySortOrder = order;
+  secondarySortColumn_ = column;
+  secondarySortOrder_ = order;
 }
 
 void AnimeListProxyModel::sort(int column, Qt::SortOrder order) {
@@ -205,8 +205,8 @@ bool AnimeListProxyModel::lessThan(const QModelIndex& lhs, const QModelIndex& rh
     return order == sortOrder() ? compare(lhs, rhs, column) : compare(rhs, lhs, column);
   };
 
-  if (m_secondarySortColumn > -1 && m_secondarySortColumn != primaryColumn) {
-    const auto result = compareInOrder(m_secondarySortColumn, m_secondarySortOrder);
+  if (secondarySortColumn_ > -1 && secondarySortColumn_ != primaryColumn) {
+    const auto result = compareInOrder(secondarySortColumn_, secondarySortOrder_);
     if (result != 0) return result < 0;
   }
 

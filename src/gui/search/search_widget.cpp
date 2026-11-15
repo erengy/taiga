@@ -61,25 +61,25 @@ namespace gui {
 
 SearchWidget::SearchWidget(QWidget* parent)
     : PageWidget(parent),
-      m_model(new AnimeListModel(this)),
-      m_proxyModel(new AnimeListProxyModel(this)),
-      m_comboYear(new ComboBox(this)),
-      m_comboSeason(new ComboBox(this)),
-      m_comboType(new ComboBox(this)),
-      m_comboStatus(new ComboBox(this)),
-      m_comboListStatus(new ComboBox(this)),
-      m_sortMenu(new QMenu(this)),
-      m_viewMenu(new QMenu(this)),
-      m_moreMenu(new QMenu(this)) {
-  m_proxyModel->setSecondarySort(taiga::session.searchListSecondarySortColumn(),
-                                 taiga::session.searchListSecondarySortOrder());
-  m_proxyModel->sort(taiga::session.searchListSortColumn(), taiga::session.searchListSortOrder());
-  m_proxyModel->setFilters(taiga::session.searchListFilters());
-  m_proxyModel->setNsfwHidden(taiga::settings()->appHideNsfw());
+      model_(new AnimeListModel(this)),
+      proxyModel_(new AnimeListProxyModel(this)),
+      comboYear_(new ComboBox(this)),
+      comboSeason_(new ComboBox(this)),
+      comboType_(new ComboBox(this)),
+      comboStatus_(new ComboBox(this)),
+      comboListStatus_(new ComboBox(this)),
+      sortMenu_(new QMenu(this)),
+      viewMenu_(new QMenu(this)),
+      moreMenu_(new QMenu(this)) {
+  proxyModel_->setSecondarySort(taiga::session.searchListSecondarySortColumn(),
+                                taiga::session.searchListSecondarySortOrder());
+  proxyModel_->sort(taiga::session.searchListSortColumn(), taiga::session.searchListSortOrder());
+  proxyModel_->setFilters(taiga::session.searchListFilters());
+  proxyModel_->setNsfwHidden(taiga::settings()->appHideNsfw());
 
   connect(taiga::settings(), &taiga::Settings::changed, this, [this](const QSet<QString>& keys) {
     if (keys.contains(taiga::Settings::Key::kAppHideNsfw)) {
-      m_proxyModel->setNsfwHidden(taiga::settings()->appHideNsfw());
+      proxyModel_->setNsfwHidden(taiga::settings()->appHideNsfw());
     }
   });
 
@@ -89,27 +89,27 @@ SearchWidget::SearchWidget(QWidget* parent)
 
   auto filtersLayout = new QHBoxLayout();
   filtersLayout->setSpacing(4);
-  m_toolbarLayout->insertLayout(0, filtersLayout);
+  toolbarLayout_->insertLayout(0, filtersLayout);
 
   // Year
   {
-    m_comboYear->setPlaceholderText("Year");
+    comboYear_->setPlaceholderText("Year");
     for (int year = QDate::currentDate().year() + 1; year >= 1940; --year) {
-      m_comboYear->addItem(QString::number(year), year);
+      comboYear_->addItem(QString::number(year), year);
     }
-    if (m_proxyModel->filters().year) {
-      m_comboYear->setCurrentText(QString::number(*m_proxyModel->filters().year));
+    if (proxyModel_->filters().year) {
+      comboYear_->setCurrentText(QString::number(*proxyModel_->filters().year));
     }
-    connect(m_comboYear, &QComboBox::currentIndexChanged, this, [this](int index) {
-      m_proxyModel->setYearFilter(filterValue(m_comboYear, index));
+    connect(comboYear_, &QComboBox::currentIndexChanged, this, [this](int index) {
+      proxyModel_->setYearFilter(filterValue(comboYear_, index));
       performSearch();
     });
-    filtersLayout->addWidget(m_comboYear);
+    filtersLayout->addWidget(comboYear_);
   }
 
   // Season
   {
-    m_comboSeason->setPlaceholderText("Season");
+    comboSeason_->setPlaceholderText("Season");
     const auto seasons = {
         anime::SeasonName::Winter,
         anime::SeasonName::Spring,
@@ -117,69 +117,69 @@ SearchWidget::SearchWidget(QWidget* parent)
         anime::SeasonName::Fall,
     };
     for (const auto season : seasons) {
-      m_comboSeason->addItem(formatSeasonName(season), static_cast<int>(season));
+      comboSeason_->addItem(formatSeasonName(season), static_cast<int>(season));
     }
-    if (m_proxyModel->filters().season) {
-      m_comboSeason->setCurrentText(
-          formatSeasonName(static_cast<anime::SeasonName>(*m_proxyModel->filters().season)));
+    if (proxyModel_->filters().season) {
+      comboSeason_->setCurrentText(
+          formatSeasonName(static_cast<anime::SeasonName>(*proxyModel_->filters().season)));
     }
-    connect(m_comboSeason, &QComboBox::currentIndexChanged, this, [this](int index) {
-      m_proxyModel->setSeasonFilter(filterValue(m_comboSeason, index));
+    connect(comboSeason_, &QComboBox::currentIndexChanged, this, [this](int index) {
+      proxyModel_->setSeasonFilter(filterValue(comboSeason_, index));
       performSearch();
     });
-    filtersLayout->addWidget(m_comboSeason);
+    filtersLayout->addWidget(comboSeason_);
   }
 
   // Type
   {
-    m_comboType->setPlaceholderText("Type");
+    comboType_->setPlaceholderText("Type");
     for (const auto type : anime::kTypes) {
-      m_comboType->addItem(formatType(type), static_cast<int>(type));
+      comboType_->addItem(formatType(type), static_cast<int>(type));
     }
-    if (m_proxyModel->filters().type) {
-      m_comboType->setCurrentText(
-          formatType(static_cast<anime::Type>(*m_proxyModel->filters().type)));
+    if (proxyModel_->filters().type) {
+      comboType_->setCurrentText(
+          formatType(static_cast<anime::Type>(*proxyModel_->filters().type)));
     }
-    connect(m_comboType, &QComboBox::currentIndexChanged, this, [this](int index) {
-      m_proxyModel->setTypeFilter(filterValue(m_comboType, index));
+    connect(comboType_, &QComboBox::currentIndexChanged, this, [this](int index) {
+      proxyModel_->setTypeFilter(filterValue(comboType_, index));
       performSearch();
     });
-    filtersLayout->addWidget(m_comboType);
+    filtersLayout->addWidget(comboType_);
   }
 
   // Status
   {
-    m_comboStatus->setPlaceholderText("Status");
+    comboStatus_->setPlaceholderText("Status");
     for (const auto status : anime::kStatuses) {
-      m_comboStatus->addItem(formatStatus(status), static_cast<int>(status));
+      comboStatus_->addItem(formatStatus(status), static_cast<int>(status));
     }
-    if (m_proxyModel->filters().status) {
-      m_comboStatus->setCurrentText(
-          formatStatus(static_cast<anime::Status>(*m_proxyModel->filters().status)));
+    if (proxyModel_->filters().status) {
+      comboStatus_->setCurrentText(
+          formatStatus(static_cast<anime::Status>(*proxyModel_->filters().status)));
     }
-    connect(m_comboStatus, &QComboBox::currentIndexChanged, this, [this](int index) {
-      m_proxyModel->setStatusFilter(filterValue(m_comboStatus, index));
+    connect(comboStatus_, &QComboBox::currentIndexChanged, this, [this](int index) {
+      proxyModel_->setStatusFilter(filterValue(comboStatus_, index));
       performSearch();
     });
-    filtersLayout->addWidget(m_comboStatus);
+    filtersLayout->addWidget(comboStatus_);
   }
 
   // List status
   {
-    m_comboListStatus->setPlaceholderText("List status");
+    comboListStatus_->setPlaceholderText("List status");
     for (const auto status : anime::list::kStatuses) {
-      m_comboListStatus->addItem(formatListStatus(status), static_cast<int>(status));
+      comboListStatus_->addItem(formatListStatus(status), static_cast<int>(status));
     }
-    if (m_proxyModel->filters().listStatus.status) {
-      m_comboListStatus->setCurrentText(formatListStatus(
-          static_cast<anime::list::Status>(*m_proxyModel->filters().listStatus.status)));
+    if (proxyModel_->filters().listStatus.status) {
+      comboListStatus_->setCurrentText(formatListStatus(
+          static_cast<anime::list::Status>(*proxyModel_->filters().listStatus.status)));
     }
-    connect(m_comboListStatus, &QComboBox::currentIndexChanged, this, [this](int index) {
-      m_proxyModel->setListStatusFilter({
-          .status = filterValue(m_comboListStatus, index),
+    connect(comboListStatus_, &QComboBox::currentIndexChanged, this, [this](int index) {
+      proxyModel_->setListStatusFilter({
+          .status = filterValue(comboListStatus_, index),
       });
     });
-    filtersLayout->addWidget(m_comboListStatus);
+    filtersLayout->addWidget(comboListStatus_);
   }
 
   // Toolbar
@@ -187,26 +187,26 @@ SearchWidget::SearchWidget(QWidget* parent)
     const auto actionSort = new QAction(theme()->getIcon("sort"), tr("Sort"), this);
     const auto actionView = new QAction(theme()->getIcon("grid_view"), tr("View"), this);
     const auto actionMore = new QAction(theme()->getIcon("more_horiz"), tr("More"), this);
-    m_toolbar->addAction(actionSort);
-    m_toolbar->addAction(actionView);
-    m_toolbar->addAction(actionMore);
+    toolbar_->addAction(actionSort);
+    toolbar_->addAction(actionView);
+    toolbar_->addAction(actionMore);
 
-    const auto sortButton = static_cast<QToolButton*>(m_toolbar->widgetForAction(actionSort));
+    const auto sortButton = static_cast<QToolButton*>(toolbar_->widgetForAction(actionSort));
     sortButton->setPopupMode(QToolButton::InstantPopup);
-    sortButton->setMenu(m_sortMenu);
+    sortButton->setMenu(sortMenu_);
 
-    const auto viewButton = static_cast<QToolButton*>(m_toolbar->widgetForAction(actionView));
+    const auto viewButton = static_cast<QToolButton*>(toolbar_->widgetForAction(actionView));
     viewButton->setPopupMode(QToolButton::InstantPopup);
-    viewButton->setMenu(m_viewMenu);
+    viewButton->setMenu(viewMenu_);
 
-    const auto moreButton = static_cast<QToolButton*>(m_toolbar->widgetForAction(actionMore));
+    const auto moreButton = static_cast<QToolButton*>(toolbar_->widgetForAction(actionMore));
     moreButton->setPopupMode(QToolButton::InstantPopup);
-    moreButton->setMenu(m_moreMenu);
+    moreButton->setMenu(moreMenu_);
   }
 
-  connect(m_sortMenu, &QMenu::aboutToShow, this, &SearchWidget::initSortMenu);
-  connect(m_viewMenu, &QMenu::aboutToShow, this, &SearchWidget::initViewMenu);
-  connect(m_moreMenu, &QMenu::aboutToShow, this, &SearchWidget::initMoreMenu);
+  connect(sortMenu_, &QMenu::aboutToShow, this, &SearchWidget::initSortMenu);
+  connect(viewMenu_, &QMenu::aboutToShow, this, &SearchWidget::initViewMenu);
+  connect(moreMenu_, &QMenu::aboutToShow, this, &SearchWidget::initMoreMenu);
 
   // List
   setViewMode(taiga::session.searchListViewMode());
@@ -224,18 +224,18 @@ SearchWidget::SearchWidget(QWidget* parent)
     connect(service, &sync::Service::searchCompleted, this,
             [this](const sync::SearchParams& params, const QList<int>& ids) {
               if (params != currentSearchParams()) return;
-              m_model->addIds(ids);
+              model_->addIds(ids);
             });
   }
 }
 
 void SearchWidget::saveState() {
-  taiga::session.setSearchListFilters(m_proxyModel->filters());
-  taiga::session.setSearchListSortColumn(m_proxyModel->sortColumn());
-  taiga::session.setSearchListSortOrder(m_proxyModel->sortOrder());
-  taiga::session.setSearchListSecondarySortColumn(m_proxyModel->secondarySortColumn());
-  taiga::session.setSearchListSecondarySortOrder(m_proxyModel->secondarySortOrder());
-  taiga::session.setSearchListViewMode(m_viewMode);
+  taiga::session.setSearchListFilters(proxyModel_->filters());
+  taiga::session.setSearchListSortColumn(proxyModel_->sortColumn());
+  taiga::session.setSearchListSortOrder(proxyModel_->sortOrder());
+  taiga::session.setSearchListSecondarySortColumn(proxyModel_->secondarySortColumn());
+  taiga::session.setSearchListSecondarySortOrder(proxyModel_->secondarySortOrder());
+  taiga::session.setSearchListViewMode(viewMode_);
 }
 
 void SearchWidget::initSortMenu() {
@@ -253,18 +253,18 @@ void SearchWidget::initSortMenu() {
 
   const auto actionGroup = new QActionGroup(this);
 
-  m_sortMenu->clear();
+  sortMenu_->clear();
 
   for (const auto& [column, order] : items) {
     const auto headerData =
-        m_model->headerData(column, Qt::Orientation::Horizontal, Qt::DisplayRole);
+        model_->headerData(column, Qt::Orientation::Horizontal, Qt::DisplayRole);
 
-    const auto action = m_sortMenu->addAction(headerData.toString(), this, [this, column, order]() {
-      if (m_listView) {
+    const auto action = sortMenu_->addAction(headerData.toString(), this, [this, column, order]() {
+      if (listView_) {
         // Sorting the proxy model doesn't update the sort indicator on the header.
-        m_listView->sortByColumn(column, order);
+        listView_->sortByColumn(column, order);
       } else {
-        m_proxyModel->sort(column, order);
+        proxyModel_->sort(column, order);
       }
 
       const auto params = currentSearchParams();
@@ -274,7 +274,7 @@ void SearchWidget::initSortMenu() {
     });
 
     action->setCheckable(true);
-    action->setChecked(column == m_proxyModel->sortColumn());
+    action->setChecked(column == proxyModel_->sortColumn());
     actionGroup->addAction(action);
   }
 }
@@ -287,57 +287,57 @@ void SearchWidget::initViewMenu() {
 
   const auto actionGroup = new QActionGroup(this);
 
-  m_viewMenu->clear();
+  viewMenu_->clear();
 
   for (const auto& [text, mode] : items) {
-    const auto action = m_viewMenu->addAction(text, this, [this, mode]() { setViewMode(mode); });
+    const auto action = viewMenu_->addAction(text, this, [this, mode]() { setViewMode(mode); });
     action->setCheckable(true);
-    action->setChecked(mode == m_viewMode);
+    action->setChecked(mode == viewMode_);
     actionGroup->addAction(action);
   }
 }
 
 void SearchWidget::initMoreMenu() {
-  m_moreMenu->clear();
+  moreMenu_->clear();
 
   const auto actionHideNsfw =
-      m_moreMenu->addAction(tr("Hide adult content"), this,
-                            [](bool checked) { taiga::settings()->setAppHideNsfw(checked); });
+      moreMenu_->addAction(tr("Hide adult content"), this,
+                           [](bool checked) { taiga::settings()->setAppHideNsfw(checked); });
   actionHideNsfw->setCheckable(true);
   actionHideNsfw->setChecked(taiga::settings()->appHideNsfw());
 }
 
 void SearchWidget::setViewMode(ListViewMode mode) {
-  if (m_listView) {
-    layout()->removeWidget(m_listView);
-    m_listView->deleteLater();
-    m_listView = nullptr;
+  if (listView_) {
+    layout()->removeWidget(listView_);
+    listView_->deleteLater();
+    listView_ = nullptr;
   }
-  if (m_listViewCards) {
-    layout()->removeWidget(m_listViewCards);
-    m_listViewCards->deleteLater();
-    m_listViewCards = nullptr;
+  if (listViewCards_) {
+    layout()->removeWidget(listViewCards_);
+    listViewCards_->deleteLater();
+    listViewCards_ = nullptr;
   }
 
-  m_viewMode = mode;
+  viewMode_ = mode;
 
   switch (mode) {
     case ListViewMode::List:
-      m_listView = new ListView(this, m_model, m_proxyModel, AnimeListContext::Search);
-      layout()->addWidget(m_listView);
-      m_listView->show();
+      listView_ = new ListView(this, model_, proxyModel_, AnimeListContext::Search);
+      layout()->addWidget(listView_);
+      listView_->show();
       break;
 
     case ListViewMode::Cards:
-      m_listViewCards = new ListViewCards(this, m_model, m_proxyModel, AnimeListContext::Search);
-      layout()->addWidget(m_listViewCards);
-      m_listViewCards->show();
+      listViewCards_ = new ListViewCards(this, model_, proxyModel_, AnimeListContext::Search);
+      layout()->addWidget(listViewCards_);
+      listViewCards_->show();
       break;
   }
 }
 
 sync::SearchParams SearchWidget::currentSearchParams() const {
-  const auto& filters = m_proxyModel->filters();
+  const auto& filters = proxyModel_->filters();
 
   return {
       .text = mainWindow()->searchBox()->text(),
@@ -348,8 +348,8 @@ sync::SearchParams SearchWidget::currentSearchParams() const {
           filters.type ? std::make_optional(static_cast<anime::Type>(*filters.type)) : std::nullopt,
       .status = filters.status ? std::make_optional(static_cast<anime::Status>(*filters.status))
                                : std::nullopt,
-      .sort = toSearchSort(static_cast<AnimeListModel::Column>(m_proxyModel->sortColumn())),
-      .sortOrder = m_proxyModel->sortOrder(),
+      .sort = toSearchSort(static_cast<AnimeListModel::Column>(proxyModel_->sortColumn())),
+      .sortOrder = proxyModel_->sortOrder(),
   };
 }
 

@@ -148,26 +148,26 @@ bool LibraryModel::isVideoFile(const QModelIndex& index) const {
 QString LibraryModel::getTitle(const QString& path) const {
   parse(path);
 
-  if (m_parsed[path].id) {
-    const auto item = anime::db()->item(m_parsed[path].id);
+  if (parsed_[path].id) {
+    const auto item = anime::db()->item(parsed_[path].id);
     if (item) return QString::fromStdString(anime::preferredTitle(*item));
   }
 
-  return m_parsed[path].title;
+  return parsed_[path].title;
 }
 
 QString LibraryModel::getEpisode(const QString& path) const {
   parse(path);
-  return m_parsed[path].episode;
+  return parsed_[path].episode;
 }
 
 int LibraryModel::getId(const QString& path) const {
   parse(path);
-  return m_parsed[path].id;
+  return parsed_[path].id;
 }
 
 void LibraryModel::parse(const QString& path) const {
-  if (m_parsed.contains(path)) return;
+  if (parsed_.contains(path)) return;
 
   const auto info = fileInfo(index(path));
   if (!info.isFile()) return;
@@ -175,7 +175,7 @@ void LibraryModel::parse(const QString& path) const {
   auto episode = track::recognition::parseFileInfo(info);
   const auto animeId = track::recognition::identify(episode);
 
-  m_parsed[path] = ParsedData{
+  parsed_[path] = ParsedData{
       .title = QString::fromStdString(episode.element(anitomy::ElementKind::Title)),
       .episode = QString::fromStdString(episode.element(anitomy::ElementKind::Episode)),
       .id = animeId,

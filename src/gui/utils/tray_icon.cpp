@@ -26,20 +26,20 @@
 
 namespace gui {
 
-TrayIcon::TrayIcon(QObject* parent, const QIcon& icon, QMenu* menu) : m_baseIcon(icon) {
+TrayIcon::TrayIcon(QObject* parent, const QIcon& icon, QMenu* menu) : baseIcon_(icon) {
   if (!QSystemTrayIcon::isSystemTrayAvailable()) {
     return;
   }
 
-  m_contextMenu = menu;
+  contextMenu_ = menu;
 
-  m_icon = new QSystemTrayIcon(parent);
-  m_icon->setContextMenu(m_contextMenu);
-  m_icon->setIcon(m_baseIcon);
-  m_icon->setToolTip("Taiga");
-  m_icon->show();
+  icon_ = new QSystemTrayIcon(parent);
+  icon_->setContextMenu(contextMenu_);
+  icon_->setIcon(baseIcon_);
+  icon_->setToolTip("Taiga");
+  icon_->show();
 
-  connect(m_icon, &QSystemTrayIcon::activated, this,
+  connect(icon_, &QSystemTrayIcon::activated, this,
           [this](QSystemTrayIcon::ActivationReason reason) {
             switch (reason) {
               case QSystemTrayIcon::ActivationReason::Trigger:
@@ -50,44 +50,44 @@ TrayIcon::TrayIcon(QObject* parent, const QIcon& icon, QMenu* menu) : m_baseIcon
             }
           });
 
-  connect(m_icon, &QSystemTrayIcon::messageClicked, this, &TrayIcon::messageClicked);
+  connect(icon_, &QSystemTrayIcon::messageClicked, this, &TrayIcon::messageClicked);
 }
 
 bool TrayIcon::isAvailable() const {
-  return m_icon != nullptr;
+  return icon_ != nullptr;
 }
 
 void TrayIcon::setBadge(Badge badge) {
-  if (m_badge == badge) return;
+  if (badge_ == badge) return;
 
-  m_badge = badge;
+  badge_ = badge;
   updateIcon();
 }
 
 void TrayIcon::showMessage(const QString& title, const QString& message) {
-  if (!m_icon) return;
+  if (!icon_) return;
 
-  m_icon->showMessage(title, message, QSystemTrayIcon::Information);
+  icon_->showMessage(title, message, QSystemTrayIcon::Information);
 }
 
 void TrayIcon::updateIcon() {
-  if (!m_icon) return;
+  if (!icon_) return;
 
-  if (m_badge == Badge::None) {
-    m_icon->setIcon(m_baseIcon);
+  if (badge_ == Badge::None) {
+    icon_->setIcon(baseIcon_);
     return;
   }
 
-  const auto sizes = m_baseIcon.availableSizes();
+  const auto sizes = baseIcon_.availableSizes();
   const QSize size = sizes.isEmpty() ? QSize(64, 64) : sizes.front();
 
-  QPixmap pixmap = m_baseIcon.pixmap(size);
+  QPixmap pixmap = baseIcon_.pixmap(size);
   paintBadge(pixmap);
-  m_icon->setIcon(QIcon(pixmap));
+  icon_->setIcon(QIcon(pixmap));
 }
 
 void TrayIcon::paintBadge(QPixmap& pixmap) const {
-  const auto color = m_badge == Badge::Success ? Theme::successColor() : Theme::errorColor();
+  const auto color = badge_ == Badge::Success ? Theme::successColor() : Theme::errorColor();
 
   const QSize pixmapSize = pixmap.size();
   const int size = pixmapSize.width() / 2;

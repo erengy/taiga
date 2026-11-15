@@ -40,9 +40,9 @@ private:
   void refreshFolders();
   void showContextMenu() const;
 
-  LibraryModel* m_model = nullptr;
-  ComboBox* m_comboRoot = nullptr;
-  QTreeView* m_view = nullptr;
+  LibraryModel* model_ = nullptr;
+  ComboBox* comboRoot_ = nullptr;
+  QTreeView* view_ = nullptr;
 };
 
 }  // namespace gui

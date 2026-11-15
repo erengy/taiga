@@ -65,8 +65,8 @@ private:
   void applyStylesheet() const;
   QString readStylesheet(const QString& name) const;
 
-  QHash<QString, QIcon> m_icons;
-  bool m_isFusion = false;
+  QHash<QString, QIcon> icons_;
+  bool isFusion_ = false;
 };
 
 Theme* theme();

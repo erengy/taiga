@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,14 +49,14 @@ private:
   void initViewMenu();
   void initMoreMenu();
 
-  AnimeListModel* m_model = nullptr;
-  AnimeListProxyModel* m_proxyModel = nullptr;
-  ListView* m_listView = nullptr;
-  ListViewCards* m_listViewCards = nullptr;
-  ListViewMode m_viewMode = ListViewMode::List;
-  QMenu* m_sortMenu = nullptr;
-  QMenu* m_viewMenu = nullptr;
-  QMenu* m_moreMenu = nullptr;
+  AnimeListModel* model_ = nullptr;
+  AnimeListProxyModel* proxyModel_ = nullptr;
+  ListView* listView_ = nullptr;
+  ListViewCards* listViewCards_ = nullptr;
+  ListViewMode viewMode_ = ListViewMode::List;
+  QMenu* sortMenu_ = nullptr;
+  QMenu* viewMenu_ = nullptr;
+  QMenu* moreMenu_ = nullptr;
 };
 
 }  // namespace gui

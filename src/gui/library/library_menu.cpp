@@ -36,20 +36,20 @@
 namespace gui {
 
 LibraryMenu::LibraryMenu(QWidget* parent, const QString& path, int animeId)
-    : QMenu(parent), m_path(path), m_anime_id(animeId) {
+    : QMenu(parent), path_(path), animeId_(animeId) {
   setAttribute(Qt::WA_DeleteOnClose);
 }
 
 void LibraryMenu::popup() {
-  if (m_path.isEmpty()) return;
+  if (path_.isEmpty()) return;
 
-  auto actionOpen = addAction(QIcon(m_path), tr("Open"), tr("Enter"), this, &LibraryMenu::open);
-  actionOpen->setEnabled(!base::isExecutableFile(m_path));
+  auto actionOpen = addAction(QIcon(path_), tr("Open"), tr("Enter"), this, &LibraryMenu::open);
+  actionOpen->setEnabled(!base::isExecutableFile(path_));
   addSeparator();
   addAction(theme()->getIcon("delete"), tr("Delete"), tr("Del"), this, &LibraryMenu::remove);
   addAction(theme()->getIcon("edit"), tr("Rename"), tr("F2"), this, &LibraryMenu::rename);
 
-  if (const auto item = anime::db()->item(m_anime_id)) {
+  if (const auto item = anime::db()->item(animeId_)) {
     addSeparator();
     addAction(theme()->getIcon("info"), tr("Details"), this, &LibraryMenu::viewDetails);
   }
@@ -58,15 +58,15 @@ void LibraryMenu::popup() {
 }
 
 void LibraryMenu::open() const {
-  openPath(m_path);
+  openPath(path_);
 }
 
 void LibraryMenu::remove() const {
-  deletePath(parentWidget(), m_path);
+  deletePath(parentWidget(), path_);
 }
 
 void LibraryMenu::rename() const {
-  renamePath(qobject_cast<QAbstractItemView*>(parentWidget()), m_path);
+  renamePath(qobject_cast<QAbstractItemView*>(parentWidget()), path_);
 }
 
 void LibraryMenu::openPath(const QString& path) {
@@ -104,7 +104,7 @@ void LibraryMenu::renamePath(QAbstractItemView* view, const QString& path) {
 }
 
 void LibraryMenu::viewDetails() const {
-  const auto item = anime::db()->item(m_anime_id);
+  const auto item = anime::db()->item(animeId_);
   if (!item) return;
 
   MediaDialog::show(parentWidget(), MediaDialogPage::Details, *item);

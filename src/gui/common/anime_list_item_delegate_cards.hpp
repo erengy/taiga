@@ -47,10 +47,10 @@ private:
   void paintSelectionBorder(QPainter* painter, const QStyleOptionViewItem& option) const;
   void advanceSpinner();
 
-  QPixmap m_spinnerPixmap;
-  qreal m_angle = 0.0;
-  mutable QTimer m_timerSpinner;
-  mutable QSet<QPersistentModelIndex> m_loadingIndices;
+  QPixmap spinnerPixmap_;
+  qreal angle_ = 0.0;
+  mutable QTimer timerSpinner_;
+  mutable QSet<QPersistentModelIndex> loadingIndices_;
 };
 
 }  // namespace gui

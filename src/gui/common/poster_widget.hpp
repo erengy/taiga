@@ -52,12 +52,12 @@ protected:
 private:
   void positionSpinner();
 
-  qreal m_cornerRadius = 0;
-  QPixmap m_pixmap;
-  QPixmap m_scaledPixmap;
-  QSize m_scaledSize;
-  SpinnerWidget* m_spinner = nullptr;
-  bool m_loading = false;
+  qreal cornerRadius_ = 0;
+  QPixmap pixmap_;
+  QPixmap scaledPixmap_;
+  QSize scaledSize_;
+  SpinnerWidget* spinner_ = nullptr;
+  bool loading_ = false;
 };
 
 }  // namespace gui

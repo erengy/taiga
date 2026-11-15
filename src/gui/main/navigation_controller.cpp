@@ -31,7 +31,7 @@
 namespace gui {
 
 NavigationController::NavigationController(MainWindow* mainWindow)
-    : QObject(mainWindow), m_mainWindow(mainWindow) {
+    : QObject(mainWindow), mainWindow_(mainWindow) {
   connect(mainWindow->navigation(), &NavigationWidget::currentPageChanged, this,
           [this](MainWindowPage page) { applyPage(page, /*addToHistory=*/true); });
 
@@ -43,7 +43,7 @@ NavigationController::NavigationController(MainWindow* mainWindow)
 }
 
 void NavigationController::navigateTo(MainWindowPage page, bool addToHistory) {
-  const auto navigation = m_mainWindow->navigation();
+  const auto navigation = mainWindow_->navigation();
   const auto item = navigation->findItemByPage(page);
 
   if (item && addToHistory) {
@@ -61,47 +61,47 @@ void NavigationController::navigateTo(MainWindowPage page, bool addToHistory) {
 }
 
 void NavigationController::navigateToListStatus(anime::list::Status status) {
-  const auto navigation = m_mainWindow->navigation();
+  const auto navigation = mainWindow_->navigation();
   if (const auto item = navigation->findListStatusItem(status)) {
     navigation->setCurrentItem(item);
   }
 }
 
 void NavigationController::applyPage(MainWindowPage page, bool addToHistory) {
-  m_mainWindow->initPage(page);
-  m_mainWindow->statusBarController()->clearMessage(StatusBarController::Source::Selection);
-  m_mainWindow->ui()->stackedWidget->setCurrentIndex(static_cast<int>(page));
+  mainWindow_->initPage(page);
+  mainWindow_->statusBarController()->clearMessage(StatusBarController::Source::Selection);
+  mainWindow_->ui()->stackedWidget->setCurrentIndex(static_cast<int>(page));
 
   if (addToHistory) recordPageHistory(page);
 }
 
 void NavigationController::goBack() {
-  if (m_pageHistoryIndex <= 0) return;
+  if (pageHistoryIndex_ <= 0) return;
 
-  navigateTo(m_pageHistory.at(--m_pageHistoryIndex), /*addToHistory=*/false);
+  navigateTo(pageHistory_.at(--pageHistoryIndex_), /*addToHistory=*/false);
   updateHistoryActions();
 }
 
 void NavigationController::goForward() {
-  if (m_pageHistoryIndex >= m_pageHistory.size() - 1) return;
+  if (pageHistoryIndex_ >= pageHistory_.size() - 1) return;
 
-  navigateTo(m_pageHistory.at(++m_pageHistoryIndex), /*addToHistory=*/false);
+  navigateTo(pageHistory_.at(++pageHistoryIndex_), /*addToHistory=*/false);
   updateHistoryActions();
 }
 
 void NavigationController::recordPageHistory(MainWindowPage page) {
-  if (m_pageHistoryIndex >= 0 && m_pageHistory.at(m_pageHistoryIndex) == page) return;
+  if (pageHistoryIndex_ >= 0 && pageHistory_.at(pageHistoryIndex_) == page) return;
 
-  m_pageHistory.removeAll(page);
-  m_pageHistory.append(page);
-  m_pageHistoryIndex = m_pageHistory.size() - 1;
+  pageHistory_.removeAll(page);
+  pageHistory_.append(page);
+  pageHistoryIndex_ = pageHistory_.size() - 1;
 
   updateHistoryActions();
 }
 
 void NavigationController::updateHistoryActions() {
-  m_mainWindow->ui()->actionBack->setEnabled(m_pageHistoryIndex > 0);
-  m_mainWindow->ui()->actionForward->setEnabled(m_pageHistoryIndex < m_pageHistory.size() - 1);
+  mainWindow_->ui()->actionBack->setEnabled(pageHistoryIndex_ > 0);
+  mainWindow_->ui()->actionForward->setEnabled(pageHistoryIndex_ < pageHistory_.size() - 1);
 }
 
 bool NavigationController::eventFilter(QObject* watched, QEvent* event) {
@@ -121,7 +121,7 @@ bool NavigationController::eventFilter(QObject* watched, QEvent* event) {
     return QObject::eventFilter(watched, event);
   }
 
-  if (type == QEvent::MouseButtonRelease && widget->window() == m_mainWindow) {
+  if (type == QEvent::MouseButtonRelease && widget->window() == mainWindow_) {
     if (mouseEvent->button() == Qt::BackButton) {
       goBack();
     } else {

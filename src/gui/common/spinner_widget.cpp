@@ -29,45 +29,45 @@ SpinnerWidget::SpinnerWidget(QWidget* parent, int size) : QLabel(parent) {
   setSize(size);
   hide();
 
-  connect(&m_timer, &QTimer::timeout, this, &SpinnerWidget::advance);
+  connect(&timer_, &QTimer::timeout, this, &SpinnerWidget::advance);
 }
 
 void SpinnerWidget::setSize(int size) {
   setFixedSize(size, size);
 
-  m_basePixmap = theme()->getIcon("progress_activity").pixmap(QSize(size, size));
-  setPixmap(m_basePixmap);
+  basePixmap_ = theme()->getIcon("progress_activity").pixmap(QSize(size, size));
+  setPixmap(basePixmap_);
 }
 
 void SpinnerWidget::start() {
   show();
 
-  if (m_timer.isActive()) return;
+  if (timer_.isActive()) return;
 
-  m_timer.start(kSpinnerIntervalMs);
+  timer_.start(kSpinnerIntervalMs);
 }
 
 void SpinnerWidget::stop() {
-  m_timer.stop();
-  m_angle = 0.0;
-  setPixmap(m_basePixmap);
+  timer_.stop();
+  angle_ = 0.0;
+  setPixmap(basePixmap_);
   hide();
 }
 
 void SpinnerWidget::advance() {
-  m_angle += kSpinnerDegreesPerTick;
-  if (m_angle >= 360.0) m_angle -= 360.0;
+  angle_ += kSpinnerDegreesPerTick;
+  if (angle_ >= 360.0) angle_ -= 360.0;
 
-  const qreal dpr = m_basePixmap.devicePixelRatio();
+  const qreal dpr = basePixmap_.devicePixelRatio();
 
-  QPixmap frame(m_basePixmap.size());
+  QPixmap frame(basePixmap_.size());
   frame.setDevicePixelRatio(dpr);
   frame.fill(Qt::transparent);
 
-  const QPointF center(m_basePixmap.width() / dpr / 2.0, m_basePixmap.height() / dpr / 2.0);
+  const QPointF center(basePixmap_.width() / dpr / 2.0, basePixmap_.height() / dpr / 2.0);
 
   QPainter painter(&frame);
-  paintSpinner(&painter, m_basePixmap, center, m_angle);
+  paintSpinner(&painter, basePixmap_, center, angle_);
 
   setPixmap(frame);
 }

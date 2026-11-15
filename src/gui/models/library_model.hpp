@@ -59,7 +59,7 @@ private:
 
   void parse(const QString& path) const;
 
-  mutable QMap<QString, ParsedData> m_parsed;
+  mutable QMap<QString, ParsedData> parsed_;
 };
 
 }  // namespace gui

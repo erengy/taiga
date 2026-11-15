@@ -43,57 +43,57 @@ namespace gui {
 
 HistoryWidget::HistoryWidget(QWidget* parent)
     : PageWidget{parent},
-      m_model(new HistoryModel(parent)),
-      m_proxyModel(new HistoryProxyModel(parent)),
-      m_view(new QTreeView(parent)) {
-  m_proxyModel->setSourceModel(m_model);
-  m_proxyModel->sort(HistoryModel::ColumnModified, Qt::SortOrder::DescendingOrder);
+      model_(new HistoryModel(parent)),
+      proxyModel_(new HistoryProxyModel(parent)),
+      view_(new QTreeView(parent)) {
+  proxyModel_->setSourceModel(model_);
+  proxyModel_->sort(HistoryModel::ColumnModified, Qt::SortOrder::DescendingOrder);
 
-  m_view->setObjectName("historyView");
-  m_view->setProperty("themed", true);
-  m_view->setFrameShape(QFrame::Shape::NoFrame);
-  m_view->setModel(m_proxyModel);
-  m_view->setAlternatingRowColors(true);
-  m_view->setAllColumnsShowFocus(true);
-  m_view->setContextMenuPolicy(Qt::CustomContextMenu);
-  m_view->setRootIsDecorated(false);
-  m_view->setUniformRowHeights(true);
+  view_->setObjectName("historyView");
+  view_->setProperty("themed", true);
+  view_->setFrameShape(QFrame::Shape::NoFrame);
+  view_->setModel(proxyModel_);
+  view_->setAlternatingRowColors(true);
+  view_->setAllColumnsShowFocus(true);
+  view_->setContextMenuPolicy(Qt::CustomContextMenu);
+  view_->setRootIsDecorated(false);
+  view_->setUniformRowHeights(true);
 
-  HeaderView::install(m_view);
-  m_view->header()->setSectionsMovable(false);
-  m_view->header()->setStretchLastSection(false);
-  m_view->header()->setTextElideMode(Qt::ElideRight);
-  m_view->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
-  m_view->header()->setSectionResizeMode(HistoryModel::ColumnTitle, QHeaderView::Stretch);
-  m_view->header()->setSectionResizeMode(HistoryModel::ColumnDetails, QHeaderView::Stretch);
+  HeaderView::install(view_);
+  view_->header()->setSectionsMovable(false);
+  view_->header()->setStretchLastSection(false);
+  view_->header()->setTextElideMode(Qt::ElideRight);
+  view_->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+  view_->header()->setSectionResizeMode(HistoryModel::ColumnTitle, QHeaderView::Stretch);
+  view_->header()->setSectionResizeMode(HistoryModel::ColumnDetails, QHeaderView::Stretch);
 
-  layout()->addWidget(m_view);
+  layout()->addWidget(view_);
 
   initToolbar();
 
-  connect(m_view, &QWidget::customContextMenuRequested, this, &HistoryWidget::showContextMenu);
-  connect(m_view, &QTreeView::doubleClicked, this, &HistoryWidget::showMediaDialog);
+  connect(view_, &QWidget::customContextMenuRequested, this, &HistoryWidget::showContextMenu);
+  connect(view_, &QTreeView::doubleClicked, this, &HistoryWidget::showMediaDialog);
 }
 
 void HistoryWidget::initToolbar() {
   const auto actionMore = new QAction(theme()->getIcon("more_horiz"), tr("More"), this);
-  m_toolbar->addAction(actionMore);
+  toolbar_->addAction(actionMore);
 
   auto* menu = new QMenu(this);
   menu->addAction(tr("Clear history..."), this, &HistoryWidget::clearHistory);
   menu->addAction(tr("Clear queue..."), this, &HistoryWidget::clearQueue);
 
-  const auto moreButton = static_cast<QToolButton*>(m_toolbar->widgetForAction(actionMore));
+  const auto moreButton = static_cast<QToolButton*>(toolbar_->widgetForAction(actionMore));
   moreButton->setPopupMode(QToolButton::InstantPopup);
   moreButton->setMenu(menu);
 }
 
 void HistoryWidget::showContextMenu() const {
-  const auto index = m_view->currentIndex();
+  const auto index = view_->currentIndex();
 
   if (!index.isValid()) return;
 
-  auto* menu = new QMenu(m_view);
+  auto* menu = new QMenu(view_);
   menu->setAttribute(Qt::WA_DeleteOnClose);
 
   menu->addAction(theme()->getIcon("info"), tr("Details"), this,

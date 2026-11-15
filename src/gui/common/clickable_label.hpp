@@ -43,7 +43,7 @@ protected:
 private:
   QString elidedText() const;
 
-  bool m_elidable = false;
+  bool elidable_ = false;
 };
 
 }  // namespace gui

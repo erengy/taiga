@@ -65,15 +65,15 @@ QWidget* dialogParent(const QWidget* widget) {
 MediaMenu::MediaMenu(QWidget* parent, const QList<Anime>& items, const QMap<int, ListEntry> entries,
                      QItemSelectionModel* selectionModel, AnimeListContext context)
     : QMenu(parent),
-      m_items(items),
-      m_entries(entries),
-      m_selectionModel(selectionModel),
-      m_context(context) {
+      items_(items),
+      entries_(entries),
+      selectionModel_(selectionModel),
+      context_(context) {
   setAttribute(Qt::WA_DeleteOnClose);
 }
 
 void MediaMenu::popup() {
-  if (m_items.empty()) return;
+  if (items_.empty()) return;
 
   addMediaItems();
   addSeparator();
@@ -89,11 +89,11 @@ void MediaMenu::popup() {
 }
 
 bool MediaMenu::isBatch() const {
-  return m_items.size() > 1;
+  return items_.size() > 1;
 }
 
 bool MediaMenu::isInList() const {
-  return m_entries.size() == m_items.size();
+  return entries_.size() == items_.size();
 }
 
 bool MediaMenu::canMatchNowPlaying() const {
@@ -102,14 +102,14 @@ bool MediaMenu::canMatchNowPlaying() const {
 }
 
 void MediaMenu::addToList(const anime::list::Status status) const {
-  for (const auto& item : m_items) {
+  for (const auto& item : items_) {
     if (getEntry(item.id)) continue;
     anime::list::save(ListEntry{.animeId = item.id, .status = status});
   }
 }
 
 void MediaMenu::clearDateCompleted() const {
-  for (const auto& item : m_items) {
+  for (const auto& item : items_) {
     const auto* entry = getEntry(item.id);
     auto updated = entry ? *entry : ListEntry{.animeId = item.id};
     updated.dateCompleted = FuzzyDate{};
@@ -118,7 +118,7 @@ void MediaMenu::clearDateCompleted() const {
 }
 
 void MediaMenu::clearDateStarted() const {
-  for (const auto& item : m_items) {
+  for (const auto& item : items_) {
     const auto* entry = getEntry(item.id);
     auto updated = entry ? *entry : ListEntry{.animeId = item.id};
     updated.dateStarted = FuzzyDate{};
@@ -128,7 +128,7 @@ void MediaMenu::clearDateStarted() const {
 
 void MediaMenu::copyLinks() const {
   QList<QString> links;
-  for (const auto& item : m_items) {
+  for (const auto& item : items_) {
     links.push_back(sync::animePageUrl(item.id));
   }
   QGuiApplication::clipboard()->setText(links.join("\n"));
@@ -136,7 +136,7 @@ void MediaMenu::copyLinks() const {
 
 void MediaMenu::copyTitles() const {
   QList<QString> titles;
-  for (const auto& item : m_items) {
+  for (const auto& item : items_) {
     titles.push_back(QString::fromStdString(anime::preferredTitle(item)));
   }
   QGuiApplication::clipboard()->setText(titles.join("\n"));
@@ -146,7 +146,7 @@ void MediaMenu::editEpisode() const {
   QSet<int> watchedEpisodes;
   int maxValue = anime::kMaxEpisodeCount;
 
-  for (const auto& item : m_items) {
+  for (const auto& item : items_) {
     if (const auto entry = getEntry(item.id)) watchedEpisodes.insert(entry->watchedEpisodes);
     if (item.episodeCount > 0) maxValue = std::min(maxValue, item.episodeCount);
   }
@@ -158,7 +158,7 @@ void MediaMenu::editEpisode() const {
                                           tr("Enter a number:"), initalValue, 0, maxValue, 1, &ok);
   if (!ok) return;
 
-  for (const auto& item : m_items) {
+  for (const auto& item : items_) {
     const auto* entry = getEntry(item.id);
     auto updated = entry ? *entry : ListEntry{.animeId = item.id};
     updated.watchedEpisodes = value;
@@ -172,7 +172,7 @@ void MediaMenu::editNotes() const {
                                                     tr("Enter notes:"), "", &ok);
   if (!ok) return;
 
-  for (const auto& item : m_items) {
+  for (const auto& item : items_) {
     const auto* entry = getEntry(item.id);
     auto updated = entry ? *entry : ListEntry{.animeId = item.id};
     updated.notes = notes.toStdString();
@@ -181,7 +181,7 @@ void MediaMenu::editNotes() const {
 }
 
 void MediaMenu::editScore(const int value) const {
-  for (const auto& item : m_items) {
+  for (const auto& item : items_) {
     const auto* entry = getEntry(item.id);
     auto updated = entry ? *entry : ListEntry{.animeId = item.id};
     updated.score = value;
@@ -190,7 +190,7 @@ void MediaMenu::editScore(const int value) const {
 }
 
 void MediaMenu::editStatus(const anime::list::Status status) const {
-  for (const auto& item : m_items) {
+  for (const auto& item : items_) {
     const auto* entry = getEntry(item.id);
     auto updated = entry ? *entry : ListEntry{.animeId = item.id};
     updated.status = status;
@@ -199,9 +199,9 @@ void MediaMenu::editStatus(const anime::list::Status status) const {
 }
 
 void MediaMenu::matchNowPlaying() const {
-  if (m_items.empty()) return;
+  if (items_.empty()) return;
 
-  const auto& item = m_items.front();
+  const auto& item = items_.front();
 
   if (const auto episode = track::media::detection()->getCurrentEpisode()) {
     const auto title = episode->element(anitomy::ElementKind::Title);
@@ -219,7 +219,7 @@ void MediaMenu::matchNowPlaying() const {
 }
 
 void MediaMenu::openFolder() const {
-  const auto& item = m_items.front();
+  const auto& item = items_.front();
 
   const auto libraryFolders = taiga::settings()->libraryFolders();
 
@@ -237,7 +237,7 @@ void MediaMenu::openFolder() const {
 }
 
 void MediaMenu::playEpisode(int number) const {
-  const auto& item = m_items.front();
+  const auto& item = items_.front();
 
   if (track::playEpisode(item.id, number)) {
     mainWindow()->statusBarController()->clearMessage(StatusBarController::Source::Playback);
@@ -252,7 +252,7 @@ void MediaMenu::playEpisode(int number) const {
 }
 
 void MediaMenu::playRandomEpisode() const {
-  const auto& item = m_items.front();
+  const auto& item = items_.front();
   const auto number = track::randomEpisodeNumber(item.id);
 
   if (!number) {
@@ -273,34 +273,34 @@ void MediaMenu::playRandomEpisode() const {
 }
 
 void MediaMenu::refresh() const {
-  for (const auto& item : m_items) {
+  for (const auto& item : items_) {
     sync::fetchAnime(item.id);
   }
 }
 
 void MediaMenu::removeFromList() const {
   QList<QString> titles;
-  for (const auto& item : m_items) {
+  for (const auto& item : items_) {
     titles.push_back(u"<li>%1</li>"_s.arg(anime::preferredTitle(item)));
   }
 
   if (confirm(dialogParent(parentWidget()),
               tr("Do you want to remove selected items from your list?"),
               u"<ul>%1</ul>"_s.arg(titles.join("")), tr("Remove"))) {
-    for (const auto& item : m_items) {
+    for (const auto& item : items_) {
       anime::list::remove(item.id);
     }
   }
 }
 
 void MediaMenu::search() const {
-  const auto& item = m_items.front();
+  const auto& item = items_.front();
   mainWindow()->navigateTo(MainWindowPage::Search);
   mainWindow()->searchBox()->setText(QString::fromStdString(anime::preferredTitle(item)));
 }
 
 void MediaMenu::searchAniDB() const {
-  for (const auto& item : m_items) {
+  for (const auto& item : items_) {
     QUrl url{"https://anidb.net/anime/"};
     url.setQuery({{"adb.search", QString::fromStdString(anime::preferredTitle(item))}});
     QDesktopServices::openUrl(url);
@@ -308,7 +308,7 @@ void MediaMenu::searchAniDB() const {
 }
 
 void MediaMenu::searchAniList() const {
-  for (const auto& item : m_items) {
+  for (const auto& item : items_) {
     if (sync::currentServiceId() == sync::ServiceId::AniList) {
       QUrl url{sync::animePageUrl(item.id)};
       QDesktopServices::openUrl(url);
@@ -323,7 +323,7 @@ void MediaMenu::searchAniList() const {
 }
 
 void MediaMenu::searchANN() const {
-  for (const auto& item : m_items) {
+  for (const auto& item : items_) {
     QUrl url{"https://www.animenewsnetwork.com/search"};
     url.setQuery({{"q", QString::fromStdString(anime::preferredTitle(item))}});
     QDesktopServices::openUrl(url);
@@ -331,7 +331,7 @@ void MediaMenu::searchANN() const {
 }
 
 void MediaMenu::searchKitsu() const {
-  for (const auto& item : m_items) {
+  for (const auto& item : items_) {
     if (sync::currentServiceId() == sync::ServiceId::Kitsu) {
       QUrl url{sync::animePageUrl(item.id)};
       QDesktopServices::openUrl(url);
@@ -344,7 +344,7 @@ void MediaMenu::searchKitsu() const {
 }
 
 void MediaMenu::searchMyAnimeList() const {
-  for (const auto& item : m_items) {
+  for (const auto& item : items_) {
     if (sync::currentServiceId() == sync::ServiceId::MyAnimeList) {
       QUrl url{sync::animePageUrl(item.id)};
       QDesktopServices::openUrl(url);
@@ -357,7 +357,7 @@ void MediaMenu::searchMyAnimeList() const {
 }
 
 void MediaMenu::searchReddit() const {
-  for (const auto& item : m_items) {
+  for (const auto& item : items_) {
     QUrl url{"https://www.reddit.com/search"};
     const auto title = QString::fromStdString(anime::preferredTitle(item));
     url.setQuery({
@@ -369,7 +369,7 @@ void MediaMenu::searchReddit() const {
 }
 
 void MediaMenu::searchWikipedia() const {
-  for (const auto& item : m_items) {
+  for (const auto& item : items_) {
     QUrl url{"https://en.wikipedia.org/wiki/Special:Search"};
     url.setQuery({{"search", QString::fromStdString(anime::preferredTitle(item))}});
     QDesktopServices::openUrl(url);
@@ -377,7 +377,7 @@ void MediaMenu::searchWikipedia() const {
 }
 
 void MediaMenu::searchYouTube() const {
-  for (const auto& item : m_items) {
+  for (const auto& item : items_) {
     if (!item.trailerId.empty()) {
       QUrl url{u"https://youtu.be/%1"_s.arg(item.trailerId)};
       QDesktopServices::openUrl(url);
@@ -390,7 +390,7 @@ void MediaMenu::searchYouTube() const {
 }
 
 void MediaMenu::setDateCompletedToAiringEnd() const {
-  for (const auto& item : m_items) {
+  for (const auto& item : items_) {
     if (!item.dateFinished) continue;
     const auto* entry = getEntry(item.id);
     if (entry && entry->dateCompleted) continue;
@@ -401,7 +401,7 @@ void MediaMenu::setDateCompletedToAiringEnd() const {
 }
 
 void MediaMenu::setDateCompletedToLastUpdated() const {
-  for (const auto& item : m_items) {
+  for (const auto& item : items_) {
     const auto* entry = getEntry(item.id);
     if (!entry || entry->dateCompleted || !entry->lastUpdated) continue;
     const auto date = std::chrono::floor<std::chrono::days>(
@@ -413,7 +413,7 @@ void MediaMenu::setDateCompletedToLastUpdated() const {
 }
 
 void MediaMenu::setDateStartedToAiringStart() const {
-  for (const auto& item : m_items) {
+  for (const auto& item : items_) {
     if (!item.dateStarted) continue;
     const auto* entry = getEntry(item.id);
     if (entry && entry->dateStarted) continue;
@@ -424,7 +424,7 @@ void MediaMenu::setDateStartedToAiringStart() const {
 }
 
 void MediaMenu::startNewRewatch() const {
-  const auto& item = m_items.front();
+  const auto& item = items_.front();
 
   const auto* entry = getEntry(item.id);
   auto updated = entry ? *entry : ListEntry{.animeId = item.id};
@@ -437,22 +437,22 @@ void MediaMenu::startNewRewatch() const {
 }
 
 void MediaMenu::torrents() const {
-  const auto& item = m_items.front();
+  const auto& item = items_.front();
   mainWindow()->navigateTo(MainWindowPage::Torrents);
   mainWindow()->searchBox()->setText(QString::fromStdString(anime::preferredTitle(item)));
 }
 
 void MediaMenu::viewDetails() const {
-  if (m_items.empty()) return;
+  if (items_.empty()) return;
 
-  const auto& anime = m_items.front();
+  const auto& anime = items_.front();
   MediaDialog::show(parentWidget(), MediaDialogPage::Details, anime);
 }
 
 void MediaMenu::edit() const {
-  if (m_items.empty()) return;
+  if (items_.empty()) return;
 
-  const auto& anime = m_items.front();
+  const auto& anime = items_.front();
   MediaDialog::show(parentWidget(), MediaDialogPage::List, anime);
 }
 
@@ -461,13 +461,13 @@ void MediaMenu::addMediaItems() {
     // View details
     addAction(theme()->getIcon("info"), tr("Details"), tr("Enter"), this, &MediaMenu::viewDetails);
 
-    if (m_context != AnimeListContext::Search) {
+    if (context_ != AnimeListContext::Search) {
       // Search
       addAction(theme()->getIcon("search"), tr("Search"), this, &MediaMenu::search);
     }
   }
 
-  if (m_context == AnimeListContext::Search) {
+  if (context_ == AnimeListContext::Search) {
     // Refresh
     addAction(theme()->getIcon("sync"), tr("Refresh"), this, &MediaMenu::refresh);
   }
@@ -544,7 +544,7 @@ void MediaMenu::addListItems() {
         auto menu = new QMenu(tr("Score"), this);
 
         QSet<int> scores;
-        for (const auto& item : m_items) {
+        for (const auto& item : items_) {
           if (const auto* entry = getEntry(item.id)) scores.insert(entry->score);
         }
         const bool hasCommonScore = scores.size() == 1;
@@ -563,7 +563,7 @@ void MediaMenu::addListItems() {
         auto menu = new QMenu(tr("Status"), this);
 
         QSet<int> statuses;
-        for (const auto& item : m_items) {
+        for (const auto& item : items_) {
           if (const auto* entry = getEntry(item.id)) {
             statuses.insert(static_cast<int>(entry->status));
           }
@@ -595,7 +595,7 @@ void MediaMenu::addLibraryItems() {
 
   if (isBatch()) return;
 
-  const auto& item = m_items.front();
+  const auto& item = items_.front();
   const auto entry = getEntry(item.id);
 
   // Play
@@ -671,13 +671,13 @@ void MediaMenu::addMetaItems() {
     return menu;
   }());
 
-  if (isBatch() && m_selectionModel) {
+  if (isBatch() && selectionModel_) {
     addAction(tr("Invert selection"), this, [this]() {
-      const auto* model = m_selectionModel->model();
+      const auto* model = selectionModel_->model();
       if (model->rowCount() == 0) return;
       const QItemSelection all(model->index(0, 0),
                                model->index(model->rowCount() - 1, model->columnCount() - 1));
-      m_selectionModel->select(all, QItemSelectionModel::Toggle | QItemSelectionModel::Rows);
+      selectionModel_->select(all, QItemSelectionModel::Toggle | QItemSelectionModel::Rows);
     });
   }
 
@@ -687,8 +687,8 @@ void MediaMenu::addMetaItems() {
 }
 
 const ListEntry* MediaMenu::getEntry(int id) const {
-  const auto it = m_entries.find(id);
-  return it != m_entries.end() ? &*it : nullptr;
+  const auto it = entries_.find(id);
+  return it != entries_.end() ? &*it : nullptr;
 }
 
 }  // namespace gui

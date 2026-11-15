@@ -50,9 +50,9 @@ private:
   bool canRetry(const int id) const;
   void retryAfter(const int id);
 
-  QRestAccessManager* m_manager = nullptr;
-  QSet<int> m_loading;
-  QMap<int, QDateTime> m_retryAfter;
+  QRestAccessManager* manager_ = nullptr;
+  QSet<int> loading_;
+  QMap<int, QDateTime> retryAfter_;
 };
 
 ImageProvider* imageProvider();

@@ -54,19 +54,19 @@ private:
   sync::SearchParams currentSearchParams() const;
   void performSearch();
 
-  AnimeListModel* m_model = nullptr;
-  AnimeListProxyModel* m_proxyModel = nullptr;
-  ComboBox* m_comboYear = nullptr;
-  ComboBox* m_comboSeason = nullptr;
-  ComboBox* m_comboType = nullptr;
-  ComboBox* m_comboStatus = nullptr;
-  ComboBox* m_comboListStatus = nullptr;
-  ListView* m_listView = nullptr;
-  ListViewCards* m_listViewCards = nullptr;
-  ListViewMode m_viewMode = ListViewMode::Cards;
-  QMenu* m_sortMenu = nullptr;
-  QMenu* m_viewMenu = nullptr;
-  QMenu* m_moreMenu = nullptr;
+  AnimeListModel* model_ = nullptr;
+  AnimeListProxyModel* proxyModel_ = nullptr;
+  ComboBox* comboYear_ = nullptr;
+  ComboBox* comboSeason_ = nullptr;
+  ComboBox* comboType_ = nullptr;
+  ComboBox* comboStatus_ = nullptr;
+  ComboBox* comboListStatus_ = nullptr;
+  ListView* listView_ = nullptr;
+  ListViewCards* listViewCards_ = nullptr;
+  ListViewMode viewMode_ = ListViewMode::Cards;
+  QMenu* sortMenu_ = nullptr;
+  QMenu* viewMenu_ = nullptr;
+  QMenu* moreMenu_ = nullptr;
 };
 
 }  // namespace gui

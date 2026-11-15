@@ -30,44 +30,44 @@ namespace gui {
 constexpr int kDefaultSpinnerSize = 24;
 
 PosterWidget::PosterWidget(QWidget* parent) : QWidget(parent) {
-  m_spinner = new SpinnerWidget(this, kDefaultSpinnerSize);
+  spinner_ = new SpinnerWidget(this, kDefaultSpinnerSize);
 }
 
 const QPixmap& PosterWidget::pixmap() const {
-  return m_pixmap;
+  return pixmap_;
 }
 
 void PosterWidget::setCornerRadius(const qreal radius) {
-  if (radius == m_cornerRadius) return;
+  if (radius == cornerRadius_) return;
 
-  m_cornerRadius = radius;
+  cornerRadius_ = radius;
 
   update();
 }
 
 void PosterWidget::setPixmap(const QPixmap& pixmap) {
-  if (pixmap.cacheKey() == m_pixmap.cacheKey()) return;
+  if (pixmap.cacheKey() == pixmap_.cacheKey()) return;
 
-  m_pixmap = pixmap;
-  m_scaledPixmap = QPixmap{};
+  pixmap_ = pixmap;
+  scaledPixmap_ = QPixmap{};
 
   update();
 }
 
 void PosterWidget::setSpinnerSize(const int size) {
-  m_spinner->setSize(size);
+  spinner_->setSize(size);
   positionSpinner();
 }
 
 void PosterWidget::setLoading(const bool loading) {
-  if (loading == m_loading) return;
+  if (loading == loading_) return;
 
-  m_loading = loading;
+  loading_ = loading;
 
-  if (m_loading) {
-    m_spinner->start();
+  if (loading_) {
+    spinner_->start();
   } else {
-    m_spinner->stop();
+    spinner_->stop();
   }
 }
 
@@ -81,30 +81,30 @@ void PosterWidget::paintEvent(QPaintEvent*) {
   QPainter painter(this);
   painter.setRenderHint(QPainter::Antialiasing);
 
-  if (m_cornerRadius > 0) {
+  if (cornerRadius_ > 0) {
     QPainterPath path;
-    path.addRoundedRect(rect(), m_cornerRadius, m_cornerRadius);
+    path.addRoundedRect(rect(), cornerRadius_, cornerRadius_);
     painter.setClipPath(path);
   }
 
   painter.fillRect(rect(), theme()->isDark() ? palette().dark() : palette().mid());
 
-  if (m_pixmap.isNull()) return;
+  if (pixmap_.isNull()) return;
 
   const QSize targetSize = size() * devicePixelRatioF();
-  if (m_scaledPixmap.isNull() || m_scaledSize != targetSize) {
-    m_scaledPixmap =
-        m_pixmap.scaled(targetSize, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
-    m_scaledSize = targetSize;
+  if (scaledPixmap_.isNull() || scaledSize_ != targetSize) {
+    scaledPixmap_ =
+        pixmap_.scaled(targetSize, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
+    scaledSize_ = targetSize;
   }
 
   const QRectF sourceRect{
-      (m_scaledPixmap.width() - targetSize.width()) / 2.0,
-      (m_scaledPixmap.height() - targetSize.height()) / 2.0,
+      (scaledPixmap_.width() - targetSize.width()) / 2.0,
+      (scaledPixmap_.height() - targetSize.height()) / 2.0,
       static_cast<qreal>(targetSize.width()),
       static_cast<qreal>(targetSize.height()),
   };
-  painter.drawPixmap(rect(), m_scaledPixmap, sourceRect);
+  painter.drawPixmap(rect(), scaledPixmap_, sourceRect);
 }
 
 void PosterWidget::resizeEvent(QResizeEvent*) {
@@ -112,7 +112,7 @@ void PosterWidget::resizeEvent(QResizeEvent*) {
 }
 
 void PosterWidget::positionSpinner() {
-  m_spinner->move((width() - m_spinner->width()) / 2, (height() - m_spinner->height()) / 2);
+  spinner_->move((width() - spinner_->width()) / 2, (height() - spinner_->height()) / 2);
 }
 
 }  // namespace gui

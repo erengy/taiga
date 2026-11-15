@@ -33,7 +33,7 @@ namespace gui {
 
 ListView::ListView(QWidget* parent, AnimeListModel* model, AnimeListProxyModel* proxyModel,
                    AnimeListContext context)
-    : m_base(new ListViewBase(parent, this, model, proxyModel, context)) {
+    : base_(new ListViewBase(parent, this, model, proxyModel, context)) {
   setObjectName("animeList");
   setProperty("themed", true);
 
@@ -85,7 +85,7 @@ void ListView::keyPressEvent(QKeyEvent* event) {
   if (event->key() == Qt::Key::Key_Return || event->key() == Qt::Key::Key_Enter) {
     const auto indexes = selectionModel()->selectedRows();
     for (const auto& index : indexes) {
-      m_base->showMediaDialog(index);
+      base_->showMediaDialog(index);
     }
     return;
   }
@@ -98,10 +98,10 @@ void ListView::mousePressEvent(QMouseEvent* event) {
     const QModelIndex index = indexAt(event->pos());
     if (index.isValid()) {
       setCurrentIndex(index);
-      if (m_base->context() == AnimeListContext::Search) {
-        m_base->openAnimePage(index);
+      if (base_->context() == AnimeListContext::Search) {
+        base_->openAnimePage(index);
       } else {
-        m_base->playNextEpisode(index);
+        base_->playNextEpisode(index);
       }
       return;
     }
