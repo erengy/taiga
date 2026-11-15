@@ -187,7 +187,7 @@ void UpdateSession::evaluate() {
       .reason = decision.reason,
       .animeId = item->id,
       .episode = watchedEpisodeNumber(*episode_, *item).value_or(0),
-      .previousEpisode = anime::list::isInList(entry) ? entry->watched_episodes : 0,
+      .previousEpisode = anime::list::isInList(entry) ? entry->watchedEpisodes : 0,
   };
 
   switch (decision.action) {
@@ -226,7 +226,7 @@ void UpdateSession::commit(const Anime& item) {
   const auto number = watchedEpisodeNumber(*episode_, item);
   if (!number) return;
 
-  const int previous = anime::list::isInList(entry) ? entry->watched_episodes : 0;
+  const int previous = anime::list::isInList(entry) ? entry->watchedEpisodes : 0;
 
   qDebug() << "Updating list:" << item.id << "episode" << *number;
   anime::list::save(anime::list::entryWithEpisodeWatched(item, entry, *number));

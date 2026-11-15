@@ -42,9 +42,9 @@ bool exportAsMarkdown(const std::string& path) {
   std::map<anime::list::Status, std::vector<std::string>> statusLists;
 
   for (const auto& entry : anime::db()->entries()) {
-    const auto item = anime::db()->item(entry.anime_id);
+    const auto item = anime::db()->item(entry.animeId);
     const auto line =
-        std::format("{} ({}/{})", item->titles.romaji, entry.watched_episodes, item->episodeCount);
+        std::format("{} ({}/{})", item->titles.romaji, entry.watchedEpisodes, item->episodeCount);
     statusLists[entry.status].push_back(line);
   }
 
@@ -137,16 +137,16 @@ bool exportAsXml(const std::string& path) {
   xml.writeEndElement();  // myinfo
 
   for (const auto& entry : anime::db()->entries()) {
-    const auto item = anime::db()->item(entry.anime_id);
+    const auto item = anime::db()->item(entry.animeId);
     xml.writeStartElement("anime");
     xml.writeNumberElement("series_animedb_id", item->id);  // @TODO: pass actual MAL ID
     xml.writeTextElement("series_title", item->titles.romaji);
     xml.writeTextElement("series_type", formatSeriesType(item->type));
     xml.writeNumberElement("series_episodes", item->episodeCount);
     xml.writeNumberElement("my_id", 0);
-    xml.writeNumberElement("my_watched_episodes", entry.watched_episodes);
-    xml.writeTextElement("my_start_date", entry.date_started.toString());
-    xml.writeTextElement("my_finish_date", entry.date_completed.toString());
+    xml.writeNumberElement("my_watched_episodes", entry.watchedEpisodes);
+    xml.writeTextElement("my_start_date", entry.dateStarted.toString());
+    xml.writeTextElement("my_finish_date", entry.dateCompleted.toString());
     xml.writeTextElement("my_fansub_group", "");
     xml.writeTextElement("my_rated", "");
     xml.writeNumberElement("my_score", sync::myanimelist::fromListScore(entry.score));
@@ -154,13 +154,13 @@ bool exportAsXml(const std::string& path) {
     xml.writeTextElement("my_storage", "");
     xml.writeTextElement("my_status", formatMyStatus(entry.status));
     xml.writeTextElement("my_comments", entry.notes);
-    xml.writeNumberElement("my_times_watched", entry.rewatched_times);
+    xml.writeNumberElement("my_times_watched", entry.rewatchedTimes);
     xml.writeTextElement("my_rewatch_value", "");
     xml.writeNumberElement("my_downloaded_eps", 0);
     xml.writeTextElement("my_tags", "");
     xml.writeNumberElement("my_rewatching", entry.rewatching);
-    xml.writeNumberElement("my_rewatching_ep", entry.rewatching_ep);
-    xml.writeNumberElement("update_on_import", sync::queue()->hasItem(entry.anime_id) ? 1 : 0);
+    xml.writeNumberElement("my_rewatching_ep", entry.rewatchingEp);
+    xml.writeNumberElement("update_on_import", sync::queue()->hasItem(entry.animeId) ? 1 : 0);
     xml.writeEndElement();
   }
 

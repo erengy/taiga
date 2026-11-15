@@ -174,16 +174,16 @@ std::optional<anime::list::Entry> parseListEntry(const QJsonValue& json) {
 
   return anime::list::Entry{
       .id = json["id"].toVariant().toLongLong(),
-      .anime_id = animeId,
-      .watched_episodes = json["progress"].toInt(),
+      .animeId = animeId,
+      .watchedEpisodes = json["progress"].toInt(),
       .score = json["score"].toInt(),
       .status = parseListStatus(status),
-      .is_private = json["private"].toBool(),
-      .rewatched_times = json["repeat"].toInt(),
+      .isPrivate = json["private"].toBool(),
+      .rewatchedTimes = json["repeat"].toInt(),
       .rewatching = status == "REPEATING",
-      .date_started = parseFuzzyDate(json["startedAt"]),
-      .date_completed = parseFuzzyDate(json["completedAt"]),
-      .last_updated = static_cast<std::time_t>(json["updatedAt"].toVariant().toLongLong()),
+      .dateStarted = parseFuzzyDate(json["startedAt"]),
+      .dateCompleted = parseFuzzyDate(json["completedAt"]),
+      .lastUpdated = static_cast<std::time_t>(json["updatedAt"].toVariant().toLongLong()),
       .notes = json["notes"].toString().toStdString(),
   };
 }

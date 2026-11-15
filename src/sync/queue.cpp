@@ -129,11 +129,11 @@ void Queue::process() {
   }
 
   processing_ = item->anime_id;
-  deleting_ = entry->pending_delete;
+  deleting_ = entry->pendingDelete;
   modifiedWhileProcessing_ = false;
   emit processing(item->anime_id);
 
-  if (entry->pending_delete) {
+  if (entry->pendingDelete) {
     deleteListEntry(item->anime_id);
   } else if (entry->id == anime::list::kUnknownId) {
     addListEntry(item->anime_id, item->dirty);
@@ -188,7 +188,7 @@ void Queue::reconcile(const int animeId, const ListEntry* remote) {
   if (!local) return;
 
   if (deleting_) {
-    if (local->pending_delete) {
+    if (local->pendingDelete) {
       anime::db()->deleteEntry(animeId);
     } else {
       // The entry was saved again while the request was in flight, so the server no longer has it.
@@ -347,16 +347,16 @@ void Queue::migrateFromV1() {
     }
 
     const auto* previous = anime::db()->entry(item.anime_id);
-    anime::list::Entry entry = previous ? *previous : anime::list::Entry{.anime_id = item.anime_id};
+    anime::list::Entry entry = previous ? *previous : anime::list::Entry{.animeId = item.anime_id};
 
-    if (item.episode) entry.watched_episodes = *item.episode;
+    if (item.episode) entry.watchedEpisodes = *item.episode;
     if (item.score) entry.score = *item.score;
     if (item.status) entry.status = *item.status;
     if (item.rewatching) entry.rewatching = *item.rewatching;
-    if (item.rewatched_times) entry.rewatched_times = *item.rewatched_times;
+    if (item.rewatched_times) entry.rewatchedTimes = *item.rewatched_times;
     if (item.notes) entry.notes = *item.notes;
-    if (item.date_started) entry.date_started = *item.date_started;
-    if (item.date_completed) entry.date_completed = *item.date_completed;
+    if (item.date_started) entry.dateStarted = *item.date_started;
+    if (item.date_completed) entry.dateCompleted = *item.date_completed;
 
     anime::list::save(entry);
   }

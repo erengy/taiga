@@ -186,16 +186,16 @@ std::optional<anime::list::Entry> parseListEntry(const QJsonValue& json, const i
 
   return anime::list::Entry{
       .id = json["id"].toVariant().toLongLong(),
-      .anime_id = animeId,
-      .watched_episodes = attributes["progress"].toInt(),
+      .animeId = animeId,
+      .watchedEpisodes = attributes["progress"].toInt(),
       .score = parseListScore(attributes["ratingTwenty"].toInt()),
       .status = parseListStatus(attributes["status"].toString()),
-      .is_private = attributes["private"].toBool(),
-      .rewatched_times = attributes["reconsumeCount"].toInt(),
+      .isPrivate = attributes["private"].toBool(),
+      .rewatchedTimes = attributes["reconsumeCount"].toInt(),
       .rewatching = attributes["reconsuming"].toBool(),
-      .date_started = parseDate(parseListDate(attributes["startedAt"].toString())),
-      .date_completed = parseDate(parseListDate(attributes["finishedAt"].toString())),
-      .last_updated = parseListLastUpdated(attributes["updatedAt"].toString()),
+      .dateStarted = parseDate(parseListDate(attributes["startedAt"].toString())),
+      .dateCompleted = parseDate(parseListDate(attributes["finishedAt"].toString())),
+      .lastUpdated = parseListLastUpdated(attributes["updatedAt"].toString()),
       .notes = attributes["notes"].toString().toStdString(),
   };
 }

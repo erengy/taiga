@@ -69,7 +69,7 @@ QJsonObject animeToJson(const Anime& item) {
 QJsonObject entryToJson(const ListEntry& entry) {
   QJsonObject object{
       {u"status"_s, statusName(entry.status)},
-      {u"progress"_s, entry.watched_episodes},
+      {u"progress"_s, entry.watchedEpisodes},
       {u"rewatching"_s, entry.rewatching},
   };
   if (entry.score > 0) object[u"score"_s] = entry.score;
@@ -83,7 +83,7 @@ const Anime* shareableAnime(const int animeId) {
   if (!item) return nullptr;
 
   const auto* entry = anime::db()->entry(item->id);
-  if (entry && entry->is_private) return nullptr;
+  if (entry && entry->isPrivate) return nullptr;
 
   return item;
 }

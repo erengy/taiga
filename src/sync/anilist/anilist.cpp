@@ -181,7 +181,7 @@ void Service::fetchListEntries() {
         }
         if (const auto listEntry = parseListEntry(entry)) {
           entries.append(*listEntry);
-          fetchedIds.insert(listEntry->anime_id);
+          fetchedIds.insert(listEntry->animeId);
         }
       }
     }
@@ -230,7 +230,7 @@ void Service::updateListEntry(const int id, const anime::list::Fields dirty) {
   if (!listEntry) return;
 
   QJsonObject variables{
-      {"mediaId", listEntry->anime_id},
+      {"mediaId", listEntry->animeId},
   };
 
   if (listEntry->id != anime::list::kUnknownId) {
@@ -244,12 +244,12 @@ void Service::updateListEntry(const int id, const anime::list::Fields dirty) {
         listEntry->rewatching ? u"REPEATING"_s : fromListStatus(listEntry->status);
   }
   if (dirty & Field::Score) variables["scoreRaw"] = listEntry->score;
-  if (dirty & Field::Episode) variables["progress"] = listEntry->watched_episodes;
-  if (dirty & Field::RewatchedTimes) variables["repeat"] = listEntry->rewatched_times;
+  if (dirty & Field::Episode) variables["progress"] = listEntry->watchedEpisodes;
+  if (dirty & Field::RewatchedTimes) variables["repeat"] = listEntry->rewatchedTimes;
   if (dirty & Field::Notes) variables["notes"] = QString::fromStdString(listEntry->notes);
-  if (dirty & Field::DateStarted) variables["startedAt"] = fromFuzzyDate(listEntry->date_started);
+  if (dirty & Field::DateStarted) variables["startedAt"] = fromFuzzyDate(listEntry->dateStarted);
   if (dirty & Field::DateCompleted) {
-    variables["completedAt"] = fromFuzzyDate(listEntry->date_completed);
+    variables["completedAt"] = fromFuzzyDate(listEntry->dateCompleted);
   }
 
   const QJsonDocument data{{

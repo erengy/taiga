@@ -234,7 +234,7 @@ void Service::updateListEntry(const int id, const anime::list::Fields dirty) {
 
   taiga::NameValuePairs body;
   if (dirty & Field::Episode) {
-    body.emplaceBack(u"num_watched_episodes"_s, QString::number(listEntry->watched_episodes));
+    body.emplaceBack(u"num_watched_episodes"_s, QString::number(listEntry->watchedEpisodes));
   }
   if (dirty & (Field::Status | Field::Rewatching)) {
     body.emplaceBack(u"status"_s, fromListStatus(listEntry->status));
@@ -244,14 +244,13 @@ void Service::updateListEntry(const int id, const anime::list::Fields dirty) {
     body.emplaceBack(u"score"_s, QString::number(fromListScore(listEntry->score)));
   }
   if (dirty & Field::RewatchedTimes) {
-    body.emplaceBack(u"num_times_rewatched"_s, QString::number(listEntry->rewatched_times));
+    body.emplaceBack(u"num_times_rewatched"_s, QString::number(listEntry->rewatchedTimes));
   }
   if (dirty & Field::DateStarted) {
-    body.emplaceBack(u"start_date"_s, QString::fromStdString(listEntry->date_started.toString()));
+    body.emplaceBack(u"start_date"_s, QString::fromStdString(listEntry->dateStarted.toString()));
   }
   if (dirty & Field::DateCompleted) {
-    body.emplaceBack(u"finish_date"_s,
-                     QString::fromStdString(listEntry->date_completed.toString()));
+    body.emplaceBack(u"finish_date"_s, QString::fromStdString(listEntry->dateCompleted.toString()));
   }
   if (dirty & Field::Notes) {
     body.emplaceBack(u"comments"_s, QString::fromStdString(listEntry->notes));

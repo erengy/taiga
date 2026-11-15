@@ -50,7 +50,7 @@ std::optional<int> nextEpisodeNumber(int animeId) {
   if (!item) return std::nullopt;
 
   const auto entry = anime::db()->entry(animeId);
-  const int watchedEpisodes = entry ? entry->watched_episodes : 0;
+  const int watchedEpisodes = entry ? entry->watchedEpisodes : 0;
 
   int number = watchedEpisodes + 1;
 
@@ -67,7 +67,7 @@ std::optional<int> randomEpisodeNumber(int animeId) {
   if (!item) return std::nullopt;
 
   const auto entry = anime::db()->entry(animeId);
-  const int watchedEpisodes = entry ? entry->watched_episodes : 0;
+  const int watchedEpisodes = entry ? entry->watchedEpisodes : 0;
 
   int maxEpisode = item->episodeCount;
 

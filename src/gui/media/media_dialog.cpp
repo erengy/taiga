@@ -125,12 +125,12 @@ MediaDialog::MediaDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::MediaDi
     // Reset progress
     if (isChecked) {
       const bool isCompleted = m_entry->status == anime::list::Status::Completed;
-      if (isCompleted && progress == m_entry->watched_episodes) {
+      if (isCompleted && progress == m_entry->watchedEpisodes) {
         ui_->spinProgress->setValue(0);
       }
     } else {
       if (progress == 0) {
-        ui_->spinProgress->setValue(m_entry->watched_episodes);
+        ui_->spinProgress->setValue(m_entry->watchedEpisodes);
       }
     }
   });
@@ -309,10 +309,10 @@ void MediaDialog::initList() {
   if (m_anime.episodeCount > 0) {
     ui_->spinProgress->setMaximum(m_anime.episodeCount);
   }
-  ui_->spinProgress->setValue(m_entry->watched_episodes);
+  ui_->spinProgress->setValue(m_entry->watchedEpisodes);
 
   // Times rewatched
-  ui_->spinRewatches->setValue(m_entry->rewatched_times);
+  ui_->spinRewatches->setValue(m_entry->rewatchedTimes);
 
   // Rewatching
   {
@@ -346,16 +346,16 @@ void MediaDialog::initList() {
   };
 
   // Date started & completed
-  ui_->checkDateStarted->setChecked(static_cast<bool>(m_entry->date_started));
-  ui_->checkDateCompleted->setChecked(static_cast<bool>(m_entry->date_completed));
+  ui_->checkDateStarted->setChecked(static_cast<bool>(m_entry->dateStarted));
+  ui_->checkDateCompleted->setChecked(static_cast<bool>(m_entry->dateCompleted));
   if (m_anime.dateStarted) {
     ui_->dateStarted->setMinimumDate(fuzzyToDate(m_anime.dateStarted));
     ui_->dateCompleted->setMinimumDate(fuzzyToDate(m_anime.dateStarted));
   }
-  ui_->dateStarted->setDate(m_entry->date_started ? fuzzyToDate(m_entry->date_started)
-                                                  : QDate::currentDate());
-  ui_->dateCompleted->setDate(m_entry->date_completed ? fuzzyToDate(m_entry->date_completed)
-                                                      : QDate::currentDate());
+  ui_->dateStarted->setDate(m_entry->dateStarted ? fuzzyToDate(m_entry->dateStarted)
+                                                 : QDate::currentDate());
+  ui_->dateCompleted->setDate(m_entry->dateCompleted ? fuzzyToDate(m_entry->dateCompleted)
+                                                     : QDate::currentDate());
 
   // Notes
   ui_->plainTextEditNotes->setPlainText(QString::fromStdString(m_entry->notes));
@@ -418,18 +418,18 @@ void MediaDialog::resizePosterImage() {
 
 void MediaDialog::accept() {
   if (m_entry) {
-    m_entry->watched_episodes = ui_->spinProgress->value();
-    m_entry->rewatched_times = ui_->spinRewatches->value();
+    m_entry->watchedEpisodes = ui_->spinProgress->value();
+    m_entry->rewatchedTimes = ui_->spinRewatches->value();
     m_entry->rewatching = ui_->checkRewatching->isChecked();
     m_entry->status = ui_->comboStatus->currentData().value<anime::list::Status>();
     m_entry->score = usesRatingSpinBox() ? ratingSpinBoxValue(ui_->spinScore)
                                          : ui_->comboScore->currentData().toInt();
-    m_entry->date_started = ui_->checkDateStarted->isChecked()
-                                ? FuzzyDate{ui_->dateStarted->date().toStdSysDays()}
-                                : FuzzyDate{};
-    m_entry->date_completed = ui_->checkDateCompleted->isChecked()
-                                  ? FuzzyDate{ui_->dateCompleted->date().toStdSysDays()}
-                                  : FuzzyDate{};
+    m_entry->dateStarted = ui_->checkDateStarted->isChecked()
+                               ? FuzzyDate{ui_->dateStarted->date().toStdSysDays()}
+                               : FuzzyDate{};
+    m_entry->dateCompleted = ui_->checkDateCompleted->isChecked()
+                                 ? FuzzyDate{ui_->dateCompleted->date().toStdSysDays()}
+                                 : FuzzyDate{};
     m_entry->notes = ui_->plainTextEditNotes->toPlainText().toStdString();
 
     anime::list::save(*m_entry);

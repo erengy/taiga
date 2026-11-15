@@ -322,7 +322,7 @@ void MainWindow::initStatusbar() {
     const auto title = anime::preferredTitle(*item);
 
     QString text;
-    if (entry->pending_delete) {
+    if (entry->pendingDelete) {
       text = tr("Deleting list entry... (%1)").arg(title);
     } else if (entry->id == anime::list::kUnknownId) {
       text = tr("Adding to list... (%1)").arg(title);

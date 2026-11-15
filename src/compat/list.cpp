@@ -60,19 +60,19 @@ ListEntry parseListEntryElement(QXmlStreamReader& xml) {
 
   while (xml.readNextStartElement()) {
     if (xml.name() == u"id") {
-      entry.anime_id = XML_ELEMENT.toInt();
+      entry.animeId = XML_ELEMENT.toInt();
 
     } else if (xml.name() == u"library_id") {
       entry.id = XML_ELEMENT.toLongLong();
 
     } else if (xml.name() == u"progress") {
-      entry.watched_episodes = XML_ELEMENT.toInt();
+      entry.watchedEpisodes = XML_ELEMENT.toInt();
 
     } else if (xml.name() == u"date_start") {
-      entry.date_started = FuzzyDate(XML_ELEMENT.toStdString());
+      entry.dateStarted = FuzzyDate(XML_ELEMENT.toStdString());
 
     } else if (xml.name() == u"date_end") {
-      entry.date_completed = FuzzyDate(XML_ELEMENT.toStdString());
+      entry.dateCompleted = FuzzyDate(XML_ELEMENT.toStdString());
 
     } else if (xml.name() == u"score") {
       entry.score = XML_ELEMENT.toInt();
@@ -81,22 +81,22 @@ ListEntry parseListEntryElement(QXmlStreamReader& xml) {
       entry.status = static_cast<anime::list::Status>(XML_ELEMENT.toInt());
 
     } else if (xml.name() == u"private") {
-      entry.is_private = XML_ELEMENT.toInt();
+      entry.isPrivate = XML_ELEMENT.toInt();
 
     } else if (xml.name() == u"rewatched_times") {
-      entry.rewatched_times = XML_ELEMENT.toInt();
+      entry.rewatchedTimes = XML_ELEMENT.toInt();
 
     } else if (xml.name() == u"rewatching") {
       entry.rewatching = XML_ELEMENT.toInt();
 
     } else if (xml.name() == u"rewatching_ep") {
-      entry.rewatching_ep = XML_ELEMENT.toInt();
+      entry.rewatchingEp = XML_ELEMENT.toInt();
 
     } else if (xml.name() == u"notes") {
       entry.notes = XML_ELEMENT.toStdString();
 
     } else if (xml.name() == u"last_updated") {
-      entry.last_updated = XML_ELEMENT.toLongLong();
+      entry.lastUpdated = XML_ELEMENT.toLongLong();
 
     } else {
       xml.skipCurrentElement();

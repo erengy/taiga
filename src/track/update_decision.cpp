@@ -48,7 +48,7 @@ UpdateDecision decideUpdate(const Episode& episode, const anime::Details& item,
 
   const bool inList = anime::list::isInList(entry);
   const bool completed = inList && entry->status == Status::Completed && !entry->rewatching;
-  const int watchedEpisodes = inList ? entry->watched_episodes : 0;
+  const int watchedEpisodes = inList ? entry->watchedEpisodes : 0;
 
   if (completed || *number < watchedEpisodes ||
       (*number == watchedEpisodes && item.episodeCount != 1)) {

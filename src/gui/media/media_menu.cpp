@@ -104,15 +104,15 @@ bool MediaMenu::canMatchNowPlaying() const {
 void MediaMenu::addToList(const anime::list::Status status) const {
   for (const auto& item : m_items) {
     if (getEntry(item.id)) continue;
-    anime::list::save(ListEntry{.anime_id = item.id, .status = status});
+    anime::list::save(ListEntry{.animeId = item.id, .status = status});
   }
 }
 
 void MediaMenu::clearDateCompleted() const {
   for (const auto& item : m_items) {
     const auto* entry = getEntry(item.id);
-    auto updated = entry ? *entry : ListEntry{.anime_id = item.id};
-    updated.date_completed = FuzzyDate{};
+    auto updated = entry ? *entry : ListEntry{.animeId = item.id};
+    updated.dateCompleted = FuzzyDate{};
     anime::list::save(updated);
   }
 }
@@ -120,8 +120,8 @@ void MediaMenu::clearDateCompleted() const {
 void MediaMenu::clearDateStarted() const {
   for (const auto& item : m_items) {
     const auto* entry = getEntry(item.id);
-    auto updated = entry ? *entry : ListEntry{.anime_id = item.id};
-    updated.date_started = FuzzyDate{};
+    auto updated = entry ? *entry : ListEntry{.animeId = item.id};
+    updated.dateStarted = FuzzyDate{};
     anime::list::save(updated);
   }
 }
@@ -147,7 +147,7 @@ void MediaMenu::editEpisode() const {
   int maxValue = anime::kMaxEpisodeCount;
 
   for (const auto& item : m_items) {
-    if (const auto entry = getEntry(item.id)) watchedEpisodes.insert(entry->watched_episodes);
+    if (const auto entry = getEntry(item.id)) watchedEpisodes.insert(entry->watchedEpisodes);
     if (item.episodeCount > 0) maxValue = std::min(maxValue, item.episodeCount);
   }
 
@@ -160,8 +160,8 @@ void MediaMenu::editEpisode() const {
 
   for (const auto& item : m_items) {
     const auto* entry = getEntry(item.id);
-    auto updated = entry ? *entry : ListEntry{.anime_id = item.id};
-    updated.watched_episodes = value;
+    auto updated = entry ? *entry : ListEntry{.animeId = item.id};
+    updated.watchedEpisodes = value;
     anime::list::save(updated);
   }
 }
@@ -174,7 +174,7 @@ void MediaMenu::editNotes() const {
 
   for (const auto& item : m_items) {
     const auto* entry = getEntry(item.id);
-    auto updated = entry ? *entry : ListEntry{.anime_id = item.id};
+    auto updated = entry ? *entry : ListEntry{.animeId = item.id};
     updated.notes = notes.toStdString();
     anime::list::save(updated);
   }
@@ -183,7 +183,7 @@ void MediaMenu::editNotes() const {
 void MediaMenu::editScore(const int value) const {
   for (const auto& item : m_items) {
     const auto* entry = getEntry(item.id);
-    auto updated = entry ? *entry : ListEntry{.anime_id = item.id};
+    auto updated = entry ? *entry : ListEntry{.animeId = item.id};
     updated.score = value;
     anime::list::save(updated);
   }
@@ -192,7 +192,7 @@ void MediaMenu::editScore(const int value) const {
 void MediaMenu::editStatus(const anime::list::Status status) const {
   for (const auto& item : m_items) {
     const auto* entry = getEntry(item.id);
-    auto updated = entry ? *entry : ListEntry{.anime_id = item.id};
+    auto updated = entry ? *entry : ListEntry{.animeId = item.id};
     updated.status = status;
     anime::list::save(updated);
   }
@@ -393,9 +393,9 @@ void MediaMenu::setDateCompletedToAiringEnd() const {
   for (const auto& item : m_items) {
     if (!item.dateFinished) continue;
     const auto* entry = getEntry(item.id);
-    if (entry && entry->date_completed) continue;
-    auto updated = entry ? *entry : ListEntry{.anime_id = item.id};
-    updated.date_completed = item.dateFinished;
+    if (entry && entry->dateCompleted) continue;
+    auto updated = entry ? *entry : ListEntry{.animeId = item.id};
+    updated.dateCompleted = item.dateFinished;
     anime::list::save(updated);
   }
 }
@@ -403,11 +403,11 @@ void MediaMenu::setDateCompletedToAiringEnd() const {
 void MediaMenu::setDateCompletedToLastUpdated() const {
   for (const auto& item : m_items) {
     const auto* entry = getEntry(item.id);
-    if (!entry || entry->date_completed || !entry->last_updated) continue;
+    if (!entry || entry->dateCompleted || !entry->lastUpdated) continue;
     const auto date = std::chrono::floor<std::chrono::days>(
-        std::chrono::system_clock::from_time_t(entry->last_updated));
+        std::chrono::system_clock::from_time_t(entry->lastUpdated));
     auto updated = *entry;
-    updated.date_completed = FuzzyDate{date};
+    updated.dateCompleted = FuzzyDate{date};
     anime::list::save(updated);
   }
 }
@@ -416,9 +416,9 @@ void MediaMenu::setDateStartedToAiringStart() const {
   for (const auto& item : m_items) {
     if (!item.dateStarted) continue;
     const auto* entry = getEntry(item.id);
-    if (entry && entry->date_started) continue;
-    auto updated = entry ? *entry : ListEntry{.anime_id = item.id};
-    updated.date_started = item.dateStarted;
+    if (entry && entry->dateStarted) continue;
+    auto updated = entry ? *entry : ListEntry{.animeId = item.id};
+    updated.dateStarted = item.dateStarted;
     anime::list::save(updated);
   }
 }
@@ -427,10 +427,10 @@ void MediaMenu::startNewRewatch() const {
   const auto& item = m_items.front();
 
   const auto* entry = getEntry(item.id);
-  auto updated = entry ? *entry : ListEntry{.anime_id = item.id};
+  auto updated = entry ? *entry : ListEntry{.animeId = item.id};
   updated.status = anime::list::Status::Watching;
   updated.rewatching = true;
-  updated.watched_episodes = 0;
+  updated.watchedEpisodes = 0;
   anime::list::save(updated);
 
   playEpisode(1);
@@ -601,7 +601,7 @@ void MediaMenu::addLibraryItems() {
   // Play
   addMenu([this, &item, entry]() {
     const int totalEpisodes = std::max(item.episodeCount, 0);
-    const int watchedEpisodes = entry ? entry->watched_episodes : 0;
+    const int watchedEpisodes = entry ? entry->watchedEpisodes : 0;
     const int maxEpisodes = totalEpisodes ? totalEpisodes : std::numeric_limits<int>::max();
     const int lastEpisode = std::min(watchedEpisodes, maxEpisodes);
     const int nextEpisode = lastEpisode + 1;
@@ -645,7 +645,7 @@ void MediaMenu::addLibraryItems() {
 
     // Start new rewatch
     if (entry && !entry->rewatching && totalEpisodes > 0 &&
-        entry->watched_episodes == totalEpisodes && item.status == anime::Status::FinishedAiring) {
+        entry->watchedEpisodes == totalEpisodes && item.status == anime::Status::FinishedAiring) {
       menu->addSeparator();
       menu->addAction(tr("Start new rewatch"), this, &MediaMenu::startNewRewatch);
     }

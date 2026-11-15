@@ -62,19 +62,19 @@ Q_DECLARE_FLAGS(Fields, Field)
 
 struct Entry {
   int64_t id = kUnknownId;
-  int anime_id = kUnknownId;
-  int watched_episodes = 0;
+  int animeId = kUnknownId;
+  int watchedEpisodes = 0;
   int score = 0;
   Status status = Status::NotInList;
-  bool is_private = false;
-  int rewatched_times = 0;
+  bool isPrivate = false;
+  int rewatchedTimes = 0;
   bool rewatching = false;
-  int rewatching_ep = 0;
-  FuzzyDate date_started;
-  FuzzyDate date_completed;
-  std::time_t last_updated;
+  int rewatchingEp = 0;
+  FuzzyDate dateStarted;
+  FuzzyDate dateCompleted;
+  std::time_t lastUpdated;
   std::string notes;
-  bool pending_delete = false;
+  bool pendingDelete = false;
 };
 
 }  // namespace anime::list

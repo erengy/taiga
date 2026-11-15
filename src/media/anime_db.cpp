@@ -160,10 +160,10 @@ void Database::updateEntries(const QList<ListEntry>& entries) {
   db_.close();
 
   for (const auto& entry : entries) {
-    entries_[entry.anime_id] = entry;
+    entries_[entry.animeId] = entry;
   }
   for (const auto& entry : entries) {
-    emit entryUpdated(entry.anime_id);
+    emit entryUpdated(entry.animeId);
   }
 }
 
@@ -349,19 +349,19 @@ void Database::bindItemToQuery(const Anime& item, QSqlQuery& q) const {
 
 void Database::bindEntryToQuery(const ListEntry& entry, QSqlQuery& q) const {
   q.bindValue(":id", static_cast<qint64>(entry.id));
-  q.bindValue(":media_id", entry.anime_id);
-  q.bindValue(":progress", entry.watched_episodes);
-  q.bindValue(":date_start", QString::fromStdString(entry.date_started.toString()));
-  q.bindValue(":date_end", QString::fromStdString(entry.date_completed.toString()));
+  q.bindValue(":media_id", entry.animeId);
+  q.bindValue(":progress", entry.watchedEpisodes);
+  q.bindValue(":date_start", QString::fromStdString(entry.dateStarted.toString()));
+  q.bindValue(":date_end", QString::fromStdString(entry.dateCompleted.toString()));
   q.bindValue(":score", entry.score);
   q.bindValue(":status", static_cast<int>(entry.status));
-  q.bindValue(":private", entry.is_private);
-  q.bindValue(":rewatched_times", entry.rewatched_times);
+  q.bindValue(":private", entry.isPrivate);
+  q.bindValue(":rewatched_times", entry.rewatchedTimes);
   q.bindValue(":rewatching", entry.rewatching);
-  q.bindValue(":rewatching_ep", entry.rewatching_ep);
+  q.bindValue(":rewatching_ep", entry.rewatchingEp);
   q.bindValue(":notes", QString::fromStdString(entry.notes));
-  q.bindValue(":last_updated", QString::number(entry.last_updated));
-  q.bindValue(":pending_delete", entry.pending_delete);
+  q.bindValue(":last_updated", QString::number(entry.lastUpdated));
+  q.bindValue(":pending_delete", entry.pendingDelete);
 }
 
 void Database::bindSettingsToQuery(const Settings& settings, QSqlQuery& q) const {
@@ -405,19 +405,19 @@ Anime Database::itemFromQuery(const QSqlQuery& q) const {
 ListEntry Database::entryFromQuery(const QSqlQuery& q) const {
   return {
       .id = q.value("id").toLongLong(),
-      .anime_id = q.value("media_id").toInt(),
-      .watched_episodes = q.value("progress").toInt(),
+      .animeId = q.value("media_id").toInt(),
+      .watchedEpisodes = q.value("progress").toInt(),
       .score = q.value("score").toInt(),
       .status = q.value("status").value<anime::list::Status>(),
-      .is_private = q.value("private").toBool(),
-      .rewatched_times = q.value("rewatched_times").toInt(),
+      .isPrivate = q.value("private").toBool(),
+      .rewatchedTimes = q.value("rewatched_times").toInt(),
       .rewatching = q.value("rewatching").toBool(),
-      .rewatching_ep = q.value("rewatching_ep").toInt(),
-      .date_started = FuzzyDate(q.value("date_start").toString().toStdString()),
-      .date_completed = FuzzyDate(q.value("date_end").toString().toStdString()),
-      .last_updated = q.value("last_updated").toInt(),
+      .rewatchingEp = q.value("rewatching_ep").toInt(),
+      .dateStarted = FuzzyDate(q.value("date_start").toString().toStdString()),
+      .dateCompleted = FuzzyDate(q.value("date_end").toString().toStdString()),
+      .lastUpdated = q.value("last_updated").toInt(),
       .notes = q.value("notes").toString().toStdString(),
-      .pending_delete = q.value("pending_delete").toBool(),
+      .pendingDelete = q.value("pending_delete").toBool(),
   };
 }
 
@@ -465,8 +465,8 @@ void Database::migrateListEntriesFromV1() {
   db_.transaction();
 
   for (const auto& entry : compat::v1::readListEntries(path)) {
-    if (!items_.contains(entry.anime_id)) continue;
-    entries_[entry.anime_id] = entry;
+    if (!items_.contains(entry.animeId)) continue;
+    entries_[entry.animeId] = entry;
     bindEntryToQuery(entry, q);
     q.exec();
   }

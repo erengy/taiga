@@ -149,7 +149,7 @@ bool AnimeListProxyModel::filterAcceptsRow(int row, const QModelIndex& parent) c
   // List status
   if (m_filter.listStatus.status) {
     auto status = anime::list::Status::NotInList;
-    if (entry && !entry->pending_delete) status = entry->status;
+    if (entry && !entry->pendingDelete) status = entry->status;
     if (m_filter.listStatus.anyStatus) {
       if (status == anime::list::Status::NotInList) return false;
     } else {
@@ -246,8 +246,8 @@ std::partial_ordering AnimeListProxyModel::compare(const QModelIndex& lhs, const
     }
 
     case AnimeListModel::ColumnRewatches:
-      return (lhsEntry ? lhsEntry->rewatched_times : 0) <=>
-             (rhsEntry ? rhsEntry->rewatched_times : 0);
+      return (lhsEntry ? lhsEntry->rewatchedTimes : 0) <=>
+             (rhsEntry ? rhsEntry->rewatchedTimes : 0);
 
     case AnimeListModel::ColumnScore:
       return (lhsEntry ? lhsEntry->score : 0) <=> (rhsEntry ? rhsEntry->score : 0);
@@ -256,15 +256,15 @@ std::partial_ordering AnimeListProxyModel::compare(const QModelIndex& lhs, const
       return lhsAnime->dateStarted <=> rhsAnime->dateStarted;
 
     case AnimeListModel::ColumnStarted:
-      return (lhsEntry ? lhsEntry->date_started : FuzzyDate{}) <=>
-             (rhsEntry ? rhsEntry->date_started : FuzzyDate{});
+      return (lhsEntry ? lhsEntry->dateStarted : FuzzyDate{}) <=>
+             (rhsEntry ? rhsEntry->dateStarted : FuzzyDate{});
 
     case AnimeListModel::ColumnCompleted:
-      return (lhsEntry ? lhsEntry->date_completed : FuzzyDate{}) <=>
-             (rhsEntry ? rhsEntry->date_completed : FuzzyDate{});
+      return (lhsEntry ? lhsEntry->dateCompleted : FuzzyDate{}) <=>
+             (rhsEntry ? rhsEntry->dateCompleted : FuzzyDate{});
 
     case AnimeListModel::ColumnLastUpdated:
-      return (lhsEntry ? lhsEntry->last_updated : 0) <=> (rhsEntry ? rhsEntry->last_updated : 0);
+      return (lhsEntry ? lhsEntry->lastUpdated : 0) <=> (rhsEntry ? rhsEntry->lastUpdated : 0);
 
     case AnimeListModel::ColumnNotes:
       return (lhsEntry ? lhsEntry->notes : "") <=> (rhsEntry ? rhsEntry->notes : "");
