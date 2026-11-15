@@ -1,18 +1,23 @@
+/*
+Colors that differ between light and dark themes. Placeholders (an at sign
+followed by a field name) are replaced with colors from `gui::ThemeColors`.
+*/
+
 /* Toolbar */
 
 QMainWindow > QToolBar {
-  border-bottom-color: rgba(0, 0, 0, 16%);
+  border-bottom-color: @border;
 }
 
 QMainWindow > #centralWidget > QSplitter {
-  background-color: rgba(255, 255, 255, 30%);
+  background-color: @splitter;
 }
 QMainWindow > #centralWidget > QSplitter::handle {
-  background-color: rgba(0, 0, 0, 16%);
+  background-color: @border;
 }
 
 QFrame#pageSeparator {
-  background-color: rgba(0, 0, 0, 16%);
+  background-color: @border;
 }
 
 /* List */
@@ -21,34 +26,31 @@ QListView#animeCards,
 QTreeView#animeList > QHeaderView,
 QTreeView#historyView > QHeaderView,
 QTreeView#libraryView > QHeaderView {
-  background-color: #fff;
+  background-color: @background;
 }
 
 QAbstractItemView[themed="true"] {
-  background-color: #fff;
-  alternate-background-color: rgba(0, 0, 0, 4%);
+  background-color: @background;
+  alternate-background-color: @itemAlternate;
 }
 QAbstractItemView[themed="true"]::item:hover:!selected {
-  background-color: rgba(0, 0, 0, 4%);
-}
-QAbstractItemView[themed="true"]::item:active {
-  color: #000;
+  background-color: @itemHover;
 }
 QAbstractItemView[themed="true"]::item:selected:active {
-  background-color: rgba(0, 0, 0, 8%);
+  background-color: @itemSelected;
 }
 QAbstractItemView[themed="true"]::item:selected:!active {
-  background-color: rgba(0, 0, 0, 6%);
+  background-color: @itemSelectedInactive;
 }
 
 /* Now Playing */
 
 #nowPlaying {
-  border-top-color: rgba(0, 0, 0, 16%);
+  border-top-color: @border;
 }
 
 /* Statusbar */
 
 QStatusBar#statusbar {
-  border-top-color: rgba(0, 0, 0, 16%);
+  border-top-color: @border;
 }

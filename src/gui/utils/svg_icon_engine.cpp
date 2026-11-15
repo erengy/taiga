@@ -64,9 +64,10 @@ QPixmap SvgIconEngine::scaledPixmap(const QSize& size, QIcon::Mode mode, QIcon::
       case QIcon::Disabled:
         return palette.color(QPalette::Disabled, QPalette::Text);
       case QIcon::Active:
-        return palette.color(QPalette::Active, QPalette::Text);
+      // Item views select with a subtle tint rather than the highlight color (see main.qss), so
+      // selected icons keep the normal text color.
       case QIcon::Selected:
-        return palette.color(QPalette::Active, QPalette::HighlightedText);
+        return palette.color(QPalette::Active, QPalette::Text);
     }
   }();
 

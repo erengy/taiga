@@ -1,7 +1,6 @@
 <RCC>
   <qresource>
-    <file>styles/dark.qss</file>
-    <file>styles/light.qss</file>
     <file>styles/main.qss</file>
+    <file>styles/theme.qss</file>
   </qresource>
 </RCC>

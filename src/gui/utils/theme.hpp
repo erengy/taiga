@@ -25,7 +25,8 @@
 
 namespace gui {
 
-// Colors that differ between light and dark themes. Keep in sync with dark.qss and light.qss.
+// Colors that differ between light and dark themes. Also used for `@name` placeholders in
+// theme.qss.
 struct ThemeColors {
   QColor background;
   QColor border;

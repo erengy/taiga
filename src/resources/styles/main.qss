@@ -52,8 +52,10 @@ QTreeView#libraryView QHeaderView::section {
   padding-right: 12px;
 }
 
+/* Selection is a subtle tint (see theme.qss), so selected items keep the normal text color */
 QAbstractItemView[themed="true"] {
   selection-background-color: transparent;
+  selection-color: palette(text);
 }
 
 QTreeView#animeList::item,

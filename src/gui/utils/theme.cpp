@@ -19,10 +19,12 @@
 #include "theme.hpp"
 
 #include <QApplication>
+#include <QRegularExpression>
 #include <QStyle>
 #include <QStyleHints>
 
 #include "base/file.hpp"
+#include "base/log.hpp"
 #include "base/string.hpp"
 #include "gui/utils/svg_icon_engine.hpp"
 #include "taiga/settings.hpp"
@@ -62,6 +64,47 @@ const ThemeColors kLightColors{
     .success = QColor(0x43, 0xa0, 0x47),  // Green 600
     .warning = QColor(0xfb, 0x8c, 0x00),  // Orange 600
 };
+
+QString toStylesheetColor(const QColor& color) {
+  return u"rgba(%1, %2, %3, %4)"_s.arg(color.red())
+      .arg(color.green())
+      .arg(color.blue())
+      .arg(color.alpha());
+}
+
+// Replaces `@name` placeholders with the matching theme colors.
+QString replaceColorPlaceholders(const QString& stylesheet, const ThemeColors& colors) {
+  const QHash<QString, QColor> values{
+      {u"background"_s, colors.background},
+      {u"border"_s, colors.border},
+      {u"splitter"_s, colors.splitter},
+      {u"itemAlternate"_s, colors.itemAlternate},
+      {u"itemHover"_s, colors.itemHover},
+      {u"itemSelected"_s, colors.itemSelected},
+      {u"itemSelectedInactive"_s, colors.itemSelectedInactive},
+  };
+
+  static const QRegularExpression placeholder{uR"(@(\w+))"_s};
+
+  QString result;
+  qsizetype last = 0;
+
+  auto it = placeholder.globalMatch(stylesheet);
+  while (it.hasNext()) {
+    const auto match = it.next();
+    result += stylesheet.sliced(last, match.capturedStart() - last);
+    if (const auto value = values.find(match.captured(1)); value != values.end()) {
+      result += toStylesheetColor(*value);
+    } else {
+      qWarning() << "Unknown stylesheet color:" << match.captured(0);
+      result += match.captured(0);
+    }
+    last = match.capturedEnd();
+  }
+  result += stylesheet.sliced(last);
+
+  return result;
+}
 
 }  // namespace
 
@@ -116,7 +159,7 @@ bool Theme::isDark() const {
 
 void Theme::applyStylesheet() const {
   const QString mainStylesheet = readStylesheet("main");
-  const QString themeStylesheet = readStylesheet(isDark() ? "dark" : "light");
+  const QString themeStylesheet = replaceColorPlaceholders(readStylesheet("theme"), colors());
   qApp->setStyleSheet(mainStylesheet + themeStylesheet);
 }
 
