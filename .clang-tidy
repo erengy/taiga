@@ -1,6 +1,55 @@
 ---
-# https://clang.llvm.org/extra/clang-tidy/checks/readability/identifier-naming.html
-Checks: '-*,readability-identifier-naming'
+# https://clang.llvm.org/extra/clang-tidy/checks/list.html
+Checks: >
+  -*,
+  bugprone-*,
+  -bugprone-easily-swappable-parameters,
+  -bugprone-narrowing-conversions,
+  -bugprone-switch-missing-default-case,
+  -bugprone-throwing-static-initialization,
+  clang-analyzer-*,
+  -clang-analyzer-cplusplus.NewDeleteLeaks,
+  -clang-analyzer-optin.core.EnumCastOutOfRange,
+  cppcoreguidelines-pro-type-member-init,
+  misc-const-correctness,
+  misc-redundant-expression,
+  misc-unused-*,
+  modernize-loop-convert,
+  modernize-make-unique,
+  modernize-pass-by-value,
+  modernize-use-emplace,
+  modernize-use-equals-default,
+  modernize-use-nullptr,
+  modernize-use-override,
+  modernize-use-ranges,
+  modernize-use-starts-ends-with,
+  modernize-use-std-format,
+  modernize-use-using,
+  performance-*,
+  -performance-enum-size,
+  -performance-no-int-to-ptr,
+  readability-container-contains,
+  readability-container-size-empty,
+  readability-delete-null-pointer,
+  readability-identifier-naming,
+  readability-inconsistent-declaration-parameter-name,
+  readability-non-const-parameter,
+  readability-redundant-*,
+  -readability-redundant-access-specifiers,
+  readability-static-accessed-through-instance
+# Disabled checks:
+# - bugprone-easily-swappable-parameters: flags most functions with two same-typed parameters
+# - bugprone-narrowing-conversions: mostly intended int/float conversions in painting code
+# - bugprone-switch-missing-default-case: switches on int column indices are exhaustive in practice
+# - bugprone-throwing-static-initialization: static tables (theme colors) are fine to allocate
+# - clang-analyzer-cplusplus.NewDeleteLeaks: doesn't understand Qt parent ownership
+# - clang-analyzer-optin.core.EnumCastOutOfRange: flags combined flags (utf8proc options)
+# - performance-enum-size: no meaningful savings
+# - performance-no-int-to-ptr: Win32 handle casts are unavoidable
+# - readability-else-after-return: `else` keeps parallel branches aligned and readable
+# - readability-make-member-function-const: suggests const for methods that change global state
+# - readability-redundant-access-specifiers: flags Qt's `public slots:` after `public:`
+# - readability-simplify-boolean-expr: explicit `return true;  // reason` branches read better
 HeaderFilterRegex: '.*[/\\]src[/\\](base|compat|gui|media|share|sync|taiga|track)[/\\].*'
 CheckOptions:
   # Types
