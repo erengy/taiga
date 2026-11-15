@@ -31,16 +31,16 @@ struct HistoryItem;
 namespace compat::v1 {
 
 struct QueueItem {
-  int anime_id = 0;
-  bool delete_entry = false;
+  int animeId = 0;
+  bool deleteEntry = false;
   std::optional<int> episode;
   std::optional<int> score;
   std::optional<anime::list::Status> status;
   std::optional<bool> rewatching;
-  std::optional<int> rewatched_times;
+  std::optional<int> rewatchedTimes;
   std::optional<std::string> notes;
-  std::optional<FuzzyDate> date_started;
-  std::optional<FuzzyDate> date_completed;
+  std::optional<FuzzyDate> dateStarted;
+  std::optional<FuzzyDate> dateCompleted;
 };
 
 QList<anime::HistoryItem> readHistory(const std::string& path);

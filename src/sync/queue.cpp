@@ -341,22 +341,22 @@ void Queue::migrateFromV1() {
   }();
 
   for (const auto& item : compat::v1::readQueue(path)) {
-    if (item.delete_entry) {
-      anime::list::remove(item.anime_id);
+    if (item.deleteEntry) {
+      anime::list::remove(item.animeId);
       continue;
     }
 
-    const auto* previous = anime::db()->entry(item.anime_id);
-    anime::list::Entry entry = previous ? *previous : anime::list::Entry{.animeId = item.anime_id};
+    const auto* previous = anime::db()->entry(item.animeId);
+    anime::list::Entry entry = previous ? *previous : anime::list::Entry{.animeId = item.animeId};
 
     if (item.episode) entry.watchedEpisodes = *item.episode;
     if (item.score) entry.score = *item.score;
     if (item.status) entry.status = *item.status;
     if (item.rewatching) entry.rewatching = *item.rewatching;
-    if (item.rewatched_times) entry.rewatchedTimes = *item.rewatched_times;
+    if (item.rewatchedTimes) entry.rewatchedTimes = *item.rewatchedTimes;
     if (item.notes) entry.notes = *item.notes;
-    if (item.date_started) entry.dateStarted = *item.date_started;
-    if (item.date_completed) entry.dateCompleted = *item.date_completed;
+    if (item.dateStarted) entry.dateStarted = *item.dateStarted;
+    if (item.dateCompleted) entry.dateCompleted = *item.dateCompleted;
 
     anime::list::save(entry);
   }

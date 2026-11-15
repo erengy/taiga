@@ -121,8 +121,8 @@ void parseQueue(QXmlStreamReader& xml, QList<QueueItem>& items) {
       const auto attrs = xml.attributes();
 
       QueueItem item{
-          .anime_id = XML_ATTR(u"anime_id").toInt(),
-          .delete_entry = XML_ATTR(u"mode") == u"delete",
+          .animeId = XML_ATTR(u"anime_id").toInt(),
+          .deleteEntry = XML_ATTR(u"mode") == u"delete",
       };
 
       if (attrs.hasAttribute(u"episode")) item.episode = XML_ATTR(u"episode").toInt();
@@ -134,16 +134,16 @@ void parseQueue(QXmlStreamReader& xml, QList<QueueItem>& items) {
         item.rewatching = XML_ATTR_BOOL(u"enable_rewatching");
       }
       if (attrs.hasAttribute(u"rewatched_times")) {
-        item.rewatched_times = XML_ATTR(u"rewatched_times").toInt();
+        item.rewatchedTimes = XML_ATTR(u"rewatched_times").toInt();
       }
       if (attrs.hasAttribute(u"notes")) {
         item.notes = XML_ATTR(u"notes").toString().toStdString();
       }
       if (attrs.hasAttribute(u"date_start")) {
-        item.date_started = FuzzyDate(XML_ATTR(u"date_start").toString().toStdString());
+        item.dateStarted = FuzzyDate(XML_ATTR(u"date_start").toString().toStdString());
       }
       if (attrs.hasAttribute(u"date_finish")) {
-        item.date_completed = FuzzyDate(XML_ATTR(u"date_finish").toString().toStdString());
+        item.dateCompleted = FuzzyDate(XML_ATTR(u"date_finish").toString().toStdString());
       }
 
       items.emplace_back(item);
