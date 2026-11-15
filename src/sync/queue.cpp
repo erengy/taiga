@@ -336,7 +336,7 @@ QueueItem Queue::itemFromQuery(const QSqlQuery& q) const {
 void Queue::migrateFromV1() {
   const auto path = []() {
     const auto service = taiga::settings()->syncService();
-    return std::format("{}/v1/user/{}@{}/history.xml", taiga::get_data_path(),
+    return std::format("{}/v1/user/{}@{}/history.xml", taiga::getDataPath(),
                        taiga::accounts()->serviceUsername(service), service);
   }();
 

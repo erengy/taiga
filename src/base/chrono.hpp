@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -69,15 +69,15 @@ public:
   bool operator==(const FuzzyDate& date) const;
 
   [[nodiscard]] bool empty() const;
-  [[nodiscard]] std::string to_string() const;
+  [[nodiscard]] std::string toString() const;
 
   [[nodiscard]] unsigned_t year() const;
   [[nodiscard]] unsigned_t month() const;
   [[nodiscard]] unsigned_t day() const;
 
-  void set_year(unsigned_t year);
-  void set_month(unsigned_t month);
-  void set_day(unsigned_t day);
+  void setYear(unsigned_t year);
+  void setMonth(unsigned_t month);
+  void setDay(unsigned_t day);
 
 private:
   std::chrono::year year_{};

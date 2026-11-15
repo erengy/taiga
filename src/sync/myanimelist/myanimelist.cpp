@@ -247,11 +247,11 @@ void Service::updateListEntry(const int id, const anime::list::Fields dirty) {
     body.emplaceBack(u"num_times_rewatched"_s, QString::number(listEntry->rewatched_times));
   }
   if (dirty & Field::DateStarted) {
-    body.emplaceBack(u"start_date"_s, QString::fromStdString(listEntry->date_started.to_string()));
+    body.emplaceBack(u"start_date"_s, QString::fromStdString(listEntry->date_started.toString()));
   }
   if (dirty & Field::DateCompleted) {
     body.emplaceBack(u"finish_date"_s,
-                     QString::fromStdString(listEntry->date_completed.to_string()));
+                     QString::fromStdString(listEntry->date_completed.toString()));
   }
   if (dirty & Field::Notes) {
     body.emplaceBack(u"comments"_s, QString::fromStdString(listEntry->notes));

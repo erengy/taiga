@@ -28,7 +28,7 @@ namespace season {
 
 using Month = std::chrono::month;
 
-constexpr SeasonName from_month(const Month month) noexcept {
+constexpr SeasonName fromMonth(const Month month) noexcept {
   // clang-format off
   switch (static_cast<unsigned int>(month)) {
     default: return Unknown;
@@ -64,7 +64,7 @@ constexpr SeasonName prev(const SeasonName name) noexcept {
   // clang-format on
 }
 
-constexpr std::pair<Month, Month> to_months(const SeasonName name) noexcept {
+constexpr std::pair<Month, Month> toMonths(const SeasonName name) noexcept {
   using namespace std::chrono;
 
   // clang-format off
@@ -78,10 +78,10 @@ constexpr std::pair<Month, Month> to_months(const SeasonName name) noexcept {
   // clang-format on
 }
 
-std::pair<Date, Date> to_date_range(const Season& season) noexcept {
+std::pair<Date, Date> toDateRange(const Season& season) noexcept {
   if (!season) return {};
 
-  const auto months = season::to_months(season.name);
+  const auto months = season::toMonths(season.name);
 
   const Date date_first{
       season.name == Winter ? season.year - std::chrono::years{1} : season.year,
@@ -105,7 +105,7 @@ Season::Season(const Date& date) : Season{FuzzyDate{date}} {}
 
 Season::Season(const FuzzyDate& date) {
   if (date.month()) {
-    name = season::from_month(std::chrono::month{date.month()});
+    name = season::fromMonth(std::chrono::month{date.month()});
   }
 
   if (date.year()) {
@@ -117,7 +117,7 @@ Season::Season(const FuzzyDate& date) {
 }
 
 Season::operator bool() const {
-  return has_name() && has_year();
+  return hasName() && hasYear();
 }
 
 Season& Season::operator++() {
@@ -150,11 +150,11 @@ std::strong_ordering Season::operator<=>(const Season& season) const {
   return cmp::equal;
 }
 
-bool Season::has_name() const {
+bool Season::hasName() const {
   return name != Unknown;
 }
 
-bool Season::has_year() const {
+bool Season::hasYear() const {
   return static_cast<int>(year);
 }
 

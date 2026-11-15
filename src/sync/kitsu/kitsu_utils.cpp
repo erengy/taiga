@@ -122,14 +122,13 @@ QJsonObject buildLibraryEntryObject(const anime::list::Entry& entry,
   }
   if (dirty & Field::DateStarted) {
     attributes["startedAt"] =
-        entry.date_started ? fromListDate(QString::fromStdString(entry.date_started.to_string()))
+        entry.date_started ? fromListDate(QString::fromStdString(entry.date_started.toString()))
                            : QJsonValue{QJsonValue::Null};
   }
   if (dirty & Field::DateCompleted) {
     attributes["finishedAt"] =
-        entry.date_completed
-            ? fromListDate(QString::fromStdString(entry.date_completed.to_string()))
-            : QJsonValue{QJsonValue::Null};
+        entry.date_completed ? fromListDate(QString::fromStdString(entry.date_completed.toString()))
+                             : QJsonValue{QJsonValue::Null};
   }
   if (dirty & Field::Notes) {
     attributes["notes"] = QString::fromStdString(entry.notes);

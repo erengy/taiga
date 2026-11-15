@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -75,9 +75,9 @@ FuzzyDate::FuzzyDate(const std::string_view date) {
 
   // Convert from YYYY-MM-DD
   if (date.size() >= 10) {
-    set_year(to_unsigned(date.substr(0, 4)));
-    set_month(to_unsigned(date.substr(5, 2)));
-    set_day(to_unsigned(date.substr(8, 2)));
+    setYear(to_unsigned(date.substr(0, 4)));
+    setMonth(to_unsigned(date.substr(5, 2)));
+    setDay(to_unsigned(date.substr(8, 2)));
   }
 }
 
@@ -122,7 +122,7 @@ bool FuzzyDate::empty() const {
   return !year() && !month() && !day();
 }
 
-std::string FuzzyDate::to_string() const {
+std::string FuzzyDate::toString() const {
   return std::format("{:0>4}-{:0>2}-{:0>2}", year(), month(), day());  // YYYY-MM-DD
 }
 
@@ -138,15 +138,15 @@ FuzzyDate::unsigned_t FuzzyDate::day() const {
   return static_cast<unsigned_t>(static_cast<unsigned int>(day_));
 }
 
-void FuzzyDate::set_year(unsigned_t year) {
+void FuzzyDate::setYear(unsigned_t year) {
   year_ = std::chrono::year{year};
 }
 
-void FuzzyDate::set_month(unsigned_t month) {
+void FuzzyDate::setMonth(unsigned_t month) {
   month_ = std::chrono::month{month};
 }
 
-void FuzzyDate::set_day(unsigned_t day) {
+void FuzzyDate::setDay(unsigned_t day) {
   day_ = std::chrono::day{day};
 }
 

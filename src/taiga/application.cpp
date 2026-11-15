@@ -162,7 +162,7 @@ void Application::activatePreviousInstance() {
 }
 
 void Application::initLogger() const {
-  const auto directory = u"%1/logs"_s.arg(get_data_path());
+  const auto directory = u"%1/logs"_s.arg(getDataPath());
   QDir().mkpath(directory);
 
   const auto date = QDate::currentDate().toString(Qt::DateFormat::ISODate);

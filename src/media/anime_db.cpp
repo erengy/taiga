@@ -216,7 +216,7 @@ void Database::deleteEntry(const int animeId) {
 }
 
 QString Database::fileName() const {
-  return u"%1/media.sqlite"_s.arg(taiga::get_data_path());
+  return u"%1/media.sqlite"_s.arg(taiga::getDataPath());
 }
 
 QString Database::sql(const QString& name) const {
@@ -330,8 +330,8 @@ void Database::bindItemToQuery(const Anime& item, QSqlQuery& q) const {
   q.bindValue(":status", static_cast<int>(item.status));
   q.bindValue(":episode_count", item.episode_count);
   q.bindValue(":episode_length", item.episode_length);
-  q.bindValue(":date_start", QString::fromStdString(item.date_started.to_string()));
-  q.bindValue(":date_end", QString::fromStdString(item.date_finished.to_string()));
+  q.bindValue(":date_start", QString::fromStdString(item.date_started.toString()));
+  q.bindValue(":date_end", QString::fromStdString(item.date_finished.toString()));
   q.bindValue(":image", QString::fromStdString(item.image_url));
   q.bindValue(":trailer_id", QString::fromStdString(item.trailer_id));
   q.bindValue(":age_rating", static_cast<int>(item.age_rating));
@@ -351,8 +351,8 @@ void Database::bindEntryToQuery(const ListEntry& entry, QSqlQuery& q) const {
   q.bindValue(":id", static_cast<qint64>(entry.id));
   q.bindValue(":media_id", entry.anime_id);
   q.bindValue(":progress", entry.watched_episodes);
-  q.bindValue(":date_start", QString::fromStdString(entry.date_started.to_string()));
-  q.bindValue(":date_end", QString::fromStdString(entry.date_completed.to_string()));
+  q.bindValue(":date_start", QString::fromStdString(entry.date_started.toString()));
+  q.bindValue(":date_end", QString::fromStdString(entry.date_completed.toString()));
   q.bindValue(":score", entry.score);
   q.bindValue(":status", static_cast<int>(entry.status));
   q.bindValue(":private", entry.is_private);
@@ -436,7 +436,7 @@ void Database::migrateItemsFromV1() {
   QSqlQuery q{db_};
   if (!q.prepare(sql("insertAnime"))) return;
 
-  const auto path = std::format("{}/v1/db/anime.xml", taiga::get_data_path());
+  const auto path = std::format("{}/v1/db/anime.xml", taiga::getDataPath());
 
   db_.transaction();
 
@@ -458,7 +458,7 @@ void Database::migrateListEntriesFromV1() {
 
   const auto path = []() {
     const auto service = taiga::settings()->syncService();
-    return std::format("{}/v1/user/{}@{}/anime.xml", taiga::get_data_path(),
+    return std::format("{}/v1/user/{}@{}/anime.xml", taiga::getDataPath(),
                        taiga::accounts()->serviceUsername(service), service);
   }();
 
@@ -481,7 +481,7 @@ void Database::migrateSettingsFromV1() {
   QSqlQuery q{db_};
   if (!q.prepare(sql("insertAnimeSettings"))) return;
 
-  const auto path = std::format("{}/v1/settings.xml", taiga::get_data_path());
+  const auto path = std::format("{}/v1/settings.xml", taiga::getDataPath());
 
   db_.transaction();
 

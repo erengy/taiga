@@ -137,7 +137,7 @@ void ImageProvider::reloadPoster(const int id) {
 }
 
 QString ImageProvider::fileName(const int id) const {
-  const auto path = QString::fromStdString(taiga::get_data_path());
+  const auto path = QString::fromStdString(taiga::getDataPath());
   const auto service = sync::serviceSlug(sync::currentServiceId());
 
   auto extension = u"jpg"_s;

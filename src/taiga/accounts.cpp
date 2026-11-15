@@ -30,7 +30,7 @@ namespace taiga {
 Accounts::Accounts(QObject* parent) : QObject{parent} {}
 
 QString Accounts::fileName() const {
-  return u"%1/accounts.json"_s.arg(get_data_path());
+  return u"%1/accounts.json"_s.arg(getDataPath());
 }
 
 ////////////////////////////////////////////////////////////////////////////////

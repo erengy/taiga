@@ -41,8 +41,7 @@ void Settings::init() const {
 
   // v1 to v2
   if (!QFile::exists(fileName())) {
-    compat::v1::readSettings(std::format("{}/v1/settings.xml", get_data_path()), *this,
-                             *accounts());
+    compat::v1::readSettings(std::format("{}/v1/settings.xml", getDataPath()), *this, *accounts());
     setValue(Key::kMetaVersion, appVersion);
     return;
   }
@@ -55,7 +54,7 @@ void Settings::init() const {
 }
 
 QString Settings::fileName() const {
-  return u"%1/settings.json"_s.arg(get_data_path());
+  return u"%1/settings.json"_s.arg(getDataPath());
 }
 
 void Settings::onValueChanged(QAnyStringView key) const {

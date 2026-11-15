@@ -39,8 +39,8 @@ public:
   Season& operator--();
   std::strong_ordering operator<=>(const Season& season) const;
 
-  bool has_name() const;
-  bool has_year() const;
+  bool hasName() const;
+  bool hasYear() const;
 
   SeasonName name = SeasonName::Unknown;
   std::chrono::year year{0};

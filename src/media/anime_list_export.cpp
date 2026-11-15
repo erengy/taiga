@@ -145,8 +145,8 @@ bool exportAsXml(const std::string& path) {
     xml.writeNumberElement("series_episodes", item->episode_count);
     xml.writeNumberElement("my_id", 0);
     xml.writeNumberElement("my_watched_episodes", entry.watched_episodes);
-    xml.writeTextElement("my_start_date", entry.date_started.to_string());
-    xml.writeTextElement("my_finish_date", entry.date_completed.to_string());
+    xml.writeTextElement("my_start_date", entry.date_started.toString());
+    xml.writeTextElement("my_finish_date", entry.date_completed.toString());
     xml.writeTextElement("my_fansub_group", "");
     xml.writeTextElement("my_rated", "");
     xml.writeNumberElement("my_score", sync::myanimelist::fromListScore(entry.score));

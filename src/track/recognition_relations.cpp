@@ -32,7 +32,7 @@ namespace track::recognition {
 namespace {
 
 QString readRelationsFile() {
-  const auto path = u"%1/anime-relations.txt"_s.arg(taiga::get_data_path());
+  const auto path = u"%1/anime-relations.txt"_s.arg(taiga::getDataPath());
 
   const auto contents = base::readFile(path);
   if (contents.isEmpty()) {

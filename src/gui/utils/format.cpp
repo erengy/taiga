@@ -151,8 +151,8 @@ QString formatTransferProgress(const qint64 current, const qint64 total) {
 }
 
 QString formatSeason(const anime::Season season, QString placeholder) {
-  if (!season.has_name() && !season.has_year()) return placeholder;
-  if (!season.has_name()) {
+  if (!season.hasName() && !season.hasYear()) return placeholder;
+  if (!season.hasName()) {
     return u"%1"_s.arg(static_cast<int>(season.year));
   } else {
     return u"%1 %2"_s.arg(formatSeasonName(season.name)).arg(static_cast<int>(season.year));

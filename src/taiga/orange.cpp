@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,12 +40,12 @@ constexpr std::array<std::pair<int, float>, 32> notes{{
 }};
 // clang-format on
 
-constexpr float get_frequency(const int note) {
+constexpr float getFrequency(const int note) {
   if (note < 0 || note > 119) return -1.0f;
   return 440.0f * std::pow(2.0f, static_cast<float>(note - 57) / 12.0f);
 };
 
-constexpr float get_duration(const float duration) {
+constexpr float getDuration(const float duration) {
   return 1600 * duration;
 };
 
@@ -64,7 +64,7 @@ void Orange::run() {
   for (const auto& [note, duration] : notes) {
     if (isInterruptionRequested()) break;
 #ifdef Q_OS_WINDOWS
-    ::Beep(static_cast<DWORD>(get_frequency(note)), static_cast<DWORD>(get_duration(duration)));
+    ::Beep(static_cast<DWORD>(getFrequency(note)), static_cast<DWORD>(getDuration(duration)));
 #endif
   }
 }
