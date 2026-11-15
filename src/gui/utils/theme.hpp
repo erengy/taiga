@@ -38,6 +38,12 @@ public:
   bool isDark() const;
   bool isFusion() const;
 
+  // Item view colors for widgets that paint their own items. Keep in sync with the themed item
+  // rules in dark.qss and light.qss.
+  QColor itemAlternateColor() const;
+  QColor itemHoverColor() const;
+  QColor itemSelectionColor(bool active) const;
+
   static QColor errorColor();
   static QColor successColor();
   static QColor warningColor();

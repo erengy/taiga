@@ -62,12 +62,11 @@ void ListItemDelegateCards::paint(QPainter* painter, const QStyleOptionViewItem&
   painter->setClipPath(path);
 
   // Background
+  painter->fillRect(rect, theme()->itemAlternateColor());
   if (option.state & QStyle::State_Selected) {
-    painter->fillRect(rect, opt.palette.highlight());
-  } else if (theme()->isDark()) {
-    painter->fillRect(rect, opt.palette.mid());
-  } else {
-    painter->fillRect(rect, opt.palette.alternateBase());
+    painter->fillRect(rect, theme()->itemSelectionColor(option.state & QStyle::State_Active));
+  } else if (option.state & QStyle::State_MouseOver) {
+    painter->fillRect(rect, theme()->itemHoverColor());
   }
 
   // Poster
@@ -75,11 +74,7 @@ void ListItemDelegateCards::paint(QPainter* painter, const QStyleOptionViewItem&
     QRect posterRect = rect;
     posterRect.setWidth(posterWidth);
 
-    if (theme()->isDark()) {
-      painter->fillRect(posterRect, opt.palette.dark());
-    } else {
-      painter->fillRect(posterRect, opt.palette.mid());
-    }
+    painter->fillRect(posterRect, theme()->isDark() ? opt.palette.dark() : opt.palette.mid());
 
     const auto pixmap =
         index.data(static_cast<int>(AnimeListItemDataRole::Poster)).value<QPixmap>();
@@ -130,7 +125,7 @@ void ListItemDelegateCards::paint(QPainter* painter, const QStyleOptionViewItem&
     QRect titleRect = rect;
     titleRect.setHeight(32);
 
-    painter->fillRect(titleRect, opt.palette.dark());
+    painter->fillRect(titleRect, theme()->itemAlternateColor());
     titleRect.adjust(12, 0, -12, 0);
 
     auto titleFont = font;
@@ -214,6 +209,29 @@ void ListItemDelegateCards::paint(QPainter* painter, const QStyleOptionViewItem&
 
     painter->drawText(synopsisRect, Qt::TextWordWrap, synopsis);
   }
+
+  // Selection border
+  if (option.state & QStyle::State_Selected) {
+    paintSelectionBorder(painter, option);
+  }
+}
+
+void ListItemDelegateCards::paintSelectionBorder(QPainter* painter,
+                                                 const QStyleOptionViewItem& option) const {
+  constexpr qreal kBorderWidth = 1;
+  constexpr qreal kBorderRadius = 4;
+
+  QColor color = option.palette.highlight().color();
+  if (!(option.state & QStyle::State_Active)) color.setAlphaF(0.5f);
+
+  // Draw inside the card, since it is clipped to its rounded rect.
+  const qreal inset = kBorderWidth / 2;
+  const QRectF rect = QRectF(option.rect).adjusted(inset, inset, -inset, -inset);
+
+  painter->setRenderHint(QPainter::Antialiasing);
+  painter->setPen(QPen(color, kBorderWidth));
+  painter->setBrush(Qt::NoBrush);
+  painter->drawRoundedRect(rect, kBorderRadius - inset, kBorderRadius - inset);
 }
 
 QSize ListItemDelegateCards::sizeHint(const QStyleOptionViewItem& option,

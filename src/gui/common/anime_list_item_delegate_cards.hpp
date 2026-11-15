@@ -44,6 +44,7 @@ protected:
 
 private:
   QSize itemSize() const;
+  void paintSelectionBorder(QPainter* painter, const QStyleOptionViewItem& option) const;
   void advanceSpinner();
 
   QPixmap m_spinnerPixmap;

@@ -100,6 +100,19 @@ QColor Theme::warningColor() {
   return QColor(0xfb, 0x8c, 0x00);  // Orange 600
 }
 
+QColor Theme::itemAlternateColor() const {
+  return isDark() ? QColor::fromRgbF(1, 1, 1, 0.03f) : QColor::fromRgbF(0, 0, 0, 0.04f);
+}
+
+QColor Theme::itemHoverColor() const {
+  return isDark() ? QColor::fromRgbF(1, 1, 1, 0.05f) : QColor::fromRgbF(0, 0, 0, 0.04f);
+}
+
+QColor Theme::itemSelectionColor(bool active) const {
+  if (isDark()) return QColor::fromRgbF(1, 1, 1, active ? 0.20f : 0.10f);
+  return QColor::fromRgbF(0, 0, 0, active ? 0.08f : 0.06f);
+}
+
 Theme* theme() {
   static auto instance = new Theme{qApp};
   return instance;

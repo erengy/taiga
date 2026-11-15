@@ -40,6 +40,8 @@ ListViewCards::ListViewCards(QWidget* parent, AnimeListModel* model,
 
   setItemDelegate(new ListItemDelegateCards(this));
 
+  viewport()->setAttribute(Qt::WA_Hover);
+
   setViewMode(QListView::ViewMode::IconMode);
   setResizeMode(QListView::ResizeMode::Adjust);
   setSpacing(16);
