@@ -33,6 +33,9 @@ constexpr auto kApiUrl = "https://api.myanimelist.net/v2";
 constexpr auto kTokenUrl = "https://myanimelist.net/v1/oauth2/token";
 
 class Service final : public sync::Service {
+  Q_OBJECT
+  Q_DISABLE_COPY_MOVE(Service)
+
 public:
   Service();
 

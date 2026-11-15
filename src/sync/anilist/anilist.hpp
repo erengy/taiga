@@ -23,6 +23,9 @@
 namespace sync::anilist {
 
 class Service final : public sync::Service {
+  Q_OBJECT
+  Q_DISABLE_COPY_MOVE(Service)
+
 public:
   Service();
 
