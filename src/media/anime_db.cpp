@@ -328,23 +328,23 @@ void Database::bindItemToQuery(const Anime& item, QSqlQuery& q) const {
   q.bindValue(":synonym", toJsonArray(item.titles.synonyms));
   q.bindValue(":type", static_cast<int>(item.type));
   q.bindValue(":status", static_cast<int>(item.status));
-  q.bindValue(":episode_count", item.episode_count);
-  q.bindValue(":episode_length", item.episode_length);
-  q.bindValue(":date_start", QString::fromStdString(item.date_started.toString()));
-  q.bindValue(":date_end", QString::fromStdString(item.date_finished.toString()));
-  q.bindValue(":image", QString::fromStdString(item.image_url));
-  q.bindValue(":trailer_id", QString::fromStdString(item.trailer_id));
-  q.bindValue(":age_rating", static_cast<int>(item.age_rating));
+  q.bindValue(":episode_count", item.episodeCount);
+  q.bindValue(":episode_length", item.episodeLength);
+  q.bindValue(":date_start", QString::fromStdString(item.dateStarted.toString()));
+  q.bindValue(":date_end", QString::fromStdString(item.dateFinished.toString()));
+  q.bindValue(":image", QString::fromStdString(item.imageUrl));
+  q.bindValue(":trailer_id", QString::fromStdString(item.trailerId));
+  q.bindValue(":age_rating", static_cast<int>(item.ageRating));
   q.bindValue(":genres", toJsonArray(item.genres));
   q.bindValue(":tags", toJsonArray(item.tags));
   q.bindValue(":producers", toJsonArray(item.producers));
   q.bindValue(":studios", toJsonArray(item.studios));
   q.bindValue(":score", QString::number(item.score));
-  q.bindValue(":popularity", item.popularity_rank);
+  q.bindValue(":popularity", item.popularityRank);
   q.bindValue(":synopsis", QString::fromStdString(item.synopsis));
-  q.bindValue(":last_aired_episode", item.last_aired_episode);
-  q.bindValue(":next_episode_time", QString::number(item.next_episode_time));
-  q.bindValue(":modified", QString::number(item.last_modified));
+  q.bindValue(":last_aired_episode", item.lastAiredEpisode);
+  q.bindValue(":next_episode_time", QString::number(item.nextEpisodeTime));
+  q.bindValue(":modified", QString::number(item.lastModified));
 }
 
 void Database::bindEntryToQuery(const ListEntry& entry, QSqlQuery& q) const {
@@ -374,19 +374,19 @@ void Database::bindSettingsToQuery(const Settings& settings, QSqlQuery& q) const
 Anime Database::itemFromQuery(const QSqlQuery& q) const {
   return {
       .id = q.value("id").toInt(),
-      .last_modified = q.value("modified").toInt(),
-      .episode_count = q.value("episode_count").toInt(),
-      .episode_length = q.value("episode_length").toInt(),
-      .age_rating = q.value("age_rating").value<anime::AgeRating>(),
+      .lastModified = q.value("modified").toInt(),
+      .episodeCount = q.value("episode_count").toInt(),
+      .episodeLength = q.value("episode_length").toInt(),
+      .ageRating = q.value("age_rating").value<anime::AgeRating>(),
       .status = q.value("status").value<anime::Status>(),
       .type = q.value("type").value<anime::Type>(),
-      .date_started = FuzzyDate(q.value("date_start").toString().toStdString()),
-      .date_finished = FuzzyDate(q.value("date_end").toString().toStdString()),
+      .dateStarted = FuzzyDate(q.value("date_start").toString().toStdString()),
+      .dateFinished = FuzzyDate(q.value("date_end").toString().toStdString()),
       .score = q.value("score").toFloat(),
-      .popularity_rank = q.value("popularity").toInt(),
-      .image_url = q.value("image").toString().toStdString(),
+      .popularityRank = q.value("popularity").toInt(),
+      .imageUrl = q.value("image").toString().toStdString(),
       .synopsis = q.value("synopsis").toString().toStdString(),
-      .trailer_id = q.value("trailer_id").toString().toStdString(),
+      .trailerId = q.value("trailer_id").toString().toStdString(),
       .titles{
           .romaji = q.value("title").toString().toStdString(),
           .english = q.value("english").toString().toStdString(),
@@ -397,8 +397,8 @@ Anime Database::itemFromQuery(const QSqlQuery& q) const {
       .producers = fromJsonArray(q.value("producers")),
       .studios = fromJsonArray(q.value("studios")),
       .tags = fromJsonArray(q.value("tags")),
-      .last_aired_episode = q.value("last_aired_episode").toInt(),
-      .next_episode_time = q.value("next_episode_time").toInt(),
+      .lastAiredEpisode = q.value("last_aired_episode").toInt(),
+      .nextEpisodeTime = q.value("next_episode_time").toInt(),
   };
 }
 

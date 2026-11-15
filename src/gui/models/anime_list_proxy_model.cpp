@@ -127,12 +127,12 @@ bool AnimeListProxyModel::filterAcceptsRow(int row, const QModelIndex& parent) c
 
   // Year
   if (m_filter.year) {
-    if (anime->date_started.year() != *m_filter.year) return false;
+    if (anime->dateStarted.year() != *m_filter.year) return false;
   }
 
   // Season
   if (m_filter.season) {
-    const anime::Season season{anime->date_started};
+    const anime::Season season{anime->dateStarted};
     if (static_cast<int>(season.name) != *m_filter.season) return false;
   }
 
@@ -229,7 +229,7 @@ std::partial_ordering AnimeListProxyModel::compare(const QModelIndex& lhs, const
                             Qt::CaseInsensitive) <=> 0;
 
     case AnimeListModel::ColumnDuration:
-      return lhsAnime->episode_length <=> rhsAnime->episode_length;
+      return lhsAnime->episodeLength <=> rhsAnime->episodeLength;
 
     case AnimeListModel::ColumnAverage:
       return lhsAnime->score <=> rhsAnime->score;
@@ -253,7 +253,7 @@ std::partial_ordering AnimeListProxyModel::compare(const QModelIndex& lhs, const
       return (lhsEntry ? lhsEntry->score : 0) <=> (rhsEntry ? rhsEntry->score : 0);
 
     case AnimeListModel::ColumnSeason:
-      return lhsAnime->date_started <=> rhsAnime->date_started;
+      return lhsAnime->dateStarted <=> rhsAnime->dateStarted;
 
     case AnimeListModel::ColumnStarted:
       return (lhsEntry ? lhsEntry->date_started : FuzzyDate{}) <=>

@@ -44,7 +44,7 @@ bool exportAsMarkdown(const std::string& path) {
   for (const auto& entry : anime::db()->entries()) {
     const auto item = anime::db()->item(entry.anime_id);
     const auto line =
-        std::format("{} ({}/{})", item->titles.romaji, entry.watched_episodes, item->episode_count);
+        std::format("{} ({}/{})", item->titles.romaji, entry.watched_episodes, item->episodeCount);
     statusLists[entry.status].push_back(line);
   }
 
@@ -142,7 +142,7 @@ bool exportAsXml(const std::string& path) {
     xml.writeNumberElement("series_animedb_id", item->id);  // @TODO: pass actual MAL ID
     xml.writeTextElement("series_title", item->titles.romaji);
     xml.writeTextElement("series_type", formatSeriesType(item->type));
-    xml.writeNumberElement("series_episodes", item->episode_count);
+    xml.writeNumberElement("series_episodes", item->episodeCount);
     xml.writeNumberElement("my_id", 0);
     xml.writeNumberElement("my_watched_episodes", entry.watched_episodes);
     xml.writeTextElement("my_start_date", entry.date_started.toString());

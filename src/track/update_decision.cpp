@@ -28,7 +28,7 @@ std::optional<int> watchedEpisodeNumber(const Episode& episode, const anime::Det
   if (range && range->second > 0) return range->second;
 
   // Single-episode anime can do without an episode number.
-  if (item.episode_count == 1) return 1;
+  if (item.episodeCount == 1) return 1;
 
   return std::nullopt;
 }
@@ -42,7 +42,7 @@ UpdateDecision decideUpdate(const Episode& episode, const anime::Details& item,
   if (outsideLibrary) return {Action::Deny, Reason::OutsideLibrary};
 
   const auto number = watchedEpisodeNumber(episode, item);
-  if (!number || (item.episode_count > 0 && *number > item.episode_count)) {
+  if (!number || (item.episodeCount > 0 && *number > item.episodeCount)) {
     return {Action::Deny, Reason::InvalidEpisode};
   }
 
@@ -51,7 +51,7 @@ UpdateDecision decideUpdate(const Episode& episode, const anime::Details& item,
   const int watchedEpisodes = inList ? entry->watched_episodes : 0;
 
   if (completed || *number < watchedEpisodes ||
-      (*number == watchedEpisodes && item.episode_count != 1)) {
+      (*number == watchedEpisodes && item.episodeCount != 1)) {
     return {Action::Deny, Reason::AlreadyWatched};
   }
 

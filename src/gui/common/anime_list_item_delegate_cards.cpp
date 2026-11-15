@@ -100,7 +100,7 @@ void ListItemDelegateCards::paint(QPainter* painter, const QStyleOptionViewItem&
       }
 
       painter->drawPixmap(posterRect, pixmap, sourceRect);
-    } else if (!item->image_url.empty()) {
+    } else if (!item->imageUrl.empty()) {
       m_loadingIndices.insert(index);
       if (!m_timerSpinner.isActive()) {
         m_timerSpinner.start(kSpinnerIntervalMs);
@@ -149,11 +149,11 @@ void ListItemDelegateCards::paint(QPainter* painter, const QStyleOptionViewItem&
   {
     QStringList parts{
         formatType(item->type),
-        formatSeason(anime::Season{item->date_started}),
+        formatSeason(anime::Season{item->dateStarted}),
         formatScore(item->score),
     };
-    if (item->episode_count != 1) {
-      parts.insert(1, tr("%1 episodes").arg(formatNumber(item->episode_count, "?")));
+    if (item->episodeCount != 1) {
+      parts.insert(1, tr("%1 episodes").arg(formatNumber(item->episodeCount, "?")));
     }
     const QString summary = parts.join(" · ");
 
@@ -173,7 +173,7 @@ void ListItemDelegateCards::paint(QPainter* painter, const QStyleOptionViewItem&
   // Details
   {
     const QStringList lines{
-        u"%1 (%2)"_s.arg(formatFuzzyDateRange(item->date_started, item->date_finished))
+        u"%1 (%2)"_s.arg(formatFuzzyDateRange(item->dateStarted, item->dateFinished))
             .arg(formatStatus(item->status)),
         joinStrings(item->genres),
         joinStrings(!item->studios.empty() ? item->studios : item->producers),

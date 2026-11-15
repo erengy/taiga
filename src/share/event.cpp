@@ -61,8 +61,8 @@ QJsonObject animeToJson(const Anime& item) {
       {u"title"_s, QString::fromStdString(anime::preferredTitle(item))},
       {u"url"_s, sync::animePageUrl(item.id)},
   };
-  if (item.episode_count > 0) object[u"episodes"_s] = item.episode_count;
-  if (!item.image_url.empty()) object[u"image"_s] = QString::fromStdString(item.image_url);
+  if (item.episodeCount > 0) object[u"episodes"_s] = item.episodeCount;
+  if (!item.imageUrl.empty()) object[u"image"_s] = QString::fromStdString(item.imageUrl);
   return object;
 }
 

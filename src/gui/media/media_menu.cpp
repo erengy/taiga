@@ -148,7 +148,7 @@ void MediaMenu::editEpisode() const {
 
   for (const auto& item : m_items) {
     if (const auto entry = getEntry(item.id)) watchedEpisodes.insert(entry->watched_episodes);
-    if (item.episode_count > 0) maxValue = std::min(maxValue, item.episode_count);
+    if (item.episodeCount > 0) maxValue = std::min(maxValue, item.episodeCount);
   }
 
   const int initalValue = watchedEpisodes.size() == 1 ? watchedEpisodes.values().front() : 0;
@@ -378,8 +378,8 @@ void MediaMenu::searchWikipedia() const {
 
 void MediaMenu::searchYouTube() const {
   for (const auto& item : m_items) {
-    if (!item.trailer_id.empty()) {
-      QUrl url{u"https://youtu.be/%1"_s.arg(item.trailer_id)};
+    if (!item.trailerId.empty()) {
+      QUrl url{u"https://youtu.be/%1"_s.arg(item.trailerId)};
       QDesktopServices::openUrl(url);
     } else {
       QUrl url{"https://www.youtube.com/results"};
@@ -391,11 +391,11 @@ void MediaMenu::searchYouTube() const {
 
 void MediaMenu::setDateCompletedToAiringEnd() const {
   for (const auto& item : m_items) {
-    if (!item.date_finished) continue;
+    if (!item.dateFinished) continue;
     const auto* entry = getEntry(item.id);
     if (entry && entry->date_completed) continue;
     auto updated = entry ? *entry : ListEntry{.anime_id = item.id};
-    updated.date_completed = item.date_finished;
+    updated.date_completed = item.dateFinished;
     anime::list::save(updated);
   }
 }
@@ -414,11 +414,11 @@ void MediaMenu::setDateCompletedToLastUpdated() const {
 
 void MediaMenu::setDateStartedToAiringStart() const {
   for (const auto& item : m_items) {
-    if (!item.date_started) continue;
+    if (!item.dateStarted) continue;
     const auto* entry = getEntry(item.id);
     if (entry && entry->date_started) continue;
     auto updated = entry ? *entry : ListEntry{.anime_id = item.id};
-    updated.date_started = item.date_started;
+    updated.date_started = item.dateStarted;
     anime::list::save(updated);
   }
 }
@@ -600,7 +600,7 @@ void MediaMenu::addLibraryItems() {
 
   // Play
   addMenu([this, &item, entry]() {
-    const int totalEpisodes = std::max(item.episode_count, 0);
+    const int totalEpisodes = std::max(item.episodeCount, 0);
     const int watchedEpisodes = entry ? entry->watched_episodes : 0;
     const int maxEpisodes = totalEpisodes ? totalEpisodes : std::numeric_limits<int>::max();
     const int lastEpisode = std::min(watchedEpisodes, maxEpisodes);
@@ -622,7 +622,7 @@ void MediaMenu::addLibraryItems() {
     }
 
     // Play random episode
-    if (item.episode_count != 1) {
+    if (item.episodeCount != 1) {
       menu->addAction(theme()->getIcon("shuffle"), tr("Random episode"), this,
                       &MediaMenu::playRandomEpisode);
     }

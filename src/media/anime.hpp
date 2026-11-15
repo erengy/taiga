@@ -92,27 +92,27 @@ struct Details {
   int id = kUnknownId;
   // std::map<sync::ServiceId, std::string> uids;
   // sync::ServiceId source = sync::ServiceId::Unknown;
-  std::time_t last_modified = 0;
-  int episode_count = kUnknownEpisodeCount;
-  int episode_length = kUnknownEpisodeLength;
-  AgeRating age_rating = AgeRating::Unknown;
+  std::time_t lastModified = 0;
+  int episodeCount = kUnknownEpisodeCount;
+  int episodeLength = kUnknownEpisodeLength;
+  AgeRating ageRating = AgeRating::Unknown;
   Status status = Status::Unknown;
   Type type = Type::Unknown;
-  FuzzyDate date_started;
-  FuzzyDate date_finished;
+  FuzzyDate dateStarted;
+  FuzzyDate dateFinished;
   float score = 0.0f;
-  int popularity_rank = 0;
-  std::string image_url;
+  int popularityRank = 0;
+  std::string imageUrl;
   std::string slug;
   std::string synopsis;
-  std::string trailer_id;
+  std::string trailerId;
   Titles titles;
   std::vector<std::string> genres;
   std::vector<std::string> producers;
   std::vector<std::string> studios;
   std::vector<std::string> tags;
-  int last_aired_episode = 0;
-  std::time_t next_episode_time = 0;
+  int lastAiredEpisode = 0;
+  std::time_t nextEpisodeTime = 0;
 };
 
 }  // namespace anime

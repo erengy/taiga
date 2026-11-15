@@ -100,17 +100,17 @@ std::optional<Anime> parseMedia(const QJsonValue& json) {
 
   Anime item{
       .id = id,
-      .last_modified = QDateTime::currentSecsSinceEpoch(),
-      .episode_count = json["episodes"].toInt(),
-      .episode_length = json["duration"].toInt(),
-      .age_rating = json["isAdult"].toBool() ? anime::AgeRating::R18 : anime::AgeRating::Unknown,
+      .lastModified = QDateTime::currentSecsSinceEpoch(),
+      .episodeCount = json["episodes"].toInt(),
+      .episodeLength = json["duration"].toInt(),
+      .ageRating = json["isAdult"].toBool() ? anime::AgeRating::R18 : anime::AgeRating::Unknown,
       .status = parseStatus(json["status"].toString()),
       .type = parseType(json["format"].toString()),
-      .date_started = parseFuzzyDate(json["startDate"]),
-      .date_finished = parseFuzzyDate(json["endDate"]),
+      .dateStarted = parseFuzzyDate(json["startDate"]),
+      .dateFinished = parseFuzzyDate(json["endDate"]),
       .score = parseScore(json["averageScore"].toInt()),
-      .popularity_rank = json["popularity"].toInt(),
-      .image_url = json["coverImage"]["extraLarge"].toString().toStdString(),
+      .popularityRank = json["popularity"].toInt(),
+      .imageUrl = json["coverImage"]["extraLarge"].toString().toStdString(),
       .synopsis = json["description"].toString().toStdString(),
       .titles{
           .romaji = json["title"]["romaji"].toString().toStdString(),
@@ -128,7 +128,7 @@ std::optional<Anime> parseMedia(const QJsonValue& json) {
   }
 
   if (json["trailer"]["site"] == "youtube") {
-    item.trailer_id = json["trailer"]["id"].toString().toStdString();
+    item.trailerId = json["trailer"]["id"].toString().toStdString();
   }
 
   for (const auto value : json["genres"].toArray()) {
@@ -158,8 +158,8 @@ std::optional<Anime> parseMedia(const QJsonValue& json) {
   }
 
   if (const auto nextAiringEpisode = json["nextAiringEpisode"]; nextAiringEpisode.isObject()) {
-    item.next_episode_time = nextAiringEpisode["airingAt"].toVariant().toLongLong();
-    item.last_aired_episode = std::max(nextAiringEpisode["episode"].toInt() - 1, 0);
+    item.nextEpisodeTime = nextAiringEpisode["airingAt"].toVariant().toLongLong();
+    item.lastAiredEpisode = std::max(nextAiringEpisode["episode"].toInt() - 1, 0);
   }
 
   return item;

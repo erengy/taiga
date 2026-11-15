@@ -86,25 +86,25 @@ Anime parseAnimeElement(QXmlStreamReader& xml) {
       anime.status = static_cast<anime::Status>(XML_ELEMENT.toInt());
 
     } else if (xml.name() == u"episode_count") {
-      anime.episode_count = XML_ELEMENT.toInt();
+      anime.episodeCount = XML_ELEMENT.toInt();
 
     } else if (xml.name() == u"episode_length") {
-      anime.episode_length = XML_ELEMENT.toInt();
+      anime.episodeLength = XML_ELEMENT.toInt();
 
     } else if (xml.name() == u"date_start") {
-      anime.date_started = FuzzyDate(XML_ELEMENT.toStdString());
+      anime.dateStarted = FuzzyDate(XML_ELEMENT.toStdString());
 
     } else if (xml.name() == u"date_end") {
-      anime.date_finished = FuzzyDate(XML_ELEMENT.toStdString());
+      anime.dateFinished = FuzzyDate(XML_ELEMENT.toStdString());
 
     } else if (xml.name() == u"image") {
-      anime.image_url = XML_ELEMENT.toStdString();
+      anime.imageUrl = XML_ELEMENT.toStdString();
 
     } else if (xml.name() == u"trailer_id") {
-      anime.trailer_id = XML_ELEMENT.toStdString();
+      anime.trailerId = XML_ELEMENT.toStdString();
 
     } else if (xml.name() == u"age_rating") {
-      anime.age_rating = static_cast<anime::AgeRating>(XML_ELEMENT.toInt());
+      anime.ageRating = static_cast<anime::AgeRating>(XML_ELEMENT.toInt());
 
     } else if (xml.name() == u"genres") {
       anime.genres = toVector(XML_ELEMENT.split(", ", Qt::SkipEmptyParts));
@@ -122,19 +122,19 @@ Anime parseAnimeElement(QXmlStreamReader& xml) {
       anime.score = XML_ELEMENT.toFloat();
 
     } else if (xml.name() == u"popularity") {
-      anime.popularity_rank = XML_ELEMENT.toInt();
+      anime.popularityRank = XML_ELEMENT.toInt();
 
     } else if (xml.name() == u"synopsis") {
       anime.synopsis = XML_ELEMENT.toStdString();
 
     } else if (xml.name() == u"last_aired_episode") {
-      anime.last_aired_episode = XML_ELEMENT.toInt();
+      anime.lastAiredEpisode = XML_ELEMENT.toInt();
 
     } else if (xml.name() == u"next_episode_time") {
-      anime.next_episode_time = XML_ELEMENT.toInt();
+      anime.nextEpisodeTime = XML_ELEMENT.toInt();
 
     } else if (xml.name() == u"modified") {
-      anime.last_modified = XML_ELEMENT.toInt();
+      anime.lastModified = XML_ELEMENT.toInt();
 
     } else {
       xml.skipCurrentElement();

@@ -47,11 +47,11 @@ Status airingStatus(const Details& item) {
 
   // It is now safe to assume that an anime with unknown dates has not yet
   // aired, considering we have covered the rare case mentioned above.
-  if (item.date_started.empty() && item.date_finished.empty()) return Status::NotYetAired;
+  if (item.dateStarted.empty() && item.dateFinished.empty()) return Status::NotYetAired;
 
   const auto today = dateInJapan();
-  if (!item.date_finished.empty() && item.date_finished < today) return Status::FinishedAiring;
-  if (!item.date_started.empty() && item.date_started <= today) return Status::Airing;
+  if (!item.dateFinished.empty() && item.dateFinished < today) return Status::FinishedAiring;
+  if (!item.dateStarted.empty() && item.dateStarted <= today) return Status::Airing;
 
   return Status::NotYetAired;
 }
@@ -75,7 +75,7 @@ bool isFinishedAiring(const Details& item) {
 
 int estimateEpisodeCount(const Details& item, const int lastKnownEpisode) {
   // If we already know the number, we don't need to estimate
-  if (item.episode_count > 0) return item.episode_count;
+  if (item.episodeCount > 0) return item.episodeCount;
 
   // Given all TV series aired in 2006-2016, most of them have their episodes
   // spanning one or two seasons. Following is a table of top ten values:
@@ -106,7 +106,7 @@ int estimateEpisodeCount(const Details& item, const int lastKnownEpisode) {
 }
 
 int estimateEpisodeLength(const Details& item) {
-  if (item.episode_length > 0) return item.episode_length;
+  if (item.episodeLength > 0) return item.episodeLength;
 
   // clang-format off
   switch (item.type) {
@@ -129,29 +129,29 @@ int estimateLastAiredEpisodeNumber(const Details& item) {
   // the series started airing gives us the last aired episode. Note that
   // irregularities such as broadcasts being postponed due to sports events make
   // this method unreliable.
-  if (!item.date_started) return 0;
+  if (!item.dateStarted) return 0;
 
   // To compensate for the fact that we don't know the airing hour,
   // we subtract one more day.
-  const auto days = dateInJapan() - item.date_started - std::chrono::days{1};
+  const auto days = dateInJapan() - item.dateStarted - std::chrono::days{1};
   const auto weeks = std::chrono::duration_cast<std::chrono::weeks>(days);
   if (weeks.count() < 0) return 0;
 
-  if (!item.episode_count || weeks.count() < item.episode_count) {
+  if (!item.episodeCount || weeks.count() < item.episodeCount) {
     if (weeks.count() < 13) {  // Not reliable for longer series
       return weeks.count() + 1;
     }
   }
 
-  return item.episode_count;
+  return item.episodeCount;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 bool isNsfw(const Details& item) {
-  if (item.age_rating == anime::AgeRating::R18) return true;
+  if (item.ageRating == anime::AgeRating::R18) return true;
 
-  if (item.age_rating == anime::AgeRating::Unknown) {
+  if (item.ageRating == anime::AgeRating::Unknown) {
     if (std::ranges::contains(item.genres, "Hentai")) return true;
   }
 
@@ -159,12 +159,12 @@ bool isNsfw(const Details& item) {
 }
 
 bool isStale(const Details& item) {
-  if (!item.last_modified) return true;
+  if (!item.lastModified) return true;
   if (item.synopsis.empty()) return true;
   if (item.genres.empty()) return true;
   if (item.score == kUnknownScore && isAiredYet(item)) return true;
 
-  const auto ms = QDateTime::currentDateTime() - QDateTime::fromSecsSinceEpoch(item.last_modified);
+  const auto ms = QDateTime::currentDateTime() - QDateTime::fromSecsSinceEpoch(item.lastModified);
   const auto duration = Duration{std::chrono::duration_cast<std::chrono::seconds>(ms)};
 
   if (airingStatus(item) == Status::FinishedAiring) return duration.weeks() >= 1;

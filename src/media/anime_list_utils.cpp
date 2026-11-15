@@ -31,7 +31,7 @@ namespace anime::list {
 
 float getProgressRatio(const Details* item, const Entry* entry) {
   const auto progress = (entry ? entry->watched_episodes : 0);
-  const auto total = (item ? item->episode_count : 0);
+  const auto total = (item ? item->episodeCount : 0);
   if (!total) return 0.8f;
   return std::min(progress / static_cast<float>(total), 1.0f);
 }
@@ -44,7 +44,7 @@ bool isInList(const Entry* entry) {
 Entry entryWithEpisodeWatched(const Details& item, const Entry* entry, const int number) {
   auto updated = isInList(entry) ? *entry : Entry{.anime_id = item.id};
 
-  const bool isFinalEpisode = item.episode_count > 0 && number == item.episode_count;
+  const bool isFinalEpisode = item.episodeCount > 0 && number == item.episodeCount;
   const FuzzyDate today{QDate::currentDate().toStdSysDays()};
 
   updated.watched_episodes = number;

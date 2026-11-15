@@ -323,7 +323,7 @@ void NowPlayingWidget::refresh() {
       m_anime ? anime::preferredTitle(*m_anime) : m_episode->element(anitomy::ElementKind::Title);
   const auto episodeNumber =
       formatEpisodeNumbers(m_episode->elements(anitomy::ElementKind::Episode));
-  const auto episodeCount = formatNumber(m_anime ? m_anime->episode_count : 0, "?");
+  const auto episodeCount = formatNumber(m_anime ? m_anime->episodeCount : 0, "?");
 
   QPixmap poster;
   if (m_anime) poster = imageProvider()->loadPoster(m_anime->id);
@@ -337,7 +337,7 @@ void NowPlayingWidget::refresh() {
       .isPlaying = track::media::detection()->getCurrentEpisode().has_value(),
       .isRecognized = m_anime.has_value(),
       .poster = poster,
-      .isPosterLoading = m_anime && poster.isNull() && !m_anime->image_url.empty(),
+      .isPosterLoading = m_anime && poster.isNull() && !m_anime->imageUrl.empty(),
       .updateState = track::updateSession()->state(),
   });
 }

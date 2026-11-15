@@ -140,7 +140,7 @@ void ListViewBase::updateSelectionStatus(const QItemSelection&, const QItemSelec
   for (const auto index : selectedIndexes()) {
     const auto anime = m_model->getAnime(m_proxyModel->mapToSource(index));
     if (!anime) continue;
-    if (anime->episode_count > 0) nEpisodes += anime->episode_count;
+    if (anime->episodeCount > 0) nEpisodes += anime->episodeCount;
     if (anime->score) {
       ++nScore;
       totalScore += anime->score;

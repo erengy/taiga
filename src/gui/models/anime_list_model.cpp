@@ -110,7 +110,7 @@ QVariant AnimeListModel::data(const QModelIndex& index, int role) const {
         case ColumnTitle:
           return QString::fromStdString(anime::preferredTitle(*anime));
         case ColumnDuration:
-          return formatEpisodeLength(anime->episode_length);
+          return formatEpisodeLength(anime->episodeLength);
         case ColumnRewatches:
           if (entry) return entry->rewatched_times;
           break;
@@ -122,7 +122,7 @@ QVariant AnimeListModel::data(const QModelIndex& index, int role) const {
         case ColumnType:
           return formatType(anime->type);
         case ColumnSeason:
-          return formatSeason(anime::Season(anime->date_started));
+          return formatSeason(anime::Season(anime->dateStarted));
         case ColumnStarted:
           if (entry) return formatFuzzyDate(entry->date_started);
           break;
@@ -143,7 +143,7 @@ QVariant AnimeListModel::data(const QModelIndex& index, int role) const {
         case ColumnTitle:
           return QString::fromStdString(anime::preferredTitle(*anime));
         case ColumnSeason:
-          return formatFuzzyDate(anime->date_started);
+          return formatFuzzyDate(anime->dateStarted);
         case ColumnLastUpdated:
           if (entry) return formatTimestamp(entry->last_updated);
           break;
@@ -181,10 +181,10 @@ QVariant AnimeListModel::data(const QModelIndex& index, int role) const {
           if (!anime->score) return disabledTextColor;
           break;
         case ColumnDuration:
-          if (anime->episode_length < 1) return disabledTextColor;
+          if (anime->episodeLength < 1) return disabledTextColor;
           break;
         case ColumnSeason:
-          if (!anime->date_started) return disabledTextColor;
+          if (!anime->dateStarted) return disabledTextColor;
           break;
         case ColumnType:
           if (anime->type == anime::Type::Unknown) return disabledTextColor;

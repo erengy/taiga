@@ -127,7 +127,7 @@ std::optional<Activity> buildActivity(const track::Episode& episode, const qint6
 
   const auto serviceId = sync::currentServiceId();
   const auto title = QString::fromStdString(anime::preferredTitle(*item));
-  const auto imageUrl = QString::fromStdString(item->image_url);
+  const auto imageUrl = QString::fromStdString(item->imageUrl);
   const auto pageUrl = sync::animePageUrl(item->id);
 
   return Activity{
@@ -135,7 +135,7 @@ std::optional<Activity> buildActivity(const track::Episode& episode, const qint6
       .statusDisplayType = StatusDisplayType::Details,  // "Watching <title>"
       .details = title,
       .detailsUrl = pageUrl,
-      .state = formatEpisode(episode, item->episode_count),
+      .state = formatEpisode(episode, item->episodeCount),
       .startTime = startTime,
       .largeImage =
           imageUrl.startsWith(u"https://") ? imageUrl : QString::fromLatin1(kDefaultImage),

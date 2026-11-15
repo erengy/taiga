@@ -48,7 +48,7 @@ void paintProgressBar(QPainter* painter, const QStyleOption& option, const Anime
                       const ListEntry* entry) {
   if (!anime || !entry) return;
 
-  const int episodes = anime->episode_count;
+  const int episodes = anime->episodeCount;
   const int watched = std::clamp(entry->watched_episodes, 0,
                                  episodes > 0 ? episodes : std::numeric_limits<int>::max());
   const auto text = u"%1/%2"_s.arg(watched).arg(formatNumber(episodes, "?"));

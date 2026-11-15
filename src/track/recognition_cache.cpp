@@ -86,8 +86,8 @@ void Cache::add(const anime::Details& item) {
   add(item.titles.japanese);
 
   // Main title + year
-  if (item.date_started.year()) {
-    const auto year = std::format("{}", item.date_started.year());
+  if (item.dateStarted.year()) {
+    const auto year = std::format("{}", item.dateStarted.year());
     if (!item.titles.romaji.contains(year)) {
       add(std::format("{} ({})", item.titles.romaji, year), 0.5f);
     }

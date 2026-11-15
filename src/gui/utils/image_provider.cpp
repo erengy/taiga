@@ -62,9 +62,9 @@ void ImageProvider::init() {
 void ImageProvider::fetchPoster(const int id, const bool revalidate) {
   const auto item = anime::db()->item(id);
 
-  if (!item || item->image_url.empty()) return;
+  if (!item || item->imageUrl.empty()) return;
 
-  QNetworkRequest request{QString::fromStdString(item->image_url)};
+  QNetworkRequest request{QString::fromStdString(item->imageUrl)};
 
   if (revalidate) {
     if (const QFileInfo file{fileName(id)}; file.exists()) {
@@ -77,7 +77,7 @@ void ImageProvider::fetchPoster(const int id, const bool revalidate) {
       if (reply.httpStatus() == 404) {
         if (const auto item = anime::db()->item(id)) {
           auto updatedItem = *item;
-          updatedItem.image_url.clear();
+          updatedItem.imageUrl.clear();
           anime::db()->updateItem(updatedItem);
         }
       }
@@ -141,8 +141,8 @@ QString ImageProvider::fileName(const int id) const {
   const auto service = sync::serviceSlug(sync::currentServiceId());
 
   auto extension = u"jpg"_s;
-  if (const auto item = anime::db()->item(id); item && !item->image_url.empty()) {
-    const QUrl url{QString::fromStdString(item->image_url)};
+  if (const auto item = anime::db()->item(id); item && !item->imageUrl.empty()) {
+    const QUrl url{QString::fromStdString(item->imageUrl)};
     if (const auto suffix = QFileInfo(url.path()).suffix(); !suffix.isEmpty()) {
       extension = suffix;
     }

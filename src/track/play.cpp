@@ -55,7 +55,7 @@ std::optional<int> nextEpisodeNumber(int animeId) {
   int number = watchedEpisodes + 1;
 
   // Replay first episode for completed anime.
-  if (item->episode_count > 0 && number > item->episode_count) {
+  if (item->episodeCount > 0 && number > item->episodeCount) {
     number = 1;
   }
 
@@ -69,18 +69,18 @@ std::optional<int> randomEpisodeNumber(int animeId) {
   const auto entry = anime::db()->entry(animeId);
   const int watchedEpisodes = entry ? entry->watched_episodes : 0;
 
-  int maxEpisode = item->episode_count;
+  int maxEpisode = item->episodeCount;
 
   // Avoid spoiling unwatched episodes, unless the series is completed.
-  // `watchedEpisodes < episode_count` can be true if rewatching.
+  // `watchedEpisodes < episodeCount` can be true if rewatching.
   const bool completed = entry && entry->status == anime::list::Status::Completed;
   if (!completed) {
     maxEpisode = watchedEpisodes + 1;
   }
 
   // Clamp to the known episode count, if any.
-  if (item->episode_count > 0) {
-    maxEpisode = std::min(maxEpisode, item->episode_count);
+  if (item->episodeCount > 0) {
+    maxEpisode = std::min(maxEpisode, item->episodeCount);
   }
 
   if (maxEpisode < 1) return std::nullopt;

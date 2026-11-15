@@ -139,8 +139,8 @@ MediaDialog::MediaDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::MediaDi
     const int status = ui_->comboStatus->itemData(index).toInt();
     if (status != static_cast<int>(anime::list::Status::Completed)) return;
     if (m_entry->status == anime::list::Status::Completed) return;
-    if (m_anime.episode_count < 1) return;
-    ui_->spinProgress->setValue(m_anime.episode_count);
+    if (m_anime.episodeCount < 1) return;
+    ui_->spinProgress->setValue(m_anime.episodeCount);
   });
 
   connect(ui_->checkDateStarted, &QCheckBox::checkStateChanged, this, [this](Qt::CheckState state) {
@@ -253,9 +253,9 @@ void MediaDialog::initDetails() {
     return label;
   };
 
-  auto seasonLabel = new QLabel(formatSeason(anime::Season(m_anime.date_started)), this);
+  auto seasonLabel = new QLabel(formatSeason(anime::Season(m_anime.dateStarted)), this);
   seasonLabel->setCursor(QCursor(Qt::CursorShape::WhatsThisCursor));
-  seasonLabel->setToolTip(formatFuzzyDateRange(m_anime.date_started, m_anime.date_finished));
+  seasonLabel->setToolTip(formatFuzzyDateRange(m_anime.dateStarted, m_anime.dateFinished));
 
   if (!m_anime.titles.synonyms.empty()) {
     ui_->infoLayout->addRow(getRowTitle(tr("Titles:")),
@@ -263,10 +263,10 @@ void MediaDialog::initDetails() {
   }
   ui_->infoLayout->addRow(getRowTitle(tr("Type:")), getRowLabel(formatType(m_anime.type)));
   ui_->infoLayout->addRow(getRowTitle(tr("Episodes:")),
-                          getRowLabel(formatNumber(m_anime.episode_count, "?")));
-  if (m_anime.episode_length > 0 && m_anime.type != anime::Type::Tv) {
-    const auto duration = formatEpisodeLength(m_anime.episode_length);
-    const auto label = m_anime.episode_count == 1 ? duration : u"%1 per episode"_s.arg(duration);
+                          getRowLabel(formatNumber(m_anime.episodeCount, "?")));
+  if (m_anime.episodeLength > 0 && m_anime.type != anime::Type::Tv) {
+    const auto duration = formatEpisodeLength(m_anime.episodeLength);
+    const auto label = m_anime.episodeCount == 1 ? duration : u"%1 per episode"_s.arg(duration);
     ui_->infoLayout->addRow(getRowTitle(tr("Duration:")), getRowLabel(label));
   }
   ui_->infoLayout->addRow(getRowTitle(tr("Status:")), getRowLabel(formatStatus(m_anime.status)));
@@ -306,8 +306,8 @@ void MediaDialog::initList() {
   if (!m_entry.has_value()) return;
 
   // Episodes watched
-  if (m_anime.episode_count > 0) {
-    ui_->spinProgress->setMaximum(m_anime.episode_count);
+  if (m_anime.episodeCount > 0) {
+    ui_->spinProgress->setMaximum(m_anime.episodeCount);
   }
   ui_->spinProgress->setValue(m_entry->watched_episodes);
 
@@ -348,9 +348,9 @@ void MediaDialog::initList() {
   // Date started & completed
   ui_->checkDateStarted->setChecked(static_cast<bool>(m_entry->date_started));
   ui_->checkDateCompleted->setChecked(static_cast<bool>(m_entry->date_completed));
-  if (m_anime.date_started) {
-    ui_->dateStarted->setMinimumDate(fuzzyToDate(m_anime.date_started));
-    ui_->dateCompleted->setMinimumDate(fuzzyToDate(m_anime.date_started));
+  if (m_anime.dateStarted) {
+    ui_->dateStarted->setMinimumDate(fuzzyToDate(m_anime.dateStarted));
+    ui_->dateCompleted->setMinimumDate(fuzzyToDate(m_anime.dateStarted));
   }
   ui_->dateStarted->setDate(m_entry->date_started ? fuzzyToDate(m_entry->date_started)
                                                   : QDate::currentDate());
@@ -398,7 +398,7 @@ void MediaDialog::initSettings() {
 void MediaDialog::loadPosterImage() {
   const auto posterPixmap = imageProvider()->loadPoster(m_anime.id);
   ui_->posterWidget->setPixmap(posterPixmap);
-  ui_->posterWidget->setLoading(posterPixmap.isNull() && !m_anime.image_url.empty());
+  ui_->posterWidget->setLoading(posterPixmap.isNull() && !m_anime.imageUrl.empty());
   resizePosterImage();
 }
 
