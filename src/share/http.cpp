@@ -43,7 +43,7 @@ bool isEnabled() {
 }
 
 std::optional<QUrl> targetUrl() {
-  const QUrl url{QString::fromStdString(taiga::settings()->webhookUrl()), QUrl::StrictMode};
+  QUrl url{QString::fromStdString(taiga::settings()->webhookUrl()), QUrl::StrictMode};
   if (!url.isValid() || url.host().isEmpty()) return std::nullopt;
   if (url.scheme() != u"http" && url.scheme() != u"https") return std::nullopt;
   return url;

@@ -57,7 +57,7 @@ bool parsePlayersData(std::vector<Player>& players) {
 std::vector<Player> getEnabledPlayers(const std::vector<Player>& players) {
   std::vector<Player> enabledPlayers;
 
-  for (const auto player : players) {
+  for (const auto& player : players) {
     if (isDisabled(player)) continue;
 
     enabledPlayers.emplace_back(player);

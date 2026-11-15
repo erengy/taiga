@@ -40,7 +40,7 @@ std::optional<QString> parseErrorMessage(const std::optional<QJsonDocument>& jso
 
   // OAuth token endpoint errors
   // {"error": "...", "error_description": "..."}
-  if (const auto description = root["error_description"].toString(); !description.isEmpty()) {
+  if (auto description = root["error_description"].toString(); !description.isEmpty()) {
     return description;
   }
 
@@ -49,8 +49,8 @@ std::optional<QString> parseErrorMessage(const std::optional<QJsonDocument>& jso
   const auto errors = root["errors"].toArray();
   if (!errors.isEmpty()) {
     const auto error = errors.first().toObject();
-    const auto title = error["title"].toString();
-    const auto detail = error["detail"].toString();
+    auto title = error["title"].toString();
+    auto detail = error["detail"].toString();
     if (!title.isEmpty() && !detail.isEmpty()) return u"%1: %2"_s.arg(title, detail);
     if (!detail.isEmpty()) return detail;
     if (!title.isEmpty()) return title;

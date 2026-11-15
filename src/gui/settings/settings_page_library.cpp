@@ -59,6 +59,7 @@ void SettingsPageLibrary::load() {
 
 void SettingsPageLibrary::apply() const {
   std::vector<std::string> folders;
+  folders.reserve(ui_->libraryFoldersList->count());
   for (int i = 0; i < ui_->libraryFoldersList->count(); ++i) {
     folders.push_back(ui_->libraryFoldersList->item(i)->text().toStdString());
   }

@@ -39,7 +39,7 @@ QString wwwAuthenticateValue(const QRestReply& reply, const QString& key) {
 }
 
 std::optional<QString> parseErrorMessage(QRestReply& reply) {
-  if (const auto description = wwwAuthenticateValue(reply, u"error_description"_s);
+  if (auto description = wwwAuthenticateValue(reply, u"error_description"_s);
       !description.isEmpty()) {
     return description;
   }

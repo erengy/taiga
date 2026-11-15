@@ -489,7 +489,7 @@ void MediaMenu::addMediaItems() {
         {"Wikipedia", &MediaMenu::searchWikipedia},
         {"YouTube", &MediaMenu::searchYouTube},
     };
-    for (const auto [text, slot] : items) {
+    for (const auto& [text, slot] : items) {
       menu->addAction(text, this, slot);
     }
 

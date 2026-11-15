@@ -54,7 +54,7 @@ void ListItemDelegateCards::paint(QPainter* painter, const QStyleOptionViewItem&
   const auto entry =
       index.data(static_cast<int>(AnimeListItemDataRole::ListEntry)).value<const ListEntry*>();
 
-  QStyleOptionViewItem opt = option;
+  const QStyleOptionViewItem& opt = option;
   QRect rect = opt.rect;
 
   QPainterPath path;

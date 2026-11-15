@@ -127,7 +127,7 @@ void normalizeSeasonNumbers(QString& str) {
       {"6", {"6th season", "season 6", "series 6", "s6"}},
   };
 
-  for (auto [after, list] : values) {
+  for (const auto& [after, list] : values) {
     for (auto before : list) {
       replaceWholeWord(str, before, after);
     }
