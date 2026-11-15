@@ -53,6 +53,15 @@
 
 namespace gui {
 
+namespace {
+
+// Parent dialogs to the window, so that they don't match stylesheet rules meant for the widget.
+QWidget* dialogParent(const QWidget* widget) {
+  return widget ? widget->window() : nullptr;
+}
+
+}  // namespace
+
 MediaMenu::MediaMenu(QWidget* parent, const QList<Anime>& items, const QMap<int, ListEntry> entries,
                      QItemSelectionModel* selectionModel, AnimeListContext context)
     : QMenu(parent),
@@ -145,7 +154,7 @@ void MediaMenu::editEpisode() const {
   const int initalValue = watchedEpisodes.size() == 1 ? watchedEpisodes.values().front() : 0;
 
   bool ok = false;
-  const auto value = QInputDialog::getInt(parentWidget(), tr("Edit Episodes Watched"),
+  const auto value = QInputDialog::getInt(dialogParent(parentWidget()), tr("Edit Episodes Watched"),
                                           tr("Enter a number:"), initalValue, 0, maxValue, 1, &ok);
   if (!ok) return;
 
@@ -159,8 +168,8 @@ void MediaMenu::editEpisode() const {
 
 void MediaMenu::editNotes() const {
   bool ok = false;
-  const auto notes =
-      QInputDialog::getMultiLineText(parentWidget(), tr("Edit Notes"), tr("Enter notes:"), "", &ok);
+  const auto notes = QInputDialog::getMultiLineText(dialogParent(parentWidget()), tr("Edit Notes"),
+                                                    tr("Enter notes:"), "", &ok);
   if (!ok) return;
 
   for (const auto& item : m_items) {
@@ -275,7 +284,8 @@ void MediaMenu::removeFromList() const {
     titles.push_back(u"<li>%1</li>"_s.arg(anime::preferredTitle(item)));
   }
 
-  if (confirm(parentWidget(), tr("Do you want to remove selected items from your list?"),
+  if (confirm(dialogParent(parentWidget()),
+              tr("Do you want to remove selected items from your list?"),
               u"<ul>%1</ul>"_s.arg(titles.join("")), tr("Remove"))) {
     for (const auto& item : m_items) {
       anime::list::remove(item.id);
