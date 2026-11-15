@@ -49,6 +49,9 @@ const ThemeColors kDarkColors{
     .itemHover = white(0.05f),
     .itemSelected = white(0.20f),
     .itemSelectedInactive = white(0.10f),
+    .gridLine = QColor(255, 255, 255, 8),
+    .secondaryText = QColor(0xaa, 0xaa, 0xaa),
+    .progress = QColor(12, 164, 12, 128),
     .success = QColor(0x66, 0xbb, 0x6a),  // Green 400
     .warning = QColor(0xff, 0xa7, 0x26),  // Orange 400
 };
@@ -61,6 +64,9 @@ const ThemeColors kLightColors{
     .itemHover = black(0.04f),
     .itemSelected = black(0.08f),
     .itemSelectedInactive = black(0.06f),
+    .gridLine = QColor(0, 0, 0, 8),
+    .secondaryText = QColor(0x66, 0x66, 0x66),
+    .progress = QColor(12, 164, 12),
     .success = QColor(0x43, 0xa0, 0x47),  // Green 600
     .warning = QColor(0xfb, 0x8c, 0x00),  // Orange 600
 };

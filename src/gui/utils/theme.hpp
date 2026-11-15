@@ -35,6 +35,9 @@ struct ThemeColors {
   QColor itemHover;
   QColor itemSelected;
   QColor itemSelectedInactive;
+  QColor gridLine;
+  QColor secondaryText;
+  QColor progress;
   QColor success;
   QColor warning;
 };

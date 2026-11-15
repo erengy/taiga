@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2024, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,9 +25,6 @@
 #include "gui/utils/theme.hpp"
 
 namespace gui {
-
-static const auto lineColorLight = QColor{0, 0, 0, 40};
-static const auto lineColorDark = QColor{255, 255, 255, 40};
 
 NavigationItemDelegate::NavigationItemDelegate(QObject* parent) : QStyledItemDelegate(parent) {}
 
@@ -64,7 +61,7 @@ void NavigationItemDelegate::paintBranch(QPainter* painter, QRect rect, bool isL
 
   painter->setPen([painter]() {
     auto pen = painter->pen();
-    pen.setColor(theme()->isDark() ? lineColorDark : lineColorLight);
+    pen.setColor(theme()->colors().border);
     return pen;
   }());
 
@@ -104,9 +101,9 @@ void NavigationItemDelegate::paintCounter(QPainter* painter, QRect rect, const i
   path.addRoundedRect(rect, 8, 8);
   painter->setClipPath(path);
 
-  painter->fillRect(rect, theme()->isDark() ? lineColorDark : lineColorLight);
+  painter->fillRect(rect, theme()->colors().border);
 
-  painter->setPen(QColor(theme()->isDark() ? 0xAAAAAA : 0x666666));
+  painter->setPen(theme()->colors().secondaryText);
   painter->drawText(rect, Qt::AlignCenter | Qt::TextSingleLine, text);
 }
 
@@ -115,7 +112,7 @@ void NavigationItemDelegate::paintSeparator(QPainter* painter, const QRect& rect
 
   const int y = rect.center().y();
 
-  painter->setPen(theme()->isDark() ? lineColorDark : lineColorLight);
+  painter->setPen(theme()->colors().border);
   painter->drawLine(rect.left() + 8, y, rect.right() - 8, y);
 };
 
