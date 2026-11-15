@@ -148,16 +148,16 @@ std::optional<Redirection> Relations::find(const int id, const int episodeNumber
   if (it == rules_.end()) return std::nullopt;
 
   for (const auto& rule : it->second) {
-    const int distance = episodeNumber - rule.source_range.first;
+    const int distance = episodeNumber - rule.sourceRange.first;
     if (distance < 0) continue;
-    if (episodeNumber > rule.source_range.second) continue;
+    if (episodeNumber > rule.sourceRange.second) continue;
 
-    int destination = rule.destination_range.first;
-    if (rule.destination_range.first != rule.destination_range.second) destination += distance;
-    if (destination > rule.destination_range.second) continue;
+    int destination = rule.destinationRange.first;
+    if (rule.destinationRange.first != rule.destinationRange.second) destination += distance;
+    if (destination > rule.destinationRange.second) continue;
 
     return Redirection{
-        .id = rule.destination_id,
+        .id = rule.destinationId,
         .episodeRange = {destination, destination},
     };
   }

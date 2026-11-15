@@ -42,9 +42,9 @@ public:
 
 private:
   struct Rule {
-    int destination_id;
-    std::pair<int, int> source_range;
-    std::pair<int, int> destination_range;
+    int destinationId;
+    std::pair<int, int> sourceRange;
+    std::pair<int, int> destinationRange;
   };
 
   void parseRule(const QString& rule, const int column);
