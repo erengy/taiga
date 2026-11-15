@@ -32,7 +32,7 @@ QList<Rating> ratingList(const RatingSystem ratingSystem) {
 
   // clang-format off
   switch (ratingSystem) {
-    case RatingSystem::Point_100:
+    case RatingSystem::Point100:
       return {
         {  0,       "0"},
         { 10 * k,  "10"},
@@ -56,7 +56,7 @@ QList<Rating> ratingList(const RatingSystem ratingSystem) {
         {100 * k, "100"},
       };
       break;
-    case RatingSystem::Point_10_Decimal:
+    case RatingSystem::Point10Decimal:
       return {
         {  0,       "0"},
         { 10 * k, "1.0"},
@@ -80,7 +80,7 @@ QList<Rating> ratingList(const RatingSystem ratingSystem) {
         {100 * k,  "10"},
       };
       break;
-    case RatingSystem::Point_10:
+    case RatingSystem::Point10:
       return {
         {  0,      "0"},
         { 10 * k,  "1"},
@@ -94,7 +94,7 @@ QList<Rating> ratingList(const RatingSystem ratingSystem) {
         { 90 * k,  "9"},
         {100 * k, "10"},
       };
-    case RatingSystem::Point_5:
+    case RatingSystem::Point5:
       return {
         { 0,     "☆☆☆☆☆"},
         {10 * k, "★☆☆☆☆"},
@@ -103,7 +103,7 @@ QList<Rating> ratingList(const RatingSystem ratingSystem) {
         {70 * k, "★★★★☆"},
         {90 * k, "★★★★★"},
       };
-    case RatingSystem::Point_3:
+    case RatingSystem::Point3:
       return {
         { 0,     "No Score"},
         {35 * k, ":("},
@@ -120,16 +120,16 @@ QString formatRating(int value, const RatingSystem ratingSystem) {
   value = (value * 100) / anime::list::kScoreMax;
 
   switch (ratingSystem) {
-    case RatingSystem::Point_100:
+    case RatingSystem::Point100:
       return QString::number(value);
 
-    case RatingSystem::Point_10_Decimal:
+    case RatingSystem::Point10Decimal:
       return QString::number(value / 10.0, 'f', 1);
 
-    case RatingSystem::Point_10:
+    case RatingSystem::Point10:
       return QString::number(value / 10);
 
-    case RatingSystem::Point_5:
+    case RatingSystem::Point5:
       value = [value]() {
         if (value < 1) return 0;
         if (value < 30) return 1;
@@ -140,7 +140,7 @@ QString formatRating(int value, const RatingSystem ratingSystem) {
       }();
       return QString{u'★'}.repeated(value) + QString{u'☆'}.repeated(5 - value);
 
-    case RatingSystem::Point_3:
+    case RatingSystem::Point3:
       value = [value]() {
         if (value < 1) return 0;
         if (value < 36) return 1;
@@ -165,11 +165,11 @@ QString formatRating(int value, const RatingSystem ratingSystem) {
 RatingSystem parseRatingSystem(const QString& value) {
   // clang-format off
   static const QMap<QString, RatingSystem> table{
-      {"POINT_100", RatingSystem::Point_100},
-      {"POINT_10_DECIMAL", RatingSystem::Point_10_Decimal},
-      {"POINT_10", RatingSystem::Point_10},
-      {"POINT_5", RatingSystem::Point_5},
-      {"POINT_3", RatingSystem::Point_3},
+      {"POINT_100", RatingSystem::Point100},
+      {"POINT_10_DECIMAL", RatingSystem::Point10Decimal},
+      {"POINT_10", RatingSystem::Point10},
+      {"POINT_5", RatingSystem::Point5},
+      {"POINT_3", RatingSystem::Point3},
   };
   // clang-format on
   return table.value(value, kDefaultRatingSystem);

@@ -37,17 +37,17 @@ constexpr auto kApiUrl = "https://kitsu.app/api/edge";
 constexpr auto kTokenUrl = "https://kitsu.app/api/oauth/token";
 constexpr auto kJsonApiMediaType = "application/vnd.api+json";
 
-enum ListPrivacy {
-  kPrivate = 1,
-  kPublic,
+enum class ListPrivacy {
+  Private = 1,
+  Public,
 };
 
-enum ListStatus {
-  kCurrentlyWatching = 1,
-  kPlanToWatch,
-  kCompleted,
-  kOnHold,
-  kDropped,
+enum class ListStatus {
+  CurrentlyWatching = 1,
+  PlanToWatch,
+  Completed,
+  OnHold,
+  Dropped,
 };
 
 class Service final : public sync::Service {

@@ -28,13 +28,13 @@ class LibraryModel final : public QFileSystemModel {
 
 public:
   enum Column {
-    COLUMN_NAME,
-    COLUMN_SIZE,
-    COLUMN_TYPE,
-    COLUMN_MODIFIED,
-    COLUMN_ANIME,
-    COLUMN_EPISODE,
-    NUM_COLUMNS,
+    ColumnName,
+    ColumnSize,
+    ColumnType,
+    ColumnModified,
+    ColumnAnime,
+    ColumnEpisode,
+    NumColumns,
   };
 
   LibraryModel(QObject* parent);

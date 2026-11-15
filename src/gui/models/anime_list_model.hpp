@@ -38,19 +38,19 @@ class AnimeListModel final : public QAbstractListModel {
 
 public:
   enum Column {
-    COLUMN_TITLE,
-    COLUMN_PROGRESS,
-    COLUMN_DURATION,
-    COLUMN_REWATCHES,
-    COLUMN_SCORE,
-    COLUMN_AVERAGE,
-    COLUMN_TYPE,
-    COLUMN_SEASON,
-    COLUMN_STARTED,
-    COLUMN_COMPLETED,
-    COLUMN_LAST_UPDATED,
-    COLUMN_NOTES,
-    NUM_COLUMNS
+    ColumnTitle,
+    ColumnProgress,
+    ColumnDuration,
+    ColumnRewatches,
+    ColumnScore,
+    ColumnAverage,
+    ColumnType,
+    ColumnSeason,
+    ColumnStarted,
+    ColumnCompleted,
+    ColumnLastUpdated,
+    ColumnNotes,
+    NumColumns
   };
 
   AnimeListModel(QObject* parent);

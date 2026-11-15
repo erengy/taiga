@@ -53,24 +53,24 @@ ListView::ListView(QWidget* parent, AnimeListModel* model, AnimeListProxyModel* 
   header()->setFirstSectionMovable(true);
   header()->setStretchLastSection(false);
   header()->setTextElideMode(Qt::ElideRight);
-  header()->hideSection(AnimeListModel::COLUMN_DURATION);
-  header()->hideSection(AnimeListModel::COLUMN_REWATCHES);
-  header()->hideSection(AnimeListModel::COLUMN_STARTED);
-  header()->hideSection(AnimeListModel::COLUMN_COMPLETED);
-  header()->hideSection(AnimeListModel::COLUMN_NOTES);
+  header()->hideSection(AnimeListModel::ColumnDuration);
+  header()->hideSection(AnimeListModel::ColumnRewatches);
+  header()->hideSection(AnimeListModel::ColumnStarted);
+  header()->hideSection(AnimeListModel::ColumnCompleted);
+  header()->hideSection(AnimeListModel::ColumnNotes);
   if (context == AnimeListContext::Search) {
-    header()->hideSection(AnimeListModel::COLUMN_SCORE);
-    header()->hideSection(AnimeListModel::COLUMN_LAST_UPDATED);
+    header()->hideSection(AnimeListModel::ColumnScore);
+    header()->hideSection(AnimeListModel::ColumnLastUpdated);
   } else {
-    header()->hideSection(AnimeListModel::COLUMN_AVERAGE);
+    header()->hideSection(AnimeListModel::ColumnAverage);
   }
-  header()->resizeSection(AnimeListModel::COLUMN_TITLE, 295);
-  header()->resizeSection(AnimeListModel::COLUMN_PROGRESS, 150);
-  header()->resizeSection(AnimeListModel::COLUMN_DURATION, 75);
-  header()->resizeSection(AnimeListModel::COLUMN_SCORE, 75);
-  header()->resizeSection(AnimeListModel::COLUMN_AVERAGE, 85);
-  header()->resizeSection(AnimeListModel::COLUMN_TYPE, 75);
-  header()->resizeSection(AnimeListModel::COLUMN_LAST_UPDATED, 110);
+  header()->resizeSection(AnimeListModel::ColumnTitle, 295);
+  header()->resizeSection(AnimeListModel::ColumnProgress, 150);
+  header()->resizeSection(AnimeListModel::ColumnDuration, 75);
+  header()->resizeSection(AnimeListModel::ColumnScore, 75);
+  header()->resizeSection(AnimeListModel::ColumnAverage, 85);
+  header()->resizeSection(AnimeListModel::ColumnType, 75);
+  header()->resizeSection(AnimeListModel::ColumnLastUpdated, 110);
 
   // `sortByColumn` needs to be called before `setSortingEnabled`.
   // Otherwise the sort column is set to `0`.

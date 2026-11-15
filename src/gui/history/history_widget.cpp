@@ -47,7 +47,7 @@ HistoryWidget::HistoryWidget(QWidget* parent)
       m_proxyModel(new HistoryProxyModel(parent)),
       m_view(new QTreeView(parent)) {
   m_proxyModel->setSourceModel(m_model);
-  m_proxyModel->sort(HistoryModel::COLUMN_MODIFIED, Qt::SortOrder::DescendingOrder);
+  m_proxyModel->sort(HistoryModel::ColumnModified, Qt::SortOrder::DescendingOrder);
 
   m_view->setObjectName("historyView");
   m_view->setProperty("themed", true);
@@ -64,8 +64,8 @@ HistoryWidget::HistoryWidget(QWidget* parent)
   m_view->header()->setStretchLastSection(false);
   m_view->header()->setTextElideMode(Qt::ElideRight);
   m_view->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
-  m_view->header()->setSectionResizeMode(HistoryModel::COLUMN_TITLE, QHeaderView::Stretch);
-  m_view->header()->setSectionResizeMode(HistoryModel::COLUMN_DETAILS, QHeaderView::Stretch);
+  m_view->header()->setSectionResizeMode(HistoryModel::ColumnTitle, QHeaderView::Stretch);
+  m_view->header()->setSectionResizeMode(HistoryModel::ColumnDetails, QHeaderView::Stretch);
 
   layout()->addWidget(m_view);
 

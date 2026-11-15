@@ -38,7 +38,7 @@ QString Session::fileName() const {
 ////////////////////////////////////////////////////////////////////////////////
 
 int Session::animeListSortColumn() const {
-  return value("animeList.sortColumn", gui::AnimeListModel::COLUMN_TITLE).toInt();
+  return value("animeList.sortColumn", gui::AnimeListModel::ColumnTitle).toInt();
 }
 
 Qt::SortOrder Session::animeListSortOrder() const {
@@ -104,7 +104,7 @@ gui::AnimeListProxyModelFilter Session::searchListFilters() const {
 }
 
 int Session::searchListSortColumn() const {
-  return value("searchList.sortColumn", gui::AnimeListModel::COLUMN_AVERAGE).toInt();
+  return value("searchList.sortColumn", gui::AnimeListModel::ColumnAverage).toInt();
 }
 
 Qt::SortOrder Session::searchListSortOrder() const {

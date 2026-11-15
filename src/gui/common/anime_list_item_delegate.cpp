@@ -57,7 +57,7 @@ void ListItemDelegate::setEditorData(QWidget* editor, const QModelIndex& index) 
 
 QWidget* ListItemDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem&,
                                         const QModelIndex& index) const {
-  if (index.column() != AnimeListModel::COLUMN_SCORE) return nullptr;
+  if (index.column() != AnimeListModel::ColumnScore) return nullptr;
 
   auto* editor = new QComboBox(parent);
   populateRatingComboBox(editor);
@@ -91,7 +91,7 @@ void ListItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opti
   }
 
   switch (index.column()) {
-    case AnimeListModel::COLUMN_PROGRESS: {
+    case AnimeListModel::ColumnProgress: {
       const PainterStateSaver painterStateSaver(painter);
       QStyledItemDelegate::paint(painter, option, index);
       const auto anime =

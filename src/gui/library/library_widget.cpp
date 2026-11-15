@@ -86,14 +86,14 @@ LibraryWidget::LibraryWidget(QWidget* parent)
   m_view->header()->setSectionsMovable(false);
   m_view->header()->setStretchLastSection(false);
   m_view->header()->setTextElideMode(Qt::ElideRight);
-  m_view->header()->hideSection(LibraryModel::COLUMN_TYPE);
+  m_view->header()->hideSection(LibraryModel::ColumnType);
   m_view->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
-  m_view->header()->setSectionResizeMode(LibraryModel::COLUMN_NAME, QHeaderView::Stretch);
-  m_view->header()->setSectionResizeMode(LibraryModel::COLUMN_ANIME, QHeaderView::Stretch);
-  m_view->header()->moveSection(LibraryModel::COLUMN_ANIME, 1);
-  m_view->header()->moveSection(LibraryModel::COLUMN_EPISODE, 2);
+  m_view->header()->setSectionResizeMode(LibraryModel::ColumnName, QHeaderView::Stretch);
+  m_view->header()->setSectionResizeMode(LibraryModel::ColumnAnime, QHeaderView::Stretch);
+  m_view->header()->moveSection(LibraryModel::ColumnAnime, 1);
+  m_view->header()->moveSection(LibraryModel::ColumnEpisode, 2);
 
-  m_view->sortByColumn(LibraryModel::COLUMN_NAME, Qt::SortOrder::AscendingOrder);
+  m_view->sortByColumn(LibraryModel::ColumnName, Qt::SortOrder::AscendingOrder);
   m_view->setSortingEnabled(true);
 
   layout()->addWidget(m_view);

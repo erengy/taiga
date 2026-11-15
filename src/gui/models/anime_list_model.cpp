@@ -54,14 +54,14 @@ AnimeListModel::AnimeListModel(QObject* parent) : QAbstractListModel(parent) {
 
   connect(taiga::settings(), &taiga::Settings::changed, this, [this](const QSet<QString>& keys) {
     if (keys.contains(taiga::Settings::Key::kAppTitleLanguage) && !m_ids.isEmpty()) {
-      emit dataChanged(index(0, 0), index(m_ids.size() - 1, NUM_COLUMNS - 1));
+      emit dataChanged(index(0, 0), index(m_ids.size() - 1, NumColumns - 1));
     }
   });
 }
 
 void AnimeListModel::refreshRow(int id) {
   if (const auto row = m_ids.indexOf(id); row > -1) {
-    emit dataChanged(index(row, 0), index(row, NUM_COLUMNS - 1));
+    emit dataChanged(index(row, 0), index(row, NumColumns - 1));
   } else {
     addIds({id});
   }
@@ -93,7 +93,7 @@ int AnimeListModel::rowCount(const QModelIndex&) const {
 }
 
 int AnimeListModel::columnCount(const QModelIndex&) const {
-  return NUM_COLUMNS;
+  return NumColumns;
 }
 
 QVariant AnimeListModel::data(const QModelIndex& index, int role) const {
@@ -107,32 +107,32 @@ QVariant AnimeListModel::data(const QModelIndex& index, int role) const {
   switch (role) {
     case Qt::DisplayRole:
       switch (index.column()) {
-        case COLUMN_TITLE:
+        case ColumnTitle:
           return QString::fromStdString(anime::preferredTitle(*anime));
-        case COLUMN_DURATION:
+        case ColumnDuration:
           return formatEpisodeLength(anime->episode_length);
-        case COLUMN_REWATCHES:
+        case ColumnRewatches:
           if (entry) return entry->rewatched_times;
           break;
-        case COLUMN_SCORE:
+        case ColumnScore:
           if (entry) return formatRating(entry->score);
           break;
-        case COLUMN_AVERAGE:
+        case ColumnAverage:
           return formatScore(anime->score);
-        case COLUMN_TYPE:
+        case ColumnType:
           return formatType(anime->type);
-        case COLUMN_SEASON:
+        case ColumnSeason:
           return formatSeason(anime::Season(anime->date_started));
-        case COLUMN_STARTED:
+        case ColumnStarted:
           if (entry) return formatFuzzyDate(entry->date_started);
           break;
-        case COLUMN_COMPLETED:
+        case ColumnCompleted:
           if (entry) return formatFuzzyDate(entry->date_completed);
           break;
-        case COLUMN_LAST_UPDATED:
+        case ColumnLastUpdated:
           if (entry) return formatAsRelativeTime(entry->last_updated, "-");
           break;
-        case COLUMN_NOTES:
+        case ColumnNotes:
           if (entry) return QString::fromStdString(entry->notes);
           break;
       }
@@ -140,14 +140,14 @@ QVariant AnimeListModel::data(const QModelIndex& index, int role) const {
 
     case Qt::ToolTipRole:
       switch (index.column()) {
-        case COLUMN_TITLE:
+        case ColumnTitle:
           return QString::fromStdString(anime::preferredTitle(*anime));
-        case COLUMN_SEASON:
+        case ColumnSeason:
           return formatFuzzyDate(anime->date_started);
-        case COLUMN_LAST_UPDATED:
+        case ColumnLastUpdated:
           if (entry) return formatTimestamp(entry->last_updated);
           break;
-        case COLUMN_NOTES:
+        case ColumnNotes:
           if (entry) return QString::fromStdString(entry->notes);
           break;
       }
@@ -155,17 +155,17 @@ QVariant AnimeListModel::data(const QModelIndex& index, int role) const {
 
     case Qt::TextAlignmentRole: {
       switch (index.column()) {
-        case COLUMN_PROGRESS:
-        case COLUMN_REWATCHES:
-        case COLUMN_SCORE:
-        case COLUMN_AVERAGE:
-        case COLUMN_TYPE:
+        case ColumnProgress:
+        case ColumnRewatches:
+        case ColumnScore:
+        case ColumnAverage:
+        case ColumnType:
           return QVariant(Qt::AlignHCenter | Qt::AlignVCenter);
-        case COLUMN_DURATION:
-        case COLUMN_SEASON:
-        case COLUMN_STARTED:
-        case COLUMN_COMPLETED:
-        case COLUMN_LAST_UPDATED:
+        case ColumnDuration:
+        case ColumnSeason:
+        case ColumnStarted:
+        case ColumnCompleted:
+        case ColumnLastUpdated:
           return QVariant(Qt::AlignRight | Qt::AlignVCenter);
         default:
           return {};
@@ -177,28 +177,28 @@ QVariant AnimeListModel::data(const QModelIndex& index, int role) const {
       const auto disabledTextColor =
           qApp->palette().color(QPalette::ColorGroup::Disabled, QPalette::ColorRole::Text);
       switch (index.column()) {
-        case COLUMN_AVERAGE:
+        case ColumnAverage:
           if (!anime->score) return disabledTextColor;
           break;
-        case COLUMN_DURATION:
+        case ColumnDuration:
           if (anime->episode_length < 1) return disabledTextColor;
           break;
-        case COLUMN_SEASON:
+        case ColumnSeason:
           if (!anime->date_started) return disabledTextColor;
           break;
-        case COLUMN_TYPE:
+        case ColumnType:
           if (anime->type == anime::Type::Unknown) return disabledTextColor;
           break;
-        case COLUMN_SCORE:
+        case ColumnScore:
           if (entry && !entry->score) return disabledTextColor;
           break;
-        case COLUMN_STARTED:
+        case ColumnStarted:
           if (entry && !entry->date_started) return disabledTextColor;
           break;
-        case COLUMN_COMPLETED:
+        case ColumnCompleted:
           if (entry && !entry->date_completed) return disabledTextColor;
           break;
-        case COLUMN_LAST_UPDATED:
+        case ColumnLastUpdated:
           if (entry && !entry->last_updated) return disabledTextColor;
           break;
       }
@@ -221,7 +221,7 @@ QVariant AnimeListModel::data(const QModelIndex& index, int role) const {
 
 bool AnimeListModel::setData(const QModelIndex& index, const QVariant& value, int role) {
   if (index.isValid() && role == Qt::EditRole) {
-    if (index.column() == COLUMN_SCORE) {
+    if (index.column() == ColumnScore) {
       const int id = m_ids.at(index.row());
       if (const auto entry = anime::db()->entry(id)) {
         auto updated = *entry;
@@ -239,18 +239,18 @@ QVariant AnimeListModel::headerData(int section, Qt::Orientation orientation, in
     case Qt::DisplayRole: {
       // clang-format off
       switch (section) {
-        case COLUMN_TITLE: return tr("Title");
-        case COLUMN_PROGRESS: return tr("Progress");
-        case COLUMN_DURATION: return tr("Duration");
-        case COLUMN_REWATCHES: return tr("Rewatches");
-        case COLUMN_SCORE: return tr("Score");
-        case COLUMN_AVERAGE: return tr("Average");
-        case COLUMN_TYPE: return tr("Type");
-        case COLUMN_SEASON: return tr("Season");
-        case COLUMN_STARTED: return tr("Started");
-        case COLUMN_COMPLETED: return tr("Completed");
-        case COLUMN_LAST_UPDATED: return tr("Last updated");
-        case COLUMN_NOTES: return tr("Notes");
+        case ColumnTitle: return tr("Title");
+        case ColumnProgress: return tr("Progress");
+        case ColumnDuration: return tr("Duration");
+        case ColumnRewatches: return tr("Rewatches");
+        case ColumnScore: return tr("Score");
+        case ColumnAverage: return tr("Average");
+        case ColumnType: return tr("Type");
+        case ColumnSeason: return tr("Season");
+        case ColumnStarted: return tr("Started");
+        case ColumnCompleted: return tr("Completed");
+        case ColumnLastUpdated: return tr("Last updated");
+        case ColumnNotes: return tr("Notes");
       }
       // clang-format on
       break;
@@ -258,17 +258,17 @@ QVariant AnimeListModel::headerData(int section, Qt::Orientation orientation, in
 
     case Qt::TextAlignmentRole: {
       switch (section) {
-        case COLUMN_PROGRESS:
-        case COLUMN_REWATCHES:
-        case COLUMN_SCORE:
-        case COLUMN_AVERAGE:
-        case COLUMN_TYPE:
+        case ColumnProgress:
+        case ColumnRewatches:
+        case ColumnScore:
+        case ColumnAverage:
+        case ColumnType:
           return QVariant(Qt::AlignHCenter | Qt::AlignVCenter);
-        case COLUMN_DURATION:
-        case COLUMN_SEASON:
-        case COLUMN_STARTED:
-        case COLUMN_COMPLETED:
-        case COLUMN_LAST_UPDATED:
+        case ColumnDuration:
+        case ColumnSeason:
+        case ColumnStarted:
+        case ColumnCompleted:
+        case ColumnLastUpdated:
           return QVariant(Qt::AlignRight | Qt::AlignVCenter);
       }
       break;
@@ -276,15 +276,15 @@ QVariant AnimeListModel::headerData(int section, Qt::Orientation orientation, in
 
     case Qt::InitialSortOrderRole: {
       switch (section) {
-        case COLUMN_PROGRESS:
-        case COLUMN_DURATION:
-        case COLUMN_REWATCHES:
-        case COLUMN_SCORE:
-        case COLUMN_AVERAGE:
-        case COLUMN_SEASON:
-        case COLUMN_STARTED:
-        case COLUMN_COMPLETED:
-        case COLUMN_LAST_UPDATED:
+        case ColumnProgress:
+        case ColumnDuration:
+        case ColumnRewatches:
+        case ColumnScore:
+        case ColumnAverage:
+        case ColumnSeason:
+        case ColumnStarted:
+        case ColumnCompleted:
+        case ColumnLastUpdated:
           return Qt::DescendingOrder;
         default:
           return Qt::AscendingOrder;

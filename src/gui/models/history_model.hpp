@@ -32,10 +32,10 @@ class HistoryModel final : public QAbstractListModel {
 
 public:
   enum Column {
-    COLUMN_TITLE,
-    COLUMN_DETAILS,
-    COLUMN_MODIFIED,
-    NUM_COLUMNS,
+    ColumnTitle,
+    ColumnDetails,
+    ColumnModified,
+    NumColumns,
   };
 
   HistoryModel(QObject* parent);

@@ -137,18 +137,18 @@ void ListWidget::initSortMenu() {
   using Qt::SortOrder::DescendingOrder;
 
   static const QList<QPair<AnimeListModel::Column, Qt::SortOrder>> items{
-      {AnimeListModel::COLUMN_TITLE, AscendingOrder},
-      {AnimeListModel::COLUMN_PROGRESS, DescendingOrder},
-      {AnimeListModel::COLUMN_DURATION, DescendingOrder},
-      {AnimeListModel::COLUMN_REWATCHES, DescendingOrder},
-      {AnimeListModel::COLUMN_SCORE, DescendingOrder},
-      {AnimeListModel::COLUMN_AVERAGE, DescendingOrder},
-      {AnimeListModel::COLUMN_TYPE, AscendingOrder},
-      {AnimeListModel::COLUMN_SEASON, DescendingOrder},
-      {AnimeListModel::COLUMN_STARTED, DescendingOrder},
-      {AnimeListModel::COLUMN_COMPLETED, DescendingOrder},
-      {AnimeListModel::COLUMN_LAST_UPDATED, DescendingOrder},
-      {AnimeListModel::COLUMN_NOTES, AscendingOrder},
+      {AnimeListModel::ColumnTitle, AscendingOrder},
+      {AnimeListModel::ColumnProgress, DescendingOrder},
+      {AnimeListModel::ColumnDuration, DescendingOrder},
+      {AnimeListModel::ColumnRewatches, DescendingOrder},
+      {AnimeListModel::ColumnScore, DescendingOrder},
+      {AnimeListModel::ColumnAverage, DescendingOrder},
+      {AnimeListModel::ColumnType, AscendingOrder},
+      {AnimeListModel::ColumnSeason, DescendingOrder},
+      {AnimeListModel::ColumnStarted, DescendingOrder},
+      {AnimeListModel::ColumnCompleted, DescendingOrder},
+      {AnimeListModel::ColumnLastUpdated, DescendingOrder},
+      {AnimeListModel::ColumnNotes, AscendingOrder},
   };
 
   const auto actionGroup = new QActionGroup(this);

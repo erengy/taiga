@@ -45,11 +45,11 @@ namespace {
 std::optional<sync::SearchSort> toSearchSort(gui::AnimeListModel::Column column) {
   // clang-format off
   switch (column) {
-    case gui::AnimeListModel::COLUMN_TITLE: return sync::SearchSort::Title;
-    case gui::AnimeListModel::COLUMN_DURATION: return sync::SearchSort::Duration;
-    case gui::AnimeListModel::COLUMN_AVERAGE: return sync::SearchSort::Score;
-    case gui::AnimeListModel::COLUMN_TYPE: return sync::SearchSort::Type;
-    case gui::AnimeListModel::COLUMN_SEASON: return sync::SearchSort::StartDate;
+    case gui::AnimeListModel::ColumnTitle: return sync::SearchSort::Title;
+    case gui::AnimeListModel::ColumnDuration: return sync::SearchSort::Duration;
+    case gui::AnimeListModel::ColumnAverage: return sync::SearchSort::Score;
+    case gui::AnimeListModel::ColumnType: return sync::SearchSort::Type;
+    case gui::AnimeListModel::ColumnSeason: return sync::SearchSort::StartDate;
     default: return std::nullopt;
   }
   // clang-format on
@@ -243,12 +243,12 @@ void SearchWidget::initSortMenu() {
   using Qt::SortOrder::DescendingOrder;
 
   static const QList<QPair<AnimeListModel::Column, Qt::SortOrder>> items{
-      {AnimeListModel::COLUMN_TITLE, AscendingOrder},
-      {AnimeListModel::COLUMN_DURATION, DescendingOrder},
-      {AnimeListModel::COLUMN_AVERAGE, DescendingOrder},
-      {AnimeListModel::COLUMN_TYPE, AscendingOrder},
-      {AnimeListModel::COLUMN_SEASON, DescendingOrder},
-      {AnimeListModel::COLUMN_STARTED, DescendingOrder},
+      {AnimeListModel::ColumnTitle, AscendingOrder},
+      {AnimeListModel::ColumnDuration, DescendingOrder},
+      {AnimeListModel::ColumnAverage, DescendingOrder},
+      {AnimeListModel::ColumnType, AscendingOrder},
+      {AnimeListModel::ColumnSeason, DescendingOrder},
+      {AnimeListModel::ColumnStarted, DescendingOrder},
   };
 
   const auto actionGroup = new QActionGroup(this);
