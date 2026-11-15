@@ -173,7 +173,7 @@ void Service::fetchListEntries() {
     QList<ListEntry> entries;
 
     for (const auto& list : *lists) {
-      for (const auto& entryValue : list.toObject()["entries"].toArray()) {
+      for (const auto& entryValue : list.toObject().value("entries").toArray()) {
         const auto entry = entryValue.toObject();
 
         if (const auto item = parseMedia(entry["media"])) {

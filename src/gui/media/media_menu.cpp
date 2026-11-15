@@ -152,7 +152,7 @@ void MediaMenu::editEpisode() const {
     if (item.episodeCount > 0) maxValue = std::min(maxValue, item.episodeCount);
   }
 
-  const int initalValue = watchedEpisodes.size() == 1 ? watchedEpisodes.values().front() : 0;
+  const int initalValue = watchedEpisodes.size() == 1 ? *watchedEpisodes.cbegin() : 0;
 
   bool ok = false;
   const auto value = QInputDialog::getInt(dialogParent(parentWidget()), tr("Edit Episodes Watched"),

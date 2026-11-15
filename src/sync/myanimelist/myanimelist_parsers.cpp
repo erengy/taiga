@@ -146,12 +146,12 @@ std::optional<anime::Details> parseAnime(const QJsonValue& json) {
   }
 
   for (const auto& value : json["genres"].toArray()) {
-    auto name = value.toObject()["name"].toString().toStdString();
+    auto name = value.toObject().value("name").toString().toStdString();
     if (!name.empty()) item.genres.emplace_back(name);
   }
 
   for (const auto& value : json["studios"].toArray()) {
-    auto name = value.toObject()["name"].toString().toStdString();
+    auto name = value.toObject().value("name").toString().toStdString();
     if (!name.empty()) item.studios.emplace_back(name);
   }
 

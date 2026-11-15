@@ -286,7 +286,7 @@ void invalidateAnime(const int id) {
 void pruneMissingEntries(const QSet<int>& fetchedIds) {
   QList<int> staleIds;
 
-  for (const auto animeId : anime::db()->entries().keys()) {
+  for (const auto& [animeId, entry] : anime::db()->entries().asKeyValueRange()) {
     if (fetchedIds.contains(animeId)) continue;
     if (queue()->hasItem(animeId)) continue;
     staleIds.append(animeId);

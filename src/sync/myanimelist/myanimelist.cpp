@@ -128,7 +128,7 @@ void Service::search(const SearchParams& params, const int offset) {
 
     QList<int> ids;
     for (const auto& value : root["data"].toArray()) {
-      if (const auto item = parseAnime(value.toObject()["node"])) {
+      if (const auto item = parseAnime(value.toObject().value("node"))) {
         anime::db()->updateItem(*item);
         ids.append(item->id);
       }
