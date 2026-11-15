@@ -115,7 +115,7 @@ std::strong_ordering FuzzyDate::operator<=>(const FuzzyDate& date) const {
 }
 
 bool FuzzyDate::operator==(const FuzzyDate& date) const {
-  return *this <=> date == std::strong_ordering::equal;
+  return std::is_eq(*this <=> date);
 }
 
 bool FuzzyDate::empty() const {
