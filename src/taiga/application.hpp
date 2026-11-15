@@ -62,8 +62,8 @@ private:
   } options_;
 
   QCommandLineParser parser_;
-  QSharedMemory shared_memory_;
-  QLocalServer local_server_;
+  QSharedMemory sharedMemory_;
+  QLocalServer localServer_;
   QPointer<gui::MainWindow> window_;
 };
 

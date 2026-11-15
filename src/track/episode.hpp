@@ -48,7 +48,7 @@ public:
 private:
   auto find(const anitomy::ElementKind kind) const;
 
-  int anime_id_;
+  int animeId_;
   std::vector<anitomy::Element> elements_;
 };
 

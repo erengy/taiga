@@ -26,7 +26,7 @@
 
 namespace track {
 
-Episode::Episode() : anime_id_{anime::kUnknownId} {}
+Episode::Episode() : animeId_{anime::kUnknownId} {}
 
 auto Episode::find(const anitomy::ElementKind kind) const {
   const auto isKind = [kind](const anitomy::Element& element) { return element.kind == kind; };
@@ -34,11 +34,11 @@ auto Episode::find(const anitomy::ElementKind kind) const {
 }
 
 int Episode::animeId() const {
-  return anime_id_;
+  return animeId_;
 }
 
 void Episode::setAnimeId(int id) {
-  anime_id_ = id;
+  animeId_ = id;
 }
 
 std::optional<std::pair<int, int>> Episode::episodeNumberRange() const {
