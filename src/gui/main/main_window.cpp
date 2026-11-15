@@ -238,6 +238,7 @@ void MainWindow::initPage(MainWindowPage page) {
       initPage(ui_->libraryPage, libraryWidget_);
       break;
 
+    // NOLINTNEXTLINE(bugprone-branch-clone)
     case MainWindowPage::Torrents:
       break;
 

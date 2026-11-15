@@ -172,6 +172,7 @@ void transliterate(QString& str) {
       case u'꞉': c = u':'; break;  // modifier letter colon (e.g. "Nisekoi:")
 
       // A few common always-equivalent romanizations
+      // NOLINTNEXTLINE(bugprone-branch-clone)
       case u'Ō': str.replace(i, 1, "ou"); break;  // latin capital letter o with macron
       case u'ō': str.replace(i, 1, "ou"); break;  // latin small letter o with macron
       case u'ū': str.replace(i, 1, "uu"); break;  // latin small letter u with macron

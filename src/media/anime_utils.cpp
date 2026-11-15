@@ -110,6 +110,7 @@ int estimateEpisodeLength(const Details& item) {
 
   // clang-format off
   switch (item.type) {
+    // NOLINTNEXTLINE(bugprone-branch-clone)
     default:
     case Type::Tv:      return 24;
     case Type::Ova:     return 24;
