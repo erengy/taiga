@@ -65,7 +65,7 @@ public:
 public slots:
   void addNewFolder();
   void displayWindow();
-  void navigateTo(MainWindowPage page);
+  void navigateTo(gui::MainWindowPage page);
   void navigateToListStatus(anime::list::Status status);
   void updateTitle();
 

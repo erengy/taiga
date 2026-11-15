@@ -43,7 +43,7 @@ public slots:
   void refresh();
 
 signals:
-  void currentPageChanged(MainWindowPage page);
+  void currentPageChanged(gui::MainWindowPage page);
   void currentListStatusChanged(anime::list::Status status);
 
 protected:

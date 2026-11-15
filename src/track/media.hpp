@@ -53,7 +53,7 @@ public:
   void setCurrentEpisodeAnimeId(int animeId);
 
 signals:
-  void currentEpisodeChanged(std::optional<Episode> media) const;
+  void currentEpisodeChanged(std::optional<track::Episode> media) const;
 
 private:
   void setPollingEnabled(bool enabled);

@@ -52,7 +52,7 @@ public:
 public slots:
   void goBack();
   void goForward();
-  void navigateTo(MainWindowPage page, bool addToHistory = true);
+  void navigateTo(gui::MainWindowPage page, bool addToHistory = true);
   void navigateToListStatus(anime::list::Status status);
 
 protected:

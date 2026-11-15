@@ -44,8 +44,8 @@ public:
   void cancel();
 
 signals:
-  void stateChanged(const UpdateState& state) const;
-  void confirmationRequested(const UpdateState& state) const;
+  void stateChanged(const track::UpdateState& state) const;
+  void confirmationRequested(const track::UpdateState& state) const;
 
 private:
   void loadSettings();
