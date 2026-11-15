@@ -311,7 +311,7 @@ void MediaMenu::searchAniDB() const {
 void MediaMenu::searchAniList() const {
   for (const auto& item : items_) {
     if (sync::currentServiceId() == sync::ServiceId::AniList) {
-      QUrl url{sync::animePageUrl(item.id)};
+      const QUrl url{sync::animePageUrl(item.id)};
       QDesktopServices::openUrl(url);
     } else {
       QUrl url{"https://anilist.co/search/anime"};
@@ -334,7 +334,7 @@ void MediaMenu::searchANN() const {
 void MediaMenu::searchKitsu() const {
   for (const auto& item : items_) {
     if (sync::currentServiceId() == sync::ServiceId::Kitsu) {
-      QUrl url{sync::animePageUrl(item.id)};
+      const QUrl url{sync::animePageUrl(item.id)};
       QDesktopServices::openUrl(url);
     } else {
       QUrl url{"https://kitsu.app/anime"};
@@ -347,7 +347,7 @@ void MediaMenu::searchKitsu() const {
 void MediaMenu::searchMyAnimeList() const {
   for (const auto& item : items_) {
     if (sync::currentServiceId() == sync::ServiceId::MyAnimeList) {
-      QUrl url{sync::animePageUrl(item.id)};
+      const QUrl url{sync::animePageUrl(item.id)};
       QDesktopServices::openUrl(url);
     } else {
       QUrl url{"https://myanimelist.net/anime.php"};
@@ -380,7 +380,7 @@ void MediaMenu::searchWikipedia() const {
 void MediaMenu::searchYouTube() const {
   for (const auto& item : items_) {
     if (!item.trailerId.empty()) {
-      QUrl url{u"https://youtu.be/%1"_s.arg(item.trailerId)};
+      const QUrl url{u"https://youtu.be/%1"_s.arg(item.trailerId)};
       QDesktopServices::openUrl(url);
     } else {
       QUrl url{"https://www.youtube.com/results"};

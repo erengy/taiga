@@ -77,7 +77,7 @@ void Queue::push(const int animeId, const anime::list::Fields dirty) {
     it->time = std::time(nullptr);
     persistItem(*it);
   } else {
-    QueueItem item{
+    const QueueItem item{
         .animeId = animeId,
         .dirty = dirty,
         .time = std::time(nullptr),

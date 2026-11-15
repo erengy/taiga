@@ -55,7 +55,7 @@ QPixmap SvgIconEngine::scaledPixmap(const QSize& size, QIcon::Mode mode, QIcon::
 
   // Resolved on every call, so that icons follow palette changes (e.g. color scheme)
   const QColor color = [mode]() {
-    QPalette palette;
+    const QPalette palette;
     switch (mode) {
       default:
       case QIcon::Normal:

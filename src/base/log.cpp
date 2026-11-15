@@ -70,7 +70,7 @@ void writeToFile(const QString& text) {
 
 void messageHandler(const QtMsgType type, const QMessageLogContext& context,
                     const QString& message) {
-  QMutexLocker lock{&g_mutex};
+  const QMutexLocker lock{&g_mutex};
 
   // Cannot use QT_NO_DEBUG_OUTPUT since the threshold is a runtime choice
   // (i.e. `--debug` command line argument).

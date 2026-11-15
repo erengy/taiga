@@ -95,7 +95,7 @@ MediaDialog::MediaDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::MediaDi
 
   connect(ui_->posterWidget, &PosterWidget::clicked, this, [this](Qt::MouseButton button) {
     if (button == Qt::MouseButton::LeftButton) {
-      QUrl url{sync::animePageUrl(anime_.id)};
+      const QUrl url{sync::animePageUrl(anime_.id)};
       QDesktopServices::openUrl(url);
     }
   });

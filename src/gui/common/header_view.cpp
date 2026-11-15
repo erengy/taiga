@@ -57,7 +57,7 @@ void HeaderView::paintSection(QPainter* painter, const QRect& rect, int logicalI
   }
 
   // Same as what QCommonStyle does for CE_Header, except that the label ends before the arrow.
-  QPainterStateGuard guard(painter);
+  const QPainterStateGuard guard(painter);
   painter->setClipRect(rect);
 
   const QRect labelRect = style()->subElementRect(QStyle::SE_HeaderLabel, &opt, this);
