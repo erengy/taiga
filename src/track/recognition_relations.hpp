@@ -32,7 +32,7 @@ namespace track::recognition {
 
 struct Redirection {
   int id;
-  std::pair<int, int> episode_range;
+  std::pair<int, int> episodeRange;
 };
 
 class Relations {

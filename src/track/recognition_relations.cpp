@@ -158,7 +158,7 @@ std::optional<Redirection> Relations::find(const int id, const int episodeNumber
 
     return Redirection{
         .id = rule.destination_id,
-        .episode_range = {destination, destination},
+        .episodeRange = {destination, destination},
     };
   }
 
@@ -182,7 +182,7 @@ std::optional<Redirection> findRedirection(const int id, const std::pair<int, in
 
   return Redirection{
       .id = first->id,
-      .episode_range = {first->episode_range.first, second->episode_range.first},
+      .episodeRange = {first->episodeRange.first, second->episodeRange.first},
   };
 }
 
