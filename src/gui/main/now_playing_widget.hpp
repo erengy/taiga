@@ -38,7 +38,6 @@ class NowPlayingWidget final : public QFrame {
 
 public:
   NowPlayingWidget(QWidget* parent);
-  ~NowPlayingWidget() = default;
 
   void reset();
   void setPlaying(track::Episode episode);

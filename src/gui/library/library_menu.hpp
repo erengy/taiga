@@ -31,7 +31,6 @@ class LibraryMenu final : public QMenu {
 
 public:
   LibraryMenu(QWidget* parent, const QString& path, int animeId);
-  ~LibraryMenu() = default;
 
   void popup();
 

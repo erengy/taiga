@@ -49,7 +49,6 @@ public:
   };
 
   StatusBarController(QObject* parent, QStatusBar* statusBar, SpinnerWidget* spinner);
-  ~StatusBarController() = default;
 
   void showMessage(const Message& message);
   void clearMessage(Source source);

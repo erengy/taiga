@@ -35,7 +35,6 @@ class NetworkAccessManager final : public QNetworkAccessManager {
 
 public:
   NetworkAccessManager(QObject* parent);
-  ~NetworkAccessManager() = default;
 
   static QHttpHeaders commonHeaders();
 };

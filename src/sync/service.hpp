@@ -47,7 +47,6 @@ class Service : public QObject {
 
 public:
   Service(const ServiceId id);
-  ~Service() = default;
 
   ServiceId id() const;
 

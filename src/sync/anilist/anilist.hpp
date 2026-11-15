@@ -25,7 +25,6 @@ namespace sync::anilist {
 class Service final : public sync::Service {
 public:
   Service();
-  ~Service() = default;
 
   static Service* instance();
 

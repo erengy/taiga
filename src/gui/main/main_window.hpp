@@ -51,7 +51,6 @@ class MainWindow final : public QMainWindow {
 
 public:
   MainWindow();
-  ~MainWindow() = default;
 
   NavigationWidget* navigation() const;
   NowPlayingWidget* nowPlaying() const;

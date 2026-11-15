@@ -44,7 +44,6 @@ class AnimeListProxyModel final : public QSortFilterProxyModel {
 
 public:
   AnimeListProxyModel(QObject* parent);
-  ~AnimeListProxyModel() = default;
 
   const AnimeListProxyModelFilter& filters() const;
   void setFilters(const AnimeListProxyModelFilter& filters);

@@ -28,8 +28,6 @@ namespace gui {
 
 SvgIconEngine::SvgIconEngine(const QString& iconName) : iconName_(iconName) {}
 
-SvgIconEngine::~SvgIconEngine() {}
-
 QString SvgIconEngine::key() const {
   return u"SvgIconEngine"_s;
 }

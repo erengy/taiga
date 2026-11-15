@@ -30,7 +30,6 @@ class PageWidget : public QWidget {
 
 public:
   PageWidget(QWidget* parent);
-  ~PageWidget() = default;
 
 protected:
   QHBoxLayout* toolbarLayout_ = nullptr;

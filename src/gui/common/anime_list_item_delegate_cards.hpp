@@ -32,7 +32,6 @@ class ListItemDelegateCards final : public QStyledItemDelegate {
 
 public:
   ListItemDelegateCards(QObject* parent);
-  ~ListItemDelegateCards() = default;
 
   void paint(QPainter* painter, const QStyleOptionViewItem& option,
              const QModelIndex& index) const override;

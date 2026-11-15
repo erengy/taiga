@@ -30,7 +30,6 @@ class SpinnerWidget final : public QLabel {
 
 public:
   explicit SpinnerWidget(QWidget* parent = nullptr, int size = 16);
-  ~SpinnerWidget() = default;
 
   void setSize(int size);
 

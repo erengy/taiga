@@ -54,7 +54,6 @@ public:
   };
 
   AnimeListModel(QObject* parent);
-  ~AnimeListModel() = default;
 
   int rowCount(const QModelIndex& parent = {}) const override;
   int columnCount(const QModelIndex& parent = {}) const override;

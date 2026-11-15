@@ -33,7 +33,6 @@ class LibraryWidget final : public PageWidget {
 
 public:
   LibraryWidget(QWidget* parent);
-  ~LibraryWidget() = default;
 
 private:
   bool eventFilter(QObject* watched, QEvent* event) override;

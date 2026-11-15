@@ -38,7 +38,6 @@ public:
   };
 
   LibraryModel(QObject* parent);
-  ~LibraryModel() = default;
 
   int columnCount(const QModelIndex& parent = {}) const override;
   QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;

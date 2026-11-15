@@ -37,7 +37,6 @@ class MediaMenu final : public QMenu {
 public:
   MediaMenu(QWidget* parent, const QList<Anime>& items, const QMap<int, ListEntry> entries,
             QItemSelectionModel* selectionModel, AnimeListContext context);
-  ~MediaMenu() = default;
 
   void popup();
 

@@ -36,7 +36,6 @@ class ListWidget final : public PageWidget {
 
 public:
   ListWidget(QWidget* parent);
-  ~ListWidget() = default;
 
   ListViewMode viewMode() const;
   void setViewMode(ListViewMode mode);

@@ -41,7 +41,6 @@ class ListViewBase final : public QObject {
 public:
   ListViewBase(QWidget* parent, QAbstractItemView* view, AnimeListModel* model,
                AnimeListProxyModel* proxyModel, AnimeListContext context);
-  ~ListViewBase() = default;
 
   AnimeListContext context() const {
     return context_;

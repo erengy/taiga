@@ -35,7 +35,6 @@ class ListView final : public QTreeView {
 public:
   ListView(QWidget* parent, AnimeListModel* model, AnimeListProxyModel* proxyModel,
            AnimeListContext context);
-  ~ListView() = default;
 
   ListViewBase* baseView() {
     return base_;

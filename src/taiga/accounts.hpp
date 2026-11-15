@@ -43,7 +43,6 @@ class Accounts final : public QObject, public base::Settings {
 
 public:
   explicit Accounts(QObject* parent);
-  ~Accounts() = default;
 
   bool anilistAuthenticated() const;
   sync::anilist::RatingSystem anilistRatingSystem() const;

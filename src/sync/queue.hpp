@@ -43,7 +43,6 @@ class Queue final : public QObject {
 
 public:
   explicit Queue(QObject* parent);
-  ~Queue() = default;
 
   void init();
 

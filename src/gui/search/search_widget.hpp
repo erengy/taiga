@@ -41,7 +41,6 @@ class SearchWidget final : public PageWidget {
 
 public:
   SearchWidget(QWidget* parent);
-  ~SearchWidget() = default;
 
   void saveState();
 

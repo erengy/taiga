@@ -37,7 +37,6 @@ class History final : public QObject {
 
 public:
   explicit History(QObject* parent);
-  ~History() = default;
 
   void init();
 

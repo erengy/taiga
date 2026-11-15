@@ -28,7 +28,6 @@ class StatusBar final : public QStatusBar {
 
 public:
   explicit StatusBar(QWidget* parent = nullptr);
-  ~StatusBar() = default;
 
 protected:
   void paintEvent(QPaintEvent* event) override;

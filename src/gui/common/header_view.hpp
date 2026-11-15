@@ -31,7 +31,6 @@ class HeaderView final : public QHeaderView {
 
 public:
   HeaderView(Qt::Orientation orientation, QWidget* parent = nullptr);
-  ~HeaderView() = default;
 
   static void install(QTreeView* view);
 

@@ -28,7 +28,6 @@ class HistoryProxyModel final : public QSortFilterProxyModel {
 
 public:
   HistoryProxyModel(QObject* parent);
-  ~HistoryProxyModel() = default;
 
 protected:
   bool lessThan(const QModelIndex& lhs, const QModelIndex& rhs) const override;

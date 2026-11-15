@@ -46,7 +46,6 @@ class MediaDialog final : public QDialog {
 
 public:
   MediaDialog(QWidget* parent);
-  ~MediaDialog() = default;
 
   static void show(QWidget* parent, MediaDialogPage page, const Anime& anime);
 

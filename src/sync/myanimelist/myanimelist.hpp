@@ -35,7 +35,6 @@ constexpr auto kTokenUrl = "https://myanimelist.net/v1/oauth2/token";
 class Service final : public sync::Service {
 public:
   Service();
-  ~Service() = default;
 
   static Service* instance();
 

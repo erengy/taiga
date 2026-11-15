@@ -34,7 +34,6 @@ class Database final : public QObject {
 
 public:
   explicit Database(QObject* parent);
-  ~Database() = default;
 
   void init();
 

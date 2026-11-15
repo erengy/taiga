@@ -32,7 +32,6 @@ class PosterWidget final : public QWidget {
 
 public:
   explicit PosterWidget(QWidget* parent = nullptr);
-  ~PosterWidget() = default;
 
   const QPixmap& pixmap() const;
 

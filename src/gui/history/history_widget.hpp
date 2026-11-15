@@ -37,7 +37,6 @@ class HistoryWidget final : public PageWidget {
 
 public:
   HistoryWidget(QWidget* parent);
-  ~HistoryWidget() = default;
 
 private:
   void initToolbar();

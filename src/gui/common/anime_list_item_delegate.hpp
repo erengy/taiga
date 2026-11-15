@@ -28,7 +28,6 @@ class ListItemDelegate final : public QStyledItemDelegate {
 
 public:
   ListItemDelegate(QObject* parent);
-  ~ListItemDelegate() = default;
 
   void setEditorData(QWidget* editor, const QModelIndex& index) const override;
   QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option,

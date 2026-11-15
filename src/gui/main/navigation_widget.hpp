@@ -35,7 +35,6 @@ class NavigationWidget final : public QTreeWidget {
 
 public:
   NavigationWidget(QWidget* parent);
-  ~NavigationWidget() = default;
 
   QTreeWidgetItem* findItemByPage(MainWindowPage page) const;
   QTreeWidgetItem* findListStatusItem(anime::list::Status status) const;
