@@ -63,10 +63,10 @@ struct Item {
   std::string comments;     // URL of a page for comments relating to the item.
   Enclosure enclosure;      // Describes a media object that is attached to the item.
   Guid guid;                // A string that uniquely identifies the item.
-  std::string pub_date;     // Indicates when the item was published.
+  std::string pubDate;      // Indicates when the item was published.
   Source source;            // The RSS channel that the item came from.
 
-  std::unordered_map<std::string, std::string> namespace_elements;
+  std::unordered_map<std::string, std::string> namespaceElements;
 };
 
 struct Feed {
