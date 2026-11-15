@@ -29,18 +29,18 @@
 
 namespace track {
 
-static bool containsEpisodeNumber(const Episode& episode, const int episode_number) {
+static bool containsEpisodeNumber(const Episode& episode, const int episodeNumber) {
   const auto numbers = episode.elements(anitomy::ElementKind::Episode);
   if (numbers.empty()) return false;
 
   const auto toInt = [](const std::string& value) { return QString::fromStdString(value).toInt(); };
   const auto [low, high] = std::ranges::minmax(numbers | std::views::transform(toInt));
 
-  return low <= episode_number && episode_number <= high;
+  return low <= episodeNumber && episodeNumber <= high;
 }
 
-std::optional<QString> findEpisode(const QString& path, const int anime_id,
-                                   const int episode_number) {
+std::optional<QString> findEpisode(const QString& path, const int animeId,
+                                   const int episodeNumber) {
   QDirIterator it{path, QDir::Files, QDirIterator::Subdirectories};
 
   while (it.hasNext()) {
@@ -52,9 +52,9 @@ std::optional<QString> findEpisode(const QString& path, const int anime_id,
 
     if (!recognition::isVideoFile(episode)) continue;
 
-    if (!containsEpisodeNumber(episode, episode_number)) continue;
+    if (!containsEpisodeNumber(episode, episodeNumber)) continue;
 
-    if (track::recognition::identify(episode) != anime_id) continue;
+    if (track::recognition::identify(episode) != animeId) continue;
 
     return info.filePath();
   }
@@ -62,7 +62,7 @@ std::optional<QString> findEpisode(const QString& path, const int anime_id,
   return std::nullopt;
 }
 
-std::optional<QString> findFolder(const QString& path, const int anime_id) {
+std::optional<QString> findFolder(const QString& path, const int animeId) {
   QDirIterator it{path, QDir::Dirs, QDirIterator::Subdirectories};
 
   while (it.hasNext()) {
@@ -72,7 +72,7 @@ std::optional<QString> findFolder(const QString& path, const int anime_id) {
 
     auto episode = recognition::parseFileInfo(info);
 
-    if (track::recognition::identify(episode) != anime_id) continue;
+    if (track::recognition::identify(episode) != animeId) continue;
 
     return info.filePath();
   }

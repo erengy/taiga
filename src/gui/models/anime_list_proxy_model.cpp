@@ -116,8 +116,8 @@ bool AnimeListProxyModel::filterAcceptsRow(int row, const QModelIndex& parent) c
     return QString::fromStdString(str).contains(view, Qt::CaseInsensitive);
   };
 
-  static const auto list_contains = [](const std::vector<std::string>& list,
-                                       const QStringView view) {
+  static const auto listContains = [](const std::vector<std::string>& list,
+                                      const QStringView view) {
     return std::ranges::any_of(list,
                                [view](const std::string& str) { return contains(str, view); });
   };
@@ -162,7 +162,7 @@ bool AnimeListProxyModel::filterAcceptsRow(int row, const QModelIndex& parent) c
     if (!contains(anime->titles.romaji, m_filter.text) &&
         !contains(anime->titles.english, m_filter.text) &&
         !contains(anime->titles.japanese, m_filter.text) &&
-        !list_contains(anime->titles.synonyms, m_filter.text)) {
+        !listContains(anime->titles.synonyms, m_filter.text)) {
       return false;
     }
   }
@@ -216,59 +216,58 @@ bool AnimeListProxyModel::lessThan(const QModelIndex& lhs, const QModelIndex& rh
 
 std::partial_ordering AnimeListProxyModel::compare(const QModelIndex& lhs, const QModelIndex& rhs,
                                                    int column) const {
-  const auto lhs_anime = getAnime(lhs);
-  const auto rhs_anime = getAnime(rhs);
-  if (!lhs_anime || !rhs_anime) return std::partial_ordering::equivalent;
+  const auto lhsAnime = getAnime(lhs);
+  const auto rhsAnime = getAnime(rhs);
+  if (!lhsAnime || !rhsAnime) return std::partial_ordering::equivalent;
 
-  const auto lhs_entry = getListEntry(lhs);
-  const auto rhs_entry = getListEntry(rhs);
+  const auto lhsEntry = getListEntry(lhs);
+  const auto rhsEntry = getListEntry(rhs);
 
   switch (column) {
     case AnimeListModel::COLUMN_TITLE:
-      return compareStrings(anime::preferredTitle(*lhs_anime), anime::preferredTitle(*rhs_anime),
+      return compareStrings(anime::preferredTitle(*lhsAnime), anime::preferredTitle(*rhsAnime),
                             Qt::CaseInsensitive) <=> 0;
 
     case AnimeListModel::COLUMN_DURATION:
-      return lhs_anime->episode_length <=> rhs_anime->episode_length;
+      return lhsAnime->episode_length <=> rhsAnime->episode_length;
 
     case AnimeListModel::COLUMN_AVERAGE:
-      return lhs_anime->score <=> rhs_anime->score;
+      return lhsAnime->score <=> rhsAnime->score;
 
     case AnimeListModel::COLUMN_TYPE:
-      return lhs_anime->type <=> rhs_anime->type;
+      return lhsAnime->type <=> rhsAnime->type;
 
     case AnimeListModel::COLUMN_PROGRESS: {
-      const auto lhs_ratio = anime::list::getProgressRatio(lhs_anime, lhs_entry);
-      const auto rhs_ratio = anime::list::getProgressRatio(rhs_anime, rhs_entry);
-      if (const auto result = lhs_ratio <=> rhs_ratio; result != 0) return result;
-      return anime::estimateEpisodeCount(*lhs_anime, 0) <=>
-             anime::estimateEpisodeCount(*rhs_anime, 0);
+      const auto lhsRatio = anime::list::getProgressRatio(lhsAnime, lhsEntry);
+      const auto rhsRatio = anime::list::getProgressRatio(rhsAnime, rhsEntry);
+      if (const auto result = lhsRatio <=> rhsRatio; result != 0) return result;
+      return anime::estimateEpisodeCount(*lhsAnime, 0) <=>
+             anime::estimateEpisodeCount(*rhsAnime, 0);
     }
 
     case AnimeListModel::COLUMN_REWATCHES:
-      return (lhs_entry ? lhs_entry->rewatched_times : 0) <=>
-             (rhs_entry ? rhs_entry->rewatched_times : 0);
+      return (lhsEntry ? lhsEntry->rewatched_times : 0) <=>
+             (rhsEntry ? rhsEntry->rewatched_times : 0);
 
     case AnimeListModel::COLUMN_SCORE:
-      return (lhs_entry ? lhs_entry->score : 0) <=> (rhs_entry ? rhs_entry->score : 0);
+      return (lhsEntry ? lhsEntry->score : 0) <=> (rhsEntry ? rhsEntry->score : 0);
 
     case AnimeListModel::COLUMN_SEASON:
-      return lhs_anime->date_started <=> rhs_anime->date_started;
+      return lhsAnime->date_started <=> rhsAnime->date_started;
 
     case AnimeListModel::COLUMN_STARTED:
-      return (lhs_entry ? lhs_entry->date_started : FuzzyDate{}) <=>
-             (rhs_entry ? rhs_entry->date_started : FuzzyDate{});
+      return (lhsEntry ? lhsEntry->date_started : FuzzyDate{}) <=>
+             (rhsEntry ? rhsEntry->date_started : FuzzyDate{});
 
     case AnimeListModel::COLUMN_COMPLETED:
-      return (lhs_entry ? lhs_entry->date_completed : FuzzyDate{}) <=>
-             (rhs_entry ? rhs_entry->date_completed : FuzzyDate{});
+      return (lhsEntry ? lhsEntry->date_completed : FuzzyDate{}) <=>
+             (rhsEntry ? rhsEntry->date_completed : FuzzyDate{});
 
     case AnimeListModel::COLUMN_LAST_UPDATED:
-      return (lhs_entry ? lhs_entry->last_updated : 0) <=>
-             (rhs_entry ? rhs_entry->last_updated : 0);
+      return (lhsEntry ? lhsEntry->last_updated : 0) <=> (rhsEntry ? rhsEntry->last_updated : 0);
 
     case AnimeListModel::COLUMN_NOTES:
-      return (lhs_entry ? lhs_entry->notes : "") <=> (rhs_entry ? rhs_entry->notes : "");
+      return (lhsEntry ? lhsEntry->notes : "") <=> (rhsEntry ? rhsEntry->notes : "");
   }
 
   return std::partial_ordering::equivalent;

@@ -125,34 +125,34 @@ void ListViewBase::showMediaMenu() {
 }
 
 void ListViewBase::updateSelectionStatus(const QItemSelection&, const QItemSelection&) {
-  const auto n_selected = selectedIndexes().size();
+  const auto nSelected = selectedIndexes().size();
 
-  if (!n_selected) {
+  if (!nSelected) {
     mainWindow()->statusBarController()->clearMessage(StatusBarController::Source::Selection);
     return;
   }
 
-  int n_episodes = 0;
-  int n_score = 0;
-  double total_score = 0.0;
-  double average_score = 0.0;
+  int nEpisodes = 0;
+  int nScore = 0;
+  double totalScore = 0.0;
+  double averageScore = 0.0;
 
   for (const auto index : selectedIndexes()) {
     const auto anime = m_model->getAnime(m_proxyModel->mapToSource(index));
     if (!anime) continue;
-    if (anime->episode_count > 0) n_episodes += anime->episode_count;
+    if (anime->episode_count > 0) nEpisodes += anime->episode_count;
     if (anime->score) {
-      ++n_score;
-      total_score += anime->score;
+      ++nScore;
+      totalScore += anime->score;
     }
   }
 
-  if (n_score) average_score = total_score / n_score;
+  if (nScore) averageScore = totalScore / nScore;
 
   const QStringList parts{
-      tr("%n item(s) selected", nullptr, n_selected),
-      tr("%n episode(s)", nullptr, n_episodes),
-      tr("%1 average").arg(formatScore(average_score)),
+      tr("%n item(s) selected", nullptr, nSelected),
+      tr("%n episode(s)", nullptr, nEpisodes),
+      tr("%1 average").arg(formatScore(averageScore)),
   };
 
   mainWindow()->statusBarController()->showMessage({

@@ -38,18 +38,18 @@ void removeHtmlTags(QString& str) {
 }
 
 QString& replaceWholeWord(QString& str, const QString& before, const QString& after) {
-  static constexpr auto is_boundary = [](const QChar& c) { return c.isSpace() || c.isPunct(); };
+  static constexpr auto isBoundary = [](const QChar& c) { return c.isSpace() || c.isPunct(); };
 
-  const auto is_whole_word = [&str, &before](qsizetype pos) {
-    if (pos == 0 || is_boundary(str.at(pos - 1))) {
-      const qsizetype pos_end = pos + before.size();
-      if (pos_end >= str.size() || is_boundary(str.at(pos_end))) return true;
+  const auto isWholeWord = [&str, &before](qsizetype pos) {
+    if (pos == 0 || isBoundary(str.at(pos - 1))) {
+      const qsizetype posEnd = pos + before.size();
+      if (posEnd >= str.size() || isBoundary(str.at(posEnd))) return true;
     }
     return false;
   };
 
   for (auto pos = str.indexOf(before); pos != -1; pos = str.indexOf(before, pos)) {
-    if (!is_whole_word(pos)) {
+    if (!isWholeWord(pos)) {
       pos += before.size();
     } else {
       str.replace(pos, before.size(), after);

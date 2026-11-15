@@ -51,7 +51,7 @@ SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::S
   ui_->scrollArea->viewport()->setAutoFillBackground(false);
   ui_->scrollAreaWidgetContents->setAutoFillBackground(false);
 
-  const auto add_item = [this](QString icon, QString text, QWidget* page = nullptr) {
+  const auto addItem = [this](QString icon, QString text, QWidget* page = nullptr) {
     auto item = new QTreeWidgetItem(ui_->treeWidget, QStringList(text));
     item->setIcon(0, theme()->getIcon(icon));
     item->setSizeHint(0, QSize{0, 24});
@@ -60,30 +60,30 @@ SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent), ui_(new Ui::S
     return item;
   };
 
-  const auto add_child = [this](QTreeWidgetItem* parent, QString text, QWidget* page = nullptr) {
+  const auto addChild = [this](QTreeWidgetItem* parent, QString text, QWidget* page = nullptr) {
     auto item = new QTreeWidgetItem(parent, QStringList(text));
     item->setData(0, kPageRole, QVariant::fromValue(page));
     if (!page) item->setDisabled(true);
   };
 
-  add_item("account_circle", "Accounts", ui_->accountsPage);
-  add_item("web_asset", "Application", ui_->applicationPage);
-  add_item("list_alt", "Anime List");
-  add_item("folder", "Library", ui_->libraryPage);
+  addItem("account_circle", "Accounts", ui_->accountsPage);
+  addItem("web_asset", "Application", ui_->applicationPage);
+  addItem("list_alt", "Anime List");
+  addItem("folder", "Library", ui_->libraryPage);
   {
-    auto item = add_item("check_circle", "Recognition", ui_->recognitionPage);
-    add_child(item, "Media players", ui_->mediaPlayersPage);
-    add_child(item, "Streaming", ui_->streamingPage);
+    auto item = addItem("check_circle", "Recognition", ui_->recognitionPage);
+    addChild(item, "Media players", ui_->mediaPlayersPage);
+    addChild(item, "Streaming", ui_->streamingPage);
   }
-  add_item("share", "Sharing", ui_->sharingPage);
+  addItem("share", "Sharing", ui_->sharingPage);
   {
-    auto item = add_item("rss_feed", "Torrents");
-    add_child(item, "Downloads");
-    add_child(item, "Filters");
+    auto item = addItem("rss_feed", "Torrents");
+    addChild(item, "Downloads");
+    addChild(item, "Filters");
   }
   {
-    auto item = add_item("warning", "Advanced", ui_->advancedPage);
-    add_child(item, "Cache");
+    auto item = addItem("warning", "Advanced", ui_->advancedPage);
+    addChild(item, "Cache");
   }
 
   ui_->treeWidget->expandAll();

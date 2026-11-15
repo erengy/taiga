@@ -35,8 +35,8 @@
 
 namespace gui {
 
-LibraryMenu::LibraryMenu(QWidget* parent, const QString& path, int anime_id)
-    : QMenu(parent), m_path(path), m_anime_id(anime_id) {
+LibraryMenu::LibraryMenu(QWidget* parent, const QString& path, int animeId)
+    : QMenu(parent), m_path(path), m_anime_id(animeId) {
   setAttribute(Qt::WA_DeleteOnClose);
 }
 

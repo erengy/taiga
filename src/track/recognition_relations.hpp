@@ -38,7 +38,7 @@ struct Redirection {
 class Relations {
 public:
   void load(const QString& contents, const int column);
-  std::optional<Redirection> find(const int id, const int episode_number) const;
+  std::optional<Redirection> find(const int id, const int episodeNumber) const;
 
 private:
   struct Rule {
@@ -48,12 +48,12 @@ private:
   };
 
   void parseRule(const QString& rule, const int column);
-  void addRule(const int id, const std::pair<int, int>& source_range, const int destination_id,
-               const std::pair<int, int>& destination_range);
+  void addRule(const int id, const std::pair<int, int>& sourceRange, const int destinationId,
+               const std::pair<int, int>& destinationRange);
 
   std::unordered_map<int, std::vector<Rule>> rules_;
 };
 
-std::optional<Redirection> findRedirection(const int id, const std::pair<int, int>& episode_range);
+std::optional<Redirection> findRedirection(const int id, const std::pair<int, int>& episodeRange);
 
 }  // namespace track::recognition

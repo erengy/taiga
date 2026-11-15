@@ -600,25 +600,25 @@ void MediaMenu::addLibraryItems() {
 
   // Play
   addMenu([this, &item, entry]() {
-    const int total_episodes = std::max(item.episode_count, 0);
-    const int watched_episodes = entry ? entry->watched_episodes : 0;
-    const int max_episodes = total_episodes ? total_episodes : std::numeric_limits<int>::max();
-    const int last_episode = std::min(watched_episodes, max_episodes);
-    const int next_episode = last_episode + 1;
+    const int totalEpisodes = std::max(item.episode_count, 0);
+    const int watchedEpisodes = entry ? entry->watched_episodes : 0;
+    const int maxEpisodes = totalEpisodes ? totalEpisodes : std::numeric_limits<int>::max();
+    const int lastEpisode = std::min(watchedEpisodes, maxEpisodes);
+    const int nextEpisode = lastEpisode + 1;
 
     auto menu = new QMenu(tr("Play"), this);
     menu->setIcon(theme()->getIcon("play_arrow"));
 
     // Play next episode
-    if (next_episode <= max_episodes) {
-      menu->addAction(theme()->getIcon("skip_next"), tr("Next episode (#%1)").arg(next_episode),
-                      this, [this, next_episode]() { playEpisode(next_episode); });
+    if (nextEpisode <= maxEpisodes) {
+      menu->addAction(theme()->getIcon("skip_next"), tr("Next episode (#%1)").arg(nextEpisode),
+                      this, [this, nextEpisode]() { playEpisode(nextEpisode); });
     }
 
     // Play last episode
-    if (last_episode > 0) {
-      menu->addAction(tr("Last episode (#%1)").arg(last_episode), this,
-                      [this, last_episode]() { playEpisode(last_episode); });
+    if (lastEpisode > 0) {
+      menu->addAction(tr("Last episode (#%1)").arg(lastEpisode), this,
+                      [this, lastEpisode]() { playEpisode(lastEpisode); });
     }
 
     // Play random episode
@@ -628,14 +628,14 @@ void MediaMenu::addLibraryItems() {
     }
 
     // Play episode
-    if (total_episodes > 1) {
+    if (totalEpisodes > 1) {
       menu->addSeparator();
-      menu->addMenu([this, total_episodes, last_episode]() {
+      menu->addMenu([this, totalEpisodes, lastEpisode]() {
         auto menu = new QMenu(tr("Episode"), this);
-        for (int i = 1; i <= total_episodes; ++i) {
+        for (int i = 1; i <= totalEpisodes; ++i) {
           auto action = new QAction(u"#%1"_s.arg(i), this);
           action->setCheckable(true);
-          action->setChecked(i <= last_episode);
+          action->setChecked(i <= lastEpisode);
           menu->addAction(action);
           connect(action, &QAction::triggered, this, [this, i]() { playEpisode(i); });
         }
@@ -644,8 +644,8 @@ void MediaMenu::addLibraryItems() {
     }
 
     // Start new rewatch
-    if (entry && !entry->rewatching && total_episodes > 0 &&
-        entry->watched_episodes == total_episodes && item.status == anime::Status::FinishedAiring) {
+    if (entry && !entry->rewatching && totalEpisodes > 0 &&
+        entry->watched_episodes == totalEpisodes && item.status == anime::Status::FinishedAiring) {
       menu->addSeparator();
       menu->addAction(tr("Start new rewatch"), this, &MediaMenu::startNewRewatch);
     }

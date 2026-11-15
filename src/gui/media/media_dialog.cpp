@@ -233,7 +233,7 @@ void MediaDialog::initDetails() {
     ui_->infoLayout->removeRow(0);
   }
 
-  const auto get_row_title = [this](const QString& text) {
+  const auto getRowTitle = [this](const QString& text) {
     auto* label = new QLabel(text, this);
     label->setAlignment(Qt::AlignRight | Qt::AlignTop);
     label->setFont([label]() {
@@ -244,7 +244,7 @@ void MediaDialog::initDetails() {
     return label;
   };
 
-  const auto get_row_label = [this](const QString& text) {
+  const auto getRowLabel = [this](const QString& text) {
     auto* label = new QLabel(text, this);
     label->setContextMenuPolicy(Qt::ContextMenuPolicy::NoContextMenu);
     label->setTextInteractionFlags(Qt::TextInteractionFlag::TextSelectableByMouse);
@@ -258,35 +258,32 @@ void MediaDialog::initDetails() {
   seasonLabel->setToolTip(formatFuzzyDateRange(m_anime.date_started, m_anime.date_finished));
 
   if (!m_anime.titles.synonyms.empty()) {
-    ui_->infoLayout->addRow(get_row_title(tr("Titles:")),
-                            get_row_label(joinStrings(m_anime.titles.synonyms)));
+    ui_->infoLayout->addRow(getRowTitle(tr("Titles:")),
+                            getRowLabel(joinStrings(m_anime.titles.synonyms)));
   }
-  ui_->infoLayout->addRow(get_row_title(tr("Type:")), get_row_label(formatType(m_anime.type)));
-  ui_->infoLayout->addRow(get_row_title(tr("Episodes:")),
-                          get_row_label(formatNumber(m_anime.episode_count, "?")));
+  ui_->infoLayout->addRow(getRowTitle(tr("Type:")), getRowLabel(formatType(m_anime.type)));
+  ui_->infoLayout->addRow(getRowTitle(tr("Episodes:")),
+                          getRowLabel(formatNumber(m_anime.episode_count, "?")));
   if (m_anime.episode_length > 0 && m_anime.type != anime::Type::Tv) {
     const auto duration = formatEpisodeLength(m_anime.episode_length);
     const auto label = m_anime.episode_count == 1 ? duration : u"%1 per episode"_s.arg(duration);
-    ui_->infoLayout->addRow(get_row_title(tr("Duration:")), get_row_label(label));
+    ui_->infoLayout->addRow(getRowTitle(tr("Duration:")), getRowLabel(label));
   }
-  ui_->infoLayout->addRow(get_row_title(tr("Status:")),
-                          get_row_label(formatStatus(m_anime.status)));
-  ui_->infoLayout->addRow(get_row_title(tr("Season:")), seasonLabel);
-  ui_->infoLayout->addRow(get_row_title(tr("Score:")), get_row_label(formatScore(m_anime.score)));
+  ui_->infoLayout->addRow(getRowTitle(tr("Status:")), getRowLabel(formatStatus(m_anime.status)));
+  ui_->infoLayout->addRow(getRowTitle(tr("Season:")), seasonLabel);
+  ui_->infoLayout->addRow(getRowTitle(tr("Score:")), getRowLabel(formatScore(m_anime.score)));
   if (!m_anime.genres.empty()) {
-    ui_->infoLayout->addRow(get_row_title(tr("Genres:")),
-                            get_row_label(joinStrings(m_anime.genres)));
+    ui_->infoLayout->addRow(getRowTitle(tr("Genres:")), getRowLabel(joinStrings(m_anime.genres)));
   }
   if (!m_anime.tags.empty()) {
-    ui_->infoLayout->addRow(get_row_title(tr("Tags:")), get_row_label(joinStrings(m_anime.tags)));
+    ui_->infoLayout->addRow(getRowTitle(tr("Tags:")), getRowLabel(joinStrings(m_anime.tags)));
   }
   if (!m_anime.studios.empty()) {
-    ui_->infoLayout->addRow(get_row_title(tr("Studios:")),
-                            get_row_label(joinStrings(m_anime.studios)));
+    ui_->infoLayout->addRow(getRowTitle(tr("Studios:")), getRowLabel(joinStrings(m_anime.studios)));
   }
   if (!m_anime.producers.empty()) {
-    ui_->infoLayout->addRow(get_row_title(tr("Producers:")),
-                            get_row_label(joinStrings(m_anime.producers)));
+    ui_->infoLayout->addRow(getRowTitle(tr("Producers:")),
+                            getRowLabel(joinStrings(m_anime.producers)));
   }
 
   const auto synopsis = QString::fromStdString(m_anime.synopsis);
@@ -344,7 +341,7 @@ void MediaDialog::initList() {
     setRatingComboBoxValue(ui_->comboScore, m_entry->score);
   }
 
-  const auto fuzzy_to_date = [](const FuzzyDate& date) {
+  const auto fuzzyToDate = [](const FuzzyDate& date) {
     return QDate{date.year(), date.month(), date.day()};
   };
 
@@ -352,12 +349,12 @@ void MediaDialog::initList() {
   ui_->checkDateStarted->setChecked(static_cast<bool>(m_entry->date_started));
   ui_->checkDateCompleted->setChecked(static_cast<bool>(m_entry->date_completed));
   if (m_anime.date_started) {
-    ui_->dateStarted->setMinimumDate(fuzzy_to_date(m_anime.date_started));
-    ui_->dateCompleted->setMinimumDate(fuzzy_to_date(m_anime.date_started));
+    ui_->dateStarted->setMinimumDate(fuzzyToDate(m_anime.date_started));
+    ui_->dateCompleted->setMinimumDate(fuzzyToDate(m_anime.date_started));
   }
-  ui_->dateStarted->setDate(m_entry->date_started ? fuzzy_to_date(m_entry->date_started)
+  ui_->dateStarted->setDate(m_entry->date_started ? fuzzyToDate(m_entry->date_started)
                                                   : QDate::currentDate());
-  ui_->dateCompleted->setDate(m_entry->date_completed ? fuzzy_to_date(m_entry->date_completed)
+  ui_->dateCompleted->setDate(m_entry->date_completed ? fuzzyToDate(m_entry->date_completed)
                                                       : QDate::currentDate());
 
   // Notes

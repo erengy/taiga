@@ -23,9 +23,8 @@
 
 namespace track {
 
-std::optional<QString> findEpisode(const QString& path, const int anime_id,
-                                   const int episode_number);
-std::optional<QString> findFolder(const QString& path, const int anime_id);
+std::optional<QString> findEpisode(const QString& path, const int animeId, const int episodeNumber);
+std::optional<QString> findFolder(const QString& path, const int animeId);
 
 bool isInsideLibraryFolders(const QString& path);
 

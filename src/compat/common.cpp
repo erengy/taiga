@@ -24,24 +24,24 @@
 namespace compat::v1 {
 
 void removeMetaElement(QString& str) {
-  static const QRegularExpression meta_element_regex{
-      "<meta>.+?</meta>", QRegularExpression::DotMatchesEverythingOption};
-  str.remove(meta_element_regex);
+  static const QRegularExpression metaElementRegex{"<meta>.+?</meta>",
+                                                   QRegularExpression::DotMatchesEverythingOption};
+  str.remove(metaElementRegex);
 }
 
 void removeInvalidCharacterReferences(QString& str) {
-  static const QRegularExpression ref_regex{"&#(x?)([0-9A-Fa-f]+);"};
+  static const QRegularExpression refRegex{"&#(x?)([0-9A-Fa-f]+);"};
 
-  const auto is_illegal = [](const uint codepoint) {
+  const auto isIllegal = [](const uint codepoint) {
     return codepoint <= 0x1F && codepoint != 0x9 && codepoint != 0xA && codepoint != 0xD;
   };
 
   qsizetype offset = 0;
-  for (auto match = ref_regex.match(str, offset); match.hasMatch();
-       match = ref_regex.match(str, offset)) {
+  for (auto match = refRegex.match(str, offset); match.hasMatch();
+       match = refRegex.match(str, offset)) {
     bool ok = false;
     const auto codepoint = match.captured(2).toUInt(&ok, match.captured(1).isEmpty() ? 10 : 16);
-    if (ok && is_illegal(codepoint)) {
+    if (ok && isIllegal(codepoint)) {
       str.remove(match.capturedStart(), match.capturedLength());
       offset = match.capturedStart();
     } else {

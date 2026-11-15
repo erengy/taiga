@@ -195,8 +195,8 @@ void ListWidget::initViewMenu() {
 void ListWidget::initMoreMenu() {
   m_moreMenu->clear();
 
-  static constexpr auto export_as = [](QWidget* parent, const QString& extension,
-                                       auto export_function) {
+  static constexpr auto exportAs = [](QWidget* parent, const QString& extension,
+                                      auto exportFunction) {
     const auto directory = QFileDialog::getExistingDirectory(
         parent, tr("Select Export Location"), {},
         QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks | QFileDialog::ReadOnly);
@@ -205,7 +205,7 @@ void ListWidget::initMoreMenu() {
 
     const auto timestamp = QDateTime::currentDateTime().toSecsSinceEpoch();
     const auto path = u"%1/animelist_%2.%3"_s.arg(directory).arg(timestamp).arg(extension);
-    const auto success = export_function(path.toStdString());
+    const auto success = exportFunction(path.toStdString());
 
     mainWindow()->statusBarController()->showMessage({
         .source = StatusBarController::Source::Export,
@@ -216,10 +216,10 @@ void ListWidget::initMoreMenu() {
   };
 
   m_moreMenu->addAction(tr("Export as Markdown..."), this,
-                        [this]() { export_as(this, "md", &anime::list::exportAsMarkdown); });
+                        [this]() { exportAs(this, "md", &anime::list::exportAsMarkdown); });
 
   m_moreMenu->addAction(tr("Export as XML..."), this,
-                        [this]() { export_as(this, "xml", &anime::list::exportAsXml); });
+                        [this]() { exportAs(this, "xml", &anime::list::exportAsXml); });
 }
 
 }  // namespace gui

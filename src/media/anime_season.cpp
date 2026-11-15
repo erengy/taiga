@@ -83,16 +83,16 @@ std::pair<Date, Date> toDateRange(const Season& season) noexcept {
 
   const auto months = season::toMonths(season.name);
 
-  const Date date_first{
+  const Date dateFirst{
       season.name == Winter ? season.year - std::chrono::years{1} : season.year,
       months.first,
       std::chrono::day{1},
   };
 
-  const Date date_last =
+  const Date dateLast =
       std::chrono::year_month_day_last{season.year, std::chrono::month_day_last(months.second)};
 
-  return {date_first, date_last};
+  return {dateFirst, dateLast};
 }
 
 }  // namespace season

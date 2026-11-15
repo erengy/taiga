@@ -208,7 +208,7 @@ void MainWindow::initPage(MainWindowPage page) {
 
   if (initializedPages.contains(page)) return;
 
-  static const auto init_page = [](QWidget* page, QWidget* widget) {
+  static const auto initPage = [](QWidget* page, QWidget* widget) {
     const auto layout = new QHBoxLayout(page);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(widget);
@@ -220,22 +220,22 @@ void MainWindow::initPage(MainWindowPage page) {
 
     case MainWindowPage::Search:
       m_searchWidget = new SearchWidget(ui_->searchPage);
-      init_page(ui_->searchPage, m_searchWidget);
+      initPage(ui_->searchPage, m_searchWidget);
       break;
 
     case MainWindowPage::List:
       m_listWidget = new ListWidget(ui_->listPage);
-      init_page(ui_->listPage, m_listWidget);
+      initPage(ui_->listPage, m_listWidget);
       break;
 
     case MainWindowPage::History:
       m_historyWidget = new HistoryWidget(ui_->historyPage);
-      init_page(ui_->historyPage, m_historyWidget);
+      initPage(ui_->historyPage, m_historyWidget);
       break;
 
     case MainWindowPage::Library:
       m_libraryWidget = new LibraryWidget(ui_->libraryPage);
-      init_page(ui_->libraryPage, m_libraryWidget);
+      initPage(ui_->libraryPage, m_libraryWidget);
       break;
 
     case MainWindowPage::Torrents:
@@ -273,8 +273,8 @@ void MainWindow::initStatusbar() {
             [this](const bool authenticated) {
               if (!authenticated) return;
 
-              const auto sender_service = qobject_cast<sync::Service*>(sender());
-              const auto slug = sync::serviceSlug(sender_service->id()).toStdString();
+              const auto senderService = qobject_cast<sync::Service*>(sender());
+              const auto slug = sync::serviceSlug(senderService->id()).toStdString();
               const auto username = taiga::accounts()->serviceUsername(slug);
 
               m_statusBarController->showMessage({
@@ -288,10 +288,10 @@ void MainWindow::initStatusbar() {
       setEnabled(true);
     });
     connect(service, &sync::Service::errorOccurred, this, [this](const QString& message) {
-      const auto sender_service = qobject_cast<sync::Service*>(sender());
+      const auto senderService = qobject_cast<sync::Service*>(sender());
       m_statusBarController->showMessage({
           .source = StatusBarController::Source::Sync,
-          .text = sync::tagMessage(sender_service->id(), message),
+          .text = sync::tagMessage(senderService->id(), message),
           .spin = false,
       });
       setEnabled(true);

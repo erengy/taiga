@@ -39,16 +39,16 @@
 namespace anime::list {
 
 bool exportAsMarkdown(const std::string& path) {
-  std::map<anime::list::Status, std::vector<std::string>> status_lists;
+  std::map<anime::list::Status, std::vector<std::string>> statusLists;
 
   for (const auto& entry : anime::db()->entries()) {
     const auto item = anime::db()->item(entry.anime_id);
     const auto line =
         std::format("{} ({}/{})", item->titles.romaji, entry.watched_episodes, item->episode_count);
-    status_lists[entry.status].push_back(line);
+    statusLists[entry.status].push_back(line);
   }
 
-  for (auto& [status, list] : status_lists) {
+  for (auto& [status, list] : statusLists) {
     std::ranges::sort(list, [](const std::string& a, const std::string& b) {
       return compareStrings(a, b, Qt::CaseInsensitive) < 0;
     });
@@ -59,7 +59,7 @@ bool exportAsMarkdown(const std::string& path) {
   if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) return false;
 
   QString text;
-  for (const auto& [status, list] : status_lists) {
+  for (const auto& [status, list] : statusLists) {
     if (!text.isEmpty()) text += "\n";
     text += u"# %1\n\n"_s.arg(gui::formatListStatus(status));
     for (const auto& line : list) {
@@ -74,7 +74,7 @@ bool exportAsMarkdown(const std::string& path) {
 }
 
 bool exportAsXml(const std::string& path) {
-  constexpr auto format_series_type = [](anime::Type type) {
+  constexpr auto formatSeriesType = [](anime::Type type) {
     // clang-format off
     switch (type) {
       default:
@@ -89,7 +89,7 @@ bool exportAsXml(const std::string& path) {
     // clang-format on
   };
 
-  constexpr auto format_my_status = [](anime::list::Status status) {
+  constexpr auto formatMyStatus = [](anime::list::Status status) {
     // clang-format off
     switch (status) {
       default:
@@ -119,9 +119,9 @@ bool exportAsXml(const std::string& path) {
 
   xml.writeStartElement("myanimelist");
 
-  std::map<anime::list::Status, int> status_counts;
+  std::map<anime::list::Status, int> statusCounts;
   for (const auto& entry : anime::db()->entries()) {
-    ++status_counts[entry.status];
+    ++statusCounts[entry.status];
   }
 
   xml.writeStartElement("myinfo");
@@ -129,11 +129,11 @@ bool exportAsXml(const std::string& path) {
   xml.writeTextElement("user_name", taiga::accounts()->myanimelistUsername());
   xml.writeNumberElement("user_export_type", 1);  // anime
   xml.writeNumberElement("user_total_anime", anime::db()->entries().count());
-  xml.writeNumberElement("user_total_watching", status_counts[anime::list::Status::Watching]);
-  xml.writeNumberElement("user_total_completed", status_counts[anime::list::Status::Completed]);
-  xml.writeNumberElement("user_total_onhold", status_counts[anime::list::Status::OnHold]);
-  xml.writeNumberElement("user_total_dropped", status_counts[anime::list::Status::Dropped]);
-  xml.writeNumberElement("user_total_plantowatch", status_counts[anime::list::Status::PlanToWatch]);
+  xml.writeNumberElement("user_total_watching", statusCounts[anime::list::Status::Watching]);
+  xml.writeNumberElement("user_total_completed", statusCounts[anime::list::Status::Completed]);
+  xml.writeNumberElement("user_total_onhold", statusCounts[anime::list::Status::OnHold]);
+  xml.writeNumberElement("user_total_dropped", statusCounts[anime::list::Status::Dropped]);
+  xml.writeNumberElement("user_total_plantowatch", statusCounts[anime::list::Status::PlanToWatch]);
   xml.writeEndElement();  // myinfo
 
   for (const auto& entry : anime::db()->entries()) {
@@ -141,7 +141,7 @@ bool exportAsXml(const std::string& path) {
     xml.writeStartElement("anime");
     xml.writeNumberElement("series_animedb_id", item->id);  // @TODO: pass actual MAL ID
     xml.writeTextElement("series_title", item->titles.romaji);
-    xml.writeTextElement("series_type", format_series_type(item->type));
+    xml.writeTextElement("series_type", formatSeriesType(item->type));
     xml.writeNumberElement("series_episodes", item->episode_count);
     xml.writeNumberElement("my_id", 0);
     xml.writeNumberElement("my_watched_episodes", entry.watched_episodes);
@@ -152,7 +152,7 @@ bool exportAsXml(const std::string& path) {
     xml.writeNumberElement("my_score", sync::myanimelist::fromListScore(entry.score));
     xml.writeTextElement("my_dvd", "");
     xml.writeTextElement("my_storage", "");
-    xml.writeTextElement("my_status", format_my_status(entry.status));
+    xml.writeTextElement("my_status", formatMyStatus(entry.status));
     xml.writeTextElement("my_comments", entry.notes);
     xml.writeNumberElement("my_times_watched", entry.rewatched_times);
     xml.writeTextElement("my_rewatch_value", "");

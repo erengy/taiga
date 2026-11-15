@@ -173,12 +173,12 @@ void LibraryModel::parse(const QString& path) const {
   if (!info.isFile()) return;
 
   auto episode = track::recognition::parseFileInfo(info);
-  const auto anime_id = track::recognition::identify(episode);
+  const auto animeId = track::recognition::identify(episode);
 
   m_parsed[path] = ParsedData{
       .title = QString::fromStdString(episode.element(anitomy::ElementKind::Title)),
       .episode = QString::fromStdString(episode.element(anitomy::ElementKind::Episode)),
-      .id = anime_id,
+      .id = animeId,
   };
 }
 

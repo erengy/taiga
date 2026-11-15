@@ -1,6 +1,6 @@
 /**
  * Taiga
- * Copyright (C) 2010-2025, Eren Okka
+ * Copyright (C) 2010-2026, Eren Okka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -59,7 +59,7 @@ std::string normalize(std::string title) {
 /////////////////////////////////////////////////////////////////////////////////
 
 void erasePunctuation(QString& str) {
-  static constexpr auto is_removable = [&](const QChar& c) {
+  static constexpr auto isRemovable = [&](const QChar& c) {
     // Control codes, white-space and punctuation characters
     if (c.unicode() <= 0xFF && !c.isLetterOrNumber()) return true;
     // Unicode stars, hearts, notes, etc.
@@ -68,7 +68,7 @@ void erasePunctuation(QString& str) {
     return false;
   };
 
-  str.removeIf(is_removable);
+  str.removeIf(isRemovable);
 }
 
 void normalizeOrdinalNumbers(QString& str) {

@@ -50,9 +50,9 @@ std::optional<int> nextEpisodeNumber(int animeId) {
   if (!item) return std::nullopt;
 
   const auto entry = anime::db()->entry(animeId);
-  const int watched_episodes = entry ? entry->watched_episodes : 0;
+  const int watchedEpisodes = entry ? entry->watched_episodes : 0;
 
-  int number = watched_episodes + 1;
+  int number = watchedEpisodes + 1;
 
   // Replay first episode for completed anime.
   if (item->episode_count > 0 && number > item->episode_count) {
@@ -67,25 +67,25 @@ std::optional<int> randomEpisodeNumber(int animeId) {
   if (!item) return std::nullopt;
 
   const auto entry = anime::db()->entry(animeId);
-  const int watched_episodes = entry ? entry->watched_episodes : 0;
+  const int watchedEpisodes = entry ? entry->watched_episodes : 0;
 
-  int max_episode = item->episode_count;
+  int maxEpisode = item->episode_count;
 
   // Avoid spoiling unwatched episodes, unless the series is completed.
-  // `watched_episodes < episode_count` can be true if rewatching.
+  // `watchedEpisodes < episode_count` can be true if rewatching.
   const bool completed = entry && entry->status == anime::list::Status::Completed;
   if (!completed) {
-    max_episode = watched_episodes + 1;
+    maxEpisode = watchedEpisodes + 1;
   }
 
   // Clamp to the known episode count, if any.
   if (item->episode_count > 0) {
-    max_episode = std::min(max_episode, item->episode_count);
+    maxEpisode = std::min(maxEpisode, item->episode_count);
   }
 
-  if (max_episode < 1) return std::nullopt;
+  if (maxEpisode < 1) return std::nullopt;
 
-  return QRandomGenerator::global()->bounded(1, max_episode + 1);
+  return QRandomGenerator::global()->bounded(1, maxEpisode + 1);
 }
 
 }  // namespace track
