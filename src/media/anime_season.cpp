@@ -133,21 +133,21 @@ Season& Season::operator--() {
 }
 
 std::strong_ordering Season::operator<=>(const Season& season) const {
-  using cmp = std::strong_ordering;
+  using Cmp = std::strong_ordering;
 
   if (year != season.year) {
-    if (!static_cast<int>(year)) return cmp::greater;
-    if (!static_cast<int>(season.year)) return cmp::less;
-    return year < season.year ? cmp::less : cmp::greater;
+    if (!static_cast<int>(year)) return Cmp::greater;
+    if (!static_cast<int>(season.year)) return Cmp::less;
+    return year < season.year ? Cmp::less : Cmp::greater;
   }
 
   if (name != season.name) {
-    if (name == Unknown) return cmp::greater;  // Unknown seasons are in the future
-    if (season.name == Unknown) return cmp::less;
-    return name < season.name ? cmp::less : cmp::greater;
+    if (name == Unknown) return Cmp::greater;  // Unknown seasons are in the future
+    if (season.name == Unknown) return Cmp::less;
+    return name < season.name ? Cmp::less : Cmp::greater;
   }
 
-  return cmp::equal;
+  return Cmp::equal;
 }
 
 bool Season::hasName() const {
