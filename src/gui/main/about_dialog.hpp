@@ -30,6 +30,7 @@ namespace gui {
 
 class AboutDialogHandler : public QObject {
   Q_OBJECT
+  Q_DISABLE_COPY_MOVE(AboutDialogHandler)
 
 public:
   AboutDialogHandler(QObject* parent);
