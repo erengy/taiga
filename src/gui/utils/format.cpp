@@ -33,6 +33,14 @@
 
 namespace gui {
 
+namespace {
+
+class Format {
+  Q_DECLARE_TR_FUNCTIONS(gui::Format)
+};
+
+}  // namespace
+
 QString formatNumber(const int value, const QString& placeholder) {
   return value > 0 ? QString::number(value) : placeholder;
 }
@@ -94,27 +102,27 @@ QString formatAsRelativeTime(const qint64 time, const QString& placeholder) {
   const QString str = [&duration]() {
     // clang-format off
     if (duration.seconds() < 90) {
-      return QCoreApplication::translate("gui/utils/format", "a moment");
+      return Format::tr("a moment");
     }
     if (duration.minutes() < 45) {
       const auto n = std::lround(duration.minutes());
-      return QCoreApplication::translate("gui/utils/format", "%n minute(s)", nullptr, n);
+      return Format::tr("%n minute(s)", nullptr, n);
     }
     if (duration.hours() < 22) {
       const auto n = std::lround(duration.hours());
-      return QCoreApplication::translate("gui/utils/format", "%n hour(s)", nullptr, n);
+      return Format::tr("%n hour(s)", nullptr, n);
     }
     if (duration.days() < 25) {
       const auto n = std::lround(duration.days());
-      return QCoreApplication::translate("gui/utils/format", "%n day(s)", nullptr, n);
+      return Format::tr("%n day(s)", nullptr, n);
     }
     if (duration.days() < 345) {
       const auto n = std::lround(duration.months());
-      return QCoreApplication::translate("gui/utils/format", "%n month(s)", nullptr, n);
+      return Format::tr("%n month(s)", nullptr, n);
     }
     {
       const auto n = std::lround(duration.years());
-      return QCoreApplication::translate("gui/utils/format", "%n year(s)", nullptr, n);
+      return Format::tr("%n year(s)", nullptr, n);
     }
     // clang-format on
   }();

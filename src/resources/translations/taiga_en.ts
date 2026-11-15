@@ -2,7 +2,7 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="en_US">
 <context>
-    <name>gui/utils/format</name>
+    <name>gui::Format</name>
     <message numerus="yes">
         <source>%n minute(s)</source>
         <translation>
