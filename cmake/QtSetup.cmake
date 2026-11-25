@@ -4,7 +4,7 @@ set(CMAKE_AUTOUIC OFF)
 
 list(APPEND CMAKE_PREFIX_PATH "$ENV{QTDIR}/lib/cmake")
 
-find_package(Qt6 REQUIRED COMPONENTS
+find_package(Qt6 ${TAIGA_QT_VERSION} REQUIRED COMPONENTS
 	Concurrent
 	Core
 	Gui

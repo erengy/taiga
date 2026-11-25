@@ -11,6 +11,8 @@ jobs:
   build:
     name: Build (${{ matrix.arch }})
     runs-on: windows-latest
+    env:
+      SCCACHE_GHA_ENABLED: "true"
     strategy:
       fail-fast: false
       matrix:
@@ -38,11 +40,19 @@ jobs:
         with:
           arch: ${{ matrix.msvc-arch }}
 
+      - name: Determine Qt version
+        id: qt-version
+        shell: pwsh
+        run: |
+          $version = (Select-String -Path CMakeLists.txt -Pattern '^\s*set\(TAIGA_QT_VERSION\s+(?<v>\d+(?:\.\d+)+)\s*\)').Matches[0].Groups['v'].Value
+          "qt-version=$version" >> $env:GITHUB_OUTPUT
+          Write-Output "Qt version: $version"
+
       - name: Install Qt
         id: install-qt
         uses: jurplel/install-qt-action@v4
         with:
-          version: '6.10.3'
+          version: ${{ steps.qt-version.outputs.qt-version }}
           arch: ${{ matrix.qt-arch }}
           modules: 'qtimageformats'
           cache: true
@@ -69,8 +79,11 @@ jobs:
           "name=$name" >> $env:GITHUB_OUTPUT
           Write-Output "Artifact name: $name"
 
+      - name: Set up sccache
+        uses: mozilla-actions/sccache-action@v0.0.11
+
       - name: Configure
-        run: cmake -B build/msvc-${{ matrix.arch }} -G "Ninja Multi-Config" -DCMAKE_BUILD_TYPE=msvc-${{ matrix.arch }}-release ${{ matrix.cmake-extra }}
+        run: cmake -B build/msvc-${{ matrix.arch }} -G "Ninja Multi-Config" -DCMAKE_BUILD_TYPE=msvc-${{ matrix.arch }}-release -DCMAKE_CXX_COMPILER_LAUNCHER=sccache ${{ matrix.cmake-extra }}
 
       - name: Build
         run: cmake --build build/msvc-${{ matrix.arch }} --config RelWithDebInfo --target taiga
