@@ -18,22 +18,20 @@
 #include "settings_page_accounts.hpp"
 
 #include <QCheckBox>
+#include <QClipboard>
 #include <QComboBox>
 #include <QDesktopServices>
 #include <QGroupBox>
+#include <QGuiApplication>
 #include <QInputDialog>
-#include <QLabel>
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QPushButton>
-#include <QUrl>
 #include <algorithm>
 #include <memory>
 #include <string>
 
-#include "base/string.hpp"
-#include "sync/anilist/anilist.hpp"
-#include "sync/anilist/anilist_utils.hpp"
+
 #include "sync/myanimelist/myanimelist.hpp"
 #include "sync/myanimelist/myanimelist_utils.hpp"
 #include "sync/service.hpp"
@@ -71,10 +69,26 @@ SettingsPageAccounts::SettingsPageAccounts(Ui::SettingsDialog* ui, QDialog* dial
   connect(ui_->serviceComboBox, &QComboBox::currentIndexChanged, this,
           [this]() { updateVisibleGroup(); });
 
-  connect(ui_->anilistAuthorizeButton, &QPushButton::clicked, this,
-          &SettingsPageAccounts::authorizeAnilist);
-  connect(ui_->myanimelistAuthorizeButton, &QPushButton::clicked, this,
-          &SettingsPageAccounts::authorizeMyanimelist);
+  connect(ui_->myanimelistLoginButton, &QPushButton::clicked, this,
+          &SettingsPageAccounts::loginToMyanimelist);
+
+  // Only report the result of a sign-in that was started here; the page also
+  // receives completions of background authentication.
+  connect(sync::myanimelist::Service::instance(), &sync::Service::authenticationCompleted,
+          this, [this](const bool authenticated) {
+            if (!myanimelistLoginPending_) return;
+
+            myanimelistLoginPending_ = false;
+            ui_->myanimelistLoginButton->setEnabled(true);
+            refreshMyanimelistFields();
+
+            if (!authenticated) {
+              QMessageBox::warning(
+                  dialog_, tr("MyAnimeList Login"),
+                  tr("Could not sign in to MyAnimeList. Check the code and try again."));
+            }
+          });
+
 }
 
 void SettingsPageAccounts::load() {
@@ -93,8 +107,8 @@ void SettingsPageAccounts::load() {
   ui_->kitsuUsernameLineEdit->setText(toQString(accounts.kitsuUsername()));
   ui_->kitsuPasswordLineEdit->setText(toQString(accounts.kitsuPassword()));
 
-  ui_->myanimelistUsernameLineEdit->setText(toQString(accounts.myanimelistUsername()));
-  ui_->myanimelistAuthorizeButton->setText(authorizeButtonText(accounts.myanimelistAccessToken()));
+  refreshMyanimelistFields();
+
 }
 
 void SettingsPageAccounts::apply() const {
@@ -110,6 +124,44 @@ void SettingsPageAccounts::apply() const {
                                ui_->kitsuPasswordLineEdit->text().toStdString());
 
   accounts.setMyanimelistUsername(toStdString(ui_->myanimelistUsernameLineEdit));
+}
+
+void SettingsPageAccounts::loginToMyanimelist() {
+  auto* service = sync::myanimelist::Service::instance();
+  service->requestAuthorization();
+
+  // The authorization page shows a code to copy, so pre-fill the dialog when
+  // it is already on the clipboard.
+  const auto suggestion =
+      sync::myanimelist::authorizationCode(QGuiApplication::clipboard()->text());
+
+  bool accepted = false;
+  const auto text = QInputDialog::getText(
+      dialog_, tr("MyAnimeList Login"),
+      tr("Sign in to MyAnimeList in the browser window that just opened, then paste the code "
+         "shown by MyAnimeList below."),
+      QLineEdit::Normal, suggestion, &accepted);
+
+  if (!accepted) return;
+
+  const auto code = sync::myanimelist::authorizationCode(text);
+  if (code.isEmpty()) {
+    QMessageBox::warning(dialog_, tr("MyAnimeList Login"),
+                         tr("The authorization code is empty."));
+    return;
+  }
+
+  myanimelistLoginPending_ = true;
+  ui_->myanimelistLoginButton->setEnabled(false);
+  service->authorize(code);
+}
+
+void SettingsPageAccounts::refreshMyanimelistFields() {
+  const auto& accounts = taiga::accounts;
+
+  ui_->myanimelistUsernameLineEdit->setText(toQString(accounts.myanimelistUsername()));
+  ui_->myanimelistAccessTokenLineEdit->setText(toQString(accounts.myanimelistAccessToken()));
+  ui_->myanimelistRefreshTokenLineEdit->setText(toQString(accounts.myanimelistRefreshToken()));
 }
 
 void SettingsPageAccounts::updateVisibleGroup() {

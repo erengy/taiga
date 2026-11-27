@@ -127,6 +127,12 @@
                <property name="rightMargin">
                 <number>0</number>
                </property>
+              <property name="leftMargin">
+                <number>0</number>
+               </property>
+               <property name="rightMargin">
+                <number>0</number>
+               </property>
                <property name="bottomMargin">
                 <number>0</number>
                </property>
@@ -143,6 +149,395 @@
               </layout>
              </widget>
              <widget class="QWidget" name="accountsPage">
+              <layout class="QVBoxLayout" name="verticalLayout_13">
+               <item>
+                <layout class="QFormLayout" name="accountsFormLayout">
+                 <item row="0" column="0">
+                  <widget class="QLabel" name="serviceLabel">
+                   <property name="text">
+                    <string>Service:</string>
+                   </property>
+                   <property name="buddy">
+                    <cstring>serviceComboBox</cstring>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="1">
+                  <widget class="QComboBox" name="serviceComboBox"/>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <widget class="QGroupBox" name="anilistGroupBox">
+                 <property name="title">
+                  <string>AniList</string>
+                 </property>
+                 <layout class="QFormLayout" name="anilistFormLayout">
+                  <item row="0" column="0">
+                   <widget class="QLabel" name="anilistUsernameLabel">
+                    <property name="text">
+                     <string>Username:</string>
+                    </property>
+                    <property name="buddy">
+                     <cstring>anilistUsernameLineEdit</cstring>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="1">
+                   <widget class="QLineEdit" name="anilistUsernameLineEdit"/>
+                  </item>
+                  <item row="1" column="0">
+                   <widget class="QLabel" name="anilistTokenLabel">
+                    <property name="text">
+                     <string>Token:</string>
+                    </property>
+                    <property name="buddy">
+                     <cstring>anilistTokenLineEdit</cstring>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="1">
+                   <widget class="QLineEdit" name="anilistTokenLineEdit">
+                    <property name="echoMode">
+                     <enum>QLineEdit::Password</enum>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QGroupBox" name="kitsuGroupBox">
+                 <property name="title">
+                  <string>Kitsu</string>
+                 </property>
+                 <layout class="QFormLayout" name="kitsuFormLayout">
+                  <item row="0" column="0">
+                   <widget class="QLabel" name="kitsuEmailLabel">
+                    <property name="text">
+                     <string>Email:</string>
+                    </property>
+                    <property name="buddy">
+                     <cstring>kitsuEmailLineEdit</cstring>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="1">
+                   <widget class="QLineEdit" name="kitsuEmailLineEdit"/>
+                  </item>
+                  <item row="1" column="0">
+                   <widget class="QLabel" name="kitsuUsernameLabel">
+                    <property name="text">
+                     <string>Username:</string>
+                    </property>
+                    <property name="buddy">
+                     <cstring>kitsuUsernameLineEdit</cstring>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="1">
+                   <widget class="QLineEdit" name="kitsuUsernameLineEdit"/>
+                  </item>
+                  <item row="2" column="0">
+                   <widget class="QLabel" name="kitsuPasswordLabel">
+                    <property name="text">
+                     <string>Password:</string>
+                    </property>
+                    <property name="buddy">
+                     <cstring>kitsuPasswordLineEdit</cstring>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="1">
+                   <widget class="QLineEdit" name="kitsuPasswordLineEdit">
+                    <property name="echoMode">
+                     <enum>QLineEdit::Password</enum>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="3" column="0">
+                   <widget class="QLabel" name="kitsuAccessTokenLabel">
+                    <property name="text">
+                     <string>Access token:</string>
+                    </property>
+                    <property name="buddy">
+                     <cstring>kitsuAccessTokenLineEdit</cstring>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="3" column="1">
+                   <widget class="QLineEdit" name="kitsuAccessTokenLineEdit">
+                    <property name="echoMode">
+                     <enum>QLineEdit::Password</enum>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="4" column="0">
+                   <widget class="QLabel" name="kitsuRefreshTokenLabel">
+                    <property name="text">
+                     <string>Refresh token:</string>
+                    </property>
+                    <property name="buddy">
+                     <cstring>kitsuRefreshTokenLineEdit</cstring>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="4" column="1">
+                   <widget class="QLineEdit" name="kitsuRefreshTokenLineEdit">
+                    <property name="echoMode">
+                     <enum>QLineEdit::Password</enum>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QGroupBox" name="myanimelistGroupBox">
+                 <property name="title">
+                  <string>MyAnimeList</string>
+                 </property>
+                 <layout class="QFormLayout" name="myanimelistFormLayout">
+                  <item row="0" column="0">
+                   <widget class="QLabel" name="myanimelistUsernameLabel">
+                    <property name="text">
+                     <string>Username:</string>
+                    </property>
+                    <property name="buddy">
+                     <cstring>myanimelistUsernameLineEdit</cstring>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="1">
+                   <widget class="QLineEdit" name="myanimelistUsernameLineEdit"/>
+                  </item>
+                  <item row="1" column="0">
+                   <widget class="QLabel" name="myanimelistAccessTokenLabel">
+                    <property name="text">
+                     <string>Access token:</string>
+                    </property>
+                    <property name="buddy">
+                     <cstring>myanimelistAccessTokenLineEdit</cstring>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="1">
+                   <widget class="QLineEdit" name="myanimelistAccessTokenLineEdit">
+                    <property name="echoMode">
+                     <enum>QLineEdit::Password</enum>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="0">
+                   <widget class="QLabel" name="myanimelistRefreshTokenLabel">
+                    <property name="text">
+                     <string>Refresh token:</string>
+                    </property>
+                    <property name="buddy">
+                     <cstring>myanimelistRefreshTokenLineEdit</cstring>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="1">
+                   <widget class="QLineEdit" name="myanimelistRefreshTokenLineEdit">
+                    <property name="echoMode">
+                     <enum>QLineEdit::Password</enum>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="3" column="0" colspan="2">
+                   <widget class="QPushButton" name="myanimelistLoginButton">
+                    <property name="text">
+                     <string>Log in with MyAnimeList...</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="4" column="0" colspan="2">
+                   <widget class="QLabel" name="myanimelistLoginHintLabel">
+                    <property name="text">
+                     <string>Opens your browser. After signing in, paste the code MyAnimeList shows into the dialog.</string>
+                    </property>
+                    <property name="wordWrap">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="syncEnabledCheckBox">
+                 <property name="text">
+                  <string>Enable automatic synchronization</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="accountsVerticalSpacer">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+              </layout>
+             </widget>
+             <widget class="QWidget" name="advancedPage">
+              <layout class="QVBoxLayout" name="verticalLayout_14">
+               <item>
+                <widget class="QLabel" name="advancedLabel">
+                 <property name="text">
+                  <string>Advanced</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QTableWidget" name="advancedTable">
+                 <property name="alternatingRowColors">
+                  <bool>true</bool>
+                 </property>
+                 <property name="selectionBehavior">
+                  <enum>QAbstractItemView::SelectRows</enum>
+                 </property>
+                 <property name="selectionMode">
+                  <enum>QAbstractItemView::SingleSelection</enum>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="applicationPage">
+          <layout class="QVBoxLayout" name="verticalLayout_4">
+           <item>
+            <widget class="QGroupBox" name="interfaceGroupBox">
+             <property name="title">
+              <string>Interface</string>
+             </property>
+             <layout class="QFormLayout" name="interfaceFormLayout">
+              <item row="0" column="0">
+               <widget class="QLabel" name="styleLabel">
+                <property name="text">
+                 <string>Style:</string>
+                </property>
+                <property name="buddy">
+                 <cstring>styleComboBox</cstring>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QComboBox" name="styleComboBox"/>
+              </item>
+              <item row="1" column="1">
+               <widget class="QLabel" name="styleHintLabel">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="text">
+                 <string>Takes effect after restarting the application.</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="colorSchemeLabel">
+                <property name="text">
+                 <string>Color scheme:</string>
+                </property>
+                <property name="buddy">
+                 <cstring>colorSchemeComboBox</cstring>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QComboBox" name="colorSchemeComboBox"/>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="titlesGroupBox">
+             <property name="title">
+              <string>Titles</string>
+             </property>
+             <layout class="QFormLayout" name="titlesFormLayout">
+              <item row="0" column="0">
+               <widget class="QLabel" name="titleLanguageLabel">
+                <property name="text">
+                 <string>Title language:</string>
+                </property>
+                <property name="buddy">
+                 <cstring>titleLanguageComboBox</cstring>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QComboBox" name="titleLanguageComboBox"/>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <spacer name="applicationVerticalSpacer">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="libraryPage">
+          <layout class="QVBoxLayout" name="verticalLayout_5">
+           <item>
+            <widget class="QLabel" name="libraryFoldersLabel">
+             <property name="text">
+              <string>Anime folders:</string>
+             </property>
+             <property name="buddy">
+              <cstring>libraryFoldersList</cstring>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="libraryFoldersLayout">
+             <item alignment="Qt::AlignTop">
+              <widget class="QListWidget" name="libraryFoldersList">
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>200</height>
+                </size>
+               </widget>
+             </item>
+             <item>
+                <widget class="QLabel" name="label">
+                 <property name="text">
+                  <string>TODO</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignmentFlag::AlignCenter</set>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </layout>
+           </item>
+          </layout>
+         </widget>
               <layout class="QVBoxLayout" name="verticalLayout_13">
                <property name="spacing">
                 <number>12</number>

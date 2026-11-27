@@ -43,14 +43,12 @@ public:
   void apply() const override;
 
 private:
+  void loginToMyanimelist();
+  void refreshMyanimelistFields();
   void updateVisibleGroup();
 
-  void authorizeAnilist();
-  void authorizeMyanimelist();
+  bool myanimelistLoginPending_ = false;
 
-  QString promptAuthorizationCode(const QString& serviceName) const;
-  void watchAuthorization(sync::Service* service, QPushButton* button, QLabel* statusLabel,
-                          const std::function<std::string()>& onSuccess);
 };
 
 }  // namespace gui

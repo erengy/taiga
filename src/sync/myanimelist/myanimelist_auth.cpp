@@ -16,10 +16,12 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <QDesktopServices>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QNetworkRequest>
 #include <QRestReply>
+#include <QUrl>
 
 #include "base/string.hpp"
 #include "myanimelist.hpp"
@@ -34,6 +36,26 @@ bool Service::retryOnTokenExpiry(QRestReply& reply, const std::function<void()>&
   if (!isTokenExpired(reply)) return false;
   refreshAccessToken(retry);
   return true;
+}
+
+void Service::requestAuthorization() {
+  std::string codeVerifier;
+  const auto url = authorizationCodeUrl(codeVerifier);
+  codeVerifier_ = QString::fromStdString(codeVerifier);
+
+  if (!QDesktopServices::openUrl(QUrl{QString::fromStdString(url)})) {
+    emit errorOccurred("Could not open the MyAnimeList authorization page.");
+  }
+}
+
+void Service::authorize(const QString& authorizationCode) {
+  if (codeVerifier_.isEmpty()) {
+    emit errorOccurred("Authorization has not been started. Try again.");
+    emit authenticationCompleted(false);
+    return;
+  }
+
+  requestAccessToken(authorizationCode, codeVerifier_);
 }
 
 void Service::requestAccessToken(const QString& authorizationCode, const QString& codeVerifier) {

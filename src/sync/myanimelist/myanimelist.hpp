@@ -42,6 +42,8 @@ public:
   static Service* instance();
 
   void authenticateUser();
+  void requestAuthorization();
+  void authorize(const QString& authorizationCode);
   void requestAccessToken(const QString& authorizationCode, const QString& codeVerifier);
   void fetchAnime(const int id);
   void search(const SearchParams& params, const int offset = 0);
@@ -51,8 +53,11 @@ public:
   void updateListEntry(const int id, const anime::list::Fields dirty);
 
 private:
-  void refreshAccessToken(const std::function<void()>& onSuccess);
-  bool retryOnTokenExpiry(QRestReply& reply, const std::function<void()>& retry);
+  void refreshAccessToken(std::function<void()> onSuccess);
+  bool retryOnTokenExpiry(QRestReply& reply, std::function<void()> retry);
+
+  QString codeVerifier_;
+
 };
 
 }  // namespace sync::myanimelist
