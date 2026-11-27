@@ -21,7 +21,7 @@
 // @NOTE: Make sure to update the following files after changing the names of
 // macros defined here:
 //
-// - /setup/Taiga.nsi
+// - /setup/Taiga.iss
 // - /src/resources/taiga.rc
 
 // Relative path to avoid RC1015 error with version.rc
