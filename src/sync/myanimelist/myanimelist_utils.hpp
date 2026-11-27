@@ -44,5 +44,6 @@ std::optional<int> pagingOffset(const QJsonObject& paging, const QString& key);
 
 std::string animePageUrl(const int id);
 std::string authorizationCodeUrl(std::string& codeVerifier);
+QString authorizationCode(const QString& input);
 
 }  // namespace sync::myanimelist

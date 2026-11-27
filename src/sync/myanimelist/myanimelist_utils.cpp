@@ -20,6 +20,7 @@
 
 #include <QJsonObject>
 #include <QRandomGenerator>
+#include <QRegularExpression>
 #include <QUrl>
 #include <QUrlQuery>
 #include <algorithm>
@@ -130,6 +131,25 @@ std::string authorizationCodeUrl(std::string& codeVerifier) {
       {"code_challenge_method", "plain"},
   });
   return url.toString().toStdString();
+}
+
+QString authorizationCode(const QString& input) {
+  auto text = input.trimmed();
+
+  // The user can paste the code itself, the query string, or the whole address
+  // of the page that is shown after signing in.
+  if (text.contains(u'?')) {
+    text = text.section(u'?', 1);
+  }
+
+  if (text.startsWith(u"code="_s)) {
+    text = text.section(u"code="_s, 1).section(u'&', 0, 0);
+  }
+
+  // A code copied from a web page can arrive with line breaks in it.
+  text.remove(QRegularExpression{u"\\s"_s});
+
+  return QUrl::fromPercentEncoding(text.toUtf8());
 }
 
 }  // namespace sync::myanimelist
